@@ -1,0 +1,13 @@
+testing/local.py
+
+*~
+*.pyc
+*.swp
+.DS_Store
+
+*.sqlite3
+
+env
+
+.coverage
+htmlcov

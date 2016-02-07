@@ -1,0 +1,10 @@
+[run]
+source = .
+
+[report]
+omit =
+    env/*
+
+exclude_lines =
+    raise Exception
+    except ImportError:
