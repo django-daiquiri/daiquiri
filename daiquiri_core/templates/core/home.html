@@ -1,0 +1,44 @@
+{% extends 'core/base.html' %}
+{% load i18n compress staticfiles core_tags %}
+
+{% block content %}
+
+    <header>
+    
+    </header>
+
+    <div class="container page">
+        <div class="row">
+            <div class="col-md-9">
+
+            </div>
+
+            <div class="col-md-3">
+                <h3>{% trans 'Login' %}</h3>
+
+                <form method="post" action="/login/" class="">
+                    {% csrf_token %}
+
+                    <div class="form-group field-username">
+                        <label for="id_username" class="sr-only">{% trans 'Username' %}:</label>
+                        <input class="form-control" id="id_username" name="username" type="text" placeholder="{% trans 'Username' %}" />
+                    </div>
+                    <div class="form-group field-username">
+                        <label for="id_username" class="sr-only">{% trans 'Password' %}:</label>
+                        <input class="form-control" id="id_password" name="password" type="password" placeholder="{% trans 'Password' %}"/>
+                    </div>
+                    <input type="submit" name="login" value="{% trans 'Login' %}" class="btn btn-primary"/>
+                </form>
+
+                <p>
+                    {% internal_link _('Register for a new account') 'registration_register' %}
+                </p>
+
+                <p>
+                    {% internal_link _('Help, i forgot my password') 'password_reset' %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

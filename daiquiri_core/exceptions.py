@@ -1,0 +1,2 @@
+class DaiquiriException(Exception):
+    pass
