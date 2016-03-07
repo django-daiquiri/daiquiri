@@ -1,9 +1,11 @@
 from markdown import markdown as markdown_function
 
 from django import template
+from django.conf import settings
 from django.template.defaultfilters import stringfilter
 from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
+from django.utils.translation import ugettext_lazy as _
 
 from ..utils import get_internal_link
 
@@ -35,9 +37,9 @@ def admin_link(context):
 @register.simple_tag(takes_context=True)
 def login_link(context):
     if context.request.user.is_authenticated():
-        return get_internal_link('Logout', 'logout')
+        return '<a href=\"%s\">%s</a>' % (settings.LOGOUT_URL, _('Logout'))
     else:
-        return get_internal_link('Login', 'login')
+        return '<a href=\"%s\">%s</a>' % (settings.LOGIN_URL, _('Login'))
 
 
 @register.filter(name='next')

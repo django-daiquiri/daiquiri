@@ -1,19 +1,19 @@
 {% load staticfiles compress %}
-<title>{{ request.site.name }}</title>
+    <title>{{ request.site.name }}</title>
 
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
-<meta property="og:title" content="{{ request.site.name }}" />
-<meta property="og:url" content="{{ request.site.domain }}" />
+    <meta property="og:title" content="{{ request.site.name }}" />
+    <meta property="og:url" content="{{ request.site.domain }}" />
 
-<link rel="shortcut icon" href="{% static 'img/favicon.png' %}" type="image/png" />
+    <link rel="shortcut icon" href="{% static 'img/favicon.png' %}" type="image/png" />
 
-<link rel="stylesheet" href="{% static 'bootstrap/dist/css/bootstrap.min.css' %}" />
-{% compress css %}
-<link rel="stylesheet" type="text/x-scss" href="{% static 'css/fonts.scss' %}" />
-<link rel="stylesheet" type="text/x-scss" href="{% static 'css/style.scss' %}" />
-{% endcompress %}
+    <link rel="stylesheet" href="{% static 'bootstrap/dist/css/bootstrap.min.css' %}" />
+    {% compress css %}
+    <link rel="stylesheet" type="text/x-scss" href="{% static 'css/fonts.scss' %}" />
+    <link rel="stylesheet" type="text/x-scss" href="{% static 'css/style.scss' %}" />
+    {% endcompress %}
 
-<script type="text/javascript" src="{% static 'jquery/dist/jquery.min.js' %}" ></script>
-<script type="text/javascript" src="{% static 'bootstrap/dist/js/bootstrap.min.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'jquery/dist/jquery.min.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'bootstrap/dist/js/bootstrap.min.js' %}" ></script>

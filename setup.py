@@ -6,9 +6,7 @@ version = '0.0.0'
 github_url = 'https://github.com/aipescience/django-daiquiri/'
 
 install_requires = [
-    'Django==1.8',
-    'django-widget-tweaks==1.4.1',
-    'djangorestframework==3.3.2',
+
 ]
 
 setup(
