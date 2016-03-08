@@ -9,6 +9,10 @@ h1, h2, h3, h4 {
     color: $headline-color;
     line-height: 40px;
 }
+h2 {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
 h5, h6 {
     color: $headline-color;
     font-size: medium;

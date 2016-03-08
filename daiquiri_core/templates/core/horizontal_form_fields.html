@@ -8,9 +8,9 @@
 {% for field in form.visible_fields %}
     <div class="form-group{% if field.errors %} has-error{% endif %} field-{{field.html_name}}">
 
-        <label class="col-md-4 control-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        <label class="col-md-2 control-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
 
-        <div class="col-md-4">
+        <div class="col-md-6">
             {% with field|widget_type as type %}
             {% if type == 'radioselect' %}
 

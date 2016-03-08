@@ -2,6 +2,7 @@ from markdown import markdown as markdown_function
 
 from django import template
 from django.conf import settings
+from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.template.defaultfilters import stringfilter
 from django.utils.encoding import force_text
@@ -43,9 +44,9 @@ def login_link(context):
         return '<a href=\"%s\">%s</a>' % (settings.LOGIN_URL, _('Login'))
 
 
-@register.simple_tag()
-def horizontal_form(form):
-    return render_to_string('core/horizontal_form.html', {'form': form})
+@register.simple_tag(takes_context=True)
+def horizontal_form(context, form, submit_value):
+    return render_to_string('core/horizontal_form.html', {'form': form, 'submit_value': submit_value}, context_instance=context)
 
 
 @register.filter(name='next')
