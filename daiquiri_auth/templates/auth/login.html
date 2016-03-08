@@ -1,7 +1,8 @@
 {% extends 'core/page.html' %}
+{% load core_tags %}
 
 {% block page %}
 
-{{ form }}
+{% horizontal_form form %}
 
 {% endblock %}
