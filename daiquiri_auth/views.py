@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.core.urlresolvers import reverse, resolve
+from django.core.urlresolvers import reverse
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
@@ -8,7 +8,7 @@ from django.http import HttpResponseRedirect
 
 from daiquiri_core.utils import get_referer_url_name
 
-from .models import Profile, DetailKey
+from .models import DetailKey
 from .forms import LoginForm, UserForm, ProfileForm
 
 
@@ -28,7 +28,7 @@ def login(request):
                 else:
                     return HttpResponseRedirect('/')
 
-    return render(request, 'auth/login.html', {'form': form})
+    return render(request, 'auth/login_form.html', {'form': form})
 
 
 def logout(request):
