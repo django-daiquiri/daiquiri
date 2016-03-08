@@ -1,0 +1,20 @@
+{% extends 'core/page.html' %}
+{% load i18n %}
+
+{% block page %}
+
+<h2>{% trans "Update profile" %}</h2>
+
+<p>
+    {% trans "Please enter your updated account information." %}
+</p>
+
+<form method="post" action="" class="form-horizontal">
+    {% csrf_token %}
+    {% include 'core/horizontal_form_next.html' %}
+    {% include 'core/horizontal_form_fields.html' with form=user_form %}
+    {% include 'core/horizontal_form_fields.html' with form=profile_form %}
+    {% include 'core/horizontal_form_submit.html' with submit_value='Update profile' %}
+</form>
+
+{% endblock %}
