@@ -45,8 +45,15 @@ def login_link(context):
 
 
 @register.simple_tag(takes_context=True)
-def horizontal_form(context, form, submit_value):
-    return render_to_string('core/horizontal_form.html', {'form': form, 'submit_value': submit_value}, context_instance=context)
+def bootstrap_form(context, **kwargs):
+    form_context = {
+        'form': context['form']
+    }
+
+    if 'submit' in kwargs:
+        form_context['submit'] = kwargs['submit']
+
+    return render_to_string('core/bootstrap_form.html', form_context, context_instance=context)
 
 
 @register.filter(name='next')
