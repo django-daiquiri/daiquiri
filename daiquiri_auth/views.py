@@ -91,6 +91,10 @@ def profile_update(request):
     return render(request, 'auth/profile_update_form.html', {'user_form': user_form, 'profile_form': profile_form, 'next': next})
 
 
+def users(request):
+    return render(request, 'auth/users.html', {})
+
+
 class UserViewSet(mixins.UpdateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer

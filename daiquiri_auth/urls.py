@@ -3,7 +3,7 @@ from django.contrib.auth import views as auth_views
 
 from rest_framework import routers
 
-from .views import profile_update, UserViewSet
+from .views import *
 
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
@@ -35,5 +35,9 @@ urlpatterns = [
         'template_name': 'auth/password_reset_complete.html',
         }, name='password_reset_complete'),
 
+    # user management
+    url(r'^users/', users, name='users'),
+
+    # rest api
     url(r'^api/', include(router.urls)),
 ]

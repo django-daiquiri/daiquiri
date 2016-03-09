@@ -3,11 +3,11 @@
 
 <head>
     {% include 'core/base_head.html' %}
-    {% block head %}
+    {% block headextra %}
     {% endblock %}
 </head>
 
-<body>
+<body {% block bodyargs %}{% endblock %}>
 
 <!-- navigation -->
     {% include 'core/base_navigation.html' %}

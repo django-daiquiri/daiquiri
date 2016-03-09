@@ -1,15 +1,15 @@
 @font-face {
     font-family: "DroidSans";
-    src: url(static('fonts/DroidSans.ttf'));
+    src: url(static('core/fonts/DroidSans.ttf'));
 }
 @font-face {
     font-family: "DroidSans";
-    src: url(static('fonts/DroidSans-Bold.ttf'));
+    src: url(static('core/fonts/DroidSans-Bold.ttf'));
     font-weight: bold;
 }
 @font-face {
     font-family: "DroidSans-Mono";
-    src: url(static('fonts/DroidSansMono.ttf'));
+    src: url(static('core/fonts/DroidSansMono.ttf'));
 }
 
 body {

@@ -1,0 +1,44 @@
+{% extends 'core/page.html' %}
+{% load staticfiles %}
+{% load i18n %}
+{% load core_tags %}
+
+{% block bodyargs %}ng-app="users" ng-controller="UsersController"{% endblock %}
+
+{% block headextra %}
+
+    <script type="text/javascript" src="{% static 'angular/angular.min.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'auth/js/users.js' %}" ></script>
+
+{% endblock %}
+
+{% block headline %}
+
+    <h2>User management</h2>
+
+{% endblock %}
+
+{% block page %}
+
+    <daiquirilist />
+
+{% endblock %}
+
+{% block sidebar %}
+
+    <ul class="list-unstyled">
+        <li>1</li>
+        <li>2</li>
+        <li>3</li>
+        <li>4</li>
+        <li>5</li>
+    </ul>
+
+    <ul class="list-unstyled">
+        <li>6</li>
+        <li>7</li>
+        <li>8</li>
+        <li>9</li>
+    </ul>
+
+{% endblock %}
