@@ -1,4 +1,5 @@
 {% extends 'core/page.html' %}
+{% load i18n %}
 {% load core_tags %}
 
 {% block page %}
@@ -6,5 +7,9 @@
 <h2>Login</h2>
 
 {% bootstrap_form submit=_('Login') %}
+
+<p>
+    {% internal_link _('Help, I forgot my password!') 'password_reset' %}
+</p>
 
 {% endblock %}
