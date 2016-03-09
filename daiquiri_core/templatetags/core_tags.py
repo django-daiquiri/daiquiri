@@ -2,7 +2,7 @@ from markdown import markdown as markdown_function
 
 from django import template
 from django.conf import settings
-from django.template import RequestContext
+from django.core.urlresolvers import reverse
 from django.template.loader import render_to_string
 from django.template.defaultfilters import stringfilter
 from django.utils.encoding import force_text
@@ -46,9 +46,15 @@ def login_link(context):
 
 @register.simple_tag(takes_context=True)
 def bootstrap_form(context, **kwargs):
-    form_context = {
-        'form': context['form']
-    }
+    form_context = {}
+
+    if 'form' in kwargs:
+        form_context['form'] = kwargs['form']
+    else:
+        form_context['form'] = context['form']
+
+    if 'action_url_name' in kwargs:
+        form_context['action'] = reverse(kwargs['action_url_name'])
 
     if 'submit' in kwargs:
         form_context['submit'] = kwargs['submit']

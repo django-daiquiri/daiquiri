@@ -1,74 +1,84 @@
-{% extends 'core/base.html' %}
+{% extends 'core/page.html' %}
 {% load staticfiles %}
 {% load i18n %}
+{% load core_tags %}
 
-{% block content %}
+{% block headline %}
+    <h2>Daiquiri</h2>
+{% endblock %}
 
-    <div class="container">
+{% block page %}
+    <h3>A framework for the publication of scientific databases</h3>
 
-        <h2>Daiquiri</h2>
-        <h3>A framework for the publication of scientific databases</h3>
+    <div class="row">
+        <div class="col-md-4">
+            <img style="margin-top: 5px;" src="{% static 'img/daiquiri.jpg' %}" />
+        </div>
 
-        <div class="row">
-            <div class="col-md-4">
-                <img style="margin-top: 5px;" src="{% static 'img/daiquiri.jpg' %}" />
-            </div>
-
-            <div class="col-md-8"><a href=""></a>
-                <p>
-                    Today, the publication of research data plays an important role in astronomy
-                    and astrophysics. On the one hand, dedicated programs, such as surveys like
-                    <a href="http://www.sdss.org/">SDSS</a> and
-                    <a href="http://www.rave-survey.aip.de/rave/">RAVE</a>,
-                    data intensive instruments like <a href="http://www.lofar.org/">LOFAR</a>,
-                    or massive simulations
-                    like <a href="http://www.mpa-garching.mpg.de/millennium/">Millennium</a> and
-                    <a href="http://cas.sdss-mirror.de/dr7/en/">MultiDark</a>
-                    are initially planned to release their data
-                    for the community. On the other hand, for more traditionally oriented research
-                    projects data publication becomes a key requirement demanded by the funding
-                    agencies.
-                </p>
-                <p>
-                    The common approach is to publish this data via dedicated web sites. This
-                    includes rather simple HTML forms as well as complex query systems such as
-                    <a href="http://casjobs.sdss.org/CasJobs/">SDSS-CAS</a> or the
-                    <a href="http://www.rave-survey.aip.de/rave/pages/database/">RAVE database query interface</a>.
-                    Most of these web sites are
-                    tailor made for the particular case and are therefore not easily transferrable
-                    to future projects.
-                </p>
-                <p>
-                    At AIP, we gained experience with both the maintenance and the
-                    development of such applications. The
-                    <a href="http://www.rave-survey.aip.de/rave/pages/database/">RAVE</a>
-                    and <a href="http://www.multidark.org/MultiDark/">MultiDark</a>
-                    databases, the <a href="http://cas.sdss-mirror.de/dr7/en/">German SDSS mirror</a>,
-                    and several smaller web sites are written or at least maintained by us. It became, however,
-                    apparent that already the current plethora of applications constitutes a major challenge
-                    for maintenance expenses and scalability.
-                </p>
-                <p>
-                    In order to address these issues, we are developing a new web framework, which
-                    is particularly designed to allow for different highly customizable web applications
-                    based on a common easily maintainable code base. It is called <b>Daiquiri</b>. As a service
-                    to the community the software is open source. Download <a href="https://github.com/aipescience/django-daiquiri">
-                    Daiquiri</a> and this <a href="https://github.com/aipescience/django-daiquiri-app">Daiquiri application</a>
-                    as a template / starting point.
-                </p>
-            </div>
-            <div class="col-md-12">
-                <p>
-                    This page itself is already made using Daiquiri. You can explore the different features
-                    and perform queries on a simple dataset. In addition you find all the information
-                    needed to host your own Daiquiri application for <i>your</i> data.
-                </p>
-                <p><b>
-                    Download <a href="https://github.com/aipescience/django-daiquiri">
-                    Daiquiri</a> and <a href="https://github.com/jochenklar/django-daiquiri-app">Daiquiri-app</a> at github!</b>
-                </p>
-            </div>
+        <div class="col-md-8"><a href=""></a>
+            <p>
+                Today, the publication of research data plays an important role in astronomy
+                and astrophysics. On the one hand, dedicated programs, such as surveys like
+                <a href="http://www.sdss.org/">SDSS</a> and
+                <a href="http://www.rave-survey.aip.de/rave/">RAVE</a>,
+                data intensive instruments like <a href="http://www.lofar.org/">LOFAR</a>,
+                or massive simulations
+                like <a href="http://www.mpa-garching.mpg.de/millennium/">Millennium</a> and
+                <a href="http://cas.sdss-mirror.de/dr7/en/">MultiDark</a>
+                are initially planned to release their data
+                for the community. On the other hand, for more traditionally oriented research
+                projects data publication becomes a key requirement demanded by the funding
+                agencies.
+            </p>
+            <p>
+                The common approach is to publish this data via dedicated web sites. This
+                includes rather simple HTML forms as well as complex query systems such as
+                <a href="http://casjobs.sdss.org/CasJobs/">SDSS-CAS</a> or the
+                <a href="http://www.rave-survey.aip.de/rave/pages/database/">RAVE database query interface</a>.
+                Most of these web sites are
+                tailor made for the particular case and are therefore not easily transferrable
+                to future projects.
+            </p>
+            <p>
+                At AIP, we gained experience with both the maintenance and the
+                development of such applications. The
+                <a href="http://www.rave-survey.aip.de/rave/pages/database/">RAVE</a>
+                and <a href="http://www.multidark.org/MultiDark/">MultiDark</a>
+                databases, the <a href="http://cas.sdss-mirror.de/dr7/en/">German SDSS mirror</a>,
+                and several smaller web sites are written or at least maintained by us. It became, however,
+                apparent that already the current plethora of applications constitutes a major challenge
+                for maintenance expenses and scalability.
+            </p>
+            <p>
+                In order to address these issues, we are developing a new web framework, which
+                is particularly designed to allow for different highly customizable web applications
+                based on a common easily maintainable code base. It is called <b>Daiquiri</b>. As a service
+                to the community the software is open source. Download <a href="https://github.com/aipescience/django-daiquiri">
+                Daiquiri</a> and this <a href="https://github.com/aipescience/django-daiquiri-app">Daiquiri application</a>
+                as a template / starting point.
+            </p>
+        </div>
+        <div class="col-md-12">
+            <p>
+                This page itself is already made using Daiquiri. You can explore the different features
+                and perform queries on a simple dataset. In addition you find all the information
+                needed to host your own Daiquiri application for <i>your</i> data.
+            </p>
+            <p><b>
+                Download <a href="https://github.com/aipescience/django-daiquiri">
+                Daiquiri</a> and <a href="https://github.com/jochenklar/django-daiquiri-app">Daiquiri-app</a> at github!</b>
+            </p>
         </div>
     </div>
+
+{% endblock %}
+
+{% block sidebar %}
+
+{% if not user.is_authenticated %}
+    <h3>Login</h3>
+
+    {% bootstrap_form form=login_form submit=_('Login') action_url_name='login' %}
+{% endif %}
 
 {% endblock %}

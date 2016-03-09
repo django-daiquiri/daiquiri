@@ -8,6 +8,10 @@
 
 {% bootstrap_form submit=_('Login') %}
 
+{% if message %}
+    <p class="text-danger">{{ message }}</p>
+{% endif %}
+
 <p>
     {% internal_link _('Help, I forgot my password!') 'password_reset' %}
 </p>

@@ -5,6 +5,7 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
+from django.utils.translation import ugettext_lazy as _
 
 from daiquiri_core.utils import get_referer_url_name
 
@@ -27,6 +28,8 @@ def login(request):
                     return HttpResponseRedirect(request.POST.get('next'))
                 else:
                     return HttpResponseRedirect('/')
+            else:
+                return render(request, 'auth/login_form.html', {'form': form, 'message': _("Your login was not successful. Your username and password didn't match. Please try again.")})
 
     return render(request, 'auth/login_form.html', {'form': form})
 
