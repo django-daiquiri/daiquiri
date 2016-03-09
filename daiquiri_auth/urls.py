@@ -1,8 +1,15 @@
-from django.conf.urls import url
+from django.conf.urls import url, include
 from django.contrib.auth import views as auth_views
 
+from rest_framework import routers
+
+from .views import profile_update, UserViewSet
+
+router = routers.DefaultRouter()
+router.register(r'users', UserViewSet)
+
 urlpatterns = [
-    url(r'^update-profile/$', 'daiquiri_auth.views.profile_update', name='profile_update'),
+    url(r'^update-profile/$', profile_update, name='profile_update'),
 
     # change password
     url(r'^password/change/$', auth_views.password_change, {
@@ -27,4 +34,6 @@ urlpatterns = [
     url(r'^password/reset/complete/$', auth_views.password_reset_complete, {
         'template_name': 'auth/password_reset_complete.html',
         }, name='password_reset_complete'),
+
+    url(r'^api/', include(router.urls)),
 ]
