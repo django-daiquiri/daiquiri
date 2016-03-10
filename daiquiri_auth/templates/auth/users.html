@@ -1,7 +1,8 @@
-{% extends 'core/page.html' %}
+{% extends 'core/wide.html' %}
 {% load staticfiles %}
 {% load i18n %}
 {% load core_tags %}
+{% load ng_tags %}
 
 {% block bodyargs %}ng-app="users" ng-controller="UsersController"{% endblock %}
 
@@ -18,27 +19,68 @@
 
 {% endblock %}
 
-{% block page %}
+{% block wide %}
 
-    <daiquirilist />
+    {% verbatim %}
 
-{% endblock %}
+    <table class="table">
+        <thead>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Information</th>
+            <th></th>
+        </thead>
+        <tbody>
+            <tr ng-repeat="user in service.data.users">
+                <td>{{user.id}}</td>
+                <td>{{user.first_name}} {{user.last_name}}</td>
+                <td>{{user.username}}</td>
+                <td>{{user.email}}</td>
+                <td>
+                    <span ng-show="user.is_superuser">Admin</span>
+                </td>
+                <td style="white-space:nowrap;" class="text-right">
+                    <a href="" class="glyphicon glyphicon-eye-open" style="margin-right: 10px;" />
+                    <a href=""
+                       ng-click="service.showUpdateUser(user.id)"
+                       class="glyphicon glyphicon-pencil"
+                       style="margin-right: 10px;"/>
+                    <a href="" class="glyphicon glyphicon-remove" style="margin-right: 10px;"/>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 
-{% block sidebar %}
+    {% endverbatim %}
 
-    <ul class="list-unstyled">
-        <li>1</li>
-        <li>2</li>
-        <li>3</li>
-        <li>4</li>
-        <li>5</li>
-    </ul>
+    <div class="modal" id="update-user-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">    <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="update-user-modal-title">Update user</h4>
+                </div>
 
-    <ul class="list-unstyled">
-        <li>6</li>
-        <li>7</li>
-        <li>8</li>
-        <li>9</li>
-    </ul>
+                <div class="modal-body">
+                    {% ng_form_field 'text' _('First name') 'first_name' 'service.data.user.first_name' %}
+                    {% ng_form_field 'text' _('Last name') 'last_name' 'service.data.user.last_name' %}
+                    {% ng_form_field 'text' _('Email') 'email' 'service.data.user.email' %}
+                    {% ng_form_field 'checkbox' _('Active') 'is_active' 'service.data.user.is_active' %}
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                        {% trans 'Close' %}
+                    </button>
+                    <button type="button" class="btn btn-primary" ng-click="service.submitUpdateUser()">
+                        {% trans 'Update user' %}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 {% endblock %}

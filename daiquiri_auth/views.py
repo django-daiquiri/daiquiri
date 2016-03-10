@@ -6,7 +6,9 @@ from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils.translation import ugettext_lazy as _
+
 
 from rest_framework import viewsets, mixins
 
@@ -91,6 +93,7 @@ def profile_update(request):
     return render(request, 'auth/profile_update_form.html', {'user_form': user_form, 'profile_form': profile_form, 'next': next})
 
 
+@ensure_csrf_cookie
 def users(request):
     return render(request, 'auth/users.html', {})
 

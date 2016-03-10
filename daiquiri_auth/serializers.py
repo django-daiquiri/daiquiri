@@ -31,6 +31,7 @@ class UserSerializer(ModelSerializer):
             'id',
             'last_login',
             'is_superuser',
+            'username',
             'is_staff',
             'date_joined',
             'groups',
