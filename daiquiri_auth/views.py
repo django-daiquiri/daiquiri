@@ -3,20 +3,20 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
-from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
+from django.contrib.auth.decorators import permission_required
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils.translation import ugettext_lazy as _
 
-
 from rest_framework import viewsets, mixins
 
+from daiquiri_core.permissions import DaiquiriModelPermissions
 from daiquiri_core.utils import get_referer_url_name
 
-from .models import DetailKey
-from .serializers import UserSerializer
-from .paginations import UserPagination
+from .models import DetailKey, Profile
+from .serializers import ProfileSerializer
+from .paginations import ProfilePagination
 from .forms import LoginForm, UserForm, ProfileForm
 
 
@@ -94,11 +94,14 @@ def profile_update(request):
 
 
 @ensure_csrf_cookie
+@permission_required('view_profile')
 def users(request):
-    return render(request, 'auth/users.html', {})
+    return render(request, 'auth/users.html', {'detail_keys': DetailKey.objects.all()})
 
 
-class UserViewSet(mixins.UpdateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    pagination_class = UserPagination
+class ProfileViewSet(mixins.UpdateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+    permission_classes = (DaiquiriModelPermissions, )
+
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+    pagination_class = ProfilePagination

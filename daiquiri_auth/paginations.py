@@ -1,5 +1,5 @@
 from rest_framework.pagination import PageNumberPagination
 
 
-class UserPagination(PageNumberPagination):
+class ProfilePagination(PageNumberPagination):
     page_size = 10

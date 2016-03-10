@@ -11,14 +11,18 @@ from jsonfield import JSONField
 
 @python_2_unicode_compatible
 class Profile(models.Model):
+
     user = models.OneToOneField(User)
     details = JSONField(null=True, blank=True)
+    attributes = JSONField(null=True, blank=True)
 
     class Meta:
         ordering = ('user',)
 
         verbose_name = _('Profile')
         verbose_name_plural = _('Profiles')
+
+        permissions = (('view_profile', 'Can view Profile'),)
 
     def __str__(self):
         return self.user.username

@@ -1,19 +1,17 @@
 from django.contrib.auth.models import User
 
-from rest_framework.serializers import ModelSerializer, SerializerMethodField
+from rest_framework.serializers import ModelSerializer
+
+from daiquiri_core.serializers import JSONField
+
+from .models import Profile
 
 
 class UserSerializer(ModelSerializer):
 
-    details = SerializerMethodField('detail_serializer_method')
-
-    def detail_serializer_method(self, obj):
-        return obj.profile.details
-
     class Meta:
         model = User
         fields = (
-            'id',
             'last_login',
             'is_superuser',
             'username',
@@ -25,7 +23,6 @@ class UserSerializer(ModelSerializer):
             'date_joined',
             'groups',
             'user_permissions',
-            'details'
         )
         read_only_fields = (
             'id',
@@ -37,3 +34,26 @@ class UserSerializer(ModelSerializer):
             'groups',
             'user_permissions'
         )
+
+
+class ProfileSerializer(ModelSerializer):
+
+    user = UserSerializer()
+    details = JSONField(allow_null=True)
+    attributes = JSONField(allow_null=True, read_only=True)
+
+    class Meta:
+        model = Profile
+        fields = ('id', 'user', 'full_name', 'details', 'attributes')
+
+    def update(self, obj, validated_data):
+        user = validated_data.pop('user')
+
+        # update the user for this profile seperately
+        obj.user.first_name = user['first_name']
+        obj.user.last_name = user['last_name']
+        obj.user.email = user['email']
+        obj.user.is_active = user['is_active']
+        obj.user.save()
+
+        return super(ProfileSerializer, self).update(obj, validated_data)
