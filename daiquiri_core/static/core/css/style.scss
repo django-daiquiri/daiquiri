@@ -53,15 +53,16 @@ form {
 
 /* modals */
 .modal-body dl {
-    margin-bottom: 10px;
-}
-.modal-body dl:last-child {
+    margin-top: 5px;
     margin-bottom: 0;
+}
+.modal-body dl:first-child {
+    margin-top: 0;
 }
 .modal-seperator {
     margin-left: -15px;
     margin-right: -15px;
-    padding-top: 5px;
+    margin-top: 15px;
     margin-bottom: 15px;
     border-bottom: 1px solid #e5e5e5;
 }
