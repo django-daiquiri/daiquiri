@@ -80,13 +80,11 @@ app.factory('UsersService', ['$http', '$timeout', function($http, $timeout) {
     }
 
     function toggleUser() {
+        $('#toggle-user-modal').modal('hide');
         data.profile.user.is_active = !data.profile.user.is_active;
         $http.put('/auth/api/profiles/' + data.profile.id + '/', data.profile)
             .success(function(response) {
                 fetchProfiles();
-                $timeout(function() {
-                    $('#toggle-user-modal').modal('hide');
-                });
             })
             .error(function(response) {
                 console.log('error');

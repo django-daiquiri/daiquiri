@@ -28,22 +28,24 @@ def get_referer_url_name(request, default=None):
 
 def get_internal_link(text, name, *args, **kwargs):
 
-    if 'target' in kwargs:
-        target = kwargs['target']
-    else:
-        target = ''
-
     if 'ng_args' in kwargs:
-        ng_args = [ng_arg.strip() for ng_arg in kwargs['ng_args'].split(',')]
+        ng_args = [ng_arg.strip() for ng_arg in kwargs.pop('ng_args').split(',')]
+    else:
+        ng_args = None
 
     url = reverse(name, args=args)
 
     # replace escaped angular tags
-    if 'ng_args' in kwargs:
+    if ng_args:
         for ng_arg in ng_args:
             url = url.replace(ng_arg, '{$ ' + ng_arg + ' $}')
 
     if text is None:
         text = url
 
-    return "<a href=\"%s\" target=\"%s\">%s</a>" % (url, target, text)
+    # add an attribute for every kwarg
+    attributes = []
+    for key in kwargs:
+        attributes.append("%s=\"%s\"" % (key, kwargs[key]))
+
+    return "<a href=\"%s\" %s>%s</a>" % (url, ' '.join(attributes), text)

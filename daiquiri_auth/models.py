@@ -17,7 +17,7 @@ class Profile(models.Model):
     attributes = JSONField(null=True, blank=True)
 
     class Meta:
-        ordering = ('user',)
+        ordering = ('user__last_name', 'user__last_name', 'user__username')
 
         verbose_name = _('Profile')
         verbose_name_plural = _('Profiles')

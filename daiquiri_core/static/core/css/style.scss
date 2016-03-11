@@ -22,6 +22,9 @@ form {
     margin-top: 20px;
     margin-bottom: 20px;
 }
+a.glyphicon {
+    text-decoration: none;
+}
 
 /* navbar */
 
@@ -40,15 +43,6 @@ form {
 .page, .sidebar {
     height: 100%;
     margin-bottom: 60px;
-}
-
-/* tables */
-
-.table-options {
-    word-wrap: none;
-}
-.table-options > a {
-    margin-left: 10px;
 }
 
 /* modals */
@@ -79,4 +73,12 @@ form {
 }
 .list-search .table-list-count {
     line-height: 30px;
+}
+
+.list-table .list-table-options {
+    white-space: nowrap;
+}
+
+.list-table .list-table-options > a {
+    margin-left: 5px;
 }
