@@ -25,7 +25,6 @@
 
     <table class="table">
         <thead>
-            <th>Id</th>
             <th>Name</th>
             <th>Username</th>
             <th>Email</th>
@@ -34,7 +33,6 @@
         </thead>
         <tbody>
             <tr ng-repeat="profile in service.data.profiles">
-                <td>{$ profile.id $}</td>
                 <td>{$ profile.full_name $}</td>
                 <td>{$ profile.user.username $}</td>
                 <td>{$ profile.user.email $}</td>
