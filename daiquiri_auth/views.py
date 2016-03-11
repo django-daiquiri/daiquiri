@@ -94,7 +94,7 @@ def profile_update(request):
 
 
 @ensure_csrf_cookie
-@permission_required('view_profile')
+@permission_required('daiquiri_auth.view_profile')
 def users(request):
     return render(request, 'auth/users.html', {'detail_keys': DetailKey.objects.all()})
 
