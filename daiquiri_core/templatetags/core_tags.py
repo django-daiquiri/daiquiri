@@ -30,7 +30,7 @@ def internal_link(context, text, name, *args, **kwargs):
 
 @register.simple_tag(takes_context=True)
 def admin_link(context):
-    if not context.request.user.is_superuser:
+    if not context.request.user.is_staff:
         return ''
 
     return mark_safe(get_internal_link('Admin', 'admin:index'))

@@ -77,6 +77,10 @@
                         <span class="glyphicon glyphicon-remove-circle" ng-show="profile.user.is_active"></span>
                         <span class="glyphicon glyphicon-ok-circle" ng-hide="profile.user.is_active"></span>
                     </a>
+{% if user.is_staff %}
+                    {% internal_link '<strong>U</strong>' 'admin:auth_user_change' 'profile.id' ng_args='profile.id' target='_blank' %}
+                    {% internal_link '<strong>P</strong>' 'admin:daiquiri_auth_profile_change' 'profile.id' ng_args='profile.id' target='_blank' %}
+{% endif %}
                 </td>
             </tr>
         </tbody>
