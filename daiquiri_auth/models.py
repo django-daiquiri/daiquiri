@@ -35,6 +35,16 @@ class Profile(models.Model):
             return self.user.username
 
 
+def create_profile_for_user(sender, **kwargs):
+    user = kwargs['instance']
+    if kwargs['created'] and not kwargs.get('raw', False):
+        profile = Profile()
+        profile.user = user
+        profile.save()
+
+post_save.connect(create_profile_for_user, sender=User)
+
+
 @python_2_unicode_compatible
 class DetailKey(models.Model):
 
@@ -62,13 +72,3 @@ class DetailKey(models.Model):
 
         verbose_name = _('DetailKey')
         verbose_name_plural = _('DetailKeys')
-
-
-def create_profile_for_user(sender, **kwargs):
-    user = kwargs['instance']
-    if kwargs['created']:
-        profile = Profile()
-        profile.user = user
-        profile.save()
-
-post_save.connect(create_profile_for_user, sender=User)
