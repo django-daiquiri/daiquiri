@@ -10,14 +10,23 @@ app.config(['$httpProvider', '$interpolateProvider', function($httpProvider, $in
 app.factory('UsersService', ['$http', '$timeout', function($http, $timeout) {
 
     var data = {
+        count: null,
         profiles: [],
         profile: {},
-        errors: {}
+        errors: {},
+        search: null
     };
 
     function fetchProfiles() {
-        $http.get('/auth/api/profiles/')
+        var url = '/auth/api/profiles/';
+
+        if (data.search) {
+            url += '?search=' + data.search;
+        }
+
+        $http.get(url)
             .success(function(response) {
+                data.count = response.count
                 data.profiles = response.results;
             })
             .error(function() {
@@ -85,10 +94,16 @@ app.factory('UsersService', ['$http', '$timeout', function($http, $timeout) {
             });
     }
 
-    fetchProfiles();
+    function init() {
+        data.search = null;
+        fetchProfiles();
+    }
 
     return {
         data: data,
+        init: init,
+        fetchProfiles: fetchProfiles,
+        fetchProfile: fetchProfiles,
         showUserModal: showUserModal,
         updateUserModal: updateUserModal,
         updateUser: updateUser,
@@ -100,5 +115,6 @@ app.factory('UsersService', ['$http', '$timeout', function($http, $timeout) {
 app.controller('UsersController', ['$scope', 'UsersService', function($scope, UsersService) {
 
     $scope.service = UsersService;
+    $scope.service.init();
 
 }]);

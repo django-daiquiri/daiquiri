@@ -66,3 +66,17 @@ form {
     margin-bottom: 15px;
     border-bottom: 1px solid #e5e5e5;
 }
+
+/* angular list */
+
+.list-search > div {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+.list-search .pagination {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+.list-search .table-list-count {
+    line-height: 30px;
+}

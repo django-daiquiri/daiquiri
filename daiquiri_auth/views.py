@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import permission_required
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils.translation import ugettext_lazy as _
 
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets, mixins, filters
 
 from daiquiri_core.permissions import DaiquiriModelPermissions
 from daiquiri_core.utils import get_referer_url_name
@@ -105,3 +105,7 @@ class ProfileViewSet(mixins.UpdateModelMixin, mixins.ListModelMixin, mixins.Retr
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
     pagination_class = ProfilePagination
+
+    filter_backends = (filters.SearchFilter, filters.OrderingFilter)
+    ordering_fields = ('user__username', 'user__email', 'user__first_name', 'user__last_name')
+    search_fields = ('user__username', 'user__email', 'user__first_name', 'user__last_name')

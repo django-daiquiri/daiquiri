@@ -23,6 +23,32 @@
 
 {# User table #}
 
+    <div class="row list-search">
+        <form class="search-form col-sm-6 list-search-form" ng-submit="service.fetchProfiles()">
+            <div class="input-group">
+                <input class="form-control"
+                       id="table-pager-search-input"
+                       placeholder="{% trans 'Search entries' %}"
+                       type="text" ng-model="service.data.search">
+                <a href="" class="input-group-addon" ng-click="service.fetchProfiles()">
+                    <span class="glyphicon glyphicon-search"></span>
+                </a>
+            </div>
+        </form>
+
+        <div class="col-sm-2 list-search-reset">
+            <ul class="pagination">
+                <li>
+                    <a href="" ng-click="service.init()">{% trans 'Reset' %}</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="col-sm-4 list-search-count text-right">
+            {$ service.data.count $} {% trans 'Entries found' %}
+        </div>
+    </div>
+
     <table class="table">
         <thead>
             <th>Name</th>
