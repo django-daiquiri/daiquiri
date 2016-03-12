@@ -20,19 +20,14 @@ class UserSerializer(ModelSerializer):
             'email',
             'is_staff',
             'is_active',
-            'date_joined',
-            'groups',
-            'user_permissions',
+            'date_joined'
         )
         read_only_fields = (
-            'id',
             'last_login',
             'is_superuser',
             'username',
             'is_staff',
-            'date_joined',
-            'groups',
-            'user_permissions'
+            'date_joined'
         )
 
 
@@ -44,7 +39,7 @@ class ProfileSerializer(ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('id', 'user', 'full_name', 'details', 'attributes')
+        fields = ('id', 'user', 'details', 'attributes')
 
     def update(self, obj, validated_data):
         user = validated_data.pop('user')

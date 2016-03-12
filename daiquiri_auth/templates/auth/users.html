@@ -153,6 +153,18 @@
                         <dd>{$ detail_value $}</dd>
                     </dl>
 
+                    <div class="modal-seperator"></div>
+
+                    <dl>
+                        <dt>{% trans 'Date joined' %}</dt>
+                        <dd>{$ service.data.row.user.date_joined $}</dd>
+                    </dl>
+                    <dl>
+                        <dt>{% trans 'Last login' %}</dt>
+                        <dd ng-show="service.data.row.user.last_login">{$ service.data.row.user.last_login $}</dd>
+                        <dd ng-hide="service.data.row.user.last_login">{% trans 'Never' %}</dd>
+                    </dl>
+
                 </div>
 
                 <div class="modal-footer">
