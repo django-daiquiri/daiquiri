@@ -9,6 +9,7 @@
 {% block headextra %}
 
     <script type="text/javascript" src="{% static 'angular/angular.min.js' %}" ></script>
+    <script type='text/javascript' src="{% static 'ngInfiniteScroll/build/ng-infinite-scroll.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'auth/js/users.js' %}" ></script>
 
 {% endblock %}
@@ -24,13 +25,13 @@
 {# User table #}
 
     <div class="row list-search">
-        <form class="search-form col-sm-6 list-search-form" ng-submit="service.fetchProfiles()">
+        <form class="search-form col-sm-6 list-search-form" ng-submit="service.search()">
             <div class="input-group">
                 <input class="form-control"
                        id="table-pager-search-input"
                        placeholder="{% trans 'Search entries' %}"
                        type="text" ng-model="service.data.search">
-                <a href="" class="input-group-addon" ng-click="service.fetchProfiles()">
+                <a href="" class="input-group-addon" ng-click="service.search()">
                     <span class="glyphicon glyphicon-search"></span>
                 </a>
             </div>
@@ -49,7 +50,7 @@
         </div>
     </div>
 
-    <table class="table list-table">
+    <table class="table list-table" infinite-scroll="service.scroll()" infinite-scroll-distance="0.2">
         <thead>
             <th style="width: 30%;">Name (Username)</th>
             <th style="width: 30%;">Email</th>

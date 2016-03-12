@@ -1,4 +1,4 @@
-var app = angular.module('users', []);
+var app = angular.module('users', ['infinite-scroll']);
 
 app.config(['$httpProvider', '$interpolateProvider', function($httpProvider, $interpolateProvider) {
     $interpolateProvider.startSymbol('{$');
@@ -7,27 +7,30 @@ app.config(['$httpProvider', '$interpolateProvider', function($httpProvider, $in
     $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
 }]);
 
+// throttle/debounce the frequency of infinite-scroll events
+angular.module('infinite-scroll').value('THROTTLE_MILLISECONDS', 100)
+
 app.factory('UsersService', ['$http', '$timeout', function($http, $timeout) {
 
+    // the url under which the profiles api is located
+    var resourceUrl = '/auth/api/profiles/';
+
     var data = {
+        url: null,
+        next: null,
         count: null,
+        search: null,
         profiles: [],
         profile: {},
         errors: {},
-        search: null
     };
 
     function fetchProfiles() {
-        var url = '/auth/api/profiles/';
-
-        if (data.search) {
-            url += '?search=' + data.search;
-        }
-
-        $http.get(url)
+        $http.get(data.url)
             .success(function(response) {
-                data.count = response.count
-                data.profiles = response.results;
+                data.count = response.count;
+                data.next = response.next;
+                data.profiles = data.profiles.concat(response.results);
             })
             .error(function() {
                 console.log('error');
@@ -42,6 +45,40 @@ app.factory('UsersService', ['$http', '$timeout', function($http, $timeout) {
             .error(function() {
                 console.log('error');
             });
+    }
+
+    function init() {
+        // reset the url
+        data.url = resourceUrl;
+
+        // reset data
+        data.search = null;
+        data.profiles = [];
+
+        // fetch the first set of profiles
+        fetchProfiles();
+    }
+
+    function search() {
+        // reset the url and add the search string
+        data.url = resourceUrl + '?search=' + data.search;
+
+        // reset data
+        data.profiles = [];
+
+        // fetch the profiles with the search parameter
+        fetchProfiles();
+    }
+
+    function scroll() {
+        if (data.next) {
+            // set the url to next and invalidate next so this code will not be triggered again
+            data.url = data.next;
+            data.next = null;
+
+            // fetch the profiles with the next url
+            fetchProfiles();
+        }
     }
 
     function showUserModal(user_id) {
@@ -92,16 +129,11 @@ app.factory('UsersService', ['$http', '$timeout', function($http, $timeout) {
             });
     }
 
-    function init() {
-        data.search = null;
-        fetchProfiles();
-    }
-
     return {
         data: data,
         init: init,
-        fetchProfiles: fetchProfiles,
-        fetchProfile: fetchProfiles,
+        search: search,
+        scroll: scroll,
         showUserModal: showUserModal,
         updateUserModal: updateUserModal,
         updateUser: updateUser,
