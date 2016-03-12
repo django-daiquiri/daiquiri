@@ -8,7 +8,7 @@ app.config(['$httpProvider', '$interpolateProvider', function($httpProvider, $in
 }]);
 
 // throttle/debounce the frequency of infinite-scroll events
-angular.module('infinite-scroll').value('THROTTLE_MILLISECONDS', 100)
+angular.module('infinite-scroll').value('THROTTLE_MILLISECONDS', 100);
 
 app.factory('UsersService', ['$http', '$timeout', function($http, $timeout) {
 
@@ -20,8 +20,8 @@ app.factory('UsersService', ['$http', '$timeout', function($http, $timeout) {
         next: null,
         count: null,
         search: null,
-        profiles: [],
-        profile: {},
+        rows: [],
+        row: null,
         errors: {},
     };
 
@@ -30,20 +30,7 @@ app.factory('UsersService', ['$http', '$timeout', function($http, $timeout) {
             .success(function(response) {
                 data.count = response.count;
                 data.next = response.next;
-                data.profiles = data.profiles.concat(response.results);
-            })
-            .error(function() {
-                console.log('error');
-            });
-    }
-
-    function fetchProfile(user_id) {
-        $http.get('/auth/api/profiles/' + user_id)
-            .success(function(response) {
-                data.profile = response;
-            })
-            .error(function() {
-                console.log('error');
+                data.rows = data.rows.concat(response.results);
             });
     }
 
@@ -53,7 +40,7 @@ app.factory('UsersService', ['$http', '$timeout', function($http, $timeout) {
 
         // reset data
         data.search = null;
-        data.profiles = [];
+        data.rows = [];
 
         // fetch the first set of profiles
         fetchProfiles();
@@ -64,7 +51,7 @@ app.factory('UsersService', ['$http', '$timeout', function($http, $timeout) {
         data.url = resourceUrl + '?search=' + data.search;
 
         // reset data
-        data.profiles = [];
+        data.rows = [];
 
         // fetch the profiles with the search parameter
         fetchProfiles();
@@ -81,51 +68,34 @@ app.factory('UsersService', ['$http', '$timeout', function($http, $timeout) {
         }
     }
 
-    function showUserModal(user_id) {
-        fetchProfile(user_id);
-        $timeout(function() {
-            $('#show-user-modal').modal('show');
-        });
-    }
+    function modal(modal_id, index) {
+        data.index = index;
+        data.row = angular.copy(data.rows[index]);
 
-    function updateUserModal(user_id) {
-        fetchProfile(user_id);
         $timeout(function() {
-            $('#update-user-modal').modal('show');
+            $('#' + modal_id).modal('show');
         });
     }
 
     function updateUser() {
-        $http.put('/auth/api/profiles/' + data.profile.id + '/', data.profile)
+        $http.put(resourceUrl + data.row.id + '/', data.row)
             .success(function(response) {
-                fetchProfiles();
-                $timeout(function() {
-                    $('#update-user-modal').modal('hide');
-                });
-            })
-            .error(function(response) {
-                console.log('error');
-                console.log(response);
+                // copy the data back to the rows array and close the modal
+                data.rows[data.index] = angular.copy(data.row);
+                $('#update-user-modal').modal('hide');
             });
-    }
-
-    function toggleUserModal(user_id) {
-        fetchProfile(user_id);
-        $timeout(function() {
-            $('#toggle-user-modal').modal('show');
-        });
     }
 
     function toggleUser() {
         $('#toggle-user-modal').modal('hide');
-        data.profile.user.is_active = !data.profile.user.is_active;
-        $http.put('/auth/api/profiles/' + data.profile.id + '/', data.profile)
+
+        // toggle the is_active flag of the user
+        data.row.user.is_active = !data.row.user.is_active;
+
+        $http.put(resourceUrl + data.row.id + '/', data.row)
             .success(function(response) {
-                fetchProfiles();
-            })
-            .error(function(response) {
-                console.log('error');
-                console.log(response);
+                // copy the data back to the rows array and close the modal
+                data.rows[data.index] = angular.copy(data.row);
             });
     }
 
@@ -134,10 +104,8 @@ app.factory('UsersService', ['$http', '$timeout', function($http, $timeout) {
         init: init,
         search: search,
         scroll: scroll,
-        showUserModal: showUserModal,
-        updateUserModal: updateUserModal,
+        modal: modal,
         updateUser: updateUser,
-        toggleUserModal: toggleUserModal,
         toggleUser: toggleUser
     };
 }]);

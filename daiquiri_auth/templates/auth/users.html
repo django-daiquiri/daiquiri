@@ -58,35 +58,40 @@
             <th style="width: 20%;"></th>
         </thead>
         <tbody>
-            <tr ng-repeat="profile in service.data.profiles">
+            <tr ng-repeat="row in service.data.rows">
                 <td>
-                    <a href="" ng-click="service.showUserModal(profile.id)">{$ profile.full_name $} ({$ profile.user.username $})</a>
+                    <a href="" ng-click="service.modal('show-user-modal', $index)">
+                        {$ row.user.first_name $} {$ row.user.last_name $}
+                    </a>
+                    <em>{$ row.user.username $}</em>
                 </td>
                 <td>
-                    <a href="mailto:{$ profile.full_name $} <{$ profile.user.email $}>">{$ profile.user.email $}</a>
+                    <a href="mailto:{$ row.user.first_name $} {$ row.user.last_name $} <{$ row.user.email $}>">
+                        {$ row.user.email $}
+                    </a>
                 </td>
                 <td>
-                    <span ng-show="profile.user.is_superuser">Admin</span>
-                    <span ng-hide="profile.user.is_active">Disabled</span>
+                    <span ng-show="row.user.is_superuser">Admin</span>
+                    <span ng-hide="row.user.is_active">Disabled</span>
                 </td>
                 <td class="text-right list-table-options">
                     <a href="" class="glyphicon glyphicon-eye-open" title="{% trans 'Show user details' %}"
-                       ng-click="service.showUserModal(profile.id)">
+                       ng-click="service.modal('show-user-modal', $index)">
                     </a>
                     <a href="" class="glyphicon glyphicon-pencil" title="{% trans 'Update user' %}"
-                       ng-click="service.updateUserModal(profile.id)">
+                       ng-click="service.modal('update-user-modal', $index)">
                     </a>
                     <a href="" class="glyphicon glyphicon-remove-circle" title="{% trans 'Disable user' %}"
-                       ng-click="service.toggleUserModal(profile.id)"
-                       ng-show="profile.user.is_active">
+                       ng-click="service.modal('toggle-user-modal', $index)"
+                       ng-show="row.user.is_active">
                     </a>
                     <a href="" class="glyphicon glyphicon-ok-circle" title="{% trans 'Re-enable user' %}"
-                       ng-click="service.toggleUserModal(profile.id)"
-                       ng-hide="profile.user.is_active">
+                       ng-click="service.modal('toggle-user-modal', $index)"
+                       ng-hide="row.user.is_active">
                     </a>
 {% if user.is_staff %}
-                    {% internal_link '<strong>U</strong>' 'admin:auth_user_change' 'profile.id' ng_args='profile.id' target='_blank' title=_('Show user in admin interface') %}
-                    {% internal_link '<strong>P</strong>' 'admin:daiquiri_auth_profile_change' 'profile.id' ng_args='profile.id' target='_blank' title=_('Show profile in admin interface') %}
+                    {% internal_link '<strong>U</strong>' 'admin:auth_user_change' 'row.id' ng_args='row.id' target='_blank' title=_('Show user in admin interface') %}
+                    {% internal_link '<strong>P</strong>' 'admin:daiquiri_auth_profile_change' 'row.id' ng_args='row.id' target='_blank' title=_('Show profile in admin interface') %}
 {% endif %}
                 </td>
             </tr>
@@ -103,29 +108,31 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="{% trans 'Close' %}">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                    <h4 class="modal-title" id="update-user-modal-title">{$ service.data.profile.full_name $}</h4>
+                    <h4 class="modal-title" id="update-user-modal-title">
+                        {$ service.data.row.user.first_name $} {$ service.data.row.user.last_name $}
+                    </h4>
                 </div>
 
                 <div class="modal-body">
 
                     <dl>
                         <dt>{% trans 'Username' %}</dt>
-                        <dd>{$ service.data.profile.user.username $}</dd>
+                        <dd>{$ service.data.row.user.username $}</dd>
                     </dl>
                     <dl>
                         <dt>{% trans 'Email' %}</dt>
-                        <dd>{$ service.data.profile.user.email $}</dd>
+                        <dd>{$ service.data.row.user.email $}</dd>
                     </dl>
 
                     <div class="modal-seperator"></div>
 
                     <dl>
                         <dt>{% trans 'First name' %}</dt>
-                        <dd>{$ service.data.profile.user.first_name $}</dd>
+                        <dd>{$ service.data.row.user.first_name $}</dd>
                     </dl>
                     <dl>
                         <dt>{% trans 'Last name' %}</dt>
-                        <dd>{$ service.data.profile.user.last_name $}</dd>
+                        <dd>{$ service.data.row.user.last_name $}</dd>
                     </dl>
 
                     <div class="modal-seperator"></div>
@@ -134,14 +141,14 @@
 
                     <dl>
                         <dt>{{ detail_key.label }}</dt>
-                        <dd>{$ service.data.profile.details['{{ detail_key.key }}'] $}</dd>
+                        <dd>{$ service.data.row.details['{{ detail_key.key }}'] $}</dd>
                     </dl>
 
 {% endfor %}
 
-                    <div ng-show="service.data.profile.attributes" class="modal-seperator"></div>
+                    <div ng-show="service.data.row.attributes" class="modal-seperator"></div>
 
-                    <dl ng-repeat="(detail_key, detail_value) in service.data.profile.attributes">
+                    <dl ng-repeat="(detail_key, detail_value) in service.data.row.attributes">
                         <dt>{$ detail_key $}</dt>
                         <dd>{$ detail_value $}</dd>
                     </dl>
@@ -170,13 +177,13 @@
                 </div>
 
                 <div class="modal-body">
-                    {% ng_form_field 'text' _('First name') 'first_name' 'service.data.profile.user.first_name' %}
-                    {% ng_form_field 'text' _('Last name') 'last_name' 'service.data.profile.user.last_name' %}
-                    {% ng_form_field 'text' _('Email') 'email' 'service.data.profile.user.email' %}
+                    {% ng_form_field 'text' _('First name') 'first_name' 'service.data.row.user.first_name' %}
+                    {% ng_form_field 'text' _('Last name') 'last_name' 'service.data.row.user.last_name' %}
+                    {% ng_form_field 'text' _('Email') 'email' 'service.data.row.user.email' %}
 
 {% for detail_key in detail_keys %}
 
-                    {% with 'service.data.profile.details.'|add:detail_key.key as ng_model %}
+                    {% with 'service.data.row.details.'|add:detail_key.key as ng_model %}
                     {% ng_form_field detail_key.data_type detail_key.label detail_key.key ng_model %}
                     {% endwith %}
 
@@ -206,8 +213,8 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                     <h4 class="modal-title" id="toggle-user-modal-title">
-                        <span ng-show="service.data.profile.user.is_active">{% trans 'Disable user' %}</span>
-                        <span ng-hide="service.data.profile.user.is_active">{% trans 'Re-enable user' %}</span>
+                        <span ng-show="service.data.row.user.is_active">{% trans 'Disable user' %}</span>
+                        <span ng-hide="service.data.row.user.is_active">{% trans 'Re-enable user' %}</span>
                     </h4>
                 </div>
 
@@ -216,8 +223,8 @@
                         {% trans 'Close' %}
                     </button>
                     <button type="button" class="btn btn-primary" ng-click="service.toggleUser()">
-                        <span ng-show="service.data.profile.user.is_active">{% trans 'Disable user' %}</span>
-                        <span ng-hide="service.data.profile.user.is_active">{% trans 'Re-enable user' %}</span>
+                        <span ng-show="service.data.row.user.is_active">{% trans 'Disable user' %}</span>
+                        <span ng-hide="service.data.row.user.is_active">{% trans 'Re-enable user' %}</span>
                     </button>
                 </div>
             </div>
