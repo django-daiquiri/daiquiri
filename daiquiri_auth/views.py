@@ -54,7 +54,7 @@ def profile_update(request):
     if request.method == 'POST':
         if 'cancel' in request.POST:
             next = request.POST.get('next')
-            if next == 'profile_update':
+            if next in ('profile_update', None):
                 return HttpResponseRedirect(reverse('home'))
             else:
                 return HttpResponseRedirect(reverse(next))
@@ -75,7 +75,7 @@ def profile_update(request):
             request.user.profile.save()
 
             next = request.POST.get('next')
-            if next == 'profile_update':
+            if next in ('profile_update', None):
                 return HttpResponseRedirect(reverse('home'))
             else:
                 return HttpResponseRedirect(reverse(next))
