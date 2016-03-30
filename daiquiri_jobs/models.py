@@ -67,3 +67,14 @@ class Job(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+    def get_phase_str(self):
+        return dict(self.PHASE_CHOICES)[self.phase]
+
+    @property
+    def error(self):
+        return None
+
+    @property
+    def quote(self):
+        return ''
