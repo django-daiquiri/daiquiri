@@ -3,12 +3,9 @@ from __future__ import unicode_literals
 import uuid
 
 from django.db import models
-from django.db.models.signals import post_save
 from django.contrib.auth.models import User
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
-
-from jsonfield import JSONField
 
 
 @python_2_unicode_compatible
@@ -71,10 +68,13 @@ class Job(models.Model):
     def get_phase_str(self):
         return dict(self.PHASE_CHOICES)[self.phase]
 
+    def get_job_type_str(self):
+        return dict(self.JOB_TYPE_CHOICES)[self.job_type]
+
     @property
     def error(self):
         return None
 
     @property
     def quote(self):
-        return ''
+        return None

@@ -27,22 +27,22 @@ class JobsViewSet(viewsets.ModelViewSet):
     @detail_route(methods=['get'])
     def executionduration(self, request, pk):
         job = get_object_or_404(Job, pk=pk)
-        return HttpResponse(job.execution_duration)
+        return HttpResponse(job.execution_duration if job.execution_duration else '')
 
     @detail_route(methods=['get'])
     def destruction(self, request, pk):
         job = get_object_or_404(Job, pk=pk)
-        return HttpResponse(job.destruction_time)
+        return HttpResponse(job.destruction_time if job.destruction_time else '')
 
     @detail_route(methods=['get'])
     def error(self, request, pk):
         job = get_object_or_404(Job, pk=pk)
-        return HttpResponse(job.error)
+        return HttpResponse(job.error if job.error else '')
 
     @detail_route(methods=['get'])
     def quote(self, request, pk):
         job = get_object_or_404(Job, pk=pk)
-        return HttpResponse(job.quote)
+        return HttpResponse(job.destruction_time if job.destruction_time else '')
 
     @detail_route(methods=['get'])
     def owner(self, request, pk):
