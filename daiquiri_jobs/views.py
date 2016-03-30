@@ -1,3 +1,11 @@
-from django.shortcuts import render
+from rest_framework import viewsets
 
-# Create your views here.
+from .models import Job
+from .serializers import JobSerializer
+from .paginations import JobPagination
+
+
+class JobsViewSet(viewsets.ModelViewSet):
+    queryset = Job.objects.all()
+    serializer_class = JobSerializer
+    pagination_class = JobPagination
