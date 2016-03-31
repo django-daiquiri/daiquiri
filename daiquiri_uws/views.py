@@ -1,3 +1,4 @@
+from django.core.urlresolvers import reverse
 from django.db import IntegrityError
 from django.http import HttpResponse
 
@@ -22,7 +23,8 @@ class UWSViewSet(ReadOnlyModelViewSet):
     filter_backends = (UWSFilterBackend, )
 
     def get_success_url(self):
-        raise NotImplementedError('.get_success_url() must be implemented')
+        url_name = self.detail_url_name
+        return reverse(self.detail_url_name, kwargs=self.kwargs)
 
     def get_serializer_class(self):
         if self.action == 'list':

@@ -70,7 +70,7 @@ class Job(models.Model):
         permissions = (('view_job', 'Can view Job'),)
 
     def __str__(self):
-        return "id=%s; phase=%s" % (str(self.id), self.phase)
+        return "id=%s; phase=%s; job_type=%s" % (str(self.id), self.phase, self.job_type)
 
     @property
     def error(self):

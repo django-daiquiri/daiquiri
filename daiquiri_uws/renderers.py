@@ -3,6 +3,7 @@ from django.utils.six.moves import StringIO
 from django.utils.encoding import smart_text
 
 from rest_framework.renderers import BaseRenderer
+from rest_framework.reverse import reverse
 
 
 class UWSRenderer(BaseRenderer):
@@ -26,14 +27,14 @@ class UWSRenderer(BaseRenderer):
         xml.startDocument()
 
         if isinstance(data, (list, tuple)):
-            self._render_list(data, xml)
+            self._render_list(data, xml, renderer_context)
         elif isinstance(data, dict):
-            self._render_retrieve(data, xml)
+            self._render_detail(data, xml, renderer_context)
 
         xml.endDocument()
         return stream.getvalue()
 
-    def _render_list(self, data, xml):
+    def _render_list(self, data, xml, renderer_context):
         xml.startElement('uws:jobs', {
             'xmlns:uws': self.ns_uws,
             'xmlns:xlink': self.ns_xlink,
@@ -41,9 +42,12 @@ class UWSRenderer(BaseRenderer):
         })
 
         for item in data:
+            url_name = renderer_context['view'].detail_url_name
+            href = reverse(url_name, args=[item['id']], request=renderer_context['request'])
+
             xml.startElement('uws:jobref', {
                 'id': item['id'],
-                'xlink:href': item['href'],
+                'xlink:href': href,
                 'xlink:type': 'simple'
             })
 
@@ -55,7 +59,7 @@ class UWSRenderer(BaseRenderer):
 
         xml.endElement('uws:jobs')
 
-    def _render_retrieve(self, data, xml):
+    def _render_detail(self, data, xml, renderer_context):
         xml.startElement('uws:job', {
             'xmlns:uws': self.ns_uws,
             'xmlns:xsi': self.ns_xsi,
