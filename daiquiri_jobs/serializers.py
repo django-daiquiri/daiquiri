@@ -16,9 +16,7 @@ class JobsSerializer(serializers.ModelSerializer):
         fields = ('id', 'phase', 'href')
 
     def get_href(self, obj):
-        current_site = Site.objects.get_current()
-
-        href = current_site.domain + reverse('uws:job-detail', args=[obj.id])
+        href = Site.objects.get_current().domain + reverse('uws:job-detail', args=[obj.id])
 
         if settings.HTTPS:
             return 'https://' + href
@@ -45,6 +43,3 @@ class JobSerializer(serializers.ModelSerializer):
             'execution_duration',
             'destruction'
         )
-
-    def get_quote(self, obj):
-        return None
