@@ -1,5 +1,7 @@
-from django.http import HttpResponse
+from django.core.urlresolvers import reverse
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404
+
 
 from rest_framework import viewsets
 from rest_framework.decorators import detail_route
@@ -8,11 +10,13 @@ from rest_framework.parsers import FormParser, JSONParser
 
 from .models import Job
 from .serializers import JobsSerializer, JobSerializer
-from .renderers import UWSRenderer
-from .parsers import UWSParser
+from .utils import UWSRenderer, UWSParser, UWSException
 
 
 class JobsViewSet(viewsets.ModelViewSet):
+    PHASE_RUN = 'RUN'
+    PHASE_ABORT = 'ABORT'
+
     queryset = Job.objects.all()
     renderer_classes = (BrowsableAPIRenderer, JSONRenderer, UWSRenderer)
     parser_classes = (FormParser, JSONParser, UWSParser)
@@ -23,10 +27,33 @@ class JobsViewSet(viewsets.ModelViewSet):
         else:
             return JobSerializer
 
-    @detail_route(methods=['get'])
+    def _redirect_to_job_303(self, job):
+        url = reverse('uws:job-detail', args=[job.id])
+        return HttpResponseRedirect(url, status=303)
+
+    @detail_route(methods=['get', 'post'])
     def phase(self, request, pk):
         job = get_object_or_404(Job, pk=pk)
-        return HttpResponse(job.get_phase_str())
+
+        if request.method == 'POST':
+            phase = request.POST.get('PHASE')
+
+            if phase == self.PHASE_RUN:
+                try:
+                    job.run()
+                    return self._redirect_to_job_303(job)
+                except UWSException:
+                    pass
+            elif phase == self.PHASE_ABORT:
+                try:
+                    job.abort()
+                    return self._redirect_to_job_303(job)
+                except UWSException:
+                    pass
+
+            return HttpResponseBadRequest()
+        else:
+            return HttpResponse(job.get_phase_str())
 
     @detail_route(methods=['get'])
     def executionduration(self, request, pk):

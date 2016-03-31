@@ -7,6 +7,8 @@ from django.contrib.auth.models import User
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
+from .utils import UWSException
+
 
 @python_2_unicode_compatible
 class Job(models.Model):
@@ -49,7 +51,7 @@ class Job(models.Model):
 
     start_time = models.DateTimeField(blank=True, null=True)
     end_time = models.DateTimeField(blank=True, null=True)
-    execution_duration = models.PositiveIntegerField(blank=True, null=True)
+    execution_duration = models.PositiveIntegerField(blank=True, default=0)
     destruction_time = models.DateTimeField(blank=True, null=True)
 
     job_type = models.PositiveSmallIntegerField(choices=JOB_TYPE_CHOICES)
@@ -78,3 +80,17 @@ class Job(models.Model):
     @property
     def quote(self):
         return None
+
+    def run(self):
+        if self.phase == self.PHASE_PENDING:
+            self.phase = self.PHASE_QUEUED
+            self.save()
+        else:
+            raise UWSException('Job is not in PENDING phase.')
+
+    def abort(self):
+        if self.phase in (self.PHASE_PENDING, self.PHASE_QUEUED, self.PHASE_EXECUTING):
+            self.phase = self.PHASE_ABORTED
+            self.save()
+        else:
+            raise UWSException('Job is not in PENDING, QUEUED or EXECUTING phase.')
