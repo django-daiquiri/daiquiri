@@ -5,10 +5,11 @@ from django.utils.encoding import smart_text
 from rest_framework.renderers import BaseRenderer
 
 
-class JobRenderer(BaseRenderer):
+class UWSRenderer(BaseRenderer):
 
     media_type = 'application/xml'
     charset = 'utf-8'
+    format = 'uws'
 
     ns_uws = 'http://www.ivoa.net/xml/UWS/v1.0'
     ns_xlink = 'http://www.w3.org/1999/xlink'
@@ -48,8 +49,8 @@ class JobRenderer(BaseRenderer):
 
             xml.startElement('uws:phase', {})
             xml.characters(smart_text(item['phase']))
-
             xml.endElement('uws:phase')
+
             xml.endElement('uws:jobref')
 
         xml.endElement('uws:jobs')
