@@ -3,11 +3,6 @@ from django.utils.six.moves import StringIO
 from django.utils.encoding import smart_text
 
 from rest_framework.renderers import BaseRenderer
-from rest_framework.parsers import BaseParser
-
-
-class UWSException(Exception):
-    pass
 
 
 class UWSRenderer(BaseRenderer):
@@ -84,9 +79,3 @@ class UWSRenderer(BaseRenderer):
     def _to_camel_case(self, snake_str):
         components = snake_str.split('_')
         return components[0] + "".join(x.title() for x in components[1:])
-
-
-class UWSParser(BaseParser):
-    media_type = 'application/xml'
-    charset = 'utf-8'
-    format = 'uws'

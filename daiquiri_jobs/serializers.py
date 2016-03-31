@@ -10,7 +10,6 @@ from .models import Job
 class JobsSerializer(serializers.ModelSerializer):
 
     href = serializers.SerializerMethodField()
-    phase = serializers.SerializerMethodField()
 
     class Meta:
         model = Job
@@ -26,15 +25,11 @@ class JobsSerializer(serializers.ModelSerializer):
         else:
             return 'http://' + href
 
-    def get_phase(self, obj):
-        return obj.get_phase_str()
-
 
 class JobSerializer(serializers.ModelSerializer):
 
     job_id = serializers.UUIDField(source='id')
     owner_id = serializers.UUIDField(source='owner.username')
-    phase = serializers.SerializerMethodField()
     quote = serializers.SerializerMethodField()
     destruction = serializers.DateTimeField(source='destruction_time')
 
@@ -50,9 +45,6 @@ class JobSerializer(serializers.ModelSerializer):
             'execution_duration',
             'destruction'
         )
-
-    def get_phase(self, obj):
-        return obj.get_phase_str()
 
     def get_quote(self, obj):
         return None
