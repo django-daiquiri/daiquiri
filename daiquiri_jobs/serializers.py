@@ -26,5 +26,7 @@ class JobSerializer(serializers.ModelSerializer):
             'start_time',
             'end_time',
             'execution_duration',
-            'destruction'
+            'destruction',
+            'results',
+            'parameters'
         )

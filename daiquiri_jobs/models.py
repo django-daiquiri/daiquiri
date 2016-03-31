@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
-from .utils import UWSException
+from daiquiri_uws.exceptions import UWSException
 
 
 @python_2_unicode_compatible
@@ -79,6 +79,21 @@ class Job(models.Model):
     @property
     def quote(self):
         return None
+
+    @property
+    def results(self):
+        return {
+            'csv': {
+                'url': '/query/download/stream/table/test/format/csv',
+                'type': 'simple'
+            }
+        }
+
+    @property
+    def parameters(self):
+        return {
+            'query': 'SELECT x,y FROM a.b;'
+        }
 
     def run(self):
         if self.phase == self.PHASE_PENDING:

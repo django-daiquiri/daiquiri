@@ -68,15 +68,42 @@ class UWSRenderer(BaseRenderer):
         })
 
         for key in data:
-            tag = 'uws:' + self._to_camel_case(key)
+            if key == 'results':
+                xml.startElement('uws:results', {})
 
-            if data[key] is None:
-                xml.startElement(tag, {'xsi:nil': 'true'})
-                xml.endElement(tag)
+                for result_id in data[key]:
+                    result = data[key][result_id]
+                    href = renderer_context['request'].build_absolute_uri(result['url'])
+
+                    xml.startElement('uws:result', {
+                        'id': result_id,
+                        'xlink:href': href,
+                        'xlink:type': result['type']
+                    })
+                    xml.endElement('uws:result')
+
+                xml.endElement('uws:results')
+            elif key == 'parameters':
+                xml.startElement('uws:parameters', {})
+
+                for parameter_id in data[key]:
+                    xml.startElement('uws:parameter', {
+                        'id': parameter_id
+                    })
+                    xml.characters(smart_text(data[key][parameter_id]))
+                    xml.endElement('uws:parameter')
+
+                xml.endElement('uws:parameters')
             else:
-                xml.startElement(tag, {})
-                xml.characters(smart_text(data[key]))
-                xml.endElement(tag)
+                tag = 'uws:' + self._to_camel_case(key)
+
+                if data[key] is None:
+                    xml.startElement(tag, {'xsi:nil': 'true'})
+                    xml.endElement(tag)
+                else:
+                    xml.startElement(tag, {})
+                    xml.characters(smart_text(data[key]))
+                    xml.endElement(tag)
 
         xml.endElement('uws:job')
 
