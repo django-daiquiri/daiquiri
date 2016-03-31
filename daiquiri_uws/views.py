@@ -23,7 +23,6 @@ class UWSViewSet(ReadOnlyModelViewSet):
     filter_backends = (UWSFilterBackend, )
 
     def get_success_url(self):
-        url_name = self.detail_url_name
         return reverse(self.detail_url_name, kwargs=self.kwargs)
 
     def get_serializer_class(self):

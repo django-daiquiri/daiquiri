@@ -19,9 +19,6 @@ from django.test import TestCase
         '''
         # IMPLEMENTED
 
-
-        # TODO: 2.2.1.2. Blocking Behaviour
-
         '''
         GET /{jobs} returns the job list as <uws:jobs> xml element.
         '''
@@ -154,3 +151,5 @@ from django.test import TestCase
         appropriate identifier.
         '''
         # IMPLEMENTED
+
+        # TODO: 2.2.1.2. Blocking Behaviour
