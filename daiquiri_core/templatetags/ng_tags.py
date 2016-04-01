@@ -6,7 +6,6 @@ register = template.Library()
 
 @register.simple_tag()
 def ng_form_field(field_type, label, field, ng_model):
-    print field_type
 
     if field_type == 'text':
         return render_to_string('core/ng_form_field_text.html', {

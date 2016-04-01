@@ -1,0 +1,98 @@
+[
+  {
+    "pk": 1,
+    "model": "auth.user",
+    "fields": {
+      "is_staff": true,
+      "date_joined": "2016-01-01T00:00:00.000Z",
+      "last_login": "2016-01-01T00:00:00.000Z",
+      "last_name": "Albert",
+      "username": "admin",
+      "user_permissions": [],
+      "password": "pbkdf2_sha256$20000$9SxVIwPbpKUD$iFkxSzLjt9AOtmAhf9SJqPWKwoQrJSCst08bBKfoJ2A=",
+      "is_active": true,
+      "first_name": "Albert",
+      "groups": [],
+      "email": "admin@example.com",
+      "is_superuser": true
+    }
+  },
+  {
+    "model": "daiquiri_auth.profile",
+    "fields": {
+      "details": {
+        "text": "text",
+        "textarea": "textarea"
+      },
+      "attributes": {
+        "test": "test"
+      },
+      "user": 1
+    },
+    "pk": 1
+  },
+  {
+    "pk": 2,
+    "model": "auth.user",
+    "fields": {
+      "is_staff": false,
+      "date_joined": "2016-01-01T00:00:00.000Z",
+      "last_login": "2016-01-01T00:00:00.000Z",
+      "last_name": "Manni",
+      "username": "manager",
+      "user_permissions": [],
+      "password": "pbkdf2_sha256$24000$GQHNSJcKA9ul$8P5X2yrGpqXe74FcuSTrxSloH0Bzb1mWm+R8luxEMKo=",
+      "is_active": true,
+      "first_name": "Manager",
+      "groups": [],
+      "email": "manager@example.com",
+      "is_superuser": false
+    }
+  },
+  {
+    "model": "daiquiri_auth.profile",
+    "fields": {
+      "details": {
+        "text": "text",
+        "textarea": "textarea"
+      },
+      "attributes": {
+        "test": "test"
+      },
+      "user": 2
+    },
+    "pk": 2
+  },
+  {
+    "pk": 3,
+    "model": "auth.user",
+    "fields": {
+      "is_staff": false,
+      "date_joined": "2016-01-01T00:00:00.000Z",
+      "last_login": "2016-01-01T00:00:00.000Z",
+      "last_name": "Ulf",
+      "username": "user",
+      "user_permissions": [],
+      "password": "pbkdf2_sha256$24000$xEOpi7bPJrLe$QAafR+uJgvUHUog8He4Nzt+bnSlvF1dZrGX0Gav1y70=",
+      "is_active": true,
+      "first_name": "User",
+      "groups": [],
+      "email": "user@example.com",
+      "is_superuser": false
+    }
+  },
+  {
+    "model": "daiquiri_auth.profile",
+    "fields": {
+      "details": {
+        "text": "text",
+        "textarea": "textarea"
+      },
+      "attributes": {
+        "test": "test"
+      },
+      "user": 3
+    },
+    "pk": 3
+  }
+]
