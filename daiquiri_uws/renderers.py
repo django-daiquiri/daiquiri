@@ -29,7 +29,7 @@ class UWSRenderer(BaseRenderer):
         if isinstance(data, (list, tuple)):
             self._render_list(data, xml, renderer_context)
         elif isinstance(data, dict):
-            self._render_detail(data, xml, renderer_context)
+            self._render_dict(data, xml, renderer_context)
 
         xml.endDocument()
         return stream.getvalue()
@@ -59,17 +59,24 @@ class UWSRenderer(BaseRenderer):
 
         xml.endElement('uws:jobs')
 
-    def _render_detail(self, data, xml, renderer_context):
-        xml.startElement('uws:job', {
+    def _render_dict(self, data, xml, renderer_context):
+
+        root_attributes = {
             'xmlns:uws': self.ns_uws,
             'xmlns:xsi': self.ns_xsi,
             'xmlns:xlink': self.ns_xlink,
             'version': self.version
-        })
+        }
+
+        if len(data) > 1:
+            xml.startElement('uws:job', root_attributes)
 
         for key in data:
             if key == 'results':
-                xml.startElement('uws:results', {})
+                if len(data) > 1:
+                    xml.startElement('uws:results', {})
+                else:
+                    xml.startElement('uws:results', root_attributes)
 
                 for result_id in data[key]:
                     result = data[key][result_id]
@@ -84,7 +91,10 @@ class UWSRenderer(BaseRenderer):
 
                 xml.endElement('uws:results')
             elif key == 'parameters':
-                xml.startElement('uws:parameters', {})
+                if len(data) > 1:
+                    xml.startElement('uws:parameters', {})
+                else:
+                    xml.startElement('uws:parameters', root_attributes)
 
                 for parameter_id in data[key]:
                     xml.startElement('uws:parameter', {
@@ -105,7 +115,8 @@ class UWSRenderer(BaseRenderer):
                     xml.characters(smart_text(data[key]))
                     xml.endElement(tag)
 
-        xml.endElement('uws:job')
+        if len(data) > 1:
+            xml.endElement('uws:job')
 
     def _to_camel_case(self, snake_str):
         components = snake_str.split('_')

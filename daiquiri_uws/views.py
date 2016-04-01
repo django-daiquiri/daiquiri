@@ -5,6 +5,7 @@ from django.http import HttpResponse
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.decorators import detail_route
 from rest_framework.parsers import FormParser
+from rest_framework.response import Response
 
 import iso8601
 
@@ -39,10 +40,21 @@ class UWSViewSet(ReadOnlyModelViewSet):
         except UWSException as e:
             return UWSBadRequest(e)
 
+    @detail_route(methods=['get'])
+    def results(self, request, pk):
+        return Response({
+            'results': self.get_object().results
+        })
+
+    @detail_route(methods=['get'])
+    def parameters(self, request, pk):
+        return Response({
+            'parameters': self.get_object().parameters
+        })
+
     @detail_route(methods=['get', 'post'])
     def destruction(self, request, pk):
         obj = self.get_object()
-
         if request.method == 'POST':
             try:
                 obj.destruction_time = iso8601.parse_date(request.POST.get('DESTRUCTION'))
