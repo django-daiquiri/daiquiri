@@ -48,7 +48,7 @@ class Job(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
-    owner = models.ForeignKey(User)
+    owner = models.ForeignKey(User, null=True)
 
     run_id = models.CharField(max_length=256, blank=True)
 
