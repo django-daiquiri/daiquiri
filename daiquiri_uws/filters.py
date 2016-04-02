@@ -2,16 +2,21 @@ from rest_framework.filters import BaseFilterBackend
 
 import iso8601
 
+from .settings import PHASE_ARCHIVED
+
 
 class UWSFilterBackend(BaseFilterBackend):
 
     def filter_queryset(self, request, queryset, view):
 
         # apply only for list
-        if view.kwargs.get('pk') is None:
+        if view.action == 'list':
             phases = request.GET.getlist('PHASE')
+
             if phases:
                 queryset = queryset.filter(phase__in=phases)
+            else:
+                queryset = queryset.exclude(phase__exact=PHASE_ARCHIVED)
 
             after = request.GET.get('AFTER')
             if after:

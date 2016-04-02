@@ -1,10 +1,10 @@
 from django.conf.urls import url, include
 
-from rest_framework import routers
+from daiquiri_uws.routers import UWSRouter
 
 from .views import *
 
-router = routers.DefaultRouter(trailing_slash=False)
+router = UWSRouter(trailing_slash=False)
 router.register(r'jobs', JobsViewSet)
 router.register(r'query', QueryJobsViewSet, base_name='query')
 

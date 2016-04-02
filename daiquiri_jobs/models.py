@@ -8,26 +8,12 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 from daiquiri_uws.exceptions import UWSException
+from daiquiri_uws.settings import *
 
 
 @python_2_unicode_compatible
 class Job(models.Model):
 
-    PHASE_PENDING = 'PENDING'
-    PHASE_QUEUED = 'QUEUED'
-    PHASE_EXECUTING = 'EXECUTING'
-    PHASE_COMPLETED = 'COMPLETED'
-    PHASE_ERROR = 'ERROR'
-    PHASE_ABORTED = 'ABORTED'
-    PHASE_UNKNOWN = 'UNKNOWN'
-    PHASE_HELD = 'HELD'
-    PHASE_SUSPENDED = 'SUSPENDED'
-    PHASE_ARCHIVED = 'ARCHIVED'
-    PHASE_ACTIVE = (
-        PHASE_PENDING,
-        PHASE_QUEUED,
-        PHASE_EXECUTING
-    )
     PHASE_CHOICES = (
         (PHASE_PENDING, 'Pending'),
         (PHASE_QUEUED, 'Queued'),
@@ -48,7 +34,7 @@ class Job(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
-    owner = models.ForeignKey(User, null=True)
+    owner = models.ForeignKey(User, blank=True, null=True)
 
     run_id = models.CharField(max_length=256, blank=True)
 
@@ -96,22 +82,22 @@ class Job(models.Model):
         }
 
     def run(self):
-        if self.phase == self.PHASE_PENDING:
-            self.phase = self.PHASE_QUEUED
+        if self.phase == PHASE_PENDING:
+            self.phase = PHASE_QUEUED
             self.save()
         else:
             raise UWSException('Job is not in PENDING phase')
 
     def abort(self):
-        if self.phase in self.PHASE_ACTIVE:
-            self.phase = self.PHASE_ABORTED
+        if self.phase in PHASE_ACTIVE:
+            self.phase = PHASE_ABORTED
             self.save()
         else:
             raise UWSException('Job is not in PENDING, QUEUED or EXECUTING phase')
 
     def archive(self):
-        if self.phase != self.PHASE_ARCHIVED:
-            self.phase = self.PHASE_ARCHIVED
+        if self.phase != PHASE_ARCHIVED:
+            self.phase = PHASE_ARCHIVED
             self.save()
         else:
             raise UWSException('Job is already in ARCHIVED phase')

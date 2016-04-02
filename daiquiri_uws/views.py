@@ -3,7 +3,6 @@ from django.db import IntegrityError
 from django.http import HttpResponse
 
 from rest_framework.viewsets import ReadOnlyModelViewSet
-from rest_framework.decorators import detail_route
 from rest_framework.parsers import FormParser
 from rest_framework.response import Response
 
@@ -13,24 +12,61 @@ from .renderers import UWSRenderer
 from .filters import UWSFilterBackend
 from .utils import UWSSuccessRedirect, UWSBadRequest
 from .exceptions import UWSException
+from .settings import PHASE_RUN, PHASE_ABORT, PHASE_PENDING
 
 
 class UWSViewSet(ReadOnlyModelViewSet):
-    PHASE_RUN = 'RUN'
-    PHASE_ABORT = 'ABORT'
 
     renderer_classes = (UWSRenderer, )
     parser_classes = (FormParser, )
     filter_backends = (UWSFilterBackend, )
 
-    def get_success_url(self):
-        return reverse(self.detail_url_name, kwargs=self.kwargs)
+    job_type = None
+
+    def get_success_url(self, pk=None):
+        if pk:
+            kwargs = {'pk': pk}
+        else:
+            kwargs = self.kwargs
+
+        return reverse(self.detail_url_name, kwargs=kwargs)
 
     def get_serializer_class(self):
         if self.action == 'list':
             return self.list_serializer_class
         else:
             return self.detail_serializer_class
+
+    def create(self, request, *args, **kwargs):
+        if not self.job_type:
+            return UWSBadRequest('job creation is forbidden on this ressource')
+
+        if request.user.is_authenticated():
+            owner = request.user
+            print owner
+        else:
+            owner = None
+
+        obj = self.get_queryset().model(
+            owner=owner,
+            phase=PHASE_PENDING,
+            job_type=self.job_type
+        )
+        obj.save()
+
+        if request.GET.get('PHASE') == PHASE_RUN:
+            try:
+                obj.run()
+            except UWSException as e:
+                return UWSBadRequest(e)
+        return UWSSuccessRedirect(self.get_success_url(obj.pk))
+
+    def update(self, request, *args, **kwargs):
+        if request.POST.get('ACTION') == 'DELETE':
+            return self.destroy(self, request)
+        else:
+            # TODO: update parameters
+            return UWSSuccessRedirect(self.get_success_url())
 
     def destroy(self, request, *args, **kwargs):
         obj = self.get_object()
@@ -40,86 +76,80 @@ class UWSViewSet(ReadOnlyModelViewSet):
         except UWSException as e:
             return UWSBadRequest(e)
 
-    @detail_route(methods=['get'])
-    def results(self, request, pk):
+    def get_results(self, request, pk):
         return Response({
             'results': self.get_object().results
         })
 
-    @detail_route(methods=['get'])
-    def parameters(self, request, pk):
+    def get_parameters(self, request, pk):
         return Response({
             'parameters': self.get_object().parameters
         })
 
-    @detail_route(methods=['get', 'post'])
-    def destruction(self, request, pk):
+    def get_destruction(self, request, pk):
         obj = self.get_object()
-        if request.method == 'POST':
+        if obj.destruction_time:
+            return HttpResponse(obj.destruction_time)
+        else:
+            return HttpResponse()
+
+    def post_destruction(self, request, pk):
+        obj = self.get_object()
+        try:
+            obj.destruction_time = iso8601.parse_date(request.POST.get('DESTRUCTION'))
+            obj.save()
+            return UWSSuccessRedirect(self.get_success_url(), status=303)
+        except (TypeError, IntegrityError, ValueError) as e:
+            return UWSBadRequest(e)
+
+    def get_executionduration(self, request, pk):
+        obj = self.get_object()
+        if obj.execution_duration:
+            return HttpResponse(obj.execution_duration)
+        else:
+            return HttpResponse()
+
+    def post_executionduration(self, request, pk):
+        obj = self.get_object()
+        try:
+            obj.execution_duration = request.POST.get('EXECUTIONDURATION')
+            obj.save()
+            return UWSSuccessRedirect(self.get_success_url(), status=303)
+        except (IntegrityError, ValueError) as e:
+            return UWSBadRequest(e)
+
+    def get_phase(self, request, pk):
+        obj = self.get_object()
+        return HttpResponse(obj.phase)
+
+    def post_phase(self, request, pk):
+        obj = self.get_object()
+
+        phase = request.POST.get('PHASE')
+
+        if phase == PHASE_RUN:
             try:
-                obj.destruction_time = iso8601.parse_date(request.POST.get('DESTRUCTION'))
-                obj.save()
+                obj.run()
                 return UWSSuccessRedirect(self.get_success_url(), status=303)
-            except (TypeError, IntegrityError, ValueError) as e:
+            except UWSException as e:
+                return UWSBadRequest(e)
+        elif phase == PHASE_ABORT:
+            try:
+                obj.abort()
+                return UWSSuccessRedirect(self.get_success_url(), status=303)
+            except UWSException as e:
                 return UWSBadRequest(e)
         else:
-            if obj.destruction_time:
-                return HttpResponse(obj.destruction_time)
-            else:
-                return HttpResponse()
+            return UWSBadRequest('unsupported value for PHASE')
 
-    @detail_route(methods=['get', 'post'])
-    def executionduration(self, request, pk):
-        obj = self.get_object()
-
-        if request.method == 'POST':
-            try:
-                obj.execution_duration = request.POST.get('EXECUTIONDURATION')
-                obj.save()
-                return UWSSuccessRedirect(self.get_success_url(), status=303)
-            except (IntegrityError, ValueError) as e:
-                return UWSBadRequest(e)
-        else:
-            if obj.execution_duration:
-                return HttpResponse(obj.execution_duration)
-            else:
-                return HttpResponse()
-
-    @detail_route(methods=['get', 'post'])
-    def phase(self, request, pk):
-        obj = self.get_object()
-
-        if request.method == 'POST':
-            phase = request.POST.get('PHASE')
-
-            if phase == self.PHASE_RUN:
-                try:
-                    obj.run()
-                    return UWSSuccessRedirect(self.get_success_url(), status=303)
-                except UWSException as e:
-                    return UWSBadRequest(e)
-            elif phase == self.PHASE_ABORT:
-                try:
-                    obj.abort()
-                    return UWSSuccessRedirect(self.get_success_url(), status=303)
-                except UWSException as e:
-                    return UWSBadRequest(e)
-            else:
-                return UWSBadRequest('unsupported value for PHASE')
-        else:
-            return HttpResponse(obj.phase)
-
-    @detail_route(methods=['get'])
-    def error(self, request, pk):
+    def get_error(self, request, pk):
         obj = self.get_object()
         return HttpResponse(obj.error) if obj.error else HttpResponse()
 
-    @detail_route(methods=['get'])
-    def quote(self, request, pk):
+    def get_quote(self, request, pk):
         obj = self.get_object()
         return HttpResponse(obj.quote) if obj.quote else HttpResponse()
 
-    @detail_route(methods=['get'])
-    def owner(self, request, pk):
+    def get_owner(self, request, pk):
         obj = self.get_object()
         return HttpResponse(obj.owner)

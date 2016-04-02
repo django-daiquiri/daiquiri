@@ -12,12 +12,13 @@ class UWSTestCase(TestCase):
     uws_ns = '{http://www.ivoa.net/xml/UWS/v1.0}'
 
     def setUp(self):
-        self.pending_job = Job.objects.filter(phase=Job.PHASE_PENDING).first()
-        self.error_job = Job.objects.filter(phase=Job.PHASE_ERROR).first()
+        self.pending_job = Job.objects.filter(phase='PENDING').first()
+        self.error_job = Job.objects.filter(phase='ERROR').first()
 
     def test_get_job_list_xml(self):
         '''
-        GET /{jobs} returns the job list as <uws:jobs> xml element.
+        GET /{jobs} returns the job list as <uws:jobs> xml element. The archived
+        jobs are not returned.
         '''
         url = reverse('uws:job-list')
         response = self.client.get(url)
@@ -26,6 +27,7 @@ class UWSTestCase(TestCase):
         root = objectify.fromstring(response.content)
         self.assertEqual(root.tag, self.uws_ns + 'jobs')
         self.assertEqual(root.jobref.tag, self.uws_ns + 'jobref')
+        self.assertEqual(len(root.jobref), 9)
 
     def test_get_job_list_xml_phase(self):
         '''
@@ -42,19 +44,20 @@ class UWSTestCase(TestCase):
     def test_get_job_list_xml_after(self):
         '''
         GET /{jobs}?AFTER=2014-09-10T10:01:02.000 returns jobs with startTimes
-        after the given [std:iso8601] time in UTC.
+        after the given [std:iso8601] time in UTC. The archived jobs are not
+        returned.
         '''
         url = reverse('uws:job-list') + '?AFTER=2015-01-01T00:00:00'
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
         root = objectify.fromstring(response.content)
-        self.assertEqual(len(root.jobref), 6)
+        self.assertEqual(len(root.jobref), 5)
 
     def test_get_job_list_xml_last(self):
         '''
         GET /{jobs}?LAST=100 returns the given number of most recent jobs
-        ordered by ascending startTimes.
+        ordered by ascending startTimes. The archived jobs are not returned.
         '''
         url = reverse('uws:job-list') + '?LAST=3'
         response = self.client.get(url)
@@ -63,16 +66,33 @@ class UWSTestCase(TestCase):
         root = objectify.fromstring(response.content)
         self.assertEqual(len(root.jobref), 3)
 
-        # '''
-        # POST /{jobs} with an application/x-www-form-urlencoded set of
-        # KEY=VALUE and additionally PHASE=RUN to an non-existing {job-id} creates
-        # a job with these parameters and runs it.
-        # '''
+    def test_post_job_list_create(self):
+        '''
+        POST /{jobs} with an application/x-www-form-urlencoded set of KEY=VALUE
+        creates a job with these parameters and redirects to /{jobs}/{job-id}
+        as 303.
+        '''
+        url = reverse('uws:query-list')
+        response = self.client.post(url, content_type='application/x-www-form-urlencoded')
+        self.assertEqual(response.status_code, 303)
 
-        # '''
-        # POST /{jobs} with an application/x-www-form-urlencoded set of
-        # KEY=VALUE to an existing {job-id} updates the parameters.
-        # '''
+        response = self.client.get(response['Location'] + '/phase')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, 'PENDING')
+
+    def test_post_job_list_create_run(self):
+        '''
+        POST /{jobs} with an application/x-www-form-urlencoded set of
+        KEY=VALUE and additionally PHASE=RUN to an non-existing {job-id} creates
+        a job with these parameters and runs it.
+        '''
+        url = reverse('uws:query-list') + '?PHASE=RUN'
+        response = self.client.post(url, content_type='application/x-www-form-urlencoded')
+        self.assertEqual(response.status_code, 303)
+
+        response = self.client.get(response['Location'] + '/phase')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, 'QUEUED')
 
     def test_get_job_detail(self):
         '''
@@ -111,10 +131,15 @@ class UWSTestCase(TestCase):
         self.assertEqual(root.tag, self.uws_ns + 'parameters')
         self.assertEqual(root.parameter.tag, self.uws_ns + 'parameter')
 
-        # '''
-        # POST /{jobs}/{job-id}/parameters with application/x-www-form-urlencoded
-        # set of KEY=VALUE updates the parameters.
-        # '''
+    def test_post_job_parameters(self):
+        '''
+        POST /{jobs}/{job-id}/parameters with application/x-www-form-urlencoded
+        set of KEY=VALUE updates the parameters and redirects to
+        /{jobs}/{job-id} as 303.
+        '''
+        url = reverse('uws:job-detail', args=[self.pending_job.pk])
+        response = self.client.post(url, '', content_type='application/x-www-form-urlencoded')
+        self.assertEqual(response.status_code, 303)
 
     def test_get_job_error(self):
         '''
@@ -133,12 +158,17 @@ class UWSTestCase(TestCase):
         url = reverse('uws:job-detail', args=[self.error_job.pk])
         response = self.client.delete(url)
         self.assertRedirects(response, url, status_code=303)
-        self.assertEqual(self.error_job.phase, Job.PHASE_ERROR)
+        self.assertEqual(self.error_job.phase, 'ERROR')
 
-        # '''
-        # POST /{jobs}/{job-id} with ACTION=DELETE sets the job phase to ARCHIVED
-        # and deletes the results and redirects to /{jobs}/{job-id} as 303.
-        # '''
+    def test_post_job_delete(self):
+        '''
+        POST /{jobs}/{job-id} with ACTION=DELETE sets the job phase to ARCHIVED
+        and deletes the results and redirects to /{jobs}/{job-id} as 303.
+        '''
+        url = reverse('uws:job-detail', args=[self.pending_job.pk])
+        response = self.client.post(url, 'ACTION=DELETE', content_type='application/x-www-form-urlencoded')
+        self.assertRedirects(response, reverse('uws:job-detail', args=[self.pending_job.pk]), status_code=303)
+        self.assertEqual(Job.objects.get(pk=self.pending_job.pk).phase, 'ARCHIVED')
 
     def test_get_job_destruction(self):
         '''
@@ -210,7 +240,7 @@ class UWSTestCase(TestCase):
         url = reverse('uws:job-phase', args=[self.pending_job.pk])
         response = self.client.post(url, 'PHASE=RUN', content_type='application/x-www-form-urlencoded')
         self.assertRedirects(response, reverse('uws:job-detail', args=[self.pending_job.pk]), status_code=303)
-        self.assertEqual(Job.objects.get(pk=self.pending_job.pk).phase, Job.PHASE_QUEUED)
+        self.assertEqual(Job.objects.get(pk=self.pending_job.pk).phase, 'QUEUED')
 
     def test_post_job_phase_abort(self):
         '''
@@ -220,7 +250,7 @@ class UWSTestCase(TestCase):
         url = reverse('uws:job-phase', args=[self.pending_job.pk])
         response = self.client.post(url, 'PHASE=ABORT', content_type='application/x-www-form-urlencoded')
         self.assertRedirects(response, reverse('uws:job-detail', args=[self.pending_job.pk]), status_code=303)
-        self.assertEqual(Job.objects.get(pk=self.pending_job.pk).phase, Job.PHASE_ABORTED)
+        self.assertEqual(Job.objects.get(pk=self.pending_job.pk).phase, 'ABORTED')
 
     def test_get_job_quote(self):
         '''
