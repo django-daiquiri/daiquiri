@@ -43,7 +43,6 @@ class UWSViewSet(ReadOnlyModelViewSet):
 
         if request.user.is_authenticated():
             owner = request.user
-            print owner
         else:
             owner = None
 
