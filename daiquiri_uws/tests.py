@@ -91,7 +91,7 @@ class UWSTestCase(TestCase):
 
         response = self.client.get(response['Location'] + '/phase')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, 'PENDING')
+        self.assertEqual(response.content, b'PENDING')
 
     def test_post_job_list_create_run(self):
         '''
@@ -105,7 +105,7 @@ class UWSTestCase(TestCase):
 
         response = self.client.get(response['Location'] + '/phase')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, 'QUEUED')
+        self.assertEqual(response.content, b'QUEUED')
 
     def test_get_job_detail(self):
         '''
@@ -194,7 +194,7 @@ class UWSTestCase(TestCase):
         url = reverse(self.destruction_url_name, args=[self.error_job.pk])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, '')
+        self.assertEqual(response.content, b'')
 
     def test_post_job_destruction(self):
         '''
@@ -223,7 +223,7 @@ class UWSTestCase(TestCase):
         url = reverse(self.executionduration_url_name, args=[self.pending_job.pk])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, '30')
+        self.assertEqual(response.content, b'30')
 
     def test_post_job_executionduration(self):
         '''
@@ -252,7 +252,7 @@ class UWSTestCase(TestCase):
         url = reverse(self.phase_url_name, args=[self.pending_job.pk])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, 'PENDING')
+        self.assertEqual(response.content, b'PENDING')
 
     def test_post_job_phase_run(self):
         '''
@@ -287,7 +287,7 @@ class UWSTestCase(TestCase):
         url = reverse(self.quote_url_name, args=[self.pending_job.pk])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, '')
+        self.assertEqual(response.content, b'')
 
     def test_get_job_owner(self):
         '''
@@ -297,4 +297,4 @@ class UWSTestCase(TestCase):
         url = reverse(self.owner_url_name, args=[self.pending_job.pk])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, 'admin')
+        self.assertEqual(response.content, b'admin')

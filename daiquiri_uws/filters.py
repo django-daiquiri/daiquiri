@@ -24,6 +24,7 @@ class UWSFilterBackend(BaseFilterBackend):
 
             last = request.GET.get('LAST')
             if last:
-                queryset = queryset.filter(start_time__isnull=False).order_by('-start_time')[:last]
+                queryset = queryset.filter(start_time__isnull=False) \
+                    .order_by('-start_time')[:int(last)]
 
         return queryset
