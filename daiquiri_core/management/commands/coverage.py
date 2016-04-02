@@ -1,5 +1,5 @@
 import subprocess
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 
 
 class Command(BaseCommand):
@@ -8,7 +8,10 @@ class Command(BaseCommand):
         parser.add_argument('--html', action='store_true', default=False, help='Create HTML coverage report')
 
     def handle(self, *args, **options):
-        subprocess.call(['coverage', 'run', 'manage.py', 'test'])
-        subprocess.call(['coverage', 'report'])
-        if options['html']:
-            subprocess.call(['coverage', 'html'])
+        try:
+            subprocess.call(['coverage', 'run', 'manage.py', 'test'])
+            subprocess.call(['coverage', 'report'])
+            if options['html']:
+                subprocess.call(['coverage', 'html'])
+        except OSError:
+            raise CommandError('coverage is not installed')
