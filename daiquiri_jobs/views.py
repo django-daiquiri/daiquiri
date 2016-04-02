@@ -8,7 +8,6 @@ class JobsViewSet(UWSViewSet):
     queryset = Job.objects.all()
     list_serializer_class = JobsSerializer
     detail_serializer_class = JobSerializer
-    detail_url_name = 'uws:job-detail'
 
 
 class QueryJobsViewSet(JobsViewSet):

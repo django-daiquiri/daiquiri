@@ -5,7 +5,6 @@ from daiquiri_uws.routers import UWSRouter
 from .views import *
 
 router = UWSRouter(trailing_slash=False)
-router.register(r'jobs', JobsViewSet)
 router.register(r'query', QueryJobsViewSet, base_name='query')
 
 urlpatterns = [
