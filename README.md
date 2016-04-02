@@ -25,40 +25,50 @@ Install `bower`:
 sudo npm -g install bower
 ```
 
-Clone the repositories to a convenient place:
+Create a `django-daiquiri` directory at a convenient place:
 
 ```
-git clone https://github.com/aipescience/django-daiquiri
-git clone https://github.com/aipescience/django-daiquiri-app
+mkdir django-daiquiri
+cd django-daiquiri
 ```
 
-If needed checkout a non master branch.
-
-Set up a virtualenv:
+Set up a virtualenv in this directory:
 
 ```
 virtualenv env
 source env/bin/activate
-pip install -r django-daiquiri-app/requirements/base.txt
-pip install -r django-daiquiri-app/requirements/mysql.txt
+```
+
+Clone the repositories and call the `daiquiri` and `app`:
+
+```
+git clone https://github.com/aipescience/django-daiquiri daiquiri
+git clone https://github.com/aipescience/django-daiquiri-app app
+```
+
+Install the requirements:
+
+```
+cd app
+pip install -r requirements/base.txt
+pip install -r requirements/mysql.txt
 ```
 
 Copy the `local.py` settings file:
 
 ```
-cd django-daiquiri-app
-cp django-daiquiri-app/daiquiri_app/settings/sample.local.py django-daiquiri-app/daiquiri_app/settings/local.py
+cp daiquiri_app/settings/sample.local.py daiquiri_app/settings/local.py
 ```
 
-Edit django-daiquiri-app/daiquiri_app/settings/local.py for database settings and 'DEBUG = True' and add
+Edit daiquiri_app/settings/local.py for database settings and 'DEBUG = True' and add
 
 ```
-import sys; sys.path.append('../django-daiquiri/')
+import sys; sys.path.append('../daiquiri/')
 ```
 
 at the top of the file.
 
-Change to the `django-daiquiri-app` directory and run:
+Run:
 
 ```
 ./manage.py migrate
