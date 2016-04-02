@@ -4,6 +4,8 @@ from django.utils.translation import ugettext_lazy as _
 
 SITE_ID = 1
 
+HTTPS = False
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = 'this is not a very secret key'
@@ -26,17 +28,17 @@ INSTALLED_APPS = (
     'daiquiri_auth',
     'daiquiri_contact',
     'daiquiri_core',
+    'daiquiri_jobs',
     'daiquiri_meetings',
     'daiquiri_query',
     'daiquiri_serve',
     'daiquiri_uws',
     # 3rd party modules
     'rest_framework',
-    'widget_tweaks',
     'markdown',
     'compressor',
-    'registration',
-    'djangobower'
+    'djangobower',
+    'widget_tweaks'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -52,7 +54,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sites.middleware.CurrentSiteMiddleware'
 )
 
-ROOT_URLCONF = 'daiquiri_app.urls'
+ROOT_URLCONF = 'testing.urls'
 
 TEMPLATES = [
     {
@@ -106,10 +108,10 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_URL = '/logout/'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media_root/')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'testing/media_root/')
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static_root/')
+STATIC_ROOT = os.path.join(BASE_DIR, 'testing/static_root/')
 
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static/'),
@@ -127,7 +129,8 @@ BOWER_COMPONENTS_ROOT = os.path.join(BASE_DIR, 'bower_root/')
 BOWER_INSTALLED_APPS = (
     'jquery',
     'angular',
-    'bootstrap'
+    'bootstrap',
+    'ngInfiniteScroll'
 )
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

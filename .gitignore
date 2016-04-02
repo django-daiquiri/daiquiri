@@ -1,5 +1,9 @@
 testing/local.py
 
+testing/static_root
+testing/media_root
+testing/bower_root
+
 *~
 *.pyc
 *.swp

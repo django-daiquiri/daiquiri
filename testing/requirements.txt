@@ -1,9 +1,10 @@
-Django==1.8
+Django==1.9
 
-djangorestframework==3.3.2
-django-widget-tweaks==1.4.1
-markdown==2.6.4
+djangorestframework
+jsonfield
+django-widget-tweaks
 django-libsass==0.4
-django-registration-redux==1.2
-jsonfield>=1.0.0
 django-bower>=5.0.4
+markdown==2.6.4
+iso8601
+lxml

@@ -10,6 +10,7 @@ daiquiri_apps = [
     'daiquiri_auth',
     'daiquiri_contact',
     'daiquiri_core',
+    'daiquiri_jobs',
     'daiquiri_meetings',
     'daiquiri_query',
     'daiquiri_serve',
