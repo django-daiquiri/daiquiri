@@ -4,7 +4,11 @@ source = .
 [report]
 omit =
     env/*
+    setup.py
+    runtests.py
+    runcoverage.py
 
 exclude_lines =
+    pass
     raise Exception
     except ImportError:
