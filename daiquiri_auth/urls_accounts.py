@@ -9,5 +9,5 @@ router.register(r'profiles', ProfileViewSet)
 
 urlpatterns = [
     url(r'^profile/', profile_update, name='account_profile'),
-    url(r'^accounts/', include('allauth.urls')),
+    url(r'^', include('allauth.urls')),
 ]
