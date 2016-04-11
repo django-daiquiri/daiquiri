@@ -9,8 +9,33 @@
     <div class="form-group{% if field.errors %} has-error{% endif %} field-{{field.html_name}}">
 
         {% with field|widget_type as type %}
-        {% if type == 'checkboxinput' %}
+        {% if type == 'radioselect' %}
 
+        <label for="{{ field.id_for_label }}" class="control-label">{{ field.label }}</label>
+        {% for choice in field %}
+        <div class="radio">
+            <label>
+                {{ choice.tag }}
+                {{ choice.choice_label }}
+            </label>
+        </div>
+        {% endfor %}
+
+        {% elif type == 'yesno' %}
+
+        <label for="{{ field.id_for_label }}" class="control-label">{{ field.label }}</label>
+        <div class="radio">
+        {% for choice in field %}
+            <label class="radio-inline">
+                {{ choice.tag }}
+                {{ choice.choice_label }}
+            </label>
+        {% endfor %}
+        </div>
+
+        {% elif type == 'checkboxinput' %}
+
+        <label for="{{ field.id_for_label }}" class="control-label">{{ field.label }}</label>
         <div class="checkbox">
             <label>
                 {{ field }}
@@ -18,9 +43,21 @@
             </label>
         </div>
 
+        {% elif type == 'checkboxselectmultiple' %}
+
+        <label for="{{ field.id_for_label }}" class="control-label">{{ field.label }}</label>
+        {% for choice in field %}
+        <div class="checkbox">
+            <label>
+                {{ choice.tag }}
+                {{ choice.choice_label }}
+            </label>
+        </div>
+        {% endfor %}
+
         {% else %}
 
-        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        <label for="{{ field.id_for_label }}" class="control-label">{{ field.label }}</label>
         {% render_field field class="form-control" %}
 
         {% endif %}
