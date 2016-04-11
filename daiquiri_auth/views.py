@@ -20,32 +20,6 @@ from .paginations import ProfilePagination
 from .forms import LoginForm, UserForm, ProfileForm
 
 
-def login(request):
-    form = LoginForm(request.POST or None)
-    if request.method == 'POST':
-        if form.is_valid():
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
-
-            user = authenticate(username=username, password=password)
-
-            if user:
-                auth_login(request, user)
-                if request.POST.get('next'):
-                    return HttpResponseRedirect(request.POST.get('next'))
-                else:
-                    return HttpResponseRedirect('/')
-            else:
-                return render(request, 'auth/login_form.html', {'form': form, 'message': _("Your login was not successful. Your username and password didn't match. Please try again.")})
-
-    return render(request, 'auth/login_form.html', {'form': form})
-
-
-def logout(request):
-    auth_logout(request)
-    return HttpResponseRedirect('/')
-
-
 @login_required()
 def profile_update(request):
     next = get_referer_url_name(request, 'home')
