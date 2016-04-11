@@ -1,0 +1,24 @@
+{% extends "core/page.html" %}
+
+{% load i18n %}
+
+{% block page %}
+
+    <h2>{% trans "Create a new account" %}</h2>
+
+    <p>{% blocktrans %}Already have an account? Then please <a href="{{ login_url }}">sign in</a>.{% endblocktrans %}</p>
+
+    <form method="post" action="{% url 'account_signup' %}">
+        {% csrf_token %}
+
+        {% if redirect_field_value %}
+        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+        {% endif %}
+
+        {% include 'core/bootstrap_form_fields.html' with form=form %}
+
+        <input type="submit" class="btn btn-primary" value="{% trans 'Create account' %}" />
+        <input type="submit" class="btn" name="cancel" value="{% trans 'Cancel' %}" />
+    </form>
+
+{% endblock %}
