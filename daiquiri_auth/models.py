@@ -8,6 +8,8 @@ from django.utils.translation import ugettext_lazy as _
 
 from jsonfield import JSONField
 
+from .utils import get_full_name
+
 
 @python_2_unicode_compatible
 class Profile(models.Model):
@@ -29,10 +31,7 @@ class Profile(models.Model):
 
     @property
     def full_name(self):
-        if self.user.first_name and self.user.last_name:
-            return self.user.first_name + ' ' + self.user.last_name
-        else:
-            return self.user.username
+        return get_full_name(self.user)
 
 
 def create_profile_for_user(sender, **kwargs):

@@ -17,7 +17,7 @@ from daiquiri_core.utils import get_referer_url_name
 from .models import DetailKey, Profile
 from .serializers import ProfileSerializer
 from .paginations import ProfilePagination
-from .forms import LoginForm, UserForm, ProfileForm
+from .forms import UserForm, ProfileForm
 
 
 @login_required()

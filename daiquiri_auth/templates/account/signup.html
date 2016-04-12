@@ -1,5 +1,4 @@
-{% extends "core/page.html" %}
-
+{% extends 'core/page.html' %}
 {% load i18n %}
 
 {% block page %}
@@ -15,7 +14,7 @@
         <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
         {% endif %}
 
-        {% include 'core/bootstrap_form_fields.html' with form=form %}
+        {% include 'core/bootstrap_form_fields.html' %}
 
         <input type="submit" class="btn btn-primary" value="{% trans 'Create account' %}" />
     </form>

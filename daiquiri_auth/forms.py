@@ -1,10 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 
-
-class LoginForm(forms.Form):
-    username = forms.CharField(required=True)
-    password = forms.CharField(widget=forms.PasswordInput, required=True)
+from .models import DetailKey
 
 
 class UserForm(forms.ModelForm):
@@ -15,12 +12,12 @@ class UserForm(forms.ModelForm):
 
 class ProfileForm(forms.Form):
     def __init__(self, *args, **kwargs):
-        profile = kwargs.pop('profile')
-        detail_keys = kwargs.pop('detail_keys')
-
         super(ProfileForm, self).__init__(*args, **kwargs)
 
-        # add fields and init values for the Profile model
+        # get the detail keys from the database
+        detail_keys = DetailKey.objects.all()
+
+        # add a field for each detail key
         for detail_key in detail_keys:
             if detail_key.data_type == 'text':
                 field = forms.CharField()
@@ -40,8 +37,8 @@ class ProfileForm(forms.Form):
             field.label = detail_key.label
             field.required = detail_key.required
             field.help_text = detail_key.help_text
+
             self.fields[detail_key.key] = field
 
-            # add an initial value, if one is found in the user details
-            if profile.details and detail_key.key in profile.details:
-                self.fields[detail_key.key].initial = profile.details[detail_key.key]
+    def signup(self, request, user):
+        pass
