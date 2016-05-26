@@ -1,0 +1,25 @@
+{% load i18n %}
+
+    <div class="modal" id="activate-user-modal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="{% trans 'Close' %}">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="activate-user-modal-title">
+                        {% trans 'Activate user' %}
+                    </h4>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                        {% trans 'Close' %}
+                    </button>
+                    <button type="button" class="btn btn-primary" ng-click="service.activateUser()">
+                        {% trans 'Activate user' %}</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>

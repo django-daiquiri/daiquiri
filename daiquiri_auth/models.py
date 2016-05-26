@@ -15,6 +15,8 @@ from .utils import get_full_name
 class Profile(models.Model):
 
     user = models.OneToOneField(User)
+    is_pending = models.BooleanField(default=False)
+    is_confirmed = models.BooleanField(default=False)
     details = JSONField(null=True, blank=True)
     attributes = JSONField(null=True, blank=True)
 

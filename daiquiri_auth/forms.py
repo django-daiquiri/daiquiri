@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
+from django.utils.translation import ugettext_lazy as _
 
 from .models import DetailKey
 
@@ -13,6 +14,14 @@ class UserForm(forms.ModelForm):
 class ProfileForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(ProfileForm, self).__init__(*args, **kwargs)
+
+        # add a field for first_name and last_name
+        self.fields['first_name'] = forms.CharField()
+        self.fields['first_name'].label = _('First name')
+        self.fields['first_name'].required = True
+        self.fields['last_name'] = forms.CharField()
+        self.fields['last_name'].label = _('Last name')
+        self.fields['last_name'].required = True
 
         # get the detail keys from the database
         detail_keys = DetailKey.objects.all()
@@ -39,6 +48,9 @@ class ProfileForm(forms.Form):
             field.help_text = detail_key.help_text
 
             self.fields[detail_key.key] = field
+
+
+class SignupForm(ProfileForm):
 
     def signup(self, request, user):
         pass
