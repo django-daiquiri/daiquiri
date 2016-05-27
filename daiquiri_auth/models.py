@@ -1,8 +1,9 @@
 from __future__ import unicode_literals
 
+from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
-from django.contrib.auth.models import User
+from django.dispatch import receiver
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
@@ -36,14 +37,13 @@ class Profile(models.Model):
         return get_full_name(self.user)
 
 
+@receiver(post_save, sender=User)
 def create_profile_for_user(sender, **kwargs):
     user = kwargs['instance']
     if kwargs['created'] and not kwargs.get('raw', False):
         profile = Profile()
         profile.user = user
         profile.save()
-
-post_save.connect(create_profile_for_user, sender=User)
 
 
 @python_2_unicode_compatible

@@ -29,11 +29,17 @@ app.factory('UsersService', ['$http', '$timeout', function($http, $timeout) {
             });
     }
 
-    function storeProfile() {
-        return $http.put(resource_url + service.current_row.id + '/', service.current_row)
+    function storeProfile(action) {
+        if (angular.isUndefined(action)) {
+            action = '/';
+        } else {
+            action = '/' + action + '/';
+        }
+
+        return $http.put(resource_url + service.current_row.id + action, service.current_row)
             .success(function(response) {
                 // copy the data back to the rows array and close the modal
-                service.rows[service.current_index] = angular.copy(service.current_row);
+                service.rows[service.current_index] = response;
             })
             .error(function(response, status) {
                 service.errors = response;
@@ -99,20 +105,13 @@ app.factory('UsersService', ['$http', '$timeout', function($http, $timeout) {
     };
 
     service.confirmUser = function() {
-        // set the profile to confirmed
-        service.current_row.is_confirmed = true;
-
-        storeProfile().then(function() {
+        storeProfile('confirm').then(function() {
             $('#confirm-user-modal').modal('hide');
         });
     };
 
     service.activateUser = function() {
-        // set the profile to active
-        service.current_row.is_confirmed = true;
-        service.current_row.is_pending = false;
-
-        storeProfile().then(function() {
+        storeProfile('activate').then(function() {
             $('#activate-user-modal').modal('hide');
         });
     };

@@ -37,8 +37,17 @@
                 </a>
             </li>
             {% if user.is_staff %}
+            {% if account_workflow == 'confirmation' %}
+            <li>
+                <a href="" ng-show="row.is_pending && row.is_confirmed" ng-click="service.modal('activate-user-modal', $index)">
+                    {% trans 'Activate the user' %}
+                </a>
+            <li>
+            {% endif %}
             <li>
                 {% internal_link _('User Admin') 'admin:auth_user_change' 'row.id' ng_args='row.id' target='_blank' %}
+            </li>
+            <li>
                 {% internal_link _('Profile Admin') 'admin:daiquiri_auth_profile_change' 'row.id' ng_args='row.id' target='_blank' %}
             </li>
             {% endif %}

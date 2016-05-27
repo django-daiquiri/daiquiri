@@ -1,20 +1,25 @@
 from django.shortcuts import render
-from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import permission_required
 from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 from rest_framework import viewsets, mixins, filters
+from rest_framework.decorators import detail_route
+from rest_framework.exceptions import MethodNotAllowed
+from rest_framework.response import Response
 
 from daiquiri_core.permissions import DaiquiriModelPermissions
 from daiquiri_core.utils import get_referer_url_name
 
 from .models import DetailKey, Profile
+from .utils import get_account_workflow
 from .serializers import ProfileSerializer
 from .paginations import ProfilePagination
 from .forms import UserForm, ProfileForm
+from .signals import user_confirmed, user_activated
 
 
 @login_required()
@@ -68,7 +73,7 @@ def profile_update(request):
 def users(request):
     return render(request, 'auth/users.html', {
         'detail_keys': DetailKey.objects.all(),
-        'account_workflow': settings.ACCOUNT_WORKFLOW if hasattr(settings, 'ACCOUNT_WORKFLOW') else None
+        'account_workflow': get_account_workflow()
     })
 
 
@@ -82,3 +87,28 @@ class ProfileViewSet(mixins.UpdateModelMixin, mixins.ListModelMixin, mixins.Retr
     filter_backends = (filters.SearchFilter, filters.OrderingFilter)
     ordering_fields = ('user__username', 'user__email', 'user__first_name', 'user__last_name')
     search_fields = ('user__username', 'user__email', 'user__first_name', 'user__last_name')
+
+    @detail_route(methods=['put'], permission_classes=[DaiquiriModelPermissions])
+    def confirm(self, request, pk=None):
+        if not get_account_workflow():
+            raise MethodNotAllowed()
+
+        profile = get_object_or_404(Profile, pk=pk)
+        profile.is_confirmed = True
+        profile.save()
+
+        user_confirmed.send(sender=self.__class__, request=request, user=profile.user)
+        return Response(self.get_serializer(profile).data)
+
+    @detail_route(methods=['put'], permission_classes=[DaiquiriModelPermissions])
+    def activate(self, request, pk=None):
+        if not get_account_workflow():
+            raise MethodNotAllowed()
+
+        profile = get_object_or_404(Profile, pk=pk)
+        profile.is_confirmed = True
+        profile.is_pending = False
+        profile.save()
+
+        user_activated.send(sender=self.__class__, request=request, user=profile.user)
+        return Response(self.get_serializer(profile).data)
