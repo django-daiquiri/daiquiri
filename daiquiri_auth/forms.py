@@ -1,8 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
-from django.utils.translation import ugettext_lazy as _
 
-from .models import DetailKey
+from .models import DetailKey, Profile
 
 
 class UserForm(forms.ModelForm):
@@ -11,23 +10,20 @@ class UserForm(forms.ModelForm):
         fields = ('first_name', 'last_name', 'email')
 
 
-class ProfileForm(forms.Form):
+class ProfileForm(forms.ModelForm):
+
+    class Meta:
+        model = Profile
+        fields = ()
+
     def __init__(self, *args, **kwargs):
         super(ProfileForm, self).__init__(*args, **kwargs)
 
-        # add a field for first_name and last_name
-        self.fields['first_name'] = forms.CharField()
-        self.fields['first_name'].label = _('First name')
-        self.fields['first_name'].required = True
-        self.fields['last_name'] = forms.CharField()
-        self.fields['last_name'].label = _('Last name')
-        self.fields['last_name'].required = True
-
         # get the detail keys from the database
-        detail_keys = DetailKey.objects.all()
+        self.detail_keys = DetailKey.objects.all()
 
         # add a field for each detail key
-        for detail_key in detail_keys:
+        for detail_key in self.detail_keys:
             if detail_key.data_type == 'text':
                 field = forms.CharField()
             elif detail_key.data_type == 'textarea':
@@ -47,7 +43,21 @@ class ProfileForm(forms.Form):
             field.required = detail_key.required
             field.help_text = detail_key.help_text
 
+            if self.instance.details and detail_key.key in self.instance.details:
+                field.initial = self.instance.details[detail_key.key]
+
             self.fields[detail_key.key] = field
+
+    def save(self, *args, **kwargs):
+        # create an empty details dict if it does not exist
+        if not self.instance.details:
+            self.instance.details = {}
+
+        # store the form date for each detail key
+        for detail_key in self.detail_keys:
+            self.instance.details[detail_key.key] = self.cleaned_data[detail_key.key]
+
+        return super(ProfileForm, self).save(*args, **kwargs)
 
 
 class SignupForm(ProfileForm):
