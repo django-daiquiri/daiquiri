@@ -95,15 +95,6 @@ app.factory('UsersService', ['$http', '$timeout', function($http, $timeout) {
         });
     };
 
-    service.toggleUser = function() {
-        // toggle the is_active flag of the user
-        service.current_row.user.is_active = !service.current_row.user.is_active;
-
-        storeProfile().then(function() {
-            $('#toggle-user-modal').modal('hide');
-        });
-    };
-
     service.confirmUser = function() {
         storeProfile('confirm').then(function() {
             $('#confirm-user-modal').modal('hide');
@@ -113,6 +104,18 @@ app.factory('UsersService', ['$http', '$timeout', function($http, $timeout) {
     service.activateUser = function() {
         storeProfile('activate').then(function() {
             $('#activate-user-modal').modal('hide');
+        });
+    };
+
+    service.disableUser = function() {
+        storeProfile('disable').then(function() {
+            $('#disable-user-modal').modal('hide');
+        });
+    };
+
+    service.enableUser = function() {
+        storeProfile('enable').then(function() {
+            $('#enable-user-modal').modal('hide');
         });
     };
 

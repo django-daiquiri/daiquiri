@@ -10,6 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from jsonfield import JSONField
 
 from .utils import get_full_name
+from .signals import user_confirmed, user_activated, user_disabled, user_enabled
 
 
 @python_2_unicode_compatible
@@ -35,6 +36,27 @@ class Profile(models.Model):
     @property
     def full_name(self):
         return get_full_name(self.user)
+
+    def confirm(self, request):
+        self.is_confirmed = True
+        self.save()
+        user_confirmed.send(sender=self.__class__, request=request, user=self.user)
+
+    def activate(self, request):
+        self.is_confirmed = True
+        self.is_pending = False
+        self.save()
+        user_activated.send(sender=self.__class__, request=request, user=self.user)
+
+    def disable(self, request):
+        self.user.is_active = False
+        self.user.save()
+        user_disabled.send(sender=self.__class__, request=request, user=self.user)
+
+    def enable(self, request):
+        self.user.is_active = True
+        self.user.save()
+        user_enabled.send(sender=self.__class__, request=request, user=self.user)
 
 
 @receiver(post_save, sender=User)

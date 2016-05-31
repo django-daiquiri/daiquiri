@@ -19,7 +19,7 @@ from .utils import get_account_workflow
 from .serializers import ProfileSerializer
 from .paginations import ProfilePagination
 from .forms import UserForm, ProfileForm
-from .signals import user_confirmed, user_activated
+from .signals import user_confirmed, user_activated, user_disabled, user_enabled
 
 
 @login_required()
@@ -94,10 +94,7 @@ class ProfileViewSet(mixins.UpdateModelMixin, mixins.ListModelMixin, mixins.Retr
             raise MethodNotAllowed()
 
         profile = get_object_or_404(Profile, pk=pk)
-        profile.is_confirmed = True
-        profile.save()
-
-        user_confirmed.send(sender=self.__class__, request=request, user=profile.user)
+        profile.confirm(request)
         return Response(self.get_serializer(profile).data)
 
     @detail_route(methods=['put'], permission_classes=[DaiquiriModelPermissions])
@@ -106,9 +103,17 @@ class ProfileViewSet(mixins.UpdateModelMixin, mixins.ListModelMixin, mixins.Retr
             raise MethodNotAllowed()
 
         profile = get_object_or_404(Profile, pk=pk)
-        profile.is_confirmed = True
-        profile.is_pending = False
-        profile.save()
+        profile.activate(request)
+        return Response(self.get_serializer(profile).data)
 
-        user_activated.send(sender=self.__class__, request=request, user=profile.user)
+    @detail_route(methods=['put'], permission_classes=[DaiquiriModelPermissions])
+    def disable(self, request, pk=None):
+        profile = get_object_or_404(Profile, pk=pk)
+        profile.disable(request)
+        return Response(self.get_serializer(profile).data)
+
+    @detail_route(methods=['put'], permission_classes=[DaiquiriModelPermissions])
+    def enable(self, request, pk=None):
+        profile = get_object_or_404(Profile, pk=pk)
+        profile.enable(request)
         return Response(self.get_serializer(profile).data)
