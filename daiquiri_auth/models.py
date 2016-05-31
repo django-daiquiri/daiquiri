@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+import logging
+
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
@@ -11,6 +13,8 @@ from jsonfield import JSONField
 
 from .utils import get_full_name
 from .signals import user_confirmed, user_activated, user_disabled, user_enabled
+
+logger = logging.getLogger(__name__)
 
 
 @python_2_unicode_compatible
@@ -40,23 +44,31 @@ class Profile(models.Model):
     def confirm(self, request):
         self.is_confirmed = True
         self.save()
+
         user_confirmed.send(sender=self.__class__, request=request, user=self.user)
+        logger.info('User \'%s\' confirmed by \'%s\'.' % (self.user.username, request.user.username))
 
     def activate(self, request):
         self.is_confirmed = True
         self.is_pending = False
         self.save()
+
         user_activated.send(sender=self.__class__, request=request, user=self.user)
+        logger.info('User \'%s\' activated by \'%s\'.' % (self.user.username, request.user.username))
 
     def disable(self, request):
         self.user.is_active = False
         self.user.save()
+
         user_disabled.send(sender=self.__class__, request=request, user=self.user)
+        logger.info('User \'%s\' disabled by \'%s\'.' % (self.user.username, request.user.username))
 
     def enable(self, request):
         self.user.is_active = True
         self.user.save()
+
         user_enabled.send(sender=self.__class__, request=request, user=self.user)
+        logger.info('User \'%s\' enabled by \'%s\'.' % (self.user.username, request.user.username))
 
 
 @receiver(post_save, sender=User)
