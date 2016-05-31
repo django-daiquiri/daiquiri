@@ -12,7 +12,7 @@ from django.utils.translation import ugettext_lazy as _
 from jsonfield import JSONField
 
 from .utils import get_full_name
-from .signals import user_confirmed, user_activated, user_disabled, user_enabled
+from .signals import user_created, user_updated, user_confirmed, user_activated, user_disabled, user_enabled
 
 logger = logging.getLogger(__name__)
 
@@ -72,12 +72,30 @@ class Profile(models.Model):
 
 
 @receiver(post_save, sender=User)
-def create_profile_for_user(sender, **kwargs):
-    user = kwargs['instance']
-    if kwargs['created'] and not kwargs.get('raw', False):
-        profile = Profile()
-        profile.user = user
-        profile.save()
+def post_save_user(sender, **kwargs):
+    if not kwargs.get('raw', False):
+        user = kwargs['instance']
+
+        if kwargs['created']:
+            profile = Profile()
+            profile.user = user
+            profile.save()
+
+            user_created.send(sender=User, user=user)
+            logger.info('User \'%s\' created.' % user.username)
+        else:
+            user_updated.send(sender=User, user=user)
+            logger.info('User \'%s\' updated.' % user.username)
+
+
+@receiver(post_save, sender=Profile)
+def post_save_profile(sender, **kwargs):
+    if not kwargs.get('raw', False):
+        profile = kwargs['instance']
+
+        if not kwargs['created']:
+            user_updated.send(sender=Profile, user=profile.user)
+            logger.info('User \'%s\' updated.' % profile.user.username)
 
 
 @python_2_unicode_compatible
