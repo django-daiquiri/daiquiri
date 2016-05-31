@@ -19,7 +19,6 @@ from .utils import get_account_workflow
 from .serializers import ProfileSerializer
 from .paginations import ProfilePagination
 from .forms import UserForm, ProfileForm
-from .signals import user_confirmed, user_activated, user_disabled, user_enabled
 
 
 @login_required()
