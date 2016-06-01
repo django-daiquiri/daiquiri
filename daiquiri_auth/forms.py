@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
+from django.utils.translation import ugettext as _
 
 from .models import DetailKey, Profile
 
@@ -25,9 +26,9 @@ class ProfileForm(forms.ModelForm):
         # add a field for each detail key
         for detail_key in self.detail_keys:
             if detail_key.data_type == 'text':
-                field = forms.CharField()
+                field = forms.CharField(widget=forms.TextInput(attrs={'placeholder': detail_key.label}))
             elif detail_key.data_type == 'textarea':
-                field = forms.CharField(widget=forms.Textarea)
+                field = forms.CharField(widget=forms.Textarea(attrs={'placeholder': detail_key.label}))
             elif detail_key.data_type == 'select':
                 field = forms.ChoiceField(choices=detail_key.options)
             elif detail_key.data_type == 'radio':
@@ -62,5 +63,16 @@ class ProfileForm(forms.ModelForm):
 
 class SignupForm(ProfileForm):
 
+    first_name = forms.CharField(max_length=30, label=_('First name'), widget=forms.TextInput(attrs={'placeholder': _('First name')}))
+    last_name = forms.CharField(max_length=30, label=_('Last name'), widget=forms.TextInput(attrs={'placeholder': _('Last name')}))
+
     def signup(self, request, user):
-        pass
+        # create an empty details dict
+        user.profile.details = {}
+
+        # store the form date for each detail key
+        for detail_key in self.detail_keys:
+            user.profile.details[detail_key.key] = self.cleaned_data[detail_key.key]
+
+        # save the profile model
+        user.profile.save()
