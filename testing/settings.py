@@ -38,7 +38,9 @@ INSTALLED_APPS = (
     'markdown',
     'compressor',
     'djangobower',
-    'widget_tweaks'
+    'widget_tweaks',
+    'allauth',
+    'allauth.account',
 )
 
 MIDDLEWARE_CLASSES = (
