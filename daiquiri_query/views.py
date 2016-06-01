@@ -1,13 +1,23 @@
 from django.shortcuts import render
+from django.http import HttpResponseRedirect
 
 from rest_framework import viewsets, mixins, filters
 
 from .models import QueryJob
 from .serializers import QueryJobSerializer
+from .forms import QueryJobForm
 
 
 def query(request):
-    return render(request, 'query/query.html', {})
+    form = QueryJobForm(request.POST or None)
+
+    if request.method == 'POST':
+        if form.is_valid():
+            return HttpResponseRedirect(request.path_info)
+
+    return render(request, 'query/query.html', {
+        'form': form
+    })
 
 
 class QueryJobViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
