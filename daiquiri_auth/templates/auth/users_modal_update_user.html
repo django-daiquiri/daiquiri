@@ -1,0 +1,39 @@
+{% load i18n %}
+{% load ng_tags %}
+
+    <div class="modal" id="update-user-modal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="{% trans 'Close' %}">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="update-user-modal-title">{% trans 'Update user' %}</h4>
+                </div>
+
+                <div class="modal-body">
+                    {% ng_form_field 'text' _('First name') 'first_name' 'service.current_row.user.first_name' %}
+                    {% ng_form_field 'text' _('Last name') 'last_name' 'service.current_row.user.last_name' %}
+                    {% ng_form_field 'text' _('Email') 'email' 'service.current_row.user.email' %}
+
+{% for detail_key in detail_keys %}
+
+                    {% with 'service.current_row.details.'|add:detail_key.key as ng_model %}
+                    {% ng_form_field detail_key.data_type detail_key.label detail_key.key ng_model %}
+                    {% endwith %}
+
+{% endfor %}
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                        {% trans 'Close' %}
+                    </button>
+                    <button type="button" class="btn btn-primary" ng-click="service.updateUser()">
+                        {% trans 'Update user' %}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>

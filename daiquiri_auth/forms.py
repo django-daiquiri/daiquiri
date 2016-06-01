@@ -1,10 +1,8 @@
 from django import forms
 from django.contrib.auth.models import User
+from django.utils.translation import ugettext as _
 
-
-class LoginForm(forms.Form):
-    username = forms.CharField(required=True)
-    password = forms.CharField(widget=forms.PasswordInput, required=True)
+from .models import DetailKey, Profile
 
 
 class UserForm(forms.ModelForm):
@@ -13,19 +11,24 @@ class UserForm(forms.ModelForm):
         fields = ('first_name', 'last_name', 'email')
 
 
-class ProfileForm(forms.Form):
-    def __init__(self, *args, **kwargs):
-        profile = kwargs.pop('profile')
-        detail_keys = kwargs.pop('detail_keys')
+class ProfileForm(forms.ModelForm):
 
+    class Meta:
+        model = Profile
+        fields = ()
+
+    def __init__(self, *args, **kwargs):
         super(ProfileForm, self).__init__(*args, **kwargs)
 
-        # add fields and init values for the Profile model
-        for detail_key in detail_keys:
+        # get the detail keys from the database
+        self.detail_keys = DetailKey.objects.all()
+
+        # add a field for each detail key
+        for detail_key in self.detail_keys:
             if detail_key.data_type == 'text':
-                field = forms.CharField()
+                field = forms.CharField(widget=forms.TextInput(attrs={'placeholder': detail_key.label}))
             elif detail_key.data_type == 'textarea':
-                field = forms.CharField(widget=forms.Textarea)
+                field = forms.CharField(widget=forms.Textarea(attrs={'placeholder': detail_key.label}))
             elif detail_key.data_type == 'select':
                 field = forms.ChoiceField(choices=detail_key.options)
             elif detail_key.data_type == 'radio':
@@ -40,8 +43,36 @@ class ProfileForm(forms.Form):
             field.label = detail_key.label
             field.required = detail_key.required
             field.help_text = detail_key.help_text
+
+            if self.instance.details and detail_key.key in self.instance.details:
+                field.initial = self.instance.details[detail_key.key]
+
             self.fields[detail_key.key] = field
 
-            # add an initial value, if one is found in the user details
-            if profile.details and detail_key.key in profile.details:
-                self.fields[detail_key.key].initial = profile.details[detail_key.key]
+    def save(self, *args, **kwargs):
+        # create an empty details dict if it does not exist
+        if not self.instance.details:
+            self.instance.details = {}
+
+        # store the form date for each detail key
+        for detail_key in self.detail_keys:
+            self.instance.details[detail_key.key] = self.cleaned_data[detail_key.key]
+
+        return super(ProfileForm, self).save(*args, **kwargs)
+
+
+class SignupForm(ProfileForm):
+
+    first_name = forms.CharField(max_length=30, label=_('First name'), widget=forms.TextInput(attrs={'placeholder': _('First name')}))
+    last_name = forms.CharField(max_length=30, label=_('Last name'), widget=forms.TextInput(attrs={'placeholder': _('Last name')}))
+
+    def signup(self, request, user):
+        # create an empty details dict
+        user.profile.details = {}
+
+        # store the form date for each detail key
+        for detail_key in self.detail_keys:
+            user.profile.details[detail_key.key] = self.cleaned_data[detail_key.key]
+
+        # save the profile model
+        user.profile.save()

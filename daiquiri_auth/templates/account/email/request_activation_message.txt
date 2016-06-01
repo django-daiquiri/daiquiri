@@ -1,0 +1,14 @@
+{% load i18n %}
+{% blocktrans with site_name=current_site.name %}
+Dear {{ site_name }} Team,
+{% endblocktrans %}
+{% blocktrans trimmed with full_user=user.profile.full_name %}
+{{ full_user }} has just validated his/her registration.
+{% endblocktrans %}
+{% blocktrans with site_domain=current_site.domain %}
+Please login to the admin interface on
+
+    {{ users_url }}
+
+and activate the user.
+{% endblocktrans %}

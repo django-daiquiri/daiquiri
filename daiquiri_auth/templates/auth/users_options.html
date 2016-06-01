@@ -1,0 +1,53 @@
+{% load i18n %}
+{% load core_tags %}
+
+    <a href="" class="glyphicon glyphicon-eye-open" title="{% trans 'Show user details' %}"
+        ng-click="service.modal('show-user-modal', $index)">
+    </a>
+    <a href="" class="glyphicon glyphicon-pencil" title="{% trans 'Update user' %}"
+        ng-click="service.modal('update-user-modal', $index)">
+    </a>
+        <a href="" class="glyphicon glyphicon glyphicon-remove-sign"
+            ng-show="row.user.is_active && !row.is_pending" title="{% trans 'Disable user' %}"
+            ng-click="service.modal('disable-user-modal', $index)">
+        </a>
+        <a href="" class="glyphicon glyphicon glyphicon-ok-sign"
+            ng-show="!row.user.is_active && !row.is_pending" title="{% trans 'Enable user' %}"
+            ng-click="service.modal('enable-user-modal', $index)">
+        </a>
+    {% if account_workflow == 'confirmation' %}
+    <a href="" class="glyphicon glyphicon-ok" title="{% trans 'Confirm the user' %}"
+        ng-show="row.is_pending && !row.is_confirmed"
+        ng-click="service.modal('confirm-user-modal', $index)">
+    </a>
+    {% endif %}
+    {% if account_workflow == 'activation' %}
+    <a href="" class="glyphicon glyphicon-ok" title="{% trans 'Activate the user' %}"
+        ng-show="row.is_pending"
+        ng-click="service.modal('activate-user-modal', $index)">
+    </a>
+    {% endif %}
+    {% if user.is_staff %}
+    <div class="dropdown users-options-dropdown">
+        <a class="dropdown-toggle" type="button" id="users-options"
+            data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"
+            title="{% trans 'Show options' %}">
+            <span class="glyphicon glyphicon-option-horizontal"></span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="users-options">
+            {% if account_workflow == 'confirmation' %}
+            <li>
+                <a href="" ng-show="row.is_pending && row.is_confirmed" ng-click="service.modal('activate-user-modal', $index)">
+                    {% trans 'Activate the user' %}
+                </a>
+            <li>
+            {% endif %}
+            <li>
+                {% internal_link _('User Admin') 'admin:auth_user_change' 'row.id' ng_args='row.id' target='_blank' %}
+            </li>
+            <li>
+                {% internal_link _('Profile Admin') 'admin:daiquiri_auth_profile_change' 'row.id' ng_args='row.id' target='_blank' %}
+            </li>
+        </ul>
+    </div>
+    {% endif %}
