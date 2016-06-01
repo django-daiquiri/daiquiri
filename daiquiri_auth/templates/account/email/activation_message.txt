@@ -1,0 +1,8 @@
+{% load i18n %}{% trans "Dear" %} {{ user.profile.full_name }},
+{% blocktrans with site_domain=current_site.domain %}
+Your account on {{ site_domain }} has been activated. You should be able to login using:
+
+    {{ login_url }}
+{% endblocktrans %}
+{% trans "Sincerely" %},
+    {{ current_site.name }} Admins

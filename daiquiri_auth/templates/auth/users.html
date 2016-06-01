@@ -2,11 +2,12 @@
 {% load staticfiles %}
 {% load i18n %}
 {% load core_tags %}
-{% load ng_tags %}
 
 {% block bodyargs %}ng-app="users" ng-controller="UsersController"{% endblock %}
 
 {% block headextra %}
+
+    <link rel="stylesheet" href="{% static 'auth/css/users.css' %}" />
 
     <script type="text/javascript" src="{% static 'angular/angular.min.js' %}" ></script>
     <script type='text/javascript' src="{% static 'ngInfiniteScroll/build/ng-infinite-scroll.min.js' %}"></script>
@@ -30,7 +31,7 @@
                 <input class="form-control"
                        id="table-pager-search-input"
                        placeholder="{% trans 'Search entries' %}"
-                       type="text" ng-model="service.data.search">
+                       type="text" ng-model="service.search_string">
                 <a href="" class="input-group-addon" ng-click="service.search()">
                     <span class="glyphicon glyphicon-search"></span>
                 </a>
@@ -46,7 +47,7 @@
         </div>
 
         <div class="col-sm-4 list-search-count text-right">
-            {$ service.data.count $} {% trans 'Users found' %}
+            {$ service.count $} {% trans 'Users found' %}
         </div>
     </div>
 
@@ -58,7 +59,7 @@
             <th style="width: 20%;"></th>
         </thead>
         <tbody>
-            <tr ng-repeat="row in service.data.rows">
+            <tr ng-repeat="row in service.rows">
                 <td>
                     <a href="" ng-click="service.modal('show-user-modal', $index)">
                         {$ row.user.first_name $} {$ row.user.last_name $}
@@ -66,181 +67,38 @@
                     <em>{$ row.user.username $}</em>
                 </td>
                 <td>
-                    <a href="mailto:{$ row.user.first_name $} {$ row.user.last_name $} <{$ row.user.email $}>">
-                        {$ row.user.email $}
-                    </a>
+                    <div ng-repeat="email in row.emails">
+                        <a href="mailto:{$ row.user.first_name $} {$ row.user.last_name $} <{$ email.email $}>">
+                            {$ email.email $}
+                        </a>
+                        <span ng-show="!email.verified">({% trans 'not verified' %})</span>
+                    </div>
                 </td>
                 <td>
-                    <span ng-show="row.user.is_superuser">Admin</span>
-                    <span ng-hide="row.user.is_active">Disabled</span>
+                    <span ng-show="row.user.is_superuser">{% trans 'Admin' %}</span>
+                    <span ng-hide="row.user.is_active">{% trans 'Disabled' %}</span>
+                    <span ng-show="row.is_pending">{% trans 'Pending' %}</span>
+                    <span ng-show="row.is_confirmed">{% trans 'Confirmed' %}</span>
                 </td>
                 <td class="text-right list-table-options">
-                    <a href="" class="glyphicon glyphicon-eye-open" title="{% trans 'Show user details' %}"
-                       ng-click="service.modal('show-user-modal', $index)">
-                    </a>
-                    <a href="" class="glyphicon glyphicon-pencil" title="{% trans 'Update user' %}"
-                       ng-click="service.modal('update-user-modal', $index)">
-                    </a>
-                    <a href="" class="glyphicon glyphicon-remove-circle" title="{% trans 'Disable user' %}"
-                       ng-click="service.modal('toggle-user-modal', $index)"
-                       ng-show="row.user.is_active">
-                    </a>
-                    <a href="" class="glyphicon glyphicon-ok-circle" title="{% trans 'Re-enable user' %}"
-                       ng-click="service.modal('toggle-user-modal', $index)"
-                       ng-hide="row.user.is_active">
-                    </a>
-{% if user.is_staff %}
-                    {% internal_link '<strong>U</strong>' 'admin:auth_user_change' 'row.id' ng_args='row.id' target='_blank' title=_('Show user in admin interface') %}
-                    {% internal_link '<strong>P</strong>' 'admin:daiquiri_auth_profile_change' 'row.id' ng_args='row.id' target='_blank' title=_('Show profile in admin interface') %}
-{% endif %}
+
+                    {% include 'auth/users_options.html' %}
+
                 </td>
             </tr>
         </tbody>
     </table>
 
-{# Show user modal #}
+    {% include 'auth/users_modal_show_user.html' %}
 
-    <div class="modal" id="show-user-modal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
+    {% include 'auth/users_modal_update_user.html' %}
 
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="{% trans 'Close' %}">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                    <h4 class="modal-title" id="update-user-modal-title">
-                        {$ service.data.row.user.first_name $} {$ service.data.row.user.last_name $}
-                    </h4>
-                </div>
+    {% include 'auth/users_modal_disable_user.html' %}
 
-                <div class="modal-body">
+    {% include 'auth/users_modal_enable_user.html' %}
 
-                    <dl>
-                        <dt>{% trans 'Username' %}</dt>
-                        <dd>{$ service.data.row.user.username $}</dd>
-                    </dl>
-                    <dl>
-                        <dt>{% trans 'Email' %}</dt>
-                        <dd>{$ service.data.row.user.email $}</dd>
-                    </dl>
+    {% include 'auth/users_modal_confirm_user.html' %}
 
-                    <div class="modal-seperator"></div>
-
-                    <dl>
-                        <dt>{% trans 'First name' %}</dt>
-                        <dd>{$ service.data.row.user.first_name $}</dd>
-                    </dl>
-                    <dl>
-                        <dt>{% trans 'Last name' %}</dt>
-                        <dd>{$ service.data.row.user.last_name $}</dd>
-                    </dl>
-
-                    <div class="modal-seperator"></div>
-
-{% for detail_key in detail_keys %}
-
-                    <dl>
-                        <dt>{{ detail_key.label }}</dt>
-                        <dd>{$ service.data.row.details['{{ detail_key.key }}'] $}</dd>
-                    </dl>
-
-{% endfor %}
-
-                    <div ng-show="service.data.row.attributes" class="modal-seperator"></div>
-
-                    <dl ng-repeat="(detail_key, detail_value) in service.data.row.attributes">
-                        <dt>{$ detail_key $}</dt>
-                        <dd>{$ detail_value $}</dd>
-                    </dl>
-
-                    <div class="modal-seperator"></div>
-
-                    <dl>
-                        <dt>{% trans 'Date joined' %}</dt>
-                        <dd>{$ service.data.row.user.date_joined $}</dd>
-                    </dl>
-                    <dl>
-                        <dt>{% trans 'Last login' %}</dt>
-                        <dd ng-show="service.data.row.user.last_login">{$ service.data.row.user.last_login $}</dd>
-                        <dd ng-hide="service.data.row.user.last_login">{% trans 'Never' %}</dd>
-                    </dl>
-
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">
-                        {% trans 'Close' %}
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-{# Update user modal #}
-
-    <div class="modal" id="update-user-modal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="{% trans 'Close' %}">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                    <h4 class="modal-title" id="update-user-modal-title">{% trans 'Update user' %}</h4>
-                </div>
-
-                <div class="modal-body">
-                    {% ng_form_field 'text' _('First name') 'first_name' 'service.data.row.user.first_name' %}
-                    {% ng_form_field 'text' _('Last name') 'last_name' 'service.data.row.user.last_name' %}
-                    {% ng_form_field 'text' _('Email') 'email' 'service.data.row.user.email' %}
-
-{% for detail_key in detail_keys %}
-
-                    {% with 'service.data.row.details.'|add:detail_key.key as ng_model %}
-                    {% ng_form_field detail_key.data_type detail_key.label detail_key.key ng_model %}
-                    {% endwith %}
-
-{% endfor %}
-
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">
-                        {% trans 'Close' %}
-                    </button>
-                    <button type="button" class="btn btn-primary" ng-click="service.updateUser()">
-                        {% trans 'Update user' %}
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-{# Toogle user modal #}
-
-    <div class="modal" id="toggle-user-modal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="{% trans 'Close' %}">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                    <h4 class="modal-title" id="toggle-user-modal-title">
-                        <span ng-show="service.data.row.user.is_active">{% trans 'Disable user' %}</span>
-                        <span ng-hide="service.data.row.user.is_active">{% trans 'Re-enable user' %}</span>
-                    </h4>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">
-                        {% trans 'Close' %}
-                    </button>
-                    <button type="button" class="btn btn-primary" ng-click="service.toggleUser()">
-                        <span ng-show="service.data.row.user.is_active">{% trans 'Disable user' %}</span>
-                        <span ng-hide="service.data.row.user.is_active">{% trans 'Re-enable user' %}</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+    {% include 'auth/users_modal_activate_user.html' %}
 
 {% endblock %}

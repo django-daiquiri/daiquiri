@@ -1,13 +1,15 @@
 from django.contrib.auth.models import User
 
-from rest_framework.serializers import ModelSerializer
+from rest_framework import serializers
+
+from allauth.account.models import EmailAddress
 
 from daiquiri_core.serializers import JSONField
 
 from .models import Profile
 
 
-class UserSerializer(ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
@@ -31,15 +33,23 @@ class UserSerializer(ModelSerializer):
         )
 
 
-class ProfileSerializer(ModelSerializer):
+class EmailAddressSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = EmailAddress
+        fields = ('email', 'verified')
+
+
+class ProfileSerializer(serializers.ModelSerializer):
 
     user = UserSerializer()
+    emails = serializers.SerializerMethodField(read_only=True)
     details = JSONField(allow_null=True)
     attributes = JSONField(allow_null=True, read_only=True)
 
     class Meta:
         model = Profile
-        fields = ('id', 'user', 'details', 'attributes')
+        fields = ('id', 'user', 'is_confirmed', 'is_pending', 'emails', 'details', 'attributes')
 
     def update(self, obj, validated_data):
         user = validated_data.pop('user')
@@ -52,3 +62,8 @@ class ProfileSerializer(ModelSerializer):
         obj.user.save()
 
         return super(ProfileSerializer, self).update(obj, validated_data)
+
+    def get_emails(self, obj):
+        emails = EmailAddress.objects.filter(user=obj.user)
+        serializer = EmailAddressSerializer(instance=emails, many=True)
+        return serializer.data

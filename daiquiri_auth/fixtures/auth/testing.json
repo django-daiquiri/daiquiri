@@ -1,5 +1,75 @@
 [
   {
+    "model": "daiquiri_auth.detailkey",
+    "pk": 1,
+    "fields": {
+      "key": "text",
+      "label": "text",
+      "data_type": "text",
+      "help_text": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.",
+      "required": true
+    }
+  },
+  {
+    "model": "daiquiri_auth.detailkey",
+    "pk": 2,
+    "fields": {
+      "key": "textarea",
+      "label": "textarea",
+      "data_type": "textarea",
+      "help_text": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.",
+      "required": true
+    }
+  },
+  {
+    "model": "daiquiri_auth.detailkey",
+    "pk": 3,
+    "fields": {
+      "key": "checkbox",
+      "label": "checkbox",
+      "data_type": "checkbox",
+      "help_text": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.",
+      "options": "[[\"a\", \"Option A\"],[\"b\", \"Option B\"]]",
+      "required": true
+    }
+  },
+  {
+    "model": "daiquiri_auth.detailkey",
+    "pk": 4,
+    "fields": {
+      "key": "radio",
+      "label": "radio",
+      "data_type": "radio",
+      "help_text": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.",
+      "options": "[[\"a\", \"Option A\"],[\"b\", \"Option B\"]]",
+      "required": true
+    }
+  },
+  {
+    "model": "daiquiri_auth.detailkey",
+    "pk": 5,
+    "fields": {
+      "key": "select",
+      "label": "select",
+      "data_type": "select",
+      "help_text": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.",
+      "options": "[[\"a\", \"Option A\"],[\"b\", \"Option B\"]]",
+      "required": true
+    }
+  },
+  {
+    "model": "daiquiri_auth.detailkey",
+    "pk": 6,
+    "fields": {
+      "key": "multiselect",
+      "label": "multiselect",
+      "data_type": "multiselect",
+      "help_text": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.",
+      "options": "[[\"a\", \"Option A\"],[\"b\", \"Option B\"]]",
+      "required": true
+    }
+  },
+  {
     "pk": 1,
     "model": "auth.user",
     "fields": {

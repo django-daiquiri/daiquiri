@@ -1,0 +1,7 @@
+{% load i18n %}
+{% blocktrans with site_name=current_site.name %}
+Dear {{ site_name }} Team,
+{% endblocktrans %}
+{% blocktrans trimmed with full_user=user.profile.full_name full_request_user=request_user.profile.full_name %}
+{{ full_user }} was just activated by {{ full_request_user }}.
+{% endblocktrans %}
