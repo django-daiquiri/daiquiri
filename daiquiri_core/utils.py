@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMultiAlternatives, EmailMessage
 from django.core.urlresolvers import reverse, resolve
+from django.http import HttpResponseRedirect
 from django.template.loader import render_to_string
 from django.template import TemplateDoesNotExist
 from django.utils.six.moves.urllib.parse import urlparse
@@ -54,6 +55,16 @@ def get_internal_link(text, name, *args, **kwargs):
         attributes.append("%s=\"%s\"" % (key, kwargs[key]))
 
     return "<a href=\"%s\" %s>%s</a>" % (url, ' '.join(attributes), text)
+
+
+def get_next_redirect(request):
+    next = request.POST.get('next')
+    current_url_name = resolve(request.path_info).url_name
+
+    if next in (current_url_name, None):
+        return HttpResponseRedirect(reverse('home'))
+    else:
+        return HttpResponseRedirect(reverse(next))
 
 
 def send_mail(request, template_prefix, context, to_emails, cc_emails=[], bcc_emails=[]):

@@ -1,8 +1,6 @@
 from django.shortcuts import render
-from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import permission_required
-from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import ensure_csrf_cookie
 
@@ -12,7 +10,7 @@ from rest_framework.exceptions import MethodNotAllowed
 from rest_framework.response import Response
 
 from daiquiri_core.permissions import DaiquiriModelPermissions
-from daiquiri_core.utils import get_referer_url_name
+from daiquiri_core.utils import get_referer_url_name, get_next_redirect
 
 from .models import DetailKey, Profile
 from .utils import get_account_workflow
@@ -30,19 +28,14 @@ def profile_update(request):
 
     if request.method == 'POST':
         if 'cancel' in request.POST:
-            next = request.POST.get('next')
-            if next in ('profile_update', None):
-                return HttpResponseRedirect(reverse('home'))
-            else:
-                return HttpResponseRedirect(reverse(next))
+            return get_next_redirect(request)
 
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
+            return get_next_redirect(request)
 
-            return HttpResponseRedirect(reverse(next))
-
-    return render(request, 'auth/profile_update_form.html', {
+    return render(request, 'account/account_profile.html', {
         'user_form': user_form,
         'profile_form': profile_form,
         'next': next
