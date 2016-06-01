@@ -4,9 +4,13 @@ from django.utils.translation import ugettext_lazy as _
 
 from daiquiri_jobs.models import Job
 
+from .managers import QueryJobsSubmissionManager
+
 
 @python_2_unicode_compatible
 class QueryJob(Job):
+
+    submission = QueryJobsSubmissionManager()
 
     tablename = models.CharField(max_length=256)
     query = models.TextField()

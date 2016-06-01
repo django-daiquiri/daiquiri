@@ -13,6 +13,9 @@ def query(request):
 
     if request.method == 'POST':
         if form.is_valid():
+
+            QueryJob.submission.submit(form.cleaned_data['query'], request.user)
+
             return HttpResponseRedirect(request.path_info)
 
     return render(request, 'query/query.html', {
