@@ -8,7 +8,7 @@ router = routers.DefaultRouter()
 router.register(r'jobs', QueryJobViewSet)
 
 urlpatterns = [
-    url(r'^$', query, name='query1'),
+    url(r'^$', query, name='query'),
 
     # rest api
     url(r'^api/', include(router.urls, namespace='query')),
