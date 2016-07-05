@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import Group
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
@@ -12,6 +13,8 @@ class Database(models.Model):
     description = models.TextField(null=True, blank=True)
 
     utype = models.CharField(max_length=256, null=True, blank=True)
+
+    published_for = models.ManyToManyField(Group, blank=True)
 
     class Meta:
         ordering = ('order', )
@@ -44,6 +47,8 @@ class Table(models.Model):
 
     type = models.CharField(max_length=8, choices=TYPE_CHOICES)
     utype = models.CharField(max_length=256, null=True, blank=True)
+
+    published_for = models.ManyToManyField(Group, blank=True)
 
     class Meta:
         ordering = ('database__order', 'order', )
@@ -78,6 +83,8 @@ class Column(models.Model):
     indexed = models.BooleanField(default=False, help_text=_('This column is indexed.'))
     std = models.BooleanField(default=False, help_text=_('This column is defined by some standard.'))
 
+    published_for = models.ManyToManyField(Group, blank=True)
+
     class Meta:
         ordering = ('table__database__order', 'table__order', 'order', )
 
@@ -97,6 +104,8 @@ class Function(models.Model):
 
     name = models.CharField(max_length=256)
     description = models.TextField(null=True, blank=True)
+
+    published_for = models.ManyToManyField(Group, blank=True)
 
     class Meta:
         ordering = ('order', )
