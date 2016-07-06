@@ -1,0 +1,101 @@
+@import 'core/css/variables';
+
+.daiquiri-browser {
+    margin-bottom: 20px;
+    white-space: nowrap;
+}
+
+.daiquiri-browser-head {
+    border-top: 1px solid $border-color;
+    border-left: 1px solid $border-color;
+    border-right: 1px solid $border-color;
+}
+
+.daiquiri-browser-body {
+    overflow-x: hidden;
+    overflow-y: auto;
+    border-top: 1px solid $border-color;
+    border-bottom: 1px solid $border-color;
+    border-left: 1px solid $border-color;
+    border-right: 1px solid $border-color;
+}
+
+@media (max-width: $screen-xs-max) {
+    .daiquiri-browser-body {
+        margin-bottom: 5px;
+    }
+}
+
+@media (min-width: $screen-xs-max) {
+    .daiquiri-browser-body {
+        height: 300px;
+    }
+
+    .daiquiri-browser .col-sm-4:nth-child(1),
+    .daiquiri-browser .col-sm-4:nth-child(2) {
+        padding-right: 0;
+    }
+    .daiquiri-browser .col-sm-4:nth-child(2),
+    .daiquiri-browser .col-sm-4:nth-child(3) {
+        padding-left: 0;
+    }
+
+    .daiquiri-browser .col-sm-4:nth-child(2) .daiquiri-browser-head,
+    .daiquiri-browser .col-sm-4:nth-child(2) .daiquiri-browser-body,
+    .daiquiri-browser .col-sm-4:nth-child(3) .daiquiri-browser-head,
+    .daiquiri-browser .col-sm-4:nth-child(3) .daiquiri-browser-body {
+        border-left: none;
+    }
+}
+
+.daiquiri-browser .nav > li > a {
+    padding: 5px 15px;
+}
+
+.daiquiri-browser .nav-pills > li > a {
+    border-radius: 0;
+}
+
+.daiquiri-browser .nav-header {
+    padding: 5px 15px;
+}
+
+
+/*
+.daiquiri-browser > div {
+    border-right: 1px solid #ccc;
+}
+.daiquiri-browser > div:last-child {
+    border-right: 0px;
+}
+.daiquiri-browser-head {
+    border-bottom: 1px solid #ccc;
+    margin: 0;
+}
+.daiquiri-browser-body {
+    overflow-x: hidden;
+    overflow-y: auto;
+    margin: 0;
+    height: 300px;
+}
+.daiquiri-browser div:last-child {
+    border-right: 0px;
+}
+.daiquiri-browser .daiquiri-browser-body li a {
+    margin-top: 0;
+    margin-bottom: 0;
+    border-radius: 0;
+
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-size: small;
+}
+.daiquiri-browser .daiquiri-browser-body li a i {
+    opacity: 0.3;
+}
+.daiquiri-browser .nav-pills > .selected > a,
+.daiquiri-browser .nav-pills > .selected > a:hover,
+.daiquiri-browser .nav-pills > .selected > a:focus {
+    background-color: #efefef;
+}
+*/

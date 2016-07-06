@@ -1,0 +1,51 @@
+<div class="daiquiri-browser row">
+    <div ng-class="{
+            'col-sm-4': browser[resource].columns.length === 3,
+            'col-sm-6': browser[resource].columns.length === 2,
+            'col-sm-12': browser[resource].columns.length === 1
+        }"
+        ng-repeat="column in browser[resource].columns">
+
+        <ul class="daiquiri-browser-head nav nav-pills nav-stacked">
+            <li class="nav-header">
+                {$ column.name | uppercase $}
+            </li>
+        </ul>
+
+        <ul class="daiquiri-browser-body nav nav-pills nav-stacked">
+
+            <li ng-repeat="item in column.items"
+                ng-class="{'active': browser.active == item}">
+                <a href=""
+                    ng-click="itemClicked(resource, item, $parent.$index, $index);"
+                    ng-dblclick="itemDblClicked(resource, item, $parent.$index, $index);">
+                    <i class="pull-right glyphicon glyphicon-chevron-right" ng-show="column.selected == $index"></i>
+                    {$ item.name $}
+                </a>
+            </li>
+
+<!--
+            <li class="nav-item" 
+                ng-repeat="(i,item) in col.items"
+                ng-class="{
+                    'active':
+                        browser.active.browsername == browser.name &&
+                        browser.active.colname == col.name &&
+                        browser.active.id == item.id
+                }">
+
+                <a href="" title="{{ item.tooltip }}"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    data-html="1"
+                    data-delay="1000"
+                    ng-click="browserItemClicked(browser.name,item,col.name,i);"
+                    ng-dblclick="browserItemDblClicked(browser.name,item);">
+                    <i class="pull-right icon-chevron-right" ng-show="i == col.selected"></i>
+                    <span>{{item.name}}</span>
+                </a>
+            </li>
+-->
+        </ul>
+    </div>
+</div>

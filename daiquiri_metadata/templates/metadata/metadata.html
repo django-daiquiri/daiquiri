@@ -1,0 +1,47 @@
+{% extends 'core/wide.html' %}
+{% load staticfiles %}
+{% load compress %}
+{% load i18n %}
+{% load core_tags %}
+
+{% block bodyargs %}ng-app="metadata" ng-controller="MetadataController"{% endblock %}
+
+{% block headextra %}
+    {% compress css %}
+    <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/browser.scss' %}" />
+    <link rel="stylesheet" type="text/x-scss" href="{% static 'metadata/css/metadata.scss' %}" />
+    {% endcompress %}
+
+    {% compress js %}
+    <script type="text/javascript" src="{% static 'angular/angular.min.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'core/js/resources.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'core/js/browser.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'metadata/js/metadata.js' %}" ></script>
+    {% endcompress %}
+{% endblock %}
+
+{% block headline %}
+
+    <h2>Metadata management</h2>
+
+{% endblock %}
+
+{% block wide %}
+
+    <p>
+        {% trans 'Please click on a database, a table, a column or a function to show or edit its metadata.' %}
+    </p>
+
+    <div class="row">
+        <div class="col-md-9">
+            <div daiquiri-browser data-resource="databases"></div>
+        </div>
+        <div class="col-md-3">
+            <div daiquiri-browser data-resource="functions"></div>
+        </div>
+    </div>
+
+    <div ng-repeat="database in service.databases">{$ database.name $}</div>
+    <div ng-repeat="function in service.functions">{$ function.name $}</div>
+
+{% endblock %}
