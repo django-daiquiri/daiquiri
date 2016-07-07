@@ -51,16 +51,16 @@ angular.module('core')
                 // set up the first column
                 column0.items = browser[browser_id].data;
 
-                if (angular.isDefined(active_item)) {
+                if (angular.isDefined(active_item) && active_item) {
                     browser.findActiveItem(browser_id, active_item);
                 } else {
-                    if (angular.isDefined(column1) && angular.isDefined(column1.selected)) {
+                    if (angular.isDefined(column1) && angular.isDefined(column1.selected) && column1.selected) {
                         // something in the SECOND column has been selected before:
                         // first select the selected item in the FIRST column
                         // then the selected item in the SECOND column
                         browser.selectItem(browser_id, 0, column0.selected);
                         browser.selectItem(browser_id, 1, column1.selected);
-                    } else if (angular.isDefined(column0) && angular.isDefined(column0.selected)) {
+                    } else if (angular.isDefined(column0) && angular.isDefined(column0.selected) && column0.selected) {
                         // something in the FIRST row has been selected before: select it again
                         browser.selectItem(browser_id, 0, column0.selected);
                     } else {
@@ -91,6 +91,9 @@ angular.module('core')
 
                 column1.items = data[row_index][column1.name];
                 column1.selected = 0;
+            } else {
+                column1.items = [];
+                column1.selected = false;
             }
         }
 
@@ -117,6 +120,9 @@ angular.module('core')
 
                 column2.items = browser[browser_id].data[column0_row_index][column1.name][column1_row_index][column2.name];
                 column2.selected = browser[browser_id].data[column0_row_index][column1.name][column1_row_index][column2.name][0];
+            } else {
+                column2.items = [];
+                column2.selected = false;
             }
         }
     };

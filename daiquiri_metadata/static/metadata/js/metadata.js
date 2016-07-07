@@ -119,10 +119,17 @@ angular.module('metadata', ['core'])
     };
 
     service.submitDeleteModal = function(resource) {
-        // resources[resource].delete().then(function() {
-        //     $('#' + resource + '-delete-modal').modal('hide');
-        //     service.initDomain();
-        // });
+        return resources[resource].remove({id: service.values.id}, function() {
+            $('#' + resource + '-delete-modal').modal('hide');
+
+            service.active = false;
+
+            if (resource === 'functions') {
+                service.initFunctionsBrowser();
+            } else {
+                service.initDatabasesBrowser();
+            }
+        });
     };
 
     return service;
