@@ -9,6 +9,7 @@ router.register(r'databases', DatabaseViewSet)
 router.register(r'tables', TableViewSet)
 router.register(r'columns', ColumnViewSet)
 router.register(r'functions', FunctionViewSet)
+router.register(r'groups', GroupViewSet)
 
 urlpatterns = [
     url(r'^$', metadata, name='metadata'),

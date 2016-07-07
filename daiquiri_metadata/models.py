@@ -14,7 +14,7 @@ class Database(models.Model):
 
     utype = models.CharField(max_length=256, null=True, blank=True)
 
-    published_for = models.ManyToManyField(Group, blank=True)
+    groups = models.ManyToManyField(Group, blank=True)
 
     class Meta:
         ordering = ('order', )
@@ -48,7 +48,7 @@ class Table(models.Model):
     type = models.CharField(max_length=8, choices=TYPE_CHOICES)
     utype = models.CharField(max_length=256, null=True, blank=True)
 
-    published_for = models.ManyToManyField(Group, blank=True)
+    groups = models.ManyToManyField(Group, blank=True)
 
     class Meta:
         ordering = ('database__order', 'order', )
@@ -83,7 +83,7 @@ class Column(models.Model):
     indexed = models.BooleanField(default=False, help_text=_('This column is indexed.'))
     std = models.BooleanField(default=False, help_text=_('This column is defined by some standard.'))
 
-    published_for = models.ManyToManyField(Group, blank=True)
+    groups = models.ManyToManyField(Group, blank=True)
 
     class Meta:
         ordering = ('table__database__order', 'table__order', 'order', )
@@ -105,7 +105,7 @@ class Function(models.Model):
     name = models.CharField(max_length=256)
     description = models.TextField(null=True, blank=True)
 
-    published_for = models.ManyToManyField(Group, blank=True)
+    groups = models.ManyToManyField(Group, blank=True)
 
     class Meta:
         ordering = ('order', )

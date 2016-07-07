@@ -1,3 +1,4 @@
+from django.contrib.auth.models import Group
 from django.shortcuts import render
 
 from rest_framework import viewsets
@@ -48,3 +49,8 @@ class FunctionViewSet(viewsets.ModelViewSet):
             return NestedFunctionSerializer
         else:
             return FunctionSerializer
+
+
+class GroupViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer

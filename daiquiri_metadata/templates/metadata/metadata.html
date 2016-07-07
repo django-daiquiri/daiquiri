@@ -14,8 +14,14 @@
 
     {% compress js %}
     <script type="text/javascript" src="{% static 'angular/angular.min.js' %}" ></script>
-    <script type="text/javascript" src="{% static 'core/js/resources.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'angular-resource/angular-resource.min.js' %}" ></script>
+
+    <script type="text/javascript" src="{% static 'core/js/core.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'core/js/filter.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'core/js/byNumber.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'core/js/formgroup.js' %}" ></script>
     <script type="text/javascript" src="{% static 'core/js/browser.js' %}" ></script>
+
     <script type="text/javascript" src="{% static 'metadata/js/metadata.js' %}" ></script>
     {% endcompress %}
 {% endblock %}
@@ -34,14 +40,18 @@
 
     <div class="row">
         <div class="col-md-9">
-            <div daiquiri-browser data-resource="databases"></div>
+            <div daiquiri-browser data-browser-id="databases"></div>
         </div>
         <div class="col-md-3">
-            <div daiquiri-browser data-resource="functions"></div>
+            <div daiquiri-browser data-browser-id="functions"></div>
         </div>
     </div>
 
-    <div ng-repeat="database in service.databases">{$ database.name $}</div>
-    <div ng-repeat="function in service.functions">{$ function.name $}</div>
+    {% include 'metadata/metadata_display.html' %}
+
+    {% include 'metadata/metadata_modal_form_databases.html' %}
+    {% include 'metadata/metadata_modal_form_tables.html' %}
+    {% include 'metadata/metadata_modal_form_columns.html' %}
+    {% include 'metadata/metadata_modal_form_functions.html' %}
 
 {% endblock %}
