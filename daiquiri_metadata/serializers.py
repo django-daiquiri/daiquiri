@@ -44,14 +44,14 @@ class NestedFunctionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Function
-        fields = ('id', 'name')
+        fields = ('id', '__str__', 'name')
 
 
 class NestedColumnSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Column
-        fields = ('id', 'name')
+        fields = ('id', '__str__', 'name')
 
 
 class NestedTableSerializer(serializers.ModelSerializer):
@@ -60,7 +60,7 @@ class NestedTableSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Table
-        fields = ('id', 'name', 'columns')
+        fields = ('id', '__str__', 'name', 'columns')
 
 
 class NestedDatabaseSerializer(serializers.ModelSerializer):
@@ -69,4 +69,4 @@ class NestedDatabaseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Database
-        fields = ('id', 'name', 'tables')
+        fields = ('id', '__str__', 'name', 'tables')
