@@ -60,6 +60,15 @@
                         data-model="service.values.utype"
                         data-errors="service.errors.utype">
                     </formgroup>
+                    <formgroup
+                        data-id="groups"
+                        data-type="multicheckbox"
+                        data-label="{% trans 'Published for' %}"
+                        data-model="service.values.groups"
+                        data-errors="service.errors.groups"
+                        data-options="service.groups"
+                        data-options-label="name">
+                    </formgroup>
                 </div>
 
                 <div class="modal-footer">

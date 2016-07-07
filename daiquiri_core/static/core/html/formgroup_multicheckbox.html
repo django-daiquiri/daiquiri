@@ -1,0 +1,26 @@
+<div class="form-group" ng-class="{'has-error': errors }">
+
+    <div class="control-label" for="{$ field $}">{$ label $}</div>
+
+    <div id="{$ id $}" class="daiquiri-multi-checkbox">
+
+        <div class="checkbox" ng-repeat="option in options" ng-hide="optionsFilter">
+            <label>
+                <input type="checkbox" ng-model="model" data-value="{$ option.id $}" multi-checkbox />
+                <span>{$ option[optionsLabel] $}</span>
+            </label>
+        </div>
+
+        <div class="checkbox" ng-repeat="option in options | filter: optionsFilter" ng-show="optionsFilter">
+            <label>
+                <input type="checkbox" ng-model="model" data-value="{$ option.id $}" multi-checkbox />
+                <span>{$ option[optionsLabel] $}</span>
+            </label>
+        </div>
+
+    </div>
+
+    <ul class="help-block list-unstyled">
+        <li ng-repeat="error in errors">{$ error $}</li>
+    </ul>
+</div>

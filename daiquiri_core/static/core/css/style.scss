@@ -94,3 +94,21 @@ a.glyphicon {
 .daiquiri-widget :last-child {
     margin-bottom: 0;
 }
+
+/* forms */
+
+formgroup:last-child > .form-group {
+    margin-bottom: 0;
+}
+
+div.control-label {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.daiquiri-multi-checkbox > :first-child {
+    margin-top: 0;
+}
+.daiquiri-multi-checkbox > :last-child {
+    margin-bottom: 0;
+}

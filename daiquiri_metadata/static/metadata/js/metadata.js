@@ -25,16 +25,26 @@ angular.module('metadata', ['core'])
 
     service.factory = {
         databases: function() {
-            return {};
+            return {
+                groups: []
+            };
          },
         tables: function() {
-            return {'database': browser.getSelectedItem('databases', 0).id};
+            return {
+                database: browser.getSelectedItem('databases', 0).id,
+                groups: []
+            };
         },
         columns: function() {
-            return {'table': browser.getSelectedItem('databases', 1).id};
+            return {
+                table: browser.getSelectedItem('databases', 1).id,
+                groups: []
+            };
         },
         functions: function() {
-            return {};
+            return {
+                groups: []
+            };
         }
     };
 
