@@ -61,8 +61,8 @@ angular.module('metadata', ['core'])
         });
     };
 
-    service.activateItem = function(resource, item) {
-        return resources[resource].get({id : item.id}, function(item) {
+    service.activateItem = function(resource, id) {
+        return resources[resource].get({id: id}, function(item) {
             item.resource = resource;
 
             item.published_for = $filter('filter')(service.groups, function(group) {
@@ -100,11 +100,13 @@ angular.module('metadata', ['core'])
         promise.then(function() {
             $('#' + resource + '-form-modal').modal('hide');
 
-            if (resource === 'functions') {
-                service.initFunctionsBrowser();
-            } else {
-                service.initDatabasesBrowser();
-            }
+            service.activateItem(resource, service.values.id).$promise.then(function () {
+                if (resource === 'functions') {
+                    service.initFunctionsBrowser();
+                } else {
+                    service.initDatabasesBrowser();
+                }
+            });
 
         }, function(result) {
             service.errors = result.data;
@@ -132,6 +134,6 @@ angular.module('metadata', ['core'])
     $scope.service.init();
 
     $scope.$on('browserItemClicked', function(event, resource, item) {
-        MetadataService.activateItem(resource, item);
+        MetadataService.activateItem(resource, item.id);
     });
 }]);
