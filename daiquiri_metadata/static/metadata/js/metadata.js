@@ -18,6 +18,24 @@ angular.module('metadata', ['core'])
         'columns': $resource(baseurl + 'metadata/api/columns/:id/'),
         'functions': $resource(baseurl + 'metadata/api/functions/:id/'),
         'groups': $resource(baseurl + 'metadata/api/groups/:id/'),
+        'tabletypes': $resource(baseurl + 'metadata/api/tabletypes/:id/'),
+    };
+
+    /* configure the factory for new items */
+
+    service.factory = {
+        databases: function() {
+            return {};
+         },
+        tables: function() {
+            return {'database': browser.getSelectedItem('databases', 0).id};
+        },
+        columns: function() {
+            return {'table': browser.getSelectedItem('databases', 1).id};
+        },
+        functions: function() {
+            return {};
+        }
     };
 
     /* create and configure the browser service */
@@ -38,6 +56,7 @@ angular.module('metadata', ['core'])
     /* define service functions */
 
     service.init = function() {
+        service.tabletypes = resources.tabletypes.query();
         service.groups = resources.groups.query();
 
         service.initDatabasesBrowser();
@@ -78,9 +97,9 @@ angular.module('metadata', ['core'])
         service.values = {};
 
         if (angular.isDefined(create) && create) {
-
+            service.values = service.factory[resource]();
         } else {
-           service.values = angular.copy(service.active);
+            service.values = angular.copy(service.active);
         }
 
         $timeout(function() {
@@ -97,10 +116,10 @@ angular.module('metadata', ['core'])
             promise = resources[resource].save(service.values).$promise;
         }
 
-        promise.then(function() {
+        promise.then(function(result) {
             $('#' + resource + '-form-modal').modal('hide');
 
-            service.activateItem(resource, service.values.id).$promise.then(function () {
+            service.activateItem(resource, result.id).$promise.then(function () {
                 if (resource === 'functions') {
                     service.initFunctionsBrowser();
                 } else {

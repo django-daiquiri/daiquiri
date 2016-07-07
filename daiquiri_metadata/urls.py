@@ -5,11 +5,12 @@ from rest_framework import routers
 from .views import *
 
 router = routers.DefaultRouter()
-router.register(r'databases', DatabaseViewSet)
-router.register(r'tables', TableViewSet)
-router.register(r'columns', ColumnViewSet)
-router.register(r'functions', FunctionViewSet)
-router.register(r'groups', GroupViewSet)
+router.register(r'databases', DatabaseViewSet, base_name='database')
+router.register(r'tables', TableViewSet, base_name='table')
+router.register(r'columns', ColumnViewSet, base_name='column')
+router.register(r'functions', FunctionViewSet, base_name='function')
+router.register(r'groups', GroupViewSet, base_name='group')
+router.register(r'tabletypes', TableTypeViewSet, base_name='tabletype')
 
 urlpatterns = [
     url(r'^$', metadata, name='metadata'),

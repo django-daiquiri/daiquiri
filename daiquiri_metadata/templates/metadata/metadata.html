@@ -47,7 +47,14 @@
         </div>
     </div>
 
-    {% include 'metadata/metadata_display.html' %}
+    <div class="row">
+        <div class="col-md-9">
+            {% include 'metadata/metadata_display.html' %}
+        </div>
+        <div class="col-md-3">
+            {% include 'metadata/metadata_options.html' %}
+        </div>
+    </div>
 
     {% include 'metadata/metadata_modal_form_databases.html' %}
     {% include 'metadata/metadata_modal_form_tables.html' %}

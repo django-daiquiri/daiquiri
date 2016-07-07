@@ -54,6 +54,8 @@ angular.module('core')
                 if (angular.isDefined(active_item) && active_item) {
                     browser.findActiveItem(browser_id, active_item);
                 } else {
+                    browser.active = {};
+
                     if (angular.isDefined(column1) && angular.isDefined(column1.selected) && column1.selected) {
                         // something in the SECOND column has been selected before:
                         // first select the selected item in the FIRST column
@@ -125,6 +127,11 @@ angular.module('core')
                 column2.selected = false;
             }
         }
+    };
+
+    browser.getSelectedItem = function(browser_id, column_index) {
+        var selected = browser[browser_id].columns[column_index].selected;
+        return browser[browser_id].columns[column_index].items[selected];
     };
 
     browser.activateItem = function(browser_id, column_index, row_index) {

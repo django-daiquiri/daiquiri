@@ -20,7 +20,8 @@
                         data-model="service.values.database"
                         data-errors="service.errors.database"
                         data-options="service.databases"
-                        data-options-label="__str__">
+                        data-options-label="__str__"
+                        data-options-null="1">
                     </formgroup>
                     <formgroup
                         data-id="order"
@@ -48,7 +49,9 @@
                         data-type="select"
                         data-label="{% trans 'Type' %}"
                         data-model="service.values.type"
-                        data-errors="service.errors.type">
+                        data-errors="service.errors.type"
+                        data-options="service.tabletypes"
+                        data-options-label="text">
                     </formgroup>
                     <formgroup
                         data-id="utype"

@@ -3,6 +3,8 @@ from django.shortcuts import render
 
 from rest_framework import viewsets
 
+from daiquiri_core.serializers import ChoicesSerializer
+
 from .models import *
 from .serializers import *
 
@@ -54,3 +56,10 @@ class FunctionViewSet(viewsets.ModelViewSet):
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
+
+
+class TableTypeViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = ChoicesSerializer
+
+    def get_queryset(self):
+        return Table.TYPE_CHOICES

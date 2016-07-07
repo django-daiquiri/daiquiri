@@ -12,7 +12,7 @@ angular.module('core')
                 }
             });
             ngModel.$formatters.push(function(val) {
-                if (val === null) {
+                if (angular.isUndefined(val) || val === null) {
                     return 'null';
                 } else {
                     return '' + val;
