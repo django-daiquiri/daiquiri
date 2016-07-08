@@ -7,22 +7,17 @@ from daiquiri_metadata.models import Database, Function
 
 from .models import QueryJob
 from .serializers import QueryJobSerializer, DatabaseSerializer, FunctionSerializer
-from .forms import QueryJobForm
 
 
 def query(request):
-    form = QueryJobForm(request.POST or None)
 
-    if request.method == 'POST':
-        if form.is_valid():
+    #query = 'select a,b from daiquiri_.tbl, tbl2 where c = 5'
+    #query = 'select adsad(1)'
+    query = 'select a.vx,b.id from daiquiri_data_sim.particles as a, daiquiri_test_obs.stars as b where b.id = 5'
 
-            QueryJob.submission.submit(form.cleaned_data['query'], request.user)
+    QueryJob.submission.submit(query, request.user)
 
-            return HttpResponseRedirect(request.path_info)
-
-    return render(request, 'query/query.html', {
-        'form': form
-    })
+    return render(request, 'query/query.html', {'query': query})
 
 
 class QueryJobViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
@@ -35,7 +30,7 @@ class DatabaseViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = DatabaseSerializer
 
     def get_queryset(self):
-        return Database.objects.filter(published_for__in=self.request.user.groups.all())
+        return Database.objects.filter(groups__in=self.request.user.groups.all())
 
 
 class FunctionViewSet(viewsets.ReadOnlyModelViewSet):
@@ -43,4 +38,4 @@ class FunctionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = FunctionSerializer
 
     def get_queryset(self):
-        return Function.objects.filter(published_for__in=self.request.user.groups.all())
+        return Function.objects.filter(groups__in=self.request.user.groups.all())
