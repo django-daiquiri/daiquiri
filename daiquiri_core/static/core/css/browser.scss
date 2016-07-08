@@ -12,6 +12,8 @@
 }
 
 .daiquiri-browser-body {
+    height: 100px;
+
     overflow-x: hidden;
     overflow-y: auto;
     border-top: 1px solid $border-color;
@@ -27,9 +29,6 @@
 }
 
 @media (min-width: $screen-xs-max) {
-    .daiquiri-browser-body {
-        height: 300px;
-    }
 
     .daiquiri-browser .col-sm-4:nth-child(1),
     .daiquiri-browser .col-sm-4:nth-child(2) {
