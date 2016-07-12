@@ -1,4 +1,3 @@
-from daiquiri_core.permissions import DaiquiriModelPermissions
 from django.contrib.auth.models import Group
 from django.shortcuts import render
 

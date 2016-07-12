@@ -4,6 +4,7 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 from .managers import PermissionsManager
+from .utils import store_table_comment, store_column_comment
 
 
 @python_2_unicode_compatible
@@ -69,6 +70,17 @@ class Table(models.Model):
     def __str__(self):
         return self.database.name + '.' + self.name
 
+    def save(self, *args, **kwargs):
+        super(Table, self).save(*args, **kwargs)
+
+        store_table_comment(self.database.name, self.name, {
+            'order': self.order,
+            'name': self.name,
+            'description': self.description,
+            'type': self.type,
+            'utype': self.utype
+        })
+
 
 @python_2_unicode_compatible
 class Column(models.Model):
@@ -106,6 +118,23 @@ class Column(models.Model):
 
     def __str__(self):
         return self.table.database.name + '.' + self.table.name + '.' + self.name
+
+    def save(self, *args, **kwargs):
+        super(Column, self).save(*args, **kwargs)
+
+        store_column_comment(self.table.database.name, self.table.name, self.name, {
+            'order': self.order,
+            'name': self.name,
+            'description': self.description,
+            'unit': self.unit,
+            'ucd': self.ucd,
+            'utype': self.utype,
+            'datatype': self.datatype,
+            'size': self.size,
+            'principal': self.principal,
+            'indexed': self.indexed,
+            'std': self.std
+        })
 
 
 @python_2_unicode_compatible
