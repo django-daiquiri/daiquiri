@@ -50,6 +50,16 @@
                         data-options="service.groups"
                         data-options-label="name">
                     </formgroup>
+
+                    <div ng-hide="service.values.id">
+                        <formgroup
+                            data-id="discover"
+                            data-type="checkbox"
+                            data-label="{% trans 'Automatically discover tables and columns' %}"
+                            data-model="service.values.discover"
+                            data-errors="service.errors.discover">
+                        </formgroup>
+                    </div>
                 </div>
 
                 <div class="modal-footer">

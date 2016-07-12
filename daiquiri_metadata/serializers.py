@@ -12,17 +12,10 @@ class GroupSerializer(serializers.ModelSerializer):
         fields = ('id', 'name')
 
 
-class DatabaseSerializer(serializers.ModelSerializer):
+class FunctionSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Database
-        fields = '__all__'
-
-
-class TableSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Table
+        model = Function
         fields = '__all__'
 
 
@@ -33,10 +26,17 @@ class ColumnSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class FunctionSerializer(serializers.ModelSerializer):
+class TableSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Function
+        model = Table
+        fields = '__all__'
+
+
+class DatabaseSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Database
         fields = '__all__'
 
 
