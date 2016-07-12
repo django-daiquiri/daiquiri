@@ -3,9 +3,14 @@ from django.contrib.auth.models import Group
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
+from .managers import PermissionsManager
+
 
 @python_2_unicode_compatible
 class Database(models.Model):
+
+    objects = models.Manager()
+    permissions = PermissionsManager()
 
     order = models.IntegerField(null=True, blank=True)
 
@@ -38,6 +43,9 @@ class Table(models.Model):
         (TYPE_VIEW, _('View'))
     )
 
+    objects = models.Manager()
+    permissions = PermissionsManager()
+
     database = models.ForeignKey(Database, related_name='tables')
 
     order = models.IntegerField(null=True, blank=True)
@@ -64,6 +72,9 @@ class Table(models.Model):
 
 @python_2_unicode_compatible
 class Column(models.Model):
+
+    objects = models.Manager()
+    permissions = PermissionsManager()
 
     table = models.ForeignKey(Table, related_name='columns')
 
@@ -99,6 +110,9 @@ class Column(models.Model):
 
 @python_2_unicode_compatible
 class Function(models.Model):
+
+    objects = models.Manager()
+    permissions = PermissionsManager()
 
     order = models.IntegerField(null=True, blank=True)
 

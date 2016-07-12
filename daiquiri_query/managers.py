@@ -21,8 +21,10 @@ class QueryJobsSubmissionManager(models.Manager):
         queue = self._get_queue(queue)
 
         # check sanity (table exists etc.)
+        # todo
 
         # translate adql -> mysql string
+        # todo
 
         # parse the query
         qp = MySQLQueryProcessor(query)
@@ -38,6 +40,7 @@ class QueryJobsSubmissionManager(models.Manager):
             raise PermissionError(errors)
 
         # store statistics/meta information
+        # todo
 
         job = self.model(
             query=query,
@@ -76,24 +79,21 @@ class QueryJobsSubmissionManager(models.Manager):
                 database_name, table_name, column_name = column.split('.')
 
                 # check permission on database
-                try:
-                    database = Database.objects.get(name=database_name, groups__in=user.groups.all())
-                except Database.DoesNotExist:
+                database = Database.permissions.check_user(database_name, user)
+                if not database:
                     errors.append(_('Database %s not found.') % database_name)
                     continue
 
                 # check permission on table
-                try:
-                    table = Table.objects.get(name=table_name, database=database, groups__in=user.groups.all())
-                except Table.DoesNotExist:
-                    errors.append(_('Table %s.%s not found.') % (database_name, table_name))
+                table = Table.permissions.check_user(table_name, user)
+                if not table:
+                    errors.append(_('Table %s not found.') % table_name)
                     continue
 
                 # check permission on column
-                try:
-                    Column.objects.get(name=column_name, table=table, groups__in=user.groups.all())
-                except Column.DoesNotExist:
-                    errors.append(_('Column %s.%s.%s not found.') % (database_name, table_name, column_name))
+                column = Column.permissions.check_user(column_name, user)
+                if not table:
+                    errors.append(_('Column %s not found.') % column_name)
                     continue
 
             except ValueError:
@@ -102,10 +102,9 @@ class QueryJobsSubmissionManager(models.Manager):
         # check permissions on functions
         for function in qp.functions:
             # check permission on function
-            try:
-                Function.objects.get(name=function_name, groups__in=user.groups.all())
-            except Function.DoesNotExist:
-                errors.append(_('Function %s not found.') % function)
+            function = Function.permissions.check_user(function_name, user)
+            if not function:
+                errors.append(_('Function %s not found.') % function_name)
                 continue
 
         # return the error stack
