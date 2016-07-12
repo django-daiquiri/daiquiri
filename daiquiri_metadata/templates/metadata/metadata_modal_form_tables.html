@@ -20,8 +20,7 @@
                         data-model="service.values.database"
                         data-errors="service.errors.database"
                         data-options="service.databases"
-                        data-options-label="__str__"
-                        data-options-null="1">
+                        data-options-label="__str__">
                     </formgroup>
                     <formgroup
                         data-id="order"
@@ -84,6 +83,10 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">
                         {% trans 'Close' %}
+                    </button>
+                    <button type="button" class="btn btn-default"
+                        ng-click="service.discoverItem('tables')">
+                        {% trans 'Autofill' %}
                     </button>
                     <button type="button" class="btn btn-primary"
                             ng-click="service.submitFormModal('tables')">

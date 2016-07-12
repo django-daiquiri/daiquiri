@@ -14,8 +14,8 @@ angular.module('metadata', ['core'])
 
     var resources = {
         'databases': $resource(baseurl + 'metadata/api/databases/:id/'),
-        'tables': $resource(baseurl + 'metadata/api/tables/:id/'),
-        'columns': $resource(baseurl + 'metadata/api/columns/:id/'),
+        'tables': $resource(baseurl + 'metadata/api/tables/:route/:id/'),
+        'columns': $resource(baseurl + 'metadata/api/columns/:route/:id/'),
         'functions': $resource(baseurl + 'metadata/api/functions/:id/'),
         'groups': $resource(baseurl + 'metadata/api/groups/:id/'),
         'tabletypes': $resource(baseurl + 'metadata/api/tabletypes/:id/'),
@@ -31,13 +31,13 @@ angular.module('metadata', ['core'])
          },
         tables: function() {
             return {
-                database: browser.getSelectedItem('databases', 0).id,
+                database: service.browser.getSelectedItem('databases', 0).id,
                 groups: []
             };
         },
         columns: function() {
             return {
-                table: browser.getSelectedItem('databases', 1).id,
+                table: service.browser.getSelectedItem('databases', 1).id,
                 groups: []
             };
         },
@@ -50,9 +50,9 @@ angular.module('metadata', ['core'])
 
     /* create and configure the browser service */
 
-    var browser = BrowserService;
+    service.browser = BrowserService;
 
-    browser.init({
+    service.browser.init({
         databases: {
             url: baseurl + 'metadata/api/databases/?nested=1',
             columns: ['databases','tables','columns']
@@ -74,19 +74,19 @@ angular.module('metadata', ['core'])
     };
 
     service.initDatabasesBrowser = function() {
-        browser.initBrowser('databases', service.active).then(function() {
-            service.databases = browser['databases'].data;
+        service.browser.initBrowser('databases', service.active).then(function() {
+            service.databases = service.browser['databases'].data;
 
             service.tables = [];
-            angular.forEach(browser['databases'].data, function(database) {
+            angular.forEach(service.browser['databases'].data, function(database) {
                 service.tables = service.tables.concat(database.tables);
             });
         });
     };
 
     service.initFunctionsBrowser = function() {
-        browser.initBrowser('functions', service.active).then(function() {
-            service.functions = browser['functions'].data;
+        service.browser.initBrowser('functions', service.active).then(function() {
+            service.functions = service.browser['functions'].data;
         });
     };
 
@@ -158,6 +158,27 @@ angular.module('metadata', ['core'])
             } else {
                 service.initDatabasesBrowser();
             }
+        });
+    };
+
+    service.discoverItem = function(resource) {
+        var parameters = {
+            route: 'discover'
+        };
+
+        if (resource === 'tables') {
+            parameters['database'] = $filter('filter')(service.databases, {'id': service.values.database})[0].name;
+            parameters['table'] = service.values.name;
+        } else if (resource === 'columns') {
+            var split = $filter('filter')(service.tables, {'id': service.values.table})[0].__str__.split('.');
+
+            parameters['database'] = split[0];
+            parameters['table'] = split[1];
+            parameters['column'] = service.values.name;
+        }
+
+        return resources[resource].query(parameters, function(response) {
+            angular.extend(service.values, response[0]);
         });
     };
 

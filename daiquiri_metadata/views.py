@@ -3,12 +3,13 @@ from django.shortcuts import render
 
 from rest_framework import viewsets, status
 from rest_framework.response import Response
+from rest_framework.decorators import list_route
 
 from daiquiri_core.serializers import ChoicesSerializer
 
 from .models import *
 from .serializers import *
-from .utils import discover_tables, discover_columns
+from .utils import discover_tables, discover_table, discover_columns, discover_column
 
 
 def metadata(request):
@@ -80,6 +81,16 @@ class TableViewSet(viewsets.ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
+    @list_route(methods=['get'], permission_classes=[])
+    def discover(self, request):
+        database_name = request.GET.get('database')
+        table_name = request.GET.get('table')
+
+        if database_name and table_name:
+            return Response([discover_table(database_name, table_name)])
+        else:
+            return Response([])
+
 
 class ColumnViewSet(viewsets.ModelViewSet):
     queryset = Column.objects.all()
@@ -89,6 +100,17 @@ class ColumnViewSet(viewsets.ModelViewSet):
             return NestedColumnSerializer
         else:
             return ColumnSerializer
+
+    @list_route(methods=['get'], permission_classes=[])
+    def discover(self, request):
+        database_name = request.GET.get('database')
+        table_name = request.GET.get('table')
+        column_name = request.GET.get('column')
+
+        if database_name and table_name:
+            return Response([discover_column(database_name, table_name, column_name)])
+        else:
+            return Response([])
 
 
 class FunctionViewSet(viewsets.ModelViewSet):
