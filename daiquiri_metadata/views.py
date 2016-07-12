@@ -34,6 +34,7 @@ class DatabaseViewSet(viewsets.ModelViewSet):
         if request.data.get('discover'):
             for table_metadata in discover_tables(database.name):
                 table_metadata['database'] = database.id
+                table_metadata['groups'] = request.data['groups']
 
                 table_serializer = TableSerializer(data=table_metadata)
                 if table_serializer.is_valid():
@@ -41,6 +42,7 @@ class DatabaseViewSet(viewsets.ModelViewSet):
 
                     for column_metadata in discover_columns(database.name, table.name):
                         column_metadata['table'] = table.id
+                        column_metadata['groups'] = request.data['groups']
 
                         column_serializer = ColumnSerializer(data=column_metadata)
                         if column_serializer.is_valid():
@@ -69,6 +71,7 @@ class TableViewSet(viewsets.ModelViewSet):
         if request.data.get('discover'):
             for column_metadata in discover_columns(table.database.name, table.name):
                 column_metadata['table'] = table.id
+                column_metadata['groups'] = request.data['groups']
 
                 column_serializer = ColumnSerializer(data=column_metadata)
                 if column_serializer.is_valid():
