@@ -3,7 +3,7 @@ from django.contrib.auth.models import Group
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
-from .managers import PermissionsManager
+from .managers import *
 from .utils import store_table_comment, store_column_comment
 
 
@@ -11,7 +11,7 @@ from .utils import store_table_comment, store_column_comment
 class Database(models.Model):
 
     objects = models.Manager()
-    permissions = PermissionsManager()
+    permissions = DatabasePermissionsManager()
 
     order = models.IntegerField(null=True, blank=True)
 
@@ -45,7 +45,7 @@ class Table(models.Model):
     )
 
     objects = models.Manager()
-    permissions = PermissionsManager()
+    permissions = TablePermissionsManager()
 
     database = models.ForeignKey(Database, related_name='tables')
 
@@ -86,7 +86,7 @@ class Table(models.Model):
 class Column(models.Model):
 
     objects = models.Manager()
-    permissions = PermissionsManager()
+    permissions = ColumnPermissionsManager()
 
     table = models.ForeignKey(Table, related_name='columns')
 
@@ -141,7 +141,7 @@ class Column(models.Model):
 class Function(models.Model):
 
     objects = models.Manager()
-    permissions = PermissionsManager()
+    permissions = FunctionPermissionsManager()
 
     order = models.IntegerField(null=True, blank=True)
 

@@ -1,0 +1,12 @@
+<table class="table">
+    <thead>
+        <tr>
+            <th ng-repeat="column in table.columns">{$ column.name $}</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="row in table.rows">
+            <td ng-repeat="element in row">{$ element $}</td>
+        </tr>
+    </tbody>
+</table>
