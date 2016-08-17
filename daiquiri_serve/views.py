@@ -59,15 +59,16 @@ class RowViewSet(viewsets.ViewSet):
 
         # get columns for this table
         columns = Column.permissions.all(self.request.user, table=table)
+        column_names = [column.name for column in columns]
 
         # get database adapter
         adapter = get_adapter('data')
 
         # query the database for the total number of rows
-        count = adapter.count_rows(database, table)
+        count = adapter.count_rows(database.name, table.name)
 
         # query the paginated rowset
-        results = adapter.fetch_rows(database, table, columns, ordering, page, page_size)
+        results = adapter.fetch_rows(database.name, table.name, column_names, ordering, page, page_size)
 
         # get the previous and next url
         next = self._get_next_url(page, page_size, count)

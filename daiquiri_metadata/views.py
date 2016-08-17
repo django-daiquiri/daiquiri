@@ -5,11 +5,11 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import list_route
 
+from daiquiri_core.adapter import get_adapter
 from daiquiri_core.serializers import ChoicesSerializer
 
 from .models import *
 from .serializers import *
-from .utils import discover_tables, discover_table, discover_columns, discover_column
 
 
 def metadata(request):
@@ -33,7 +33,9 @@ class DatabaseViewSet(viewsets.ModelViewSet):
         database = serializer.save()
 
         if request.data.get('discover'):
-            for table_metadata in discover_tables(database.name):
+            adapter = get_adapter('metadata')
+
+            for table_metadata in adapter.fetch_tables(database.name):
                 table_metadata['database'] = database.id
                 table_metadata['groups'] = request.data['groups']
 
@@ -41,7 +43,7 @@ class DatabaseViewSet(viewsets.ModelViewSet):
                 if table_serializer.is_valid():
                     table = table_serializer.save()
 
-                    for column_metadata in discover_columns(database.name, table.name):
+                    for column_metadata in adapter.fetch_columns(database.name, table.name):
                         column_metadata['table'] = table.id
                         column_metadata['groups'] = request.data['groups']
 
@@ -70,7 +72,9 @@ class TableViewSet(viewsets.ModelViewSet):
         table = serializer.save()
 
         if request.data.get('discover'):
-            for column_metadata in discover_columns(table.database.name, table.name):
+            adapter = get_adapter('metadata')
+
+            for column_metadata in adapter.fetch_columns(table.database.name, table.name):
                 column_metadata['table'] = table.id
                 column_metadata['groups'] = request.data['groups']
 
@@ -87,7 +91,7 @@ class TableViewSet(viewsets.ModelViewSet):
         table_name = request.GET.get('table')
 
         if database_name and table_name:
-            return Response([discover_table(database_name, table_name)])
+            return Response([get_adapter('metadata').fetch_table(database_name, table_name)])
         else:
             return Response([])
 
@@ -108,7 +112,7 @@ class ColumnViewSet(viewsets.ModelViewSet):
         column_name = request.GET.get('column')
 
         if database_name and table_name:
-            return Response([discover_column(database_name, table_name, column_name)])
+            return Response([get_adapter('metadata').fetch_column(database_name, table_name, column_name)])
         else:
             return Response([])
 

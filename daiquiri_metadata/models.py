@@ -3,8 +3,9 @@ from django.contrib.auth.models import Group
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
+from daiquiri_core.adapter import get_adapter
+
 from .managers import *
-from .utils import store_table_comment, store_column_comment
 
 
 @python_2_unicode_compatible
@@ -73,7 +74,7 @@ class Table(models.Model):
     def save(self, *args, **kwargs):
         super(Table, self).save(*args, **kwargs)
 
-        store_table_comment(self.database.name, self.name, {
+        get_adapter('metadata').store_table_metadata(self.database.name, self.name, {
             'order': self.order,
             'name': self.name,
             'description': self.description,
@@ -122,7 +123,7 @@ class Column(models.Model):
     def save(self, *args, **kwargs):
         super(Column, self).save(*args, **kwargs)
 
-        store_column_comment(self.table.database.name, self.table.name, self.name, {
+        get_adapter('metadata').store_column_metadata(self.table.database.name, self.table.name, self.name, {
             'order': self.order,
             'name': self.name,
             'description': self.description,
