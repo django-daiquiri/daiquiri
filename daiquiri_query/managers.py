@@ -79,19 +79,19 @@ class QueryJobsSubmissionManager(models.Manager):
                 database_name, table_name, column_name = column.split('.')
 
                 # check permission on database
-                database = Database.permissions.check_user(database_name, user)
+                database = Database.permissions.get(user, database_name=database_name)
                 if not database:
                     errors.append(_('Database %s not found.') % database_name)
                     continue
 
                 # check permission on table
-                table = Table.permissions.check_user(table_name, user)
+                table = Table.permissions.get(user, database_name=database_name, table_name=table_name)
                 if not table:
                     errors.append(_('Table %s not found.') % table_name)
                     continue
 
                 # check permission on column
-                column = Column.permissions.check_user(column_name, user)
+                column = Column.permissions.get(user, database_name=database_name, table_name=table_name, column_name=column_name)
                 if not table:
                     errors.append(_('Column %s not found.') % column_name)
                     continue
@@ -102,7 +102,7 @@ class QueryJobsSubmissionManager(models.Manager):
         # check permissions on functions
         for function in qp.functions:
             # check permission on function
-            function = Function.permissions.check_user(function_name, user)
+            function = Function.permissions.get(user, function_name=function_name)
             if not function:
                 errors.append(_('Function %s not found.') % function_name)
                 continue

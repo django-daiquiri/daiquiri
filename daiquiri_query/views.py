@@ -13,7 +13,7 @@ def query(request):
 
     #query = 'select a,b from daiquiri_.tbl, tbl2 where c = 5'
     #query = 'select adsad(1)'
-    query = 'select a.vx,b.id from daiquiri_data_sim.particles as a, daiquiri_test_obs.stars as b where b.id = 5'
+    query = 'select a.vx,b.id from daiquiri_data_sim.particles as a, daiquiri_data_obs.stars as b where b.id = 5'
 
     QueryJob.submission.submit(query, request.user)
 
