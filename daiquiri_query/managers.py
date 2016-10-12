@@ -92,7 +92,7 @@ class QueryJobsSubmissionManager(models.Manager):
 
                 # check permission on column
                 column = Column.permissions.get(user, database_name=database_name, table_name=table_name, column_name=column_name)
-                if not table:
+                if not column:
                     errors.append(_('Column %s not found.') % column_name)
                     continue
 
