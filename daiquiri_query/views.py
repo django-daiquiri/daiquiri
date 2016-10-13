@@ -1,10 +1,8 @@
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
 
-from rest_framework import viewsets, mixins, filters
-from rest_framework.permissions import DjangoModelPermissions, IsAuthenticated
-from rest_framework.decorators import list_route, detail_route
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import ValidationError
 
 from daiquiri_metadata.models import Database, Function
