@@ -9,6 +9,10 @@
 
 {% block page %}
 
-    <pre>{{ query }}</pre>
+    <pre>SELECT a,b FROM daiquiri_.tbl, tbl2 WHERE c = 5</pre>
+    <pre>SELECT adsad(1)</pre>
+    <pre>SELECT a.vx,b.id FROM daiquiri_data_sim.particles AS a, daiquiri_data_obs.stars AS b WHERE b.id = 5</pre>
+    <pre>SELECT TOP 10 id FROM daiquiri_data_sim.particles</pre>
+    <pre>SELECT id FROM daiquiri_data_sim.particles LIMIT 10</pre>
 
 {% endblock %}

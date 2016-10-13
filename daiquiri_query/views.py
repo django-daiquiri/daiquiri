@@ -1,31 +1,59 @@
-from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
+from django.shortcuts import render, get_object_or_404
 
 from rest_framework import viewsets, mixins, filters
+from rest_framework.permissions import DjangoModelPermissions, IsAuthenticated
+from rest_framework.decorators import list_route, detail_route
+from rest_framework.exceptions import ValidationError
 
 from daiquiri_metadata.models import Database, Function
 
-from .models import QueryJob
-from .serializers import QueryJobSerializer, DatabaseSerializer, FunctionSerializer
+from .models import *
+from .serializers import *
+from .exceptions import *
 
 
+@login_required()
 def query(request):
-
-    #query = 'select a,b from daiquiri_.tbl, tbl2 where c = 5'
-    #query = 'select adsad(1)'
-    query = 'select a.vx,b.id from daiquiri_data_sim.particles as a, daiquiri_data_obs.stars as b where b.id = 5'
-
-    QueryJob.submission.submit(query, request.user)
-
-    return render(request, 'query/query.html', {'query': query})
+    return render(request, 'query/query.html', {})
 
 
-class QueryJobViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
-    queryset = QueryJob.objects.all()
-    serializer_class = QueryJobSerializer
+class QueryJobViewSet(viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated, )
+
+    def get_queryset(self):
+        return QueryJob.objects.filter(owner=self.request.user)
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return QueryJobListSerializer
+        elif self.action == 'retrieve':
+            return QueryJobRetrieveSerializer
+        elif self.action == 'create':
+            return QueryJobCreateSerializer
+        elif self.action == 'update' or self.action == 'partial_update':
+            return QueryJobUpdateSerializer
+
+    def perform_create(self, serializer):
+        try:
+            QueryJob.submission.submit(serializer.data, self.request.user)
+        except ADQLSyntaxError as e:
+            raise ValidationError({'query': e.message})
+        except MySQLSyntaxError as e:
+            raise ValidationError({'query': e.message})
+        except PermissionError as e:
+            raise ValidationError({'query': e.message})
+
+    def perform_update(self, serializer):
+        serializer.save()
+
+    def perform_destroy(self, instance):
+        instance.archive()
 
 
 class DatabaseViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = (IsAuthenticated, )
 
     serializer_class = DatabaseSerializer
 
@@ -34,6 +62,7 @@ class DatabaseViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class FunctionViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = (IsAuthenticated, )
 
     serializer_class = FunctionSerializer
 

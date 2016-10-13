@@ -1,10 +1,13 @@
-class ADQLSyntaxError(Exception):
+from daiquiri_core.exceptions import DaiquiriException
+
+
+class ADQLSyntaxError(DaiquiriException):
     pass
 
 
-class MySQLSyntaxError(Exception):
+class MySQLSyntaxError(DaiquiriException):
     pass
 
 
-class PermissionError(Exception):
+class PermissionError(DaiquiriException):
     pass

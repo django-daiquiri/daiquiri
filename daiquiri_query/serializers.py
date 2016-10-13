@@ -5,11 +5,42 @@ from daiquiri_metadata.models import Database, Table, Column, Function
 from .models import QueryJob
 
 
-class QueryJobSerializer(serializers.ModelSerializer):
+class QueryJobListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = QueryJob
+        fields = (
+            'id',
+            'tablename'
+        )
+
+
+class QueryJobRetrieveSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = QueryJob
         fields = '__all__'
+
+
+class QueryJobCreateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = QueryJob
+        fields = (
+            'tablename',
+            'queue',
+            'query_language',
+            'query'
+        )
+
+
+class QueryJobUpdateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = QueryJob
+        fields = (
+            'tablename',
+        )
 
 
 class FunctionSerializer(serializers.ModelSerializer):

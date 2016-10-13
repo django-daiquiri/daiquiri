@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
@@ -10,11 +11,17 @@ from .managers import QueryJobsSubmissionManager
 @python_2_unicode_compatible
 class QueryJob(Job):
 
+    objects = models.Manager()
     submission = QueryJobsSubmissionManager()
 
     tablename = models.CharField(max_length=256)
+    queue = models.CharField(max_length=16, choices=settings.QUERY['queues'])
+
+    query_language = models.CharField(max_length=8, choices=settings.QUERY['query_languages'])
     query = models.TextField()
-    queue = models.CharField(max_length=16)
+    actual_query = models.TextField(null=True, blank=True)
+
+    queue = models.CharField(max_length=16, choices=settings.QUERY['queues'])
     nrows = models.IntegerField(null=True, blank=True)
     size = models.IntegerField(null=True, blank=True)
 
@@ -25,4 +32,4 @@ class QueryJob(Job):
         permissions = (('view_queryjob', 'Can view QueryJob'),)
 
     def __str__(self):
-        return super(QueryJob, self).__str__()
+        return self.get_str()

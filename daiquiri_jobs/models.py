@@ -56,7 +56,7 @@ class Job(models.Model):
         permissions = (('view_job', 'Can view Job'),)
 
     def __str__(self):
-        return "id=%s; phase=%s; job_type=%s" % (str(self.id), self.phase, self.job_type)
+        return self.get_str()
 
     @property
     def error(self):
@@ -80,6 +80,9 @@ class Job(models.Model):
         return {
             'query': 'SELECT x,y FROM a.b;'
         }
+
+    def get_str(self):
+        return "id=%s; phase=%s; job_type=%s" % (str(self.id), self.phase, self.job_type)
 
     def run(self):
         if self.phase == PHASE_PENDING:

@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from django.db import models
-from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
 from daiquiri_jobs.models import Job
@@ -11,23 +10,33 @@ from daiquiri_uws.settings import PHASE_PENDING
 from .exceptions import *
 
 from queryparser.mysql import MySQLQueryProcessor
+from queryparser.adql import ADQLQueryTranslator
 
 
 class QueryJobsSubmissionManager(models.Manager):
 
-    def submit(self, query, user, tablename=None, queue=None):
+    def submit(self, data, user):
 
-        tablename = self._get_tablename(tablename)
-        queue = self._get_queue(queue)
+        query = data['query']
+        query_language = data['query_language']
+        tablename = self._get_tablename(data['tablename'])
+        queue = self._get_queue(data['queue'])
 
         # check sanity (table exists etc.)
         # todo
 
-        # translate adql -> mysql string
-        # todo
+        if query_language == 'adql':
+            # translate adql -> mysql string
+            try:
+                adt = ADQLQueryTranslator(query)
+                actual_query = adt.to_mysql()
+            except RuntimeError as e:
+                raise ADQLSyntaxError(str(e))
+        else:
+            actual_query = query
 
         # parse the query
-        qp = MySQLQueryProcessor(query)
+        qp = MySQLQueryProcessor(actual_query)
         qp.process_query()
 
         # check for syntax errors
@@ -43,7 +52,9 @@ class QueryJobsSubmissionManager(models.Manager):
         # todo
 
         job = self.model(
+            query_language=query_language,
             query=query,
+            actual_query=actual_query,
             owner=user,
             tablename=tablename,
             queue=queue,
