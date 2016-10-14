@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from rest_framework import serializers
 
 from daiquiri_metadata.models import Database, Table, Column, Function
@@ -13,7 +11,8 @@ class QueryJobListSerializer(serializers.ModelSerializer):
         model = QueryJob
         fields = (
             'id',
-            'tablename'
+            'tablename',
+            'start_time'
         )
 
 
@@ -26,7 +25,7 @@ class QueryJobRetrieveSerializer(serializers.ModelSerializer):
 
 class QueryJobCreateSerializer(serializers.ModelSerializer):
 
-    tablename = serializers.CharField(default=datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))
+    tablename = serializers.CharField(required=False)
 
     class Meta:
         model = QueryJob

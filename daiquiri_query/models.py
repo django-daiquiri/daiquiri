@@ -26,6 +26,8 @@ class QueryJob(Job):
     size = models.IntegerField(null=True, blank=True)
 
     class Meta:
+        ordering = ('start_time', )
+
         verbose_name = _('QueryJob')
         verbose_name_plural = _('QueryJobs')
 

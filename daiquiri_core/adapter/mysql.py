@@ -18,6 +18,23 @@ class MySQLAdapter(BaseAdapter):
     def escape_string(self, string):
         return "'%s'" % string
 
+    def execute_query(self, query):
+        return self.fetchall(query)
+
+    def submit_direct_query(self, database_name, table_name, query):
+        # construct the actual query
+        sql = 'SET @i = 0; CREATE TABLE %(database)s.%(table)s ENGINE=MyISAM (' % {
+            'database': self.escape_identifier(database_name),
+            'table': self.escape_identifier(table_name),
+        }
+        sql += 'SELECT @i:=@i+1 AS `row_id`,`result`.* FROM ('
+        sql += query
+        sql += ') as `result` );'
+
+        self.execute(sql)
+
+        return sql
+
     def count_rows(self, database_name, table_name):
         # prepare sql string
         sql = 'SELECT COUNT(*) FROM %(database)s.%(table)s' % {

@@ -5,6 +5,7 @@ from daiquiri_jobs.models import Job
 from daiquiri_metadata.models import Database, Table, Column, Function
 from daiquiri_uws.settings import PHASE_PENDING
 
+from .backends import get_query_backend
 from .exceptions import *
 
 from queryparser.mysql import MySQLQueryProcessor
@@ -13,7 +14,7 @@ from queryparser.adql import ADQLQueryTranslator
 
 class QueryJobsSubmissionManager(models.Manager):
 
-    def submit(self, query_language, query, tablename, queue, user):
+    def submit(self, query_language, query, queue, tablename, user):
         """
         Submit a query to the job management and the query backend.
         """
@@ -61,7 +62,8 @@ class QueryJobsSubmissionManager(models.Manager):
         )
         job.save()
 
-        # create actual query
+        # submit the query
+        get_query_backend().submit(job)
 
     def _check_table(self, tablename):
         errors = []

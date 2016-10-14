@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
+from django.utils.timezone import now
 
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
@@ -34,12 +35,17 @@ class QueryJobViewSet(viewsets.ModelViewSet):
             return QueryJobUpdateSerializer
 
     def perform_create(self, serializer):
+        if 'tablename' in serializer.data:
+            tablename = serializer.data['tablename']
+        else:
+            tablename = now().strftime("%Y-%m-%d-%H-%M-%S")
+
         try:
             QueryJob.submission.submit(
                 serializer.data['query_language'],
                 serializer.data['query'],
-                serializer.data['tablename'],
                 serializer.data['queue'],
+                tablename,
                 self.request.user
             )
         except ADQLSyntaxError as e:
