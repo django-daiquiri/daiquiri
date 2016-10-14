@@ -11,3 +11,7 @@ class MySQLSyntaxError(DaiquiriException):
 
 class PermissionError(DaiquiriException):
     pass
+
+
+class TableError(DaiquiriException):
+    pass

@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -15,18 +13,18 @@ from queryparser.adql import ADQLQueryTranslator
 
 class QueryJobsSubmissionManager(models.Manager):
 
-    def submit(self, data, user):
+    def submit(self, query_language, query, tablename, queue, user):
+        """
+        Submit a query to the job management and the query backend.
+        """
 
-        query = data['query']
-        query_language = data['query_language']
-        tablename = self._get_tablename(data['tablename'])
-        queue = self._get_queue(data['queue'])
+        # check if a table with that name already exists
+        errors = self._check_table(tablename)
+        if errors:
+            raise TableError(errors)
 
-        # check sanity (table exists etc.)
-        # todo
-
+        # translate adql -> mysql string
         if query_language == 'adql':
-            # translate adql -> mysql string
             try:
                 adt = ADQLQueryTranslator(query)
                 actual_query = adt.to_mysql()
@@ -65,17 +63,19 @@ class QueryJobsSubmissionManager(models.Manager):
 
         # create actual query
 
-    def _get_tablename(self, tablename):
-        if tablename:
-            return tablename
-        else:
-            return datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+    def _check_table(self, tablename):
+        errors = []
 
-    def _get_queue(self, queue):
-        if queue:
-            return queue
-        else:
-            return 'default'
+        # check if a job with this tablename exists
+        try:
+            self.get(tablename=tablename)
+            errors.append(_('A job with this table name aready exists.'))
+        except self.model.DoesNotExist:
+            # check if the table alread exists in the database
+            pass
+
+        # return the error stack
+        return errors
 
     def _check_permissions(self, user, qp):
         errors = []

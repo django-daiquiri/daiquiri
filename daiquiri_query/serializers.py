@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from rest_framework import serializers
 
 from daiquiri_metadata.models import Database, Table, Column, Function
@@ -23,6 +25,8 @@ class QueryJobRetrieveSerializer(serializers.ModelSerializer):
 
 
 class QueryJobCreateSerializer(serializers.ModelSerializer):
+
+    tablename = serializers.CharField(default=datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))
 
     class Meta:
         model = QueryJob

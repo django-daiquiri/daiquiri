@@ -35,13 +35,21 @@ class QueryJobViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         try:
-            QueryJob.submission.submit(serializer.data, self.request.user)
+            QueryJob.submission.submit(
+                serializer.data['query_language'],
+                serializer.data['query'],
+                serializer.data['tablename'],
+                serializer.data['queue'],
+                self.request.user
+            )
         except ADQLSyntaxError as e:
             raise ValidationError({'query': e.message})
         except MySQLSyntaxError as e:
             raise ValidationError({'query': e.message})
         except PermissionError as e:
             raise ValidationError({'query': e.message})
+        except TableError as e:
+            raise ValidationError({'tablename': e.message})
 
     def perform_update(self, serializer):
         serializer.save()
