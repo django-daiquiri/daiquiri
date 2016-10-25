@@ -2,9 +2,9 @@ from django import forms
 
 class ContactForm(forms.Form):
     contact_name = forms.CharField(required=True)
-    subject = forms.CharField(required=True)
+    contact_subject = forms.CharField(required=True)
     contact_email = forms.EmailField(required=True)
-    content = forms.CharField(
+    contact_message = forms.CharField(
         required=True,
         widget=forms.Textarea
     )
