@@ -22,11 +22,11 @@ def contact(request):
             contact_name = request.POST.get('contact_name', '')
             contact_subject = request.POST.get('contact_subject', '')
             contact_email = request.POST.get('contact_email', '')
-            contact_message = request.POST.get('content', '')
+            contact_message = request.POST.get('contact_message', '')
 
             # Email the profile with the
             # contact information
-            template = get_template('contact_template.txt')
+            template = get_template('contact/contact_template.txt')
             context = Context({
                 'contact_name': contact_name,
                 'contact_email': contact_email,
@@ -38,17 +38,15 @@ def contact(request):
             email = EmailMessage(
                 "New contact form submission",
                 content,
-                "Your website" +'',
-                ['youremail@gmail.com'],
+                "example.com" +'',
+                ['admin@example.com'],
                 headers = {'Reply-To': contact_email }
             )
             email.send()
-            return redirect('contact/thanks')
+            return render(request, 'contact/thanks.html')
+        else:
+            return HttpResponse('Make sure all fields are entered and valid.')
 
     return render(request, 'contact/contact.html', {
         'form': form_class,
     })
-
-
-def thanks(request):
-    return HttpResponse('Thank you for your message! We will respond as soon as possible.')
