@@ -5,13 +5,14 @@
 
 
 {% block headline %}
-    <h2>Contact</h2>
+    <h2>{% trans 'Contact' %}</h2>
 {% endblock %}
 
 {% block page %}
+<p>{% trans 'Please send us your questions/comments/bug reports etc. via the following form.' %}</p>
 <form role="form" action="" method="post">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit">Submit</button>
+    <button type="submit">{% trans 'Submit' %}</button>
 </form>
 {% endblock %}

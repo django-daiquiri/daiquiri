@@ -16,11 +16,4 @@ class ContactForm(forms.Form):
         self.fields['contact_subject'].label = "Subject:"
         self.fields['contact_message'].label = "Message:"
 
-    def clean(self):
-        if (self.cleaned_data.get('email') !=
-            self.cleaned_data.get('confirm_email')):
-
-            raise ValidationError("Email addresses do not match.")
-
-        return self.cleaned_data
 

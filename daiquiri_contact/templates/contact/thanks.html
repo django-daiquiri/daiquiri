@@ -5,11 +5,11 @@
 
 
 {% block headline %}
-    <h2>Thank you for leaving a message for us!</h2>
+    <h2>{% trans 'Thank you for leaving a message for us!' %}</h2>
 {% endblock %}
 
 {% block page %}
-<p>We will reply as soon as possible.</p>
-<p>Sincerely yours,</p>
-<p>example.com admins</p>
+<p>{% trans 'We will reply as soon as possible.' %}</p>
+<p>{% trans 'Sincerely yours,' %}</p>
+<p>{% trans 'example.com admins' %}</p>
 {% endblock %}
