@@ -38,8 +38,10 @@ class QueryJob(Job):
     def __str__(self):
         return self.get_str()
 
-    def delete(self, *args, **kwargs):
+    def cleanup(self, *args, **kwargs):
         adapter = get_adapter('data')
         adapter.drop_table(self.database_name, self.table_name)
 
-        super(QueryJob, self).delete(*args, **kwargs)
+        self.nrows = None
+        self.size = None
+        self.save()

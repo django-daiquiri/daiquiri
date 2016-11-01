@@ -100,8 +100,17 @@ class Job(models.Model):
             raise UWSException('Job is not in PENDING, QUEUED or EXECUTING phase')
 
     def archive(self):
+        if hasattr(self, 'queryjob'):
+            self.queryjob.cleanup()
+
         if self.phase != PHASE_ARCHIVED:
             self.phase = PHASE_ARCHIVED
             self.save()
         else:
             raise UWSException('Job is already in ARCHIVED phase')
+
+    def delete(self, *args, **kwargs):
+        if hasattr(self, 'queryjob'):
+            self.queryjob.cleanup()
+
+        super(Job, self).delete(*args, **kwargs)
