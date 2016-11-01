@@ -38,6 +38,19 @@ class QueryJob(Job):
     def __str__(self):
         return self.get_str()
 
+    def parameters(self):
+        return {
+            'database_name': self.database_name,
+            'table_name': self.table_name,
+            'queue': self.queue,
+            'query_language': self.query_language,
+            'query': self.query,
+            'actual_query': self.actual_query,
+            'queue': self.queue,
+            'nrows': self.nrows,
+            'size': self.size
+        }
+
     def cleanup(self, *args, **kwargs):
         adapter = get_adapter('data')
         adapter.drop_table(self.database_name, self.table_name)

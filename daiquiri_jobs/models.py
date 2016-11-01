@@ -78,9 +78,10 @@ class Job(models.Model):
 
     @property
     def parameters(self):
-        return {
-            'query': 'SELECT x,y FROM a.b;'
-        }
+        if hasattr(self, 'queryjob'):
+            return self.queryjob.parameters
+        else:
+            return {}
 
     def get_str(self):
         return "id=%s; phase=%s; job_type=%s" % (str(self.id), self.phase, self.job_type)
