@@ -23,13 +23,11 @@ class MySQLAdapter(BaseAdapter):
 
     def submit_direct_query(self, database_name, table_name, query):
         # construct the actual query
-        sql = 'SET @i = 0; CREATE TABLE %(database)s.%(table)s ENGINE=MyISAM (' % {
+        sql = 'CREATE TABLE %(database)s.%(table)s ENGINE=MyISAM ( %(query)s );' % {
             'database': self.escape_identifier(database_name),
             'table': self.escape_identifier(table_name),
+            'query': query
         }
-        sql += 'SELECT @i:=@i+1 AS `row_id`,`result`.* FROM ('
-        sql += query
-        sql += ') as `result` );'
 
         self.execute(sql)
 
@@ -43,6 +41,10 @@ class MySQLAdapter(BaseAdapter):
         }
 
         return self.fetchone(sql)[0]
+
+    def fetch_stats(self, database_name, table_name):
+        sql = 'SELECT table_rows as nrows, data_length + index_length AS size FROM `information_schema`.`tables` WHERE `table_schema` = %s AND table_name = %s;'
+        return self.fetchone(sql, (database_name, table_name))
 
     def fetch_rows(self, database_name, table_name, column_names, ordering=None, page=1, page_size=10):
         # create a list of escaped columns

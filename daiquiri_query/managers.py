@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.utils.timezone import now
 
 from daiquiri_jobs.models import Job
 from daiquiri_metadata.models import Database, Table, Column, Function
@@ -58,6 +59,7 @@ class QueryJobsSubmissionManager(models.Manager):
             tablename=tablename,
             queue=queue,
             phase=PHASE_PENDING,
+            #creation_time=now()
             job_type=Job.JOB_TYPE_QUERY
         )
         job.save()
