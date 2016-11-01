@@ -104,6 +104,15 @@ class MySQLAdapter(BaseAdapter):
 
         return self.fetch_table_metadata(database_name, row[0], row[1])
 
+    def drop_table(self, database_name, table_name):
+        # construct the actual query
+        sql = 'DROP TABLE %(database)s.%(table)s;' % {
+            'database': self.escape_identifier(database_name),
+            'table': self.escape_identifier(table_name)
+        }
+
+        self.execute(sql)
+
     def fetch_table_metadata(self, database_name, table_name, table_type):
         # prepare sql string
         sql = 'SHOW CREATE TABLE %(database)s.%(table)s' % {

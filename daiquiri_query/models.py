@@ -3,6 +3,7 @@ from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
+from daiquiri_core.adapter import get_adapter
 from daiquiri_jobs.models import Job
 
 from .managers import QueryJobsSubmissionManager
@@ -36,3 +37,9 @@ class QueryJob(Job):
 
     def __str__(self):
         return self.get_str()
+
+    def delete(self, *args, **kwargs):
+        adapter = get_adapter('data')
+        adapter.drop_table(self.database_name, self.table_name)
+
+        super(QueryJob, self).delete(*args, **kwargs)
