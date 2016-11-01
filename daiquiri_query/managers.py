@@ -59,7 +59,7 @@ class QueryJobsSubmissionManager(models.Manager):
             table_name=table_name,
             queue=queue,
             phase=PHASE_PENDING,
-            #creation_time=now()
+            creation_time=now(),
             job_type=Job.JOB_TYPE_QUERY
         )
         job.save()

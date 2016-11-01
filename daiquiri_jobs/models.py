@@ -40,6 +40,7 @@ class Job(models.Model):
 
     phase = models.CharField(max_length=10, choices=PHASE_CHOICES)
 
+    creation_time = models.DateTimeField(blank=True, null=True)
     start_time = models.DateTimeField(blank=True, null=True)
     end_time = models.DateTimeField(blank=True, null=True)
     execution_duration = models.PositiveIntegerField(blank=True, default=0)
