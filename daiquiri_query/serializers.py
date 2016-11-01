@@ -11,7 +11,8 @@ class QueryJobListSerializer(serializers.ModelSerializer):
         model = QueryJob
         fields = (
             'id',
-            'tablename',
+            'database_name',
+            'table_name',
             'start_time'
         )
 
@@ -25,12 +26,12 @@ class QueryJobRetrieveSerializer(serializers.ModelSerializer):
 
 class QueryJobCreateSerializer(serializers.ModelSerializer):
 
-    tablename = serializers.CharField(required=False)
+    table_name = serializers.CharField(required=False)
 
     class Meta:
         model = QueryJob
         fields = (
-            'tablename',
+            'table_name',
             'queue',
             'query_language',
             'query'
@@ -42,7 +43,7 @@ class QueryJobUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = QueryJob
         fields = (
-            'tablename',
+            'table_name',
         )
 
 

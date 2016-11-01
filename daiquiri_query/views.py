@@ -35,17 +35,17 @@ class QueryJobViewSet(viewsets.ModelViewSet):
             return QueryJobUpdateSerializer
 
     def perform_create(self, serializer):
-        if 'tablename' in serializer.data:
-            tablename = serializer.data['tablename']
+        if 'table_name' in serializer.data:
+            table_name = serializer.data['table_name']
         else:
-            tablename = now().strftime("%Y-%m-%d-%H-%M-%S")
+            table_name = now().strftime("%Y-%m-%d-%H-%M-%S")
 
         try:
             QueryJob.submission.submit(
                 serializer.data['query_language'],
                 serializer.data['query'],
                 serializer.data['queue'],
-                tablename,
+                table_name,
                 self.request.user
             )
         except ADQLSyntaxError as e:
@@ -55,7 +55,7 @@ class QueryJobViewSet(viewsets.ModelViewSet):
         except PermissionError as e:
             raise ValidationError({'query': e.message})
         except TableError as e:
-            raise ValidationError({'tablename': e.message})
+            raise ValidationError({'table_name': e.message})
 
     def perform_update(self, serializer):
         serializer.save()

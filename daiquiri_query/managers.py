@@ -15,13 +15,13 @@ from queryparser.adql import ADQLQueryTranslator
 
 class QueryJobsSubmissionManager(models.Manager):
 
-    def submit(self, query_language, query, queue, tablename, user):
+    def submit(self, query_language, query, queue, table_name, user):
         """
         Submit a query to the job management and the query backend.
         """
 
         # check if a table with that name already exists
-        errors = self._check_table(tablename)
+        errors = self._check_table(table_name)
         if errors:
             raise TableError(errors)
 
@@ -56,7 +56,7 @@ class QueryJobsSubmissionManager(models.Manager):
             query=query,
             actual_query=actual_query,
             owner=user,
-            tablename=tablename,
+            table_name=table_name,
             queue=queue,
             phase=PHASE_PENDING,
             #creation_time=now()
@@ -67,12 +67,12 @@ class QueryJobsSubmissionManager(models.Manager):
         # submit the query
         get_query_backend().submit(job)
 
-    def _check_table(self, tablename):
+    def _check_table(self, table_name):
         errors = []
 
-        # check if a job with this tablename exists
+        # check if a job with this table name exists
         try:
-            self.get(tablename=tablename)
+            self.get(table_name=table_name)
             errors.append(_('A job with this table name aready exists.'))
         except self.model.DoesNotExist:
             # check if the table alread exists in the database

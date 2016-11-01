@@ -14,7 +14,8 @@ class QueryJob(Job):
     objects = models.Manager()
     submission = QueryJobsSubmissionManager()
 
-    tablename = models.CharField(max_length=256)
+    database_name = models.CharField(max_length=256)
+    table_name = models.CharField(max_length=256)
     queue = models.CharField(max_length=16, choices=settings.QUERY['queues'])
 
     query_language = models.CharField(max_length=8, choices=settings.QUERY['query_languages'])
