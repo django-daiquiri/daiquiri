@@ -104,9 +104,17 @@ class MySQLAdapter(BaseAdapter):
 
         return self.fetch_table_metadata(database_name, row[0], row[1])
 
+    def rename_table(self, database_name, table_name, new_table_name):
+        sql = 'RENAME TABLE %(database)s.%(table)s to %(database)s.%(new_table)s;' % {
+            'database': self.escape_identifier(database_name),
+            'table': self.escape_identifier(table_name),
+            'new_table': self.escape_identifier(new_table_name)
+        }
+
+        self.execute(sql)
+
     def drop_table(self, database_name, table_name):
-        # construct the actual query
-        sql = 'DROP TABLE %(database)s.%(table)s;' % {
+        sql = 'DROP TABLE IF EXISTS %(database)s.%(table)s;' % {
             'database': self.escape_identifier(database_name),
             'table': self.escape_identifier(table_name)
         }

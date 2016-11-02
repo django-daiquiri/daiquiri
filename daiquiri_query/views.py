@@ -58,7 +58,10 @@ class QueryJobViewSet(viewsets.ModelViewSet):
             raise ValidationError({'table_name': e.message})
 
     def perform_update(self, serializer):
-        serializer.save()
+        try:
+            serializer.save()
+        except TableError as e:
+            raise ValidationError({'table_name': e.message})
 
     def perform_destroy(self, instance):
         instance.archive()

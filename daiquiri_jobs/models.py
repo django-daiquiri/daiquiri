@@ -59,6 +59,19 @@ class Job(models.Model):
     def __str__(self):
         return self.get_str()
 
+    def save(self, *args, **kwargs):
+        if self.pk is not None:
+            if hasattr(self, 'queryjob'):
+                self.queryjob.rename_table(self.table_name)
+
+        super(Job, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        if hasattr(self, 'queryjob'):
+            self.queryjob.drop_table()
+
+        super(Job, self).delete(*args, **kwargs)
+
     @property
     def error(self):
         return None
@@ -101,17 +114,11 @@ class Job(models.Model):
             raise UWSException('Job is not in PENDING, QUEUED or EXECUTING phase')
 
     def archive(self):
-        if hasattr(self, 'queryjob'):
-            self.queryjob.cleanup()
-
         if self.phase != PHASE_ARCHIVED:
             self.phase = PHASE_ARCHIVED
             self.save()
         else:
             raise UWSException('Job is already in ARCHIVED phase')
 
-    def delete(self, *args, **kwargs):
         if hasattr(self, 'queryjob'):
-            self.queryjob.cleanup()
-
-        super(Job, self).delete(*args, **kwargs)
+            self.queryjob.drop_table()

@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.db.utils import OperationalError
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
@@ -7,6 +8,7 @@ from daiquiri_core.adapter import get_adapter
 from daiquiri_jobs.models import Job
 
 from .managers import QueryJobsSubmissionManager
+from .exceptions import *
 
 
 @python_2_unicode_compatible
@@ -38,6 +40,7 @@ class QueryJob(Job):
     def __str__(self):
         return self.get_str()
 
+    @property
     def parameters(self):
         return {
             'database_name': self.database_name,
@@ -51,7 +54,16 @@ class QueryJob(Job):
             'size': self.size
         }
 
-    def cleanup(self, *args, **kwargs):
+    def rename_table(self, new_table_name):
+        if self.table_name != new_table_name:
+            try:
+                adapter = get_adapter('data')
+                # self.table is still the old name since Job is updated first
+                adapter.rename_table(self.database_name, self.table_name, new_table_name)
+            except OperationalError as e:
+                raise TableError(e.args[1])
+
+    def drop_table(self):
         adapter = get_adapter('data')
         adapter.drop_table(self.database_name, self.table_name)
 

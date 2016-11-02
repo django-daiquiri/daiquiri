@@ -11,9 +11,8 @@ class QueryJobListSerializer(serializers.ModelSerializer):
         model = QueryJob
         fields = (
             'id',
-            'database_name',
             'table_name',
-            'start_time'
+            'creation_time'
         )
 
 
