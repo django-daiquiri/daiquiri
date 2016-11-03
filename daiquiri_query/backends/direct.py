@@ -12,7 +12,7 @@ class DirectQueryBackend(BaseQueryBackend):
         adapter = get_adapter('data')
 
         # set database and start time
-        job.database_name = self.get_user_db(job.owner.username)
+        job.database_name = self.get_user_database_name(job.owner.username)
         job.start_time = now()
 
         # get the actual query and submit the job to the database
@@ -25,5 +25,5 @@ class DirectQueryBackend(BaseQueryBackend):
         job.phase = PHASE_COMPLETED
         job.save()
 
-    def get_user_db(self, username):
+    def get_user_database_name(self, username):
         return 'daiquiri_user_' + username

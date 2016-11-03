@@ -9,6 +9,7 @@ from rest_framework.exceptions import ParseError, NotFound
 from rest_framework.reverse import reverse
 
 from daiquiri_core.adapter import get_adapter
+from daiquiri_query.backends import get_query_backend
 
 from daiquiri_metadata.models import Database, Table, Column
 
@@ -47,28 +48,36 @@ class RowViewSet(viewsets.ViewSet):
         # get the page_size from the querystring and make sure it is an int
         page_size = self._get_page_size()
 
-        # check permissions on the database
-        database = Database.permissions.get(self.request.user, database_name=database_name)
-        if not database:
-            raise NotFound()
-
-        # check permissions on the table
-        table = Table.permissions.get(self.request.user, database=database, table_name=table_name)
-        if not table:
-            raise NotFound()
-
-        # get columns for this table
-        columns = Column.permissions.all(self.request.user, table=table)
-        column_names = [column.name for column in columns]
-
         # get database adapter
         adapter = get_adapter('data')
 
+        # get query backend adapter
+        user_database_name = get_query_backend().get_user_database_name(self.request.user.username)
+
+        if database_name == user_database_name:
+            # get database adapter and fetch the columns
+            columns = adapter.fetch_columns(database_name, table_name)
+            column_names = [column['name'] for column in columns]
+        else:
+            # check permissions on the database
+            database = Database.permissions.get(self.request.user, database_name=database_name)
+            if not database:
+                raise NotFound()
+
+            # check permissions on the table
+            table = Table.permissions.get(self.request.user, database=database, table_name=table_name)
+            if not table:
+                raise NotFound()
+
+            # get columns for this table
+            columns = Column.permissions.all(self.request.user, table=table)
+            column_names = [column.name for column in columns]
+
         # query the database for the total number of rows
-        count = adapter.count_rows(database.name, table.name)
+        count = adapter.count_rows(database_name, table_name)
 
         # query the paginated rowset
-        results = adapter.fetch_rows(database.name, table.name, column_names, ordering, page, page_size)
+        results = adapter.fetch_rows(database_name, table_name, column_names, ordering, page, page_size)
 
         # get the previous and next url
         next = self._get_next_url(page, page_size, count)
@@ -123,16 +132,24 @@ class ColumnViewSet(viewsets.ViewSet):
         database_name = self.request.GET.get('database')
         table_name = self.request.GET.get('table')
 
-        # check permissions on the database
-        database = Database.permissions.get(self.request.user, database_name=database_name)
-        if not database:
-            raise NotFound()
+        # get database adapter
+        user_database_name = get_query_backend().get_user_database_name(self.request.user.username)
 
-        # check permissions on the table
-        table = Table.permissions.get(self.request.user, database=database, table_name=table_name)
-        if not table:
-            raise NotFound()
+        if database_name == user_database_name:
+            # get database adapter and fetch the columns
+            columns = get_adapter('data').fetch_columns(database_name, table_name)
+        else:
+            # check permissions on the database
+            database = Database.permissions.get(self.request.user, database_name=database_name)
+            if not database:
+                raise NotFound()
 
-        # get columns for this table
-        columns = Column.permissions.all(self.request.user, table=table)
+            # check permissions on the table
+            table = Table.permissions.get(self.request.user, database=database, table_name=table_name)
+            if not table:
+                raise NotFound()
+
+            # get columns for this table
+            columns = Column.permissions.all(self.request.user, table=table)
+
         return Response(ColumnSerializer(columns, many=True).data)
