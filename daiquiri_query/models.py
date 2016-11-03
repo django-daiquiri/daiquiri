@@ -7,15 +7,14 @@ from django.utils.translation import ugettext_lazy as _
 from daiquiri_core.adapter import get_adapter
 from daiquiri_jobs.models import Job
 
-from .managers import QueryJobsSubmissionManager
+from .managers import QueryJobManager
 from .exceptions import *
 
 
 @python_2_unicode_compatible
 class QueryJob(Job):
 
-    objects = models.Manager()
-    submission = QueryJobsSubmissionManager()
+    objects = QueryJobManager()
 
     database_name = models.CharField(max_length=256)
     table_name = models.CharField(max_length=256)

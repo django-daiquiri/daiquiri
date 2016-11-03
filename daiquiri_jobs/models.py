@@ -10,6 +10,8 @@ from django.utils.translation import ugettext_lazy as _
 from daiquiri_uws.exceptions import UWSException
 from daiquiri_uws.settings import *
 
+from .managers import JobManager
+
 
 @python_2_unicode_compatible
 class Job(models.Model):
@@ -31,6 +33,8 @@ class Job(models.Model):
     JOB_TYPE_CHOICES = (
         (JOB_TYPE_QUERY, 'Query'),
     )
+
+    objects = JobManager()
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 

@@ -41,7 +41,7 @@ class QueryJobViewSet(viewsets.ModelViewSet):
             table_name = now().strftime("%Y-%m-%d-%H-%M-%S")
 
         try:
-            QueryJob.submission.submit(
+            QueryJob.objects.submit(
                 serializer.data['query_language'],
                 serializer.data['query'],
                 serializer.data['queue'],

@@ -13,7 +13,20 @@ from queryparser.mysql import MySQLQueryProcessor
 from queryparser.adql import ADQLQueryTranslator
 
 
-class QueryJobsSubmissionManager(models.Manager):
+class QueryJobQuerySet(models.QuerySet):
+
+    def delete(self, *args, **kwargs):
+        # drop tables for all deleted jobs
+        for job in self.all():
+            job.drop_table()
+
+        return super(QueryJobQuerySet, self).delete(*args, **kwargs)
+
+
+class QueryJobManager(models.Manager):
+
+    def get_queryset(self):
+        return QueryJobQuerySet(self.model, using=self._db)
 
     def submit(self, query_language, query, queue, table_name, user):
         """
