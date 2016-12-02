@@ -1,4 +1,18 @@
 from django.shortcuts import render
+# from django.contrib.auth.decorators import login_required
+# from django.contrib.auth.decorators import permission_required
+from django.shortcuts import get_object_or_404
+
+from rest_framework import viewsets, mixins, filters
+from rest_framework.decorators import detail_route
+from rest_framework.exceptions import MethodNotAllowed
+from rest_framework.response import Response
+
+#from daiquiri_core.permissions import DaiquiriModelPermissions
+#from daiquiri_core.utils import get_referer_url_name, get_next_redirect
+
+from .models import ContactMessage
+from .forms import ContactForm
 
 from django.core.mail import EmailMessage
 from django.core.mail import send_mail, BadHeaderError
@@ -7,12 +21,10 @@ from django.template import Context
 from django.template.loader import get_template
 from django.http import HttpResponse, HttpResponseRedirect
 
-from forms import ContactForm
+
 
 def contact(request):
-    form_class = ContactForm
 
-    # new logic!
     if request.method == 'GET':
         form = ContactForm()
     else:
@@ -48,5 +60,5 @@ def contact(request):
             return HttpResponse('Make sure all fields are entered and valid.')
 
     return render(request, 'contact/contact.html', {
-        'form': form_class,
+        'form': form,
     })
