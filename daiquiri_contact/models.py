@@ -31,8 +31,7 @@ class ContactMessage(models.Model):
     )
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
-    first_name = models.CharField(max_length=30)
-    last_name = models.CharField(max_length=30)
+    name = models.CharField(max_length=30)
     email = models.CharField(max_length=30)
     subject = models.CharField(max_length=30)
 
