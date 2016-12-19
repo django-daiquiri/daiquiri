@@ -1,0 +1,103 @@
+{% load i18n %}
+
+<p>
+    On this page, you can find an overview about a submitted query job. For a table view of the results, the plotting tool, and to access the download form, please use the tabs at the top of the page.
+</p>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        {% trans 'Query' %}
+    </div>
+    <div class="panel-body">
+        <div class="cm-s-default" id="query">
+            {$ service.job.query $}
+        </div>
+    </div>
+    <div class="panel-footer">
+        <a href="" ng-click="pasteQuery()">
+            {% trans 'Open new query form with this query' %}
+        </a>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        {% trans 'Job parameters' %}
+    </div>
+    <div class="panel-body">
+        <dl class="dl-horizontal">
+            <dt>{% trans 'Job status' %}</dt>
+            <dd ng-class="{
+                'text-success': service.job.phase == 'COMPLETED',
+                'text-warning': service.job.phase == 'TIMEOUT',
+                'text-error': service.job.phase == 'ERROR',
+                'text-info': service.job.phase == 'QUEUED'}">
+                {$ service.job.phase $}
+            </dd>
+
+            <div ng-show="service.job.status == 'error'">
+                <dt>{% trans 'Error' %}</dt>
+                <dd class="text-error">
+                    {$ service.job.error $}
+                </dd>
+            </div>
+
+            <dt>{% trans 'Full database table name' %}</dt>
+            <dd>{$ service.job.database_name $}.{$ service.job.table_name $}</dd>
+
+            <dt>{% trans 'Internal job id' %}</dt>
+            <dd>{$ service.job.id $}</dd>
+
+            <dt>{% trans 'Time submitted' %}</dt>
+            <dd>{$ service.job.creation_time $}</dd>
+
+            <div ng-show="service.job.start_time && service.job.creation_time">
+                <dt>{% trans 'Time in queue' %}</dt>
+                <dd>{$ service.job.start_time - service.job.creation_time $} s</dd>
+            </div>
+
+            <div ng-show="service.job.end_time && service.job.start_time">
+                <dt>{% trans 'Time for query' %}</dt>
+                <dd>{$ service.job.end_time - service.job.start_time $} s</dd>
+            </div>
+
+            <div ng-show="service.job.nrows != null">
+                <dt>{% trans 'Number of rows' %}</dt>
+                <dd>{$ service.job.nrows $}</dd>
+            </div>
+
+            <div ng-show="service.job.size != null">
+                <dt>{% trans 'Size of the table' %}</dt>
+                <dd>{$ service.job.size | bytes $}</dd>
+            </div>
+        </dl>
+    </div>
+    <div class="panel-footer">
+        <div ng-show="service.job.status == 'success'">
+            <a href="" ng-click="showDialog('rename-job')">
+                Rename the job's result table
+            </button>
+        </div>
+        <div ng-show="service.job.status == 'running' || service.job.status == 'pending'">
+            <a href="" ng-click="showDialog('kill-job')">
+                Kill the job
+            </a>
+        </div>
+        <div ng-show="service.job.status != 'running' && service.job.status != 'pending'">
+            <a href="" ng-click="showDialog('remove-job')">
+                Remove the job
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        {% trans 'Actual query' %}
+    </div>
+    <div class="panel-body">
+        <div class="cm-s-default" id="actual-query">
+            {$ service.job.actual_query $}
+        </div>
+    </div>
+</div>

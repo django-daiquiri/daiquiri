@@ -9,6 +9,7 @@ angular.module('core')
             help: '@',
             model: '=',
             errors: '=',
+            mode: '@',
             options: '=',
             optionsLabel: '@',
             optionsFilter: '=',

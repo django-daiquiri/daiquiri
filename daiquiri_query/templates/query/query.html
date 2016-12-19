@@ -1,18 +1,96 @@
-{% extends 'core/page.html' %}
+{% extends 'core/wide.html' %}
 {% load staticfiles %}
+{% load compress %}
 {% load i18n %}
 {% load core_tags %}
 
-{% block headline %}
-    <h2>Query</h2>
+{% block bodyargs %}ng-app="query" ng-controller="QueryController"{% endblock %}
+
+{% block headextra %}
+
+    {% compress css %}
+    <link rel="stylesheet" href="{% static 'codemirror/lib/codemirror.css' %}" />
+    <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/browser.scss' %}" />
+    <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/codemirror.scss' %}" />
+    <link rel="stylesheet" type="text/x-scss" href="{% static 'query/css/query.scss' %}" />
+    {% endcompress %}
+
+    {% compress js %}
+    <script type="text/javascript" src="{% static 'angular/angular.min.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'angular-resource/angular-resource.min.js' %}" ></script>
+
+    <script type="text/javascript" src="{% static 'codemirror/lib/codemirror.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'codemirror/addon/mode/overlay.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'codemirror/addon/runmode/runmode.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'codemirror/mode/sql/sql.js' %}" ></script>
+
+    <script type="text/javascript" src="{% static 'core/js/core.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'core/js/filter.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'core/js/multiCheckbox.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'core/js/byNumber.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'core/js/formgroup.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'core/js/browser.js' %}" ></script>
+
+    <script type="text/javascript" src="{% static 'query/js/query.js' %}" ></script>
+    {% endcompress %}
 {% endblock %}
 
-{% block page %}
+{% block headline %}
+    <h1>{% trans 'Query interface' %}</h1>
+{% endblock %}
 
-    <pre>SELECT a,b FROM daiquiri_.tbl, tbl2 WHERE c = 5</pre>
-    <pre>SELECT adsad(1)</pre>
-    <pre>SELECT a.vx,b.id FROM daiquiri_data_sim.particles AS a, daiquiri_data_obs.stars AS b WHERE b.id = 5</pre>
-    <pre>SELECT TOP 10 id FROM daiquiri_data_sim.particles</pre>
-    <pre>SELECT id FROM daiquiri_data_sim.particles LIMIT 10</pre>
+{% block wide %}
+
+<div class="row">
+    <div class="col-md-3">
+        {% include 'query/query_sidebar.html' %}
+    </div>
+    <div class="col-md-9">
+        {% for form in forms %}
+
+        <div ng-show="service.form == '{{ form.key }}'">
+
+            <h2 class="daiquiri-query-form-title">{{ form.label }}</h2>
+
+            <p class="daiquiri-query-form-help">{{ form.help }}</p>
+
+            {% include form.template %}
+
+        </div>
+
+        {% endfor %}
+
+        <div ng-show="service.job">
+
+            <h2 class="daiquiri-query-job-title">{% trans 'Query job' %} `{$ service.job.table_name $}`</h2>
+
+            <ul class="nav nav-tabs daiquiri-query-job-tabs">
+                <li role="presentation" ng-class="{active: service.tab == 'overview'}">
+                    <a href="" ng-click="service.tab = 'overview'">{% trans 'Job overview' %}</a>
+                </li>
+                <li role="presentation" ng-class="{active: service.tab == 'results'}">
+                    <a href="" ng-click="service.tab = 'results'">{% trans 'Results table' %}</a>
+                </li>
+                <li role="presentation" ng-class="{active: service.tab == 'download'}">
+                    <a href="" ng-click="service.tab = 'download'">{% trans 'Download' %}</a>
+                </li>
+            </ul>
+
+            <div ng-show="service.tab == 'overview'">
+                {% include 'query/query_overview.html' %}
+            </div>
+            <div ng-show="service.tab == 'results'">
+                {% include 'query/query_results.html' %}
+            </div>
+            <div ng-show="service.tab == 'download'">
+                {% include 'query/query_download.html' %}
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
 
 {% endblock %}

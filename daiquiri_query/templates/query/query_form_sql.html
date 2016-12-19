@@ -1,0 +1,32 @@
+{% load i18n %}
+
+<div class="btn-group daiquiri-query-form-bar" role="group">
+    <button type="button" class="btn btn-default">Databases</button>
+    <button type="button" class="btn btn-default">Functions</button>
+    <button type="button" class="btn btn-default">Examples</button>
+</div>
+
+<formgroup
+    data-id="sql_query"
+    data-type="codemirror"
+    data-label="{% trans 'SQL query' %}"
+    data-model="service.values.sql.query"
+    data-errors="service.errors.sql.query"
+    data-mode="text/x-mariadb">
+</formgroup>
+
+<formgroup
+    data-id="table_name"
+    data-type="text"
+    data-label="{% trans 'Table name' %}"
+    data-model="service.values.sql.table_name"
+    data-errors="service.errors.sql.table_name">
+</formgroup>
+
+<button class="btn btn-primary" ng-click="service.submit('sql')">
+    {% trans 'Submit new SQL Query' %}
+</button>
+
+<button class="btn" ng-click="">
+    {% trans 'Clear input window' %}
+</button>

@@ -1,0 +1,38 @@
+{% load i18n %}
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        {% trans 'Database status' %}
+    </div>
+    <div class="panel-body">
+        There are 5 jobs in the queue.
+You are using the guest user. For a personal account, please sign up here.
+The guest user is using 28.1 MB of its quota of 100.0 MB.
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        {% trans 'New query job' %}
+    </div>
+    <ul class="list-group">
+        {% for form in forms %}
+
+        <li class="list-group-item">
+            <a href="" ng-click="service.activateForm('{{ form.key }}')">{{ form.label }}</a>
+        </li>
+
+        {% endfor %}
+    </ul>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        {% trans 'Job list' %}
+    </div>
+    <ul class="list-group">
+        <li class="list-group-item" ng-repeat="job in service.jobs">
+            <a href="" ng-click="service.activateJob(job)">{$ job.table_name $}</a>
+        </li>
+    </ul>
+</div>
