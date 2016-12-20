@@ -23,17 +23,21 @@ def send_contact_message(request, contact_form):
 
         new_message.save()
 
-        to_emails = get_admin_emails()
 
         site = get_current_site(request)
 
         subject = "[%s] %s" % (site.name, new_message.subject)
 
         from_email = settings.DEFAULT_FROM_EMAIL
+        # send message to the admins
+        admin_emails = get_admin_emails()
+        msg_admin = EmailMessage(subject, new_message.message, from_email, admin_emails)
+        msg_admin.send()
 
-        msg = EmailMessage(subject, new_message.message, from_email, to_emails)
-        # msg.attach_alternative(bodies['html'], 'text/html')
+        # send confirmation message to the user
+        user_email = "[%s]" % (new_message.email)
+        msg_user = EmailMessage(subject, new_message.message, from_email, [user_email])
+        msg_user.send()
 
-        msg.send()
 
 
