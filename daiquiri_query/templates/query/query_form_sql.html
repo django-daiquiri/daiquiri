@@ -11,7 +11,7 @@
     data-type="codemirror"
     data-label="{% trans 'SQL query' %}"
     data-model="service.values.sql.query"
-    data-errors="service.errors.sql.query"
+    data-errors="service.errors.sql.query.messages"
     data-mode="text/x-mariadb">
 </formgroup>
 
@@ -30,3 +30,7 @@
 <button class="btn" ng-click="">
     {% trans 'Clear input window' %}
 </button>
+
+<pre>
+select count(id from daiquiri_data_obs.stars
+</pre>

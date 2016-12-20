@@ -1,7 +1,10 @@
+import json
+
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.utils.timezone import now
+from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
@@ -51,10 +54,13 @@ class QueryJobViewSet(viewsets.ModelViewSet):
                 table_name,
                 self.request.user
             )
-        except ADQLSyntaxError as e:
-            raise ValidationError({'query': e.message})
-        except MySQLSyntaxError as e:
-            raise ValidationError({'query': e.message})
+        except (ADQLSyntaxError, MySQLSyntaxError) as e:
+            raise ValidationError({
+                'query': {
+                    'messages': [_('There has been an error while parsing your query.')],
+                    'positions': json.dumps(e.message),
+                }
+            })
         except PermissionError as e:
             raise ValidationError({'query': e.message})
         except TableError as e:

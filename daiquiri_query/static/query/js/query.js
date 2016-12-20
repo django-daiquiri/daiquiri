@@ -70,12 +70,20 @@ angular.module('query', ['core'])
 
         resources.jobs.save(values).$promise
             .then(function (response) {
-                console.log('okidoki');
             }, function (response) {
-                console.log('nope nope nope');
                 service.errors[key] = response.data;
-            });
 
+                var editor = $('.CodeMirror')[0].CodeMirror;
+                var positions = angular.fromJson(service.errors.sql.query.positions);
+                angular.forEach(positions, function(position) {
+                    editor.markText(
+                        {line: position[0] - 1, ch: position[1]},
+                        {line: position[0] - 1, ch: position[1] + position[2].length},
+                        {className: 'codemirror-error'},
+                        {clearOnEnter: true}
+                    );
+                });
+            });
     };
 
     service.renameJob = function() {
