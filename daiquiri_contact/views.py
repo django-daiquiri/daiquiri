@@ -17,6 +17,14 @@ def contact(request):
 
             return render(request, 'contact/thanks.html')
 
+    else:
+        if request.user.is_authenticated:
+
+            contact_form.initial = {
+                'email': request.user.email,
+                'name': request.user.profile.full_name
+            }
+
     return render(request, 'contact/contact.html', {'form': contact_form})
 
 
