@@ -25,7 +25,7 @@ class ContactMessage(models.Model):
     )
 
     name = models.CharField(max_length=30)
-    email = models.CharField(max_length=30)
+    email = models.EmailField(max_length=30)
     subject = models.CharField(max_length=30)
 
 #    User = models.OneToOneField(User)
