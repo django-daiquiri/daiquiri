@@ -18,8 +18,12 @@ The guest user is using 28.1 MB of its quota of 100.0 MB.
     <ul class="list-group">
         {% for form in forms %}
 
-        <li class="list-group-item">
-            <a href="" ng-click="service.activateForm('{{ form.key }}')">{{ form.label }}</a>
+        <li class="list-group-item list-group-link">
+            <a href=""
+                ng-click="service.activateForm('{{ form.key }}')"
+                ng-class="{active: service.form == '{{ form.key }}'}">
+                {{ form.label }}
+            </a>
         </li>
 
         {% endfor %}
@@ -31,8 +35,10 @@ The guest user is using 28.1 MB of its quota of 100.0 MB.
         {% trans 'Job list' %}
     </div>
     <ul class="list-group">
-        <li class="list-group-item" ng-repeat="job in service.jobs">
-            <a href="" ng-click="service.activateJob(job)">{$ job.table_name $}</a>
+        <li class="list-group-item list-group-link" ng-repeat="job in service.jobs">
+            <a href="" ng-click="service.activateJob(job)" ng-class="{active: service.job.id == job.id}">
+                {$ job.table_name $}
+            </a>
         </li>
     </ul>
 </div>
