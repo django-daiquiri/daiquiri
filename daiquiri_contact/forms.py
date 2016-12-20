@@ -12,30 +12,23 @@ class ContactForm(forms.ModelForm):
 
     class Meta:
         model = ContactMessage
-        fields = ()
+        fields = ['name','email','subject', 'message']
+        widgets = {
+            'name':forms.TextInput(attrs={'placeholder': _('Your name')}),
+            'email': forms.TextInput(attrs={'placeholder': _('Your email address')}),
+            'subject': forms.TextInput(attrs={'placeholder': _('Your subject')}),
+            'message':forms.Textarea(attrs={'placeholder': _('Your message')}),
+        }
+        labels = {
+            'name': _('Your name'),
+            'email':_('Please enter your email address so our answer will reach you'),
+            'message':_('Your message')
+        }
+        error_messages = {
+            'name': {
+                'max_length': _("This writer's name is too long."),
+            },
+        }
 
-    name = forms.CharField(max_length=30, label=_('Your name'),
-                               widget=forms.TextInput(attrs={'placeholder': _('Your name')}))
-    email = forms.CharField(max_length=30, label=_('Your email'),
-                                widget=forms.TextInput(attrs={'placeholder': _('Your email')}))
-    subject = forms.CharField(max_length=30, label=_('Subject'),
-                                  widget=forms.TextInput(attrs={'placeholder': _('Subject')}))
-    # category = forms.ChoiceInput(choices=ContactMessage.category)
-    message = forms.CharField(max_length=450, label=_('Your message'),
-                                  widget=forms.Textarea(attrs={'placeholder': _('Your message')}))
 
 
-    def __init__(self, *args, **kwargs):
-        super(ContactForm, self).__init__(*args, **kwargs)
-
-
-    def save(self, *args, **kwargs):
-        # create an empty details dict if it does not exist
-        if not self.instance.details:
-            self.instance.details = {}
-
-        # store the form date for each detail key
-        for detail_key in self.detail_keys:
-            self.instance.details[detail_key.key] = self.cleaned_data[detail_key.key]
-
-        return super(ContactForm, self).save(*args, **kwargs)

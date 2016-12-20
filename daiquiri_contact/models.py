@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 
 import logging
-import uuid
 
 # from django.contrib.auth.models import User
 from django.db import models
@@ -25,28 +24,19 @@ class ContactMessage(models.Model):
         ('STATUS_CLOSED', 'closed')
     )
 
-    CATEGORY_CHOICES = (
-        ('CATEGORY_SUPPORT', 'Support'),
-        ('CATEGORY_BUG', 'Bug')
-    )
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-
     name = models.CharField(max_length=30)
     email = models.CharField(max_length=30)
     subject = models.CharField(max_length=30)
 
 #    User = models.OneToOneField(User)
-    category = JSONField(null=True, blank=True)
     status = JSONField(null=True, blank=True)
     datetime = models.DateTimeField(blank=True, null=True)
 
-    category = models.CharField(max_length=10, choices=CATEGORY_CHOICES)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES)
-
     message = models.CharField(max_length=450)
 
+
     class Meta:
-        ordering = ('datetime',)
+        ordering = ('datetime','status')
 
         verbose_name = _('Contact message')
         verbose_name_plural = _('Contact messages')
@@ -55,13 +45,13 @@ class ContactMessage(models.Model):
         return self.get_str()
 
     def get_str(self):
-        return "id=%s; category=%s; status=%s" % (str(self.id), self.category, self.status)
+        return "email=%s; subject=%s; status=%s; message=%s" % (str(self.email), self.subject, str(self.status), self.message)
 
     def set_status_closed(self):
-        if self.status != STATUS_CLOSED:
-            self.status = STATUS_CLOSED
+        if self.status != 'STATUS_CLOSED':
+            self.status = 'STATUS_CLOSED'
             self.save()
 
     def set_status_active(self):
-        self.status = STATUS_ACTIVE
+        self.status = 'STATUS_ACTIVE'
         self.save()
