@@ -29,12 +29,18 @@ angular.module('query', ['core'])
     /* configure factories */
 
     var factories = {
-
+        'jobs': {
+            'queue': 'default',
+            'query_language': 'mysql'
+        }
     };
 
     /* create the query service */
 
-    var service = {};
+    var service = {
+        values: {},
+        errors: {}
+    };
 
     service.init = function() {
         service.jobs = resources.jobs.query();
@@ -54,6 +60,22 @@ angular.module('query', ['core'])
             CodeMirror.runMode(service.job.query, "text/x-mariadb", angular.element('#query')[0]);
             CodeMirror.runMode(service.job.actual_query, "text/x-mariadb", angular.element('#actual-query')[0]);
         });
+    };
+
+    service.submitJob = function(key) {
+
+        service.errors[key] = {};
+
+        var values = angular.extend({}, service.values[key], factories.jobs);
+
+        resources.jobs.save(values).$promise
+            .then(function (response) {
+                console.log('okidoki');
+            }, function (response) {
+                console.log('nope nope nope');
+                service.errors[key] = response.data;
+            });
+
     };
 
     service.renameJob = function() {

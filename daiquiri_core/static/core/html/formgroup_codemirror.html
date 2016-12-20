@@ -4,6 +4,6 @@
     <textarea codemirror class="form-control" id="{$ id $}" ng-model="model" data-mode="{$ mode $}"/>
 
     <ul class="help-block list-unstyled">
-        <li ng-repeat="error in errors">{$ error $}</li>
+        <li ng-repeat="error in errors track by $index">{$ error $}</li>
     </ul>
 </div>

@@ -1,3 +1,5 @@
+@import 'core/css/variables';
+
 h2.daiquiri-query-form-title,
 h2.daiquiri-query-job-title {
     margin-top: 0;
@@ -19,4 +21,8 @@ p.daiquiri-query-form-help {
 
 .CodeMirror {
     height: 250px;
+}
+
+.has-error .CodeMirror {
+    border-color: $error-color;
 }
