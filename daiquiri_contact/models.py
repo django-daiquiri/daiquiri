@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 import logging
 
-# from django.contrib.auth.models import User
+from django.contrib.auth.models import User
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
@@ -28,7 +28,7 @@ class ContactMessage(models.Model):
     email = models.EmailField(max_length=30)
     subject = models.CharField(max_length=30)
 
-#    User = models.OneToOneField(User)
+    User = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL, related_name='contact_messages')
     status = JSONField(null=True, blank=True)
     datetime = models.DateTimeField(blank=True, null=True)
 
