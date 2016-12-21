@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.db import models
-from django.db.utils import OperationalError
+from django.db.utils import OperationalError, ProgrammingError
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
@@ -64,7 +64,12 @@ class QueryJob(Job):
 
     def drop_table(self):
         adapter = get_adapter('data')
-        adapter.drop_table(self.database_name, self.table_name)
+
+        # drop the corresponding database table, but fail silently
+        try:
+            adapter.drop_table(self.database_name, self.table_name)
+        except ProgrammingError:
+            pass
 
         self.nrows = None
         self.size = None
