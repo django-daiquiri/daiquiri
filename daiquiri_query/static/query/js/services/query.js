@@ -1,4 +1,4 @@
-app.factory('QueryService', ['$resource', '$injector', function($resource, $injector) {
+app.factory('QueryService', ['$resource', '$injector', 'PollingService', function($resource, $injector, PollingService) {
 
     /* get the base url */
 
@@ -37,6 +37,14 @@ app.factory('QueryService', ['$resource', '$injector', function($resource, $inje
 
         // activate overview tab
         service.tab = 'overview';
+
+        // start the polling service
+        PollingService.init();
+        PollingService.register('jobs', function() {
+            resources.jobs.query(function(response) {
+                service.jobs = response;
+            });
+        });
     };
 
     service.activateForm = function(key) {
