@@ -5,6 +5,15 @@ from daiquiri_metadata.models import Database, Table, Column, Function
 from .models import QueryJob
 
 
+class FormSerializer(serializers.Serializer):
+
+    key = serializers.CharField()
+    form_service = serializers.SerializerMethodField()
+
+    def get_form_service(self, obj):
+        return obj['key'][0].upper() + obj['key'][1:] + 'FormService'
+
+
 class QueryJobListSerializer(serializers.ModelSerializer):
 
     class Meta:

@@ -31,7 +31,12 @@
     <script type="text/javascript" src="{% static 'core/js/formgroup.js' %}" ></script>
     <script type="text/javascript" src="{% static 'core/js/browser.js' %}" ></script>
 
-    <script type="text/javascript" src="{% static 'query/js/query.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'query/js/app.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'query/js/services/query.js' %}" ></script>
+    {% for form in forms %}
+    <script type="text/javascript" src="{% static form.service %}" ></script>
+    {% endfor %}
+
     {% endcompress %}
 {% endblock %}
 

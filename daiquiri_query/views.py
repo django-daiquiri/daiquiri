@@ -6,7 +6,7 @@ from django.shortcuts import render
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 
-from rest_framework import viewsets
+from rest_framework import viewsets, mixins
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import ValidationError
 
@@ -22,6 +22,15 @@ def query(request):
     return render(request, 'query/query.html', {
         'forms': settings.QUERY['forms']
     })
+
+
+class FormViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    permission_classes = (IsAuthenticated, )
+
+    serializer_class = FormSerializer
+
+    def get_queryset(self):
+        return settings.QUERY['forms']
 
 
 class QueryJobViewSet(viewsets.ModelViewSet):
