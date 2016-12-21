@@ -11,6 +11,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import ValidationError
 
 from daiquiri_metadata.models import Database, Function
+from daiquiri_uws.settings import PHASE_ARCHIVED
 
 from .models import *
 from .serializers import *
@@ -37,7 +38,7 @@ class QueryJobViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, )
 
     def get_queryset(self):
-        return QueryJob.objects.filter(owner=self.request.user)
+        return QueryJob.objects.filter(owner=self.request.user).exclude(phase=PHASE_ARCHIVED)
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -79,7 +80,7 @@ class QueryJobViewSet(viewsets.ModelViewSet):
         try:
             serializer.save()
         except TableError as e:
-            raise ValidationError({'table_name': e.message})
+            raise ValidationError({'table_name': [e.message]})
 
     def perform_destroy(self, instance):
         instance.archive()

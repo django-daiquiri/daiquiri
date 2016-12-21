@@ -73,19 +73,19 @@
         </dl>
     </div>
     <div class="panel-footer">
-        <div ng-show="service.job.status == 'success'">
-            <a href="" ng-click="showDialog('rename-job')">
-                Rename the job's result table
+        <div ng-show="service.job.phase == 'COMPLETED'">
+            <a href="" ng-click="service.showModal('rename-job', service.job)">
+                {% trans 'Rename the job\'s result table' %}
             </button>
         </div>
-        <div ng-show="service.job.status == 'running' || service.job.status == 'pending'">
-            <a href="" ng-click="showDialog('kill-job')">
-                Kill the job
+        <div ng-show="service.job.phase == 'EXECUTING' || service.job.phase == 'PENDING'">
+            <a href="" ng-click="service.showModal('kill-job', service.job)">
+                {% trans 'Kill the job' %}
             </a>
         </div>
-        <div ng-show="service.job.status != 'running' && service.job.status != 'pending'">
-            <a href="" ng-click="showDialog('remove-job')">
-                Remove the job
+        <div ng-show="service.job.phase != 'EXECUTING' && service.job.status != 'PENDING'">
+            <a href="" ng-click="service.showModal('remove-job', service.job)">
+                {% trans 'Remove the job' %}
             </a>
         </div>
     </div>

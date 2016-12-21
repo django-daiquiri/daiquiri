@@ -118,11 +118,11 @@ class Job(models.Model):
             raise UWSException('Job is not in PENDING, QUEUED or EXECUTING phase')
 
     def archive(self):
+        if hasattr(self, 'queryjob'):
+            self.queryjob.drop_table()
+
         if self.phase != PHASE_ARCHIVED:
             self.phase = PHASE_ARCHIVED
             self.save()
         else:
             raise UWSException('Job is already in ARCHIVED phase')
-
-        if hasattr(self, 'queryjob'):
-            self.queryjob.drop_table()

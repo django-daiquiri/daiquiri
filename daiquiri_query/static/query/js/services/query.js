@@ -8,7 +8,7 @@ app.factory('QueryService', ['$resource', '$injector', 'PollingService', functio
 
     var resources = {
         forms: $resource(baseurl + 'query/api/forms/'),
-        jobs: $resource(baseurl + 'query/api/jobs/:id/'),
+        jobs: $resource(baseurl + 'query/api/jobs/:id/:detail_route'),
         databases: $resource(baseurl + 'query/api/databases/'),
         functions: $resource(baseurl + 'query/api/functions/'),
     };
@@ -33,18 +33,26 @@ app.factory('QueryService', ['$resource', '$injector', 'PollingService', functio
         });
 
         // load joblist
-        service.jobs = resources.jobs.query();
+        service.fetchJobs();
 
         // activate overview tab
         service.tab = 'overview';
 
         // start the polling service
         PollingService.init();
-        PollingService.register('jobs', function() {
-            resources.jobs.query(function(response) {
-                service.jobs = response;
-            });
-        });
+        PollingService.register('jobs', service.fetchJobs);
+    };
+
+    service.fetchJobs = function() {
+        return resources.jobs.query(function(response) {
+            service.jobs = response;
+        }).$promise;
+    };
+
+    service.fetchJob = function(job) {
+        return resources.jobs.get({id: job.id}, function(response) {
+            service.job = response;
+        }).$promise;
     };
 
     service.activateForm = function(key) {
@@ -54,7 +62,7 @@ app.factory('QueryService', ['$resource', '$injector', 'PollingService', functio
 
     service.activateJob = function(job) {
         service.form = null;
-        service.job = resources.jobs.get({id: job.id}, function() {
+        service.fetchJob(job).then(function() {
             CodeMirror.runMode(service.job.query, "text/x-mariadb", angular.element('#query')[0]);
             CodeMirror.runMode(service.job.actual_query, "text/x-mariadb", angular.element('#actual-query')[0]);
         });
@@ -73,16 +81,37 @@ app.factory('QueryService', ['$resource', '$injector', 'PollingService', functio
         });
     };
 
-    service.renameJob = function() {
+    service.showModal = function(modal, job) {
+        service.errors = {};
 
+        if (angular.isDefined(job)) {
+            service.values = job;
+        }
+
+        $('#' + modal + '-modal').modal('show');
+    };
+
+    service.renameJob = function() {
+        resources.jobs.update({id: service.values.id}, service.values).$promise.then(function() {
+            service.fetchJobs();
+            $('.modal').modal('hide');
+        }, function(response) {
+            service.errors = response.data;
+        });
     };
 
     service.killJob = function() {
-
+        resources.jobs.update({id: service.values.id, detail_route: 'kill'}, {}, function() {
+            service.fetchJobs();
+            $('.modal').modal('hide');
+        });
     };
 
     service.removeJob = function() {
-
+        resources.jobs.delete({id: service.values.id}, function() {
+            service.fetchJobs();
+            $('.modal').modal('hide');
+        });
     };
 
     return service;
