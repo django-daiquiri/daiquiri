@@ -65,7 +65,12 @@ app.factory('QueryService', ['$resource', '$injector', 'PollingService', functio
             'queue': 'default',
             'query_language': 'mysql'
         });
-        return resources.jobs.save(values).$promise;
+
+        return resources.jobs.save(values).$promise.then(function() {
+            resources.jobs.query(function(response) {
+                service.jobs = response;
+            });
+        });
     };
 
     service.renameJob = function() {

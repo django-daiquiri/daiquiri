@@ -19,6 +19,11 @@ p.daiquiri-query-form-help {
     margin-bottom: 20px;
 }
 
+.daiquiri-query-joblist {
+    max-height: 400px;
+    overflow-y: scroll;
+}
+
 .CodeMirror {
     height: 250px;
 }
