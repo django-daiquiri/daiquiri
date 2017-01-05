@@ -72,7 +72,7 @@ class QueryJobViewSet(viewsets.ModelViewSet):
                 }
             })
         except PermissionError as e:
-            raise ValidationError({'query': e.message})
+            raise ValidationError({'query': {'messages': e.message}})
         except TableError as e:
             raise ValidationError({'table_name': e.message})
 
