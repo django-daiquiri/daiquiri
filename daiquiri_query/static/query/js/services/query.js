@@ -1,4 +1,4 @@
-app.factory('QueryService', ['$resource', '$injector', 'PollingService', function($resource, $injector, PollingService) {
+app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'TableService', function($resource, $injector, PollingService, TableService) {
 
     /* get the base url */
 
@@ -30,13 +30,15 @@ app.factory('QueryService', ['$resource', '$injector', 'PollingService', functio
 
             // activate first form
             service.forms[response[0].key].activate();
+            service.activateJob({'id': 'f8c5c882-b005-4f12-8f32-ba7c7df3b8e5' });
         });
 
         // load joblist
         service.fetchJobs();
 
         // activate overview tab
-        service.tab = 'overview';
+        // service.tab = 'overview';
+        service.tab = 'results';
 
         // start the polling service
         PollingService.init();
@@ -63,6 +65,9 @@ app.factory('QueryService', ['$resource', '$injector', 'PollingService', functio
     service.activateJob = function(job) {
         service.form = null;
         service.fetchJob(job).then(function() {
+
+            TableService.init(service.job.database_name, service.job.table_name);
+
             CodeMirror.runMode(service.job.query, "text/x-mariadb", angular.element('#query')[0]);
             CodeMirror.runMode(service.job.actual_query, "text/x-mariadb", angular.element('#actual-query')[0]);
         });

@@ -1,0 +1,27 @@
+@import 'core/css/variables';
+
+.daiquiri-table {
+
+}
+.daiquiri-table-pagination,
+.daiquiri-table-page-size {
+    margin-bottom: 10px;
+}
+.daiquiri-table .pagination,
+.daiquiri-table .table {
+    margin: 0;
+}
+.daiquiri-table-pane {
+    border: 1px solid $border-color;
+    border-radius: 4px;
+    overflow-x: scroll;
+}
+
+.daiquiri-table table {
+    table-layout: fixed;
+}
+
+.daiquiri-table table th,
+.daiquiri-table table td {
+    width: 300px;
+}

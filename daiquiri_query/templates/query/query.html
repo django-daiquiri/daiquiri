@@ -11,9 +11,12 @@
     {% compress css %}
     <link rel="stylesheet" href="{% static 'codemirror/lib/codemirror.css' %}" />
     <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/browser.scss' %}" />
+    <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/table.scss' %}" />
     <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/codemirror.scss' %}" />
     <link rel="stylesheet" type="text/x-scss" href="{% static 'query/css/query.scss' %}" />
     {% endcompress %}
+
+    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
 
     {% compress js %}
     <script type="text/javascript" src="{% static 'angular/angular.min.js' %}" ></script>
@@ -30,6 +33,7 @@
     <script type="text/javascript" src="{% static 'core/js/byNumber.js' %}" ></script>
     <script type="text/javascript" src="{% static 'core/js/formgroup.js' %}" ></script>
     <script type="text/javascript" src="{% static 'core/js/browser.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'core/js/table.js' %}" ></script>
 
     <script type="text/javascript" src="{% static 'query/js/app.js' %}" ></script>
     <script type="text/javascript" src="{% static 'query/js/services/query.js' %}" ></script>

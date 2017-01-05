@@ -8,7 +8,10 @@ angular.module('core')
         },
         link: function (scope, element, attrs) {
             scope.table = TableService;
-            scope.table.init(attrs['database'], attrs['table']);
+
+            if (angular.isDefined(attrs.database) && angular.isDefined(attrs.table)) {
+                TableService.init(attrs.database, attrs.table);
+            }
         }
     };
 }])
@@ -32,6 +35,19 @@ angular.module('core')
         config: {
             page: 1,
             page_size: 10
+        },
+        label: {
+            first: gettext('First'),
+            previous: gettext('Previous'),
+            next: gettext('Next'),
+            last: gettext('Last'),
+            page_size: function(value, count) {
+                if (angular.isDefined(value) && angular.isDefined(count)) {
+                    return interpolate(gettext('Show %s of %s rows'), [value, count]);
+                } else {
+                    return '';
+                }
+            }
         }
     };
 

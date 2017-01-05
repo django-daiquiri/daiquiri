@@ -1,12 +1,43 @@
-<table class="table">
-    <thead>
-        <tr>
-            <th ng-repeat="column in table.columns">{$ column.name $}</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr ng-repeat="row in table.rows">
-            <td ng-repeat="element in row">{$ element $}</td>
-        </tr>
-    </tbody>
-</table>
+<div class="daiquiri-table">
+    <div class="row">
+        <div class="col-sm-8 daiquiri-table-pagination">
+            <ul class="pagination">
+                <li>
+                    <a href="" ng-click="table.first()">{$ table.label.first $}</a>
+                </li>
+                <li>
+                    <a href="" ng-click="table.previous()">{$ table.label.previous $}</a>
+                </li>
+                <li>
+                    <a href="" ng-click="table.next()">{$ table.label.next $}</a>
+                </li>
+                <li>
+                    <a href="" ng-click="table.last()">{$ table.label.last $}</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="col-sm-4 daiquiri-table-page-size">
+            <select class="form-control" ng-model="table.config.page_size" ng-change="table.fetch()" by-number>
+                <option value="{$ value $}" ng-repeat="value in [10, 20, 100]">
+                    {$ table.label.page_size(value, table.count) $}
+                </option>
+            </select>
+        </div>
+    </div>
+
+    <div class="daiquiri-table-pane">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th ng-repeat="column in table.columns">{$ column.name $}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="row in table.rows">
+                    <td ng-repeat="element in row track by $index">{$ element $}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
