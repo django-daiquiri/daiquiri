@@ -1,28 +1,40 @@
 <div class="daiquiri-table">
-    <div class="row">
-        <div class="col-sm-8 daiquiri-table-pagination">
-            <ul class="pagination">
-                <li>
-                    <a href="" ng-click="table.first()">{$ table.label.first $}</a>
-                </li>
-                <li>
-                    <a href="" ng-click="table.previous()">{$ table.label.previous $}</a>
-                </li>
-                <li>
-                    <a href="" ng-click="table.next()">{$ table.label.next $}</a>
-                </li>
-                <li>
-                    <a href="" ng-click="table.last()">{$ table.label.last $}</a>
-                </li>
-            </ul>
+    <div class="row daiquiri-table-header">
+        <div class="col-sm-6">
+            <form class="daiquiri-table-search" ng-submit="table.filter()">
+                <div class="input-group">
+                    <input type="search" class="form-control" placeholder="{$ table.i18n.filter $}" ng-model="table.filter_string">
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="submit">
+                            <i class="fa fa-search" aria-hidden="true"></i>
+                        </button>
+                    </span>
+                </div>
+            </form>
         </div>
+        <div class="col-sm-6">
+            <div class="daiquiri-table-pagination">
+                <ul class="pagination">
+                    <li>
+                        <a href="" ng-click="table.first()">{$ table.i18n.first $}</a>
+                    </li>
+                    <li>
+                        <a href="" ng-click="table.previous()">{$ table.i18n.previous $}</a>
+                    </li>
+                    <li>
+                        <a href="" ng-click="table.next()">{$ table.i18n.next $}</a>
+                    </li>
+                    <li>
+                        <a href="" ng-click="table.last()">{$ table.i18n.last $}</a>
+                    </li>
+                </ul>
 
-        <div class="col-sm-4 daiquiri-table-page-size">
-            <select class="form-control" ng-model="table.config.page_size" ng-change="table.fetch()" by-number>
-                <option value="{$ value $}" ng-repeat="value in [10, 20, 100]">
-                    {$ table.label.page_size(value, table.count) $}
-                </option>
-            </select>
+                <ul class="pagination">
+                    <li>
+                        <a href="" ng-click="table.reset()">{$ table.i18n.reset $}</a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 
@@ -39,5 +51,19 @@
                 </tr>
             </tbody>
         </table>
+    </div>
+
+    <div class="row daiquiri-table-footer">
+        <div class="col-sm-8 daiquiri-table-count">
+            {$ table.i18n.count() $}
+        </div>
+
+        <div class="col-sm-4 daiquiri-table-page-size">
+            <select class="form-control" ng-model="table.config.page_size" ng-change="table.fetch()" by-number>
+                <option value="{$ value $}" ng-repeat="value in [10, 20, 100]">
+                    {$ table.i18n.page_size(value) $}
+                </option>
+            </select>
+        </div>
     </div>
 </div>

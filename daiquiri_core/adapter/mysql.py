@@ -33,20 +33,35 @@ class MySQLAdapter(BaseAdapter):
 
         return sql
 
-    def count_rows(self, database_name, table_name):
+    def count_rows(self, database_name, table_name, column_names=None, filter_string=None):
         # prepare sql string
         sql = 'SELECT COUNT(*) FROM %(database)s.%(table)s' % {
             'database': self.escape_identifier(database_name),
             'table': self.escape_identifier(table_name)
         }
 
-        return self.fetchone(sql)[0]
+        # process filtering
+        if filter_string:
+            # create a list of escaped columns
+            escaped_column_names = [self.escape_identifier(column_name) for column_name in column_names]
+
+            sql_args = []
+            where_stmts = []
+            for escaped_column_name in escaped_column_names:
+                sql_args.append('%' + filter_string + '%')
+                where_stmts.append(escaped_column_name + ' LIKE %s')
+
+            sql += ' WHERE ' + ' OR '.join(where_stmts)
+        else:
+            sql_args = None
+
+        return self.fetchone(sql, args=sql_args)[0]
 
     def fetch_stats(self, database_name, table_name):
         sql = 'SELECT table_rows as nrows, data_length + index_length AS size FROM `information_schema`.`tables` WHERE `table_schema` = %s AND table_name = %s;'
         return self.fetchone(sql, (database_name, table_name))
 
-    def fetch_rows(self, database_name, table_name, column_names, ordering=None, page=1, page_size=10):
+    def fetch_rows(self, database_name, table_name, column_names, ordering=None, page=1, page_size=10, filter_string=None):
         # create a list of escaped columns
         escaped_column_names = [self.escape_identifier(column_name) for column_name in column_names]
 
@@ -56,6 +71,18 @@ class MySQLAdapter(BaseAdapter):
             'table': self.escape_identifier(table_name),
             'columns': ', '.join(escaped_column_names)
         }
+
+        # process filtering
+        if filter_string:
+            sql_args = []
+            where_stmts = []
+            for escaped_column_name in escaped_column_names:
+                sql_args.append('%' + filter_string + '%')
+                where_stmts.append(escaped_column_name + ' LIKE %s')
+
+            sql += ' WHERE ' + ' OR '.join(where_stmts)
+        else:
+            sql_args = None
 
         # process ordering
         if ordering:
@@ -76,7 +103,7 @@ class MySQLAdapter(BaseAdapter):
             'offset': (int(page) - 1) * int(page_size)
         }
 
-        return self.fetchall(sql)
+        return self.fetchall(sql, args=sql_args)
 
     def fetch_tables(self, database_name):
         # escape input
@@ -173,6 +200,14 @@ class MySQLAdapter(BaseAdapter):
         row = self.fetchone(sql)
 
         return self.fetch_column_metadata(row[0], row[1], row[4], row[8])
+
+    def fetch_column_names(self, database_name, table_name):
+        # prepare sql string
+        sql = 'SHOW COLUMNS FROM %(database)s.%(table)s' % {
+            'database': self.escape_identifier(database_name),
+            'table': self.escape_identifier(table_name),
+        }
+        return [column[0] for column in self.fetchall(sql)]
 
     def fetch_column_metadata(self, column_name, column_datatype, column_indexed, column_comment):
         # handle legacy comments starting with 'DQIMETA='

@@ -34,26 +34,36 @@ angular.module('core')
     var service = {
         config: {
             page: 1,
-            page_size: 10
+            page_size: 10,
+            filter: null
         },
-        label: {
+        i18n: {
             first: gettext('First'),
             previous: gettext('Previous'),
             next: gettext('Next'),
             last: gettext('Last'),
-            page_size: function(value, count) {
-                if (angular.isDefined(value) && angular.isDefined(count)) {
-                    return interpolate(gettext('Show %s of %s rows'), [value, count]);
+            reset: gettext('Reset'),
+            filter: gettext('Filter'),
+            count: function() {
+                var page_count = Math.ceil(service.count / service.config.page_size);
+                if (service.config.filter) {
+                    return interpolate(gettext('Page %s of %s (%s rows total, filtering for "%s")'), [service.config.page,page_count, service.count, service.config.filter]);
                 } else {
-                    return '';
+                    return interpolate(gettext('Page %s of %s (%s rows total)'), [service.config.page,page_count, service.count]);
                 }
+            },
+            page_size: function(value) {
+                return interpolate(gettext('Show %s of %s rows'), [value, service.count]);
             }
-        }
+        },
+        search_string: null
     };
 
     service.init = function(database, table) {
         service.config.database = database;
         service.config.table = table;
+        service.config.filter = null;
+        service.filter_string = null;
 
         service.columns = resources.columns.query(service.config);
 
@@ -87,7 +97,19 @@ angular.module('core')
     };
 
     service.last = function() {
-        service.config.page = Math.floor(service.count / service.config.page_size);
+        service.config.page = Math.ceil(service.count / service.config.page_size);
+        service.fetch();
+    };
+
+    service.reset = function() {
+        service.config.page = 1;
+        service.config.filter = null;
+        service.filter_string = null;
+        service.fetch();
+    };
+
+    service.filter = function() {
+        service.config.filter = service.filter_string;
         service.fetch();
     };
 

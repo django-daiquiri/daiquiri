@@ -42,6 +42,9 @@ class RowViewSet(viewsets.ViewSet):
         # get the ordering
         ordering = self.request.GET.get('ordering')
 
+        # get the search string
+        filter_string = self.request.GET.get('filter')
+
         # get the page from the querystring and make sure it is an int
         page = self._get_page()
 
@@ -74,10 +77,10 @@ class RowViewSet(viewsets.ViewSet):
             column_names = [column.name for column in columns]
 
         # query the database for the total number of rows
-        count = adapter.count_rows(database_name, table_name)
+        count = adapter.count_rows(database_name, table_name, column_names, filter_string)
 
         # query the paginated rowset
-        results = adapter.fetch_rows(database_name, table_name, column_names, ordering, page, page_size)
+        results = adapter.fetch_rows(database_name, table_name, column_names, ordering, page, page_size, filter_string)
 
         # get the previous and next url
         next = self._get_next_url(page, page_size, count)

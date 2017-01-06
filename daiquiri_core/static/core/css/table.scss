@@ -1,27 +1,55 @@
 @import 'core/css/variables';
 
 .daiquiri-table {
+    margin-bottom: 20px;
+}
+
+/* header */
+
+.daiquiri-table-header {
 
 }
-.daiquiri-table-pagination,
-.daiquiri-table-page-size {
+.daiquiri-table-search {
+    margin: 0 0 10px 0;
+}
+.daiquiri-table-pagination {
     margin-bottom: 10px;
 }
-.daiquiri-table .pagination,
-.daiquiri-table .table {
+@media(min-width: $screen-xs-max) {
+    .daiquiri-table-pagination {
+        text-align: right;
+    }
+}
+.daiquiri-table-pagination .pagination {
     margin: 0;
 }
+
+/* pane */
+
 .daiquiri-table-pane {
     border: 1px solid $border-color;
     border-radius: 4px;
     overflow-x: scroll;
 }
 
-.daiquiri-table table {
+.daiquiri-table-pane .table {
+    margin: 0;
     table-layout: fixed;
 }
 
-.daiquiri-table table th,
-.daiquiri-table table td {
+.daiquiri-table-pane .table th,
+.daiquiri-table-pane .table td {
     width: 300px;
+}
+
+/* footer */
+
+.daiquiri-table-footer {
+    margin-top: 10px;
+}
+.daiquiri-table-count {
+    line-height: 34px;
+}
+.daiquiri-table-page-size {
+
 }
