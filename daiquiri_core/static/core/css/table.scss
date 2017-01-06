@@ -29,17 +29,66 @@
 .daiquiri-table-pane {
     border: 1px solid $border-color;
     border-radius: 4px;
-    overflow-x: scroll;
+    width: auto;
+    overflow-x: auto;
 }
-
 .daiquiri-table-pane .table {
     margin: 0;
-    table-layout: fixed;
+    table-layout: fixed !important;
 }
-
 .daiquiri-table-pane .table th,
 .daiquiri-table-pane .table td {
-    width: 300px;
+    width: 200px;
+    padding: 0;
+    border-right: 1px solid $border-color;
+}
+.daiquiri-table-pane .table th:last-child,
+.daiquiri-table-pane .table td:last-child {
+    border-right: none;
+}
+.daiquiri-table-pane .table .cell {
+    white-space: nowrap;
+    padding: 8px;
+    position: relative;
+}
+.daiquiri-table-pane .table th {
+    position: relative;
+}
+.daiquiri-table-pane .table th .name {
+    overflow: hidden;
+}
+.daiquiri-table-pane .table th .order {
+    cursor: pointer;
+    position: absolute;
+    z-index: 1000;
+    top: 8px;
+    bottom: 8px;
+    right: 8px;
+}
+.daiquiri-table-pane .table th .order i {
+    //margin-top: 2px;
+    opacity: 0.2;
+}
+.daiquiri-table-pane .table th .order i.ordered {
+    opacity: 1;
+}
+.daiquiri-table-pane .table th .handle {
+    position: absolute;
+    z-index: 2000;
+    top: 0;
+    bottom: 0;
+    right: -9px;
+    width: 17px;
+}
+.daiquiri-table-pane .table th .handle:hover {
+    cursor: move;
+}
+.daiquiri-table-pane .table.no-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
 }
 
 /* footer */

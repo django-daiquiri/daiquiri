@@ -6,6 +6,9 @@ angular.module('core')
             var staticurl = angular.element('meta[name="staticurl"]').attr('content');
             return staticurl + 'core/html/table.html';
         },
+        scope: {
+            'values': '='
+        },
         link: function (scope, element, attrs) {
             scope.table = TableService;
 
@@ -16,7 +19,7 @@ angular.module('core')
     };
 }])
 
-.factory('TableService', ['$resource', '$timeout', '$filter', function($resource, $timeout, $filter) {
+.factory('TableService', ['$resource', '$document', function($resource, $document) {
 
     /* get the base url */
 
@@ -35,6 +38,7 @@ angular.module('core')
         config: {
             page: 1,
             page_size: 10,
+            ordering: null,
             filter: null
         },
         i18n: {
@@ -62,12 +66,10 @@ angular.module('core')
     service.init = function(database, table) {
         service.config.database = database;
         service.config.table = table;
-        service.config.filter = null;
-        service.filter_string = null;
 
         service.columns = resources.columns.query(service.config);
 
-        service.fetch();
+        service.reset();
     };
 
     service.fetch = function() {
@@ -103,6 +105,7 @@ angular.module('core')
 
     service.reset = function() {
         service.config.page = 1;
+        service.config.ordering = null;
         service.config.filter = null;
         service.filter_string = null;
         service.fetch();
@@ -111,6 +114,37 @@ angular.module('core')
     service.filter = function() {
         service.config.filter = service.filter_string;
         service.fetch();
+    };
+
+    service.order = function(column_name) {
+        if (service.config.ordering == column_name) {
+            service.config.ordering = '-' + column_name;
+        } else {
+            service.config.ordering = column_name;
+        }
+        service.fetch();
+    };
+
+    service.resize = function (column_index) {
+        var zero = event.pageX;
+        var table = angular.element('.daiquiri-table-pane .table');
+        var th = angular.element('[data-column-index="' + column_index + '"]');
+        var width = th.width();
+
+        table.addClass('no-select');
+        function enterResize(event) {
+            var newWidth = width + event.pageX - zero;
+            if (newWidth >= 40) th.width(newWidth);
+        }
+
+        function exitResize() {
+            table.removeClass('no-select');
+            $document.off('mousemove',enterResize);
+            $document.off('mouseup',exitResize);
+        }
+
+        $document.on('mousemove', enterResize);
+        $document.on('mouseup', exitResize);
     };
 
     return service;

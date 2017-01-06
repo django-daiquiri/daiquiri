@@ -42,12 +42,30 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th ng-repeat="column in table.columns">{$ column.name $}</th>
+                    <th ng-repeat="column in table.columns" data-column-index="{$ $index $}">
+                        <div class="cell">
+                            <div class="name">
+                                {$ column.name $}
+                            </div>
+                            <div class="order" ng-click="table.order(column.name)">
+                                <i ng-class="{
+                                    'fa fa-chevron-down': !table.config.ordering.endsWith(column.name),
+                                    'ordered fa fa-chevron-down': table.config.ordering == column.name,
+                                    'ordered fa fa-chevron-up': table.config.ordering == '-' + column.name
+                                }" aria-hidden="true"></i>
+                            </div>
+                            <div ng-if="!$last" class="handle" ng-mousedown="table.resize($index)"></div>
+                        </div>
+                    </th>
                 </tr>
             </thead>
             <tbody>
                 <tr ng-repeat="row in table.rows">
-                    <td ng-repeat="element in row track by $index">{$ element $}</td>
+                    <td ng-repeat="element in row track by $index">
+                        <div class="cell">
+                            {$ element $}
+                        </div>
+                    </td>
                 </tr>
             </tbody>
         </table>
@@ -60,7 +78,7 @@
 
         <div class="col-sm-4 daiquiri-table-page-size">
             <select class="form-control" ng-model="table.config.page_size" ng-change="table.fetch()" by-number>
-                <option value="{$ value $}" ng-repeat="value in [10, 20, 100]">
+                <option value="{$ value $}" ng-repeat="value in values">
                     {$ table.i18n.page_size(value) $}
                 </option>
             </select>
