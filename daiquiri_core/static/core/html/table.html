@@ -1,3 +1,30 @@
+<script type="text/ng-template" id="tooltip.html">
+    <div ng-show="column.description">
+        <strong>{$ table.i18n.description $}</strong> {$ column.description $}
+    </div>
+    <div ng-show="column.unit">
+        <strong>{$ table.i18n.unit $}</strong> {$ column.unit $}
+    </div>
+    <div ng-show="column.ucd">
+        <strong>{$ table.i18n.ucd $}</strong> {$ column.ucd $}
+    </div>
+    <div ng-show="column.datatype">
+        <strong>{$ table.i18n.datatype $}</strong> {$ column.datatype $}
+    </div>
+    <div ng-show="column.size">
+        <strong>{$ table.i18n.size $}</strong> {$ column.size $}
+    </div>
+    <div>
+        <strong ng-show="column.principal">{$ table.i18n.principal $}</strong>
+    </div>
+    <div>
+        <strong ng-show="column.indexed">{$ table.i18n.indexed $}</strong>
+    </div>
+    <div>
+        <strong ng-show="column.std">{$ table.i18n.std $}</strong>
+    </div>
+</script>
+
 <div class="daiquiri-table">
     <div class="row daiquiri-table-header">
         <div class="col-sm-6">
@@ -45,7 +72,7 @@
                     <th ng-repeat="column in table.columns" data-column-index="{$ $index $}">
                         <div class="cell">
                             <div class="name">
-                                {$ column.name $}
+                                <span>{$ column.name $}</span>
                             </div>
                             <div class="order" ng-click="table.order(column.name)">
                                 <i ng-class="{

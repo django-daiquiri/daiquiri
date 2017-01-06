@@ -1,6 +1,6 @@
 angular.module('core')
 
-.directive('daiquiriTable', ['TableService', function(TableService) {
+.directive('daiquiriTable', ['$timeout', '$compile', '$templateCache', 'TableService', function($timeout, $compile, $templateCache, TableService) {
     return {
         templateUrl: function(element, attrs) {
             var staticurl = angular.element('meta[name="staticurl"]').attr('content');
@@ -9,12 +9,39 @@ angular.module('core')
         scope: {
             'values': '='
         },
-        link: function (scope, element, attrs) {
+        link: function(scope, element, attrs) {
             scope.table = TableService;
 
             if (angular.isDefined(attrs.database) && angular.isDefined(attrs.table)) {
                 TableService.init(attrs.database, attrs.table);
             }
+
+            // refresh the tooltips everytime a new set of columns is fetched
+            scope.$watch(function() {
+                return angular.isDefined(scope.table.columns) && scope.table.columns.$resolved;
+            }, function(new_value) {
+                if (new_value) {
+                    var template = $templateCache.get('tooltip.html');
+
+                    $timeout(function() {
+                        angular.forEach(scope.table.columns, function(column, index) {
+                            var isolated_scope = scope.$new(true);
+                            isolated_scope.column = column;
+                            isolated_scope.table = scope.table;
+
+                            $('[data-column-index="' + index + '"] .name span').popover({
+                                title: '<strong>' + column.name + '</strong>',
+                                content: $compile(template)(isolated_scope),
+                                html: true,
+                                trigger: 'hover',
+                                placement: 'bottom',
+                                container: '.daiquiri-table'
+                            });
+                        });
+                    });
+                }
+            });
+
         }
     };
 }])
@@ -58,9 +85,18 @@ angular.module('core')
             },
             page_size: function(value) {
                 return interpolate(gettext('Show %s of %s rows'), [value, service.count]);
-            }
+            },
+            'description': gettext('Description'),
+            'unit': gettext('Unit'),
+            'ucd': gettext('UCD'),
+            'datatype': gettext('Data type'),
+            'size': gettext('Size'),
+            'principal': gettext('Principal'),
+            'indexed': gettext('Indexed'),
+            'std': gettext('STD'),
         },
-        search_string: null
+        search_string: null,
+        updated: false
     };
 
     service.init = function(database, table) {
@@ -68,7 +104,6 @@ angular.module('core')
         service.config.table = table;
 
         service.columns = resources.columns.query(service.config);
-
         service.reset();
     };
 
