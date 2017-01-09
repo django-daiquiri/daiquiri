@@ -29,7 +29,7 @@ angular.module('core')
                             isolated_scope.column = column;
                             isolated_scope.table = scope.table;
 
-                            $('[data-column-index="' + index + '"] .name span').popover({
+                            $('[data-column-index="' + index + '"] .info').popover({
                                 title: '<strong>' + column.name + '</strong>',
                                 content: $compile(template)(isolated_scope),
                                 html: true,
