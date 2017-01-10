@@ -1,4 +1,4 @@
-app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'TableService', function($resource, $injector, PollingService, TableService) {
+app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'DownloadService', 'TableService', function($resource, $injector, PollingService, DownloadService, TableService) {
 
     /* get the base url */
 
@@ -38,11 +38,14 @@ app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'TableS
 
         // activate overview tab
         // service.tab = 'overview';
-        service.tab = 'results';
+        service.tab = 'download';
 
         // start the polling service
         PollingService.init();
         PollingService.register('jobs', service.fetchJobs);
+
+        // load the download service
+        service.downloads = DownloadService;
     };
 
     service.fetchJobs = function() {

@@ -27,6 +27,8 @@
     <script type="text/javascript" src="{% static 'codemirror/addon/runmode/runmode.js' %}" ></script>
     <script type="text/javascript" src="{% static 'codemirror/mode/sql/sql.js' %}" ></script>
 
+    <script type="text/javascript" src="{% static 'angular-file-saver/dist/angular-file-saver.bundle.js' %}" ></script>
+
     <script type="text/javascript" src="{% static 'core/js/core.js' %}" ></script>
     <script type="text/javascript" src="{% static 'core/js/filter.js' %}" ></script>
     <script type="text/javascript" src="{% static 'core/js/multiCheckbox.js' %}" ></script>
@@ -38,7 +40,8 @@
     <script type="text/javascript" src="{% static 'query/js/app.js' %}" ></script>
     <script type="text/javascript" src="{% static 'query/js/services/query.js' %}" ></script>
     <script type="text/javascript" src="{% static 'query/js/services/polling.js' %}" ></script>
-    {% for form in forms %}
+    <script type="text/javascript" src="{% static 'query/js/services/download.js' %}" ></script>
+    {% for form in query_settings.forms %}
     <script type="text/javascript" src="{% static form.service %}" ></script>
     {% endfor %}
 
@@ -56,17 +59,9 @@
         {% include 'query/query_sidebar.html' %}
     </div>
     <div class="col-md-9">
-        {% for form in forms %}
+        {% for form in query_settings.forms %}
 
-        <div ng-show="service.form == '{{ form.key }}'">
-
-            <h2 class="daiquiri-query-form-title">{{ form.label }}</h2>
-
-            <p class="daiquiri-query-form-help">{{ form.help }}</p>
-
-            {% include form.template %}
-
-        </div>
+            {% include 'query/query_form.html' %}
 
         {% endfor %}
 

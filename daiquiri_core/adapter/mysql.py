@@ -1,6 +1,9 @@
 import json
+import os
 import re
+import subprocess
 
+from django.conf import settings
 from django.db import connections
 
 from .base import BaseAdapter
@@ -8,8 +11,10 @@ from .base import BaseAdapter
 
 class MySQLAdapter(BaseAdapter):
 
-    def __init__(self, database_config):
-        self.connection = connections[database_config]
+    def __init__(self, database_key, database_config):
+        self.database_key = database_key
+        self.database_config = database_config
+        self.connection = connections[database_key]
         self.cursor = self.connection.cursor()
 
     def escape_identifier(self, identifier):
@@ -271,3 +276,75 @@ class MySQLAdapter(BaseAdapter):
 
             # execute query
             self.fetchone(sql)
+
+    def dump_table(self, database_name, table_name, username, format):
+
+        directory_name = os.path.join(settings.QUERY['download_dir'], username)
+        file_name = os.path.join(directory_name, table_name + '.' + format['extension'])
+
+        try:
+            os.mkdir(directory_name)
+        except OSError:
+            pass
+
+        if format['key'] == 'csv':
+            self.dump_table_csv(database_name, table_name, file_name)
+
+        elif format['key'] == 'votable':
+            self.dump_table_votable(database_name, table_name, file_name)
+
+        else:
+            raise Exception('Not supported.')
+
+        return file_name
+
+    def _get_stream_table_cmd(self, database_name, table_name):
+        cmd = 'mysql --user=\'%(USER)s\' --password=\'%(PASSWORD)s\'' % self.database_config
+
+        if self.database_config['HOST']:
+            cmd += ' --host=\'%(HOST)s\'' % self.database_config
+
+        if self.database_config['PORT']:
+            cmd += ' --port=\'%(PORT)s\'' % self.database_config
+
+        cmd += ' --execute=\'SELECT * FROM %(database)s.%(table)s\'' % {
+            'database': self.escape_identifier(database_name),
+            'table': self.escape_identifier(table_name)
+        }
+
+        return cmd
+
+    def dump_table_csv(self, database_name, table_name, file_name):
+        cmd = self._get_stream_table_cmd(database_name, table_name)
+        cmd += ' | sed \'s/\\t/","/g;s/^/"/;s/$/"/;s/\\n//g\''
+        cmd += ' > ' + file_name
+        subprocess.check_call(cmd, shell=True)
+
+    def dump_table_votable(self, database_name, table_name, file_name):
+        # get column metadata
+        columns = self.fetch_columns(database_name, table_name)
+
+        # write header
+        header = '<?xml version="1.0"?><VOTABLE version="1.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.ivoa.net/xml/VOTable/v1.3" xmlns:stc="http://www.ivoa.net/xml/STC/v1.30" ><RESOURCE name="%(database)s"><TABLE name="%(table)s">' % {
+            'database': database_name,
+            'table': table_name
+        }
+
+        for column in columns:
+            header += '<FIELD name="%(name)s" datatype="%(datatype)s"/>' % column
+
+        header += '<DATA><TABLEDATA>'
+
+        cmd = 'echo \'%s\' > %s' % (header, file_name)
+        subprocess.check_call(cmd, shell=True)
+
+        # write table data
+        cmd = self._get_stream_table_cmd(database_name, table_name)
+        cmd += ' | sed \'s/\\t/<\/TD><TD>/g;s/^/<TR><TD>/;s/$/<\/TD><\/TR>/;s/\\n//g\''
+        cmd += ' >> ' + file_name
+        subprocess.check_call(cmd, shell=True)
+
+        # write footer
+        footer = '</TABLEDATA></DATA></TABLE></RESOURCE></VOTABLE>'
+        cmd = 'echo \'%s\' >> %s' % (footer, file_name)
+        subprocess.check_call(cmd, shell=True)

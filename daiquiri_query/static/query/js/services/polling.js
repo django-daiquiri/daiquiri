@@ -9,36 +9,44 @@ app.factory('PollingService', ['$timeout', function($timeout) {
     };
 
     service.poll = function() {
-        angular.forEach(service.actions, function(action) {
+        angular.forEach(service.actions, function(action, polling_id) {
             if (action.enabled) {
-                action.callback();
+                action.callback(action.callback_options);
             }
         });
 
-        $timeout(service.poll, 5000);
+        $timeout(service.poll, 10000);
     };
 
-    service.register = function(key, callback, enabled) {
+    service.register = function(polling_id, callback, callback_options, enabled) {
+        if (angular.isUndefined(callback_options)) {
+            callback_options = {};
+        }
         if (angular.isUndefined(enabled)) {
             enabled = true;
         }
 
-        service.actions[key] = {
+        service.actions[polling_id] = {
             'callback': callback,
+            'callback_options': callback_options,
             'enabled': enabled
         };
     };
 
-    service.unregister = function(key) {
-        delete service.actions[key];
+    service.unregister = function(polling_id) {
+        delete service.actions[polling_id];
     };
 
-    service.enable = function(key) {
-        service.actions[key].enabled = true;
+    service.enable = function(polling_id) {
+        service.actions[polling_id].enabled = true;
     };
 
-    service.disable = function(key) {
-        service.actions[key].enabled = false;
+    service.disable = function(polling_id) {
+        service.actions[polling_id].enabled = false;
+    };
+
+    service.isRegistered = function(polling_id) {
+        return angular.isDefined(service.actions[polling_id]);
     };
 
     return service;

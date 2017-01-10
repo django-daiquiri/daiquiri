@@ -74,3 +74,7 @@ class QueryJob(Job):
         self.nrows = None
         self.size = None
         self.save()
+
+    def create_download_file(self, format):
+        adapter = get_adapter('data')
+        return adapter.dump_table(self.database_name, self.table_name, self.owner.username, format)

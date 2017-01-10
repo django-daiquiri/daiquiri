@@ -1,14 +1,18 @@
 import json
+from sendfile import sendfile
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.http import Http404
 from django.shortcuts import render
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import viewsets, mixins
+from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import ValidationError
+from rest_framework.decorators import detail_route
 
 from daiquiri_metadata.models import Database, Function
 from daiquiri_uws.settings import PHASE_ARCHIVED
@@ -21,7 +25,7 @@ from .exceptions import *
 @login_required()
 def query(request):
     return render(request, 'query/query.html', {
-        'forms': settings.QUERY['forms']
+        'query_settings': settings.QUERY
     })
 
 
@@ -84,6 +88,24 @@ class QueryJobViewSet(viewsets.ModelViewSet):
 
     def perform_destroy(self, instance):
         instance.archive()
+
+    @detail_route(methods=['get'], url_path='download/(?P<format_key>\w+)')
+    def download(self, request, pk=None, format_key=None):
+        try:
+            format = [f for f in settings.QUERY['download_formats'] if f['key'] == format_key][0]
+        except IndexError:
+            raise ValidationError({'format': "Not supported."})
+
+        try:
+            job = self.get_queryset().get(pk=pk)
+            download_file = job.create_download_file(format)
+
+            if download_file:
+                return sendfile(request, download_file, attachment=True)
+            else:
+                return Response('PENDING')
+        except QueryJob.DoesNotExist:
+            raise Http404
 
 
 class DatabaseViewSet(viewsets.ReadOnlyModelViewSet):

@@ -1,4 +1,4 @@
-var app = angular.module('query', ['core']);
+var app = angular.module('query', ['core', 'ngFileSaver']);
 
 app.filter('bytes', function() {
     return function(bytes) {

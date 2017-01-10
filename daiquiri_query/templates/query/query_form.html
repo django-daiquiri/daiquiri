@@ -1,0 +1,11 @@
+{% load i18n %}
+
+    <div ng-show="service.form == '{{ form.key }}'">
+
+        <h2 class="daiquiri-query-form-title">{{ form.label }}</h2>
+
+        <p class="daiquiri-query-form-help">{{ form.help }}</p>
+
+        {% include form.template %}
+
+    </div>
