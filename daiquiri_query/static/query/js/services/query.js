@@ -30,15 +30,13 @@ app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'Downlo
 
             // activate first form
             service.forms[response[0].key].activate();
-            service.activateJob({'id': 'f8c5c882-b005-4f12-8f32-ba7c7df3b8e5' });
         });
 
         // load joblist
         service.fetchJobs();
 
         // activate overview tab
-        // service.tab = 'overview';
-        service.tab = 'download';
+        service.tab = 'overview';
 
         // start the polling service
         PollingService.init();

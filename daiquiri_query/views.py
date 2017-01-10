@@ -55,6 +55,14 @@ class QueryJobViewSet(viewsets.ModelViewSet):
             return QueryJobUpdateSerializer
 
     def perform_create(self, serializer):
+
+        if 'query' not in serializer.data:
+            raise ValidationError({
+                'query': {
+                    'messages': [_('Value is required and can\'t be empty')]
+                }
+            })
+
         if 'table_name' in serializer.data:
             table_name = serializer.data['table_name']
         else:

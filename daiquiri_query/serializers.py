@@ -35,6 +35,7 @@ class QueryJobRetrieveSerializer(serializers.ModelSerializer):
 
 class QueryJobCreateSerializer(serializers.ModelSerializer):
 
+    query = serializers.CharField(required=False)
     table_name = serializers.CharField(required=False)
 
     class Meta:
