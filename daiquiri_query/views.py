@@ -89,7 +89,7 @@ class QueryJobViewSet(viewsets.ModelViewSet):
     def perform_destroy(self, instance):
         instance.archive()
 
-    @detail_route(methods=['get'], url_path='download/(?P<format_key>\w+)')
+    @detail_route(methods=['put'], url_path='download/(?P<format_key>\w+)')
     def download(self, request, pk=None, format_key=None):
         try:
             format = [f for f in settings.QUERY['download_formats'] if f['key'] == format_key][0]
