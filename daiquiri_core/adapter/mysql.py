@@ -1,5 +1,7 @@
+import csv
 import json
 import os
+import pipes
 import re
 import subprocess
 
@@ -299,7 +301,7 @@ class MySQLAdapter(BaseAdapter):
         return file_name
 
     def _get_stream_table_cmd(self, database_name, table_name):
-        cmd = 'mysql --user=\'%(USER)s\' --password=\'%(PASSWORD)s\'' % self.database_config
+        cmd = 'mysqldump --user=\'%(USER)s\' --password=\'%(PASSWORD)s\'' % self.database_config
 
         if self.database_config['HOST']:
             cmd += ' --host=\'%(HOST)s\'' % self.database_config
@@ -307,21 +309,42 @@ class MySQLAdapter(BaseAdapter):
         if self.database_config['PORT']:
             cmd += ' --port=\'%(PORT)s\'' % self.database_config
 
-        cmd += ' --execute=\'SELECT * FROM %(database)s.%(table)s\'' % {
-            'database': self.escape_identifier(database_name),
-            'table': self.escape_identifier(table_name)
+        cmd += ' --compact --no-create-info -q %(database)s %(table)s' % {
+            'database': pipes.quote(database_name),
+            'table': pipes.quote(table_name)
         }
 
         return cmd
 
     def dump_table_csv(self, database_name, table_name, file_name):
+        # get column names
+        column_names = self.fetch_column_names(database_name, table_name)
+
+        with open(file_name, 'wb') as csvfile:
+            writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            writer.writerow(column_names)
+
+        # construct sed regexp
+        sed_cmd = (
+            # remove the INSERT INTO command
+            's/^.*VALUES (//g',
+            # replace end of row with a new line
+            's/),(/\\n/g',
+            # remove ); at the end
+            's/);$//g',
+            # convert ' to ""
+            's/\\x27/"/g'
+        )
+
         cmd = self._get_stream_table_cmd(database_name, table_name)
-        cmd += ' | sed \'s/\\t/","/g;s/^/"/;s/$/"/;s/\\n//g\''
-        cmd += ' > ' + file_name
+        cmd += ' | sed \'%s\'' % ';'.join(sed_cmd)
+        cmd += ' >> ' + file_name
+        print cmd
         subprocess.check_call(cmd, shell=True)
 
     def dump_table_votable(self, database_name, table_name, file_name):
-        # get column metadata
+        # get column names and metadata
+        column_names = self.fetch_column_names(database_name, table_name)
         columns = self.fetch_columns(database_name, table_name)
 
         # write header
@@ -330,18 +353,32 @@ class MySQLAdapter(BaseAdapter):
             'table': table_name
         }
 
-        for column in columns:
+        for column_name, column in zip(column_names, columns):
+            column['name'] = column_name
             header += '<FIELD name="%(name)s" datatype="%(datatype)s"/>' % column
 
         header += '<DATA><TABLEDATA>'
 
-        cmd = 'echo \'%s\' > %s' % (header, file_name)
-        subprocess.check_call(cmd, shell=True)
+        with open(file_name, 'wb') as f:
+            f.write(header)
+
+        # construct sed regexp
+        sed_cmd = (
+            # replace the INSERT INTO command with <TR><TD>
+            's/^.*VALUES (/<TR><TD>/g',
+            # replace end of row with </TD></TR>
+            's/),(/<\/TD><\/TR><TR><TD>/g',
+            # replace , with </TD><TD>
+            's/,/<\/TD><TD>/g',
+            # replace ); at the end with </TD></TR>
+            's/);$/<\/TD><\/TR>/g',
+        )
 
         # write table data
         cmd = self._get_stream_table_cmd(database_name, table_name)
-        cmd += ' | sed \'s/\\t/<\/TD><TD>/g;s/^/<TR><TD>/;s/$/<\/TD><\/TR>/;s/\\n//g\''
+        cmd += ' | sed \'%s\'' % ';'.join(sed_cmd)
         cmd += ' >> ' + file_name
+        print cmd
         subprocess.check_call(cmd, shell=True)
 
         # write footer
