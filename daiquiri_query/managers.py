@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, OperationalError
 from django.utils.translation import ugettext_lazy as _
 from django.utils.timezone import now
 
@@ -78,7 +78,10 @@ class QueryJobManager(models.Manager):
         job.save()
 
         # submit the query
-        get_query_backend().submit(job)
+        try:
+            get_query_backend().submit(job)
+        except OperationalError as e:
+            raise ConnectionError([e.args])
 
     def _check_table(self, table_name):
         errors = []

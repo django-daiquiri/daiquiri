@@ -15,3 +15,6 @@ class PermissionError(DaiquiriException):
 
 class TableError(DaiquiriException):
     pass
+
+class ConnectionError(DaiquiriException):
+    pass

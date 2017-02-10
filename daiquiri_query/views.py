@@ -83,10 +83,11 @@ class QueryJobViewSet(viewsets.ModelViewSet):
                     'positions': json.dumps(e.message),
                 }
             })
-        except PermissionError as e:
+        except (PermissionError, ConnectionError) as e:
             raise ValidationError({'query': {'messages': e.message}})
         except TableError as e:
             raise ValidationError({'table_name': e.message})
+
 
     def perform_update(self, serializer):
         try:
