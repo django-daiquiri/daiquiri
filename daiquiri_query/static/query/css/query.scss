@@ -28,6 +28,11 @@ p.daiquiri-query-form-help {
     position: relative;
     margin-bottom: 20px;
 
+    .btn-group {
+        .dropdown-menu {
+            min-width: 200px;
+        }
+    }
     .btn-group.wide {
         position: static;
 
@@ -41,6 +46,18 @@ p.daiquiri-query-form-help {
 
         .dropdown-menu {
             left: 0;
+        }
+    }
+
+    .dropdown-menu {
+        padding: 10px;
+
+        .daiquiri-browser {
+            margin-bottom: 5px;
+
+            .daiquiri-browser-body {
+                height: 300px;
+            }
         }
     }
 }

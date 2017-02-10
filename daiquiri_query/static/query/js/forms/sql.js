@@ -1,9 +1,33 @@
-app.factory('SqlFormService', ['$timeout', 'QueryService', function($timeout, QueryService) {
+app.factory('SqlFormService', ['$timeout', 'QueryService', 'BrowserService', function($timeout, QueryService, BrowserService) {
+
+    /* get the base url */
+
+    var baseurl = angular.element('meta[name="baseurl"]').attr('content');
+
+    /* create the form service */
 
     var service = {
         values: {},
         errors: {}
     };
+
+    /* create and configure the browser service */
+
+    service.browser = BrowserService;
+
+    service.browser.init({
+        databases: {
+            url: baseurl + 'metadata/api/databases/?nested=1',
+            columns: ['databases','tables','columns']
+        },
+        functions: {
+            url: baseurl + 'metadata/api/functions/?nested=1',
+            columns: ['functions']
+        }
+    });
+
+    service.browser.initBrowser('databases');
+    service.browser.initBrowser('functions');
 
     service.activate = function() {
         QueryService.activateForm('sql');
@@ -36,7 +60,24 @@ app.factory('SqlFormService', ['$timeout', 'QueryService', function($timeout, Qu
             });
     };
 
-    service.pasteQuery = function(query) {
+    service.pasteItem = function(resource, item) {
+        var editor = $('.CodeMirror')[0].CodeMirror;
+
+        if (resource == 'databases') {
+            editor.replaceSelection(item.name);
+        } else if (resource == 'tables') {
+            editor.replaceSelection(item.name);
+        } else if (resource == 'columns') {
+            editor.replaceSelection(item.name);
+        } else if (resource == 'functions') {
+            editor.replaceSelection(item.name + '()');
+        }
+
+        editor.focus();
+        $('.daiquiri-query-btn-groups .btn-group').removeClass('open');
+    }
+
+    service.replaceQuery = function(query) {
         service.values.query = query;
         service.activate();
     }
