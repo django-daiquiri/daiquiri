@@ -24,6 +24,31 @@ p.daiquiri-query-form-help {
     overflow-y: auto;
 }
 
+.daiquiri-query-btn-groups {
+    position: relative;
+    margin-bottom: 20px;
+
+    .btn-group.wide {
+        position: static;
+
+        .dropdown-menu {
+            right: 0;
+        }
+    }
+
+    .btn-group.wide.pull-right {
+        position: static;
+
+        .dropdown-menu {
+            left: 0;
+        }
+    }
+}
+
+.query-dropdown-menu-wide {
+    right: 0;
+}
+
 .CodeMirror {
     height: 250px;
 }

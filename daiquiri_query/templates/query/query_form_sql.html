@@ -4,10 +4,52 @@
    {% trans 'Place your SQL statement directly in the text area below and submit your request using the button.' %}
 </p>
 
-<div class="btn-group daiquiri-query-form-bar" role="group">
-    <button type="button" class="btn btn-default">Databases</button>
-    <button type="button" class="btn btn-default">Functions</button>
-    <button type="button" class="btn btn-default">Examples</button>
+<div class="daiquiri-query-btn-groups">
+    <div class="btn-group wide">
+        <button type="button" class="btn btn-default dropdown-toggle"
+            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            {% trans 'Databases' %} <span class="caret"></span>
+        </button>
+        <div class="dropdown-menu">
+
+        </div>
+    </div>
+    <div class="btn-group">
+        <button type="button" class="btn btn-default dropdown-toggle"
+            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            {% trans 'Functions' %} <span class="caret"></span>
+        </button>
+        <div class="dropdown-menu">
+
+        </div>
+    </div>
+    <div class="btn-group">
+        <button type="button" class="btn btn-default dropdown-toggle"
+            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            {% trans 'CDS search' %} <span class="caret"></span>
+        </button>
+        <div class="dropdown-menu">
+
+        </div>
+    </div>
+    <div class="btn-group">
+        <button type="button" class="btn btn-default dropdown-toggle"
+            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            {% trans 'Column search' %} <span class="caret"></span>
+        </button>
+        <div class="dropdown-menu">
+
+        </div>
+    </div>
+    <div class="btn-group wide pull-right">
+        <button type="button" class="btn btn-default dropdown-toggle"
+            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            {% trans 'Examples' %} <span class="caret"></span>
+        </button>
+        <div class="dropdown-menu">
+
+        </div>
+    </div>
 </div>
 
 <formgroup
