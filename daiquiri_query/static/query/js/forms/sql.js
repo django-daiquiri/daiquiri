@@ -36,5 +36,10 @@ app.factory('SqlFormService', ['$timeout', 'QueryService', function($timeout, Qu
             });
     };
 
+    service.pasteQuery = function(query) {
+        service.values.query = query;
+        service.activate();
+    }
+
     return service;
 }]);
