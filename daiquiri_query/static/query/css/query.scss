@@ -30,7 +30,7 @@ p.daiquiri-query-form-help {
 
     .btn-group {
         .dropdown-menu {
-            min-width: 200px;
+            min-width: 225px;
         }
     }
     .btn-group.wide {
@@ -50,14 +50,34 @@ p.daiquiri-query-form-help {
     }
 
     .dropdown-menu {
-        padding: 10px;
+        padding: 0;
 
         .daiquiri-browser {
             margin-bottom: 5px;
 
-            .daiquiri-browser-body {
-                height: 300px;
+            :first-child {
+                .daiquiri-browser-head,
+                .daiquiri-browser-body {
+                    border-left: none;
+                }
             }
+            :last-child {
+                .daiquiri-browser-head,
+                .daiquiri-browser-body {
+                    border-right: none;
+                }
+            }
+            .daiquiri-browser-head {
+                border-top: none;
+            }
+            .daiquiri-browser-body {
+                height: 200px;
+            }
+        }
+        .help-block {
+            margin-bottom: 5px;
+            padding-left: 15px;
+            padding-right: 15px;
         }
     }
 }
