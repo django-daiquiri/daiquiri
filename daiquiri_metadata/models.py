@@ -5,7 +5,12 @@ from django.utils.translation import ugettext_lazy as _
 
 from daiquiri_core.adapter import get_adapter
 
-from .managers import *
+from .managers import (
+    DatabasePermissionsManager,
+    TablePermissionsManager,
+    ColumnPermissionsManager,
+    FunctionPermissionsManager
+)
 
 
 @python_2_unicode_compatible

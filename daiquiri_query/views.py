@@ -18,6 +18,7 @@ from daiquiri_metadata.models import Database, Function
 from daiquiri_uws.settings import PHASE_ARCHIVED
 
 from .models import *
+from .backends import get_query_backend
 from .serializers import *
 from .exceptions import *
 
@@ -53,6 +54,25 @@ class QueryJobViewSet(viewsets.ModelViewSet):
             return QueryJobCreateSerializer
         elif self.action == 'update' or self.action == 'partial_update':
             return QueryJobUpdateSerializer
+
+    def list(self, request, *args, **kwargs):
+        query_backend = get_query_backend()
+        user_database_name = query_backend.get_user_database_name(self.request.user.username)
+
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        data = serializer.data
+
+        for job in data:
+            job['columns'] = query_backend.fetch_columns(user_database_name, job['table_name'])
+
+        return Response(data)
 
     def perform_create(self, serializer):
 

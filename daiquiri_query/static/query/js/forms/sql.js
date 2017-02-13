@@ -17,11 +17,11 @@ app.factory('SqlFormService', ['$timeout', 'QueryService', 'BrowserService', fun
 
     service.browser.init({
         databases: {
-            url: baseurl + 'metadata/api/databases/?nested=1',
+            url: baseurl + 'query/api/databases/?nested=1',
             columns: ['databases','tables','columns']
         },
         functions: {
-            url: baseurl + 'metadata/api/functions/?nested=1',
+            url: baseurl + 'query/api/functions/?nested=1',
             columns: ['functions']
         }
     });

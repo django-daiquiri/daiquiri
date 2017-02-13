@@ -27,3 +27,7 @@ class DirectQueryBackend(BaseQueryBackend):
 
     def get_user_database_name(self, username):
         return 'daiquiri_user_' + username
+
+    def fetch_columns(self, database_name, table_name):
+        adapter = get_adapter('data')
+        return adapter.fetch_columns(database_name, table_name)
