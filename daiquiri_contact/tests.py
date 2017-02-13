@@ -1,6 +1,7 @@
 import unittest
 from forms import ContactForm
 
+
 class FormTests(unittest.TestCase):
     def test_validation(self):
         form_data = {

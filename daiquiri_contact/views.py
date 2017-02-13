@@ -1,9 +1,8 @@
 from django.shortcuts import render
+from django.utils.timezone import now
 
 from .forms import ContactForm
 from .utils import send_contact_message
-from datetime import datetime
-
 
 
 def contact(request):
@@ -15,16 +14,16 @@ def contact(request):
 
         if contact_form.is_valid():
 
-            new_message = contact_form.save(commit=False)
-            new_message.set_status_active()
-            new_message.datetime = datetime.now()
+            message = contact_form.save(commit=False)
+            message.set_status_active()
+            message.created = now()
 
             if request.user.is_authenticated:
-                new_message.User = request.user
+                message.user = request.user
 
-            new_message.save()
+            message.save()
 
-            send_contact_message(request, new_message)
+            send_contact_message(request, message)
 
             return render(request, 'contact/thanks.html')
 
@@ -37,8 +36,3 @@ def contact(request):
             }
 
     return render(request, 'contact/contact.html', {'form': contact_form})
-
-
-
-
-
