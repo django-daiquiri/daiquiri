@@ -13,22 +13,6 @@ app.factory('SqlFormService', ['$timeout', 'QueryService', 'BrowserService', fun
 
     /* create and configure the browser service */
 
-    service.browser = BrowserService;
-
-    service.browser.init({
-        databases: {
-            url: baseurl + 'query/api/databases/?nested=1',
-            columns: ['databases','tables','columns']
-        },
-        functions: {
-            url: baseurl + 'query/api/functions/?nested=1',
-            columns: ['functions']
-        }
-    });
-
-    service.browser.initBrowser('databases');
-    service.browser.initBrowser('functions');
-
     service.activate = function() {
         QueryService.activateForm('sql');
 

@@ -25,52 +25,52 @@ angular.module('core')
     };
 }])
 
-.factory('BrowserService', ['$http', '$timeout', '$filter', function($http, $timeout, $filter) {
+.factory('BrowserService', ['$timeout', '$filter', function($timeout, $filter) {
     var browser = {};
 
-    browser.init = function (browser_ids) {
-        angular.forEach(browser_ids, function (options, browser_id) {
-            browser[browser_id] = {
-                url: options.url,
-                columns: options.columns.map(function(column) { return { name: column, items: [] }; })
-            };
-        });
+    browser.init = function(browser_id, columns, data, active_item) {
+        browser[browser_id] = {
+            'columns': columns.map(function(column) { return { name: column, items: [] }; })
+        };
     };
 
-    browser.initBrowser = function(browser_id, active_item) {
-        return $http.get(browser[browser_id].url)
-            .success(function(response) {
-                // store the response data structure
-                browser[browser_id].data = response;
+    browser.render = function(browser_id, data, active_item) {
+        // set the the data structure
+        browser[browser_id].data = data;
 
-                // define shorcuts
-                var column0 = browser[browser_id].columns[0],
-                    column1 = browser[browser_id].columns[1],
-                    column2 = browser[browser_id].columns[2];
+        // define shortcuts
+        var column0 = browser[browser_id].columns[0],
+            column1 = browser[browser_id].columns[1],
+            column2 = browser[browser_id].columns[2];
 
-                // set up the first column
-                column0.items = browser[browser_id].data;
+        // set up the first column
+        column0.items = browser[browser_id].data;
 
-                if (angular.isDefined(active_item) && active_item) {
-                    browser.findActiveItem(browser_id, active_item);
-                } else {
-                    browser.active = {};
+        if (angular.isDefined(active_item) && active_item) {
+            browser.findActiveItem(browser_id, active_item);
+        } else {
+            if (angular.isDefined(column1) && angular.isDefined(column1.selected) && column1.selected) {
+                // something in the SECOND column has been selected before:
+                // first select the selected item in the FIRST column
+                // then the selected item in the SECOND column
+                var column0_selected = column0.selected,
+                    column1_selected = column1.selected;
 
-                    if (angular.isDefined(column1) && angular.isDefined(column1.selected) && column1.selected) {
-                        // something in the SECOND column has been selected before:
-                        // first select the selected item in the FIRST column
-                        // then the selected item in the SECOND column
-                        browser.selectItem(browser_id, 0, column0.selected);
-                        browser.selectItem(browser_id, 1, column1.selected);
-                    } else if (angular.isDefined(column0) && angular.isDefined(column0.selected) && column0.selected) {
-                        // something in the FIRST row has been selected before: select it again
-                        browser.selectItem(browser_id, 0, column0.selected);
-                    } else {
-                        // nothing has been selected yet, select the first item of the FIRST column
-                        browser.selectItem(browser_id, 0, 0);
-                    }
-                }
-            });
+                browser.selectItem(browser_id, 0, column0_selected);
+                browser.selectItem(browser_id, 1, column1_selected);
+
+            } else if (angular.isDefined(column0) && angular.isDefined(column0.selected) && column0.selected) {
+                // something in the FIRST row has been selected before: select it again
+                browser.selectItem(browser_id, 0, column0.selected);
+            } else {
+                // nothing has been selected yet, select the first item of the FIRST column
+                browser.selectItem(browser_id, 0, 0);
+            }
+
+            if (angular.isDefined(browser.active) && browser.active.browser_id == browser_id) {
+                browser.activateItem(browser_id, browser.active.column_index, browser.active.row_index);
+            }
+        }
     };
 
     browser.selectItem = function(browser_id, column_index, row_index) {
@@ -130,8 +130,10 @@ angular.module('core')
     };
 
     browser.getSelectedItem = function(browser_id, column_index) {
-        var selected = browser[browser_id].columns[column_index].selected;
-        return browser[browser_id].columns[column_index].items[selected];
+        if (angular.isDefined(browser[browser_id])) {
+            var selected = browser[browser_id].columns[column_index].selected;
+            return browser[browser_id].columns[column_index].items[selected];
+        }
     };
 
     browser.activateItem = function(browser_id, column_index, row_index) {
@@ -153,7 +155,6 @@ angular.module('core')
     };
 
     browser.findActiveItem = function(browser_id, item) {
-
         // define shorcuts
         var column0 = browser[browser_id].columns[0],
             column1 = browser[browser_id].columns[1],

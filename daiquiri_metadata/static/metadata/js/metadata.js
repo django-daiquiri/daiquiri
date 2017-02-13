@@ -8,12 +8,14 @@ angular.module('metadata', ['core'])
 
     /* create the metadata service */
 
-    var service = {};
+    var service = {
+        browser: BrowserService
+    };
 
     /* configure the resources */
 
     var resources = {
-        'databases': $resource(baseurl + 'metadata/api/databases/:id/'),
+        'databases': $resource(baseurl + 'metadata/api/databases/:list_route/:id/'),
         'tables': $resource(baseurl + 'metadata/api/tables/:route/:id/'),
         'columns': $resource(baseurl + 'metadata/api/columns/:route/:id/'),
         'functions': $resource(baseurl + 'metadata/api/functions/:id/'),
@@ -48,45 +50,37 @@ angular.module('metadata', ['core'])
         }
     };
 
-    /* create and configure the browser service */
-
-    service.browser = BrowserService;
-
-    service.browser.init({
-        databases: {
-            url: baseurl + 'metadata/api/databases/?nested=1',
-            columns: ['databases','tables','columns']
-        },
-        functions: {
-            url: baseurl + 'metadata/api/functions/?nested=1',
-            columns: ['functions']
-        }
-    });
-
     /* define service functions */
 
     service.init = function() {
         service.tabletypes = resources.tabletypes.query();
         service.groups = resources.groups.query();
 
+        BrowserService.init('databases', ['databases','tables','columns']);
+        BrowserService.init('functions', ['functions']);
+
         service.initDatabasesBrowser();
         service.initFunctionsBrowser();
     };
 
     service.initDatabasesBrowser = function() {
-        service.browser.initBrowser('databases', service.active).then(function() {
-            service.databases = service.browser['databases'].data;
+        resources.databases.query({'list_route': 'nested'}, function(response) {
+            service.databases = response;
 
             service.tables = [];
-            angular.forEach(service.browser['databases'].data, function(database) {
+            angular.forEach(service.databases, function(database) {
                 service.tables = service.tables.concat(database.tables);
             });
+
+            BrowserService.render('databases', service.databases, service.active);
         });
     };
 
     service.initFunctionsBrowser = function() {
-        service.browser.initBrowser('functions', service.active).then(function() {
-            service.functions = service.browser['functions'].data;
+        resources.functions.query(function(response) {
+            service.functions = response;
+
+            BrowserService.render('functions', service.functions, service.active);
         });
     };
 
@@ -192,5 +186,9 @@ angular.module('metadata', ['core'])
 
     $scope.$on('browserItemClicked', function(event, resource, item) {
         MetadataService.activateItem(resource, item.id);
+    });
+
+    $scope.$on('browserDblItemClicked', function(event, resource, item) {
+        MetadataService.openFormModal(resource);
     });
 }]);

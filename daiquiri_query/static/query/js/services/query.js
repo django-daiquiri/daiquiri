@@ -1,4 +1,4 @@
-app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'DownloadService', 'TableService', function($resource, $injector, PollingService, DownloadService, TableService) {
+app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'DownloadService', 'TableService', 'BrowserService', function($resource, $injector, PollingService, DownloadService, TableService, BrowserService) {
 
     /* get the base url */
 
@@ -12,6 +12,11 @@ app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'Downlo
         databases: $resource(baseurl + 'query/api/databases/'),
         functions: $resource(baseurl + 'query/api/functions/'),
     };
+
+    /* initialise the browser service */
+
+    BrowserService.init('databases', ['databases', 'tables', 'columns'])
+    BrowserService.init('functions', ['functions'])
 
     /* create the query service */
 
@@ -32,8 +37,19 @@ app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'Downlo
             service.forms[response[0].key].activate();
         });
 
-        // load joblist
-        service.fetchJobs();
+        // fetch functions
+        resources.functions.query(function(response) {
+            service.functions = response;
+            BrowserService.render('functions', service.functions);
+        });
+
+        // fetch databases
+        resources.databases.query(function(response) {
+            service.databases = response;
+
+            // load joblist when database have been fetched
+            service.fetchJobs();
+        });
 
         // activate overview tab
         service.tab = 'overview';
@@ -49,6 +65,16 @@ app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'Downlo
     service.fetchJobs = function() {
         return resources.jobs.query(function(response) {
             service.jobs = response;
+
+            BrowserService.render('databases', service.databases.concat({
+                name: 'hey',
+                tables: response.map(function(job) {
+                    return {
+                        name: job.table_name,
+                        columns: job.columns
+                    };
+                }),
+            }));
         }).$promise;
     };
 

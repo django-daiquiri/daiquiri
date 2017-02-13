@@ -18,12 +18,7 @@ def metadata(request):
 
 class DatabaseViewSet(viewsets.ModelViewSet):
     queryset = Database.objects.all()
-
-    def get_serializer_class(self):
-        if self.request.GET.get('nested'):
-            return NestedDatabaseSerializer
-        else:
-            return DatabaseSerializer
+    serializer_class = DatabaseSerializer
 
     def create(self, request, *args, **kwargs):
 
@@ -54,15 +49,16 @@ class DatabaseViewSet(viewsets.ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
+    @list_route()
+    def nested(self, request):
+        queryset = Database.objects.all()
+        serializer = NestedDatabaseSerializer(queryset, many=True)
+        return Response(serializer.data)
+
 
 class TableViewSet(viewsets.ModelViewSet):
     queryset = Table.objects.all()
-
-    def get_serializer_class(self):
-        if self.request.GET.get('nested'):
-            return NestedTableSerializer
-        else:
-            return TableSerializer
+    serializer_class = TableSerializer
 
     def create(self, request, *args, **kwargs):
 
@@ -95,15 +91,16 @@ class TableViewSet(viewsets.ModelViewSet):
         else:
             return Response([])
 
+    @list_route()
+    def nested(self, request):
+        queryset = Table.objects.all()
+        serializer = NestedTableSerializer(queryset, many=True)
+        return Response(serializer.data)
+
 
 class ColumnViewSet(viewsets.ModelViewSet):
     queryset = Column.objects.all()
-
-    def get_serializer_class(self):
-        if self.request.GET.get('nested'):
-            return NestedColumnSerializer
-        else:
-            return ColumnSerializer
+    serializer_class = ColumnSerializer
 
     @list_route(methods=['get'], permission_classes=[])
     def discover(self, request):
@@ -115,6 +112,12 @@ class ColumnViewSet(viewsets.ModelViewSet):
             return Response([get_adapter('metadata').fetch_column(database_name, table_name, column_name)])
         else:
             return Response([])
+
+    @list_route()
+    def nested(self, request):
+        queryset = Column.objects.all()
+        serializer = NestedColumnSerializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class FunctionViewSet(viewsets.ModelViewSet):
