@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, ProgrammingError
 from django.contrib.auth.models import Group
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
@@ -79,13 +79,16 @@ class Table(models.Model):
     def save(self, *args, **kwargs):
         super(Table, self).save(*args, **kwargs)
 
-        get_adapter('metadata').store_table_metadata(self.database.name, self.name, {
-            'order': self.order,
-            'name': self.name,
-            'description': self.description,
-            'type': self.type,
-            'utype': self.utype
-        })
+        try:
+            get_adapter('metadata').store_table_metadata(self.database.name, self.name, {
+                'order': self.order,
+                'name': self.name,
+                'description': self.description,
+                'type': self.type,
+                'utype': self.utype
+            })
+        except ProgrammingError:
+            pass
 
 
 @python_2_unicode_compatible
@@ -128,19 +131,22 @@ class Column(models.Model):
     def save(self, *args, **kwargs):
         super(Column, self).save(*args, **kwargs)
 
-        get_adapter('metadata').store_column_metadata(self.table.database.name, self.table.name, self.name, {
-            'order': self.order,
-            'name': self.name,
-            'description': self.description,
-            'unit': self.unit,
-            'ucd': self.ucd,
-            'utype': self.utype,
-            'datatype': self.datatype,
-            'size': self.size,
-            'principal': self.principal,
-            'indexed': self.indexed,
-            'std': self.std
-        })
+        try:
+            get_adapter('metadata').store_column_metadata(self.table.database.name, self.table.name, self.name, {
+                'order': self.order,
+                'name': self.name,
+                'description': self.description,
+                'unit': self.unit,
+                'ucd': self.ucd,
+                'utype': self.utype,
+                'datatype': self.datatype,
+                'size': self.size,
+                'principal': self.principal,
+                'indexed': self.indexed,
+                'std': self.std
+            })
+        except ProgrammingError:
+            pass
 
 
 @python_2_unicode_compatible
