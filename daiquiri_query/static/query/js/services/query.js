@@ -9,6 +9,7 @@ app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'Downlo
     var resources = {
         forms: $resource(baseurl + 'query/api/forms/'),
         jobs: $resource(baseurl + 'query/api/jobs/:id/:detail_route'),
+        examples: $resource(baseurl + 'query/api/examples/'),
         databases: $resource(baseurl + 'query/api/databases/'),
         functions: $resource(baseurl + 'query/api/functions/'),
     };
@@ -17,6 +18,7 @@ app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'Downlo
 
     BrowserService.init('databases', ['databases', 'tables', 'columns'])
     BrowserService.init('functions', ['functions'])
+    BrowserService.init('examples', ['examples'])
 
     /* create the query service */
 
@@ -41,6 +43,12 @@ app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'Downlo
         resources.functions.query(function(response) {
             service.functions = response;
             BrowserService.render('functions', service.functions);
+        });
+
+        // fetch examples
+        resources.examples.query(function(response) {
+            service.examples = response;
+            BrowserService.render('examples', service.examples);
         });
 
         // fetch databases

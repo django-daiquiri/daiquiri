@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from daiquiri_metadata.models import Database, Table, Column, Function
 
-from .models import QueryJob
+from .models import QueryJob, Example
 
 
 class FormSerializer(serializers.Serializer):
@@ -56,6 +56,20 @@ class QueryJobUpdateSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'table_name'
+        )
+
+
+class ExampleSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Example
+        fields = (
+            'id',
+            'order',
+            'name',
+            'description',
+            'query_string',
+            'groups'
         )
 
 

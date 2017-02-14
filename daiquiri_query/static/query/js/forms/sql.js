@@ -46,17 +46,7 @@ app.factory('SqlFormService', ['$timeout', 'QueryService', 'BrowserService', fun
 
     service.pasteItem = function(resource, item) {
         var editor = $('.CodeMirror')[0].CodeMirror;
-
-        if (resource == 'databases') {
-            editor.replaceSelection(item.query_string);
-        } else if (resource == 'tables') {
-            editor.replaceSelection(item.query_string);
-        } else if (resource == 'columns') {
-            editor.replaceSelection(item.query_string);
-        } else if (resource == 'functions') {
-            editor.replaceSelection(item.query_string);
-        }
-
+        editor.replaceSelection(item.query_string);
         editor.focus();
         $('.daiquiri-query-btn-groups .btn-group').removeClass('open');
     }

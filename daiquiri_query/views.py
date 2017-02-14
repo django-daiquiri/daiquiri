@@ -19,8 +19,23 @@ from daiquiri_uws.settings import PHASE_ARCHIVED
 
 from .models import *
 from .backends import get_query_backend
-from .serializers import *
-from .exceptions import *
+from .serializers import (
+    FormSerializer,
+    QueryJobListSerializer,
+    QueryJobRetrieveSerializer,
+    QueryJobCreateSerializer,
+    QueryJobUpdateSerializer,
+    ExampleSerializer,
+    DatabaseSerializer,
+    FunctionSerializer
+)
+from .exceptions import (
+    ADQLSyntaxError,
+    MySQLSyntaxError,
+    PermissionError,
+    TableError,
+    ConnectionError
+)
 
 
 @login_required()
@@ -135,6 +150,15 @@ class QueryJobViewSet(viewsets.ModelViewSet):
                 return Response('PENDING')
         except QueryJob.DoesNotExist:
             raise Http404
+
+
+class ExampleViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = (IsAuthenticated, )
+
+    serializer_class = ExampleSerializer
+
+    def get_queryset(self):
+        return Example.objects.filter(groups__in=self.request.user.groups.all())
 
 
 class DatabaseViewSet(viewsets.ReadOnlyModelViewSet):

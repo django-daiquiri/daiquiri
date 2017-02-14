@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib.auth.models import Group
 from django.db import models
 from django.db.utils import OperationalError, ProgrammingError
 from django.utils.encoding import python_2_unicode_compatible
@@ -78,3 +79,27 @@ class QueryJob(Job):
     def create_download_file(self, format):
         adapter = get_adapter('data')
         return adapter.dump_table(self.database_name, self.table_name, self.owner.username, format)
+
+
+@python_2_unicode_compatible
+class Example(models.Model):
+
+    order = models.IntegerField(null=True, blank=True)
+
+    name = models.CharField(max_length=256)
+    description = models.TextField(null=True, blank=True)
+
+    query_string = models.TextField()
+
+    groups = models.ManyToManyField(Group, blank=True)
+
+    class Meta:
+        ordering = ('order', )
+
+        verbose_name = _('Example')
+        verbose_name_plural = _('Examples')
+
+        permissions = (('view_example', 'Can view Example'),)
+
+    def __str__(self):
+        return self.name
