@@ -28,9 +28,10 @@ angular.module('core')
 .factory('BrowserService', ['$timeout', '$filter', function($timeout, $filter) {
     var browser = {};
 
-    browser.init = function(browser_id, columns, data, active_item) {
+    browser.init = function(browser_id, columns, filter) {
         browser[browser_id] = {
-            'columns': columns.map(function(column) { return { name: column, items: [] }; })
+            'columns': columns.map(function(column) { return { name: column, items: [] }; }),
+            'filter': filter
         };
     };
 

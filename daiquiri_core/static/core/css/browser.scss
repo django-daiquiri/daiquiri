@@ -6,9 +6,7 @@
 }
 
 .daiquiri-browser-head {
-    border-top: 1px solid $border-color;
-    border-left: 1px solid $border-color;
-    border-right: 1px solid $border-color;
+    border: 1px solid $border-color;
 }
 
 .daiquiri-browser-body {
@@ -16,7 +14,6 @@
 
     overflow-x: hidden;
     overflow-y: auto;
-    border-top: 1px solid $border-color;
     border-bottom: 1px solid $border-color;
     border-left: 1px solid $border-color;
     border-right: 1px solid $border-color;

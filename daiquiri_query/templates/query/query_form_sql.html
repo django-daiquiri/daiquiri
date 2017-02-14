@@ -17,6 +17,20 @@
             </p>
         </div>
     </div>
+
+    <div class="btn-group">
+        <button type="button" class="btn btn-default dropdown-toggle"
+            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            {% trans 'Columns' %} <span class="caret"></span>
+        </button>
+        <div class="dropdown-menu">
+            <div daiquiri-browser data-browser-id="columns" class="daiquiri-metadata-browser"></div>
+            <p class="help-block small">
+                {% trans 'A double click will paste the column into the query field.' %}
+            </p>
+        </div>
+    </div>
+
     <div class="btn-group">
         <button type="button" class="btn btn-default dropdown-toggle"
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -29,6 +43,7 @@
             </p>
         </div>
     </div>
+
     <div class="btn-group">
         <button type="button" class="btn btn-default dropdown-toggle"
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -38,15 +53,7 @@
 
         </div>
     </div>
-    <div class="btn-group">
-        <button type="button" class="btn btn-default dropdown-toggle"
-            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            {% trans 'Column search' %} <span class="caret"></span>
-        </button>
-        <div class="dropdown-menu">
 
-        </div>
-    </div>
     <div class="btn-group wide pull-right">
         <button type="button" class="btn btn-default dropdown-toggle"
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

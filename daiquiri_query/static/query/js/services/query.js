@@ -17,6 +17,7 @@ app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'Downlo
     /* initialise the browser service */
 
     BrowserService.init('databases', ['databases', 'tables', 'columns'])
+    BrowserService.init('columns', ['columns'], true)
     BrowserService.init('functions', ['functions'])
     BrowserService.init('examples', ['examples'])
 
@@ -41,19 +42,28 @@ app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'Downlo
 
         // fetch functions
         resources.functions.query(function(response) {
-            service.functions = response;
-            BrowserService.render('functions', service.functions);
+            BrowserService.render('functions', response);
         });
 
         // fetch examples
         resources.examples.query(function(response) {
-            service.examples = response;
-            BrowserService.render('examples', service.examples);
+            BrowserService.render('examples', response);
         });
 
         // fetch databases
         resources.databases.query(function(response) {
             service.databases = response;
+
+            service.columns = []
+            angular.forEach(service.databases, function(database) {
+                angular.forEach(database.tables, function(table) {
+                    angular.forEach(table.columns, function(column) {
+                        var column_copy = angular.copy(column);
+                        column_copy.name = database.name + '.' + table.name + '.' + column.name;
+                        service.columns.push(column_copy);
+                    });
+                });
+            });
 
             // load joblist when database have been fetched
             service.fetchJobs();
@@ -74,15 +84,28 @@ app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'Downlo
         return resources.jobs.query(function(response) {
             service.jobs = response;
 
-            BrowserService.render('databases', service.databases.concat({
+            var user_database = {
                 name: 'hey',
                 tables: response.map(function(job) {
                     return {
                         name: job.table_name,
                         columns: job.columns
                     };
-                }),
-            }));
+                })
+            };
+
+            var user_columns = [];
+            angular.forEach(user_database.tables, function(table) {
+                angular.forEach(table.columns, function(column) {
+                    var column_copy = angular.copy(column);
+                    column_copy.name = user_database.name + '.' + table.name + '.' + column.name;
+                    user_columns.push(column_copy);
+                });
+            });
+
+            BrowserService.render('databases', service.databases.concat(user_database));
+            BrowserService.render('columns', service.columns.concat(user_columns));
+
         }).$promise;
     };
 

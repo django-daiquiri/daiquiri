@@ -12,9 +12,17 @@
             </li>
         </ul>
 
+        <ul class="daiquiri-browser-head nav nav-pills nav-stacked"
+            ng-show="browser[browserId].filter">
+            <li class="nav-header">
+                <input type="text" class="form-control" placeholder="Filter"
+                    ng-model="column.filter_string" />
+            </li>
+        </ul>
+
         <ul class="daiquiri-browser-body nav nav-pills nav-stacked">
 
-            <li ng-repeat="item in column.items"
+            <li ng-repeat="item in column.items | filter: column.filter_string"
                 ng-class="{ 'active': browser.isActive(browserId, $parent.$index, $index) }">
                 <a href=""
                     ng-click="itemClicked(browserId, item, $parent.$index, $index);"
