@@ -14,12 +14,16 @@ class GroupSerializer(serializers.ModelSerializer):
 
 class FunctionSerializer(serializers.ModelSerializer):
 
+    label = serializers.CharField(source='__str__')
+
     class Meta:
         model = Function
         fields = '__all__'
 
 
 class ColumnSerializer(serializers.ModelSerializer):
+
+    label = serializers.CharField(source='__str__')
 
     class Meta:
         model = Column
@@ -28,12 +32,16 @@ class ColumnSerializer(serializers.ModelSerializer):
 
 class TableSerializer(serializers.ModelSerializer):
 
+    label = serializers.CharField(source='__str__')
+
     class Meta:
         model = Table
         fields = '__all__'
 
 
 class DatabaseSerializer(serializers.ModelSerializer):
+
+    label = serializers.CharField(source='__str__')
 
     class Meta:
         model = Database
@@ -44,14 +52,14 @@ class NestedFunctionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Function
-        fields = ('id', '__str__', 'name')
+        fields = ('id', 'name')
 
 
 class NestedColumnSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Column
-        fields = ('id', '__str__', 'name')
+        fields = ('id', 'name')
 
 
 class NestedTableSerializer(serializers.ModelSerializer):
@@ -60,8 +68,7 @@ class NestedTableSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Table
-        fields = ('id', '__str__', 'name', 'columns')
-
+        fields = ('id', 'name', 'columns')
 
 class NestedDatabaseSerializer(serializers.ModelSerializer):
 
@@ -69,4 +76,4 @@ class NestedDatabaseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Database
-        fields = ('id', '__str__', 'name', 'tables')
+        fields = ('id', 'name', 'tables')

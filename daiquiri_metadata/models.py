@@ -39,6 +39,10 @@ class Database(models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def query_string(self):
+        return get_adapter('data').escape_identifier(self.name)
+
 
 @python_2_unicode_compatible
 class Table(models.Model):
@@ -89,6 +93,14 @@ class Table(models.Model):
             })
         except ProgrammingError:
             pass
+
+    @property
+    def query_string(self):
+        adapter = get_adapter('data')
+        return '%(database)s.%(table)s' % {
+            'database': adapter.escape_identifier(self.database.name),
+            'table': adapter.escape_identifier(self.name)
+        }
 
 
 @python_2_unicode_compatible
@@ -148,6 +160,10 @@ class Column(models.Model):
         except ProgrammingError:
             pass
 
+    @property
+    def query_string(self):
+        return get_adapter('data').escape_identifier(self.name)
+
 
 @python_2_unicode_compatible
 class Function(models.Model):
@@ -159,6 +175,8 @@ class Function(models.Model):
 
     name = models.CharField(max_length=256)
     description = models.TextField(null=True, blank=True)
+
+    query_string = models.CharField(max_length=256)
 
     groups = models.ManyToManyField(Group, blank=True)
 

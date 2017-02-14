@@ -67,7 +67,7 @@ class FunctionSerializer(serializers.ModelSerializer):
             'id',
             'order',
             'name',
-            'description'
+            'query_string'
         )
 
 
@@ -79,6 +79,7 @@ class ColumnSerializer(serializers.ModelSerializer):
             'id',
             'order',
             'name',
+            'query_string',
             'description',
             'unit',
             'ucd',
@@ -101,6 +102,7 @@ class TableSerializer(serializers.ModelSerializer):
             'id',
             'order',
             'name',
+            'query_string',
             'description',
             'type',
             'utype',
@@ -118,6 +120,7 @@ class DatabaseSerializer(serializers.ModelSerializer):
             'id',
             'order',
             'name',
+            'query_string',
             'description',
             'utype',
             'tables'

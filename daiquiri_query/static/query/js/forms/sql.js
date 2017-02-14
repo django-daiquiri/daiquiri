@@ -48,13 +48,13 @@ app.factory('SqlFormService', ['$timeout', 'QueryService', 'BrowserService', fun
         var editor = $('.CodeMirror')[0].CodeMirror;
 
         if (resource == 'databases') {
-            editor.replaceSelection(item.name);
+            editor.replaceSelection(item.query_string);
         } else if (resource == 'tables') {
-            editor.replaceSelection(item.name);
+            editor.replaceSelection(item.query_string);
         } else if (resource == 'columns') {
-            editor.replaceSelection(item.name);
+            editor.replaceSelection(item.query_string);
         } else if (resource == 'functions') {
-            editor.replaceSelection(item.name + '()');
+            editor.replaceSelection(item.query_string);
         }
 
         editor.focus();
