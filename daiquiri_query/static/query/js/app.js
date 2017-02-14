@@ -18,7 +18,7 @@ app.controller('QueryController', ['$scope', 'QueryService', function($scope, Qu
     $scope.service.init();
 
 
-    $('.daiquiri-query-btn-groups .dropdown-menu').on('click', function(event) {
+    $('.daiquiri-query-dropdowns .dropdown-menu').on('click', function(event) {
         event.stopPropagation();
     })
     $scope.$on('browserDblItemClicked', function(event, resource, item) {

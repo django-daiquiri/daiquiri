@@ -1,0 +1,54 @@
+{% load i18n %}
+
+    <div class="btn-group wide">
+        <button type="button" class="btn btn-default dropdown-toggle"
+            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            {% trans 'Simbad' %} <span class="caret"></span>
+        </button>
+        <div class="dropdown-menu">
+            <div class="input-group">
+                <input type="text" class="form-control"
+                    placeholder="{% trans 'Object name' %}"
+                    ng-model="service.simbad.values.query"/>
+                <span class="input-group-btn">
+                    <button class="btn btn-default" type="button" ng-click="service.simbad.query()">
+                        {% trans 'Search on SIMBAD' %}
+                    </button>
+                </span>
+            </div>
+
+            <ul class="text-danger list-unstyled">
+                <li ng-repeat="error in service.simbad.errors">{$ error $}</li>
+            </ul>
+
+            <table class="table" ng-show="service.simbad.results.length">
+                <thead>
+                    <th>{% trans 'Object' %}</th>
+                    <th>{% trans 'Type' %}</th>
+                    <th>{% trans 'Coordinates' %}</th>
+                    <th></th>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="row in service.simbad.results">
+                        <td>{$ row.object $}</td>
+                        <td>{$ row.type $}</td>
+                        <td>
+                            <a href="" ng-click="service.forms.sql.pasteString(row.ra)"
+                                title="{% trans 'Paste RA to query field' %}">
+                                {$ row.ra $}
+                            </a>
+                            <a href="" ng-click="service.forms.sql.pasteString(row.de)"
+                                title="{% trans 'Paste DE to query field' %}">
+                                {$ row.de $}
+                            </a>
+                        </td>
+                        <td>
+                            <a href="" ng-click="service.simbad.searchVizier">
+                                 {% trans 'Search on VizieR' %}
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>

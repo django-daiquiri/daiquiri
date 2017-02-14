@@ -24,7 +24,7 @@ p.daiquiri-query-form-help {
     overflow-y: auto;
 }
 
-.daiquiri-query-btn-groups {
+.daiquiri-query-dropdowns {
     position: relative;
     margin-bottom: 20px;
 
@@ -79,11 +79,14 @@ p.daiquiri-query-form-help {
             padding-left: 15px;
             padding-right: 15px;
         }
+        ul.text-danger,
+        .input-group {
+            margin: 5px;
+        }
+        .table {
+            margin-bottom: 5px;
+        }
     }
-}
-
-.query-dropdown-menu-wide {
-    right: 0;
 }
 
 .CodeMirror {

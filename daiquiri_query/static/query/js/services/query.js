@@ -1,4 +1,4 @@
-app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'DownloadService', 'TableService', 'BrowserService', function($resource, $injector, PollingService, DownloadService, TableService, BrowserService) {
+app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'DownloadService', 'SimbadService', 'VizierService', 'TableService', 'BrowserService', function($resource, $injector, PollingService, DownloadService, SimbadService, VizierService, TableService, BrowserService) {
 
     /* get the base url */
 
@@ -78,6 +78,10 @@ app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'Downlo
 
         // load the download service
         service.downloads = DownloadService;
+
+        // load the simbad service
+        service.simbad = SimbadService;
+        service.vizier = VizierService;
     };
 
     service.fetchJobs = function() {

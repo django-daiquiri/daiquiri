@@ -48,7 +48,14 @@ app.factory('SqlFormService', ['$timeout', 'QueryService', 'BrowserService', fun
         var editor = $('.CodeMirror')[0].CodeMirror;
         editor.replaceSelection(item.query_string);
         editor.focus();
-        $('.daiquiri-query-btn-groups .btn-group').removeClass('open');
+        $('.daiquiri-query-dropdowns .btn-group').removeClass('open');
+    }
+
+    service.pasteString = function(string) {
+        var editor = $('.CodeMirror')[0].CodeMirror;
+        editor.replaceSelection(string);
+        editor.focus();
+        $('.daiquiri-query-dropdowns .btn-group').removeClass('open');
     }
 
     service.replaceQuery = function(query) {

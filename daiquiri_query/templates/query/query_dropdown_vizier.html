@@ -1,0 +1,63 @@
+{% load i18n %}
+
+{% load i18n %}
+
+    <div class="btn-group wide">
+        <button type="button" class="btn btn-default dropdown-toggle"
+            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            {% trans 'VizieR' %} <span class="caret"></span>
+        </button>
+        <div class="dropdown-menu">
+            <div class="input-group">
+                <input type="text" class="form-control"
+                    placeholder="{% trans 'Object name or coordinates' %}"
+                    ng-model="service.vizier.values.query"/>
+                <span class="input-group-btn">
+                    <button class="btn btn-default" type="button" ng-click="service.vizier.query()">
+                        {% trans 'Search on VizieR' %}
+                    </button>
+                </span>
+            </div>
+
+            <ul class="text-danger list-unstyled">
+                <li ng-repeat="error in service.vizier.errors">{$ error $}</li>
+            </ul>
+
+            <table class="table" ng-show="service.vizier.results.length">
+                <thead>
+                    <th>{% trans 'ID' %}</th>
+                    <th>{% trans 'Coordinates' %}</th>
+                    <th>{% trans 'Distance' %}</th>
+                    <th>{% trans 'Catalog' %}</th>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="row in service.vizier.results">
+                        <td>
+                            <a href="" ng-click="service.forms.sql.pasteString(row.id)"
+                                title="{% trans 'Paste ID to query field' %}">
+                                {$ row.id $}
+                            </a>
+                        <td>
+                            <a href="" ng-click="service.forms.sql.pasteString(row.ra)"
+                                title="{% trans 'Paste RA to query field' %}">
+                                {$ row.ra $}
+                            </a>
+                            <a href="" ng-click="service.forms.sql.pasteString(row.de)"
+                                title="{% trans 'Paste DE to query field' %}">
+                                {$ row.de $}
+                            </a>
+                        </td>
+                        <td>
+                            <a href="" ng-click="service.forms.sql.pasteString(row.distance)"
+                                title="{% trans 'Paste distance to query field' %}">
+                                {$ row.distance $}
+                            </a>
+                        </td>
+                        <td>
+                            {$ row.catalog $}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
