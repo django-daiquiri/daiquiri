@@ -1,7 +1,5 @@
 {% load i18n %}
 
-{% load i18n %}
-
     <div class="btn-group wide">
         <button type="button" class="btn btn-default dropdown-toggle"
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -11,19 +9,19 @@
             <div class="input-group">
                 <input type="text" class="form-control"
                     placeholder="{% trans 'Object name or coordinates' %}"
-                    ng-model="service.vizier.values.query"/>
+                    ng-model="service.dropdowns.vizier.values.query"/>
                 <span class="input-group-btn">
-                    <button class="btn btn-default" type="button" ng-click="service.vizier.query()">
+                    <button class="btn btn-default" type="button" ng-click="service.dropdowns.vizier.query()">
                         {% trans 'Search on VizieR' %}
                     </button>
                 </span>
             </div>
 
             <ul class="text-danger list-unstyled">
-                <li ng-repeat="error in service.vizier.errors">{$ error $}</li>
+                <li ng-repeat="error in service.dropdowns.vizier.errors">{$ error $}</li>
             </ul>
 
-            <table class="table" ng-show="service.vizier.results.length">
+            <table class="table" ng-show="service.dropdowns.vizier.results.length">
                 <thead>
                     <th>{% trans 'ID' %}</th>
                     <th>{% trans 'Coordinates' %}</th>
@@ -31,7 +29,7 @@
                     <th>{% trans 'Catalog' %}</th>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="row in service.vizier.results">
+                    <tr ng-repeat="row in service.dropdowns.vizier.results">
                         <td>
                             <a href="" ng-click="service.forms.sql.pasteString(row.id)"
                                 title="{% trans 'Paste ID to query field' %}">

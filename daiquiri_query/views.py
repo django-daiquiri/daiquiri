@@ -21,6 +21,7 @@ from .models import *
 from .backends import get_query_backend
 from .serializers import (
     FormSerializer,
+    DropdownSerializer,
     QueryJobListSerializer,
     QueryJobRetrieveSerializer,
     QueryJobCreateSerializer,
@@ -52,6 +53,15 @@ class FormViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
     def get_queryset(self):
         return settings.QUERY['forms']
+
+
+class DropdownViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    permission_classes = (IsAuthenticated, )
+
+    serializer_class = DropdownSerializer
+
+    def get_queryset(self):
+        return settings.QUERY['dropdowns']
 
 
 class QueryJobViewSet(viewsets.ModelViewSet):

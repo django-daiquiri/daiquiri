@@ -1,19 +1,16 @@
-app.factory('VizierService', ['$http', function($http) {
+app.factory('VizierDropdownService', ['$http', function($http) {
 
     /* get the base url */
 
     var service = {
         values: {},
         errors: [],
-        catalogs: ['I/322A', 'I/259']
     };
 
     service.query = function() {
-        var url = 'http://vizier.u-strasbg.fr/viz-bin/votable';
-
-        $http.get(url, {
+        $http.get(service.options.url, {
             params: {
-                '-source': service.catalogs.join(' '),
+                '-source': service.options.catalogs.join(' '),
                 '-c': service.values.query,
                 '-c.r': 2,
                 '-out': '_RA _DEC _r *meta.id.part;meta.main *meta.id;meta.main',
@@ -28,7 +25,7 @@ app.factory('VizierService', ['$http', function($http) {
             xmlDoc = $.parseXML(response);
             xml = $(xmlDoc);
 
-            angular.forEach(service.catalogs, function(catalog) {
+            angular.forEach(service.options.catalogs, function(catalog) {
                 var catalog_xml = xml.find("RESOURCE[name='" + catalog + "']");
 
                 catalog_xml.find("TABLEDATA TR").each(function() {
@@ -50,6 +47,10 @@ app.factory('VizierService', ['$http', function($http) {
                     });
                 });
             });
+
+            if (service.results.length == 0) {
+                service.errors.push('Query retrieved no object.')
+            }
         });
     };
 

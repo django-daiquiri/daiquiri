@@ -1,4 +1,4 @@
-app.factory('SimbadService', ['$http', function($http) {
+app.factory('SimbadDropdownService', ['$http', function($http) {
 
     /* get the base url */
 
@@ -8,9 +8,7 @@ app.factory('SimbadService', ['$http', function($http) {
     };
 
     service.query = function() {
-        var url = 'http://simbad.u-strasbg.fr/simbad/sim-id';
-
-        $http.get(url, {
+        $http.get(service.options.url, {
             params: {
                 'Ident': service.values.query,
                 'output.format': 'votable',
@@ -25,18 +23,18 @@ app.factory('SimbadService', ['$http', function($http) {
             $xml = $(xmlDoc);
             rows = $xml.find('TABLEDATA TR');
 
-            if (rows.length) {
-                rows.each(function() {
-                    elements = $(this).find('TD');
-                    service.results.push({
-                        object: elements.eq(0).text(),
-                        type: elements.eq(6).text(),
-                        ra: elements.eq(1).text(),
-                        de: elements.eq(2).text(),
-                    });
+            rows.each(function() {
+                elements = $(this).find('TD');
+                service.results.push({
+                    object: elements.eq(0).text(),
+                    type: elements.eq(6).text(),
+                    ra: elements.eq(1).text(),
+                    de: elements.eq(2).text(),
                 });
-            } else {
-                service.errors.push('Object not found.')
+            });
+
+            if (service.results.length == 0) {
+                service.errors.push('Query retrieved no object.')
             }
         });
     };

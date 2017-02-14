@@ -8,8 +8,11 @@
     {% include 'query/query_dropdown_databases.html' %}
     {% include 'query/query_dropdown_columns.html' %}
     {% include 'query/query_dropdown_functions.html' %}
-    {% include 'query/query_dropdown_simbad.html' %}
-    {% include 'query/query_dropdown_vizier.html' %}
+
+    {% for dropdown in query_settings.dropdowns %}
+    {% include dropdown.template %}
+    {% endfor %}
+
     {% include 'query/query_dropdown_examples.html' %}
 </div>
 

@@ -14,6 +14,19 @@ class FormSerializer(serializers.Serializer):
         return obj['key'][0].upper() + obj['key'][1:] + 'FormService'
 
 
+class DropdownSerializer(serializers.Serializer):
+
+    key = serializers.CharField()
+    dropdown_service = serializers.SerializerMethodField()
+    options = serializers.SerializerMethodField()
+
+    def get_dropdown_service(self, obj):
+        return obj['key'][0].upper() + obj['key'][1:] + 'DropdownService'
+
+    def get_options(self, obj):
+        return obj['options']
+
+
 class QueryJobListSerializer(serializers.ModelSerializer):
 
     class Meta:

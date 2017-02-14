@@ -1,4 +1,4 @@
-app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'DownloadService', 'SimbadService', 'VizierService', 'TableService', 'BrowserService', function($resource, $injector, PollingService, DownloadService, SimbadService, VizierService, TableService, BrowserService) {
+app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'DownloadService', 'TableService', 'BrowserService', function($resource, $injector, PollingService, DownloadService, TableService, BrowserService) {
 
     /* get the base url */
 
@@ -8,6 +8,7 @@ app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'Downlo
 
     var resources = {
         forms: $resource(baseurl + 'query/api/forms/'),
+        dropdowns: $resource(baseurl + 'query/api/dropdowns/'),
         jobs: $resource(baseurl + 'query/api/jobs/:id/:detail_route'),
         examples: $resource(baseurl + 'query/api/examples/'),
         databases: $resource(baseurl + 'query/api/databases/'),
@@ -25,6 +26,7 @@ app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'Downlo
 
     var service = {
         forms: {},
+        dropdowns: {},
         values: {},
         errors: {}
     };
@@ -38,6 +40,14 @@ app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'Downlo
 
             // activate first form
             service.forms[response[0].key].activate();
+        });
+
+        // load dropdowns
+        resources.dropdowns.query(function(response) {
+            angular.forEach(response, function(dropdown) {
+                service.dropdowns[dropdown.key] = $injector.get(dropdown.dropdown_service);
+                service.dropdowns[dropdown.key].options = dropdown.options;
+            });
         });
 
         // fetch functions
@@ -78,10 +88,6 @@ app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'Downlo
 
         // load the download service
         service.downloads = DownloadService;
-
-        // load the simbad service
-        service.simbad = SimbadService;
-        service.vizier = VizierService;
     };
 
     service.fetchJobs = function() {
