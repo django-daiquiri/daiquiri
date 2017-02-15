@@ -6,9 +6,9 @@ app.filter('bytes', function() {
         if (bytes === 0 || bytes === '0' ) return '0 bytes';
 
         var units = ['bytes', 'kB', 'MB', 'GB', 'TB', 'PB'];
-        var number = Math.floor(Math.log(bytes) / Math.log(1024));
+        var number = Math.floor(Math.log(bytes) / Math.log(1000));
 
-        return (bytes / Math.pow(1024, Math.floor(number))).toFixed(1) +  ' ' + units[number];
+        return (bytes / Math.pow(1000, Math.floor(number))).toFixed(1) +  ' ' + units[number];
     };
 });
 

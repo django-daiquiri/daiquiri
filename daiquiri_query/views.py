@@ -3,6 +3,7 @@ from sendfile import sendfile
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.db.models import Sum
 from django.http import Http404
 from django.shortcuts import render
 from django.utils.timezone import now
@@ -14,6 +15,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import ValidationError
 from rest_framework.decorators import detail_route
 
+from daiquiri_core.utils import human2bytes
 from daiquiri_metadata.models import Database, Function
 from daiquiri_uws.settings import PHASE_ARCHIVED
 
@@ -44,6 +46,29 @@ def query(request):
     return render(request, 'query/query.html', {
         'query_settings': settings.QUERY
     })
+
+class StatusViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    permission_classes = (IsAuthenticated, )
+
+    def get_queryset(self):
+        return []
+
+    def list(self, request):
+
+        quota = 0
+        for group in request.user.groups.all():
+            group_quota = human2bytes(settings.QUERY['quota'][group.name])
+            quota = group_quota if group_quota > quota else quota
+
+        jobs = QueryJob.objects.filter(owner=self.request.user).exclude(phase=PHASE_ARCHIVED)
+        size = jobs.aggregate(Sum('size'))['size__sum']
+
+        return Response([{
+            'guest': not request.user.is_authenticated(),
+            'queued_jobs': None,
+            'size': size,
+            'quota': quota
+        }])
 
 
 class FormViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):

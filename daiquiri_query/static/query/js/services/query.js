@@ -7,6 +7,7 @@ app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'Downlo
     /* configure resources */
 
     var resources = {
+        status: $resource(baseurl + 'query/api/status/'),
         forms: $resource(baseurl + 'query/api/forms/'),
         dropdowns: $resource(baseurl + 'query/api/dropdowns/'),
         jobs: $resource(baseurl + 'query/api/jobs/:id/:detail_route'),
@@ -50,6 +51,9 @@ app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'Downlo
             });
         });
 
+        // fetch status
+        service.fetchStatus();
+
         // fetch functions
         resources.functions.query(function(response) {
             BrowserService.render('functions', response);
@@ -85,9 +89,16 @@ app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'Downlo
         // start the polling service
         PollingService.init();
         PollingService.register('jobs', service.fetchJobs);
+        PollingService.register('status', service.fetchStatus);
 
         // load the download service
         service.downloads = DownloadService;
+    };
+
+    service.fetchStatus = function() {
+        resources.status.query(function(response) {
+            service.status = response[0];
+        });
     };
 
     service.fetchJobs = function() {
@@ -147,10 +158,9 @@ app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'Downlo
             'query_language': 'mysql'
         });
 
-        return resources.jobs.save(values).$promise.then(function() {
-            resources.jobs.query(function(response) {
-                service.jobs = response;
-            });
+        return resources.jobs.save(values).$promise.then(function(result) {
+            service.fetchStatus();
+            service.fetchJobs();
         });
     };
 
@@ -175,6 +185,7 @@ app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'Downlo
 
     service.killJob = function() {
         resources.jobs.update({id: service.values.id, detail_route: 'kill'}, {}, function() {
+            service.fetchStatus();
             service.fetchJobs();
             $('.modal').modal('hide');
         });
@@ -182,6 +193,7 @@ app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'Downlo
 
     service.removeJob = function() {
         resources.jobs.delete({id: service.values.id}, function() {
+            service.fetchStatus();
             service.fetchJobs();
             $('.modal').modal('hide');
         });

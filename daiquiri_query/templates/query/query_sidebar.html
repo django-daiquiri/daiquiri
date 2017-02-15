@@ -5,9 +5,32 @@
         {% trans 'Database status' %}
     </div>
     <div class="panel-body">
-        There are 5 jobs in the queue.
-You are using the guest user. For a personal account, please sign up here.
-The guest user is using 28.1 MB of its quota of 100.0 MB.
+        <p ng-show="service.status.queued_jobs == 1">
+            {% blocktrans %}
+            There is one job in the queue.
+            {% endblocktrans %}
+        </p>
+        <p ng-show="service.status.queued_jobs > 1">
+            {% blocktrans with queued_jobs='{$ service.status.queued_jobs $}' %}
+            There are {{ queued_jobs }} jobs in the queue.
+            {% endblocktrans %}
+        </p>
+        <p ng-show="service.status.guest">
+            {% url 'account_signup' as register_url %}
+            {% blocktrans %}
+            You are using the guest user. For a personal account, please sign up <a href="{{ register_url }}">here</a>.
+            {% endblocktrans %}
+        </p>
+        <p ng-show="service.status.guest">
+            {% blocktrans with size='{$ service.status.size | bytes $}' quota='{$ service.status.quota | bytes $}' %}
+            The guest user is using {{ size }} of its quota of {{ quota }}.
+            {% endblocktrans %}
+        </p>
+        <p ng-hide="service.status.guest">
+            {% blocktrans with size='{$ service.status.size | bytes $}' quota='{$ service.status.quota | bytes $}' %}
+            You are using {{ size }} of your quota of {{ quota }}.
+            {% endblocktrans %}
+        </p>
     </div>
 </div>
 
