@@ -69,7 +69,11 @@ angular.module('metadata', ['core'])
 
             service.tables = [];
             angular.forEach(service.databases, function(database) {
-                service.tables = service.tables.concat(database.tables);
+                database.label = database.name;
+                angular.forEach(database.tables, function(table) {
+                    table.label = database.name + '.' + table.name;
+                    service.tables.push(table);
+                });
             });
 
             BrowserService.render('databases', service.databases, service.active);

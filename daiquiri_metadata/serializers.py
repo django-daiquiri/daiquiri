@@ -70,6 +70,7 @@ class NestedTableSerializer(serializers.ModelSerializer):
         model = Table
         fields = ('id', 'name', 'columns')
 
+
 class NestedDatabaseSerializer(serializers.ModelSerializer):
 
     tables = NestedTableSerializer(many=True, read_only=True)

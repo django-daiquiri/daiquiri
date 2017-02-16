@@ -13,22 +13,26 @@
                 </div>
 
                 <div class="modal-body">
-                    <formgroup
-                        data-id="table"
-                        data-type="selectnumber"
-                        data-label="{% trans 'Table' %}"
-                        data-model="service.values.table"
-                        data-errors="service.errors.table"
-                        data-options="service.tables"
-                        data-options-label="__str__">
-                    </formgroup>
-                    <formgroup
-                        data-id="order"
-                        data-type="number"
-                        data-label="{% trans 'Order' %}"
-                        data-model="service.values.order"
-                        data-errors="service.errors.order">
-                    </formgroup>
+                    <div class="row">
+                        <formgroup
+                            class="col-md-9"
+                            data-id="table"
+                            data-type="selectnumber"
+                            data-label="{% trans 'Table' %}"
+                            data-model="service.values.table"
+                            data-errors="service.errors.table"
+                            data-options="service.tables"
+                            data-options-label="label">
+                        </formgroup>
+                        <formgroup
+                            class="col-md-3"
+                            data-id="order"
+                            data-type="number"
+                            data-label="{% trans 'Order' %}"
+                            data-model="service.values.order"
+                            data-errors="service.errors.order">
+                        </formgroup>
+                    </div>
                     <formgroup
                         data-id="name"
                         data-type="text"
@@ -60,45 +64,54 @@
                     <formgroup
                         data-id="utype"
                         data-type="text"
-                        data-label="{% trans 'Std' %}"
+                        data-label="{% trans 'Utype' %}"
                         data-model="service.values.utype"
                         data-errors="service.errors.utype">
                     </formgroup>
-                    <formgroup
-                        data-id="datatype"
-                        data-type="text"
-                        data-label="{% trans 'Datatype' %}"
-                        data-model="service.values.datatype"
-                        data-errors="service.errors.datatype">
-                    </formgroup>
-                    <formgroup
-                        data-id="size"
-                        data-type="number"
-                        data-label="{% trans 'Size' %}"
-                        data-model="service.values.size"
-                        data-errors="service.errors.size">
-                    </formgroup>
-                    <formgroup
-                        data-id="principal"
-                        data-type="checkbox"
-                        data-label="{% trans 'Principal' %}"
-                        data-model="service.values.principal"
-                        data-errors="service.errors.principal">
-                    </formgroup>
-                    <formgroup
-                        data-id="indexed"
-                        data-type="checkbox"
-                        data-label="{% trans 'Indexed' %}"
-                        data-model="service.values.indexed"
-                        data-errors="service.errors.principal">
-                    </formgroup>
-                    <formgroup
-                        data-id="std"
-                        data-type="checkbox"
-                        data-label="{% trans 'STD' %}"
-                        data-model="service.values.std"
-                        data-errors="service.errors.std">
-                    </formgroup>
+                    <div class="row">
+                        <formgroup
+                            class="col-md-9"
+                            data-id="datatype"
+                            data-type="text"
+                            data-label="{% trans 'Datatype' %}"
+                            data-model="service.values.datatype"
+                            data-errors="service.errors.datatype">
+                        </formgroup>
+                        <formgroup
+                            class="col-md-3"
+                            data-id="size"
+                            data-type="number"
+                            data-label="{% trans 'Size' %}"
+                            data-model="service.values.size"
+                            data-errors="service.errors.size">
+                        </formgroup>
+                    </div>
+                    <div class="row">
+                        <formgroup
+                            class="col-md-2"
+                            data-id="principal"
+                            data-type="checkbox"
+                            data-label="{% trans 'Principal' %}"
+                            data-model="service.values.principal"
+                            data-errors="service.errors.principal">
+                        </formgroup>
+                        <formgroup
+                            class="col-md-2"
+                            data-id="indexed"
+                            data-type="checkbox"
+                            data-label="{% trans 'Indexed' %}"
+                            data-model="service.values.indexed"
+                            data-errors="service.errors.principal">
+                        </formgroup>
+                        <formgroup
+                            class="col-md-2"
+                            data-id="std"
+                            data-type="checkbox"
+                            data-label="{% trans 'STD' %}"
+                            data-model="service.values.std"
+                            data-errors="service.errors.std">
+                        </formgroup>
+                    </div>
                     <formgroup
                         data-id="groups"
                         data-type="multicheckbox"
