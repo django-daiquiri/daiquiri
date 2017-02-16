@@ -9,7 +9,7 @@ from daiquiri_core.adapter import get_adapter
 from daiquiri_jobs.models import Job
 
 from .managers import QueryJobManager
-from .exceptions import *
+from .exceptions import TableError
 
 
 @python_2_unicode_compatible
@@ -45,7 +45,6 @@ class QueryJob(Job):
         return {
             'database_name': self.database_name,
             'table_name': self.table_name,
-            'queue': self.queue,
             'query_language': self.query_language,
             'query': self.query,
             'actual_query': self.actual_query,

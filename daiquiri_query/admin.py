@@ -6,6 +6,7 @@ from .models import QueryJob, Example
 class QueryJobAdmin(admin.ModelAdmin):
     pass
 
+
 class ExampleAdmin(admin.ModelAdmin):
     pass
 

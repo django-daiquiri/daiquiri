@@ -7,7 +7,7 @@ from daiquiri_metadata.models import Database, Table, Column, Function
 from daiquiri_uws.settings import PHASE_PENDING
 
 from .backends import get_query_backend
-from .exceptions import *
+from .exceptions import TableError, ADQLSyntaxError, MySQLSyntaxError, PermissionError, ConnectionError
 
 from queryparser.mysql import MySQLQueryProcessor
 from queryparser.adql import ADQLQueryTranslator
@@ -131,7 +131,7 @@ class QueryJobManager(models.Manager):
                 errors.append(_('No database given for column %s') % column)
 
         # check permissions on functions
-        for function in qp.functions:
+        for function_name in qp.functions:
             # check permission on function
             function = Function.permissions.get(user, function_name=function_name)
             if not function:

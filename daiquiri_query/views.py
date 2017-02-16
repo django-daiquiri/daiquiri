@@ -19,7 +19,7 @@ from daiquiri_core.utils import human2bytes
 from daiquiri_metadata.models import Database, Function
 from daiquiri_uws.settings import PHASE_ARCHIVED
 
-from .models import *
+from .models import QueryJob, Example
 from .backends import get_query_backend
 from .serializers import (
     FormSerializer,
@@ -46,6 +46,7 @@ def query(request):
     return render(request, 'query/query.html', {
         'query_settings': settings.QUERY
     })
+
 
 class StatusViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     permission_classes = (IsAuthenticated, )
@@ -157,7 +158,6 @@ class QueryJobViewSet(viewsets.ModelViewSet):
             raise ValidationError({'query': {'messages': e.message}})
         except TableError as e:
             raise ValidationError({'table_name': e.message})
-
 
     def perform_update(self, serializer):
         try:
