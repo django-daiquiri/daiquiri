@@ -1,0 +1,108 @@
+{% extends 'core/wide.html' %}
+{% load staticfiles %}
+{% load compress %}
+{% load i18n %}
+{% load core_tags %}
+
+{% block bodyargs %}ng-app="query" ng-controller="QueryController"{% endblock %}
+
+{% block headextra %}
+
+    {% compress css %}
+    <link rel="stylesheet" href="{% static 'codemirror/lib/codemirror.css' %}" />
+    <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/browser.scss' %}" />
+    <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/table.scss' %}" />
+    <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/codemirror.scss' %}" />
+    <link rel="stylesheet" type="text/x-scss" href="{% static 'query/css/query.scss' %}" />
+    {% endcompress %}
+
+    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
+
+    {% compress js %}
+    <script type="text/javascript" src="{% static 'angular/angular.min.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'angular-resource/angular-resource.min.js' %}" ></script>
+
+    <script type="text/javascript" src="{% static 'codemirror/lib/codemirror.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'codemirror/addon/mode/overlay.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'codemirror/addon/runmode/runmode.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'codemirror/mode/sql/sql.js' %}" ></script>
+
+    <script type="text/javascript" src="{% static 'angular-file-saver/dist/angular-file-saver.bundle.js' %}" ></script>
+
+    <script type="text/javascript" src="{% static 'core/js/core.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'core/js/filter.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'core/js/multiCheckbox.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'core/js/byNumber.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'core/js/formgroup.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'core/js/browser.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'core/js/table.js' %}" ></script>
+
+    <script type="text/javascript" src="{% static 'query/js/app.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'query/js/services/query.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'query/js/services/polling.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'query/js/services/download.js' %}" ></script>
+
+    {% for dropdown in query_settings.dropdowns %}
+    <script type="text/javascript" src="{% static dropdown.service %}" ></script>
+    {% endfor %}
+
+    {% for form in query_settings.forms %}
+    <script type="text/javascript" src="{% static form.service %}" ></script>
+    {% endfor %}
+
+    {% endcompress %}
+{% endblock %}
+
+{% block headline %}
+    <h1>{% trans 'Query interface' %}</h1>
+{% endblock %}
+
+{% block wide %}
+
+<div class="row">
+    <div class="col-md-3">
+        {% include 'query/query_sidebar.html' %}
+    </div>
+    <div class="col-md-9">
+        {% for form in query_settings.forms %}
+
+            {% include 'query/query_form.html' %}
+
+        {% endfor %}
+
+        <div ng-show="service.job">
+
+            <h2 class="daiquiri-query-job-title">{% trans 'Query job' %} `{$ service.job.table_name $}`</h2>
+
+            <ul class="nav nav-tabs daiquiri-query-job-tabs">
+                <li role="presentation" ng-class="{active: service.tab == 'overview'}">
+                    <a href="" ng-click="service.tab = 'overview'">{% trans 'Job overview' %}</a>
+                </li>
+                <li role="presentation" ng-class="{active: service.tab == 'results'}">
+                    <a href="" ng-click="service.tab = 'results'">{% trans 'Results table' %}</a>
+                </li>
+                <li role="presentation" ng-class="{active: service.tab == 'download'}">
+                    <a href="" ng-click="service.tab = 'download'">{% trans 'Download' %}</a>
+                </li>
+            </ul>
+
+            <div ng-show="service.tab == 'overview'">
+                {% include 'query/query_overview.html' %}
+            </div>
+            <div ng-show="service.tab == 'results'">
+                {% include 'query/query_results.html' %}
+            </div>
+            <div ng-show="service.tab == 'download'">
+                {% include 'query/query_download.html' %}
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+{% include 'query/query_modal_rename_job.html' %}
+{% include 'query/query_modal_kill_job.html' %}
+{% include 'query/query_modal_remove_job.html' %}
+
+{% endblock %}

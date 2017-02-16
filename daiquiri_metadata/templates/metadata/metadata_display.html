@@ -1,0 +1,42 @@
+{% load i18n %}
+
+    <div class="daiquiri-widget daiquiri-metadata-display">
+        <div ng-hide="service.active">
+            Please select a database, table, column or function in the browser above.
+        </div>
+        <div ng-show="service.active">
+            <div class="pull-right">
+                <a href="" class="glyphicon glyphicon-pencil" title="{% trans 'Update' %}"
+                    ng-click="service.openFormModal(service.active.resource, false)">
+                </a>
+                <a href="" class="glyphicon glyphicon-trash" title="{% trans 'Delete' %}"
+                    ng-click="service.openDeleteModal(service.active.resource, false)">
+                </a>
+            </div>
+
+            <div class="daiquiri-metadata-display-title">
+                <strong ng-show="service.active.resource === 'databases'">{% trans 'Database' %}</strong>
+                <strong ng-show="service.active.resource === 'tables'">{% trans 'Table' %}</strong>
+                <strong ng-show="service.active.resource === 'columns'">{% trans 'Column' %}</strong>
+                <strong ng-show="service.active.resource === 'functions'">{% trans 'Function' %}</strong>
+                <span>{$ service.active.label $}</span>
+            </div>
+
+            <dl class="dl-horizontal">
+                <div ng-repeat="(key, value) in service.active"
+                    ng-hide="['resource', 'groups', 'database', 'table'].indexOf(key) != -1">
+
+                    <dt>{$ key | ucfirst | removeUnderscores $}</dt>
+
+                    <dd ng-hide="key === 'published_for'">{$ value $}&nbsp;</dd>
+                    <dd ng-show="key === 'published_for'">
+                        <ul class="list-unstyled">
+                            <li ng-repeat="group in service.active.published_for">
+                                {$ group.name $}
+                            </li>
+                        <ul>
+                    </dd>
+                </div>
+            </dl>
+        </div>
+    </div>

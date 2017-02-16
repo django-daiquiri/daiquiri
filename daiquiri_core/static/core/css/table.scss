@@ -1,0 +1,116 @@
+@import 'core/css/variables';
+
+.daiquiri-table {
+    margin-bottom: 20px;
+
+    h3.popover-title {
+        padding: 9px 14px;
+        line-height: 20px;
+    }
+
+    .daiquiri-table-header {
+
+        .daiquiri-table-search {
+            margin: 0 0 10px 0;
+        }
+        .daiquiri-table-pagination {
+            margin-bottom: 10px;
+
+            @media(min-width: $screen-xs-max) {
+                text-align: right;
+            }
+            .pagination {
+                margin: 0;
+            }
+        }
+    }
+
+    .daiquiri-table-pane {
+        border: 1px solid $border-color;
+        border-radius: 4px;
+        width: auto;
+        overflow-x: auto;
+
+        .table {
+            margin: 0;
+            table-layout: fixed !important;
+
+            th,
+            td {
+                width: 200px;
+                padding: 0;
+                border-right: 1px solid $border-color;
+            }
+            th:last-child,
+            td:last-child {
+                border-right: none;
+            }
+            .cell {
+                white-space: nowrap;
+                padding: 8px;
+                position: relative;
+            }
+            th {
+                position: relative;
+
+                .name {
+                    overflow: hidden;
+                }
+                .info {
+                    position: absolute;
+                    z-index: 1000;
+                    top: 8px;
+                    bottom: 8px;
+                    right: 24px;
+                    opacity: 0.2;
+                }
+                .order {
+                    cursor: pointer;
+                    position: absolute;
+                    z-index: 1000;
+                    top: 8px;
+                    bottom: 8px;
+                    right: 8px;
+
+                    i {
+                        //margin-top: 2px;
+                        opacity: 0.2;
+                    }
+                    i.ordered {
+                        opacity: 1;
+                    }
+                }
+                .handle {
+                    position: absolute;
+                    z-index: 2000;
+                    top: 0;
+                    bottom: 0;
+                    right: -9px;
+                    width: 17px;
+                }
+                .handle:hover {
+                    cursor: move;
+                }
+            }
+
+            &.no-select {
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                -o-user-select: none;
+                user-select: none;
+            }
+        }
+    }
+
+    .daiquiri-table-footer {
+        margin-top: 10px;
+
+        .daiquiri-table-count {
+            line-height: 34px;
+        }
+        .daiquiri-table-page-size {
+
+        }
+    }
+}

@@ -1,0 +1,84 @@
+{% load i18n %}
+
+<p>
+    {% trans 'Please specify a coordinate ranges in x, y, z. The query will result in objects that have coordinates in the search box.' %}
+</p>
+
+<div class="row fieldset">
+    <div class="col-md-6">
+        <formgroup
+            data-id="x_min"
+            data-type="text"
+            data-label="{% trans 'X min' %}"
+            data-model="service.forms.box.values.x_min"
+            data-errors="service.forms.box.errors.x_min">
+        </formgroup>
+    </div>
+    <div class="col-md-6">
+        <formgroup
+            data-id="x_max"
+            data-type="text"
+            data-label="{% trans 'X max' %}"
+            data-model="service.forms.box.values.x_max"
+            data-errors="service.forms.box.errors.x_max">
+        </formgroup>
+    </div>
+</div>
+
+<div class="row fieldset">
+    <div class="col-md-6">
+        <formgroup
+            data-id="y_min"
+            data-type="text"
+            data-label="{% trans 'Y min' %}"
+            data-model="service.forms.box.values.y_min"
+            data-errors="service.forms.box.errors.y_min">
+        </formgroup>
+    </div>
+    <div class="col-md-6">
+        <formgroup
+            data-id="y_max"
+            data-type="text"
+            data-label="{% trans 'Y max' %}"
+            data-model="service.forms.box.values.y_max"
+            data-errors="service.forms.box.errors.y_max">
+        </formgroup>
+    </div>
+</div>
+
+<div class="row fieldset">
+    <div class="col-md-6">
+        <formgroup
+            data-id="z_min"
+            data-type="text"
+            data-label="{% trans 'Z min' %}"
+            data-model="service.forms.box.values.z_min"
+            data-errors="service.forms.box.errors.z_min">
+        </formgroup>
+    </div>
+    <div class="col-md-6">
+        <formgroup
+            data-id="z_max"
+            data-type="text"
+            data-label="{% trans 'Z max' %}"
+            data-model="service.forms.box.values.z_max"
+            data-errors="service.forms.box.errors.z_max">
+        </formgroup>
+    </div>
+</div>
+
+<formgroup
+    data-id="box_table_name"
+    data-type="text"
+    data-label="{% trans 'Table name' %}"
+    data-model="service.forms.sql.values.table_name"
+    data-errors="service.forms.sql.errors.table_name">
+</formgroup>
+
+<button class="btn btn-primary" ng-click="service.forms.sql.submit()">
+    {% trans 'Submit new SQL Query' %}
+</button>
+
+<button class="btn" ng-click="">
+    {% trans 'Clear input window' %}
+</button>

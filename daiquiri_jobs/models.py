@@ -10,6 +10,8 @@ from django.utils.translation import ugettext_lazy as _
 from daiquiri_uws.exceptions import UWSException
 from daiquiri_uws.settings import *
 
+from .managers import JobManager
+
 
 @python_2_unicode_compatible
 class Job(models.Model):
@@ -32,6 +34,8 @@ class Job(models.Model):
         (JOB_TYPE_QUERY, 'Query'),
     )
 
+    objects = JobManager()
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     owner = models.ForeignKey(User, blank=True, null=True)
@@ -40,6 +44,7 @@ class Job(models.Model):
 
     phase = models.CharField(max_length=10, choices=PHASE_CHOICES)
 
+    creation_time = models.DateTimeField(blank=True, null=True)
     start_time = models.DateTimeField(blank=True, null=True)
     end_time = models.DateTimeField(blank=True, null=True)
     execution_duration = models.PositiveIntegerField(blank=True, default=0)
@@ -56,7 +61,20 @@ class Job(models.Model):
         permissions = (('view_job', 'Can view Job'),)
 
     def __str__(self):
-        return "id=%s; phase=%s; job_type=%s" % (str(self.id), self.phase, self.job_type)
+        return self.get_str()
+
+    def save(self, *args, **kwargs):
+        if self.pk is not None:
+            if hasattr(self, 'queryjob'):
+                self.queryjob.rename_table(self.table_name)
+
+        super(Job, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        if hasattr(self, 'queryjob'):
+            self.queryjob.drop_table()
+
+        super(Job, self).delete(*args, **kwargs)
 
     @property
     def error(self):
@@ -77,9 +95,13 @@ class Job(models.Model):
 
     @property
     def parameters(self):
-        return {
-            'query': 'SELECT x,y FROM a.b;'
-        }
+        if hasattr(self, 'queryjob'):
+            return self.queryjob.parameters
+        else:
+            return {}
+
+    def get_str(self):
+        return "id=%s; phase=%s; job_type=%s" % (str(self.id), self.phase, self.job_type)
 
     def run(self):
         if self.phase == PHASE_PENDING:
@@ -96,6 +118,9 @@ class Job(models.Model):
             raise UWSException('Job is not in PENDING, QUEUED or EXECUTING phase')
 
     def archive(self):
+        if hasattr(self, 'queryjob'):
+            self.queryjob.drop_table()
+
         if self.phase != PHASE_ARCHIVED:
             self.phase = PHASE_ARCHIVED
             self.save()

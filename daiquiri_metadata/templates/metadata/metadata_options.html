@@ -1,0 +1,27 @@
+{% load i18n %}
+
+    <div class="daiquiri-widget daiquiri-metadata-options">
+
+        <ul class="list-unstyled">
+            <li>
+                <a href="" ng-click="service.openFormModal('databases', true)">
+                    {% trans 'Create new database entry' %}
+                </a>
+            </li>
+            <li ng-show="service.browser.getSelectedItem('databases', 0)">
+                <a href="" ng-click="service.openFormModal('tables', true)">
+                    {% trans 'Create new table entry' %}
+                </a>
+            </li>
+            <li ng-show="service.browser.getSelectedItem('databases', 1)">
+                <a href="" ng-click="service.openFormModal('columns', true)">
+                    {% trans 'Create new column entry' %}
+                </a>
+            </li>
+            <li>
+                <a href="" ng-click="service.openFormModal('functions', true)">
+                    {% trans 'Create new function entry' %}
+                </a>
+            </li>
+        </ul>
+    </div>

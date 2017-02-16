@@ -1,3 +1,14 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import QueryJob, Example
+
+
+class QueryJobAdmin(admin.ModelAdmin):
+    pass
+
+
+class ExampleAdmin(admin.ModelAdmin):
+    pass
+
+admin.site.register(QueryJob, QueryJobAdmin)
+admin.site.register(Example, ExampleAdmin)

@@ -1,0 +1,42 @@
+{% load i18n %}
+
+<p>
+   {% trans 'Place your SQL statement directly in the text area below and submit your request using the button.' %}
+</p>
+
+<div class="daiquiri-query-dropdowns">
+    {% include 'query/query_dropdown_databases.html' %}
+    {% include 'query/query_dropdown_columns.html' %}
+    {% include 'query/query_dropdown_functions.html' %}
+
+    {% for dropdown in query_settings.dropdowns %}
+    {% include dropdown.template %}
+    {% endfor %}
+
+    {% include 'query/query_dropdown_examples.html' %}
+</div>
+
+<formgroup
+    data-id="sql_query"
+    data-type="codemirror"
+    data-label="{% trans 'SQL query' %}"
+    data-model="service.forms.sql.values.query"
+    data-errors="service.forms.sql.errors.query.messages"
+    data-mode="text/x-mariadb">
+</formgroup>
+
+<formgroup
+    data-id="sql_table_name"
+    data-type="text"
+    data-label="{% trans 'Table name' %}"
+    data-model="service.forms.sql.values.table_name"
+    data-errors="service.forms.sql.errors.table_name">
+</formgroup>
+
+<button class="btn btn-primary" ng-click="service.forms.sql.submit()">
+    {% trans 'Submit new SQL Query' %}
+</button>
+
+<button class="btn" ng-click="">
+    {% trans 'Clear input window' %}
+</button>

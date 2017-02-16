@@ -1,0 +1,76 @@
+{% load i18n %}
+
+    <div class="modal" id="databases-form-modal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" tabindex="-1">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">
+                        {% trans 'Database' %}
+                    </h4>
+                </div>
+
+                <div class="modal-body">
+                    <formgroup
+                        data-id="order"
+                        data-type="number"
+                        data-label="{% trans 'Order' %}"
+                        data-model="service.values.order"
+                        data-errors="service.errors.order">
+                    </formgroup>
+                    <formgroup
+                        data-id="name"
+                        data-type="text"
+                        data-label="{% trans 'Name' %}"
+                        data-model="service.values.name"
+                        data-errors="service.errors.name">
+                    </formgroup>
+                    <formgroup
+                        data-id="description"
+                        data-type="textarea"
+                        data-label="{% trans 'Description' %}"
+                        data-model="service.values.description"
+                        data-errors="service.errors.description">
+                    </formgroup>
+                    <formgroup
+                        data-id="utype"
+                        data-type="text"
+                        data-label="{% trans 'Utype' %}"
+                        data-model="service.values.utype"
+                        data-errors="service.errors.utype">
+                    </formgroup>
+                    <formgroup
+                        data-id="groups"
+                        data-type="multicheckbox"
+                        data-label="{% trans 'Published for' %}"
+                        data-model="service.values.groups"
+                        data-errors="service.errors.groups"
+                        data-options="service.groups"
+                        data-options-label="name">
+                    </formgroup>
+
+                    <div ng-hide="service.values.id">
+                        <formgroup
+                            data-id="discover"
+                            data-type="checkbox"
+                            data-label="{% trans 'Automatically discover tables and columns' %}"
+                            data-model="service.values.discover"
+                            data-errors="service.errors.discover">
+                        </formgroup>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                        {% trans 'Close' %}
+                    </button>
+                    <button type="button" class="btn btn-primary"
+                            ng-click="service.submitFormModal('databases')">
+                        {% trans 'Save' %}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>

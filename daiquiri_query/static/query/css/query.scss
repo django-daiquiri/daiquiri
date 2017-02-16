@@ -1,0 +1,102 @@
+@import 'core/css/variables';
+
+h2.daiquiri-query-form-title,
+h2.daiquiri-query-job-title {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+p.daiquiri-query-form-help {
+    margin-bottom: 20px;
+}
+
+.daiquiri-query-form-bar {
+    margin-bottom: 20px;
+}
+
+.daiquiri-query-job-tabs {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.daiquiri-query-joblist {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.daiquiri-query-dropdowns {
+    position: relative;
+    margin-bottom: 20px;
+
+    .btn-group {
+        .dropdown-menu {
+            min-width: 225px;
+        }
+    }
+    .btn-group.wide {
+        position: static;
+
+        .dropdown-menu {
+            right: 0;
+        }
+    }
+
+    .btn-group.wide.pull-right {
+        position: static;
+
+        .dropdown-menu {
+            left: 0;
+        }
+    }
+
+    .dropdown-menu {
+        padding: 0;
+
+        .daiquiri-browser {
+            margin-bottom: 5px;
+
+            :first-child {
+                .daiquiri-browser-head,
+                .daiquiri-browser-body {
+                    border-left: none;
+                }
+            }
+            :last-child {
+                .daiquiri-browser-head,
+                .daiquiri-browser-body {
+                    border-right: none;
+                }
+            }
+            .daiquiri-browser-head {
+                border-top: none;
+            }
+            .daiquiri-browser-body {
+                height: 200px;
+            }
+        }
+        .help-block {
+            margin-bottom: 5px;
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+        ul.text-danger,
+        .input-group {
+            margin: 5px;
+        }
+        .table {
+            margin-bottom: 5px;
+        }
+    }
+}
+
+.CodeMirror {
+    height: 250px;
+}
+
+.has-error .CodeMirror {
+    border-color: $error-color;
+}
+
+.codemirror-error {
+    background-color: $error-color;
+}
