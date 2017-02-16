@@ -97,6 +97,9 @@ a.glyphicon {
 
 /* panel */
 
+.panel .panel-body p:last-child {
+    margin-bottom: 0;
+}
 .panel li.list-group-link {
     padding: 0;
 }
