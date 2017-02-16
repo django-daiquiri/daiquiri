@@ -13,14 +13,13 @@ from rest_framework import viewsets, mixins
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import ValidationError
-from rest_framework.decorators import detail_route
+from rest_framework.decorators import list_route, detail_route
 
 from daiquiri_core.utils import human2bytes
 from daiquiri_metadata.models import Database, Function
 from daiquiri_uws.settings import PHASE_ARCHIVED
 
 from .models import QueryJob, Example
-from .backends import get_query_backend
 from .serializers import (
     FormSerializer,
     DropdownSerializer,
@@ -39,6 +38,7 @@ from .exceptions import (
     TableError,
     ConnectionError
 )
+from utils import fetch_user_database_metadata
 
 
 @login_required()
@@ -55,12 +55,13 @@ class StatusViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         return []
 
     def list(self, request):
-
+        # get quota from settings
         quota = 0
         for group in request.user.groups.all():
             group_quota = human2bytes(settings.QUERY['quota'][group.name])
             quota = group_quota if group_quota > quota else quota
 
+        # get the size of all the tables of this user
         jobs = QueryJob.objects.filter(owner=self.request.user).exclude(phase=PHASE_ARCHIVED)
         size = jobs.aggregate(Sum('size'))['size__sum']
 
@@ -105,25 +106,6 @@ class QueryJobViewSet(viewsets.ModelViewSet):
             return QueryJobCreateSerializer
         elif self.action == 'update' or self.action == 'partial_update':
             return QueryJobUpdateSerializer
-
-    def list(self, request, *args, **kwargs):
-        query_backend = get_query_backend()
-        user_database_name = query_backend.get_user_database_name(self.request.user.username)
-
-        queryset = self.filter_queryset(self.get_queryset())
-
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(queryset, many=True)
-        data = serializer.data
-
-        for job in data:
-            job['columns'] = query_backend.fetch_columns(user_database_name, job['table_name'])
-
-        return Response(data)
 
     def perform_create(self, serializer):
 
@@ -203,6 +185,11 @@ class DatabaseViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         return Database.objects.filter(groups__in=self.request.user.groups.all())
+
+    @list_route(methods=['get'])
+    def user(self, request):
+        jobs = QueryJob.objects.filter(owner=self.request.user).exclude(phase=PHASE_ARCHIVED)
+        return Response([fetch_user_database_metadata(jobs, request.user.username)])
 
 
 class FunctionViewSet(viewsets.ReadOnlyModelViewSet):

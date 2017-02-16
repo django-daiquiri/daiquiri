@@ -22,12 +22,10 @@ class DirectQueryBackend(BaseQueryBackend):
         job.end_time = now()
         job.execution_duration = (job.end_time - job.start_time).seconds
         job.nrows, job.size = adapter.fetch_stats(job.database_name, job.table_name)
+        job.metadata = adapter.fetch_table(job.database_name, job.table_name)
+        job.metadata['columns'] = adapter.fetch_columns(job.database_name, job.table_name)
         job.phase = PHASE_COMPLETED
         job.save()
 
     def get_user_database_name(self, username):
         return 'daiquiri_user_' + username
-
-    def fetch_columns(self, database_name, table_name):
-        adapter = get_adapter('data')
-        return adapter.fetch_columns(database_name, table_name)

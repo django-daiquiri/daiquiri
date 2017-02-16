@@ -12,7 +12,7 @@ app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'Downlo
         dropdowns: $resource(baseurl + 'query/api/dropdowns/'),
         jobs: $resource(baseurl + 'query/api/jobs/:id/:detail_route'),
         examples: $resource(baseurl + 'query/api/examples/'),
-        databases: $resource(baseurl + 'query/api/databases/'),
+        databases: $resource(baseurl + 'query/api/databases/:list_route/'),
         functions: $resource(baseurl + 'query/api/functions/'),
     };
 
@@ -79,17 +79,21 @@ app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'Downlo
                 });
             });
 
-            // load joblist when database have been fetched
-            service.fetchJobs();
+            // load user database when databases have been fetched
+            service.fetchUserDatabase();
         });
+
+        // fetch joblist
+        service.fetchJobs();
 
         // activate overview tab
         service.tab = 'overview';
 
         // start the polling service
         PollingService.init();
-        PollingService.register('jobs', service.fetchJobs);
         PollingService.register('status', service.fetchStatus);
+        PollingService.register('jobs', service.fetchJobs);
+        PollingService.register('database', service.fetchUserDatabase);
 
         // load the download service
         service.downloads = DownloadService;
@@ -98,22 +102,14 @@ app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'Downlo
     service.fetchStatus = function() {
         resources.status.query(function(response) {
             service.status = response[0];
-        });
+        }).$promise;
     };
 
-    service.fetchJobs = function() {
-        return resources.jobs.query(function(response) {
-            service.jobs = response;
-
-            var user_database = {
-                name: 'hey',
-                tables: response.map(function(job) {
-                    return {
-                        name: job.table_name,
-                        columns: job.columns
-                    };
-                })
-            };
+    service.fetchUserDatabase = function() {
+        return resources.databases.query({
+            'list_route': 'user'
+        }, function(response) {
+            var user_database = response[0];
 
             var user_columns = [];
             angular.forEach(user_database.tables, function(table) {
@@ -126,7 +122,12 @@ app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'Downlo
 
             BrowserService.render('databases', service.databases.concat(user_database));
             BrowserService.render('columns', service.columns.concat(user_columns));
+        }).$promise;
+    }
 
+    service.fetchJobs = function() {
+        return resources.jobs.query(function(response) {
+            service.jobs = response;
         }).$promise;
     };
 

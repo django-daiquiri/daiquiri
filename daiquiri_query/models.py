@@ -5,6 +5,8 @@ from django.db.utils import OperationalError, ProgrammingError
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
+from jsonfield import JSONField
+
 from daiquiri_core.adapter import get_adapter
 from daiquiri_jobs.models import Job
 
@@ -28,6 +30,8 @@ class QueryJob(Job):
     queue = models.CharField(max_length=16, choices=settings.QUERY['queues'])
     nrows = models.IntegerField(null=True, blank=True)
     size = models.IntegerField(null=True, blank=True)
+
+    metadata = JSONField()
 
     class Meta:
         ordering = ('start_time', )
