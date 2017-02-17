@@ -3,12 +3,10 @@
 {% load i18n %}
 {% load core_tags %}
 
-{% block headline %}
-    <h2>Daiquiri</h2>
-{% endblock %}
-
 {% block page %}
-    <h3>A framework for the publication of scientific databases</h3>
+    <h1>Daiquiri</h1>
+
+    <h2>A framework for the publication of scientific databases</h2>
 
     <div class="row">
         <div class="col-md-4">
@@ -76,7 +74,7 @@
 {% block sidebar %}
 
 {% if not user.is_authenticated %}
-    <h3>Login</h3>
+    <h2>Login</h2>
 
     {# {% bootstrap_form form=login_form submit=_('Login') action_url_name='login' %} #}
 {% endif %}

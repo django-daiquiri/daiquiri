@@ -27,13 +27,9 @@
     {% endcompress %}
 {% endblock %}
 
-{% block headline %}
-
-    <h2>{{ database }}.{{ table }}</h2>
-
-{% endblock %}
-
 {% block wide %}
+
+    <h1>{{ database }}.{{ table }}</h1>
 
     <div daiquiri-table
         data-values="[10, 20, 100]"

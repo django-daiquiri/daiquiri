@@ -1,9 +1,9 @@
 {% extends 'core/page.html' %}
 {% load i18n %}
 
-{% block content %}
+{% block page %}
 
-    <h2>{% trans "Verify your email address" %}</h2>
+    <h1>{% trans "Verify your email address" %}</h1>
 
     {% url 'account_email' as email_url %}
 
