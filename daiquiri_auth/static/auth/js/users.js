@@ -1,4 +1,4 @@
-var app = angular.module('users', ['infinite-scroll']);
+var app = angular.module('users', ['core', 'infinite-scroll']);
 
 app.config(['$httpProvider', '$interpolateProvider', function($httpProvider, $interpolateProvider) {
     $interpolateProvider.startSymbol('{$');
@@ -30,6 +30,8 @@ app.factory('UsersService', ['$http', '$timeout', function($http, $timeout) {
     }
 
     function storeProfile(action) {
+        service.errors = {};
+
         if (angular.isUndefined(action)) {
             action = '/';
         } else {
@@ -83,6 +85,7 @@ app.factory('UsersService', ['$http', '$timeout', function($http, $timeout) {
     service.modal = function(modal_id, index) {
         service.current_index = index;
         service.current_row = angular.copy(service.rows[index]);
+        service.errors = {};
 
         $timeout(function() {
             $('#' + modal_id).modal('show');

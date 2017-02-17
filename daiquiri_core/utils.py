@@ -3,8 +3,6 @@ import re
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMultiAlternatives, EmailMessage
-from django.core.urlresolvers import reverse, resolve
-from django.http import HttpResponseRedirect
 from django.template.loader import render_to_string
 from django.template import TemplateDoesNotExist
 from django.utils.six.moves.urllib.parse import urlparse
@@ -12,6 +10,10 @@ from django.utils.six.moves.urllib.parse import urlparse
 
 def get_script_alias(request):
     return request.path[:-len(request.path_info)]
+
+
+def get_referer(request, default=None):
+    return request.META.get('HTTP_REFERER', default)
 
 
 def get_referer_path_info(request, default=None):
@@ -23,50 +25,14 @@ def get_referer_path_info(request, default=None):
     return urlparse(referer).path[len(script_alias):]
 
 
-def get_referer_url_name(request, default=None):
-    referer = request.META.get('HTTP_REFERER', None)
-    if not referer:
-        return default
-
-    referer_path = urlparse(referer).path
-    referer_url_name = resolve(referer_path).url_name
-
-    return referer_url_name
-
-
-def get_internal_link(text, name, *args, **kwargs):
-
-    if 'ng_args' in kwargs:
-        ng_args = [ng_arg.strip() for ng_arg in kwargs.pop('ng_args').split(',')]
-    else:
-        ng_args = None
-
-    url = reverse(name, args=args)
-
-    # replace escaped angular tags
-    if ng_args:
-        for ng_arg in ng_args:
-            url = url.replace(ng_arg, '{$ ' + ng_arg + ' $}')
-
-    if text is None:
-        text = url
-
-    # add an attribute for every kwarg
-    attributes = []
-    for key in kwargs:
-        attributes.append("%s=\"%s\"" % (key, kwargs[key]))
-
-    return "<a href=\"%s\" %s>%s</a>" % (url, ' '.join(attributes), text)
-
-
-def get_next_redirect(request):
+def get_next(request):
     next = request.POST.get('next')
-    current_url_name = resolve(request.path_info).url_name
+    current = request.path_info
 
-    if next in (current_url_name, None):
-        return HttpResponseRedirect(reverse('home'))
+    if next in (current, None):
+        return get_script_alias(request) + '/'
     else:
-        return HttpResponseRedirect(reverse(next))
+        return get_script_alias(request) + next
 
 
 def human2bytes(string):
