@@ -60,7 +60,12 @@
                             </li>
                             <li role="separator" class="divider"></li>
                             <li>
-                                <a href="{% url 'account_logout' %}">Logout</a>
+                                <form class="logout-form" action="{% url 'account_logout' %}" method="POST">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-link">
+                                        {% trans 'Logout' %}
+                                    </button>
+                                </form>
                             </li>
                         </ul>
                     </li>
@@ -68,7 +73,7 @@
 {% else %}
 
                     <li>
-                        <a href="{% url 'account_login' %}">Login</a>
+                        <a href="{% url 'account_login' %}">{% trans 'Login' %}</a>
                     </li>
 
 {% endif %}
