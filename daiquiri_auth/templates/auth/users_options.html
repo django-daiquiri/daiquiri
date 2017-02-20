@@ -43,11 +43,12 @@
             <li>
             {% endif %}
             <li>
-                {% internal_link _('User Admin') 'admin:auth_user_change' 'row.id' ng_args='row.id' target='_blank' %}
+                <a href="{{ user_admin_url }}">{% trans 'User Admin' %}</a>
             </li>
             <li>
-                {% internal_link _('Profile Admin') 'admin:daiquiri_auth_profile_change' 'row.id' ng_args='row.id' target='_blank' %}
+                <a href="{{ profile_admin_url }}">{% trans 'Profile Admin' %}</a>
             </li>
         </ul>
     </div>
+
     {% endif %}

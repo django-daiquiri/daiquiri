@@ -76,7 +76,7 @@
 {% if not user.is_authenticated %}
     <h2>Login</h2>
 
-    {# {% bootstrap_form form=login_form submit=_('Login') action_url_name='login' %} #}
+    {% include 'account/login_form.html' %}
 {% endif %}
 
 {% endblock %}

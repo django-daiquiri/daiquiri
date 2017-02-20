@@ -1,5 +1,4 @@
 {% load i18n %}
-{% load ng_tags %}
 
     <div class="modal" id="update-user-modal" tabindex="-1">
         <div class="modal-dialog">
@@ -12,18 +11,42 @@
                 </div>
 
                 <div class="modal-body">
-                    {% ng_form_field 'text' _('First name') 'first_name' 'service.current_row.user.first_name' %}
-                    {% ng_form_field 'text' _('Last name') 'last_name' 'service.current_row.user.last_name' %}
-                    {% ng_form_field 'text' _('Email') 'email' 'service.current_row.user.email' %}
-
-{% for detail_key in detail_keys %}
-
-                    {% with 'service.current_row.details.'|add:detail_key.key as ng_model %}
-                    {% ng_form_field detail_key.data_type detail_key.label detail_key.key ng_model %}
-                    {% endwith %}
-
-{% endfor %}
-
+                    <div class="row">
+                        <formgroup
+                            class="col-md-6"
+                            data-id="first_name"
+                            data-type="text"
+                            data-label="{% trans 'First Name' %}"
+                            data-model="service.current_row.user.first_name"
+                            data-errors="service.errors.user.first_name">
+                        </formgroup>
+                        <formgroup
+                            class="col-md-6"
+                            data-id="last_name"
+                            data-type="text"
+                            data-label="{% trans 'Last Name' %}"
+                            data-model="service.current_row.user.first_name"
+                            data-errors="service.errors.user.last_name">
+                        </formgroup>
+                    </div>
+                    <formgroup
+                        data-id="name"
+                        data-type="text"
+                        data-label="{% trans 'Email' %}"
+                        data-model="service.current_row.user.email"
+                        data-errors="service.errors.user.email">
+                    </formgroup>
+                    {% for detail_key in detail_keys %}
+                    <formgroup
+                        data-id="{{ detail_key.key }}"
+                        data-type="{{ detail_key.data_type }}"
+                        data-label="{{ detail_key.label }}"
+                        data-model="{{ detail_key.model }}"
+                        data-errors="{{ detail_key.errors }}"
+                        data-options='{{ detail_key.options_json|safe }}'
+                        data-options-label="label">
+                    </formgroup>
+                    {% endfor %}
                 </div>
 
                 <div class="modal-footer">
