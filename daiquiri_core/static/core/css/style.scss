@@ -189,6 +189,7 @@ div.fieldset {
     line-height: 29px;
     font-weight: bold;
 }
+
 .logout-form {
     margin: 0;
 }
@@ -208,4 +209,10 @@ div.fieldset {
     color: $navbar-dropdown-hover-color;
     background-color: $navbar-dropdown-hover-background-color;
     text-decoration: none;
+}
+.logout-form .btn-link:focus {
+    color: $navbar-dropdown-hover-color;
+    background-color: $navbar-dropdown-hover-background-color;
+    text-decoration: none;
+    outline: none;
 }
