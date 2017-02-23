@@ -1,0 +1,9 @@
+{% load i18n %}
+{% load core_tags %}
+
+    <a href="" class="glyphicon glyphicon-eye-open" title="{% trans 'Show message details' %}"
+        ng-click="service.modal('show-message-modal', $index)">
+    </a>
+    <a href="" class="glyphicon glyphicon glyphicon-remove-sign" title="{% trans 'Delete message' %}"
+         ng-click="service.modal('delete-message-modal', $index)">
+     </a>
