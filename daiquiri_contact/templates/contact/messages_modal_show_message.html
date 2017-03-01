@@ -12,45 +12,37 @@
 
                 <div class="modal-body">
 
+                   <dl>
+                        <dt>{% trans 'ID' %}</dt>
+                        <dd>{$ service.current_row.id $}</dd>
+
                     <dl>
-                        <dt>{% trans 'Name' %}</dt>
-                        <dd>{$ service.current_row.messages.author $}</dd>
+                        <dt>{% trans 'Author' %}</dt>
+                        <dd>{$ service.current_row.author $}</dd>
                     </dl>
                     <dl>
                         <dt>{% trans 'Email' %}</dt>
-                        <dd>{$ service.current_row.messages.email $}</dd>
+                        <dd>{$ service.current_row.email $}</dd>
                     </dl>
                     <dl>
                         <dt>{% trans 'Created' %}</dt>
-                        <dd>{$ service.current_row.messages.created $}</dd>
+                        <dd>{$ service.current_row.created $}</dd>
                     </dl>
                     <dl>
                         <dt>{% trans 'Status' %}</dt>
-                        <dd>{$ service.current_row.messages.status $}</dd>
+                        <dd>{$ service.current_row.status $}</dd>
                     </dl>
-                    <div class="modal-seperator"></div>
 
                     <div class="modal-seperator"></div>
                     <dl>
                         <dt>{% trans 'Subject' %}</dt>
-                        <dd>{$ service.current_row.messages.subject $}</dd>
+                        <dd>{$ service.current_row.subject $}</dd>
 
                     <dl>
                         <dt>{% trans 'Message' %}</dt>
-                        <dd>{$ service.current_row.messages.message $}</dd>
+                        <dd>{$ service.current_row.message $}</dd>
                     </dl>
 
-
-                    <div ng-show="service.current_row.attributes" class="modal-seperator"></div>
-
-                    <dl ng-repeat="(detail_key, detail_value) in service.current_row.attributes">
-                        <dt>{$ detail_key $}</dt>
-                        <dd>{$ detail_value $}</dd>
-                    </dl>
-
-                    <div class="modal-seperator"></div>
-
-                    </dl>
 
                 </div>
 

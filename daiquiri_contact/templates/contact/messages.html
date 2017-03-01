@@ -3,7 +3,7 @@
 {% load i18n %}
 {% load compress %}
 
-{% block bodyargs %}ng-app="messages" ng-controller="ContactController"{% endblock %}
+{% block bodyargs %}ng-app="messages" ng-controller="MessagesController"{% endblock %}
 
 {% block headextra %}
     {% compress css %}
@@ -57,41 +57,39 @@
 
     <table class="table list-table" infinite-scroll="service.scroll()" infinite-scroll-distance="0.2">
         <thead>
-            <th style="width: 30%;">Id</th>
-            <th style="width: 30%;">Created</th>
-            <th style="width: 30%;">Author</th>
-            <th style="width: 30%;">Email</th>
             <th style="width: 20%;">Subject</th>
-            <th style="width: 20%;">Status</th>
-            <th style="width: 20%;"></th>
+            <th style="width: 20%;">Author</th>
+            <th style="width: 10%;">Created</th>
+            <th style="width: 10%;">Email</th>
+            <th style="width: 5%;">Status</th>
+            <th style="width: 10%;"></th>
         </thead>
         <tbody>
             <tr ng-repeat="row in service.rows">
                 <td>
-                    <span ng-show="row.messages.id"> </span>
+                    <span ng-show="row.subject"> {$ row.subject $} </span>
                 </td>
                 <td>
-                    <span ng-show="row.messages.created"> </span>
-                </td>
-                <td>
-                    <a href="" ng-click="service.modal('show-messages-modal', $index)">
-                        {$ row.messages.author  $}
+                    <a href="" ng-click="service.modal('show-author-modal', $index)">
+                        {$ row.author  $}
                     </a>
-                    <em>{$ row.messages.author $}</em>
-                </td>
+                    <em>{$ row.author $}</em>
                 </td>
                 <td>
-                    <div ng-repeat="email in row.emails">
-                        <a href="mailto:{$ row.messages.email $} <{$ email.email $}>">
-                            {$ email.email $}
+                    <span ng-show="row.created"> {$ row.created $} </span>
+                </td>
+                <td>
+                    <div ng-show="row.email">
+                        <a href="mailto:{$ row.email $} <{$ row.email $}>">
+                            {$ row.email $}
                         </a>
                     </div>
                 </td>
                 <td>
-                    <span ng-show="row.messages.subject"></span>
-                </td>
-                <td>
-                    <span ng-show="row.messages.status"></span>
+                    <span ng-hide="row.status">{% trans 'Active' %}</span>
+                    <span ng-show="row.status">{% trans 'Closed' %}</span>
+                    <span ng-show="row.status">{% trans 'Spam' %}</span>
+                    <span ng-show="row.status">{$ row.status $} </span>
                 </td>
                 <td class="text-right list-table-options">
 
@@ -104,8 +102,6 @@
     </table>
 
     {% include 'contact/messages_modal_show_message.html' %}
-
-    {% include 'contact/messages_modal_delete_message.html' %}
 
 
 {% endblock %}

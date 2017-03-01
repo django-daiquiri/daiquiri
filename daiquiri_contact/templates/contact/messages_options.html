@@ -4,6 +4,7 @@
     <a href="" class="glyphicon glyphicon-eye-open" title="{% trans 'Show message details' %}"
         ng-click="service.modal('show-message-modal', $index)">
     </a>
-    <a href="" class="glyphicon glyphicon glyphicon-remove-sign" title="{% trans 'Delete message' %}"
-         ng-click="service.modal('delete-message-modal', $index)">
-     </a>
+    <a href="" class="fa fa-check" title="{% trans 'Responded!' %}"
+        ng-show="row.status"
+        ng-click="service.modal('set-status-closed', $index)">
+    </a>

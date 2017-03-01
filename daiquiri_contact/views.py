@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.utils.timezone import now
 
-from rest_framework import viewsets
+from rest_framework import viewsets, filters
 
 from daiquiri_core.permissions import DaiquiriModelPermissions
 
@@ -9,6 +9,7 @@ from .models import ContactMessage
 from .serializers import ContactMessageSerializer
 from .forms import ContactForm
 from .utils import send_contact_message
+from .paginations import MessagePagination
 
 
 def contact(request):
@@ -56,9 +57,8 @@ class ContactMessageViewSet(viewsets.ModelViewSet):
 
     queryset = ContactMessage.objects.all()
     serializer_class = ContactMessageSerializer
-    # pagination_class = MessagePagination
+    pagination_class = MessagePagination
 
-    # filter_backends = (filters.SearchFilter, filters.OrderingFilter)
-    # ordering_fields = ('user__username', 'user__email', 'user__first_name', 'user__last_name')
-    # search_fields = ('user__username', 'user__email', 'user__first_name', 'user__last_name')
+    filter_backends = (filters.SearchFilter, filters.OrderingFilter)
+    search_fields = ('author', 'email')
 

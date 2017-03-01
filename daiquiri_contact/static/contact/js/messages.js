@@ -20,11 +20,12 @@ app.factory('MessagesService', ['$http', '$timeout', function($http, $timeout) {
     function fetchMessages() {
         return $http.get(service.current_url)
             .success(function(response) {
+                console.log(response)
                 service.count = response.count;
                 service.next = response.next;
                 service.rows = service.rows.concat(response.results);
             });
-    };
+    }
 
     function storeMessage(action) {
         service.errors = {};
@@ -43,7 +44,7 @@ app.factory('MessagesService', ['$http', '$timeout', function($http, $timeout) {
             .error(function(response, status) {
                 service.errors = response;
             });
-    };
+    }
 
     service.init = function() {
         // reset the url
@@ -89,9 +90,9 @@ app.factory('MessagesService', ['$http', '$timeout', function($http, $timeout) {
         });
     };
 
-    service.setStatusClosed = function() {
+    service.updateStatus = function() {
         storeMessages().then(function() {
-            $('#setStatusClosed-messages-modal').modal('hide');
+            $('#updateStatus-messages-modal').modal('hide');
         });
     };
 
@@ -99,12 +100,9 @@ app.factory('MessagesService', ['$http', '$timeout', function($http, $timeout) {
         updateMessage().then(function() {
             $('#update-messages-modal').modal('hide');
         });
+    };
 
 
-     service.deleteMessage = function() {
-        deleteMessage('disable').then(function() {
-            $('#delete-message-modal').modal('hide');
-        });
     };
 
     return service;

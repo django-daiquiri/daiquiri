@@ -16,7 +16,8 @@ class ContactMessage(models.Model):
 
     STATUS_CHOICES = (
         ('STATUS_ACTIVE', 'active'),
-        ('STATUS_CLOSED', 'closed')
+        ('STATUS_CLOSED', 'closed'),
+        ('STATUS_SPAM', 'spam')
     )
 
     author = models.CharField(max_length=256)
@@ -30,7 +31,7 @@ class ContactMessage(models.Model):
     message = models.TextField()
 
     class Meta:
-        ordering = ('created', 'status')
+        ordering = ('created', 'status', 'author')
 
         verbose_name = _('Contact message')
         verbose_name_plural = _('Contact messages')
@@ -44,4 +45,8 @@ class ContactMessage(models.Model):
 
     def set_status_active(self):
         self.status = 'STATUS_ACTIVE'
+        self.save()
+
+    def set_status_spam(self):
+        self.status = 'STATUS_SPAM'
         self.save()
