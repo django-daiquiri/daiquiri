@@ -14,10 +14,12 @@ logger = logging.getLogger(__name__)
 @python_2_unicode_compatible
 class ContactMessage(models.Model):
 
+
+
     STATUS_CHOICES = (
-        (STATUS_ACTIVE, 'active'),
-        (STATUS_CLOSED, 'closed'),
-        (STATUS_SPAM, 'spam')
+        ('STATUS_ACTIVE', 'active'),
+        ('STATUS_CLOSED', 'closed'),
+        ('STATUS_SPAM', 'spam')
     )
 
     author = models.CharField(max_length=256)
@@ -40,13 +42,13 @@ class ContactMessage(models.Model):
         return "created=%s; email=%s; subject=%s; status=%s" % (self.created, self.email, self.subject, self.status)
 
     def set_status_closed(self):
-        self.status = STATUS_CLOSED
+        self.status = 'closed'
         self.save()
 
     def set_status_active(self):
-        self.status = STATUS_ACTIVE
+        self.status = 'active'
         self.save()
 
     def set_status_spam(self):
-        self.status = STATUS_SPAM
+        self.status = 'spam'
         self.save()
