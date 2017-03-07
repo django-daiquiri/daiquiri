@@ -14,12 +14,14 @@ logger = logging.getLogger(__name__)
 @python_2_unicode_compatible
 class ContactMessage(models.Model):
 
-
+    STATUS_ACTIVE = 'ACTIVE'
+    STATUS_CLOSED = 'CLOSED'
+    STATUS_SPAM = 'SPAM'
 
     STATUS_CHOICES = (
-        ('STATUS_ACTIVE', 'active'),
-        ('STATUS_CLOSED', 'closed'),
-        ('STATUS_SPAM', 'spam')
+        (STATUS_ACTIVE, 'active'),
+        (STATUS_CLOSED, 'closed'),
+        (STATUS_SPAM, 'spam')
     )
 
     author = models.CharField(max_length=256)

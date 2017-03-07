@@ -92,7 +92,7 @@ app.factory('MessagesService', ['$http', '$timeout', function($http, $timeout) {
 
     service.updateStatus = function() {
         storeMessages().then(function() {
-            $('#updateStatus-messages-modal').modal('hide');
+            $('#setStatusClosed-messages-modal').modal('hide');
         });
     };
 
@@ -103,7 +103,7 @@ app.factory('MessagesService', ['$http', '$timeout', function($http, $timeout) {
     };
 
 
-    };
+
 
     return service;
 }]);
