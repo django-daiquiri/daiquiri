@@ -53,53 +53,51 @@
     {% endcompress %}
 {% endblock %}
 
-{% block headline %}
-    <h1>{% trans 'Query interface' %}</h1>
-{% endblock %}
-
 {% block wide %}
 
-<div class="row">
-    <div class="col-md-3">
-        {% include 'query/query_sidebar.html' %}
-    </div>
-    <div class="col-md-9">
-        {% for form in query_settings.forms %}
+    <h1>{% trans 'Query interface' %}</h1>
 
-            {% include 'query/query_form.html' %}
+    <div class="row">
+        <div class="col-md-3">
+            {% include 'query/query_sidebar.html' %}
+        </div>
+        <div class="col-md-9">
+            {% for form in query_settings.forms %}
 
-        {% endfor %}
+                {% include 'query/query_form.html' %}
 
-        <div ng-show="service.job">
+            {% endfor %}
 
-            <h2 class="daiquiri-query-job-title">{% trans 'Query job' %} `{$ service.job.table_name $}`</h2>
+            <div ng-show="service.job">
 
-            <ul class="nav nav-tabs daiquiri-query-job-tabs">
-                <li role="presentation" ng-class="{active: service.tab == 'overview'}">
-                    <a href="" ng-click="service.tab = 'overview'">{% trans 'Job overview' %}</a>
-                </li>
-                <li role="presentation" ng-class="{active: service.tab == 'results'}">
-                    <a href="" ng-click="service.tab = 'results'">{% trans 'Results table' %}</a>
-                </li>
-                <li role="presentation" ng-class="{active: service.tab == 'download'}">
-                    <a href="" ng-click="service.tab = 'download'">{% trans 'Download' %}</a>
-                </li>
-            </ul>
+                <h2 class="daiquiri-query-job-title">{% trans 'Query job' %} `{$ service.job.table_name $}`</h2>
 
-            <div ng-show="service.tab == 'overview'">
-                {% include 'query/query_overview.html' %}
-            </div>
-            <div ng-show="service.tab == 'results'">
-                {% include 'query/query_results.html' %}
-            </div>
-            <div ng-show="service.tab == 'download'">
-                {% include 'query/query_download.html' %}
+                <ul class="nav nav-tabs daiquiri-query-job-tabs">
+                    <li role="presentation" ng-class="{active: service.tab == 'overview'}">
+                        <a href="" ng-click="service.tab = 'overview'">{% trans 'Job overview' %}</a>
+                    </li>
+                    <li role="presentation" ng-class="{active: service.tab == 'results'}">
+                        <a href="" ng-click="service.tab = 'results'">{% trans 'Results table' %}</a>
+                    </li>
+                    <li role="presentation" ng-class="{active: service.tab == 'download'}">
+                        <a href="" ng-click="service.tab = 'download'">{% trans 'Download' %}</a>
+                    </li>
+                </ul>
+
+                <div ng-show="service.tab == 'overview'">
+                    {% include 'query/query_overview.html' %}
+                </div>
+                <div ng-show="service.tab == 'results'">
+                    {% include 'query/query_results.html' %}
+                </div>
+                <div ng-show="service.tab == 'download'">
+                    {% include 'query/query_download.html' %}
+                </div>
+
             </div>
 
         </div>
-
     </div>
-</div>
 
 {% include 'query/query_modal_rename_job.html' %}
 {% include 'query/query_modal_kill_job.html' %}

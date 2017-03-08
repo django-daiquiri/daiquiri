@@ -1,0 +1,22 @@
+{% extends 'core/page.html' %}
+{% load i18n %}
+
+{% block page %}
+
+    <h1>{% trans "Contact Form" %}</h1>
+
+    <p>
+        {% trans "Please enter your contact details and your message." %}
+    </p>
+
+    <form method="post" action="{% url 'contact' %}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next }}" />
+
+        {% include 'core/bootstrap_form_fields.html' %}
+
+        <input type="submit" value="{% trans 'Contact message' %}" class="btn {{ submit_danger|yesno:'btn-danger,btn-primary' }}" />
+        <input type="submit" name="cancel" value="{% trans 'Cancel' %}" class="btn" />
+    </form>
+
+{% endblock %}

@@ -96,32 +96,3 @@ def post_save_profile(sender, **kwargs):
         if not kwargs['created']:
             user_updated.send(sender=Profile, user=profile.user)
             logger.info('User \'%s\' updated.' % profile.user.username)
-
-
-@python_2_unicode_compatible
-class DetailKey(models.Model):
-
-    TYPE_CHOICES = (
-        ('text', 'Text'),
-        ('textarea', 'Textarea'),
-        ('checkbox', 'Checkbox'),
-        ('radio', 'Radio button'),
-        ('select', 'Select'),
-        ('multiselect', 'Multiselect'),
-    )
-
-    key = models.SlugField()
-    label = models.CharField(max_length=256)
-    data_type = models.CharField(max_length=11, choices=TYPE_CHOICES)
-    help_text = models.TextField(blank=True, help_text=_('Enter a help text to be displayed next to the input element'))
-    options = JSONField(null=True, blank=True, help_text=_('Enter valid JSON of the form [[key, label], [key, label], ...]'))
-    required = models.BooleanField()
-
-    def __str__(self):
-        return self.key
-
-    class Meta:
-        ordering = ('key',)
-
-        verbose_name = _('DetailKey')
-        verbose_name_plural = _('DetailKeys')

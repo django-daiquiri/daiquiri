@@ -30,6 +30,7 @@ Create a `django-daiquiri` directory at a convenient place:
 ```
 mkdir django-daiquiri
 cd django-daiquiri
+mkdir log
 ```
 
 Set up a virtualenv in this directory:

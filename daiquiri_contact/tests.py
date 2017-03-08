@@ -1,3 +1,12 @@
-from django.test import TestCase
+import unittest
+from forms import ContactForm
 
-# Create your tests here.
+
+class FormTests(unittest.TestCase):
+    def test_validation(self):
+        form_data = {
+            'contact_name': 'X' * 300,
+        }
+
+        form = ContactForm(data=form_data)
+        self.assertFalse(form.is_valid())

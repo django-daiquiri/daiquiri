@@ -4,10 +4,16 @@ html, body {
     height: 100%;
     background-color: $background-color;
 }
-
+h1:first-child {
+    margin-top: 0;
+}
+h2 {
+    font-size: 28px;
+}
 h1, h2, h3, h4 {
     color: $headline-color;
     line-height: 40px;
+    margin-bottom: 20px;
 }
 h3:first-child {
     margin-top: 0;
@@ -38,7 +44,10 @@ a.glyphicon {
 /* content */
 
 .content {
-    padding-top: 60px;
+    padding-top: 80px;
+}
+.sidebar {
+    margin-top: 40px;
 }
 .page, .sidebar {
     height: 100%;
@@ -142,4 +151,68 @@ div.control-label {
 
 div.fieldset {
     margin-bottom: 20px;
+}
+
+/* misc */
+
+.email-form label,
+.connections-form label {
+    display: block;
+    margin: 0;
+    line-height: 40px;
+    border-bottom: 1px solid $modal-border-color;
+}
+.email-form label:first-child,
+.connections-form label:first-child {
+    border-top: 1px solid $modal-border-color;
+}
+.email-form label input,
+.connections-form label input {
+    margin-left: 5px;
+    margin-right: 5px;
+}
+.email-form .email-form-buttons,
+.connections-form .connections-form-buttons {
+    margin-top: 10px;
+}
+.socialaccount_providers {
+    margin: 0;
+    padding: 0;
+    height: 42px;
+}
+.socialaccount_providers li {
+    float: left;
+    margin-right: 10px;
+    list-style: none;
+}
+.socialaccount_provider_name {
+    line-height: 29px;
+    font-weight: bold;
+}
+
+.logout-form {
+    margin: 0;
+}
+.logout-form .btn-link {
+    padding: 3px 20px;
+    color: $navbar-dropdown-color;
+    display: block;
+    width: 100%;
+    text-align: left;
+    border: none;
+    clear: both;
+    font-weight: 400;
+    line-height: 1.42857143;
+    white-space: nowrap;
+}
+.logout-form .btn-link:hover {
+    color: $navbar-dropdown-hover-color;
+    background-color: $navbar-dropdown-hover-background-color;
+    text-decoration: none;
+}
+.logout-form .btn-link:focus {
+    color: $navbar-dropdown-hover-color;
+    background-color: $navbar-dropdown-hover-background-color;
+    text-decoration: none;
+    outline: none;
 }
