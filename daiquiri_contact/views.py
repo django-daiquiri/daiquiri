@@ -32,7 +32,7 @@ def contact(request):
 
             contact_form.initial = {
                 'email': request.user.email,
-                'name': request.user.profile.full_name
+                'author': request.user.profile.full_name
             }
 
     return render(request, 'contact/contact.html', {'form': contact_form})

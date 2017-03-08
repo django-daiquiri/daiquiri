@@ -3,13 +3,10 @@
 {% load i18n %}
 {% load core_tags %}
 
-
-{% block headline %}
-    <h2>{% trans 'Thank you for leaving a message for us!' %}</h2>
-{% endblock %}
-
 {% block page %}
-<p>{% trans 'We will reply as soon as possible.' %}</p>
-<p>{% trans 'Sincerely yours,' %}</p>
-<p>{% trans 'example.com admins' %}</p>
+    <h1>{% trans 'Thank you for leaving a message for us!' %}</h1>
+
+    <p>{% trans 'We will reply as soon as possible.' %}</p>
+    <p>{% trans 'Sincerely yours,' %}</p>
+    <p>{% trans 'example.com admins' %}</p>
 {% endblock %}
