@@ -65,7 +65,7 @@
             <th style="width: 10%;"></th>
         </thead>
         <tbody>
-            <tr ng-repeat="row in service.rows">
+            <tr ng-repeat="row in service.rows" ng-hide="row.status == 'SPAM' ">
                 <td>
                     <span ng-show="row.subject"> {$ row.subject $} </span>
                 </td>
