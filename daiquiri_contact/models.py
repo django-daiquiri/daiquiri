@@ -44,13 +44,13 @@ class ContactMessage(models.Model):
         return "created=%s; email=%s; subject=%s; status=%s" % (self.created, self.email, self.subject, self.status)
 
     def set_status_closed(self):
-        self.status = 'closed'
+        self.status = self.STATUS_CLOSED
         self.save()
 
     def set_status_active(self):
-        self.status = 'active'
+        self.status = self.STATUS_ACTIVE
         self.save()
 
     def set_status_spam(self):
-        self.status = 'spam'
+        self.status = self.STATUS_SPAM
         self.save()

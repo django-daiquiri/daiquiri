@@ -10,9 +10,17 @@ from .models import ContactMessage
 
 
 class ContactMessageSerializer(serializers.ModelSerializer):
+
+    status_label = serializers.SerializerMethodField()
+
+
+
     class Meta:
         model = ContactMessage
         fields = '__all__'
+
+    def get_status_label(self, obj):
+        return dict(ContactMessage.STATUS_CHOICES)[obj.status]
 
 # #    def update(self, obj, validated_data):
 # #        message = validated_data.pop('message')

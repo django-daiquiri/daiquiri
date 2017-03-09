@@ -26,11 +26,11 @@
                     </dl>
                     <dl>
                         <dt>{% trans 'Created' %}</dt>
-                        <dd>{$ service.current_row.created $}</dd>
+                        <dd>{$ service.current_row.created | date: 'MMM d, yyyy hh:mm'  $}</dd>
                     </dl>
                     <dl>
                         <dt>{% trans 'Status' %}</dt>
-                        <dd>{$ service.current_row.status $}</dd>
+                        <dd>{$ service.current_row.status_label $}</dd>
                     </dl>
 
                     <div class="modal-seperator"></div>
