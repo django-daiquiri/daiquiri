@@ -20,29 +20,10 @@ app.factory('MessagesService', ['$http', '$timeout', function($http, $timeout) {
     function fetchMessages() {
         return $http.get(service.current_url)
             .success(function(response) {
-                console.log(response)
+                console.log(response);
                 service.count = response.count;
                 service.next = response.next;
                 service.rows = service.rows.concat(response.results);
-            });
-    }
-
-    function storeMessage(action) {
-        service.errors = {};
-
-        if (angular.isUndefined(action)) {
-            action = '/';
-        } else {
-            action = '/' + action + '/';
-        }
-
-        return $http.put(resource_url + service.current_row.id + action, service.current_row)
-            .success(function(response) {
-                // copy the data back to the rows array and close the modal
-                service.rows[service.current_index] = response;
-            })
-            .error(function(response, status) {
-                service.errors = response;
             });
     }
 
@@ -50,6 +31,11 @@ app.factory('MessagesService', ['$http', '$timeout', function($http, $timeout) {
         // reset the url
         service.current_url = resource_url;
 
+        console.log(service.current_url + ('api/status'))
+        $http.get(service.current_url).success(function(response) {
+                console.log(response);
+                //service.rows = service.rows.concat(response.results);
+            });
         // reset data
         service.search_string = null;
         service.rows = [];
@@ -90,19 +76,16 @@ app.factory('MessagesService', ['$http', '$timeout', function($http, $timeout) {
         });
     };
 
-    service.updateStatus = function() {
-        storeMessages().then(function() {
-            $('#setStatusClosed-messages-modal').modal('hide');
-        });
-    };
+    service.updateMessage = function(row, status) {
+        console.log('updateMessage')
+        //console.log(action)
+        service.errors = {};
 
-    service.updateMessage = function() {
-        updateMessage().then(function() {
-            $('#update-messages-modal').modal('hide');
-        });
-    };
+        row.status = status;
+        row.status_label = status;
+        return $http.put(resource_url + row.id + '/', row)
 
-
+    }
 
 
     return service;

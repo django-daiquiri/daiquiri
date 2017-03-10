@@ -2,7 +2,9 @@ from django.shortcuts import render
 from django.utils.timezone import now
 
 from rest_framework import viewsets, filters
+from rest_framework.permissions import IsAuthenticated
 
+from daiquiri_core.views import ChoicesViewSet
 from daiquiri_core.permissions import DaiquiriModelPermissions
 
 from .models import ContactMessage
@@ -61,4 +63,9 @@ class ContactMessageViewSet(viewsets.ModelViewSet):
 
     filter_backends = (filters.SearchFilter, filters.OrderingFilter)
     search_fields = ('author', 'email')
+
+
+class StatusViewSet(ChoicesViewSet):
+    permission_classes = (IsAuthenticated, )
+    queryset = ContactMessage.STATUS_CHOICES
 

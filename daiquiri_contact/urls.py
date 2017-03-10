@@ -7,6 +7,7 @@ from .views import *
 
 router = routers.DefaultRouter()
 router.register(r'messages', ContactMessageViewSet)
+router.register(r'status', StatusViewSet,  base_name='status')
 
 urlpatterns = [
     url(r'^messages/', messages, name='messages'),
