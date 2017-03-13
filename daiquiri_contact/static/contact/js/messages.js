@@ -20,7 +20,6 @@ app.factory('MessagesService', ['$http', '$timeout', function($http, $timeout) {
     function fetchMessages() {
         return $http.get(service.current_url)
             .success(function(response) {
-                console.log(response);
                 service.count = response.count;
                 service.next = response.next;
                 service.rows = service.rows.concat(response.results);
@@ -31,7 +30,7 @@ app.factory('MessagesService', ['$http', '$timeout', function($http, $timeout) {
         // reset the url
         service.current_url = resource_url;
 
-        console.log(service.current_url + ('api/status'))
+        console.log(resource_url)
         $http.get(service.current_url).success(function(response) {
                 console.log(response);
                 //service.rows = service.rows.concat(response.results);
@@ -77,14 +76,26 @@ app.factory('MessagesService', ['$http', '$timeout', function($http, $timeout) {
     };
 
     service.updateMessage = function(row, status) {
-        console.log('updateMessage')
+        console.log('status:', status)
+        console.log(row)
+
         //console.log(action)
         service.errors = {};
-
         row.status = status;
-        row.status_label = status;
-        return $http.put(resource_url + row.id + '/', row)
 
+        $http.get('/contact/api/status/?format=json').success(function(status_json) {
+            console.log(status_json)
+            text = ""
+            for(i = 0; i < status_json.length; i++){
+                console.log(i)
+                console.log(status_json[i])
+                if (status_json[i].id == status){
+                    row.status_label = status_json[i].text
+
+                }
+            }
+        });
+        return $http.put(resource_url + row.id + '/', row)
     }
 
 
