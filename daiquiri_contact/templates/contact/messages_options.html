@@ -5,10 +5,10 @@
         ng-click="service.modal('show-message-modal', $index)">
     </a>
     <a href="" ng-show="row.status == 'ACTIVE'"
-        class="fa fa-check" title="{% trans 'Close the thread' %} "
+        class="fa fa-square-o" title="{% trans 'Close the thread' %} "
         ng-click="service.updateMessage(row, 'CLOSED')">
     </a>
-    <a href="" ng-show="row.status == 'CLOSED'" class="fa fa-check-square" title="{% trans 'Open the thread' %}"
+    <a href="" ng-show="row.status == 'CLOSED'" class="fa fa-check" title="{% trans 'Open the thread' %}"
         ng-click="service.updateMessage(row, 'ACTIVE')">
     </a>
 
