@@ -62,7 +62,7 @@ class ContactMessageViewSet(viewsets.ModelViewSet):
     pagination_class = MessagePagination
 
     filter_backends = (filters.SearchFilter, filters.OrderingFilter)
-    search_fields = ('author', 'email')
+    search_fields = ('author', 'email', 'subject')
 
 
 class StatusViewSet(ChoicesViewSet):
