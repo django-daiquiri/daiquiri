@@ -182,6 +182,12 @@ class QueryJobViewSet(viewsets.ModelViewSet):
         except QueryJob.DoesNotExist:
             raise Http404
 
+def examples(request):
+    # get urls to the admin interface to be used with angular
+
+    return render(request, 'query/examples.html', {
+
+    })
 
 class ExampleViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticated, )
@@ -190,6 +196,7 @@ class ExampleViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         return Example.objects.filter(groups__in=self.request.user.groups.all())
+
 
 
 class DatabaseViewSet(viewsets.ReadOnlyModelViewSet):

@@ -8,6 +8,7 @@ from .views import (
     FormViewSet,
     DropdownViewSet,
     QueryJobViewSet,
+    examples,
     ExampleViewSet,
     DatabaseViewSet,
     FunctionViewSet,
@@ -27,6 +28,7 @@ router.register(r'queues', QueueViewSet, base_name='queue')
 router.register(r'querylanguages', QueryLanguageViewSet, base_name='querylanguage')
 
 urlpatterns = [
+    url(r'^examples/', examples, name='examples'),
     url(r'^$', query, name='query'),
 
     # rest api

@@ -1,0 +1,42 @@
+{% load i18n %}
+
+    <div class="modal" id="show-example-modal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="{% trans 'Close' %}">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+
+                   <dl>
+                        <dt>{% trans 'ID' %}</dt>
+                        <dd>{$ service.current_row.id $}</dd>
+
+                    <dl>
+                        <dt>{% trans 'Name' %}</dt>
+                        <dd>{$ service.current_row.name $}</dd>
+                    </dl>
+
+                     <dl>
+                        <dt>{% trans 'Description' %}</dt>
+                        <dd>{$ service.current_row.description $}</dd>
+                    </dl>
+                    <dl>
+                        <dt>{% trans 'Query string' %}</dt>
+                        <dd>{$ service.current_row.query_string $}</dd>
+                    </dl>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                        {% trans 'Close' %}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
