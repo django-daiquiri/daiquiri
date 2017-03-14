@@ -58,11 +58,13 @@ class ContactMessageViewSet(viewsets.ModelViewSet):
     permission_classes = (DaiquiriModelPermissions, )
 
     queryset = ContactMessage.objects.all()
+
     serializer_class = ContactMessageSerializer
     pagination_class = MessagePagination
 
     filter_backends = (filters.SearchFilter, filters.OrderingFilter)
     search_fields = ('author', 'email', 'subject')
+
 
 
 class StatusViewSet(ChoicesViewSet):
