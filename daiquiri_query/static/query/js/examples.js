@@ -26,6 +26,27 @@ app.factory('ExamplesService', ['$http', '$timeout', function($http, $timeout) {
             });
     }
 
+
+    function storeExample(action) {
+        service.errors = {};
+
+        if (angular.isUndefined(action)) {
+            action = '/';
+        } else {
+            action = '/' + action + '/';
+        }
+
+        return $http.put(resource_url + service.current_row.id + action, service.current_row)
+            .success(function(response) {
+                // copy the data back to the rows array and close the modal
+                service.rows[service.current_index] = response;
+            })
+            .error(function(response, status) {
+                service.errors = response;
+            });
+    }
+
+
     service.init = function() {
         // reset the url
         service.current_url = resource_url;
@@ -71,6 +92,13 @@ app.factory('ExamplesService', ['$http', '$timeout', function($http, $timeout) {
     };
 
     service.updateExample = function(row) {
+
+        service.errors = {};
+
+        return $http.put(resource_url + row.id + '/', row)
+    };
+
+     service.createExample = function(row) {
 
         service.errors = {};
 

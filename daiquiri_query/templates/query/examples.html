@@ -52,5 +52,16 @@
         </tbody>
     </table>
 
+    <div class="modal-footer">
+
+        <div class="btn-group wide pull-right">
+            <button type="button" class="btn btn-primary"
+                    ng-click="service.modal('create-example-modal', $index)">
+                {% trans 'Create new example' %}
+            </button>
+        </div>
+    </div>
+     {% include 'query/examples_modal_show_example.html' %}
+     {% include 'query/examples_modal_create_example.html' %}
 
 {% endblock %}
