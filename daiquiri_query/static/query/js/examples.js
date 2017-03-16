@@ -18,6 +18,7 @@ app.factory('ExamplesService', ['$http', '$timeout', function($http, $timeout) {
     var service = {};
 
     function fetchExamples() {
+
         return $http.get(service.current_url)
             .success(function(response) {
                 service.count = response.count;
@@ -49,8 +50,9 @@ app.factory('ExamplesService', ['$http', '$timeout', function($http, $timeout) {
 
     service.init = function() {
         // reset the url
+        console.log('init')
         service.current_url = resource_url;
-
+        console.log(resource_url)
         // reset data
         service.search_string = null;
         service.rows = [];
@@ -98,12 +100,14 @@ app.factory('ExamplesService', ['$http', '$timeout', function($http, $timeout) {
         return $http.put(resource_url + row.id + '/', row)
     };
 
+
      service.createExample = function(row) {
 
         service.errors = {};
 
         return $http.put(resource_url + row.id + '/', row)
     };
+
 
     service.deleteExample = function(row) {
 

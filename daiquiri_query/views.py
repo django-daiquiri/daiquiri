@@ -32,6 +32,7 @@ from .serializers import (
     DatabaseSerializer,
     FunctionSerializer
 )
+from .paginations import ExamplePagination
 from .exceptions import (
     ADQLSyntaxError,
     MySQLSyntaxError,
@@ -193,6 +194,9 @@ class ExampleViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticated, )
 
     serializer_class = ExampleSerializer
+    pagination_class = ExamplePagination
+
+    # queryset = Example.objects.all()
 
     def get_queryset(self):
         return Example.objects.filter(groups__in=self.request.user.groups.all())
