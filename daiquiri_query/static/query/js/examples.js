@@ -93,21 +93,18 @@ app.factory('ExamplesService', ['$http', '$timeout', function($http, $timeout) {
         });
     };
 
-    service.updateExample = function(row) {
 
+     service.storeExample = function(row) {
+
+        console.log('storeExample')
+        console.log(row)
         service.errors = {};
-
-        return $http.put(resource_url + row.id + '/', row)
+        if (!('id' in row)) {
+            return $http.put(resource_url + row.id + '/', row)
+        } else {
+            return $http.post(resource_url, row)
+        }
     };
-
-
-     service.createExample = function(row) {
-
-        service.errors = {};
-
-        return $http.put(resource_url + row.id + '/', row)
-    };
-
 
     service.deleteExample = function(row) {
 

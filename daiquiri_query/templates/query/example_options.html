@@ -5,11 +5,9 @@
         ng-click="service.modal('show-example-modal', $index)">
     </a>
     <a href="" class="fa fa-pencil" title="{% trans 'Update example details' %}"
-        ng-click="service.modal('update-example-modal', $index)">
+        ng-click="service.modal('examples-modal-form', $index)">
     </a>
     <a href="" class="fa fa-trash-o"
             title="{% trans 'Delete example' %}"
             ng-click="service.modal('delete-example-modal', $index)">
     </a>
-
-     {% include 'query/examples_modal_update_example.html' %}

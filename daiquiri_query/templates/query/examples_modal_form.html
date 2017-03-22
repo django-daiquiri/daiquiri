@@ -1,46 +1,42 @@
 {% load i18n %}
 
-    <div class="modal" id="create-example-modal" tabindex="-1">
+    <div class="modal" id="examples-modal-form" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="{% trans 'Close' %}">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                    <h4 class="modal-title" id="update-user-modal-title">{% trans 'Create example query' %}</h4>
+                    <h4 class="modal-title" id="examples-modal-form">{% trans ' Example query' %}</h4>
                 </div>
 
                 <div class="modal-body">
-                   <formgroup
-                       class="col-md-6"
+                    <formgroup
                        data-id="name"
                        data-type="text"
                        data-label="{% trans 'Name' %}"
-                       data-model="service.current_row.example.name"
-                        data-errors="service.errors.example.name">
+                       data-model="service.current_row.name"
+                       data-errors="service.errors.example.name">
                    </formgroup>
                    <formgroup
-                            class="col-md-6"
-                            data-id="description"
-                            data-type="text"
-                            data-label="{% trans 'Query string' %}"
-                            data-model="service.current_row.example.query_string"
-                            data-errors="service.errors.example.query_string">
-                        </formgroup>
-                        <formgroup
-                            class="col-md-6"
-                            data-id="description"
-                            data-type="text"
-                            data-label="{% trans 'Description (optional)' %}"
-                            data-model="service.current_row.example.description"
-                            data-errors="service.errors.example.description">
-                        </formgroup>
-
+                       data-id="query_string"
+                       data-type="text"
+                       data-label="{% trans 'Query string' %}"
+                       data-model="service.current_row.query_string"
+                       data-errors="service.errors.example.query_string">
+                   </formgroup>
+                   <formgroup
+                       data-id="description"
+                       data-type="textarea"
+                       data-label="{% trans 'Description' %}"
+                       data-model="service.current_row.description"
+                       data-errors="service.errors.example.description">
+                   </formgroup>
                     <formgroup
                         data-id="order"
-                        data-type="text"
+                        data-type="number"
                         data-label="{% trans 'Order in list' %}"
-                        data-model="service.current_row.example.order"
+                        data-model="service.current_row.order"
                         data-errors="service.errors.example.order">
                     </formgroup>
                     <formgroup
@@ -52,14 +48,13 @@
                         data-options="service.groups"
                         data-options-label="name">
                     </formgroup>
-
                 </div>
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">
                         {% trans 'Close' %}
                     </button>
-                    <button type="button" class="btn btn-primary" ng-click="service.createExample()">
+                    <button type="button" class="btn btn-primary" ng-click="service.storeExample(row)">
                         {% trans 'Save' %}
                     </button>
                 </div>

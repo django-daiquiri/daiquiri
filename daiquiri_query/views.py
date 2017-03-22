@@ -190,16 +190,16 @@ def examples(request):
 
     })
 
-class ExampleViewSet(viewsets.ReadOnlyModelViewSet):
+class ExampleViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, )
 
     serializer_class = ExampleSerializer
     pagination_class = ExamplePagination
 
-    # queryset = Example.objects.all()
+    queryset = Example.objects.all()
 
-    def get_queryset(self):
-        return Example.objects.filter(groups__in=self.request.user.groups.all())
+    # def get_queryset(self):
+    #   return Example.objects.filter(groups__in=self.request.user.groups.all())
 
 
 

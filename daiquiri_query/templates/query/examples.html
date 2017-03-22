@@ -29,6 +29,14 @@
 
     <h1>Example queries</h1>
 
+        <div class="btn-group wide pull-right">
+            <button type="button" class="btn btn-default"
+                    ng-click="service.modal('examples-modal-form', $index)">
+                {% trans 'Create new example' %}
+            </button>
+        </div>
+
+
     <table class="table list-table" infinite-scroll="service.scroll()" infinite-scroll-distance="0.2">
         <thead>
             <th style="width: 60%;">Name</th>
@@ -52,13 +60,7 @@
         </tbody>
     </table>
 
-        <div class="btn-group wide pull-right">
-            <button type="button" class="btn btn-primary"
-                    ng-click="service.modal('create-example-modal', $index)">
-                {% trans 'Create new example' %}
-            </button>
-        </div>
      {% include 'query/examples_modal_show_example.html' %}
-     {% include 'query/examples_modal_create_example.html' %}
+     {% include 'query/examples_modal_form.html' %}
 
 {% endblock %}
