@@ -99,7 +99,7 @@ app.factory('ExamplesService', ['$http', '$timeout', function($http, $timeout) {
         console.log('storeExample')
         console.log(row)
         service.errors = {};
-        if (!('id' in row)) {
+        if (row.id != null) {
             return $http.put(resource_url + row.id + '/', row)
         } else {
             return $http.post(resource_url, row)
