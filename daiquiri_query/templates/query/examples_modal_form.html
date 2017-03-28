@@ -43,7 +43,7 @@
                         data-id="groups"
                         data-type="multicheckbox"
                         data-label="{% trans 'Published for' %}"
-                        data-model="service.values.groups"
+                        data-model="service.groups"
                         data-errors="service.errors.groups"
                         data-options="service.groups"
                         data-options-label="name">
@@ -54,7 +54,7 @@
                     <button type="button" class="btn btn-default" data-dismiss="modal">
                         {% trans 'Close' %}
                     </button>
-                    <button type="button" class="btn btn-primary" ng-click="service.storeExample(service.current_row)">
+                    <button type="button" class="btn btn-primary" ng-click="service.updateExample(service.current_row)">
                         {% trans 'Save' %}
                     </button>
                 </div>

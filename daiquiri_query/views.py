@@ -1,6 +1,7 @@
 import json
 from sendfile import sendfile
 
+from django.contrib.auth.models import Group
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
@@ -30,7 +31,8 @@ from .serializers import (
     QueryJobUpdateSerializer,
     ExampleSerializer,
     DatabaseSerializer,
-    FunctionSerializer
+    FunctionSerializer,
+    GroupSerializer
 )
 from .paginations import ExamplePagination
 from .exceptions import (
@@ -45,7 +47,9 @@ from utils import fetch_user_database_metadata
 
 @login_required()
 def query(request):
-    return render(request, 'query/query.html')
+    return render(request, 'query/query.html', {
+        'query_settings': settings.QUERY
+    })
 
 
 class StatusViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -224,6 +228,11 @@ class FunctionViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         return Function.objects.filter(groups__in=self.request.user.groups.all())
+
+
+class GroupViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
 
 
 class QueueViewSet(ChoicesViewSet):

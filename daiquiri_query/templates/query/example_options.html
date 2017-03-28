@@ -9,5 +9,7 @@
     </a>
     <a href="" class="fa fa-trash-o"
             title="{% trans 'Delete example' %}"
-            ng-click="service.modal('delete-example-modal', $index)">
+            ng-click="service.modal('examples-modal-delete', $index)">
     </a>
+
+ {% include 'query/examples_modal_delete.html' %}

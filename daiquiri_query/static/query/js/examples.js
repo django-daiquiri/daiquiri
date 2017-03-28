@@ -94,7 +94,7 @@ app.factory('ExamplesService', ['$http', '$timeout', function($http, $timeout) {
     };
 
 
-     service.storeExample = function(row) {
+    function storeExample(row) {
 
         console.log('storeExample')
         console.log(row)
@@ -106,9 +106,26 @@ app.factory('ExamplesService', ['$http', '$timeout', function($http, $timeout) {
         }
     };
 
-    service.deleteExample = function(row) {
+    function removeExample(row){
+        return $http.delete(resource_url + row.id, row).success( function(){
+            console.log(service.rows)
+            console.log(service.current_index)
+            service.rows.splice(service.current_index, 1);
+        });
+     }
 
-        return $http.put(resource_url + row.id + '/' + 'delete', row)
+
+    service.updateExample = function(row) {
+        storeExample(row).then(function() {
+            $('#examples-modal-form').modal('hide');
+        });
+    };
+
+
+    service.deleteExample = function(row) {
+        removeExample(row).then(function() {
+            $('#examples-modal-delete').modal('hide');
+        });
     };
 
     return service;

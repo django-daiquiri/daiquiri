@@ -29,6 +29,16 @@
                         <dt>{% trans 'Query string' %}</dt>
                         <dd>{$ service.current_row.query_string $}</dd>
                     </dl>
+                    <dl>
+                        <dt>{% trans 'Published for' %}</dt>
+                        <dd>
+                            <ul class="list-unstyled">
+                                <li ng-repeat="group in service.current_row.groups">
+                                    {$ group.name $}
+                                </li>
+                            <ul>
+                        </dd>
+                    </dl>
 
                 </div>
 

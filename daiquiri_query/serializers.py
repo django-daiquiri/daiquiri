@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from django.contrib.auth.models import Group
+
 from daiquiri_metadata.models import Database, Table, Column, Function
 
 from .models import QueryJob, Example
@@ -171,3 +173,9 @@ class DatabaseSerializer(serializers.ModelSerializer):
             'utype',
             'tables'
         )
+
+class GroupSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Group
+        fields = ('id', 'name')

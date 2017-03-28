@@ -120,7 +120,7 @@ class Example(models.Model):
     groups = models.ManyToManyField(Group, blank=True)
 
     class Meta:
-        ordering = ('order', )
+        ordering = ('order',)
 
         verbose_name = _('Example')
         verbose_name_plural = _('Examples')
