@@ -50,9 +50,7 @@ app.factory('ExamplesService', ['$http', '$timeout', function($http, $timeout) {
 
     service.init = function() {
         // reset the url
-        console.log('init')
         service.current_url = resource_url;
-        console.log(resource_url)
         // reset data
         service.search_string = null;
         service.rows = [];
@@ -96,20 +94,28 @@ app.factory('ExamplesService', ['$http', '$timeout', function($http, $timeout) {
 
     function storeExample(row) {
 
-        console.log('storeExample')
-        console.log(row)
         service.errors = {};
         if (row.id != null) {
-            return $http.put(resource_url + row.id + '/', row)
+            return $http.put(resource_url + row.id + '/', row).success(function(response) {
+                // copy the data back to the rows array and close the modal
+                service.rows[service.current_index] = response;
+            })
+            .error(function(response, status) {
+                service.errors = response;
+            });
         } else {
-            return $http.post(resource_url, row)
+            return $http.post(resource_url, row).success(function(response) {
+                // copy the data back to the rows array and close the modal
+                service.rows[service.current_index] = response;
+            })
+            .error(function(response, status) {
+                service.errors = response;
+            });
         }
     };
 
     function removeExample(row){
         return $http.delete(resource_url + row.id, row).success( function(){
-            console.log(service.rows)
-            console.log(service.current_index)
             service.rows.splice(service.current_index, 1);
         });
      }
