@@ -106,7 +106,8 @@ app.factory('ExamplesService', ['$http', '$timeout', function($http, $timeout) {
         } else {
             return $http.post(resource_url, row).success(function(response) {
                 // copy the data back to the rows array and close the modal
-                service.rows[service.current_index] = response;
+                service.rows.push(response);
+                service.rows.sort();
             })
             .error(function(response, status) {
                 service.errors = response;
