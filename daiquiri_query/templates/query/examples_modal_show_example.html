@@ -13,8 +13,14 @@
                 <div class="modal-body">
 
                    <dl>
-                        <dt>{% trans 'ID' %}</dt>
+                        <dt>{% trans 'DB id' %}</dt>
                         <dd>{$ service.current_row.id $}</dd>
+                   </dl>
+                   <dl>
+                        <dt>{% trans 'Order in list' %}</dt>
+                        <dd>{$ service.current_row.order $}</dd>
+
+                    </dl>
 
                     <dl>
                         <dt>{% trans 'Name' %}</dt>
@@ -34,7 +40,7 @@
                         <dd>
                             <ul class="list-unstyled">
                                 <li ng-repeat="group in service.current_row.groups">
-                                    {$ group.name $}
+                                    {$ group $}
                                 </li>
                             <ul>
                         </dd>

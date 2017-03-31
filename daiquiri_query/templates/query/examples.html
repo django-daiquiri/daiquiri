@@ -44,7 +44,7 @@
             <th style="width: 30%;">{% trans 'Published for' %}</th>
         </thead>
         <tbody>
-            <tr ng-repeat="row in service.rows" ">
+            <tr ng-repeat="row in service.rows">
                 <td>
                     <span ng-show="row.order">{$ row.order $}</span>
                 </td>
@@ -55,8 +55,9 @@
                 </td>
                 <td>
                     <ul class="list-unstyled">
-                        <li ng-repeat="group in service.active.published_for">
-                                {$ group.name $}
+                        <li ng-repeat="group in row.groups">
+                             <span ng-show="group">{$ group $} </span>
+                             <span ng-show="service.getGroupName(group)">{$ group.name $} </span>
                          </li>
                         <ul>
 

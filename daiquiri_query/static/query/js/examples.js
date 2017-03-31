@@ -14,6 +14,7 @@ app.factory('ExamplesService', ['$http', '$timeout', function($http, $timeout) {
 
     // the url under which the profiles api is located
     var resource_url = '/query/api/examples/';
+    var groups_url = '/query/api/groups/'
 
     var service = {};
 
@@ -134,6 +135,19 @@ app.factory('ExamplesService', ['$http', '$timeout', function($http, $timeout) {
             $('#examples-modal-delete').modal('hide');
         });
     };
+
+    service.getGroupName = function(group_id) {
+        console.log('getGroupName');
+        console.log(group_id);
+        console.log(service.current_row.group);
+        $http.get(groups_url + '?format=json').success(function(groups_json) {
+            for(i = 0; i < groups_json.length; i++){
+                if (status_json[i].id == group_id){
+                    row.group_name = status_json[i].name;
+                }
+            }
+        });
+    }
 
     return service;
 }]);
