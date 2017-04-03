@@ -97,13 +97,22 @@ app.factory('ExamplesService', ['$http', '$timeout', function($http, $timeout) {
     };
 
     service.modal = function(modal_id, index) {
-        service.current_index = index;
-        service.current_row = angular.copy(service.rows[index]);
-        service.errors = {};
 
-        $timeout(function() {
-            $('#' + modal_id).modal('show');
-        });
+        console.log(modal_id)
+        console.log(index)
+         if (angular.isUndefined(index)) {
+            service.current_index = 0;
+            service.current_row = {};
+         } else {
+            service.current_index = index;
+            service.current_row = angular.copy(service.rows[index]);
+          }
+         service.errors = {};
+
+         $timeout(function() {
+             $('#' + modal_id).modal('show');
+         });
+
     };
 
 
