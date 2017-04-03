@@ -39,10 +39,10 @@
                         <dt>{% trans 'Published for' %}</dt>
                         <dd>
                             <ul class="list-unstyled">
-                                <li ng-repeat="group in service.current_row.groups">
-                                    {$ group $}
+                                <li ng-repeat="group_id in service.current_row.groups">
+                                    {$ service.groups_map[group_id] $}
                                 </li>
-                            <ul>
+                            </ul>
                         </dd>
                     </dl>
 
