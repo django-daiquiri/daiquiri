@@ -18,6 +18,19 @@ app.factory('ExamplesService', ['$http', '$timeout', function($http, $timeout) {
 
     var service = {};
 
+    function fetchGroups() {
+
+       return $http.get(groups_url)
+            .success(function(response) {
+                service.groups = response;
+                service.groups_map = {};
+                angular.forEach(response, function(group){
+                    service.groups_map[group.id] = group.name;
+                });
+            });
+
+    }
+
     function fetchExamples() {
 
         return $http.get(service.current_url)
@@ -56,6 +69,7 @@ app.factory('ExamplesService', ['$http', '$timeout', function($http, $timeout) {
         service.search_string = null;
         service.rows = [];
 
+        fetchGroups();
         // fetch the first set of profiles
         fetchExamples();
     };
@@ -116,6 +130,7 @@ app.factory('ExamplesService', ['$http', '$timeout', function($http, $timeout) {
         }
     };
 
+
     function removeExample(row){
         return $http.delete(resource_url + row.id, row).success( function(){
             service.rows.splice(service.current_index, 1);
@@ -136,18 +151,6 @@ app.factory('ExamplesService', ['$http', '$timeout', function($http, $timeout) {
         });
     };
 
-    service.getGroupName = function(group_id) {
-        console.log('getGroupName');
-        console.log(group_id);
-        console.log(service.current_row.group);
-        $http.get(groups_url + '?format=json').success(function(groups_json) {
-            for(i = 0; i < groups_json.length; i++){
-                if (status_json[i].id == group_id){
-                    row.group_name = status_json[i].name;
-                }
-            }
-        });
-    }
 
     return service;
 }]);
