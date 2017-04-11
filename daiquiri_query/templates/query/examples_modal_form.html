@@ -16,28 +16,28 @@
                        data-type="text"
                        data-label="{% trans 'Name' %}"
                        data-model="service.current_row.name"
-                       data-errors="service.errors.example.name">
+                       data-errors="service.errors.name">
                    </formgroup>
                    <formgroup
                        data-id="query_string"
                        data-type="text"
                        data-label="{% trans 'Query string' %}"
                        data-model="service.current_row.query_string"
-                       data-errors="service.errors.example.query_string">
+                       data-errors="service.errors.query_string">
                    </formgroup>
                    <formgroup
                        data-id="description"
                        data-type="textarea"
                        data-label="{% trans 'Description' %}"
                        data-model="service.current_row.description"
-                       data-errors="service.errors.example.description">
+                       data-errors="service.errors.description">
                    </formgroup>
                     <formgroup
                         data-id="order"
                         data-type="number"
                         data-label="{% trans 'Order in list' %}"
                         data-model="service.current_row.order"
-                        data-errors="service.errors.example.order">
+                        data-errors="service.errors.order">
                     </formgroup>
                     <formgroup
                         data-id="groups"
@@ -48,13 +48,14 @@
                         data-options="service.groups"
                         data-options-label="name">
                     </formgroup>
+                    {$ service.current_row $}
                 </div>
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">
                         {% trans 'Close' %}
                     </button>
-                    <button type="button" class="btn btn-primary" ng-click="service.updateExample(service.current_row)">
+                    <button type="button" class="btn btn-primary" ng-click="service.updateExample()">
                         {% trans 'Save' %}
                     </button>
                 </div>

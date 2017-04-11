@@ -39,14 +39,7 @@
 
     <table class="table list-table" infinite-scroll="service.scroll()" infinite-scroll-distance="0.2">
         <thead>
-            <th style="width: 20%;">{% trans 'Order Nr.' %}
-            <div class="order" ng-click="table.order(column.name)">
-                                <i ng-class="{
-                                    'fa fa-chevron-down': !table.config.ordering.endsWith(column.name),
-                                    'ordered fa fa-chevron-down': table.config.ordering == column.name,
-                                    'ordered fa fa-chevron-up': table.config.ordering == '-' + column.name
-                                }" aria-hidden="true"></i>
-                            </div></th>
+            <th style="width: 20%;">{% trans 'Order Nr.' %}</th>
 
             <th style="width: 50%">{% trans 'Name' %}</th>
             <th style="width: 30%;">{% trans 'Published for' %}</th>

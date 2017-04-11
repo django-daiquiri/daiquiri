@@ -14,7 +14,15 @@ app.factory('ExamplesService', ['$http', '$timeout', function($http, $timeout) {
 
     // the url under which the profiles api is located
     var resource_url = '/query/api/examples/';
-    var groups_url = '/query/api/groups/'
+    var groups_url = '/query/api/groups/';
+
+    var factories = {
+        examples: function(){
+            return {
+                groups: []
+            };
+        }
+    };
 
     var service = {};
 
@@ -99,7 +107,7 @@ app.factory('ExamplesService', ['$http', '$timeout', function($http, $timeout) {
     service.modal = function(modal_id, index) {
 
          if (angular.isUndefined(index)) {
-            service.current_row = {};
+            service.current_row = factories.examples();
          } else {
             service.current_index = index;
             service.current_row = angular.copy(service.rows[index]);
@@ -113,12 +121,11 @@ app.factory('ExamplesService', ['$http', '$timeout', function($http, $timeout) {
     };
 
 
-    function storeExample(row) {
+    function storeExample() {
 
         service.errors = {};
-        if (row.id != null) {
-            console.log(row)
-            return $http.put(resource_url + row.id + '/', row).success(function(response) {
+        if (service.current_row.id != null) {
+            return $http.put(resource_url + service.current_row.id + '/', service.current_row).success(function(response) {
                 // copy the data back to the rows array and close the modal
                 service.rows[service.current_index] = response;
             })
@@ -126,10 +133,8 @@ app.factory('ExamplesService', ['$http', '$timeout', function($http, $timeout) {
                 service.errors = response;
             });
         } else {
-            return $http.post(resource_url, row).success(function(response) {
+            return $http.post(resource_url, service.current_row).success(function(response) {
                 // copy the data back to the rows array and close the modal
-                console.log(row)
-                console.log(response)
                 service.rows.push(response);
                 service.rows.sort();
             })
@@ -147,8 +152,8 @@ app.factory('ExamplesService', ['$http', '$timeout', function($http, $timeout) {
      }
 
 
-    service.updateExample = function(row) {
-        storeExample(row).then(function() {
+    service.updateExample = function() {
+        storeExample().then(function() {
             $('#examples-modal-form').modal('hide');
         });
     };
