@@ -15,7 +15,8 @@ app.factory('PollingService', ['$timeout', function($timeout) {
             }
         });
 
-        $timeout(service.poll, 10000);
+        // 4 seconds matches on rotation of the spinning Queued icon
+        $timeout(service.poll, 4000);
     };
 
     service.register = function(polling_id, callback, callback_options, enabled) {

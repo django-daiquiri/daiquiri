@@ -1,16 +1,20 @@
 import sys
 
+from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
 from daiquiri_core.adapter import get_adapter
-from daiquiri_query.backends import get_query_backend
+from daiquiri_uws.settings import PHASE_COMPLETED
+
+
+def get_user_database_name(username):
+    return settings.QUERY['user_database_prefix'] + username
 
 
 def fetch_user_database_metadata(jobs, username):
     adapter = get_adapter('data')
-    query_backend = get_query_backend()
 
-    database_name = query_backend.get_user_database_name(username)
+    database_name = get_user_database_name(username)
 
     database = {
         'order': sys.maxsize,
@@ -21,15 +25,16 @@ def fetch_user_database_metadata(jobs, username):
     }
 
     for job in jobs:
-        table = job.metadata
-        table['query_string'] = '%(database)s.%(table)s' % {
-            'database': adapter.escape_identifier(database_name),
-            'table': adapter.escape_identifier(table['name'])
-        }
+        if job.phase == PHASE_COMPLETED:
+            table = job.metadata
+            table['query_string'] = '%(database)s.%(table)s' % {
+                'database': adapter.escape_identifier(database_name),
+                'table': adapter.escape_identifier(table['name'])
+            }
 
-        for column in table['columns']:
-            column['query_string'] = adapter.escape_identifier(column['name'])
+            for column in table['columns']:
+                column['query_string'] = adapter.escape_identifier(column['name'])
 
-        database['tables'].append(table)
+            database['tables'].append(table)
 
     return database

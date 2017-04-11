@@ -10,7 +10,7 @@ app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'Downlo
         status: $resource(baseurl + 'query/api/status/'),
         forms: $resource(baseurl + 'query/api/forms/'),
         dropdowns: $resource(baseurl + 'query/api/dropdowns/'),
-        jobs: $resource(baseurl + 'query/api/jobs/:id/:detail_route'),
+        jobs: $resource(baseurl + 'query/api/jobs/:id/:detail_route/'),
         examples: $resource(baseurl + 'query/api/examples/'),
         databases: $resource(baseurl + 'query/api/databases/:list_route/'),
         functions: $resource(baseurl + 'query/api/functions/'),
@@ -134,6 +134,8 @@ app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'Downlo
     service.fetchJob = function(job) {
         return resources.jobs.get({id: job.id}, function(response) {
             service.job = response;
+            service.job.time_queue = moment.duration(moment(service.job.start_time) - moment(service.job.creation_time)).seconds();
+            service.job.time_query = moment.duration(moment(service.job.end_time) - moment(service.job.start_time)).seconds();
         }).$promise;
     };
 
@@ -146,7 +148,9 @@ app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'Downlo
         service.form = null;
         service.fetchJob(job).then(function() {
 
-            TableService.init(service.job.database_name, service.job.table_name);
+            if (service.job.phase == 'COMPLETED') {
+                TableService.init(service.job.database_name, service.job.table_name);
+            }
 
             CodeMirror.runMode(service.job.query, "text/x-mariadb", angular.element('#query')[0]);
             CodeMirror.runMode(service.job.actual_query, "text/x-mariadb", angular.element('#actual-query')[0]);
@@ -159,9 +163,10 @@ app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'Downlo
             'query_language': 'mysql'
         });
 
-        return resources.jobs.save(values).$promise.then(function(result) {
+        return resources.jobs.save(values).$promise.then(function(job) {
             service.fetchStatus();
             service.fetchJobs();
+            service.activateJob(job);
         });
     };
 

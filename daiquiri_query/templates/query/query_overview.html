@@ -53,12 +53,12 @@
 
             <div ng-show="service.job.start_time && service.job.creation_time">
                 <dt>{% trans 'Time in queue' %}</dt>
-                <dd>{$ service.job.start_time - service.job.creation_time $} s</dd>
+                <dd>{$ service.job.time_queue $} s</dd>
             </div>
 
             <div ng-show="service.job.end_time && service.job.start_time">
                 <dt>{% trans 'Time for query' %}</dt>
-                <dd>{$ service.job.end_time - service.job.start_time $} s</dd>
+                <dd>{$ service.job.time_query $} s</dd>
             </div>
 
             <div ng-show="service.job.nrows != null">

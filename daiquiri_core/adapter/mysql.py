@@ -19,26 +19,26 @@ class MySQLAdapter(BaseAdapter):
         self.connection = connections[database_key]
         self.cursor = self.connection.cursor()
 
+    def fetch_pid(self):
+        return self.connection.connection.thread_id()
+
     def escape_identifier(self, identifier):
         return '`%s`' % identifier
 
     def escape_string(self, string):
         return "'%s'" % string
 
-    def execute_query(self, query):
-        return self.fetchall(query)
-
-    def submit_direct_query(self, database_name, table_name, query):
+    def build_query(self, database_name, table_name, query):
         # construct the actual query
-        sql = 'CREATE TABLE %(database)s.%(table)s ENGINE=MyISAM ( %(query)s );' % {
+        return 'CREATE TABLE %(database)s.%(table)s ENGINE=MyISAM ( %(query)s );' % {
             'database': self.escape_identifier(database_name),
             'table': self.escape_identifier(table_name),
             'query': query
         }
 
+    def kill_query(self, pid):
+        sql = 'KILL %(pid)i' % {'pid': pid}
         self.execute(sql)
-
-        return sql
 
     def count_rows(self, database_name, table_name, column_names=None, filter_string=None):
         # prepare sql string

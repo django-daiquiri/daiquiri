@@ -9,9 +9,9 @@ from rest_framework.exceptions import ParseError, NotFound
 from rest_framework.reverse import reverse
 
 from daiquiri_core.adapter import get_adapter
-from daiquiri_query.backends import get_query_backend
 
 from daiquiri_metadata.models import Database, Table, Column
+from daiquiri_query.utils import get_user_database_name
 
 from .serializers import *
 
@@ -55,7 +55,7 @@ class RowViewSet(viewsets.ViewSet):
         adapter = get_adapter('data')
 
         # get query backend adapter
-        user_database_name = get_query_backend().get_user_database_name(self.request.user.username)
+        user_database_name = get_user_database_name(self.request.user.username)
 
         if database_name == user_database_name:
             # get database adapter and fetch the columns
@@ -136,7 +136,7 @@ class ColumnViewSet(viewsets.ViewSet):
         table_name = self.request.GET.get('table')
 
         # get database adapter
-        user_database_name = get_query_backend().get_user_database_name(self.request.user.username)
+        user_database_name = get_user_database_name(self.request.user.username)
 
         if database_name == user_database_name:
             # get database adapter and fetch the columns

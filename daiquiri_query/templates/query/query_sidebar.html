@@ -61,7 +61,7 @@
         <li class="list-group-item" ng-if="!service.jobs.length">
             {% trans 'No jobs found.' %}
         </li>
-        <li class="list-group-item list-group-link" ng-repeat="job in service.jobs">
+        <li class="list-group-item list-group-link" ng-repeat="job in service.jobs | orderBy: '-creation_time'">
             <a href="" ng-click="service.activateJob(job)" ng-class="{active: service.job.id == job.id}">
                 <div class="pull-right">
                     <i class="fa fa-pause" title="PENDING" ng-show="job.phase == 'PENDING'"></i>

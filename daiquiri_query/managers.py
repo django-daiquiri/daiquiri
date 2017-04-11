@@ -1,12 +1,15 @@
+from django.conf import settings
 from django.db import models, OperationalError
 from django.utils.translation import ugettext_lazy as _
 from django.utils.timezone import now
 
 from daiquiri_jobs.models import Job
 from daiquiri_metadata.models import Database, Table, Column, Function
-from daiquiri_uws.settings import PHASE_PENDING
+from daiquiri_uws.settings import PHASE_PENDING, PHASE_QUEUED
 
-from .backends import get_query_backend
+from daiquiri_query.tasks import submit_query
+
+from .utils import get_user_database_name
 from .exceptions import TableError, ADQLSyntaxError, MySQLSyntaxError, PermissionError, ConnectionError
 
 from queryparser.mysql import MySQLQueryProcessor
@@ -28,7 +31,7 @@ class QueryJobManager(models.Manager):
     def get_queryset(self):
         return QueryJobQuerySet(self.model, using=self._db)
 
-    def submit(self, query_language, query, queue, table_name, user):
+    def submit(self, query_language, query, queue, table_name, user, sync=False):
         """
         Submit a query to the job management and the query backend.
         """
@@ -46,7 +49,7 @@ class QueryJobManager(models.Manager):
             except RuntimeError as e:
                 raise ADQLSyntaxError(str(e))
         else:
-            actual_query = query
+            actual_query = query.strip(';')
 
         # parse the query
         qp = MySQLQueryProcessor(actual_query)
@@ -69,19 +72,23 @@ class QueryJobManager(models.Manager):
             query=query,
             actual_query=actual_query,
             owner=user,
+            database_name=get_user_database_name(user.username),
             table_name=table_name,
             queue=queue,
-            phase=PHASE_PENDING,
+            phase=PHASE_QUEUED,
             creation_time=now(),
             job_type=Job.JOB_TYPE_QUERY
         )
         job.save()
 
-        # submit the query
-        try:
-            get_query_backend().submit(job)
-        except OperationalError as e:
-            raise ConnectionError([e.args])
+        # start the submit_query task in a syncronous or asuncronous way
+        job_id = str(job.id)
+        if not settings.QUERY['async'] or sync:
+            submit_query.apply((job_id, ), task_id=job_id)
+        else:
+            submit_query.apply_async((job_id, ), task_id=job_id)
+
+        return job.id
 
     def _check_table(self, table_name):
         errors = []

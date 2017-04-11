@@ -9,6 +9,7 @@ from jsonfield import JSONField
 
 from daiquiri_core.adapter import get_adapter
 from daiquiri_jobs.models import Job
+from daiquiri_uws.settings import PHASE_ABORTED
 
 from .managers import QueryJobManager
 from .exceptions import TableError
@@ -32,6 +33,8 @@ class QueryJob(Job):
     size = models.IntegerField(null=True, blank=True)
 
     metadata = JSONField()
+
+    pid = models.IntegerField(null=True, blank=True)
 
     class Meta:
         ordering = ('start_time', )
@@ -78,6 +81,18 @@ class QueryJob(Job):
         self.nrows = None
         self.size = None
         self.save()
+
+    def kill(self):
+        self.phase = PHASE_ABORTED
+        self.save()
+
+        # kill the job on the database
+        try:
+            adapter = get_adapter('data')
+            adapter.kill_query(self.pid)
+        except OperationalError:
+            # the query was probably killed before
+            pass
 
     def create_download_file(self, format):
         adapter = get_adapter('data')

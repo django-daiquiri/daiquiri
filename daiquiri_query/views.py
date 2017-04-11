@@ -100,7 +100,7 @@ class QueryJobViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == 'list':
             return QueryJobListSerializer
-        elif self.action == 'retrieve':
+        elif self.action == 'retrieve' or self.action == 'kill':
             return QueryJobRetrieveSerializer
         elif self.action == 'create':
             return QueryJobCreateSerializer
@@ -122,13 +122,17 @@ class QueryJobViewSet(viewsets.ModelViewSet):
             table_name = now().strftime("%Y-%m-%d-%H-%M-%S")
 
         try:
-            QueryJob.objects.submit(
+            job_id = QueryJob.objects.submit(
                 serializer.data['query_language'],
                 serializer.data['query'],
                 serializer.data['queue'],
                 table_name,
                 self.request.user
             )
+
+            # inject the job id into the serializers data
+            serializer._data['id'] = job_id
+
         except (ADQLSyntaxError, MySQLSyntaxError) as e:
             raise ValidationError({
                 'query': {
@@ -149,6 +153,17 @@ class QueryJobViewSet(viewsets.ModelViewSet):
 
     def perform_destroy(self, instance):
         instance.archive()
+
+    @detail_route(methods=['get', 'put'])
+    def kill(self, request, pk=None):
+        try:
+            job = self.get_queryset().get(pk=pk)
+            job.kill()
+
+            serializer = QueryJobRetrieveSerializer(instance=job)
+            return Response(serializer.data)
+        except QueryJob.DoesNotExist:
+            raise Http404
 
     @detail_route(methods=['put'], url_path='download/(?P<format_key>\w+)')
     def download(self, request, pk=None, format_key=None):
