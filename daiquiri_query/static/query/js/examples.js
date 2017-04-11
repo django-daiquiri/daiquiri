@@ -98,10 +98,7 @@ app.factory('ExamplesService', ['$http', '$timeout', function($http, $timeout) {
 
     service.modal = function(modal_id, index) {
 
-        console.log(modal_id)
-        console.log(index)
          if (angular.isUndefined(index)) {
-            service.current_index = 0;
             service.current_row = {};
          } else {
             service.current_index = index;
@@ -120,6 +117,7 @@ app.factory('ExamplesService', ['$http', '$timeout', function($http, $timeout) {
 
         service.errors = {};
         if (row.id != null) {
+            console.log(row)
             return $http.put(resource_url + row.id + '/', row).success(function(response) {
                 // copy the data back to the rows array and close the modal
                 service.rows[service.current_index] = response;
@@ -130,6 +128,8 @@ app.factory('ExamplesService', ['$http', '$timeout', function($http, $timeout) {
         } else {
             return $http.post(resource_url, row).success(function(response) {
                 // copy the data back to the rows array and close the modal
+                console.log(row)
+                console.log(response)
                 service.rows.push(response);
                 service.rows.sort();
             })
