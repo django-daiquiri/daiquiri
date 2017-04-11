@@ -140,3 +140,11 @@ class TableTypeViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         return Table.TYPE_CHOICES
+
+
+class MetaDBViewSet(viewsets,ReadOnlyModelViewSet):
+    permission_classes = (DaiquiriModelPermissions,)
+
+    queryset = Database.object
+
+    serializer_class = MetaDBSerializer

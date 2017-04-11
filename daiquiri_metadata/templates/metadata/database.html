@@ -1,0 +1,16 @@
+{% extends 'core/page.html' %}
+{% load i18n %}
+
+{% block page %}
+
+    <h1>{% trans "Description of the " {{ db_name }} %}</h1>
+
+    {% blocktrans %}
+        Description: {{ db_description }}
+    {% endblocktrans %}
+
+    <p>
+        {% trans "List of tables:" %}
+    </p>
+
+{% endblock %}
