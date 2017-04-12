@@ -1,4 +1,4 @@
-app.factory('QueryService', ['$resource', '$injector', '$q', 'PollingService', 'DownloadService', 'TableService', 'BrowserService', function($resource, $injector, $q, PollingService, DownloadService, TableService, BrowserService) {
+app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'PollingService', 'DownloadService', 'TableService', 'BrowserService', function($resource, $injector, $q, $filter, PollingService, DownloadService, TableService, BrowserService) {
 
     /* get the base url */
 
@@ -17,6 +17,12 @@ app.factory('QueryService', ['$resource', '$injector', '$q', 'PollingService', '
         queues: $resource(baseurl + 'query/api/queues/'),
         querylanguages: $resource(baseurl + 'query/api/querylanguages/'),
     };
+
+    /* configure private functions */
+
+    function getJobIndex(job) {
+        return service.jobs.indexOf($filter('filter')(service.jobs, {'id': job.id})[0])
+    }
 
     /* initialise the browser service */
 
@@ -206,9 +212,19 @@ app.factory('QueryService', ['$resource', '$injector', '$q', 'PollingService', '
     };
 
     service.removeJob = function() {
+        var index = getJobIndex(service.values);
+
+        var next_job;
+        if (index == 0) {
+            next_job = service.jobs[1];
+        } else {
+            next_job = service.jobs[index - 1];
+        }
+
         resources.jobs.delete({id: service.values.id}, function() {
             service.fetchStatus();
             service.fetchJobs();
+            service.activateJob(next_job);
             $('.modal').modal('hide');
         });
     };
