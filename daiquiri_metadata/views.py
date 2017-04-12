@@ -148,11 +148,34 @@ def dbview(request, dbname):
 
     try:
         db = Database.objects.get(name=dbname)
-        db_view = MetaDBSerializer(db)
-        return render(request, "metadata/database.html", {'form': db_view})
+        db_tables =  list(Table.objects.filter(database=db.id))
+        print (db_tables)
+        db_view = {
+            'db_name': db.name,
+            'db_description': db.description,
+            'db_tables': db_tables
+        }
+        return render(request, "metadata/database_view.html", db_view)
 
     except ObjectDoesNotExist:
         raise Http404
 
+
+def tableview(request, dbname, tablename):
+
+    try:
+        dbid = Database.objects.get(name=dbname).id
+        the_table = Table.objects.filter(name=tablename).get(database=dbid)
+        full_table_name = dbname + '.' + tablename
+        table_view = {
+            'full_table_name': full_table_name,
+            'table_name': the_table.name,
+            'table_description': the_table.description,
+            'db_name': dbname
+        }
+        return render(request, "metadata/table_view.html", table_view)
+
+    except ObjectDoesNotExist:
+        raise Http404
 
 

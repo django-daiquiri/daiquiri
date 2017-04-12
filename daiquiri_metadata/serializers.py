@@ -80,14 +80,3 @@ class NestedDatabaseSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'tables')
 
 
-class MetaDBSerializer(serializers.ModelSerializer):
-
-    tables = TableSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Database
-        fields = (
-            'name',
-            'description',
-            'tables'
-        )

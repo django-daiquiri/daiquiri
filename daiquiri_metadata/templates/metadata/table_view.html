@@ -1,0 +1,47 @@
+{% extends 'core/wide.html' %}
+{% load i18n %}
+
+{% block wide %}
+
+    <h1> {{ full_table_name }} </h1>
+
+          <h2> {% trans 'Description' %}</h2>
+            <p> {{ table_description }} </p>
+
+         <h2> {% trans 'Columns' %} </h2>
+
+        <table class="table list-table" infinite-scroll="service.scroll()" infinite-scroll-distance="0.2">
+        <thead>
+            <th style="width: 30%;">{% trans 'Column.' %}</th>
+            <th style="width: 10%">{% trans 'Type' %}</th>
+            <th style="width: 10%;">{% trans 'UCD' %}</th>
+            <th style="width: 10%;">{% trans 'Unit' %}</th>
+            <th style="width: 40%;">{% trans 'Unit' %}</th>
+        </thead>
+        <tbody>
+            <tr ng-repeat="column in service.rows">
+                <td>
+                    <span ng-show="row.order">{$ row.order $}</span>
+                </td>
+                <td>
+                    <a href="" ng-click="service.modal('show-column-modal', $index)">
+                       <span ng-show="row.name"> {$ row.name $} </span>
+                    </a>
+                </td>
+                <td>
+                    <ul class="list-unstyled">
+                        <li ng-repeat="group_id in row.groups">
+                            {$ service.groups_map[group_id] $}
+                         </li>
+                    </ul>
+
+                </td>
+                <td class="text-right list-table-options">
+
+                </td>
+               </tr>
+        </tbody>
+    </table>
+
+
+{% endblock %}
