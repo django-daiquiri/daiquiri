@@ -11,7 +11,7 @@ from jsonfield import JSONField
 
 from daiquiri_core.adapter import get_adapter
 from daiquiri_jobs.models import Job
-from daiquiri_uws.settings import PHASE_QUEUED, PHASE_EXECUTING, PHASE_ABORTED
+from daiquiri_uws.settings import PHASE_QUEUED, PHASE_EXECUTING, PHASE_COMPLETED, PHASE_ABORTED
 
 from .managers import QueryJobManager
 from .exceptions import TableError
@@ -75,10 +75,11 @@ class QueryJob(Job):
         adapter = get_adapter('data')
 
         # drop the corresponding database table, but fail silently
-        try:
-            adapter.drop_table(self.database_name, self.table_name)
-        except ProgrammingError:
-            pass
+        if self.phase == PHASE_COMPLETED:
+            try:
+                adapter.drop_table(self.database_name, self.table_name)
+            except ProgrammingError:
+                pass
 
         self.nrows = None
         self.size = None
