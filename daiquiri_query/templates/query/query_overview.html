@@ -30,15 +30,15 @@
             <dd ng-class="{
                 'text-success': service.job.phase == 'COMPLETED',
                 'text-warning': service.job.phase == 'TIMEOUT',
-                'text-error': service.job.phase == 'ERROR',
+                'text-danger': service.job.phase == 'ERROR',
                 'text-info': service.job.phase == 'QUEUED'}">
                 {$ service.job.phase $}
             </dd>
 
-            <div ng-show="service.job.status == 'error'">
+            <div ng-show="service.job.phase == 'ERROR'">
                 <dt>{% trans 'Error' %}</dt>
-                <dd class="text-error">
-                    {$ service.job.error $}
+                <dd class="text-danger">
+                    {$ service.job.metadata $}
                 </dd>
             </div>
 
@@ -50,6 +50,9 @@
 
             <dt>{% trans 'Time submitted' %}</dt>
             <dd>{$ service.job.creation_time $}</dd>
+
+            <dt>{% trans 'Queue' %}</dt>
+            <dd>{$ (service.queues|filter: {'id': service.job.queue})[0].text $}</dd>
 
             <div ng-show="service.job.start_time && service.job.creation_time">
                 <dt>{% trans 'Time in queue' %}</dt>

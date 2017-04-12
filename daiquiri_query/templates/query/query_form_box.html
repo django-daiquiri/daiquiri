@@ -67,18 +67,24 @@
     </div>
 </div>
 
-<formgroup
-    data-id="box_table_name"
-    data-type="text"
-    data-label="{% trans 'Table name' %}"
-    data-model="service.forms.sql.values.table_name"
-    data-errors="service.forms.sql.errors.table_name">
-</formgroup>
+<div class="row">
+    <formgroup
+        class="col-md-9"
+        data-type="text"
+        data-label="{% trans 'Table name' %}"
+        data-model="service.forms.box.values.table_name"
+        data-errors="service.forms.box.errors.table_name">
+    </formgroup>
+    <formgroup
+        class="col-md-3"
+        data-type="select"
+        data-label="{% trans 'Queue' %}"
+        data-model="service.active_queue"
+        data-options="service.queues"
+        data-options-label="text">
+    </formgroup>
+</div>
 
-<button class="btn btn-primary" ng-click="service.forms.sql.submit()">
-    {% trans 'Submit new SQL Query' %}
-</button>
-
-<button class="btn" ng-click="">
-    {% trans 'Clear input window' %}
+<button class="btn btn-primary" ng-click="service.forms.box.submit()">
+    {% trans 'Submit new box search' %}
 </button>

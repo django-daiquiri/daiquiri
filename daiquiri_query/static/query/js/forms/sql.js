@@ -7,7 +7,9 @@ app.factory('SqlFormService', ['$timeout', 'QueryService', 'BrowserService', fun
     /* create the form service */
 
     var service = {
-        values: {},
+        values: {
+            'query_language': QueryService.query_languages[0].id
+        },
         errors: {}
     };
 

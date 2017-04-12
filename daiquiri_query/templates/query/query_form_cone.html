@@ -7,7 +7,6 @@
 <div class="row fieldset">
     <div class="col-md-4">
         <formgroup
-            data-id="ra"
             data-type="text"
             data-label="{% trans 'RA (degrees)' %}"
             data-model="service.values.cone.ra"
@@ -16,7 +15,6 @@
     </div>
     <div class="col-md-4">
         <formgroup
-            data-id="de"
             data-type="text"
             data-label="{% trans 'DE (degrees)' %}"
             data-model="service.values.cone.de"
@@ -25,7 +23,6 @@
     </div>
     <div class="col-md-4">
         <formgroup
-            data-id="radius"
             data-type="text"
             data-label="{% trans 'Radius (arcsec)' %}"
             data-model="service.values.cone.radius"
@@ -34,16 +31,26 @@
     </div>
 </div>
 
-<formgroup
-    data-id="table_name"
-    data-type="text"
-    data-label="{% trans 'Table name' %}"
-    data-model="service.values.sql.table_name"
-    data-errors="service.errors.sql.table_name">
-</formgroup>
+<div class="row">
+    <formgroup
+        class="col-md-9"
+        data-type="text"
+        data-label="{% trans 'Table name' %}"
+        data-model="service.forms.cone.values.table_name"
+        data-errors="service.forms.cone.errors.table_name">
+    </formgroup>
+    <formgroup
+        class="col-md-3"
+        data-type="select"
+        data-label="{% trans 'Queue' %}"
+        data-model="service.active_queue"
+        data-options="service.queues"
+        data-options-label="text">
+    </formgroup>
+</div>
 
-<button class="btn btn-primary" ng-click="service.submitJob('sql')">
-    {% trans 'Submit new SQL Query' %}
+<button class="btn btn-primary" ng-click="service.forms.cone.submit()">
+    {% trans 'Submit new cone search' %}
 </button>
 
 <button class="btn" ng-click="">

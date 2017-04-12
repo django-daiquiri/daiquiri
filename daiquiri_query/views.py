@@ -15,6 +15,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import ValidationError
 from rest_framework.decorators import list_route, detail_route
 
+from daiquiri_core.views import ChoicesViewSet
 from daiquiri_core.utils import human2bytes
 from daiquiri_metadata.models import Database, Function
 from daiquiri_uws.settings import PHASE_ARCHIVED
@@ -43,9 +44,7 @@ from utils import fetch_user_database_metadata
 
 @login_required()
 def query(request):
-    return render(request, 'query/query.html', {
-        'query_settings': settings.QUERY
-    })
+    return render(request, 'query/query.html')
 
 
 class StatusViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -214,3 +213,13 @@ class FunctionViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         return Function.objects.filter(groups__in=self.request.user.groups.all())
+
+
+class QueueViewSet(ChoicesViewSet):
+    permission_classes = (IsAuthenticated, )
+    queryset = settings.QUERY['queues']
+
+
+class QueryLanguageViewSet(ChoicesViewSet):
+    permission_classes = (IsAuthenticated, )
+    queryset = settings.QUERY['query_languages']

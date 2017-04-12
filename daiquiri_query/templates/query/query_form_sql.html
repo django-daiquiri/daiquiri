@@ -9,7 +9,7 @@
     {% include 'query/query_dropdown_columns.html' %}
     {% include 'query/query_dropdown_functions.html' %}
 
-    {% for dropdown in query_settings.dropdowns %}
+    {% for dropdown in settings.QUERY.dropdowns %}
     {% include dropdown.template %}
     {% endfor %}
 
@@ -17,7 +17,6 @@
 </div>
 
 <formgroup
-    data-id="sql_query"
     data-type="codemirror"
     data-label="{% trans 'SQL query' %}"
     data-model="service.forms.sql.values.query"
@@ -25,13 +24,32 @@
     data-mode="text/x-mariadb">
 </formgroup>
 
-<formgroup
-    data-id="sql_table_name"
-    data-type="text"
-    data-label="{% trans 'Table name' %}"
-    data-model="service.forms.sql.values.table_name"
-    data-errors="service.forms.sql.errors.table_name">
-</formgroup>
+<div class="row">
+    <formgroup
+        class="col-md-6"
+        data-type="text"
+        data-label="{% trans 'Table name' %}"
+        data-model="service.forms.sql.values.table_name"
+        data-errors="service.forms.sql.errors.table_name">
+    </formgroup>
+    <formgroup
+        class="col-md-3"
+        data-type="select"
+        data-label="{% trans 'Query language' %}"
+        data-model="service.forms.sql.values.query_language"
+        data-errors="service.forms.sql.errors.query_language"
+        data-options="service.query_languages"
+        data-options-label="text">
+    </formgroup>
+    <formgroup
+        class="col-md-3"
+        data-type="select"
+        data-label="{% trans 'Queue' %}"
+        data-model="service.active_queue"
+        data-options="service.queues"
+        data-options-label="text">
+    </formgroup>
+</div>
 
 <button class="btn btn-primary" ng-click="service.forms.sql.submit()">
     {% trans 'Submit new SQL Query' %}

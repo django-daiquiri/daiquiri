@@ -1,4 +1,4 @@
-app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'DownloadService', 'TableService', 'BrowserService', function($resource, $injector, PollingService, DownloadService, TableService, BrowserService) {
+app.factory('QueryService', ['$resource', '$injector', '$q', 'PollingService', 'DownloadService', 'TableService', 'BrowserService', function($resource, $injector, $q, PollingService, DownloadService, TableService, BrowserService) {
 
     /* get the base url */
 
@@ -14,6 +14,8 @@ app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'Downlo
         examples: $resource(baseurl + 'query/api/examples/'),
         databases: $resource(baseurl + 'query/api/databases/:list_route/'),
         functions: $resource(baseurl + 'query/api/functions/'),
+        queues: $resource(baseurl + 'query/api/queues/'),
+        querylanguages: $resource(baseurl + 'query/api/querylanguages/'),
     };
 
     /* initialise the browser service */
@@ -33,14 +35,21 @@ app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'Downlo
     };
 
     service.init = function() {
-        // load forms
-        resources.forms.query(function(response) {
-            angular.forEach(response, function(form) {
-                service.forms[form.key] = $injector.get(form.form_service);
-            });
+        // fetch queues,  query languages and then load forms
+        service.queues = resources.queues.query();
+        service.query_languages = resources.querylanguages.query();
 
-            // activate first form
-            service.forms[response[0].key].activate();
+        $q.all([service.queues.$promise, service.query_languages.$promise]).then(function(){
+            service.active_queue = service.queues[0].id;
+
+            resources.forms.query(function(response) {
+                angular.forEach(response, function(form) {
+                    service.forms[form.key] = $injector.get(form.form_service);
+                });
+
+                // activate first form
+                service.forms[response[0].key].activate();
+            });
         });
 
         // load dropdowns
@@ -159,8 +168,7 @@ app.factory('QueryService', ['$resource', '$injector', 'PollingService', 'Downlo
 
     service.submitJob = function(values) {
         values = angular.extend({}, values, {
-            'queue': 'default',
-            'query_language': 'mysql'
+            'queue': service.active_queue
         });
 
         return resources.jobs.save(values).$promise.then(function(job) {

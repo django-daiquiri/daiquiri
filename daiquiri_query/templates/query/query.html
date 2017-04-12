@@ -44,11 +44,11 @@
     <script type="text/javascript" src="{% static 'query/js/services/polling.js' %}" ></script>
     <script type="text/javascript" src="{% static 'query/js/services/download.js' %}" ></script>
 
-    {% for dropdown in query_settings.dropdowns %}
+    {% for dropdown in settings.QUERY.dropdowns %}
     <script type="text/javascript" src="{% static dropdown.service %}" ></script>
     {% endfor %}
 
-    {% for form in query_settings.forms %}
+    {% for form in settings.QUERY.forms %}
     <script type="text/javascript" src="{% static form.service %}" ></script>
     {% endfor %}
 
@@ -64,7 +64,7 @@
             {% include 'query/query_sidebar.html' %}
         </div>
         <div class="col-md-9">
-            {% for form in query_settings.forms %}
+            {% for form in settings.QUERY.forms %}
 
                 {% include 'query/query_form.html' %}
 

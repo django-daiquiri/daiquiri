@@ -1,8 +1,11 @@
 from __future__ import absolute_import, unicode_literals
+
 from celery import shared_task
+from celery.exceptions import SoftTimeLimitExceeded
 
 from django.db.utils import OperationalError, ProgrammingError
 from django.utils.timezone import now
+from django.utils.translation import ugettext_lazy as _
 
 
 @shared_task
@@ -46,6 +49,13 @@ def submit_query(job_id):
             job.metadata = {
                 'errors': str(e)
             }
+
+    except SoftTimeLimitExceeded:
+        job.phase = PHASE_ERROR
+        job.metadata = {
+            'errors': _('The query exceeded the timelimit for this queue.')
+        }
+
     else:
         # get additional information about the completed job
         job.phase = PHASE_COMPLETED

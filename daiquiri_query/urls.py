@@ -10,7 +10,9 @@ from .views import (
     QueryJobViewSet,
     ExampleViewSet,
     DatabaseViewSet,
-    FunctionViewSet
+    FunctionViewSet,
+    QueueViewSet,
+    QueryLanguageViewSet
 )
 
 router = routers.DefaultRouter()
@@ -21,6 +23,8 @@ router.register(r'jobs', QueryJobViewSet, base_name='job')
 router.register(r'examples', ExampleViewSet, base_name='example')
 router.register(r'databases', DatabaseViewSet, base_name='database')
 router.register(r'functions', FunctionViewSet, base_name='function')
+router.register(r'queues', QueueViewSet, base_name='queue')
+router.register(r'querylanguages', QueryLanguageViewSet, base_name='querylanguage')
 
 urlpatterns = [
     url(r'^$', query, name='query'),

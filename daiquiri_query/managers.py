@@ -86,7 +86,7 @@ class QueryJobManager(models.Manager):
         if not settings.QUERY['async'] or sync:
             submit_query.apply((job_id, ), task_id=job_id)
         else:
-            submit_query.apply_async((job_id, ), task_id=job_id)
+            submit_query.apply_async((job_id, ), task_id=job_id, queue=job.queue)
 
         return job.id
 

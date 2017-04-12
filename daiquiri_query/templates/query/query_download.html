@@ -5,7 +5,7 @@
 </p>
 
 <div class="row">
-{% for download_format in query_settings.download_formats %}
+{% for download_format in settings.QUERY.download_formats %}
     <div class="col-md-3">
         <p>
             <a href="" ng-click="service.downloads.download( service.job, '{{ download_format.key }}')">{{ download_format.label }}</a>
