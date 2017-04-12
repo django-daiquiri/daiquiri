@@ -18,12 +18,6 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
         querylanguages: $resource(baseurl + 'query/api/querylanguages/'),
     };
 
-    /* configure private functions */
-
-    function getJobIndex(job) {
-        return service.jobs.indexOf($filter('filter')(service.jobs, {'id': job.id})[0])
-    }
-
     /* initialise the browser service */
 
     BrowserService.init('databases', ['databases', 'tables', 'columns'])
@@ -143,6 +137,17 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
     service.fetchJobs = function() {
         return resources.jobs.query(function(response) {
             service.jobs = response;
+
+            if (service.job) {
+                // get the phase of the current job in the jobs list
+                var phase = $filter('filter')(service.jobs, {'id': service.job.id})[0].phase;
+
+                // if the phase has changed, fetch it again
+                if (phase != service.job.phase) {
+                    service.fetchJob(service.job);
+                }
+            }
+
         }).$promise;
     };
 
@@ -212,7 +217,7 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
     };
 
     service.removeJob = function() {
-        var index = getJobIndex(service.values);
+        var index = service.jobs.indexOf($filter('filter')(service.jobs, {'id': service.job.id})[0]);
 
         var next_job;
         if (index == 0) {
