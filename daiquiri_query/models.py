@@ -1,3 +1,5 @@
+from celery.task.control import revoke
+
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.db import models
@@ -9,7 +11,7 @@ from jsonfield import JSONField
 
 from daiquiri_core.adapter import get_adapter
 from daiquiri_jobs.models import Job
-from daiquiri_uws.settings import PHASE_ABORTED
+from daiquiri_uws.settings import PHASE_QUEUED, PHASE_EXECUTING, PHASE_ABORTED
 
 from .managers import QueryJobManager
 from .exceptions import TableError
@@ -83,16 +85,22 @@ class QueryJob(Job):
         self.save()
 
     def kill(self):
+        phase = self.phase
+
         self.phase = PHASE_ABORTED
         self.save()
 
-        # kill the job on the database
-        try:
-            adapter = get_adapter('data')
-            adapter.kill_query(self.pid)
-        except OperationalError:
-            # the query was probably killed before
-            pass
+        if phase == PHASE_QUEUED:
+            revoke(str(self.id))
+
+        elif phase == PHASE_EXECUTING:
+            # kill the job on the database
+            try:
+                adapter = get_adapter('data')
+                adapter.kill_query(self.pid)
+            except OperationalError:
+                # the query was probably killed before
+                pass
 
     def create_download_file(self, format):
         adapter = get_adapter('data')
