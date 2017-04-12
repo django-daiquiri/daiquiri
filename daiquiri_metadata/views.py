@@ -1,5 +1,7 @@
 from django.contrib.auth.models import Group
 from django.shortcuts import render
+from django.core.exceptions import ObjectDoesNotExist
+from django.http import Http404
 
 from rest_framework import viewsets, status
 from rest_framework.response import Response
@@ -142,9 +144,15 @@ class TableTypeViewSet(viewsets.ReadOnlyModelViewSet):
         return Table.TYPE_CHOICES
 
 
-class MetaDBViewSet(viewsets,ReadOnlyModelViewSet):
-    permission_classes = (DaiquiriModelPermissions,)
+def dbview(request, dbname):
 
-    queryset = Database.object
+    try:
+        db = Database.objects.get(name=dbname)
+        db_view = MetaDBSerializer(db)
+        return render(request, "metadata/database.html", {'form': db_view})
 
-    serializer_class = MetaDBSerializer
+    except ObjectDoesNotExist:
+        raise Http404
+
+
+

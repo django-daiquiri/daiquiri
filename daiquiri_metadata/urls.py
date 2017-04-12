@@ -14,7 +14,7 @@ router.register(r'tabletypes', TableTypeViewSet, base_name='tabletype')
 
 
 urlpatterns = [
-    url(r'^db_meta/(?P<pk>[0-9a-zA-Z_-]+)$', MetaDBViewSet, name='meta_db')
+    url(r'^db_meta/(?P<dbname>\w+)/$', dbview, name='meta_db'),
     url(r'^$', metadata, name='metadata'),
 
     # rest api

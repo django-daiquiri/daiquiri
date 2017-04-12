@@ -3,7 +3,7 @@
 
 {% block page %}
 
-    <h1>{% trans "Description of the " {{ db_name }} %}</h1>
+    <h1> {{ db_name }}</h1>
 
     {% blocktrans %}
         Description: {{ db_description }}
@@ -12,5 +12,6 @@
     <p>
         {% trans "List of tables:" %}
     </p>
+    {{ db_tables }}
 
 {% endblock %}

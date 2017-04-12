@@ -88,8 +88,6 @@ class MetaDBSerializer(serializers.ModelSerializer):
         model = Database
         fields = (
             'name',
-            'query_string',
             'description',
-            'utype',
             'tables'
         )
