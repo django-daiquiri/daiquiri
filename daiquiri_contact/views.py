@@ -46,12 +46,10 @@ def contact(request):
 
     return render(request, 'contact/contact.html', {'form': contact_form})
 
+
 def messages(request):
     # get urls to the admin interface to be used with angular
-
-    return render(request, 'contact/messages.html', {
-
-    })
+    return render(request, 'contact/messages.html', {})
 
 
 class ContactMessageViewSet(viewsets.ModelViewSet):
@@ -66,8 +64,6 @@ class ContactMessageViewSet(viewsets.ModelViewSet):
     search_fields = ('author', 'email', 'subject')
 
 
-
 class StatusViewSet(ChoicesViewSet):
     permission_classes = (IsAuthenticated, )
     queryset = ContactMessage.STATUS_CHOICES
-

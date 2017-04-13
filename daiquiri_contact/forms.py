@@ -6,6 +6,8 @@ from .models import ContactMessage
 
 class ContactForm(forms.ModelForm):
 
+    use_required_attribute = False
+
     class Meta:
         model = ContactMessage
         fields = ['author', 'email', 'subject', 'message']
