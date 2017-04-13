@@ -13,6 +13,27 @@ from .base import BaseAdapter
 
 class MySQLAdapter(BaseAdapter):
 
+    functions = (
+        # group_functions
+        'AVG', 'COUNT', 'MAX_SYM', 'MIN_SYM', 'SUM', 'BIT_AND', 'BIT_OR', 'BIT_XOR',
+        'BIT_COUNT', 'GROUP_CONCAT', 'STD', 'STDDEV', 'STDDEV_POP', 'STDDEV_SAMP',
+        'VAR_POP', 'VAR_SAMP', 'VARIANCE',
+        # number_functions
+        'ABS', 'ACOS', 'ASIN', 'ATAN2', 'ATAN', 'CEIL', 'CEILING', 'CONV', 'COS', 'COT',
+        'CRC32', 'DEGREES', 'EXP', 'FLOOR', 'LN', 'LOG10', 'LOG2', 'LOG', 'MOD', 'PI', 'POW'
+        'POWER', 'RADIANS', 'RAND', 'ROUND', 'SIGN', 'SIN', 'SQRT', 'TAN', 'TRUNCATE',
+        # time_functions
+        'ADDDATE', 'ADDTIME', 'CONVERT_TZ', 'CURDATE', 'CURTIME', 'DATE_ADD',
+        'DATE_FORMAT', 'DATE_SUB', 'DATE_SYM', 'DATEDIFF', 'DAYNAME', 'DAYOFMONTH',
+        'DAYOFWEEK', 'DAYOFYEAR', 'EXTRACT', 'FROM_DAYS', 'FROM_UNIXTIME', 'GET_FORMAT',
+        'HOUR', 'LAST_DAY', 'MAKEDATE', 'MAKETIME', 'MICROSECOND', 'MINUTE', 'MONTH',
+        'MONTHNAME', 'NOW', 'PERIOD_ADD', 'PERIOD_DIFF', 'QUARTER', 'SEC_TO_TIME',
+        'SECOND', 'STR_TO_DATE', 'SUBTIME', 'SYSDATE', 'TIME_FORMAT', 'TIME_TO_SEC',
+        'TIME_SYM', 'TIMEDIFF', 'TIMESTAMP', 'TIMESTAMPADD', 'TIMESTAMPDIFF', 'TO_DAYS',
+        'TO_SECONDS', 'UNIX_TIMESTAMP', 'UTC_DATE', 'UTC_TIME', 'UTC_TIMESTAMP', 'WEEK',
+        'WEEKDAY', 'WEEKOFYEAR', 'YEAR', 'YEARWEEK',
+    )
+
     def __init__(self, database_key, database_config):
         self.database_key = database_key
         self.database_config = database_config
@@ -23,7 +44,8 @@ class MySQLAdapter(BaseAdapter):
         return self.connection.connection.thread_id()
 
     def escape_identifier(self, identifier):
-        return '`%s`' % identifier
+        # escape backticks whithin the identifier and backtick the string
+        return '`%s`' % identifier.replace('`', '``')
 
     def escape_string(self, string):
         return "'%s'" % string

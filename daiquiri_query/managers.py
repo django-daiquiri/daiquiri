@@ -1,16 +1,17 @@
 from django.conf import settings
-from django.db import models, OperationalError
+from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils.timezone import now
 
+from daiquiri_core.adapter import get_adapter
 from daiquiri_jobs.models import Job
 from daiquiri_metadata.models import Database, Table, Column, Function
-from daiquiri_uws.settings import PHASE_PENDING, PHASE_QUEUED
+from daiquiri_uws.settings import PHASE_QUEUED
 
 from daiquiri_query.tasks import submit_query
 
 from .utils import get_user_database_name
-from .exceptions import TableError, ADQLSyntaxError, MySQLSyntaxError, PermissionError, ConnectionError
+from .exceptions import TableError, ADQLSyntaxError, MySQLSyntaxError, PermissionError
 
 from queryparser.mysql import MySQLQueryProcessor
 from queryparser.adql import ADQLQueryTranslator
@@ -135,11 +136,14 @@ class QueryJobManager(models.Manager):
 
         # check permissions on functions
         for function_name in qp.functions:
-            # check permission on function
-            function = Function.permissions.get(user, function_name=function_name)
-            if not function:
-                errors.append(_('Function %s not found.') % function_name)
+            if function_name.upper() in get_adapter('data').functions:
                 continue
+            else:
+                # check permission on function
+                function = Function.permissions.get(user, function_name=function_name)
+                if not function:
+                    errors.append(_('Function %s not found.') % function_name)
+                    continue
 
         # return the error stack
         return errors
