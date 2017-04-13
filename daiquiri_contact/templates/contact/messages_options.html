@@ -1,0 +1,30 @@
+{% load i18n %}
+{% load core_tags %}
+
+    <a href="" class="fa fa-eye" title="{% trans 'Show message details' %}"
+        ng-click="service.modal('show-message-modal', $index)">
+    </a>
+    <a href="" ng-show="row.status == 'ACTIVE'"
+        class="fa fa-square-o" title="{% trans 'Close the thread' %} "
+        ng-click="service.updateMessage(row, 'CLOSED')">
+    </a>
+    <a href="" ng-show="row.status == 'CLOSED'" class="fa fa-check" title="{% trans 'Open the thread' %}"
+        ng-click="service.updateMessage(row, 'ACTIVE')">
+    </a>
+
+    <div class="dropdown messages-options-dropdown">
+        <a class="dropdown-toggle" type="button" id="messages-options"
+            data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"
+            title="{% trans 'Show options' %}">
+            <span class="fa fa-ellipsis-h"></span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="messages-options">
+            <li>
+                <a href=""
+                    ng-click="service.updateMessage(row, 'SPAM')">
+                    <i class="fa fa-ban"></i>
+                    <span>{% trans 'Mark as spam' %}</span>
+                </a>
+            <li>
+        </ul>
+    </div>

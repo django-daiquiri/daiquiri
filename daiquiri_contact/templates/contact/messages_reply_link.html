@@ -1,0 +1,17 @@
+{% load i18n %}
+
+<div ng-show="row.email">
+    <a href="mailto:{$ row.email $}?subject=Re: {$ row.subject $}&body={% trans "Dear" %} {$ row.author $},
+%0A%0A
+%0A%0A
+{% trans 'Best regards,' %}
+%0A%0A
+%0A%0A
+{% trans 'Your message was:' %}
+%0A%0A
+> {$ row.message $}
+%0A%0A">
+
+        {$ row.email $}
+    </a>
+</div>

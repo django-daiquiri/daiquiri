@@ -28,7 +28,8 @@ form {
     margin-top: 20px;
     margin-bottom: 20px;
 }
-a.glyphicon {
+a.glyphicon,
+a.fa {
     text-decoration: none;
 }
 
@@ -84,13 +85,20 @@ a.glyphicon {
 .list-search .list-search-count {
     line-height: 34px;
 }
-
 .list-table .list-table-options {
     white-space: nowrap;
 }
-
-.list-table .list-table-options > a {
-    margin-left: 5px;
+.list-table .dropdown {
+    display: inline-block;
+}
+.list-table .dropdown > a.dropdown-toggle {
+    display: block;
+    cursor: pointer;
+}
+.list-table .list-table-options > a,
+.list-table .dropdown > a.dropdown-toggle {
+    text-align: center;
+    width: 16px;
 }
 
 /* daiquiri-widget */
