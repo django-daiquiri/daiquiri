@@ -40,7 +40,7 @@ def submit_query(job_id):
     except ProgrammingError as e:
         job.phase = PHASE_ERROR
         job.metadata = {
-            'errors': str(e)
+            'errors': [str(e)]
         }
 
     except OperationalError as e:
@@ -56,7 +56,7 @@ def submit_query(job_id):
     except SoftTimeLimitExceeded:
         job.phase = PHASE_ERROR
         job.metadata = {
-            'errors': _('The query exceeded the timelimit for this queue.')
+            'errors': [_('The query exceeded the timelimit for this queue.')]
         }
 
     else:

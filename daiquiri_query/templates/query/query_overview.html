@@ -38,7 +38,7 @@
             <div ng-show="service.job.phase == 'ERROR'">
                 <dt>{% trans 'Error' %}</dt>
                 <dd class="text-danger">
-                    {$ service.job.metadata $}
+                    <p ng-repeat="error in service.job.errors">{$ error $}</p>
                 </dd>
             </div>
 
