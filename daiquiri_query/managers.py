@@ -91,18 +91,14 @@ class QueryJobManager(models.Manager):
         return job.id
 
     def _check_table(self, table_name):
-        errors = []
-
         # check if a job with this table name exists
         try:
             self.get(table_name=table_name)
-            errors.append(_('A job with this table name aready exists.'))
+            return [_('A job with this table name aready exists.')]
+
         except self.model.DoesNotExist:
             # check if the table alread exists in the database
             pass
-
-        # return the error stack
-        return errors
 
     def _check_permissions(self, user, qp):
         errors = []

@@ -112,6 +112,17 @@ class MySQLAdapter(BaseAdapter):
 
         return self.fetchall(sql, args=sql_args)
 
+    def create_user_database_if_not_exists(self, database_name):
+        # escape input
+        escaped_database_name = self.escape_identifier(database_name)
+
+        # prepare sql string
+        sql = 'CREATE DATABASE IF NOT EXISTS %(database)s' % {
+            'database': escaped_database_name
+        }
+
+        self.execute(sql)
+
     def fetch_tables(self, database_name):
         # escape input
         escaped_database_name = self.escape_identifier(database_name)

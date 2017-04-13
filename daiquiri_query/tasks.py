@@ -20,6 +20,9 @@ def submit_query(job_id):
     # get the adapter with the database specific functions
     adapter = get_adapter('data')
 
+    # create the database of the user if it not already exists
+    adapter.create_user_database_if_not_exists(job.database_name)
+
     # set database and start time
     job.start_time = now()
 
