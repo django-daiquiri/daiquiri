@@ -372,7 +372,7 @@ class MySQLAdapter(BaseAdapter):
         cmd = self._get_stream_table_cmd(database_name, table_name)
         cmd += ' | sed \'%s\'' % ';'.join(sed_cmd)
         cmd += ' >> ' + file_name
-        print cmd
+
         subprocess.check_call(cmd, shell=True)
 
     def dump_table_votable(self, database_name, table_name, file_name):
@@ -411,7 +411,7 @@ class MySQLAdapter(BaseAdapter):
         cmd = self._get_stream_table_cmd(database_name, table_name)
         cmd += ' | sed \'%s\'' % ';'.join(sed_cmd)
         cmd += ' >> ' + file_name
-        print cmd
+
         subprocess.check_call(cmd, shell=True)
 
         # write footer
