@@ -41,8 +41,6 @@ class QueryJobListSerializer(serializers.ModelSerializer):
 
 class QueryJobRetrieveSerializer(serializers.ModelSerializer):
 
-    errors = serializers.SerializerMethodField()
-
     class Meta:
         model = QueryJob
         fields = (
@@ -54,6 +52,7 @@ class QueryJobRetrieveSerializer(serializers.ModelSerializer):
             'end_time',
             'execution_duration',
             'destruction_time',
+            'error_summary',
             'job_type',
             'database_name',
             'table_name',
@@ -62,13 +61,8 @@ class QueryJobRetrieveSerializer(serializers.ModelSerializer):
             'actual_query',
             'queue',
             'nrows',
-            'size',
-            'errors'
+            'size'
         )
-
-    def get_errors(self, obj):
-        if 'errors' in obj.metadata:
-            return obj.metadata['errors']
 
 
 class QueryJobCreateSerializer(serializers.ModelSerializer):

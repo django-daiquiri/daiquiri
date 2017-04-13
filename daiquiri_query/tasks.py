@@ -39,9 +39,7 @@ def submit_query(job_id):
 
     except ProgrammingError as e:
         job.phase = PHASE_ERROR
-        job.metadata = {
-            'errors': [str(e)]
-        }
+        job.error_summary = str(e)
 
     except OperationalError as e:
         # load the job again and check if the job was killed
@@ -49,15 +47,11 @@ def submit_query(job_id):
 
         if job.phase != PHASE_ABORTED:
             job.phase = PHASE_ERROR
-            job.metadata = {
-                'errors': str(e)
-            }
+            job.error_summary = str(e)
 
     except SoftTimeLimitExceeded:
         job.phase = PHASE_ERROR
-        job.metadata = {
-            'errors': [_('The query exceeded the timelimit for this queue.')]
-        }
+        job.error_summary = _('The query exceeded the timelimit for this queue.')
 
     else:
         # get additional information about the completed job

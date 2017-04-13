@@ -37,9 +37,7 @@
 
             <div ng-show="service.job.phase == 'ERROR'">
                 <dt>{% trans 'Error' %}</dt>
-                <dd class="text-danger">
-                    <p ng-repeat="error in service.job.errors">{$ error $}</p>
-                </dd>
+                <dd class="text-danger">{$ service.job.error_summary $}</dd>
             </div>
 
             <dt>{% trans 'Full database table name' %}</dt>
