@@ -1,6 +1,5 @@
 from celery.task.control import revoke
 
-from django.conf import settings
 from django.contrib.auth.models import Group
 from django.db import models
 from django.db.utils import OperationalError, ProgrammingError
@@ -24,13 +23,13 @@ class QueryJob(Job):
 
     database_name = models.CharField(max_length=256)
     table_name = models.CharField(max_length=256)
-    queue = models.CharField(max_length=16, choices=settings.QUERY['queues'])
+    queue = models.CharField(max_length=16)
 
-    query_language = models.CharField(max_length=8, choices=settings.QUERY['query_languages'])
+    query_language = models.CharField(max_length=8)
     query = models.TextField()
     actual_query = models.TextField(null=True, blank=True)
 
-    queue = models.CharField(max_length=16, choices=settings.QUERY['queues'])
+    queue = models.CharField(max_length=16)
     nrows = models.IntegerField(null=True, blank=True)
     size = models.IntegerField(null=True, blank=True)
 
