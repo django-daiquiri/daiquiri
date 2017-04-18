@@ -99,7 +99,7 @@ alias grun='java org.antlr.v4.gui.TestRig'
 ```
 
 ### Queryparser
-As long as pip install is in development, install the [Queryparser](https://github.com/aipescience/queryparse). 
+As long as pip install is in development, install the [Queryparser](https://github.com/aipescience/queryparser). 
 
 
 #### MariaDB
