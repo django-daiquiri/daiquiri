@@ -38,11 +38,14 @@ def contact(request):
 
     else:
         if request.user.is_authenticated:
+            try:
+                contact_form.initial = {
+                    'email': request.user.email,
+                    'author': request.user.profile.full_name
+                }
+            except AttributeError:
+                pass
 
-            contact_form.initial = {
-                'email': request.user.email,
-                'author': request.user.profile.full_name
-            }
 
     return render(request, 'contact/contact.html', {'form': contact_form})
 
