@@ -10,36 +10,34 @@
 
          <h2> {% trans 'Columns' %} </h2>
 
-        <table class="table list-table" infinite-scroll="service.scroll()" infinite-scroll-distance="0.2">
+        <table class="table list-table" infinite-scrsoll="service.scroll()" infinite-scroll-distance="0.2">
         <thead>
-            <th style="width: 30%;">{% trans 'Column.' %}</th>
-            <th style="width: 10%">{% trans 'Type' %}</th>
-            <th style="width: 10%;">{% trans 'UCD' %}</th>
+            <th style="width: 15%;">{% trans 'Name' %}</th>
+            <th style="width: 15%">{% trans 'Type' %}</th>
+            <th style="width: 15%;">{% trans 'UCD' %}</th>
             <th style="width: 10%;">{% trans 'Unit' %}</th>
-            <th style="width: 40%;">{% trans 'Unit' %}</th>
+            <th style="width: 40%;">{% trans 'Description' %}</th>
         </thead>
         <tbody>
-            <tr ng-repeat="column in service.rows">
+            {% for column in columns %}
+            <tr>
                 <td>
-                    <span ng-show="row.order">{$ row.order $}</span>
-                </td>
-                <td>
-                    <a href="" ng-click="service.modal('show-column-modal', $index)">
-                       <span ng-show="row.name"> {$ row.name $} </span>
-                    </a>
+                    {{ column.name }}
                 </td>
                 <td>
-                    <ul class="list-unstyled">
-                        <li ng-repeat="group_id in row.groups">
-                            {$ service.groups_map[group_id] $}
-                         </li>
-                    </ul>
-
+                    {{ column.datatype }}
                 </td>
-                <td class="text-right list-table-options">
-
+                <td>
+                    {{ column.ucd }}
                 </td>
-               </tr>
+                <td>
+                    {{ column.utype }}
+                </td>
+                <td>
+                    {{ column.description }}
+                </td>
+            </tr>
+            {% endfor %}
         </tbody>
     </table>
 

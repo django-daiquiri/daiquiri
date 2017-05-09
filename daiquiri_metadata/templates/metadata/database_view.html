@@ -10,9 +10,11 @@
 
          <h2> {% trans 'List of tables' %} </h2>
             <ul class="list-unstyled">
-                <li ng-repeat="table in db_tables">
-                    {{ db_tables }}
+                {% for table in db_tables %}
+                <li>
+                    {{ table }}
                 </li>
+                {% endfor %}
             </ul>
 
 {% endblock %}

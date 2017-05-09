@@ -148,8 +148,7 @@ def dbview(request, dbname):
 
     try:
         db = Database.objects.get(name=dbname)
-        db_tables =  list(Table.objects.filter(database=db.id))
-        print (db_tables)
+        db_tables =  Table.objects.filter(database=db.id)
         db_view = {
             'db_name': db.name,
             'db_description': db.description,
@@ -167,11 +166,13 @@ def tableview(request, dbname, tablename):
         dbid = Database.objects.get(name=dbname).id
         the_table = Table.objects.filter(name=tablename).get(database=dbid)
         full_table_name = dbname + '.' + tablename
+
+        columns = Column.objects.filter(table=the_table)
+
         table_view = {
             'full_table_name': full_table_name,
-            'table_name': the_table.name,
             'table_description': the_table.description,
-            'db_name': dbname
+            'columns': columns
         }
         return render(request, "metadata/table_view.html", table_view)
 
