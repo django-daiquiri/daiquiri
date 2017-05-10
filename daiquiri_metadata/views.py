@@ -157,7 +157,7 @@ def dbview(request, dbname):
             'db_description': db.description,
             'db_tables': db_tables
         }
-        return render(request, "metadata/database_view.html", db_view)
+        return render(request, "metadata/metadata_database_view.html", db_view)
 
     except ObjectDoesNotExist:
         raise Http404
@@ -177,7 +177,7 @@ def tableview(request, dbname, tablename):
             'table_description': the_table.description,
             'columns': columns
         }
-        return render(request, "metadata/table_view.html", table_view)
+        return render(request, "metadata/metadata_table_view.html", table_view)
 
     except ObjectDoesNotExist:
         raise Http404
