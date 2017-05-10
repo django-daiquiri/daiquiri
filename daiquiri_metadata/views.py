@@ -146,6 +146,9 @@ class TableTypeViewSet(viewsets.ReadOnlyModelViewSet):
 
 def dbview(request, dbname):
 
+    print(request)
+    print('request above')
+
     try:
         db = Database.objects.get(name=dbname)
         db_tables =  Table.objects.filter(database=db.id)

@@ -12,7 +12,8 @@
             <ul class="list-unstyled">
                 {% for table in db_tables %}
                 <li>
-                    {{ table }}
+                    <a href="{{ table.name }}"> {{ table }} </a>
+                    <p> {{ table.description }}
                 </li>
                 {% endfor %}
             </ul>
