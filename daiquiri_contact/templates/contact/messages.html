@@ -37,7 +37,7 @@
                        placeholder="{% trans 'Search entries' %}"
                        type="text" ng-model="service.search_string">
                 <a href="" class="input-group-addon" ng-click="service.search()">
-                    <span class="glyphicon glyphicon-search"></span>
+                    <span class="fa fa-search"></span>
                 </a>
             </div>
         </form>
@@ -49,7 +49,6 @@
                 </li>
             </ul>
         </div>
-
         <div class="col-sm-4 list-search-count text-right">
             {$ service.count $} {% trans 'Contact messages found' %}
         </div>
@@ -62,10 +61,17 @@
             <th style="width: 20%;">{% trans 'Email' %}</th>
             <th style="width: 20%;">{% trans 'Created' %}</th>
             <th style="width: 5%;">{% trans 'Status' %}</th>
-            <th style="width: 10%;"></th>
+            <th style="width: 10%;">
+                <a href="" ng-show="service.nospam" class="fa fa-circle-o" title="{% trans 'Show spam messages' %}"
+                    ng-click="service.showSpam(false)">
+                </a>
+                 <a href="" ng-show="service.nospam == false" class="fa fa-check-circle-o" title="{% trans 'Hide spam messages' %}"
+                    ng-click="service.showSpam(true)">
+                </a>
+            </th>
         </thead>
         <tbody>
-            <tr ng-repeat="row in service.rows" ng-hide="row.status == 'SPAM'">
+            <tr ng-repeat="row in service.rows" ng-hide="row.status == 'SPAM' && service.nospam">
                 <td>
                     <a href="" ng-click="service.modal('show-message-modal', $index)">
                         {$ row.subject $}

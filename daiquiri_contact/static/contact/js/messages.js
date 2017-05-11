@@ -17,6 +17,8 @@ app.factory('MessagesService', ['$http', '$timeout', function($http, $timeout) {
 
     var service = {};
 
+    var nospam = true;
+
     function fetchMessages() {
         return $http.get(service.current_url)
             .success(function(response) {
@@ -33,7 +35,7 @@ app.factory('MessagesService', ['$http', '$timeout', function($http, $timeout) {
         // reset data
         service.search_string = null;
         service.rows = [];
-
+        service.nospam = nospam;
         // fetch the first set of profiles
         fetchMessages();
     };
@@ -83,6 +85,14 @@ app.factory('MessagesService', ['$http', '$timeout', function($http, $timeout) {
             }
         });
         return $http.put(resource_url + row.id + '/', row)
+    }
+
+    service.showSpam = function(ifspam) {
+        console.log(ifspam)
+        console.log(nospam);
+        nospam = ifspam;
+
+        service.init();
     }
 
     return service;
