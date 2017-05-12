@@ -56,7 +56,15 @@
 
     <table class="table list-table" infinite-scroll="service.scroll()" infinite-scroll-distance="0.2">
         <thead>
-            <th style="width: 30%;">{% trans 'Subject' %}</th>
+            <th style="width: 30%;">{% trans 'Subject' %}
+                <a href="" ng-click="service.order('Subject')">
+                                <i ng-class="{
+                                    'fa fa-chevron-down': !table.config.ordering.endsWith('Subject'),
+                                    'ordered fa fa-chevron-down': table.config.ordering == 'Subject',
+                                    'ordered fa fa-chevron-up': table.config.ordering == '-' + 'Subject'
+                                }" aria-hidden="true"></i>
+                </div>
+            </th>
             <th style="width: 15%;">{% trans 'Author' %}</th>
             <th style="width: 20%;">{% trans 'Email' %}</th>
             <th style="width: 20%;">{% trans 'Created' %}</th>

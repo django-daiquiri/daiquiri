@@ -15,9 +15,15 @@ app.factory('MessagesService', ['$http', '$timeout', function($http, $timeout) {
     // the url under which the profiles api is located
     var resource_url = '/contact/api/messages/';
 
-    var service = {};
+    var service = {
+     config: {
+            ordering: null,
+          }
+    };
 
     var nospam = true;
+
+    var ordering = null;
 
     function fetchMessages() {
         return $http.get(service.current_url)
@@ -27,6 +33,12 @@ app.factory('MessagesService', ['$http', '$timeout', function($http, $timeout) {
                 service.rows = service.rows.concat(response.results);
             });
     }
+    service.fetch = function() {
+        resources.rows.paginate(service.config, function(response) {
+            service.count = response.count;
+            service.rows = response.results;
+        });
+    };
 
     service.init = function() {
         // reset the url
@@ -88,12 +100,19 @@ app.factory('MessagesService', ['$http', '$timeout', function($http, $timeout) {
     }
 
     service.showSpam = function(ifspam) {
-        console.log(ifspam)
-        console.log(nospam);
         nospam = ifspam;
 
         service.init();
     }
+
+    service.order = function(column_name) {
+        if (service.config.ordering == column_name) {
+            service.config.ordering = '-' + column_name;
+        } else {
+            service.config.ordering = column_name;
+        }
+        service.fetchMessages();
+    };
 
     return service;
 }]);
