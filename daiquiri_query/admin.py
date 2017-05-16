@@ -8,7 +8,9 @@ class QueryJobAdmin(admin.ModelAdmin):
 
 
 class ExampleAdmin(admin.ModelAdmin):
-    pass
+    search_fields = ("name", "description", "query_string")
+    list_display = ("id", "order", "name", "description", "query_string")
+
 
 admin.site.register(QueryJob, QueryJobAdmin)
 admin.site.register(Example, ExampleAdmin)

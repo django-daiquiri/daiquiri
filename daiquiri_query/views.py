@@ -1,6 +1,7 @@
 import json
 from sendfile import sendfile
 
+from django.contrib.auth.models import Group
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
@@ -30,8 +31,10 @@ from .serializers import (
     QueryJobUpdateSerializer,
     ExampleSerializer,
     DatabaseSerializer,
-    FunctionSerializer
+    FunctionSerializer,
+    GroupSerializer
 )
+from .paginations import ExamplePagination
 from .exceptions import (
     ADQLSyntaxError,
     MySQLSyntaxError,
@@ -44,7 +47,9 @@ from utils import fetch_user_database_metadata
 
 @login_required()
 def query(request):
-    return render(request, 'query/query.html')
+    return render(request, 'query/query.html', {
+        'query_settings': settings.QUERY
+    })
 
 
 class StatusViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -183,13 +188,21 @@ class QueryJobViewSet(viewsets.ModelViewSet):
             raise Http404
 
 
-class ExampleViewSet(viewsets.ReadOnlyModelViewSet):
+def examples(request):
+    # get urls to the admin interface to be used with angular
+    return render(request, 'query/examples.html', {})
+
+
+class ExampleViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, )
 
     serializer_class = ExampleSerializer
+    pagination_class = ExamplePagination
 
-    def get_queryset(self):
-        return Example.objects.filter(groups__in=self.request.user.groups.all())
+    queryset = Example.objects.all()
+
+    # def get_queryset(self):
+    #   return Example.objects.filter(groups__in=self.request.user.groups.all())
 
 
 class DatabaseViewSet(viewsets.ReadOnlyModelViewSet):
@@ -213,6 +226,11 @@ class FunctionViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         return Function.objects.filter(groups__in=self.request.user.groups.all())
+
+
+class GroupViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
 
 
 class QueueViewSet(ChoicesViewSet):
