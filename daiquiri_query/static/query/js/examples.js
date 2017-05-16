@@ -49,7 +49,6 @@ app.factory('ExamplesService', ['$http', '$timeout', function($http, $timeout) {
             });
     }
 
-
     function storeExample(action) {
         service.errors = {};
 
@@ -68,7 +67,6 @@ app.factory('ExamplesService', ['$http', '$timeout', function($http, $timeout) {
                 service.errors = response;
             });
     }
-
 
     service.init = function() {
         // reset the url
@@ -144,13 +142,11 @@ app.factory('ExamplesService', ['$http', '$timeout', function($http, $timeout) {
         }
     };
 
-
     function removeExample(row){
         return $http.delete(resource_url + row.id, row).success( function(){
             service.rows.splice(service.current_index, 1);
         });
-     }
-
+    }
 
     service.updateExample = function() {
         storeExample().then(function() {
@@ -158,13 +154,11 @@ app.factory('ExamplesService', ['$http', '$timeout', function($http, $timeout) {
         });
     };
 
-
     service.deleteExample = function(row) {
         removeExample(row).then(function() {
             $('#examples-modal-delete').modal('hide');
         });
     };
-
 
     return service;
 }]);
