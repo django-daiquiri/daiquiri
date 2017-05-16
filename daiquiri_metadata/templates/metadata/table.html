@@ -3,23 +3,25 @@
 
 {% block wide %}
 
-    <h1> {{ full_table_name }} </h1>
+    <h1>{{ table }}</h1>
 
-          <h2> {% trans 'Description' %}</h2>
-            <p> {{ table_description }} </p>
+    {% if table.description %}
+    <h2>{% trans 'Description' %}</h2>
+    <p>{{ table.description }}</p>
+    {% endif %}
 
-         <h2> {% trans 'Columns' %} </h2>
+    <h2>{% trans 'Columns' %}</h2>
 
-        <table class="table list-table" infinite-scrsoll="service.scroll()" infinite-scroll-distance="0.2">
+    <table class="table">
         <thead>
             <th style="width: 15%;">{% trans 'Name' %}</th>
-            <th style="width: 15%">{% trans 'Type' %}</th>
+            <th style="width: 15%;">{% trans 'Type' %}</th>
             <th style="width: 15%;">{% trans 'UCD' %}</th>
             <th style="width: 15%;">{% trans 'Unit' %}</th>
             <th style="width: 40%;">{% trans 'Description' %}</th>
         </thead>
         <tbody>
-            {% for column in columns %}
+            {% for column in table.columns.all %}
             <tr>
                 <td>
                     {{ column.name }}
@@ -28,18 +30,17 @@
                     {{ column.datatype }}
                 </td>
                 <td>
-                    {{ column.ucd }}
+                    {{ column.ucd|default_if_none:'' }}
                 </td>
                 <td>
-                    {{ column.utype }}
+                    {{ column.unit|default_if_none:'' }}
                 </td>
                 <td>
-                    {{ column.description }}
+                    {{ column.description|default_if_none:'' }}
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-
 
 {% endblock %}

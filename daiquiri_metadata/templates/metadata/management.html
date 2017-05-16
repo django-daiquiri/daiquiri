@@ -46,21 +46,21 @@
 
     <div class="row">
         <div class="col-md-9">
-            {% include 'metadata/metadata_display.html' %}
+            {% include 'metadata/management_display.html' %}
         </div>
         <div class="col-md-3">
-            {% include 'metadata/metadata_options.html' %}
+            {% include 'metadata/management_options.html' %}
         </div>
     </div>
 
-    {% include 'metadata/metadata_modal_form_databases.html' %}
-    {% include 'metadata/metadata_modal_form_tables.html' %}
-    {% include 'metadata/metadata_modal_form_columns.html' %}
-    {% include 'metadata/metadata_modal_form_functions.html' %}
+    {% include 'metadata/management_modal_form_databases.html' %}
+    {% include 'metadata/management_modal_form_tables.html' %}
+    {% include 'metadata/management_modal_form_columns.html' %}
+    {% include 'metadata/management_modal_form_functions.html' %}
 
-    {% include 'metadata/metadata_modal_delete_databases.html' %}
-    {% include 'metadata/metadata_modal_delete_tables.html' %}
-    {% include 'metadata/metadata_modal_delete_columns.html' %}
-    {% include 'metadata/metadata_modal_delete_functions.html' %}
+    {% include 'metadata/management_modal_delete_databases.html' %}
+    {% include 'metadata/management_modal_delete_tables.html' %}
+    {% include 'metadata/management_modal_delete_columns.html' %}
+    {% include 'metadata/management_modal_delete_functions.html' %}
 
 {% endblock %}

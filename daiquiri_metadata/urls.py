@@ -2,7 +2,15 @@ from django.conf.urls import url, include
 
 from rest_framework import routers
 
-from .views import *
+from .views import database, table, management
+from .viewsets import (
+    DatabaseViewSet,
+    TableViewSet,
+    ColumnViewSet,
+    FunctionViewSet,
+    GroupViewSet,
+    TableTypeViewSet
+)
 
 router = routers.DefaultRouter()
 router.register(r'databases', DatabaseViewSet, base_name='database')
@@ -14,10 +22,10 @@ router.register(r'tabletypes', TableTypeViewSet, base_name='tabletype')
 
 
 urlpatterns = [
-    url(r'^db_meta/(?P<dbname>\w+)/$', dbview, name='meta_db'),
-    url(r'^db_meta/(?P<dbname>\w+)/(?P<tablename>\w+)/$', tableview, name='meta_db'),
-    url(r'^$', metadata, name='metadata'),
-
-    # rest api
     url(r'^api/', include(router.urls, namespace='metadata')),
+
+    url(r'^management/$', management, name='metadata_management'),
+
+    url(r'^(?P<database_name>\w+)/$', database, name='metadata_database'),
+    url(r'^(?P<database_name>\w+)/(?P<table_name>\w+)/$', table, name='metadata_table'),
 ]

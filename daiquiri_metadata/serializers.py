@@ -78,5 +78,3 @@ class NestedDatabaseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Database
         fields = ('id', 'name', 'tables')
-
-
