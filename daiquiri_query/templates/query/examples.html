@@ -29,26 +29,22 @@
 
     <h1>Example queries</h1>
 
-        <div class="btn-group wide pull-right">
-            <button type="button" class="btn btn-default"
-                    ng-click="service.modal('examples-modal-form', $index)">
-                {% trans 'Create new example' %}
-            </button>
-        </div>
+    <div class="btn-group wide pull-right">
+        <button type="button" class="btn btn-default"
+            ng-click="service.modal('examples-modal-form', $index)">
 
+            {% trans 'Create new example' %}
+        </button>
+    </div>
 
     <table class="table list-table" infinite-scroll="service.scroll()" infinite-scroll-distance="0.2">
         <thead>
-            <th style="width: 20%;">{% trans 'Order Nr.' %}</th>
-
             <th style="width: 50%">{% trans 'Name' %}</th>
-            <th style="width: 30%;">{% trans 'Published for' %}</th>
+            <th style="width: 20%;">{% trans 'Published for' %}</th>
+            <th style="width: 10%;"></th>
         </thead>
         <tbody>
             <tr ng-repeat="row in service.rows">
-                <td>
-                    <span ng-show="row.order">{$ row.order $}</span>
-                </td>
                 <td>
                     <a href="" ng-click="service.modal('show-example-modal', $index)">
                        <span ng-show="row.name"> {$ row.name $} </span>
@@ -60,16 +56,16 @@
                             {$ service.groups_map[group_id] $}
                          </li>
                     </ul>
-
                 </td>
                 <td class="text-right list-table-options">
-                        {% include 'query/example_options.html' %}
+                    {% include 'query/example_options.html' %}
                 </td>
-               </tr>
+            </tr>
         </tbody>
     </table>
 
-     {% include 'query/examples_modal_show_example.html' %}
-     {% include 'query/examples_modal_form.html' %}
+    {% include 'query/examples_modal_show.html' %}
+    {% include 'query/examples_modal_form.html' %}
+    {% include 'query/examples_modal_delete.html' %}
 
 {% endblock %}
