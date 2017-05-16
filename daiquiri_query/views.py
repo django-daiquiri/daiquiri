@@ -192,6 +192,7 @@ def examples(request):
     # get urls to the admin interface to be used with angular
     return render(request, 'query/examples.html', {})
 
+
 class ExampleViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, )
 
