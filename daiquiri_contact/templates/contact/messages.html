@@ -42,15 +42,23 @@
             </div>
         </form>
 
-        <div class="col-sm-2 list-search-reset">
+        <div class="col-sm-1 list-search-reset">
             <ul class="pagination">
                 <li>
                     <a href="" ng-click="service.init()">{% trans 'Reset' %}</a>
                 </li>
             </ul>
         </div>
-        <div class="col-sm-4 list-search-count text-right">
-            {$ service.count $} {% trans 'Contact messages found' %}
+        <div class="col-sm-2 list-search-reset">
+            <ul class="pagination">
+                <li>
+                    <a href="" ng-show="service.show_spam" ng-click="service.showSpam(true)">{% trans 'Show spam' %}</a>
+                    <a href="" ng-show="service.show_spam == false" ng-click="service.showSpam(false)">{% trans 'Hide spam' %}</a>
+                </li>
+            </ul>
+        </div>
+        <div class="col-sm-3rкорм list-search-count text-right">
+            {$ service.count $} {% trans 'messages found' %}
         </div>
     </div>
 
@@ -70,16 +78,11 @@
             <th style="width: 20%;">{% trans 'Created' %}</th>
             <th style="width: 5%;">{% trans 'Status' %}</th>
             <th style="width: 10%;">
-                <a href="" ng-show="service.nospam" class="fa fa-circle-o" title="{% trans 'Show spam messages' %}"
-                    ng-click="service.showSpam(false)">
-                </a>
-                 <a href="" ng-show="service.nospam == false" class="fa fa-ban" title="{% trans 'Hide spam messages' %}"
-                    ng-click="service.showSpam(true)">
-                </a>
+
             </th>
         </thead>
         <tbody>
-            <tr ng-repeat="row in service.rows" ng-hide="row.status == 'SPAM' && service.nospam">
+            <tr ng-repeat="row in service.rows" ng-hide="row.status == 'SPAM' && !service.show_spam">
                 <td>
                     <a href="" ng-click="service.modal('show-message-modal', $index)">
                         {$ row.subject $}

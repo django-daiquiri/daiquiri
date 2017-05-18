@@ -21,7 +21,7 @@ app.factory('MessagesService', ['$http', '$timeout', function($http, $timeout) {
           }
     };
 
-    var nospam = true;
+    var show_spam = true;
 
     var ordering = null;
 
@@ -33,6 +33,7 @@ app.factory('MessagesService', ['$http', '$timeout', function($http, $timeout) {
                 service.rows = service.rows.concat(response.results);
             });
     }
+
     service.fetch = function() {
         resources.rows.paginate(service.config, function(response) {
             service.count = response.count;
@@ -47,7 +48,7 @@ app.factory('MessagesService', ['$http', '$timeout', function($http, $timeout) {
         // reset data
         service.search_string = null;
         service.rows = [];
-        service.nospam = nospam;
+        service.show_spam = show_spam;
         // fetch the first set of profiles
         fetchMessages();
     };
@@ -99,11 +100,26 @@ app.factory('MessagesService', ['$http', '$timeout', function($http, $timeout) {
         return $http.put(resource_url + row.id + '/', row)
     }
 
-    service.showSpam = function(ifspam) {
-        nospam = ifspam;
+    service.showSpam = function(show_spam) {
+        service.show_spam = show_spam;
+        if (show_spam) {
+            console.log(show_spam)
+            console.log('I want to see spam')
+            service.current_url = resource_url + '?search=' + 'spam';
+            service.rows = [];
+            fetchMessages();
+        }
+        else {
+            console.log(show_spam)
 
-        service.init();
-    }
+
+            // reset data
+            service.rows = [];
+
+            // fetch the profiles with the search parameter
+           fetchMessages();
+        }
+      };
 
     service.order = function(column_name) {
         if (service.config.ordering == column_name) {
