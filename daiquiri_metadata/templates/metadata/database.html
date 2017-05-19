@@ -1,0 +1,23 @@
+{% extends 'core/page.html' %}
+{% load i18n %}
+
+{% block page %}
+
+    <h1>{{ database }}</h1>
+
+    {% if database.description %}
+    <h2>{% trans 'Description' %}</h2>
+    <p>{{ database.description }}</p>
+    {% endif %}
+
+    <h2>{% trans 'Tables' %}</h2>
+
+    {% for table in database.tables.all %}
+    <h4><a href="{{ table.name }}">{{ table }}</a></h4>
+
+    {% if table.description %}
+    <p>{{ table.description }}</p>
+    {% endif %}
+    {% endfor %}
+
+{% endblock %}
