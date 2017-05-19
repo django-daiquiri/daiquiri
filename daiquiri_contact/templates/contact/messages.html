@@ -52,8 +52,8 @@
         <div class="col-sm-2 list-search-reset">
             <ul class="pagination">
                 <li>
-                    <a href="" ng-show="service.show_spam" ng-click="service.showSpam(true)">{% trans 'Show spam' %}</a>
-                    <a href="" ng-show="service.show_spam == false" ng-click="service.showSpam(false)">{% trans 'Hide spam' %}</a>
+                    <a href="" ng-show="!service.show_spam" ng-click="service.showSpam(true)">{% trans 'Show spam' %}</a>
+                    <a href="" ng-show="service.show_spam" ng-click="service.showSpam(false)">{% trans 'Hide spam' %}</a>
                 </li>
             </ul>
         </div>
@@ -64,15 +64,7 @@
 
     <table class="table list-table" infinite-scroll="service.scroll()" infinite-scroll-distance="0.2">
         <thead>
-            <th style="width: 30%;">{% trans 'Subject' %}
-                <a href="" ng-click="service.order('Subject')">
-                                <i ng-class="{
-                                    'fa fa-chevron-down': !table.config.ordering.endsWith('Subject'),
-                                    'ordered fa fa-chevron-down': table.config.ordering == 'Subject',
-                                    'ordered fa fa-chevron-up': table.config.ordering == '-' + 'Subject'
-                                }" aria-hidden="true"></i>
-                </div>
-            </th>
+            <th style="width: 30%;">{% trans 'Subject' %}</th>
             <th style="width: 15%;">{% trans 'Author' %}</th>
             <th style="width: 20%;">{% trans 'Email' %}</th>
             <th style="width: 20%;">{% trans 'Created' %}</th>
@@ -82,7 +74,8 @@
             </th>
         </thead>
         <tbody>
-            <tr ng-repeat="row in service.rows" ng-hide="row.status == 'SPAM' && !service.show_spam">
+            <tr ng-repeat="row in service.rows"
+                ng-hide="(row.status == 'SPAM' && !service.show_spam) || (service.show_spam && row.status != 'SPAM')">
                 <td>
                     <a href="" ng-click="service.modal('show-message-modal', $index)">
                         {$ row.subject $}

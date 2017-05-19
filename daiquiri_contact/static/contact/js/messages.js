@@ -15,15 +15,7 @@ app.factory('MessagesService', ['$http', '$timeout', function($http, $timeout) {
     // the url under which the profiles api is located
     var resource_url = '/contact/api/messages/';
 
-    var service = {
-     config: {
-            ordering: null,
-          }
-    };
-
-    var show_spam = true;
-
-    var ordering = null;
+    var service = {};
 
     function fetchMessages() {
         return $http.get(service.current_url)
@@ -34,13 +26,6 @@ app.factory('MessagesService', ['$http', '$timeout', function($http, $timeout) {
             });
     }
 
-    service.fetch = function() {
-        resources.rows.paginate(service.config, function(response) {
-            service.count = response.count;
-            service.rows = response.results;
-        });
-    };
-
     service.init = function() {
         // reset the url
         service.current_url = resource_url;
@@ -48,7 +33,7 @@ app.factory('MessagesService', ['$http', '$timeout', function($http, $timeout) {
         // reset data
         service.search_string = null;
         service.rows = [];
-        service.show_spam = show_spam;
+        service.show_spam = false;
         // fetch the first set of profiles
         fetchMessages();
     };
@@ -101,34 +86,18 @@ app.factory('MessagesService', ['$http', '$timeout', function($http, $timeout) {
     }
 
     service.showSpam = function(show_spam) {
+
         service.show_spam = show_spam;
         if (show_spam) {
-            console.log(show_spam)
-            console.log('I want to see spam')
             service.current_url = resource_url + '?search=' + 'spam';
             service.rows = [];
             fetchMessages();
         }
         else {
-            console.log(show_spam)
-
-
             // reset data
-            service.rows = [];
-
-            // fetch the profiles with the search parameter
-           fetchMessages();
+            service.init();
         }
       };
-
-    service.order = function(column_name) {
-        if (service.config.ordering == column_name) {
-            service.config.ordering = '-' + column_name;
-        } else {
-            service.config.ordering = column_name;
-        }
-        service.fetchMessages();
-    };
 
     return service;
 }]);
