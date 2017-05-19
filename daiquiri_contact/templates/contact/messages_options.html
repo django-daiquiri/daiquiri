@@ -21,9 +21,18 @@
         <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="messages-options">
             <li>
                 <a href=""
+                    ng-hide="row.status == 'SPAM' "
                     ng-click="service.updateMessage(row, 'SPAM')">
                     <i class="fa fa-ban"></i>
                     <span>{% trans 'Mark as spam' %}</span>
+                </a>
+            <li>
+            <li>
+                <a href=""
+                    ng-hide="row.status != 'SPAM' "
+                    ng-click="service.updateMessage(row, 'ACTIVE')">
+                    <i class="fa fa-check"></i>
+                    <span>{% trans 'Not spam' %}</span>
                 </a>
             <li>
         </ul>

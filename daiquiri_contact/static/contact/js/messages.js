@@ -33,7 +33,7 @@ app.factory('MessagesService', ['$http', '$timeout', function($http, $timeout) {
         // reset data
         service.search_string = null;
         service.rows = [];
-
+        service.show_spam = false;
         // fetch the first set of profiles
         fetchMessages();
     };
@@ -84,6 +84,20 @@ app.factory('MessagesService', ['$http', '$timeout', function($http, $timeout) {
         });
         return $http.put(resource_url + row.id + '/', row)
     }
+
+    service.showSpam = function(show_spam) {
+
+        service.show_spam = show_spam;
+        if (show_spam) {
+            service.current_url = resource_url + '?search=' + 'spam';
+            service.rows = [];
+            fetchMessages();
+        }
+        else {
+            // reset data
+            service.init();
+        }
+      };
 
     return service;
 }]);
