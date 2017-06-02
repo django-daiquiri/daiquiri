@@ -50,16 +50,18 @@ class Command(BaseCommand):
             pass
 
         # check if the permissions for the user databases are ok
-        user = User.objects.first()
-
         try:
-            database_name = get_user_database_name(user.username)
-            data.update({'NAME': get_user_database_name('%')})
+            user = User.objects.first()
 
-            try:
-                data_adapter.fetch_tables(data['NAME'])
-            except OperationalError:
-                sql.append('GRANT ALL ON `%(NAME)s`.* TO \'%(USER)s\'@\'localhost\';' % data)
+            if user:
+                database_name = get_user_database_name(user.username)
+                data.update({'NAME': get_user_database_name(database_name)})
+
+                try:
+                    data_adapter.fetch_tables(data['NAME'])
+                except OperationalError:
+                    data.update({'NAME': get_user_database_name('%')})
+                    sql.append('GRANT ALL ON `%(NAME)s`.* TO \'%(USER)s\'@\'localhost\';' % data)
 
         except ProgrammingError:
             pass
