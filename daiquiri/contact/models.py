@@ -34,6 +34,8 @@ class ContactMessage(models.Model):
         verbose_name = _('Contact message')
         verbose_name_plural = _('Contact messages')
 
+        permissions = (('view_contactmessage', 'Can view ContactMessage'),)
+
     def __str__(self):
         return "created=%s; email=%s; subject=%s; status=%s" % (self.created, self.email, self.subject, self.status)
 

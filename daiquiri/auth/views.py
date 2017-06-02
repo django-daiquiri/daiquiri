@@ -1,12 +1,14 @@
 import json
 
 from django.conf import settings
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from daiquiri.core.utils import get_referer_path_info, get_next
+from django.views.generic import TemplateView
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.views.decorators.csrf import ensure_csrf_cookie
+
+from daiquiri.core.views import ModelPermissionMixin
 
 from .utils import get_account_workflow
 from .forms import UserForm, ProfileForm
@@ -33,22 +35,26 @@ def profile_update(request):
     })
 
 
-@ensure_csrf_cookie
-@permission_required('daiquiri_auth.view_profile')
-def users(request):
-    # get urls to the admin interface to be used with angular
-    user_admin_url = reverse('admin:auth_user_change', args=['row.id']).replace('row.id', '{$ row.id $}')
-    profile_admin_url = reverse('admin:daiquiri_auth_profile_change', args=['row.id']).replace('row.id', '{$ row.id $}')
+class UsersView(ModelPermissionMixin, TemplateView):
+    template_name = 'auth/users.html'
+    permission_required = 'daiquiri_auth.view_profile'
 
-    detail_keys = settings.AUTH['detail_keys']
-    for detail_key in detail_keys:
-        detail_key['options_json'] = json.dumps(detail_key['options'])
-        detail_key['model'] = 'service.current_row.details.%s' % detail_key['key']
-        detail_key['errors'] = 'service.errors.%s' % detail_key['key']
+    def get_context_data(self, **kwargs):
+        # get urls to the admin interface to be used with angular
+        user_admin_url = reverse('admin:auth_user_change', args=['row.id']).replace('row.id', '{$ row.id $}')
+        profile_admin_url = reverse('admin:daiquiri_auth_profile_change', args=['row.id']).replace('row.id', '{$ row.id $}')
 
-    return render(request, 'auth/users.html', {
-        'detail_keys': detail_keys,
-        'account_workflow': get_account_workflow(),
-        'user_admin_url': user_admin_url,
-        'profile_admin_url': profile_admin_url
-    })
+        detail_keys = settings.AUTH['detail_keys']
+        for detail_key in detail_keys:
+            detail_key['options_json'] = json.dumps(detail_key['options'])
+            detail_key['model'] = 'service.current_row.details.%s' % detail_key['key']
+            detail_key['errors'] = 'service.errors.%s' % detail_key['key']
+
+        context = super(UsersView, self).get_context_data(**kwargs)
+        context.update({
+            'detail_keys': detail_keys,
+            'account_workflow': get_account_workflow(),
+            'user_admin_url': user_admin_url,
+            'profile_admin_url': profile_admin_url
+        })
+        return context

@@ -14,6 +14,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.decorators import list_route, detail_route
 
 from daiquiri.core.viewsets import ChoicesViewSet
+from daiquiri.core.permissions import HasModelPermission
 from daiquiri.core.utils import human2bytes
 from daiquiri.uws.settings import PHASE_ARCHIVED
 
@@ -48,8 +49,10 @@ class StatusViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         # get quota from settings
         quota = 0
         for group in request.user.groups.all():
-            group_quota = human2bytes(settings.QUERY['quota'][group.name])
-            quota = group_quota if group_quota > quota else quota
+            group_quota = settings.QUERY['quota'].get(group.name)
+            if group_quota:
+                group_quota = human2bytes(group_quota)
+                quota = group_quota if group_quota > quota else quota
 
         # get the size of all the tables of this user
         jobs = QueryJob.objects.filter(owner=self.request.user).exclude(phase=PHASE_ARCHIVED)
@@ -175,12 +178,12 @@ class QueryJobViewSet(viewsets.ModelViewSet):
 
 
 class ExampleViewSet(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (HasModelPermission, )
     serializer_class = ExampleSerializer
     pagination_class = ExamplePagination
     queryset = Example.objects.all()
 
-    @list_route(methods=['get'])
+    @list_route(methods=['get'], permission_classes=(IsAuthenticated, ))
     def user(self, request):
         examples = Example.objects.filter(groups__in=self.request.user.groups.all())
         serializer = UserExampleSerializer(examples, many=True)

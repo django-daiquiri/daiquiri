@@ -14,7 +14,7 @@ app.factory('ExamplesService', ['$http', '$timeout', function($http, $timeout) {
 
     // the url under which the profiles api is located
     var resource_url = '/query/api/examples/';
-    var groups_url = '/query/api/groups/';
+    var groups_url = '/auth/api/groups/';
 
     var factories = {
         examples: function(){

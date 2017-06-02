@@ -2,7 +2,7 @@ from rest_framework import viewsets, filters
 from rest_framework.permissions import IsAuthenticated
 
 from daiquiri.core.viewsets import ChoicesViewSet
-from daiquiri.core.permissions import DaiquiriModelPermissions
+from daiquiri.core.permissions import HasModelPermission
 
 from .models import ContactMessage
 from .serializers import ContactMessageSerializer
@@ -10,7 +10,7 @@ from .paginations import MessagePagination
 
 
 class ContactMessageViewSet(viewsets.ModelViewSet):
-    permission_classes = (DaiquiriModelPermissions, )
+    permission_classes = (HasModelPermission, )
 
     queryset = ContactMessage.objects.all()
 

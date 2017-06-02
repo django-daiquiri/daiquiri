@@ -2,7 +2,7 @@ from django.conf.urls import url, include
 
 from rest_framework import routers
 
-from .views import database, table, management
+from .views import ManagementView, DatabaseView, TableView
 from .viewsets import (
     DatabaseViewSet,
     TableViewSet,
@@ -21,8 +21,8 @@ router.register(r'tabletypes', TableTypeViewSet, base_name='tabletype')
 urlpatterns = [
     url(r'^api/', include(router.urls, namespace='metadata')),
 
-    url(r'^management/$', management, name='metadata_management'),
+    url(r'^management/$', ManagementView.as_view(), name='metadata_management'),
 
-    url(r'^(?P<database_name>\w+)/$', database, name='metadata_database'),
-    url(r'^(?P<database_name>\w+)/(?P<table_name>\w+)/$', table, name='metadata_table'),
+    url(r'^(?P<database_name>\w+)/$', DatabaseView.as_view(), name='metadata_database'),
+    url(r'^(?P<database_name>\w+)/(?P<table_name>\w+)/$', TableView.as_view(), name='metadata_table'),
 ]

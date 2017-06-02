@@ -31,7 +31,9 @@ form {
     margin-bottom: 20px;
 }
 
-a {
+
+a,
+.pagination > li > a {
     color: $link-color;
 
     &:visited {
@@ -149,29 +151,34 @@ a {
 
 /* panel */
 
-.panel .panel-body p:last-child {
-    margin-bottom: 0;
-}
-.panel li.list-group-link {
-    padding: 0;
-}
-.panel li.list-group-link > a {
-    display: block;
-    padding: 10px 15px;
-}
-.panel li.list-group-link:last-child > a {
-    border-bottom-right-radius: 4px;
-    border-bottom-left-radius: 4px;
-}
-.panel li.list-group-link > a:hover {
-    text-decoration: none;
-    color: $hover-color;
-    background-color: $hover-background-color;
-}
-.panel li.list-group-link > a.active {
-    text-decoration: none;
-    color: $active-color;
-    background-color: $active-background-color;
+.panel {
+    .panel-body p:last-child {
+        margin-bottom: 0;
+    }
+
+    li {
+        &.list-group-link {
+            padding: 0;
+        }
+        &.list-group-link > a {
+            display: block;
+            padding: 10px 15px;
+        }
+        &.list-group-link:last-child > a {
+            border-bottom-right-radius: 4px;
+            border-bottom-left-radius: 4px;
+        }
+        &.list-group-link > a:hover {
+            text-decoration: none;
+            color: $panel-hover-color;
+            background-color: $panel-hover-background-color;
+        }
+        &.list-group-link > a.active {
+            text-decoration: none;
+            color: $panel-active-color;
+            background-color: $panel-active-background-color;
+        }
+    }
 }
 
 /* forms */

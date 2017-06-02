@@ -1,5 +1,8 @@
 from django.shortcuts import render
 from django.utils.timezone import now
+from django.views.generic import TemplateView
+
+from daiquiri.core.views import ModelPermissionMixin
 
 from .forms import ContactForm
 from .utils import send_contact_message
@@ -40,6 +43,6 @@ def contact(request):
     return render(request, 'contact/contact.html', {'form': contact_form})
 
 
-def messages(request):
-    # get urls to the admin interface to be used with angular
-    return render(request, 'contact/messages.html', {})
+class MessagesView(ModelPermissionMixin, TemplateView):
+    template_name = 'contact/messages.html'
+    permission_required = 'daiquiri_contact.view_contactmessage'
