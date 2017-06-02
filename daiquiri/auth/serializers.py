@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 
 from rest_framework import serializers
 
@@ -31,6 +31,13 @@ class UserSerializer(serializers.ModelSerializer):
             'is_staff',
             'date_joined'
         )
+
+
+class GroupSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Group
+        fields = ('id', 'name')
 
 
 class EmailAddressSerializer(serializers.ModelSerializer):

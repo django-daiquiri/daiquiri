@@ -5,19 +5,22 @@ from rest_framework.response import Response
 from rest_framework.decorators import list_route
 
 from daiquiri.core.adapter import get_adapter
-from daiquiri.core.serializers import ChoicesSerializer
+from daiquiri.core.viewsets import ChoicesViewSet
 
 from .models import Database, Table, Column, Function
 from .serializers import (
     DatabaseSerializer,
     TableSerializer,
     ColumnSerializer,
-    FunctionSerializer,
-    NestedDatabaseSerializer,
-    NestedTableSerializer,
-    NestedColumnSerializer,
-    NestedFunctionSerializer,
-    GroupSerializer
+    FunctionSerializer
+)
+from .serializers.management import (
+    DatabaseSerializer as ManagementDatabaseSerializer,
+    FunctionSerializer as ManagementFunctionSerializer
+)
+from .serializers.user import (
+    DatabaseSerializer as UserDatabaseSerializer,
+    FunctionSerializer as UserFunctionSerializer
 )
 
 
@@ -55,9 +58,16 @@ class DatabaseViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     @list_route()
-    def nested(self, request):
+    def management(self, request):
         queryset = Database.objects.all()
-        serializer = NestedDatabaseSerializer(queryset, many=True)
+        serializer = ManagementDatabaseSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @list_route(methods=['get'])
+    def user(self, request):
+        # filter the databases which are published for the groups of the user
+        queryset = Database.objects.filter(groups__in=self.request.user.groups.all())
+        serializer = UserDatabaseSerializer(queryset, context={'request': request}, many=True)
         return Response(serializer.data)
 
 
@@ -96,12 +106,6 @@ class TableViewSet(viewsets.ModelViewSet):
         else:
             return Response([])
 
-    @list_route()
-    def nested(self, request):
-        queryset = Table.objects.all()
-        serializer = NestedTableSerializer(queryset, many=True)
-        return Response(serializer.data)
-
 
 class ColumnViewSet(viewsets.ModelViewSet):
     queryset = Column.objects.all()
@@ -118,30 +122,23 @@ class ColumnViewSet(viewsets.ModelViewSet):
         else:
             return Response([])
 
-    @list_route()
-    def nested(self, request):
-        queryset = Column.objects.all()
-        serializer = NestedColumnSerializer(queryset, many=True)
-        return Response(serializer.data)
-
 
 class FunctionViewSet(viewsets.ModelViewSet):
     queryset = Function.objects.all()
+    serializer_class = FunctionSerializer
 
-    def get_serializer_class(self):
-        if self.request.GET.get('nested'):
-            return NestedFunctionSerializer
-        else:
-            return FunctionSerializer
+    @list_route(methods=['get'])
+    def management(self, request):
+        queryset = Function.objects.all()
+        serializer = ManagementFunctionSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @list_route(methods=['get'])
+    def user(self, request):
+        queryset = Function.objects.filter(groups__in=self.request.user.groups.all())
+        serializer = UserFunctionSerializer(queryset, many=True)
+        return Response(serializer.data)
 
 
-class GroupViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Group.objects.all()
-    serializer_class = GroupSerializer
-
-
-class TableTypeViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = ChoicesSerializer
-
-    def get_queryset(self):
-        return Table.TYPE_CHOICES
+class TableTypeViewSet(ChoicesViewSet):
+    queryset = Table.TYPE_CHOICES

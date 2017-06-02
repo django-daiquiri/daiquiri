@@ -10,9 +10,9 @@ from django.utils.translation import ugettext_lazy as _
 
 @shared_task
 def submit_query(job_id):
-    from daiquiri_core.adapter import get_adapter
-    from daiquiri_query.models import QueryJob
-    from daiquiri_uws.settings import PHASE_EXECUTING, PHASE_COMPLETED, PHASE_ERROR, PHASE_ABORTED
+    from daiquiri.core.adapter import get_adapter
+    from daiquiri.query.models import QueryJob
+    from daiquiri.uws.settings import PHASE_EXECUTING, PHASE_COMPLETED, PHASE_ERROR, PHASE_ABORTED
 
     # get the job object from the database
     job = QueryJob.objects.get(pk=job_id)

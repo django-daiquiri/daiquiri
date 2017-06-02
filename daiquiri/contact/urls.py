@@ -2,12 +2,8 @@ from django.conf.urls import url, include
 
 from rest_framework import routers
 
-from .views import (
-    contact,
-    messages,
-    ContactMessageViewSet,
-    StatusViewSet
-)
+from .views import contact, messages
+from .viewsets import ContactMessageViewSet, StatusViewSet
 
 router = routers.DefaultRouter()
 router.register(r'messages', ContactMessageViewSet, base_name='message')

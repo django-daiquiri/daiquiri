@@ -16,11 +16,11 @@ angular.module('metadata', ['core'])
 
     var resources = {
         'databases': $resource(baseurl + 'metadata/api/databases/:list_route/:id/'),
-        'tables': $resource(baseurl + 'metadata/api/tables/:route/:id/'),
-        'columns': $resource(baseurl + 'metadata/api/columns/:route/:id/'),
-        'functions': $resource(baseurl + 'metadata/api/functions/:id/'),
-        'groups': $resource(baseurl + 'metadata/api/groups/:id/'),
+        'tables': $resource(baseurl + 'metadata/api/tables/:list_route/:id/'),
+        'columns': $resource(baseurl + 'metadata/api/columns/:list_route/:id/'),
+        'functions': $resource(baseurl + 'metadata/api/functions/:list_route/:id/'),
         'tabletypes': $resource(baseurl + 'metadata/api/tabletypes/:id/'),
+        'groups': $resource(baseurl + 'auth/api/groups/:id/'),
     };
 
     /* configure the factory for new items */
@@ -64,7 +64,7 @@ angular.module('metadata', ['core'])
     };
 
     service.initDatabasesBrowser = function() {
-        resources.databases.query({'list_route': 'nested'}, function(response) {
+        resources.databases.query({'list_route': 'management'}, function(response) {
             service.databases = response;
 
             service.tables = [];
@@ -81,7 +81,7 @@ angular.module('metadata', ['core'])
     };
 
     service.initFunctionsBrowser = function() {
-        resources.functions.query(function(response) {
+        resources.functions.query({'list_route': 'management'}, function(response) {
             service.functions = response;
 
             BrowserService.render('functions', service.functions, service.active);
@@ -161,7 +161,7 @@ angular.module('metadata', ['core'])
 
     service.discoverItem = function(resource) {
         var parameters = {
-            route: 'discover'
+            list_route: 'discover'
         };
 
         if (resource === 'tables') {

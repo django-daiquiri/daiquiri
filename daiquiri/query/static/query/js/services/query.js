@@ -11,11 +11,11 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
         forms: $resource(baseurl + 'query/api/forms/'),
         dropdowns: $resource(baseurl + 'query/api/dropdowns/'),
         jobs: $resource(baseurl + 'query/api/jobs/:id/:detail_route/'),
-        examples: $resource(baseurl + 'query/api/examples/'),
-        databases: $resource(baseurl + 'query/api/databases/:list_route/'),
-        functions: $resource(baseurl + 'query/api/functions/'),
+        examples: $resource(baseurl + 'query/api/examples/user/'),
         queues: $resource(baseurl + 'query/api/queues/'),
         querylanguages: $resource(baseurl + 'query/api/querylanguages/'),
+        databases: $resource(baseurl + 'metadata/api/databases/:list_route/'),
+        functions: $resource(baseurl + 'metadata/api/functions/'),
     };
 
     /* initialise the browser service */

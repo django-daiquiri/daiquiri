@@ -1,7 +1,7 @@
-from daiquiri.uws.views import UWSViewSet
+from daiquiri.uws.viewsets import UWSViewSet
 
 from .models import Job
-from .serializers import *
+from .serializers import JobsSerializer, JobSerializer
 
 
 class JobsViewSet(UWSViewSet):
