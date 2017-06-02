@@ -21,7 +21,14 @@ def submit_query(job_id):
     adapter = get_adapter('data')
 
     # create the database of the user if it not already exists
-    adapter.create_user_database_if_not_exists(job.database_name)
+    try:
+        adapter.create_user_database_if_not_exists(job.database_name)
+    except OperationalError as e:
+        job.phase = PHASE_ERROR
+        job.error_summary = str(e)
+        job.save()
+
+        return job.phase
 
     # set database and start time
     job.start_time = now()
