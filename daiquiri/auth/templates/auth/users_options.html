@@ -1,20 +1,22 @@
 {% load i18n %}
 {% load core_tags %}
 
-    <a href="" class="glyphicon glyphicon-eye-open" title="{% trans 'Show user details' %}"
+    <a href="" class="fa fa-eye" title="{% trans 'Show user details' %}"
         ng-click="service.modal('show-user-modal', $index)">
     </a>
-    <a href="" class="glyphicon glyphicon-pencil" title="{% trans 'Update user' %}"
+    <a href="" class="fa fa-pencil" title="{% trans 'Update user' %}"
         ng-click="service.modal('update-user-modal', $index)">
     </a>
-        <a href="" class="glyphicon glyphicon glyphicon-remove-sign"
+    <span ng-show="{$ row.id $} != {{ request.user.id }}">
+        <a href="" class="fa fa-times-circle"
             ng-show="row.user.is_active && !row.is_pending" title="{% trans 'Disable user' %}"
             ng-click="service.modal('disable-user-modal', $index)">
         </a>
-        <a href="" class="glyphicon glyphicon glyphicon-ok-sign"
+        <a href="" class="fa fa-check-circle"
             ng-show="!row.user.is_active && !row.is_pending" title="{% trans 'Enable user' %}"
             ng-click="service.modal('enable-user-modal', $index)">
         </a>
+    </span>
     {% if account_workflow == 'confirmation' %}
     <a href="" class="glyphicon glyphicon-ok" title="{% trans 'Confirm the user' %}"
         ng-show="row.is_pending && !row.is_confirmed"
@@ -28,7 +30,7 @@
     </a>
     {% endif %}
     {% if user.is_staff %}
-    <div class="dropdown users-options-dropdown">
+    <div class="dropdown">
         <a class="dropdown-toggle" type="button" id="users-options"
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"
             title="{% trans 'Show options' %}">

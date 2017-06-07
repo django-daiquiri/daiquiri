@@ -1,90 +1,34 @@
-var app = angular.module('users', ['core', 'infinite-scroll']);
+var app = angular.module('users', ['list', 'infinite-scroll']);
 
-app.config(['$httpProvider', '$interpolateProvider', function($httpProvider, $interpolateProvider) {
-    $interpolateProvider.startSymbol('{$');
-    $interpolateProvider.endSymbol('$}');
-    $httpProvider.defaults.xsrfCookieName = 'csrftoken';
-    $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
-}]);
+app.factory('UsersService', ['$resource', '$timeout', 'ListService', function($resource, $timeout, ListService) {
 
-// throttle/debounce the frequency of infinite-scroll events
-angular.module('infinite-scroll').value('THROTTLE_MILLISECONDS', 100);
+    /* get the base url */
 
-app.factory('UsersService', ['$http', '$timeout', function($http, $timeout) {
+    var baseurl = angular.element('meta[name="baseurl"]').attr('content');
 
-    // the url under which the profiles api is located
-    var resource_url = '/auth/api/profiles/';
+    /* configure resources */
+
+    var resources = {
+        profiles: $resource(baseurl + 'auth/api/profiles/:id/:detail_route/')
+    }
+
+    /* init the list service */
+
+    ListService.init(resources.profiles);
+
+    /* create the messages service */
 
     var service = {
-        current_url: null,
-        next_url: null
+        list: ListService
     };
-
-    function fetchProfiles() {
-        return $http.get(service.current_url)
-            .success(function(response) {
-                service.count = response.count;
-                service.next = response.next;
-                service.rows = service.rows.concat(response.results);
-            });
-    }
-
-    function storeProfile(action) {
-        service.errors = {};
-
-        if (angular.isUndefined(action)) {
-            action = '/';
-        } else {
-            action = '/' + action + '/';
-        }
-
-        return $http.put(resource_url + service.current_row.id + action, service.current_row)
-            .success(function(response) {
-                // copy the data back to the rows array and close the modal
-                service.rows[service.current_index] = response;
-            })
-            .error(function(response, status) {
-                service.errors = response;
-            });
-    }
 
     service.init = function() {
-        // reset the url
-        service.current_url = resource_url;
 
-        // reset data
-        service.search_string = null;
-        service.rows = [];
-
-        // fetch the first set of profiles
-        fetchProfiles();
-    };
-
-    service.search = function() {
-        // reset the url and add the search string
-        service.current_url = resource_url + '?search=' + service.search_string;
-
-        // reset data
-        service.rows = [];
-
-        // fetch the profiles with the search parameter
-        fetchProfiles();
-    };
-
-    service.scroll = function() {
-        if (service.next_url) {
-            // set the url to next and invalidate next so this code will not be triggered again
-            service.url = service.next_url;
-            service.next_url = null;
-
-            // fetch the profiles with the next url
-            fetchProfiles();
-        }
     };
 
     service.modal = function(modal_id, index) {
         service.current_index = index;
-        service.current_row = angular.copy(service.rows[index]);
+        service.current_row = angular.copy(service.list.rows[index]);
         service.errors = {};
 
         $timeout(function() {
@@ -92,33 +36,19 @@ app.factory('UsersService', ['$http', '$timeout', function($http, $timeout) {
         });
     };
 
-    service.updateUser = function() {
-        storeProfile().then(function() {
-            $('#update-user-modal').modal('hide');
-        });
-    };
+    service.storeProfile = function(action) {
+        service.errors = {};
 
-    service.confirmUser = function() {
-        storeProfile('confirm').then(function() {
-            $('#confirm-user-modal').modal('hide');
-        });
-    };
+        resources.profiles.update({
+            id: service.current_row.id,
+            detail_route: action
+        }, service.current_row, function(response) {
+            // copy the data back to the rows array and close the modal
+            service.list.rows[service.current_index] = response;
 
-    service.activateUser = function() {
-        storeProfile('activate').then(function() {
-            $('#activate-user-modal').modal('hide');
-        });
-    };
-
-    service.disableUser = function() {
-        storeProfile('disable').then(function() {
-            $('#disable-user-modal').modal('hide');
-        });
-    };
-
-    service.enableUser = function() {
-        storeProfile('enable').then(function() {
-            $('#enable-user-modal').modal('hide');
+            $('.modal').modal('hide');
+        }, function(result) {
+            service.errors = result.data;
         });
     };
 
