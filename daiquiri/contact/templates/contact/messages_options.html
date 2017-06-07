@@ -12,7 +12,7 @@
         ng-click="service.updateMessage(row, 'ACTIVE')">
     </a>
 
-    <div class="dropdown messages-options-dropdown">
+    <div class="dropdown">
         <a class="dropdown-toggle" type="button" id="messages-options"
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"
             title="{% trans 'Show options' %}">
@@ -21,7 +21,7 @@
         <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="messages-options">
             <li>
                 <a href=""
-                    ng-hide="row.status == 'SPAM' "
+                    ng-hide="row.status == 'SPAM'"
                     ng-click="service.updateMessage(row, 'SPAM')">
                     <i class="fa fa-ban"></i>
                     <span>{% trans 'Mark as spam' %}</span>
@@ -29,7 +29,7 @@
             <li>
             <li>
                 <a href=""
-                    ng-hide="row.status != 'SPAM' "
+                    ng-hide="row.status != 'SPAM'"
                     ng-click="service.updateMessage(row, 'ACTIVE')">
                     <i class="fa fa-check"></i>
                     <span>{% trans 'Not spam' %}</span>

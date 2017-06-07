@@ -109,35 +109,6 @@ a,
     border-bottom: 1px solid #e5e5e5;
 }
 
-/* angular list */
-
-.list-search > div {
-    margin-top: 20px;
-    margin-bottom: 20px;
-}
-.list-search .pagination {
-    margin-top: 0;
-    margin-bottom: 0;
-}
-.list-search .list-search-count {
-    line-height: 34px;
-}
-.list-table .list-table-options {
-    white-space: nowrap;
-}
-.list-table .dropdown {
-    display: inline-block;
-}
-.list-table .dropdown > a.dropdown-toggle {
-    display: block;
-    cursor: pointer;
-}
-.list-table .list-table-options > a,
-.list-table .dropdown > a.dropdown-toggle {
-    text-align: center;
-    width: 16px;
-}
-
 /* daiquiri-widget */
 
 .daiquiri-widget {

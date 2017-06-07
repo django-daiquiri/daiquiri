@@ -29,7 +29,7 @@ class ContactMessage(models.Model):
     message = models.TextField()
 
     class Meta:
-        ordering = ('status', 'created', 'author')
+        ordering = ('-created', 'author')
 
         verbose_name = _('Contact message')
         verbose_name_plural = _('Contact messages')

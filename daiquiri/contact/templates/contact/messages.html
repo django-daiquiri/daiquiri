@@ -7,6 +7,7 @@
 
 {% block headextra %}
     {% compress css %}
+    <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/list.scss' %}" />
     <link rel="stylesheet" type="text/x-scss" href="{% static 'contact/css/messages.scss' %}" />
     {% endcompress %}
 
@@ -16,6 +17,7 @@
     <script type='text/javascript' src="{% static 'ngInfiniteScroll/build/ng-infinite-scroll.min.js' %}"></script>
 
     <script type="text/javascript" src="{% static 'core/js/core.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'core/js/list.js' %}" ></script>
     <script type="text/javascript" src="{% static 'core/js/filter.js' %}" ></script>
     <script type="text/javascript" src="{% static 'core/js/multiCheckbox.js' %}" ></script>
     <script type="text/javascript" src="{% static 'core/js/byNumber.js' %}" ></script>
@@ -29,76 +31,87 @@
 
     <h1>Contact messages</h1>
 
-    <div class="row list-search">
-        <form class="search-form col-sm-6 list-search-form" ng-submit="service.search()">
-            <div class="input-group">
-                <input class="form-control"
-                       id="table-pager-search-input"
-                       placeholder="{% trans 'Search entries' %}"
-                       type="text" ng-model="service.search_string">
-                <a href="" class="input-group-addon" ng-click="service.search()">
-                    <span class="fa fa-search"></span>
-                </a>
-            </div>
-        </form>
-
-        <div class="col-sm-1 list-search-reset">
-            <ul class="pagination">
-                <li>
-                    <a href="" ng-click="service.init()">{% trans 'Reset' %}</a>
-                </li>
-            </ul>
-        </div>
-        <div class="col-sm-2 list-search-reset">
-            <ul class="pagination">
-                <li>
-                    <a href="" ng-show="!service.show_spam" ng-click="service.showSpam(true)">{% trans 'Show spam' %}</a>
-                    <a href="" ng-show="service.show_spam" ng-click="service.showSpam(false)">{% trans 'Hide spam' %}</a>
-                </li>
-            </ul>
-        </div>
-        <div class="col-sm-3rкорм list-search-count text-right">
-            {$ service.count $} {% trans 'messages found' %}
-        </div>
-    </div>
-
-    <table class="table list-table" infinite-scroll="service.scroll()" infinite-scroll-distance="0.2">
-        <thead>
-            <th style="width: 30%;">{% trans 'Subject' %}</th>
-            <th style="width: 15%;">{% trans 'Author' %}</th>
-            <th style="width: 20%;">{% trans 'Email' %}</th>
-            <th style="width: 20%;">{% trans 'Created' %}</th>
-            <th style="width: 5%;">{% trans 'Status' %}</th>
-            <th style="width: 10%;">
-
-            </th>
-        </thead>
-        <tbody>
-            <tr ng-repeat="row in service.rows"
-                ng-hide="(row.status == 'SPAM' && !service.show_spam) || (service.show_spam && row.status != 'SPAM')">
-                <td>
-                    <a href="" ng-click="service.modal('show-message-modal', $index)">
-                        {$ row.subject $}
+    <div class="daiquiri-list">
+        <div class="row daiquiri-list-header">
+            <form class="col-sm-6" ng-submit="service.list.search()">
+                <div class="input-group">
+                    <input class="form-control"
+                           id="table-pager-search-input"
+                           placeholder="{% trans 'Search entries' %}"
+                           type="text" ng-model="service.list.search_string">
+                    <a href="" class="input-group-addon" ng-click="service.list.search()">
+                        <span class="fa fa-search"></span>
                     </a>
-                </td>
-                <td>
-                    {$ row.author $}
-                </td>
-                <td>
-                    {% include 'contact/messages_reply_link.html' %}
-                </td>
-                <td>
-                    {$ row.created | date: 'MMM d, yyyy hh:mm' $}
-                </td>
-                <td>
-                    {$ row.status_label $}
-                </td>
-                <td class="text-right list-table-options">
-                    {% include 'contact/messages_options.html' %}
-                </td>
-            </tr>
-        </tbody>
-    </table>
+                </div>
+            </form>
+
+            <div class="col-sm-1">
+                <ul class="pagination">
+                    <li>
+                        <a href="" ng-click="service.list.reset()">{% trans 'Reset' %}</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-sm-2">
+                <ul class="pagination">
+                    <li>
+                        <a href="" ng-click="service.toggleSpam()">
+                            <span ng-show="!service.list.params.spam">{% trans 'Show spam' %}</span>
+                            <span ng-show="service.list.params.spam">{% trans 'Hide spam' %}</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-sm-3 count text-right">
+                {$ service.list.count $} {% trans 'messages found' %}
+            </div>
+        </div>
+
+        <table class="table daiquiri-list-table" infinite-scroll="service.list.fetch()" infinite-scroll-distance="0.2">
+            <thead>
+                <th style="width: 20%;" data-order-list="subject">
+                    {% trans 'Subject' %}
+                </th>
+                <th style="width: 15%;" data-order-list="author">
+                    {% trans 'Author' %}
+                </th>
+                <th style="width: 15%;" data-order-list="email">
+                    {% trans 'Email' %}
+                </th>
+                <th style="width: 20%;" data-order-list="created">
+                    {% trans 'Created' %}
+                </th>
+                <th style="width: 15%;" data-order-list="status">
+                    {% trans 'Status' %}
+                </th>
+                <th style="width: 10%;"></th>
+            </thead>
+            <tbody>
+                <tr ng-repeat="row in service.list.rows">
+                    <td>
+                        <a href="" ng-click="service.modal('show-message-modal', $index)">
+                            {$ row.subject $}
+                        </a>
+                    </td>
+                    <td>
+                        {$ row.author $}
+                    </td>
+                    <td>
+                        {% include 'contact/messages_reply_link.html' %}
+                    </td>
+                    <td>
+                        {$ row.created | date: 'MMM d, yyyy hh:mm' $}
+                    </td>
+                    <td>
+                        {$ row.status_label $}
+                    </td>
+                    <td class="text-right options">
+                        {% include 'contact/messages_options.html' %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
     {% include 'contact/messages_modal_show.html' %}
 

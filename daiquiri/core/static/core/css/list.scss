@@ -1,0 +1,40 @@
+.daiquiri-list {
+    .daiquiri-list-header {
+        margin-top: 20px;
+        margin-bottom: 20px;
+
+        form,
+        .pagination {
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+        .count {
+            line-height: 34px;
+        }
+    }
+    .daiquiri-list-table {
+        th .order {
+            cursor: pointer;
+
+            i {
+                opacity: 0.2;
+            }
+            i.ordered {
+                opacity: 1;
+            }
+        }
+            .options {
+            a.fa {
+                width: 16px;
+                text-align: center;
+            }
+            .dropdown {
+                display: inline-block;
+
+                a.dropdown-toggle {
+                    cursor: pointer;
+                }
+            }
+        }
+    }
+}

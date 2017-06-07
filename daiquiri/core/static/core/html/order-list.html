@@ -1,0 +1,8 @@
+<span ng-transclude class="name"></span>
+<span class="order" ng-click="list.order(column_name)">
+    <i ng-class="{
+        'fa fa-chevron-down': !list.params.ordering.endsWith(column_name),
+        'ordered fa fa-chevron-down': list.params.ordering == column_name,
+        'ordered fa fa-chevron-up': list.params.ordering == '-' + column_name
+    }" aria-hidden="true"></i>
+</span>

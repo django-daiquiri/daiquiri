@@ -7,6 +7,7 @@ from daiquiri.core.permissions import HasModelPermission
 from .models import ContactMessage
 from .serializers import ContactMessageSerializer
 from .paginations import MessagePagination
+from .filters import SpamBackend
 
 
 class ContactMessageViewSet(viewsets.ModelViewSet):
@@ -17,8 +18,14 @@ class ContactMessageViewSet(viewsets.ModelViewSet):
     serializer_class = ContactMessageSerializer
     pagination_class = MessagePagination
 
-    filter_backends = (filters.SearchFilter, filters.OrderingFilter)
-    search_fields = ('author', 'email', 'subject', 'status')
+    filter_backends = (
+        filters.SearchFilter,
+        filters.OrderingFilter,
+        filters.DjangoFilterBackend,
+        SpamBackend
+    )
+    search_fields = ('author', 'email', 'subject', 'message', 'status')
+    filter_fields = ('status', )
 
 
 class StatusViewSet(ChoicesViewSet):
