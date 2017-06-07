@@ -7,6 +7,7 @@
 
 {% block headextra %}
     {% compress css %}
+    <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/list.scss' %}" />
     <link rel="stylesheet" type="text/x-scss" href="{% static 'query/css/examples.scss' %}" />
     {% endcompress %}
 
@@ -16,6 +17,7 @@
     <script type='text/javascript' src="{% static 'ngInfiniteScroll/build/ng-infinite-scroll.min.js' %}"></script>
 
     <script type="text/javascript" src="{% static 'core/js/core.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'core/js/list.js' %}" ></script>
     <script type="text/javascript" src="{% static 'core/js/filter.js' %}" ></script>
     <script type="text/javascript" src="{% static 'core/js/multiCheckbox.js' %}" ></script>
     <script type="text/javascript" src="{% static 'core/js/byNumber.js' %}" ></script>
@@ -29,40 +31,64 @@
 
     <h1>Example queries</h1>
 
-    <div class="btn-group wide pull-right">
-        <button type="button" class="btn btn-default"
-            ng-click="service.modal('examples-modal-form', $index)">
-
-            {% trans 'Create new example' %}
-        </button>
-    </div>
-
-    <table class="table list-table" infinite-scroll="service.scroll()" infinite-scroll-distance="0.2">
-        <thead>
-            <th style="width: 50%">{% trans 'Name' %}</th>
-            <th style="width: 20%;">{% trans 'Published for' %}</th>
-            <th style="width: 10%;"></th>
-        </thead>
-        <tbody>
-            <tr ng-repeat="row in service.rows">
-                <td>
-                    <a href="" ng-click="service.modal('show-example-modal', $index)">
-                       <span ng-show="row.name"> {$ row.name $} </span>
+    <div class="daiquiri-list">
+        <div class="row daiquiri-list-header">
+            <form class="col-sm-6" ng-submit="service.list.search()">
+                <div class="input-group">
+                    <input class="form-control"
+                           id="table-pager-search-input"
+                           placeholder="{% trans 'Search examples' %}"
+                           type="text" ng-model="service.list.search_string">
+                    <a href="" class="input-group-addon" ng-click="service.list.search()">
+                        <span class="fa fa-search"></span>
                     </a>
-                </td>
-                <td>
-                    <ul class="list-unstyled">
-                        <li ng-repeat="group_id in row.groups">
-                            {$ service.groups_map[group_id] $}
-                         </li>
-                    </ul>
-                </td>
-                <td class="text-right list-table-options">
-                    {% include 'query/example_options.html' %}
-                </td>
-            </tr>
-        </tbody>
-    </table>
+                </div>
+            </form>
+            <div class="col-sm-3">
+                <ul class="pagination">
+                    <li>
+                        <a href="" ng-click="service.list.reset()">{% trans 'Reset' %}</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-sm-3 text-right">
+                <ul class="pagination">
+                    <li>
+                        <a href="" ng-click="service.modal('examples-modal-form', $index)">
+                            {% trans 'Create new example' %}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <table class="table daiquiri-list-table" infinite-scroll="service.list.fetch()" infinite-scroll-distance="0.2">
+            <thead>
+                <th style="width: 50%" data-order-list="name">{% trans 'Name' %}</th>
+                <th style="width: 20%;" data-order-list="groups">{% trans 'Published for' %}</th>
+                <th style="width: 10%;"></th>
+            </thead>
+            <tbody>
+                <tr ng-repeat="row in service.list.rows">
+                    <td>
+                        <a href="" ng-click="service.modal('show-example-modal', $index)">
+                           <span ng-show="row.name"> {$ row.name $} </span>
+                        </a>
+                    </td>
+                    <td>
+                        <ul class="list-unstyled">
+                            <li ng-repeat="group_id in row.groups">
+                                {$ service.groups_map[group_id] $}
+                             </li>
+                        </ul>
+                    </td>
+                    <td class="text-right list-table-options">
+                        {% include 'query/examples_options.html' %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
     {% include 'query/examples_modal_show.html' %}
     {% include 'query/examples_modal_form.html' %}

@@ -75,7 +75,6 @@ angular.module('list', ['core'])
     };
 
     service.order = function(column_name) {
-        console.log(column_name);
         if (service.params.ordering == column_name) {
             service.params.ordering = '-' + column_name;
         } else {

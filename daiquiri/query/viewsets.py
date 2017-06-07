@@ -7,7 +7,7 @@ from django.http import Http404
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets, mixins, filters
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import ValidationError
@@ -182,6 +182,13 @@ class ExampleViewSet(viewsets.ModelViewSet):
     serializer_class = ExampleSerializer
     pagination_class = ExamplePagination
     queryset = Example.objects.all()
+
+    filter_backends = (
+        filters.SearchFilter,
+        filters.OrderingFilter
+    )
+    search_fields = ('name', 'description', 'query_string')
+
 
     @list_route(methods=['get'], permission_classes=(IsAuthenticated, ))
     def user(self, request):

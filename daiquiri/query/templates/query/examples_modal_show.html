@@ -1,6 +1,6 @@
 {% load i18n %}
 
-    <div class="modal" id="show-example-modal" tabindex="-1">
+    <div class="modal" id="examples-modal-show" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
 
@@ -12,10 +12,6 @@
                 </div>
 
                 <div class="modal-body">
-                    <dl>
-                        <dt>{% trans 'Id' %}</dt>
-                        <dd>{$ service.current_row.id $}</dd>
-                    </dl>
                     <dl>
                         <dt>{% trans 'Order in list' %}</dt>
                         <dd>{$ service.current_row.order $}</dd>
