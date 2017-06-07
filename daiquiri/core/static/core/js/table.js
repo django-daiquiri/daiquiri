@@ -62,7 +62,7 @@ angular.module('core')
     /* create the metadata service */
 
     var service = {
-        config: {
+        params: {
             page: 1,
             page_size: 10,
             ordering: null,
@@ -76,11 +76,11 @@ angular.module('core')
             reset: gettext('Reset'),
             filter: gettext('Filter'),
             count: function() {
-                var page_count = Math.ceil(service.count / service.config.page_size);
-                if (service.config.filter) {
-                    return interpolate(gettext('Page %s of %s (%s rows total, filtering for "%s")'), [service.config.page,page_count, service.count, service.config.filter]);
+                var page_count = Math.ceil(service.count / service.params.page_size);
+                if (service.params.filter) {
+                    return interpolate(gettext('Page %s of %s (%s rows total, filtering for "%s")'), [service.params.page,page_count, service.count, service.params.filter]);
                 } else {
-                    return interpolate(gettext('Page %s of %s (%s rows total)'), [service.config.page,page_count, service.count]);
+                    return interpolate(gettext('Page %s of %s (%s rows total)'), [service.params.page,page_count, service.count]);
                 }
             },
             page_size: function(value) {
@@ -95,67 +95,67 @@ angular.module('core')
             'indexed': gettext('Indexed'),
             'std': gettext('STD'),
         },
-        search_string: null,
+        filter_string: null,
         updated: false
     };
 
     service.init = function(database, table) {
-        service.config.database = database;
-        service.config.table = table;
+        service.params.database = database;
+        service.params.table = table;
 
-        service.columns = resources.columns.query(service.config);
+        service.columns = resources.columns.query(service.params);
         service.reset();
     };
 
     service.fetch = function() {
-        resources.rows.paginate(service.config, function(response) {
+        resources.rows.paginate(service.params, function(response) {
             service.count = response.count;
             service.rows = response.results;
         });
     };
 
     service.first = function() {
-        service.config.page = 1;
+        service.params.page = 1;
         service.fetch();
     };
 
     service.previous = function() {
-        if (service.config.page > 1) {
-            service.config.page -= 1;
+        if (service.params.page > 1) {
+            service.params.page -= 1;
             service.fetch();
         }
     };
 
     service.next = function() {
-        if (service.config.page * service.config.page_size < service.count) {
-            service.config.page += 1;
+        if (service.params.page * service.params.page_size < service.count) {
+            service.params.page += 1;
             service.fetch();
         }
     };
 
     service.last = function() {
-        service.config.page = Math.ceil(service.count / service.config.page_size);
+        service.params.page = Math.ceil(service.count / service.params.page_size);
         service.fetch();
     };
 
     service.reset = function() {
-        service.config.page = 1;
-        service.config.ordering = null;
-        service.config.filter = null;
+        service.params.page = 1;
+        service.params.ordering = null;
+        service.params.filter = null;
         service.filter_string = null;
         service.fetch();
     };
 
     service.filter = function() {
-        service.config.filter = service.filter_string;
+        service.params.filter = service.filter_string;
         service.fetch();
     };
 
     service.order = function(column_name) {
-        if (service.config.ordering == column_name) {
-            service.config.ordering = '-' + column_name;
+        if (service.params.ordering == column_name) {
+            service.params.ordering = '-' + column_name;
         } else {
-            service.config.ordering = column_name;
+            service.params.ordering = column_name;
         }
         service.fetch();
     };
