@@ -7,11 +7,11 @@ from rest_framework.exceptions import MethodNotAllowed
 from rest_framework.response import Response
 
 from daiquiri.core.permissions import HasModelPermission
+from daiquiri.core.paginations import ListPagination
 
 from .models import Profile
 from .utils import get_account_workflow
 from .serializers import ProfileSerializer, GroupSerializer
-from .paginations import ProfilePagination
 
 
 class ProfileViewSet(mixins.UpdateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
@@ -19,7 +19,7 @@ class ProfileViewSet(mixins.UpdateModelMixin, mixins.ListModelMixin, mixins.Retr
 
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
-    pagination_class = ProfilePagination
+    pagination_class = ListPagination
 
     filter_backends = (filters.SearchFilter, filters.OrderingFilter)
     ordering_fields = ('user__username', 'user__email', 'user__first_name', 'user__last_name')

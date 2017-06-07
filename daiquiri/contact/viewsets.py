@@ -3,10 +3,10 @@ from rest_framework.permissions import IsAuthenticated
 
 from daiquiri.core.viewsets import ChoicesViewSet
 from daiquiri.core.permissions import HasModelPermission
+from daiquiri.core.paginations import ListPagination
 
 from .models import ContactMessage
 from .serializers import ContactMessageSerializer
-from .paginations import MessagePagination
 from .filters import SpamBackend
 
 
@@ -16,7 +16,7 @@ class ContactMessageViewSet(viewsets.ModelViewSet):
     queryset = ContactMessage.objects.all()
 
     serializer_class = ContactMessageSerializer
-    pagination_class = MessagePagination
+    pagination_class = ListPagination
 
     filter_backends = (
         filters.SearchFilter,

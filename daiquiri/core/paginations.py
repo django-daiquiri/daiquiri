@@ -1,5 +1,5 @@
 from rest_framework.pagination import PageNumberPagination
 
 
-class MessagePagination(PageNumberPagination):
+class ListPagination(PageNumberPagination):
     page_size = 30

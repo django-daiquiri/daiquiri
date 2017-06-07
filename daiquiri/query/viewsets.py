@@ -16,6 +16,7 @@ from rest_framework.decorators import list_route, detail_route
 from daiquiri.core.viewsets import ChoicesViewSet
 from daiquiri.core.permissions import HasModelPermission
 from daiquiri.core.utils import human2bytes
+from daiquiri.core.paginations import ListPagination
 from daiquiri.uws.settings import PHASE_ARCHIVED
 
 from .models import QueryJob, Example
@@ -180,7 +181,7 @@ class QueryJobViewSet(viewsets.ModelViewSet):
 class ExampleViewSet(viewsets.ModelViewSet):
     permission_classes = (HasModelPermission, )
     serializer_class = ExampleSerializer
-    pagination_class = ExamplePagination
+    pagination_class = ListPagination
     queryset = Example.objects.all()
 
     filter_backends = (
@@ -188,7 +189,6 @@ class ExampleViewSet(viewsets.ModelViewSet):
         filters.OrderingFilter
     )
     search_fields = ('name', 'description', 'query_string')
-
 
     @list_route(methods=['get'], permission_classes=(IsAuthenticated, ))
     def user(self, request):
