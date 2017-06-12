@@ -30,7 +30,6 @@ from .serializers import (
     ExampleSerializer,
     UserExampleSerializer
 )
-from .paginations import ExamplePagination
 from .exceptions import (
     ADQLSyntaxError,
     MySQLSyntaxError,
