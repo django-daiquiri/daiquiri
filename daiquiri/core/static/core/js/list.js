@@ -42,31 +42,28 @@ angular.module('list', ['core'])
             service.idle = false;
 
             return service.resource.get(service.params, function(response) {
-                    service.count = response.count;
-                    if (service.params.page == 1) {
-                        service.rows = response.results;
-                    } else {
-                        service.rows = service.rows.concat(response.results);
+                service.count = response.count;
+                if (service.params.page == 1) {
+                    service.rows = response.results;
+                } else {
+                    service.rows = service.rows.concat(response.results);
+                }
+
+                service.params.page = null;
+                if (response.next) {
+                    var m = response.next.match(/page=(\d+)/);
+                    if (m) {
+                        service.params.page = parseInt(m[1]);
                     }
+                }
+                service.idle = true;
 
-                    service.params.page = null;
-                    if (response.next) {
-                        var m = response.next.match(/page=(\d+)/);
-                        if (m) {
-                            service.params.page = parseInt(m[1]);
-                        }
-                    }
-                    service.idle = true;
-
-                    if (response.next) {
-                        if (service.show_spam )
-
-
-                        service.fetch();
-                    }
-                }).$promise;
+                if (response.next) {
+                    service.fetch();
+                }
+            }).$promise;
         }
-    }
+    };
 
     service.search = function() {
         service.params.page = 1;
@@ -90,7 +87,7 @@ angular.module('list', ['core'])
         service.params.ordering = null;
         service.params.search = null;
         service.fetch();
-    }
+    };
 
     return service;
 }]);

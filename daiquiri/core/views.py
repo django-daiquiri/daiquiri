@@ -20,7 +20,6 @@ def home(request):
 class PermissionRedirectMixin(object):
 
     def handle_no_permission(self):
-        print self.get_permission_denied_message()
         if self.request.user.is_authenticated():
             raise PermissionDenied(self.get_permission_denied_message())
 
