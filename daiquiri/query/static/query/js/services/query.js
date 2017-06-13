@@ -14,8 +14,8 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
         examples: $resource(baseurl + 'query/api/examples/user/'),
         queues: $resource(baseurl + 'query/api/queues/'),
         querylanguages: $resource(baseurl + 'query/api/querylanguages/'),
-        databases: $resource(baseurl + 'metadata/api/databases/:list_route/'),
-        functions: $resource(baseurl + 'metadata/api/functions/'),
+        databases: $resource(baseurl + 'metadata/api/databases/user/'),
+        functions: $resource(baseurl + 'metadata/api/functions/user/'),
     };
 
     /* initialise the browser service */
@@ -115,8 +115,8 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
     };
 
     service.fetchUserDatabase = function() {
-        return resources.databases.query({
-            'list_route': 'user'
+        return resources.jobs.query({
+            'detail_route': 'tables'
         }, function(response) {
             var user_database = response[0];
 

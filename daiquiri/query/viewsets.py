@@ -37,6 +37,7 @@ from .exceptions import (
     TableError,
     ConnectionError
 )
+from utils import fetch_user_database_metadata
 
 
 class StatusViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -147,7 +148,12 @@ class QueryJobViewSet(viewsets.ModelViewSet):
     def perform_destroy(self, instance):
         instance.archive()
 
-    @detail_route(methods=['get', 'put'])
+    @list_route(methods=['get'])
+    def tables(self, request):
+        jobs = QueryJob.objects.filter(owner=self.request.user).exclude(phase=PHASE_ARCHIVED)
+        return Response([fetch_user_database_metadata(jobs, request.user.username)])
+
+    @detail_route(methods=['put'])
     def kill(self, request, pk=None):
         try:
             job = self.get_queryset().get(pk=pk)
