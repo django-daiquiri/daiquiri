@@ -9,25 +9,26 @@
 
 <body {% block bodyargs %}{% endblock %}>
 
-<!-- navigation -->
+<!-- begin navigation -->
     {% include 'core/base_navigation.html' %}
 <!-- end navigation -->
 
-<!-- content -->
+<!-- begin content -->
 
     <div class="content">
         {% block content %}
+        <!-- content placeholder -->
         {% endblock %}
     </div>
 
 <!-- end content -->
 
-<!-- footer -->
+<!-- begin footer -->
     {% include 'core/base_footer.html' %}
 <!-- end footer -->
 
 {% if not debug %}
-<!-- analytics -->
+<!-- begin analytics -->
     {% include 'core/base_analytics.html' %}
 <!-- end analytics -->
 {% endif %}

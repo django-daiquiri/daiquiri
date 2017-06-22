@@ -1,0 +1,9 @@
+{% extends 'core/base.html' %}
+{% load staticfiles %}
+{% load compress %}
+
+{% block headextra %}
+{% compress css %}
+    <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/wordpress.scss' %}" />
+{% endcompress %}
+{% endblock %}
