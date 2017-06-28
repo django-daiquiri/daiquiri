@@ -5,8 +5,10 @@ from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from daiquiri.core.utils import get_referer_path_info, get_next
 from django.views.generic import TemplateView
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
+
+from allauth.account.views import logout as allauth_logout
 
 from daiquiri.core.views import ModelPermissionMixin
 
@@ -33,6 +35,25 @@ def profile_update(request):
         'profile_form': profile_form,
         'next': get_referer_path_info(request, default='/')
     })
+
+
+@login_required()
+def profile_json(request):
+    return JsonResponse({
+        'username': request.user.username
+    })
+
+
+def logout(request, *args, **kwargs):
+    response = allauth_logout(request, *args, **kwargs)
+
+    # delete wordpress cookies
+    if hasattr(settings, 'WORDPRESS') and settings.WORDPRESS:
+        for cookie in request.COOKIES:
+            if cookie.startswith('wordpress') or cookie.startswith('wp-settings'):
+                response.delete_cookie(cookie)
+
+    return response
 
 
 class UsersView(ModelPermissionMixin, TemplateView):

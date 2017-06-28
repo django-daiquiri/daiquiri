@@ -10,6 +10,10 @@ class DaiquiriAccountAdapter(DefaultAccountAdapter):
 
     WORKFLOWS = ('confirmation', 'activation')
 
+    def is_safe_url(self, url):
+        from django.utils.http import is_safe_url
+        return is_safe_url(url, allowed_hosts=settings.ALLOWED_HOSTS)
+
     def has_workflow(self):
         return hasattr(settings, 'ACCOUNT_WORKFLOW') and settings.ACCOUNT_WORKFLOW in self.WORKFLOWS
 

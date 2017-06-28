@@ -84,7 +84,7 @@ class QueryJobManager(models.Manager):
 
         # start the submit_query task in a syncronous or asuncronous way
         job_id = str(job.id)
-        if not settings.QUERY['async'] or sync:
+        if not settings.ASYNC or sync:
             submit_query.apply((job_id, ), task_id=job_id)
         else:
             submit_query.apply_async((job_id, ), task_id=job_id, queue=job.queue)

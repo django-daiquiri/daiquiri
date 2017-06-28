@@ -9,7 +9,8 @@ app.factory('UsersService', ['$resource', '$timeout', 'ListService', function($r
     /* configure resources */
 
     var resources = {
-        profiles: $resource(baseurl + 'auth/api/profiles/:id/:detail_route/')
+        profiles: $resource(baseurl + 'auth/api/profiles/:id/:detail_route/'),
+        groups: $resource(baseurl + 'auth/api/groups/:id/')
     }
 
     /* init the list service */
@@ -23,7 +24,7 @@ app.factory('UsersService', ['$resource', '$timeout', 'ListService', function($r
     };
 
     service.init = function() {
-
+        service.groups = resources.groups.query();
     };
 
     service.modal = function(modal_id, index) {

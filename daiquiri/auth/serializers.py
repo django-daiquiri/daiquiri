@@ -22,7 +22,8 @@ class UserSerializer(serializers.ModelSerializer):
             'email',
             'is_staff',
             'is_active',
-            'date_joined'
+            'date_joined',
+            'groups'
         )
         read_only_fields = (
             'last_login',
@@ -66,6 +67,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         obj.user.last_name = user['last_name']
         obj.user.email = user['email']
         obj.user.is_active = user['is_active']
+        obj.user.groups = user['groups']
         obj.user.save()
 
         return super(ProfileSerializer, self).update(obj, validated_data)

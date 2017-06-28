@@ -25,7 +25,7 @@
                             data-id="last_name"
                             data-type="text"
                             data-label="{% trans 'Last Name' %}"
-                            data-model="service.current_row.user.first_name"
+                            data-model="service.current_row.user.last_name"
                             data-errors="service.errors.user.last_name">
                         </formgroup>
                     </div>
@@ -47,6 +47,15 @@
                         data-options-label="label">
                     </formgroup>
                     {% endfor %}
+                    <formgroup
+                        data-id="groups"
+                        data-type="multicheckbox"
+                        data-label="{% trans 'Groups' %}"
+                        data-model="service.current_row.user.groups"
+                        data-errors="service.errors.user.groups"
+                        data-options="service.groups"
+                        data-options-label="name">
+                    </formgroup>
                 </div>
 
                 <div class="modal-footer">

@@ -2,14 +2,19 @@ from django.dispatch import receiver
 
 from allauth.account.signals import email_confirmed
 
-from .signals import user_confirmed, user_activated
+from .signals import (
+    user_confirmed,
+    user_activated
+)
 
-from .utils import get_account_workflow
-from .utils import send_request_confirmation
-from .utils import send_request_activation
-from .utils import send_notify_confirmation
-from .utils import send_notify_activation
-from .utils import send_activation
+from .utils import (
+    get_account_workflow,
+    send_request_confirmation,
+    send_request_activation,
+    send_notify_confirmation,
+    send_notify_activation,
+    send_activation
+)
 
 
 @receiver(email_confirmed)

@@ -76,6 +76,24 @@ a,
     .dropdown li.divider:first-child {
         display: none;
     }
+
+    .dropdown-menu {
+        .sub-menu {
+            padding-left: 0;
+            list-style-type: none;
+
+            a {
+                color: inherit;
+                text-decoration: none;
+            }
+            li {
+                padding: 1px 20px 1px 40px;
+            }
+            :hover {
+                background-color: $navigation-dropdown-hover-background-color;
+            }
+        }
+    }
 }
 
 /* content */
