@@ -48,10 +48,9 @@ def logout(request, *args, **kwargs):
     response = allauth_logout(request, *args, **kwargs)
 
     # delete wordpress cookies
-    if hasattr(settings, 'WORDPRESS') and settings.WORDPRESS:
-        for cookie in request.COOKIES:
-            if cookie.startswith('wordpress') or cookie.startswith('wp-settings'):
-                response.delete_cookie(cookie)
+    for cookie in request.COOKIES:
+        if cookie.startswith('wordpress') or cookie.startswith('wp-settings'):
+            response.delete_cookie(cookie)
 
     return response
 
