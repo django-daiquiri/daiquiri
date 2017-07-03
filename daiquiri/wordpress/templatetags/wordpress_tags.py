@@ -11,8 +11,13 @@ register = template.Library()
 
 
 @register.simple_tag(takes_context=True)
-def wordpress_url(context):
-    return get_script_alias(context.request) + settings.WORDPRESS_URL
+def wordpress_url(context, path=None):
+    url = get_script_alias(context.request) + settings.WORDPRESS_URL
+
+    if path:
+        url += path
+
+    return url
 
 
 @register.simple_tag(takes_context=True)
@@ -22,9 +27,9 @@ def wordpress_admin_url(context):
 
 @register.simple_tag()
 def wordpress_menu(menu_name):
-
-    with open(os.path.join(settings.WORDPRESS_PATH, 'wp-content', 'menus', menu_name + '.html')) as f:
-        menu_file = File(f)
-        menu_string = menu_file.read()
-
-    return mark_safe(menu_string)
+    try:
+        with open(os.path.join(settings.WORDPRESS_PATH, 'wp-content', 'menus', menu_name + '.html')) as f:
+            menu_file = File(f)
+            return mark_safe(menu_file.read())
+    except IOError:
+        return ''
