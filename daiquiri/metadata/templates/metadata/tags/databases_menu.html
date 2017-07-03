@@ -1,0 +1,13 @@
+{% for database in databases %}
+<li>
+    <a href="{% url 'metadata_database' database.name %}">{{ database.name }}</a>
+
+    <ul class="sub-menu">
+        {% for table in database.tables.all %}
+        <li>
+            <a href="{% url 'metadata_table' database.name table.name %}">{{ table }}</a>
+        </li>
+        {% endfor %}
+    </ul>
+</li>
+{% endfor %}

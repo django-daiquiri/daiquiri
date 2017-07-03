@@ -1,13 +1,37 @@
-{% extends 'core/wide.html' %}
+{% extends 'core/page.html' %}
 {% load i18n %}
+{% load static %}
 
-{% block wide %}
+{% block page %}
 
-    <h1>{{ table }}</h1>
+    <h1>
+        {% if table.title %}
+        {{ table.title }} ({{ table }})
+        {% else %}
+        {{ table }}
+        {% endif %}
+    </h1>
 
-    {% if table.description %}
-    <h2>{% trans 'Description' %}</h2>
+    {% if table.long_description %}
+
+    <h2>Description</h2>
+    <p>{{ table.long_description }}</p>
+
+    {% elif table.description %}
+
+    <h2>Description</h2>
     <p>{{ table.description }}</p>
+
+    {% endif %}
+
+    {% if table.attribution %}
+    <h2>Attribution</h2>
+    <p>
+        Any paper making substantial use of this table is kindly requested to include this acknowledgement:
+    </p>
+    <blockquote>
+        {{ table.attribution }}
+    </blockquote>
     {% endif %}
 
     <h2>{% trans 'Columns' %}</h2>
@@ -42,5 +66,43 @@
             {% endfor %}
         </tbody>
     </table>
+
+{% endblock %}
+
+{% block sidebar %}
+
+    {% if table.pid %}
+    <div class="panel panel-default">
+        <div class="panel-heading">Persistant identifier</div>
+        <div class="panel-body">
+            <p>Please use the following identifier to cite this table:</p>
+            <p>
+                <a class="break" href="{{ table.pid }}">{{ table.pid }}</a>
+            </p>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if table.license %}
+    <div class="panel panel-default">
+        <div class="panel-heading">License</div>
+        <div class="panel-body">
+            <p class="text-center">
+                <img src="{% static 'metadata/img' %}/{{ table.license | lower }}.png" />
+            </p>
+            <p>
+                This table is published under the <a href="{{ table.license_url }}">{{ table.license_label }}</a>.
+            </p>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="panel panel-default">
+        <div class="panel-heading">Contributors</div>
+        <ul class="list-group">
+            <li class="list-group-item">Jochen Klar</li>
+            <li class="list-group-item">Harry Enke</li>
+        </ul>
+    </div>
 
 {% endblock %}

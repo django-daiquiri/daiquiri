@@ -12,6 +12,36 @@ from .managers import (
     FunctionPermissionsManager
 )
 
+LICENSE_CC0 = 'CC0'
+LICENSE_PD = 'PD'
+LICENSE_BY = 'BY'
+LICENSE_BY_SA = 'BY_SA'
+LICENSE_BY_ND = 'BY_ND'
+LICENSE_BY_NC = 'BY_NC'
+LICENSE_BY_NC_SA = 'BY_NC_SA'
+LICENSE_BY_NC_ND = 'BY_NC_ND'
+LICENSE_CHOICES = (
+    (LICENSE_CC0, 'CC0 1.0 Universal (CC0 1.0)'),
+    (LICENSE_PD, 'Public Domain Mark'),
+    (LICENSE_BY, 'Attribution 4.0 International (CC BY 4.0)'),
+    (LICENSE_BY_SA, 'Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)'),
+    (LICENSE_BY_ND, 'Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0)'),
+    (LICENSE_BY_NC, 'Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)'),
+    (LICENSE_BY_NC_SA, 'Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)'),
+    (LICENSE_BY_NC_ND, 'Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)')
+)
+
+LICENSE_URLS = {
+    LICENSE_CC0: 'https://creativecommons.org/publicdomain/zero/1.0/',
+    LICENSE_PD: None,
+    LICENSE_BY: 'https://creativecommons.org/licenses/by/4.0/',
+    LICENSE_BY_SA: 'https://creativecommons.org/licenses/by-sa/4.0/',
+    LICENSE_BY_ND: 'https://creativecommons.org/licenses/by-nd/4.0/',
+    LICENSE_BY_NC: 'https://creativecommons.org/licenses/by-nc/4.0/',
+    LICENSE_BY_NC_SA: 'https://creativecommons.org/licenses/by-nc-sa/4.0/',
+    LICENSE_BY_NC_ND: 'https://creativecommons.org/licenses/by-nc-nd/4.0/'
+}
+
 
 @python_2_unicode_compatible
 class Database(models.Model):
@@ -22,7 +52,16 @@ class Database(models.Model):
     order = models.IntegerField(null=True, blank=True)
 
     name = models.CharField(max_length=256)
+
+    title = models.CharField(max_length=256, null=True, blank=True)
+
     description = models.TextField(null=True, blank=True)
+    long_description = models.TextField(null=True, blank=True)
+
+    attribution = models.TextField(null=True, blank=True)
+
+    license = models.CharField(max_length=8, choices=LICENSE_CHOICES, null=True, blank=True)
+    pid = models.URLField(max_length=256, null=True, blank=True)
 
     utype = models.CharField(max_length=256, null=True, blank=True)
 
@@ -43,6 +82,14 @@ class Database(models.Model):
     def query_string(self):
         return get_adapter('data').escape_identifier(self.name)
 
+    @property
+    def license_label(self):
+        return dict(LICENSE_CHOICES)[self.license]
+
+    @property
+    def license_url(self):
+        return LICENSE_URLS[self.license]
+
 
 @python_2_unicode_compatible
 class Table(models.Model):
@@ -62,7 +109,16 @@ class Table(models.Model):
     order = models.IntegerField(null=True, blank=True)
 
     name = models.CharField(max_length=256)
+
+    title = models.CharField(max_length=256, null=True, blank=True)
+
     description = models.TextField(null=True, blank=True)
+    long_description = models.TextField(null=True, blank=True)
+
+    attribution = models.TextField(null=True, blank=True)
+
+    license = models.CharField(max_length=8, choices=LICENSE_CHOICES, null=True, blank=True)
+    pid = models.URLField(max_length=256, null=True, blank=True)
 
     type = models.CharField(max_length=8, choices=TYPE_CHOICES)
     utype = models.CharField(max_length=256, null=True, blank=True)
@@ -101,6 +157,14 @@ class Table(models.Model):
             'database': adapter.escape_identifier(self.database.name),
             'table': adapter.escape_identifier(self.name)
         }
+
+    @property
+    def license_label(self):
+        return dict(LICENSE_CHOICES)[self.license]
+
+    @property
+    def license_url(self):
+        return LICENSE_URLS[self.license]
 
 
 @python_2_unicode_compatible

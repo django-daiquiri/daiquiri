@@ -14,7 +14,7 @@ class GroupSerializer(serializers.ModelSerializer):
 
 class FunctionSerializer(serializers.ModelSerializer):
 
-    label = serializers.CharField(source='__str__')
+    label = serializers.CharField(source='__str__', read_only=True)
 
     class Meta:
         model = Function
@@ -23,7 +23,7 @@ class FunctionSerializer(serializers.ModelSerializer):
 
 class ColumnSerializer(serializers.ModelSerializer):
 
-    label = serializers.CharField(source='__str__')
+    label = serializers.CharField(source='__str__', read_only=True)
 
     class Meta:
         model = Column
@@ -32,7 +32,7 @@ class ColumnSerializer(serializers.ModelSerializer):
 
 class TableSerializer(serializers.ModelSerializer):
 
-    label = serializers.CharField(source='__str__')
+    label = serializers.CharField(source='__str__', read_only=True)
 
     class Meta:
         model = Table
@@ -41,7 +41,7 @@ class TableSerializer(serializers.ModelSerializer):
 
 class DatabaseSerializer(serializers.ModelSerializer):
 
-    label = serializers.CharField(source='__str__')
+    label = serializers.CharField(source='__str__', read_only=True)
 
     class Meta:
         model = Database

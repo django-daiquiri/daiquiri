@@ -32,7 +32,6 @@ form {
     margin-bottom: 20px;
 }
 
-
 a,
 .pagination > li > a {
     color: $link-color;
@@ -46,11 +45,28 @@ a,
     &:focus {
         color: $link-color-focus;
     }
+    &.btn {
+        color: white;
+    }
 
     &.glyphicon,
     &.fa {
         text-decoration: none;
     }
+}
+
+blockquote {
+    padding: 5px 8px;
+    font-size: inherit;
+}
+
+.expand {
+    display: block;
+    width: 100%;
+}
+
+.break {
+    word-wrap: break-word;
 }
 
 /* navbar */
@@ -104,7 +120,7 @@ a,
     padding-bottom: 40px;
 }
 .sidebar {
-    margin-top: 40px;
+    margin-top: 60px;
 }
 .page, .sidebar {
     // height: 100%;

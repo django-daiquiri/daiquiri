@@ -1,23 +1,89 @@
 {% extends 'core/page.html' %}
 {% load i18n %}
+{% load static %}
 
 {% block page %}
 
-    <h1>{{ database }}</h1>
+    <h1>
+        {% if database.title %}
+        {{ database.title }} ({{ database }})
+        {% else %}
+        {{ database }}
+        {% endif %}
+    </h1>
 
-    {% if database.description %}
-    <h2>{% trans 'Description' %}</h2>
+    {% if database.long_description %}
+
+    <h2>Description</h2>
+    <p>{{ database.long_description }}</p>
+
+    {% elif database.description %}
+
+    <h2>Description</h2>
     <p>{{ database.description }}</p>
+
+    {% endif %}
+
+    {% if database.attribution %}
+    <h2>Attribution</h2>
+    <p>
+        Any paper making substantial use of this database is kindly requested to include this acknowledgement:
+    </p>
+    <blockquote>
+        {{ database.attribution }}
+    </blockquote>
     {% endif %}
 
     <h2>{% trans 'Tables' %}</h2>
 
-    {% for table in database.tables.all %}
-    <h4><a href="{{ table.name }}">{{ table }}</a></h4>
+    <ul class="list-unstyled">
+        {% for table in database.tables.all %}
+        <li>
+            <h6>
+                <a href="{% url 'metadata_table' database.name table.name %}">
+                    {% if table.title %}
+                    {{ table.title }} ({{ table }})
+                    {% else %}
+                    {{ table }}
+                    {% endif %}
+                </a>
+            </h6>
 
-    {% if table.description %}
-    <p>{{ table.description }}</p>
+            {% if table.description %}
+            {{ table.description }}
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+
+{% endblock %}
+
+{% block sidebar %}
+
+    {% if database.pid %}
+    <div class="panel panel-default">
+        <div class="panel-heading">Persistant identifier</div>
+        <div class="panel-body">
+            <p>Please use the following identifier to cite this database:</p>
+            <p>
+                <a class="break" href="{{ database.pid }}">{{ database.pid }}</a>
+            </p>
+        </div>
+    </div>
     {% endif %}
-    {% endfor %}
+
+    {% if database.license %}
+    <div class="panel panel-default">
+        <div class="panel-heading">License</div>
+        <div class="panel-body">
+            <p class="text-center">
+                <img src="{% static 'metadata/img' %}/{{ database.license | lower }}.png" />
+            </p>
+            <p>
+                This database is published under the <a href="{{ database.license_url }}">{{ database.license_label }}</a>.
+            </p>
+        </div>
+    </div>
+    {% endif %}
 
 {% endblock %}
