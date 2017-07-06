@@ -1,6 +1,7 @@
 {% extends 'core/page.html' %}
 {% load i18n %}
 {% load static %}
+{% load core_tags %}
 
 {% block page %}
 
@@ -15,23 +16,19 @@
     {% if database.long_description %}
 
     <h2>Description</h2>
-    <p>{{ database.long_description }}</p>
+    <p>{{ database.long_description | markdown }}</p>
 
     {% elif database.description %}
 
     <h2>Description</h2>
-    <p>{{ database.description }}</p>
+    <p>{{ database.description | markdown }}</p>
 
     {% endif %}
 
     {% if database.attribution %}
     <h2>Attribution</h2>
-    <p>
-        Any paper making substantial use of this database is kindly requested to include this acknowledgement:
-    </p>
-    <blockquote>
-        {{ database.attribution }}
-    </blockquote>
+
+    {{ database.attribution | markdown }}
     {% endif %}
 
     <h2>{% trans 'Tables' %}</h2>

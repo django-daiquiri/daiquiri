@@ -18,7 +18,13 @@
             </label>
         </div>
 
+        <div ng-hide="options.length">
+            <i>{$ optionsEmpty $}</i>
+        </div>
+
     </div>
+
+    <p class="help-block" ng-show="help">{$ help $}</p>
 
     <ul class="help-block list-unstyled">
         <li ng-repeat="error in errors">{$ error $}</li>

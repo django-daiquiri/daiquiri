@@ -7,7 +7,7 @@ from rest_framework.decorators import list_route
 from daiquiri.core.adapter import get_adapter
 from daiquiri.core.viewsets import ChoicesViewSet
 
-from .models import Database, Table, Column, Function
+from .models import Database, Table, Column, Function, LICENSE_CHOICES
 from .serializers import (
     DatabaseSerializer,
     TableSerializer,
@@ -40,6 +40,7 @@ class DatabaseViewSet(viewsets.ModelViewSet):
 
             for table_metadata in adapter.fetch_tables(database.name):
                 table_metadata['database'] = database.id
+                table_metadata['license'] = database.license
                 table_metadata['groups'] = request.data['groups']
 
                 table_serializer = TableSerializer(data=table_metadata)
@@ -142,3 +143,7 @@ class FunctionViewSet(viewsets.ModelViewSet):
 
 class TableTypeViewSet(ChoicesViewSet):
     queryset = Table.TYPE_CHOICES
+
+
+class LicenseViewSet(ChoicesViewSet):
+    queryset = LICENSE_CHOICES

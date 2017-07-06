@@ -49,23 +49,53 @@ class Database(models.Model):
     objects = models.Manager()
     permissions = DatabasePermissionsManager()
 
-    order = models.IntegerField(null=True, blank=True)
-
-    name = models.CharField(max_length=256)
-
-    title = models.CharField(max_length=256, null=True, blank=True)
-
-    description = models.TextField(null=True, blank=True)
-    long_description = models.TextField(null=True, blank=True)
-
-    attribution = models.TextField(null=True, blank=True)
-
-    license = models.CharField(max_length=8, choices=LICENSE_CHOICES, null=True, blank=True)
-    pid = models.URLField(max_length=256, null=True, blank=True)
-
-    utype = models.CharField(max_length=256, null=True, blank=True)
-
-    groups = models.ManyToManyField(Group, blank=True)
+    order = models.IntegerField(
+        default=0, null=True, blank=True,
+        verbose_name=_('Order'),
+        help_text=_('Position in lists.')
+    )
+    name = models.CharField(
+        max_length=256,
+        verbose_name=_('Name'),
+        help_text=_('Name of the database on the database server.')
+    )
+    title = models.CharField(
+        max_length=256, null=True, blank=True,
+        verbose_name=_('Title'),
+        help_text=_('Human readable title of the database.')
+    )
+    description = models.TextField(
+        null=True, blank=True,
+        verbose_name=_('Description'),
+        help_text=_('A brief description of the database to be displayed in the user interface.')
+    )
+    long_description = models.TextField(
+        null=True, blank=True,
+        verbose_name=_('Long description'),
+        help_text=_('A more extensive description of the database to be displayed on the public database page.')
+    )
+    attribution = models.TextField(
+        null=True, blank=True,
+        verbose_name=_('Attribution'),
+        help_text=_('The desired attribution for the database.')
+    )
+    license = models.CharField(
+        max_length=8, choices=LICENSE_CHOICES, null=True, blank=True,
+        verbose_name=_('License')
+    )
+    pid = models.URLField(
+        max_length=256, null=True, blank=True,
+        verbose_name=_('Persistent identifier'),
+    )
+    utype = models.CharField(
+        max_length=256, null=True, blank=True,
+        verbose_name=_('IVOA Utype'),
+    )
+    groups = models.ManyToManyField(
+        Group, blank=True,
+        verbose_name=_('Groups'),
+        help_text=_('The groups which have access to the database.')
+    )
 
     class Meta:
         ordering = ('order', )
@@ -104,26 +134,61 @@ class Table(models.Model):
     objects = models.Manager()
     permissions = TablePermissionsManager()
 
-    database = models.ForeignKey(Database, related_name='tables')
-
-    order = models.IntegerField(null=True, blank=True)
-
-    name = models.CharField(max_length=256)
-
-    title = models.CharField(max_length=256, null=True, blank=True)
-
-    description = models.TextField(null=True, blank=True)
-    long_description = models.TextField(null=True, blank=True)
-
-    attribution = models.TextField(null=True, blank=True)
-
-    license = models.CharField(max_length=8, choices=LICENSE_CHOICES, null=True, blank=True)
-    pid = models.URLField(max_length=256, null=True, blank=True)
-
-    type = models.CharField(max_length=8, choices=TYPE_CHOICES)
-    utype = models.CharField(max_length=256, null=True, blank=True)
-
-    groups = models.ManyToManyField(Group, blank=True)
+    database = models.ForeignKey(
+        Database, related_name='tables',
+        verbose_name=_('Database'),
+        help_text=_('Database the table belongs to.')
+    )
+    order = models.IntegerField(
+        null=True, blank=True,
+        verbose_name=_('Order'),
+        help_text=_('Position in lists.')
+    )
+    name = models.CharField(
+        max_length=256,
+        verbose_name=_('Name'),
+        help_text=_('Identifier of the table on the database server.')
+    )
+    title = models.CharField(
+        max_length=256, null=True, blank=True,
+        verbose_name=_('Title'),
+        help_text=_('Human readable title of the table.')
+    )
+    description = models.TextField(null=True, blank=True,
+        verbose_name=_('Description'),
+        help_text=_('A brief description of the table to be displayed in the user interface.')
+    )
+    long_description = models.TextField(
+        null=True, blank=True,
+        verbose_name=_('Long description'),
+        help_text=_('A more extensive description of the table to be displayed on the public database page.')
+    )
+    attribution = models.TextField(
+        null=True, blank=True,
+        verbose_name=_('Attribution'),
+        help_text=_('The desired attribution for the table.')
+    )
+    license = models.CharField(
+        max_length=8, choices=LICENSE_CHOICES, null=True, blank=True,
+        verbose_name=_('License')
+    )
+    pid = models.URLField(
+        max_length=256, null=True, blank=True,
+        verbose_name=_('Persistent identifier')
+    )
+    type = models.CharField(
+        max_length=8, choices=TYPE_CHOICES,
+        verbose_name=_('Type of table')
+    )
+    utype = models.CharField(
+        max_length=256, null=True, blank=True,
+        verbose_name=_('IVOA Utype')
+    )
+    groups = models.ManyToManyField(
+        Group, blank=True,
+        verbose_name=_('Groups'),
+        help_text=_('The groups which have access to the table.')
+    )
 
     class Meta:
         ordering = ('database__order', 'order', )
@@ -135,20 +200,6 @@ class Table(models.Model):
 
     def __str__(self):
         return self.database.name + '.' + self.name
-
-    def save(self, *args, **kwargs):
-        super(Table, self).save(*args, **kwargs)
-
-        try:
-            get_adapter('metadata').store_table_metadata(self.database.name, self.name, {
-                'order': self.order,
-                'name': self.name,
-                'description': self.description,
-                'type': self.type,
-                'utype': self.utype
-            })
-        except ProgrammingError:
-            pass
 
     @property
     def query_string(self):
@@ -173,25 +224,65 @@ class Column(models.Model):
     objects = models.Manager()
     permissions = ColumnPermissionsManager()
 
-    table = models.ForeignKey(Table, related_name='columns')
-
-    order = models.IntegerField(null=True, blank=True)
-
-    name = models.CharField(max_length=256)
-    description = models.TextField(null=True, blank=True)
-
-    unit = models.CharField(max_length=256, null=True, blank=True)
-    ucd = models.CharField(max_length=256, null=True, blank=True)
-    utype = models.CharField(max_length=256, null=True, blank=True)
-
-    datatype = models.CharField(max_length=256, null=True, blank=True)
-    size = models.IntegerField(null=True, blank=True, help_text=_('The length of variable length datatypes, e.g. varchar(256).'))
-
-    principal = models.BooleanField(default=False, help_text=_('This column is considered a core part of the content.'))
-    indexed = models.BooleanField(default=False, help_text=_('This column is indexed.'))
-    std = models.BooleanField(default=False, help_text=_('This column is defined by some standard.'))
-
-    groups = models.ManyToManyField(Group, blank=True)
+    table = models.ForeignKey(
+        Table, related_name='columns',
+        help_text=_('Table the column belongs to.')
+    )
+    order = models.IntegerField(
+        null=True, blank=True,
+        verbose_name=_('Order'),
+        help_text=_('Position in lists.')
+    )
+    name = models.CharField(max_length=256,
+        verbose_name=_('Name'),
+        help_text=_('Identifier of the column on the database server.')
+    )
+    description = models.TextField(null=True, blank=True,
+        verbose_name=_('Description'),
+        help_text=_('A brief description of the column to be displayed in the user interface.')
+    )
+    unit = models.CharField(
+        max_length=256, null=True, blank=True,
+        verbose_name=_('Unit')
+    )
+    ucd = models.CharField(
+        max_length=256, null=True, blank=True,
+        verbose_name=_('IVOA UCDs')
+    )
+    utype = models.CharField(
+        max_length=256, null=True, blank=True,
+        verbose_name=_('IVOA Utype')
+    )
+    datatype = models.CharField(
+        max_length=256, null=True, blank=True,
+        verbose_name=_('Datatype'),
+        help_text=_('The datatype of the column on the database server.')
+    )
+    size = models.IntegerField(
+        null=True, blank=True,
+        verbose_name=_('Size'),
+        help_text=_('The length of variable length datatypes, e.g. varchar(256).')
+    )
+    principal = models.BooleanField(
+        default=False,
+        verbose_name=_('Principal'),
+        help_text=_('Designates whether the column is considered a core part of the content.')
+    )
+    indexed = models.BooleanField(
+        default=False,
+        verbose_name=_('Indexed'),
+        help_text=_('Designates whether the column is indexed.')
+    )
+    std = models.BooleanField(
+        default=False,
+        verbose_name=_('Standard'),
+        help_text=_('Designates whether the column is defined by some standard.')
+    )
+    groups = models.ManyToManyField(
+        Group, blank=True,
+        verbose_name=_('Groups'),
+        help_text=_('The groups which have access to the column.')
+    )
 
     class Meta:
         ordering = ('table__database__order', 'table__order', 'order', )
@@ -204,26 +295,6 @@ class Column(models.Model):
     def __str__(self):
         return self.table.database.name + '.' + self.table.name + '.' + self.name
 
-    def save(self, *args, **kwargs):
-        super(Column, self).save(*args, **kwargs)
-
-        try:
-            get_adapter('metadata').store_column_metadata(self.table.database.name, self.table.name, self.name, {
-                'order': self.order,
-                'name': self.name,
-                'description': self.description,
-                'unit': self.unit,
-                'ucd': self.ucd,
-                'utype': self.utype,
-                'datatype': self.datatype,
-                'size': self.size,
-                'principal': self.principal,
-                'indexed': self.indexed,
-                'std': self.std
-            })
-        except ProgrammingError:
-            pass
-
     @property
     def query_string(self):
         return get_adapter('data').escape_identifier(self.name)
@@ -235,14 +306,30 @@ class Function(models.Model):
     objects = models.Manager()
     permissions = FunctionPermissionsManager()
 
-    order = models.IntegerField(null=True, blank=True)
-
-    name = models.CharField(max_length=256)
-    description = models.TextField(null=True, blank=True)
-
-    query_string = models.CharField(max_length=256)
-
-    groups = models.ManyToManyField(Group, blank=True)
+    order = models.IntegerField(
+        null=True, blank=True,
+        verbose_name=_('Order'),
+        help_text=_('Position in lists.')
+    )
+    name = models.CharField(
+        max_length=256,
+        verbose_name=_('Name'),
+        help_text=_('Identifier of the function on the server.')
+    )
+    description = models.TextField(
+        null=True, blank=True,
+        verbose_name=_('Description'),
+        help_text=_('A brief description of the function to be displayed in the user interface.')
+    )
+    query_string = models.CharField(
+        max_length=256,
+        help_text=_('Prototype of this function in a SQL query.')
+    )
+    groups = models.ManyToManyField(
+        Group, blank=True,
+        verbose_name=_('Groups'),
+        help_text=_('The groups which have access to this function.')
+    )
 
     class Meta:
         ordering = ('order', )

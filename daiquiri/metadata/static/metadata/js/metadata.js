@@ -20,6 +20,7 @@ angular.module('metadata', ['core'])
         'columns': $resource(baseurl + 'metadata/api/columns/:list_route/:id/'),
         'functions': $resource(baseurl + 'metadata/api/functions/:list_route/:id/'),
         'tabletypes': $resource(baseurl + 'metadata/api/tabletypes/:id/'),
+        'licenses': $resource(baseurl + 'metadata/api/licenses/:id/'),
         'groups': $resource(baseurl + 'auth/api/groups/:id/'),
     };
 
@@ -55,6 +56,7 @@ angular.module('metadata', ['core'])
     service.init = function() {
         service.tabletypes = resources.tabletypes.query();
         service.groups = resources.groups.query();
+        service.licenses = resources.licenses.query();
 
         BrowserService.init('databases', ['databases','tables','columns']);
         BrowserService.init('functions', ['functions']);

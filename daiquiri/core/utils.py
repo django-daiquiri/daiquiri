@@ -35,6 +35,19 @@ def get_next(request):
         return get_script_alias(request) + next
 
 
+def get_model_field_meta(model):
+    meta = {}
+
+    for field in model._meta.get_fields():
+        meta[field.name] = {}
+        if hasattr(field, 'verbose_name'):
+            meta[field.name]['verbose_name'] = field.verbose_name
+        if hasattr(field, 'help_text'):
+            meta[field.name]['help_text'] = field.help_text
+
+    return meta
+
+
 def human2bytes(string):
     m = re.match('([0-9.]+)\s*([A-Za-z]+)', string)
     number, unit =  float(m.group(1)), m.group(2).strip().lower()

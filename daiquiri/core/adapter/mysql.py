@@ -270,48 +270,6 @@ class MySQLAdapter(BaseAdapter):
 
         return column_metadata
 
-    def store_table_metadata(self, database_name, table_name, table_metadata):
-        # prepare sql string
-        sql = 'ALTER TABLE %(database)s.%(table)s COMMENT %(json)s' % {
-            'database': self.escape_identifier(database_name),
-            'table': self.escape_identifier(table_name),
-            'json': self.escape_string(json.dumps(table_metadata))
-        }
-
-        # execute query
-        self.execute(sql)
-
-    def store_column_metadata(self, database_name, table_name, column_name, column_metadata):
-        # prepare sql string
-        sql = 'SHOW CREATE TABLE %(database)s.%(table)s' % {
-            'database': self.escape_identifier(database_name),
-            'table': self.escape_identifier(table_name)
-        }
-
-        # execute query
-        row = self.fetchone(sql)
-
-        # parse the create table statement to get the correct column options string
-        # e.g. 'double NOT NULL'
-        column_options = False
-        for line in row[1].split('\n'):
-            if line.strip().startswith(self.escape_identifier(column_name)):
-                column_options = line.strip().strip(',').split('COMMENT')[0]
-                break
-
-        if column_options:
-            # prepare sql string
-            sql = 'ALTER TABLE %(database)s.%(table)s CHANGE %(column)s %(options)s COMMENT %(json)s' % {
-                'database': self.escape_identifier(database_name),
-                'table': self.escape_identifier(table_name),
-                'column': self.escape_identifier(column_name),
-                'options': column_options,
-                'json': self.escape_string(json.dumps(column_metadata))
-            }
-
-            # execute query
-            self.fetchone(sql)
-
     def dump_table(self, database_name, table_name, username, format):
 
         directory_name = os.path.join(settings.QUERY['download_dir'], username)

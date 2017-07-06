@@ -5,7 +5,9 @@
               id="{$ id $}"
               type="text"
               ng-model="model"
-              rows="4" />
+              rows="6" />
+
+    <p class="help-block" ng-show="help">{$ help $}</p>
 
     <ul class="help-block list-unstyled">
         <li ng-repeat="error in errors">{$ error $}</li>

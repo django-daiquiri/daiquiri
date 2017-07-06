@@ -2,7 +2,7 @@
 
     <div class="modal" id="columns-form-modal" tabindex="-1">
         <div class="modal-dialog">
-            <div class="modal-content">
+            <div class="modal-content modal-lg">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" tabindex="-1">
                         <span aria-hidden="true">&times;</span>
@@ -15,103 +15,113 @@
                 <div class="modal-body">
                     <div class="row">
                         <formgroup
-                            class="col-md-9"
+                            class="col-md-4"
                             data-id="table"
                             data-type="selectnumber"
-                            data-label="{% trans 'Table' %}"
+                            data-label="{{ meta.Column.table.verbose_name }}"
+                            data-help="{{ meta.Column.table.help_text }}"
                             data-model="service.values.table"
                             data-errors="service.errors.table"
                             data-options="service.tables"
                             data-options-label="label">
                         </formgroup>
                         <formgroup
-                            class="col-md-3"
+                            class="col-md-6"
+                            data-id="name"
+                            data-type="text"
+                            data-label="{{ meta.Column.name.verbose_name }}"
+                            data-help="{{ meta.Column.name.help_text }}"
+                            data-model="service.values.name"
+                            data-errors="service.errors.name">
+                        </formgroup>
+                        <formgroup
+                            class="col-md-2"
                             data-id="order"
                             data-type="number"
-                            data-label="{% trans 'Order' %}"
+                            data-label="{{ meta.Column.order.verbose_name }}"
+                            data-help="{{ meta.Column.order.help_text }}"
                             data-model="service.values.order"
                             data-errors="service.errors.order">
                         </formgroup>
                     </div>
                     <formgroup
-                        data-id="name"
-                        data-type="text"
-                        data-label="{% trans 'Name' %}"
-                        data-model="service.values.name"
-                        data-errors="service.errors.name">
-                    </formgroup>
-                    <formgroup
                         data-id="description"
                         data-type="textarea"
-                        data-label="{% trans 'Description' %}"
+                        data-label="{{ meta.Column.description.verbose_name }}"
+                        data-help="{{ meta.Column.description.help_text }}"
                         data-model="service.values.description"
                         data-errors="service.errors.description">
                     </formgroup>
-                    <formgroup
-                        data-id="unit"
-                        data-type="text"
-                        data-label="{% trans 'Unit' %}"
-                        data-model="service.values.unit"
-                        data-errors="service.errors.unit">
-                    </formgroup>
-                    <formgroup
-                        data-id="ucd"
-                        data-type="text"
-                        data-label="{% trans 'UCD' %}"
-                        data-model="service.values.ucd"
-                        data-errors="service.errors.ucd">
-                    </formgroup>
-                    <formgroup
-                        data-id="utype"
-                        data-type="text"
-                        data-label="{% trans 'Utype' %}"
-                        data-model="service.values.utype"
-                        data-errors="service.errors.utype">
-                    </formgroup>
                     <div class="row">
                         <formgroup
-                            class="col-md-9"
+                            class="col-md-4"
+                            data-id="unit"
+                            data-type="text"
+                            data-label="{{ meta.Column.unit.verbose_name }}"
+                            data-model="service.values.unit"
+                            data-errors="service.errors.unit">
+                        </formgroup>
+                        <formgroup
+                            class="col-md-4"
+                            data-id="ucd"
+                            data-type="text"
+                            data-label="{{ meta.Column.ucd.verbose_name }}"
+                            data-model="service.values.ucd"
+                            data-errors="service.errors.ucd">
+                        </formgroup>
+                        <formgroup
+                            class="col-md-4"
+                            data-id="utype"
+                            data-type="text"
+                            data-label="{{ meta.Column.utype.verbose_name }}"
+                            data-model="service.values.utype"
+                            data-errors="service.errors.utype">
+                        </formgroup>
+                    </div>
+                    <div class="row">
+                        <formgroup
+                            class="col-md-6"
                             data-id="datatype"
                             data-type="text"
-                            data-label="{% trans 'Datatype' %}"
+                            data-label="{{ meta.Column.datatype.verbose_name }}"
+                            data-help="{{ meta.Column.datatype.help_text }}"
                             data-model="service.values.datatype"
                             data-errors="service.errors.datatype">
                         </formgroup>
                         <formgroup
-                            class="col-md-3"
+                            class="col-md-6"
                             data-id="size"
                             data-type="number"
-                            data-label="{% trans 'Size' %}"
+                            data-label="{{ meta.Column.size.verbose_name }}"
+                            data-help="{{ meta.Column.size.help_text }}"
                             data-model="service.values.size"
                             data-errors="service.errors.size">
                         </formgroup>
                     </div>
-                    <div class="row">
-                        <formgroup
-                            class="col-md-2"
-                            data-id="principal"
-                            data-type="checkbox"
-                            data-label="{% trans 'Principal' %}"
-                            data-model="service.values.principal"
-                            data-errors="service.errors.principal">
-                        </formgroup>
-                        <formgroup
-                            class="col-md-2"
-                            data-id="indexed"
-                            data-type="checkbox"
-                            data-label="{% trans 'Indexed' %}"
-                            data-model="service.values.indexed"
-                            data-errors="service.errors.principal">
-                        </formgroup>
-                        <formgroup
-                            class="col-md-2"
-                            data-id="std"
-                            data-type="checkbox"
-                            data-label="{% trans 'STD' %}"
-                            data-model="service.values.std"
-                            data-errors="service.errors.std">
-                        </formgroup>
-                    </div>
+                    <formgroup
+                        data-id="principal"
+                        data-type="checkbox"
+                        data-label="{{ meta.Column.principal.verbose_name }}"
+                        data-help="{{ meta.Column.principal.help_text }}"
+                        data-model="service.values.principal"
+                        data-errors="service.errors.principal">
+                    </formgroup>
+                    <formgroup
+                        data-id="indexed"
+                        data-type="checkbox"
+                        data-label="{{ meta.Column.indexed.verbose_name }}"
+                        data-help="{{ meta.Column.indexed.help_text }}"
+                        data-model="service.values.indexed"
+                        data-errors="service.errors.indexed">
+                    </formgroup>
+                    <formgroup
+                        data-id="std"
+                        data-type="checkbox"
+                        data-label="{{ meta.Column.std.verbose_name }}"
+                        data-help="{{ meta.Column.std.help_text }}"
+                        data-model="service.values.std"
+                        data-errors="service.errors.std">
+                    </formgroup>
                     <formgroup
                         data-id="groups"
                         data-type="multicheckbox"
