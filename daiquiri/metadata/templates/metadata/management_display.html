@@ -6,10 +6,18 @@
         </div>
         <div ng-show="service.active">
             <div class="pull-right">
-                <a href="" class="glyphicon glyphicon-pencil" title="{% trans 'Update' %}"
+                <a href="" class="fa fa-pencil" title="{% trans 'Update' %}"
                     ng-click="service.openFormModal(service.active.resource, false)">
                 </a>
-                <a href="" class="glyphicon glyphicon-trash" title="{% trans 'Delete' %}"
+                <a href="" class="fa fa-file-text" title="{% trans 'Update description' %}"
+                    ng-show="service.active.resource === 'databases' || service.active.resource === 'tables'"
+                    ng-click="service.openFormModal(service.active.resource, false, 'description')">
+                </a>
+                <a href="" class="fa fa-graduation-cap" title="{% trans 'Update attribution' %}"
+                    ng-show="service.active.resource === 'databases' || service.active.resource === 'tables'"
+                    ng-click="service.openFormModal(service.active.resource, false, 'attribution')">
+                </a>
+                <a href="" class="fa fa-trash" title="{% trans 'Delete' %}"
                     ng-click="service.openDeleteModal(service.active.resource, false)">
                 </a>
             </div>

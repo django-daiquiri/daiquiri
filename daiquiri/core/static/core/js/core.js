@@ -31,6 +31,7 @@ angular.module('core', ['ngResource'])
             // instanciate CodeMirror on the element
             editor = CodeMirror.fromTextArea(element[0], {
                 lineNumbers: true,
+                lineWrapping: true,
                 mode: attrs.mode
             });
 
@@ -48,4 +49,4 @@ angular.module('core', ['ngResource'])
             });
         }
     };
-});
+})

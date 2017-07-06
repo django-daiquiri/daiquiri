@@ -102,7 +102,7 @@ angular.module('metadata', ['core'])
         });
     };
 
-    service.openFormModal = function(resource, create) {
+    service.openFormModal = function(resource, create, modal) {
         service.errors = {};
         service.values = {};
 
@@ -113,11 +113,22 @@ angular.module('metadata', ['core'])
         }
 
         $timeout(function() {
-            $('#' + resource + '-form-modal').modal('show');
+            var modal_id;
+            if (angular.isDefined(modal) && modal) {
+                modal_id = '#' + resource + '-' + modal + '-form-modal';
+            } else {
+                modal_id = '#' + resource + '-form-modal';
+            }
+
+            $(modal_id).modal('show');
+
+            // if (angular.element(modal_id + ' .CodeMirror').length) {
+            //     angular.element(modal_id + ' .CodeMirror')[0].CodeMirror.refresh();
+            // }
         });
     };
 
-    service.submitFormModal = function(resource) {
+    service.submitFormModal = function(resource, close) {
 
         var promise;
         if (angular.isDefined(service.values.id)) {
@@ -127,16 +138,17 @@ angular.module('metadata', ['core'])
         }
 
         promise.then(function(result) {
-            $('#' + resource + '-form-modal').modal('hide');
+            if (angular.isUndefined(close) || close) {
+                $('.modal').modal('hide');
 
-            service.activateItem(resource, result.id).$promise.then(function () {
-                if (resource === 'functions') {
-                    service.initFunctionsBrowser();
-                } else {
-                    service.initDatabasesBrowser();
-                }
-            });
-
+                service.activateItem(resource, result.id).$promise.then(function () {
+                    if (resource === 'functions') {
+                        service.initFunctionsBrowser();
+                    } else {
+                        service.initDatabasesBrowser();
+                    }
+                });
+            }
         }, function(result) {
             service.errors = result.data;
         });

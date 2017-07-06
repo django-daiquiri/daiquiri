@@ -8,13 +8,20 @@
 
 {% block headextra %}
     {% compress css %}
+    <link rel="stylesheet" href="{% static 'codemirror/lib/codemirror.css' %}" />
+
     <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/browser.scss' %}" />
+    <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/codemirror.scss' %}" />
     <link rel="stylesheet" type="text/x-scss" href="{% static 'metadata/css/metadata.scss' %}" />
     {% endcompress %}
 
     {% compress js %}
     <script type="text/javascript" src="{% static 'angular/angular.min.js' %}" ></script>
     <script type="text/javascript" src="{% static 'angular-resource/angular-resource.min.js' %}" ></script>
+
+    <script type="text/javascript" src="{% static 'codemirror/lib/codemirror.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'codemirror/addon/mode/overlay.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'codemirror/mode/markdown/markdown.js' %}" ></script>
 
     <script type="text/javascript" src="{% static 'core/js/core.js' %}" ></script>
     <script type="text/javascript" src="{% static 'core/js/filter.js' %}" ></script>
@@ -54,7 +61,11 @@
     </div>
 
     {% include 'metadata/management_modal_form_databases.html' %}
+    {% include 'metadata/management_modal_form_databases_description.html' %}
+    {% include 'metadata/management_modal_form_databases_attribution.html' %}
     {% include 'metadata/management_modal_form_tables.html' %}
+    {% include 'metadata/management_modal_form_tables_description.html' %}
+    {% include 'metadata/management_modal_form_tables_attribution.html' %}
     {% include 'metadata/management_modal_form_columns.html' %}
     {% include 'metadata/management_modal_form_functions.html' %}
 
