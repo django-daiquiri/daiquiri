@@ -122,9 +122,11 @@ angular.module('metadata', ['core'])
 
             $(modal_id).modal('show');
 
-            // if (angular.element(modal_id + ' .CodeMirror').length) {
-            //     angular.element(modal_id + ' .CodeMirror')[0].CodeMirror.refresh();
-            // }
+            $timeout(function() {
+                if (angular.element(modal_id + ' .CodeMirror').length) {
+                    angular.element(modal_id + ' .CodeMirror')[0].CodeMirror.refresh();
+                }
+            });
         });
     };
 
