@@ -136,6 +136,7 @@ AUTHENTICATION_BACKENDS = (
 ACCOUNT_ADAPTER = 'daiquiri.auth.adapter.DaiquiriAccountAdapter'
 ACCOUNT_SIGNUP_FORM_CLASS = 'daiquiri.auth.forms.SignupForm'
 ACCOUNT_USER_DISPLAY = 'daiquiri.auth.utils.get_full_name'
+ACCOUNT_EMAIL_MAX_LENGTH = 190
 
 BOWER_COMPONENTS_ROOT = os.path.join(BASE_DIR, 'bower_root/')
 
