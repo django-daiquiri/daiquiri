@@ -13,55 +13,35 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         sql = []
 
-        meta = settings.DATABASES['metadata']
+        tap = settings.DATABASES['tap']
         data = settings.DATABASES['data']
 
-        # check if the permissions for the metadata adapter are ok
+        # check if the permissions for the tap adapter are ok
         try:
-            metadata_adapter = get_adapter('metadata')
+            get_adapter('tap')
         except OperationalError:
-            sql.append('CREATE USER \'%(USER)s\'@\'localhost\' IDENTIFIED BY \'%(PASSWORD)s\';' % meta)
+            sql.append('CREATE USER \'%(USER)s\'@\'localhost\' IDENTIFIED BY \'%(PASSWORD)s\';' % tap)
+            sql.append('GRANT ALL ON `%(NAME)s`.* TO \'%(USER)s\'@\'localhost\';' % tap)
 
         # check if the permissions for the data adapter are ok
         try:
             data_adapter = get_adapter('data')
         except OperationalError:
             sql.append('CREATE USER \'%(USER)s\'@\'localhost\' IDENTIFIED BY \'%(PASSWORD)s\';' % data)
+            data.update({'NAME': get_user_database_name('%')})
+            sql.append('GRANT ALL ON `%(NAME)s`.* TO \'%(USER)s\'@\'localhost\';' % data)
 
         # check if the permissions for the science databases are ok
         databases = Database.objects.all()
 
         try:
             for database in databases:
-                meta.update({'NAME': database.name})
                 data.update({'NAME': database.name})
-
-                try:
-                    metadata_adapter.fetch_tables(meta['NAME'])
-                except OperationalError:
-                    sql.append('GRANT SELECT, ALTER ON `%(NAME)s`.* TO \'%(USER)s\'@\'localhost\';' % meta)
-
-                try:
-                    data_adapter.fetch_tables(meta['NAME'])
-                except OperationalError:
-                    sql.append('GRANT SELECT ON `%(NAME)s`.* TO \'%(USER)s\'@\'localhost\';' % data)
-
-        except ProgrammingError:
-            pass
-
-        # check if the permissions for the user databases are ok
-        try:
-            user = User.objects.first()
-
-            if user:
-                database_name = get_user_database_name(user.username)
-                data.update({'NAME': get_user_database_name(database_name)})
 
                 try:
                     data_adapter.fetch_tables(data['NAME'])
                 except OperationalError:
-                    data.update({'NAME': get_user_database_name('%')})
-                    sql.append('GRANT ALL ON `%(NAME)s`.* TO \'%(USER)s\'@\'localhost\';' % data)
+                    sql.append('GRANT SELECT ON `%(NAME)s`.* TO \'%(USER)s\'@\'localhost\';' % data)
 
         except ProgrammingError:
             pass
