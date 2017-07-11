@@ -44,6 +44,7 @@ DJANGO_APPS = [
 ADDITIONAL_APPS = [
     'rest_framework',
     'django_filters',
+    'django_extensions',
     'markdown',
     'compressor',
     'djangobower',
