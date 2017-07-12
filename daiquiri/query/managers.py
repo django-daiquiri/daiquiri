@@ -68,12 +68,20 @@ class QueryJobManager(models.Manager):
         # store statistics/meta information
         # todo
 
+        # get the owner and username
+        if user.is_anonymous():
+            owner = None
+            username = 'anonymous'
+        else:
+            owner = user
+            username = user.username
+
         job = self.model(
             query_language=query_language,
             query=query,
             actual_query=actual_query,
-            owner=user,
-            database_name=get_user_database_name(user.username),
+            owner=owner,
+            database_name=get_user_database_name(username),
             table_name=table_name,
             queue=queue,
             phase=PHASE_QUEUED,

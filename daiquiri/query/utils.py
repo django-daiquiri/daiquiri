@@ -1,10 +1,15 @@
 import sys
 
 from django.conf import settings
+from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 
 from daiquiri.core.adapter import get_adapter
 from daiquiri.uws.settings import PHASE_COMPLETED
+
+
+def get_default_table_name():
+    return now().strftime("%Y-%m-%d-%H-%M-%S")
 
 
 def get_user_database_name(username):

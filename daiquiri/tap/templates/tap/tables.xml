@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vosi:tableset xmlns:vosi="http://www.ivoa.net/xml/VOSITables/v1.0"
+               xmlns:vod="http://www.ivoa.net/xml/VODataService/v1.1"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="http://www.ivoa.net/xml/VODataService/v1.1 http://www.ivoa.net/xml/VOSITables/v1.0">
+
+    {% for schema in schemas %}
+    <schema>
+        <name>{{ schema.schema_name }}</name>
+        {% for table in schema.tables.all %}
+        <table>
+            <name>{{ table.table_name }}</name>
+            {% if table.description %}
+            <description>{{ table.description }}</description>
+            {% endif %}
+            {% for column in table.columns.all %}
+            <column>
+                <name>{{ column.column_name }}</name>
+                <dataType xsi:type="vod:TAPType">{{ column.datatype }}</dataType>
+                {% if column.description %}<description>{{ column.description }}</description>{% endif %}
+                {% if column.ucd %}<ucd>{{ column.ucd }}</ucd>{% endif %}
+                {% if column.indexed %}<flag>indexed</flag>{% endif %}
+                {% if column.primary %}<flag>primary</flag>{% endif %}
+                {% if column.std %}<flag>std</flag>{% endif %}
+            </column>
+            {% endfor %}
+        </table>
+        {% endfor %}
+    </schema>
+    {% endfor %}
+</vosi:tableset>

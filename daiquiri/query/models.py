@@ -29,7 +29,7 @@ class QueryJob(Job):
     query = models.TextField()
     actual_query = models.TextField(null=True, blank=True)
 
-    queue = models.CharField(max_length=16)
+    queue = models.CharField(max_length=16, null=True, blank=True)
     nrows = models.IntegerField(null=True, blank=True)
     size = models.IntegerField(null=True, blank=True)
 

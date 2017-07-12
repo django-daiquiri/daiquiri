@@ -15,7 +15,10 @@ def database_updated_handler(sender, **kwargs):
 
     instance = kwargs['instance']
 
-    schema, created = TapSchema.objects.using('tap').get_or_create(pk=instance.id)
+    try:
+        schema = TapSchema.objects.using('tap').get(pk=instance.id)
+    except TapSchema.DoesNotExist:
+        schema = TapSchema(pk=instance.id)
 
     schema.schema_name = instance.name
     schema.utype = None
@@ -29,15 +32,20 @@ def table_updated_handler(sender, **kwargs):
 
     instance = kwargs['instance']
 
-    table, created = TapTable.objects.using('tap').get_or_create(pk=instance.id)
+    try:
+        table = TapTable.objects.using('tap').get(pk=instance.id)
+    except TapTable.DoesNotExist:
+        table = TapTable(pk=instance.id)
 
+    table.schema = TapSchema.objects.using('tap').get(pk=instance.database.id)
     table.schema_name = str(instance.database)
     table.table_name = instance.name
     table.table_type = instance.type
     table.utype = instance.utype
     if instance.description:
-        schema.description = instance.description[:255]
+        table.description = instance.description[:255]
     table.table_index = instance.order
+
     table.save()
 
 
@@ -46,8 +54,12 @@ def column_updated_handler(sender, **kwargs):
 
     instance = kwargs['instance']
 
-    column, created = TapColumn.objects.using('tap').get_or_create(pk=instance.id)
+    try:
+        column = TapColumn.objects.using('tap').get(pk=instance.id)
+    except TapColumn.DoesNotExist:
+        column = TapColumn(pk=instance.id)
 
+    column.table = TapTable.objects.using('tap').get(pk=instance.table.id)
     column.table_name = str(instance.table)
     column.column_name = instance.name
     column.datatype = instance.datatype

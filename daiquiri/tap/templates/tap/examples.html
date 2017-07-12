@@ -1,0 +1,14 @@
+{% extends 'core/wide.html' %}
+{% load i18n %}
+
+{% block wide %}
+
+    <h1>{% trans 'Examples' %}</h1>
+
+    {% for example in examples %}
+        <h2>{{ example.name }}</h2>
+        <p>{{ example.description }}</p>
+        <pre>{{ example.query_string }}</pre>
+    {% endfor %}
+
+{% endblock %}

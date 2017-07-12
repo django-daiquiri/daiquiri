@@ -37,7 +37,7 @@ from .exceptions import (
     TableError,
     ConnectionError
 )
-from utils import fetch_user_database_metadata
+from .utils import get_default_table_name, fetch_user_database_metadata
 
 
 class StatusViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -113,7 +113,7 @@ class QueryJobViewSet(viewsets.ModelViewSet):
         if 'table_name' in serializer.data:
             table_name = serializer.data['table_name']
         else:
-            table_name = now().strftime("%Y-%m-%d-%H-%M-%S")
+            table_name = get_default_table_name()
 
         try:
             job_id = QueryJob.objects.submit(
@@ -164,7 +164,7 @@ class QueryJobViewSet(viewsets.ModelViewSet):
         except QueryJob.DoesNotExist:
             raise Http404
 
-    @detail_route(methods=['put'], url_path='download/(?P<format_key>\w+)')
+    @detail_route(methods=['put'], url_path='download/(?P<format_key>\w+)', url_name='download')
     def download(self, request, pk=None, format_key=None):
         try:
             format = [f for f in settings.QUERY['download_formats'] if f['key'] == format_key][0]

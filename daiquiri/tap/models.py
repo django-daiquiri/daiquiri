@@ -21,6 +21,8 @@ class Schema(models.Model):
 @python_2_unicode_compatible
 class Table(models.Model):
 
+    schema = models.ForeignKey(Schema, related_name='tables')
+
     schema_name = models.CharField(max_length=256)
     table_name = models.CharField(max_length=256)
     table_type = models.CharField(max_length=256)
@@ -38,6 +40,8 @@ class Table(models.Model):
 
 @python_2_unicode_compatible
 class Column(models.Model):
+
+    table = models.ForeignKey(Table, related_name='columns')
 
     table_name = models.CharField(max_length=256)
     column_name = models.CharField(max_length=256)

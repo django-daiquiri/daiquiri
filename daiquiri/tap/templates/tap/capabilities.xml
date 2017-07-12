@@ -1,0 +1,47 @@
+{% load core_tags %}<?xml version="1.0" encoding="UTF-8"?>
+
+<vosi:capabilities xmlns=""
+   xmlns:vosi="http://www.ivoa.net/xml/VOSI/v1.0"
+   xmlns:vs="http://www.ivoa.net/xml/VODataService/v1.0"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://www.ivoa.net/xml/VOSI/v1.0 http://www.ivoa.net/xml/VOSI/v1.0 http://www.ivoa.net/xml/VODataService/v1.0 http://www.ivoa.net/xml/VODataService/v1.0">
+
+    <vosi:capability standardID="ivo://ivoa.net/std/TAP">
+        <interface xsi:type="vs:ParamHTTP" role="std" version="1.0">
+            <accessURL use="base">
+                {% url 'tap_root' %}
+            </accessURL>
+        </interface>
+    </vosi:capability>
+
+    <vosi:capability standardID="ivo://ivoa.net/std/TAP#async-1.1">
+        <interface xsi:type="vs:ParamHTTP" role="std" version="1.1">
+            <accessURL use="base">{% url 'tap_async' %}</accessURL>
+        </interface>
+    </vosi:capability>
+
+    <vosi:capability standardID="ivo://ivoa.net/std/TAP#sync-1.1">
+        <interface xsi:type="vs:ParamHTTP" role="std" version="1.1">
+            <accessURL use="base">{% url 'tap_sync' %}</accessURL>
+        </interface>
+    </vosi:capability>
+
+    <vosi:capability standardID="ivo://ivoa.net/std/VOSI#capabilities">
+        <interface xsi:type="vs:ParamHTTP">
+        <accessURL use="full">{% url 'tap_capabilities' %}</accessURL>
+        </interface>
+    </vosi:capability>
+
+    <vosi:capability standardID="ivo://ivoa.net/std/VOSI#taples">
+        <interface xsi:type="vs:ParamHTTP">
+            <accessURL use="full">{% url 'tap_tables' %}</accessURL>
+        </interface>
+    </vosi:capability>
+
+    <vosi:capability standardID="ivo://ivoa.net/std/DALI#examples">
+       <interface xsi:type="vr:WebBrowser">
+          <accessURL use="full">{% url 'tap_examples' %}</accessURL>
+       </interface>
+    </vosi:capability>
+
+</vosi:capabilities>
