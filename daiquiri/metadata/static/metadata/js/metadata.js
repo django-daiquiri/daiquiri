@@ -21,6 +21,7 @@ angular.module('metadata', ['core'])
         'functions': $resource(baseurl + 'metadata/api/functions/:list_route/:id/'),
         'tabletypes': $resource(baseurl + 'metadata/api/tabletypes/:id/'),
         'licenses': $resource(baseurl + 'metadata/api/licenses/:id/'),
+        'accesslevels': $resource(baseurl + 'metadata/api/accesslevels/:id/'),
         'groups': $resource(baseurl + 'auth/api/groups/:id/'),
     };
 
@@ -29,23 +30,31 @@ angular.module('metadata', ['core'])
     service.factory = {
         databases: function() {
             return {
+                access_level: 'PRIVATE',
+                metadata_access_level: 'PRIVATE',
                 groups: []
             };
          },
         tables: function() {
             return {
                 database: service.browser.getSelectedItem('databases', 0).id,
+                access_level: 'PRIVATE',
+                metadata_access_level: 'PRIVATE',
                 groups: []
             };
         },
         columns: function() {
             return {
                 table: service.browser.getSelectedItem('databases', 1).id,
+                access_level: 'PRIVATE',
+                metadata_access_level: 'PRIVATE',
                 groups: []
             };
         },
         functions: function() {
             return {
+                access_level: 'PRIVATE',
+                metadata_access_level: 'PRIVATE',
                 groups: []
             };
         }
@@ -57,6 +66,7 @@ angular.module('metadata', ['core'])
         service.tabletypes = resources.tabletypes.query();
         service.groups = resources.groups.query();
         service.licenses = resources.licenses.query();
+        service.accesslevels = resources.accesslevels.query();
 
         BrowserService.init('databases', ['databases','tables','columns']);
         BrowserService.init('functions', ['functions']);

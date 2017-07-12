@@ -7,7 +7,7 @@ from rest_framework.decorators import list_route
 from daiquiri.core.adapter import get_adapter
 from daiquiri.core.viewsets import ChoicesViewSet
 
-from .models import Database, Table, Column, Function, LICENSE_CHOICES
+from .models import Database, Table, Column, Function, LICENSE_CHOICES, ACCESS_LEVEL_CHOICES
 from .serializers import (
     DatabaseSerializer,
     TableSerializer,
@@ -36,12 +36,13 @@ class DatabaseViewSet(viewsets.ModelViewSet):
         database = serializer.save()
 
         if request.data.get('discover'):
-            adapter = get_adapter('metadata')
+            adapter = get_adapter('data')
 
             for table_metadata in adapter.fetch_tables(database.name):
                 table_metadata['database'] = database.id
-                table_metadata['license'] = database.license
                 table_metadata['groups'] = request.data['groups']
+                for key in ['license', 'access_level', 'metadata_access_level']:
+                    table_metadata[key] = getattr(database, key)
 
                 table_serializer = TableSerializer(data=table_metadata)
                 if table_serializer.is_valid():
@@ -50,6 +51,8 @@ class DatabaseViewSet(viewsets.ModelViewSet):
                     for column_metadata in adapter.fetch_columns(database.name, table.name):
                         column_metadata['table'] = table.id
                         column_metadata['groups'] = request.data['groups']
+                        for key in ['access_level', 'metadata_access_level']:
+                            column_metadata[key] = getattr(table, key)
 
                         column_serializer = ColumnSerializer(data=column_metadata)
                         if column_serializer.is_valid():
@@ -84,11 +87,13 @@ class TableViewSet(viewsets.ModelViewSet):
         table = serializer.save()
 
         if request.data.get('discover'):
-            adapter = get_adapter('metadata')
+            adapter = get_adapter('data')
 
             for column_metadata in adapter.fetch_columns(table.database.name, table.name):
                 column_metadata['table'] = table.id
                 column_metadata['groups'] = request.data['groups']
+                for key in ['access_level', 'metadata_access_level']:
+                    column_metadata[key] = getattr(table, key)
 
                 column_serializer = ColumnSerializer(data=column_metadata)
                 if column_serializer.is_valid():
@@ -103,7 +108,7 @@ class TableViewSet(viewsets.ModelViewSet):
         table_name = request.GET.get('table')
 
         if database_name and table_name:
-            return Response([get_adapter('metadata').fetch_table(database_name, table_name)])
+            return Response([get_adapter('data').fetch_table(database_name, table_name)])
         else:
             return Response([])
 
@@ -119,7 +124,7 @@ class ColumnViewSet(viewsets.ModelViewSet):
         column_name = request.GET.get('column')
 
         if database_name and table_name:
-            return Response([get_adapter('metadata').fetch_column(database_name, table_name, column_name)])
+            return Response([get_adapter('data').fetch_column(database_name, table_name, column_name)])
         else:
             return Response([])
 
@@ -147,3 +152,7 @@ class TableTypeViewSet(ChoicesViewSet):
 
 class LicenseViewSet(ChoicesViewSet):
     queryset = LICENSE_CHOICES
+
+
+class AccessLevelViewSet(ChoicesViewSet):
+    queryset = ACCESS_LEVEL_CHOICES

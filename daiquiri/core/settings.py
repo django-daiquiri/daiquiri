@@ -160,3 +160,5 @@ SETTINGS_EXPORT = [
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_FROM = 'info@example.com'
+
+TAP_ACCESS_LEVEL = 'PUBLIC'

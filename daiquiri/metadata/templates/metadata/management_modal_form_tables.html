@@ -105,10 +105,34 @@
                             data-errors="service.errors.utype">
                         </formgroup>
                     </div>
+                    <div class="row">
+                        <formgroup
+                            class="col-md-6"
+                            data-id="access_level"
+                            data-type="select"
+                            data-label="{{ meta.Table.access_level.verbose_name }}"
+                            data-help="{{ meta.Table.access_level.help_text }}"
+                            data-model="service.values.access_level"
+                            data-errors="service.errors.access_level"
+                            data-options="service.accesslevels"
+                            data-options-label="text">
+                        </formgroup>
+                        <formgroup
+                            class="col-md-6"
+                            data-id="metadata_access_level"
+                            data-type="select"
+                            data-label="{{ meta.Table.metadata_access_level.verbose_name }}"
+                            data-help="{{ meta.Table.metadata_access_level.help_text }}"
+                            data-model="service.values.metadata_access_level"
+                            data-errors="service.errors.metadata_access_level"
+                            data-options="service.accesslevels"
+                            data-options-label="text">
+                        </formgroup>
+                    </div>
                     <formgroup
                         data-id="groups"
                         data-type="multicheckbox"
-                        data-label="{% trans 'Published for' %}"
+                        data-label="{% trans 'Groups with access' %}"
                         data-model="service.values.groups"
                         data-errors="service.errors.groups"
                         data-options="service.groups"

@@ -42,6 +42,14 @@ LICENSE_URLS = {
     LICENSE_BY_NC_ND: 'https://creativecommons.org/licenses/by-nc-nd/4.0/'
 }
 
+ACCESS_LEVEL_PRIVATE = 'PRIVATE'
+ACCESS_LEVEL_INTERNAL = 'INTERNAL'
+ACCESS_LEVEL_PUBLIC = 'PUBLIC'
+ACCESS_LEVEL_CHOICES = (
+    (ACCESS_LEVEL_PRIVATE, _('Private - access must be granted by group')),
+    (ACCESS_LEVEL_INTERNAL, _('Internal - logged in users can access')),
+    (ACCESS_LEVEL_PUBLIC, _('Public - anonymous visitors can access'))
+)
 
 @python_2_unicode_compatible
 class Database(models.Model):
@@ -90,6 +98,14 @@ class Database(models.Model):
     utype = models.CharField(
         max_length=256, null=True, blank=True,
         verbose_name=_('IVOA Utype'),
+    )
+    access_level = models.CharField(
+        max_length=8, choices=ACCESS_LEVEL_CHOICES,
+        verbose_name=_('Access level')
+    )
+    metadata_access_level = models.CharField(
+        max_length=8, choices=ACCESS_LEVEL_CHOICES,
+        verbose_name=_('Metadata access level')
     )
     groups = models.ManyToManyField(
         Group, blank=True,
@@ -183,6 +199,14 @@ class Table(models.Model):
     utype = models.CharField(
         max_length=256, null=True, blank=True,
         verbose_name=_('IVOA Utype')
+    )
+    access_level = models.CharField(
+        max_length=8, choices=ACCESS_LEVEL_CHOICES,
+        verbose_name=_('Access level')
+    )
+    metadata_access_level = models.CharField(
+        max_length=8, choices=ACCESS_LEVEL_CHOICES,
+        verbose_name=_('Metadata access level')
     )
     groups = models.ManyToManyField(
         Group, blank=True,
@@ -278,6 +302,14 @@ class Column(models.Model):
         verbose_name=_('Standard'),
         help_text=_('Designates whether the column is defined by some standard.')
     )
+    access_level = models.CharField(
+        max_length=8, choices=ACCESS_LEVEL_CHOICES, null=True, blank=True,
+        verbose_name=_('Access level')
+    )
+    metadata_access_level = models.CharField(
+        max_length=8, choices=ACCESS_LEVEL_CHOICES, null=True, blank=True,
+        verbose_name=_('Metadata access level')
+    )
     groups = models.ManyToManyField(
         Group, blank=True,
         verbose_name=_('Groups'),
@@ -323,7 +355,16 @@ class Function(models.Model):
     )
     query_string = models.CharField(
         max_length=256,
+        verbose_name=_('Query string'),
         help_text=_('Prototype of this function in a SQL query.')
+    )
+    access_level = models.CharField(
+        max_length=8, choices=ACCESS_LEVEL_CHOICES,
+        verbose_name=_('Access level')
+    )
+    metadata_access_level = models.CharField(
+        max_length=8, choices=ACCESS_LEVEL_CHOICES,
+        verbose_name=_('Metadata access level')
     )
     groups = models.ManyToManyField(
         Group, blank=True,
