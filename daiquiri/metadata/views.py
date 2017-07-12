@@ -1,3 +1,4 @@
+from django.http import Http404
 from django.views.generic import TemplateView
 
 from daiquiri.core.views import ModelPermissionMixin
@@ -26,7 +27,10 @@ class DatabaseView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(DatabaseView, self).get_context_data(**kwargs)
-        context['database'] = Database.objects.get(name=self.kwargs.get('database_name'))
+        try:
+            context['database'] = Database.permissions.get(self.request.user, database_name=self.kwargs.get('database_name'))
+        except Database.DoesNotExist:
+            raise Http404()
         return context
 
 
