@@ -122,20 +122,23 @@ class QueryJobManager(models.Manager):
                 database_name, table_name, column_name = column.split('.')
 
                 # check permission on database
-                database = Database.objects.filter_by_access_level(user).get(name=database_name)
-                if not database:
+                try:
+                    database = Database.objects.filter_by_access_level(user).get(name=database_name)
+                except Database.DoesNotExist:
                     errors.append(_('Database %s not found.') % database_name)
                     continue
 
                 # check permission on table
-                table = Table.objects.filter_by_access_level(user).filter(database=database).get(name=table_name)
-                if not table:
+                try:
+                    table = Table.objects.filter_by_access_level(user).filter(database=database).get(name=table_name)
+                except Table.DoesNotExist:
                     errors.append(_('Table %s not found.') % table_name)
                     continue
 
                 # check permission on column
-                column = Column.objects.filter_by_access_level(user).filter(table=table).get(name=column_name)
-                if not column:
+                try:
+                    column = Column.objects.filter_by_access_level(user).filter(table=table).get(name=column_name)
+                except Column.DoesNotExist:
                     errors.append(_('Column %s not found.') % column_name)
                     continue
 
