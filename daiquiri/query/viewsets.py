@@ -37,11 +37,12 @@ from .exceptions import (
     TableError,
     ConnectionError
 )
+from .permissions import HasPermission
 from .utils import get_default_table_name, fetch_user_database_metadata
 
 
 class StatusViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (HasPermission, )
 
     def get_queryset(self):
         return []
@@ -56,8 +57,9 @@ class StatusViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
                 quota = group_quota if group_quota > quota else quota
 
         # get the size of all the tables of this user
-        jobs = QueryJob.objects.filter(owner=self.request.user).exclude(phase=PHASE_ARCHIVED)
-        size = jobs.aggregate(Sum('size'))['size__sum']
+        jobs = QueryJob.objects.filter_by_owner(self.request.user).exclude(phase=PHASE_ARCHIVED)
+
+        size = jobs.aggregate(Sum('size'))['size__sum'] or 0
 
         return Response([{
             'guest': not request.user.is_authenticated(),
@@ -68,7 +70,7 @@ class StatusViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
 
 class FormViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (HasPermission, )
 
     serializer_class = FormSerializer
 
@@ -77,7 +79,7 @@ class FormViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
 
 class DropdownViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (HasPermission, )
 
     serializer_class = DropdownSerializer
 
@@ -86,10 +88,10 @@ class DropdownViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
 
 class QueryJobViewSet(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (HasPermission, )
 
     def get_queryset(self):
-        return QueryJob.objects.filter(owner=self.request.user).exclude(phase=PHASE_ARCHIVED)
+        return QueryJob.objects.filter_by_owner(self.request.user).exclude(phase=PHASE_ARCHIVED)
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -150,8 +152,7 @@ class QueryJobViewSet(viewsets.ModelViewSet):
 
     @list_route(methods=['get'])
     def tables(self, request):
-        jobs = QueryJob.objects.filter(owner=self.request.user).exclude(phase=PHASE_ARCHIVED)
-        return Response([fetch_user_database_metadata(jobs, request.user.username)])
+        return Response(fetch_user_database_metadata(request.user, self.get_queryset()))
 
     @detail_route(methods=['put'])
     def kill(self, request, pk=None):
@@ -195,7 +196,7 @@ class ExampleViewSet(viewsets.ModelViewSet):
     )
     search_fields = ('name', 'description', 'query_string')
 
-    @list_route(methods=['get'], permission_classes=(IsAuthenticated, ))
+    @list_route(methods=['get'], permission_classes=(HasPermission, ))
     def user(self, request):
         examples = Example.objects.filter(groups__in=self.request.user.groups.all())
         serializer = UserExampleSerializer(examples, many=True)
@@ -203,10 +204,10 @@ class ExampleViewSet(viewsets.ModelViewSet):
 
 
 class QueueViewSet(ChoicesViewSet):
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (HasPermission, )
     queryset = settings.QUERY['queues']
 
 
 class QueryLanguageViewSet(ChoicesViewSet):
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (HasPermission, )
     queryset = settings.QUERY['query_languages']

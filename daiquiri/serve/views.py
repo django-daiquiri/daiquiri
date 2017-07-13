@@ -55,7 +55,7 @@ class RowViewSet(viewsets.ViewSet):
         adapter = get_adapter('data')
 
         # get query backend adapter
-        user_database_name = get_user_database_name(self.request.user.username)
+        user_database_name = get_user_database_name(self.request.user)
 
         if database_name == user_database_name:
             # get database adapter and fetch the columns
@@ -63,13 +63,15 @@ class RowViewSet(viewsets.ViewSet):
             column_names = [column['name'] for column in columns]
         else:
             # check permissions on the database
-            database = Database.objects.filter_by_access_level(self.request.user).get(name=database_name)
-            if not database:
+            try:
+                database = Database.objects.filter_by_access_level(self.request.user).get(name=database_name)
+            except Database.DoesNotExist:
                 raise NotFound()
 
             # check permissions on the table
-            table = Table.objects.filter_by_access_level(self.request.user).filter(database=database).get(name=table_name)
-            if not table:
+            try:
+                table = Table.objects.filter_by_access_level(self.request.user).filter(database=database).get(name=table_name)
+            except Table.DoesNotExist:
                 raise NotFound()
 
             # get columns for this table
@@ -136,20 +138,22 @@ class ColumnViewSet(viewsets.ViewSet):
         table_name = self.request.GET.get('table')
 
         # get database adapter
-        user_database_name = get_user_database_name(self.request.user.username)
+        user_database_name = get_user_database_name(self.request.user)
 
         if database_name == user_database_name:
             # get database adapter and fetch the columns
             columns = get_adapter('data').fetch_columns(database_name, table_name)
         else:
             # check permissions on the database
-            database = Database.objects.filter_by_access_level(self.request.user).get(name=database_name)
-            if not database:
+            try:
+                database = Database.objects.filter_by_access_level(self.request.user).get(name=database_name)
+            except Database.DoesNotExist:
                 raise NotFound()
 
             # check permissions on the table
-            table = Table.objects.filter_by_access_level(self.request.user).filter(database=database).get(name=table_name)
-            if not table:
+            try:
+                table = Table.objects.filter_by_access_level(self.request.user).filter(database=database).get(name=table_name)
+            except Table.DoesNotExist:
                 raise NotFound()
 
             # get columns for this table

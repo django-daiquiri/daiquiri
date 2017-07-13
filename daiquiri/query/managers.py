@@ -32,6 +32,12 @@ class QueryJobManager(models.Manager):
     def get_queryset(self):
         return QueryJobQuerySet(self.model, using=self._db)
 
+    def filter_by_owner(self, user):
+        if user.is_anonymous():
+            return self.get_queryset().filter(owner=None)
+        else:
+            return self.get_queryset().filter(owner=user)
+
     def submit(self, query_language, query, queue, table_name, user, sync=False):
         """
         Submit a query to the job management and the query backend.
@@ -68,20 +74,12 @@ class QueryJobManager(models.Manager):
         # store statistics/meta information
         # todo
 
-        # get the owner and username
-        if user.is_anonymous():
-            owner = None
-            username = 'anonymous'
-        else:
-            owner = user
-            username = user.username
-
         job = self.model(
             query_language=query_language,
             query=query,
             actual_query=actual_query,
-            owner=owner,
-            database_name=get_user_database_name(username),
+            owner=owner if not user.is_anonymous() else None,
+            database_name=get_user_database_name(user),
             table_name=table_name,
             queue=queue,
             phase=PHASE_QUEUED,

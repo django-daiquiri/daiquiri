@@ -12,14 +12,21 @@ def get_default_table_name():
     return now().strftime("%Y-%m-%d-%H-%M-%S")
 
 
-def get_user_database_name(username):
+def get_user_database_name(user):
+    if not user:
+        username = '%'
+    elif user.is_anonymous():
+        username = 'anonymous'
+    else:
+        username = user.username
+
     return settings.QUERY['user_database_prefix'] + username
 
 
-def fetch_user_database_metadata(jobs, username):
+def fetch_user_database_metadata(user, jobs):
     adapter = get_adapter('data')
 
-    database_name = get_user_database_name(username)
+    database_name = get_user_database_name(user)
 
     database = {
         'order': sys.maxsize,
@@ -42,4 +49,4 @@ def fetch_user_database_metadata(jobs, username):
 
             database['tables'].append(table)
 
-    return database
+    return [database]

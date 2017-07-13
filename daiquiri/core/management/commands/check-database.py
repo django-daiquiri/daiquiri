@@ -28,7 +28,7 @@ class Command(BaseCommand):
             data_adapter = get_adapter('data')
         except OperationalError:
             sql.append('CREATE USER \'%(USER)s\'@\'localhost\' IDENTIFIED BY \'%(PASSWORD)s\';' % data)
-            data.update({'NAME': get_user_database_name('%')})
+            data.update({'NAME': get_user_database_name(None)})
             sql.append('GRANT ALL ON `%(NAME)s`.* TO \'%(USER)s\'@\'localhost\';' % data)
 
         # check if the permissions for the science databases are ok
