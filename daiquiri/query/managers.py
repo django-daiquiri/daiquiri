@@ -155,4 +155,4 @@ class QueryJobManager(models.Manager):
                     continue
 
         # return the error stack
-        return errors
+        return list(set(errors))
