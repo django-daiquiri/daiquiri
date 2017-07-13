@@ -32,7 +32,7 @@
         </interface>
     </vosi:capability>
 
-    <vosi:capability standardID="ivo://ivoa.net/std/VOSI#taples">
+    <vosi:capability standardID="ivo://ivoa.net/std/VOSI#tables">
         <interface xsi:type="vs:ParamHTTP">
             <accessURL use="full">{% url 'tap_tables' %}</accessURL>
         </interface>
