@@ -32,6 +32,7 @@ angular.module('metadata', ['core'])
             return {
                 access_level: 'PRIVATE',
                 metadata_access_level: 'PRIVATE',
+                discover: true,
                 groups: []
             };
          },
@@ -40,6 +41,7 @@ angular.module('metadata', ['core'])
                 database: service.browser.getSelectedItem('databases', 0).id,
                 access_level: 'PRIVATE',
                 metadata_access_level: 'PRIVATE',
+                discover: true,
                 groups: []
             };
         },
