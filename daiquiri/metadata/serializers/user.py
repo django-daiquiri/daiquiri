@@ -43,7 +43,7 @@ class TableSerializer(serializers.ModelSerializer):
 
     def get_columns(self, obj):
         # filter the columns which are published for the groups of the user
-        queryset = obj.columns.filter(groups__in=self.context['request'].user.groups.all())
+        queryset = obj.columns.filter_by_access_level(self.context['request'].user)
         return ColumnSerializer(queryset, context=self.context, many=True).data
 
 
@@ -65,7 +65,7 @@ class DatabaseSerializer(serializers.ModelSerializer):
 
     def get_tables(self, obj):
         # filter the tables which are published for the groups of the user
-        queryset = obj.tables.filter(groups__in=self.context['request'].user.groups.all())
+        queryset = obj.tables.filter_by_access_level(self.context['request'].user)
         return TableSerializer(queryset, context=self.context, many=True).data
 
 

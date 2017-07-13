@@ -27,8 +27,10 @@ class DatabaseView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(DatabaseView, self).get_context_data(**kwargs)
+
+        database_name = self.kwargs.get('database_name')
         try:
-            context['database'] = Database.permissions.get(self.request.user, database_name=self.kwargs.get('database_name'))
+            context['database'] = Database.objects.filter_by_metadata_access_level(self.request.user).get(name=database_name)
         except Database.DoesNotExist:
             raise Http404()
         return context
@@ -39,8 +41,18 @@ class TableView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(TableView, self).get_context_data(**kwargs)
-        context['table'] = Table.objects.get(
-            name=self.kwargs.get('table_name'),
-            database__name=self.kwargs.get('database_name')
-        )
+
+        database_name = self.kwargs.get('database_name')
+        table_name = self.kwargs.get('table_name')
+
+        try:
+            database = Database.objects.filter_by_metadata_access_level(self.request.user).get(name=database_name)
+        except Database.DoesNotExist:
+            raise Http404()
+
+        try:
+            context['table'] = Table.objects.filter_by_metadata_access_level(self.request.user).filter(database=database).get(name=table_name)
+        except Database.DoesNotExist:
+            raise Http404()
+
         return context

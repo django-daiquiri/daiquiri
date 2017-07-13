@@ -5,57 +5,15 @@ from django.utils.translation import ugettext_lazy as _
 
 from daiquiri.core.adapter import get_adapter
 
-from .managers import (
-    DatabasePermissionsManager,
-    TablePermissionsManager,
-    ColumnPermissionsManager,
-    FunctionPermissionsManager
-)
+from .settings import LICENSE_CHOICES, LICENSE_URLS, ACCESS_LEVEL_CHOICES
+from .managers import MetadataManager
 
-LICENSE_CC0 = 'CC0'
-LICENSE_PD = 'PD'
-LICENSE_BY = 'BY'
-LICENSE_BY_SA = 'BY_SA'
-LICENSE_BY_ND = 'BY_ND'
-LICENSE_BY_NC = 'BY_NC'
-LICENSE_BY_NC_SA = 'BY_NC_SA'
-LICENSE_BY_NC_ND = 'BY_NC_ND'
-LICENSE_CHOICES = (
-    (LICENSE_CC0, 'CC0 1.0 Universal (CC0 1.0)'),
-    (LICENSE_PD, 'Public Domain Mark'),
-    (LICENSE_BY, 'Attribution 4.0 International (CC BY 4.0)'),
-    (LICENSE_BY_SA, 'Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)'),
-    (LICENSE_BY_ND, 'Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0)'),
-    (LICENSE_BY_NC, 'Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)'),
-    (LICENSE_BY_NC_SA, 'Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)'),
-    (LICENSE_BY_NC_ND, 'Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)')
-)
 
-LICENSE_URLS = {
-    LICENSE_CC0: 'https://creativecommons.org/publicdomain/zero/1.0/',
-    LICENSE_PD: None,
-    LICENSE_BY: 'https://creativecommons.org/licenses/by/4.0/',
-    LICENSE_BY_SA: 'https://creativecommons.org/licenses/by-sa/4.0/',
-    LICENSE_BY_ND: 'https://creativecommons.org/licenses/by-nd/4.0/',
-    LICENSE_BY_NC: 'https://creativecommons.org/licenses/by-nc/4.0/',
-    LICENSE_BY_NC_SA: 'https://creativecommons.org/licenses/by-nc-sa/4.0/',
-    LICENSE_BY_NC_ND: 'https://creativecommons.org/licenses/by-nc-nd/4.0/'
-}
-
-ACCESS_LEVEL_PRIVATE = 'PRIVATE'
-ACCESS_LEVEL_INTERNAL = 'INTERNAL'
-ACCESS_LEVEL_PUBLIC = 'PUBLIC'
-ACCESS_LEVEL_CHOICES = (
-    (ACCESS_LEVEL_PRIVATE, _('Private - access must be granted by group')),
-    (ACCESS_LEVEL_INTERNAL, _('Internal - logged in users can access')),
-    (ACCESS_LEVEL_PUBLIC, _('Public - anonymous visitors can access'))
-)
 
 @python_2_unicode_compatible
 class Database(models.Model):
 
-    objects = models.Manager()
-    permissions = DatabasePermissionsManager()
+    objects = MetadataManager()
 
     order = models.IntegerField(
         default=0, null=True, blank=True,
@@ -147,8 +105,7 @@ class Table(models.Model):
         (TYPE_VIEW, _('View'))
     )
 
-    objects = models.Manager()
-    permissions = TablePermissionsManager()
+    objects = MetadataManager()
 
     database = models.ForeignKey(
         Database, related_name='tables',
@@ -245,8 +202,7 @@ class Table(models.Model):
 @python_2_unicode_compatible
 class Column(models.Model):
 
-    objects = models.Manager()
-    permissions = ColumnPermissionsManager()
+    objects = MetadataManager()
 
     table = models.ForeignKey(
         Table, related_name='columns',
@@ -335,8 +291,7 @@ class Column(models.Model):
 @python_2_unicode_compatible
 class Function(models.Model):
 
-    objects = models.Manager()
-    permissions = FunctionPermissionsManager()
+    objects = MetadataManager()
 
     order = models.IntegerField(
         null=True, blank=True,

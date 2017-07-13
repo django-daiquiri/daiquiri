@@ -70,7 +70,7 @@ class DatabaseViewSet(viewsets.ModelViewSet):
     @list_route(methods=['get'])
     def user(self, request):
         # filter the databases which are published for the groups of the user
-        queryset = Database.objects.filter(groups__in=self.request.user.groups.all())
+        queryset = Database.objects.filter_by_access_level(self.request.user)
         serializer = UserDatabaseSerializer(queryset, context={'request': request}, many=True)
         return Response(serializer.data)
 

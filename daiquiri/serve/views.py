@@ -19,8 +19,8 @@ from .serializers import *
 def serve_table(request, database_name, table_name):
 
     # check permission on database
-    database = Database.permissions.get(request.user, database_name=database_name)
-    table = Table.permissions.get(request.user, database=database, table_name=table_name)
+    database = Database.objects.filter_by_access_level(request.user).get(name=database_name)
+    table = Table.objects.filter_by_access_level(request.user).filter(database=database).get(name=table_name)
 
     if not (database or table):
         raise Http404()
@@ -63,17 +63,17 @@ class RowViewSet(viewsets.ViewSet):
             column_names = [column['name'] for column in columns]
         else:
             # check permissions on the database
-            database = Database.permissions.get(self.request.user, database_name=database_name)
+            database = Database.objects.filter_by_access_level(self.request.user).get(name=database_name)
             if not database:
                 raise NotFound()
 
             # check permissions on the table
-            table = Table.permissions.get(self.request.user, database=database, table_name=table_name)
+            table = Table.objects.filter_by_access_level(self.request.user).filter(database=database).get(name=table_name)
             if not table:
                 raise NotFound()
 
             # get columns for this table
-            columns = Column.permissions.all(self.request.user, table=table)
+            columns = Column.objects.filter_by_access_level(self.request.user).filter(table=table)
             column_names = [column.name for column in columns]
 
         # query the database for the total number of rows
@@ -143,16 +143,16 @@ class ColumnViewSet(viewsets.ViewSet):
             columns = get_adapter('data').fetch_columns(database_name, table_name)
         else:
             # check permissions on the database
-            database = Database.permissions.get(self.request.user, database_name=database_name)
+            database = Database.objects.filter_by_access_level(self.request.user).get(name=database_name)
             if not database:
                 raise NotFound()
 
             # check permissions on the table
-            table = Table.permissions.get(self.request.user, database=database, table_name=table_name)
+            table = Table.objects.filter_by_access_level(self.request.user).filter(database=database).get(name=table_name)
             if not table:
                 raise NotFound()
 
             # get columns for this table
-            columns = Column.permissions.all(self.request.user, table=table)
+            columns = Column.objects.filter_by_access_level(self.request.user).filter(table=table)
 
         return Response(ColumnSerializer(columns, many=True).data)

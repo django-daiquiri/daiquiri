@@ -122,19 +122,19 @@ class QueryJobManager(models.Manager):
                 database_name, table_name, column_name = column.split('.')
 
                 # check permission on database
-                database = Database.permissions.get(user, database_name=database_name)
+                database = Database.objects.filter_by_access_level(user).get(name=database_name)
                 if not database:
                     errors.append(_('Database %s not found.') % database_name)
                     continue
 
                 # check permission on table
-                table = Table.permissions.get(user, database_name=database_name, table_name=table_name)
+                table = Table.objects.filter_by_access_level(user).filter(database=database).get(name=table_name)
                 if not table:
                     errors.append(_('Table %s not found.') % table_name)
                     continue
 
                 # check permission on column
-                column = Column.permissions.get(user, database_name=database_name, table_name=table_name, column_name=column_name)
+                column = Column.objects.filter_by_access_level(user).filter(table=table).get(name=column_name)
                 if not column:
                     errors.append(_('Column %s not found.') % column_name)
                     continue
@@ -148,7 +148,7 @@ class QueryJobManager(models.Manager):
                 continue
             else:
                 # check permission on function
-                function = Function.permissions.get(user, function_name=function_name)
+                function = Function.objects.filter_by_access_level(user).get(name=name)
                 if not function:
                     errors.append(_('Function %s not found.') % function_name)
                     continue
