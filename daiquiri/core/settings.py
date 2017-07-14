@@ -1,19 +1,15 @@
-import __main__
-
 import os
+import inspect
 
 from django.utils.translation import ugettext_lazy as _
 
-main_file = __main__.__file__
+# second entry in the call stach is the script that imported settings.py
+# this is the BASE_DIR/PROJECT_DIR/settings/__init__.py file
+settings_init_filename = inspect.stack()[1][1]
 
-if os.path.basename(main_file) == 'manage.py':
-    BASE_DIR = os.path.dirname(os.path.abspath(main_file))
-elif os.path.basename(main_file) == 'wsgi.py':
-    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(main_file)))
-else:
-    raise Exception('Main file is not manage.py nor wsgi.py.')
-
-DAIQUIRI_APP = os.environ['DJANGO_SETTINGS_MODULE'].split('.settings')[0]
+PROJECT_DIR = os.path.dirname(os.path.dirname(settings_init_filename))
+BASE_DIR = os.path.dirname(PROJECT_DIR)
+DAIQUIRI_APP = os.path.basename(PROJECT_DIR)
 
 DEBUG = False
 
