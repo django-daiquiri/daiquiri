@@ -12,6 +12,17 @@
                 {% url 'tap_root' %}
             </accessURL>
         </interface>
+
+        {% for language in settings.QUERY.query_languages %}
+        <language>
+            <name>{{ language.key }}</name>
+            <version>{{ language.version }}</version>
+            {% if language.description %}
+            <description>{{ language.description }}</description>
+            {% endif %}
+        </language>
+        {% endfor %}
+
     </vosi:capability>
 
     <vosi:capability standardID="ivo://ivoa.net/std/TAP#async-1.1">

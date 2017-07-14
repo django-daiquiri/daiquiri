@@ -205,9 +205,9 @@ class ExampleViewSet(viewsets.ModelViewSet):
 
 class QueueViewSet(ChoicesViewSet):
     permission_classes = (HasPermission, )
-    queryset = settings.QUERY['queues']
+    queryset = [(item['key'], item['label']) for item in settings.QUERY['queues']]
 
 
 class QueryLanguageViewSet(ChoicesViewSet):
     permission_classes = (HasPermission, )
-    queryset = settings.QUERY['query_languages']
+    queryset = [(item['key'], item['label']) for item in settings.QUERY['query_languages']]

@@ -7,6 +7,9 @@
     {% for schema in schemas %}
     <schema>
         <name>{{ schema.schema_name }}</name>
+        {% if schema.description %}
+        <description>{{ schema.description }}</description>
+        {% endif %}
         {% for table in schema.tables.all %}
         <table>
             <name>{{ table.table_name }}</name>

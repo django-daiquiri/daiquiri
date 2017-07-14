@@ -24,7 +24,7 @@ from .models import Schema, Table, Column
 def sync(request):
     if request.method == 'POST':
 
-        query_language = request.POST.get('LANG').lower()
+        query_language = request.POST.get('LANG').lower().split('-')[0]
         query = request.POST.get('QUERY')
 
         try:
