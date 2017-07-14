@@ -1,3 +1,4 @@
+import os
 import sys
 
 from django.conf import settings
@@ -21,6 +22,11 @@ def get_user_database_name(user):
         username = user.username
 
     return settings.QUERY['user_database_prefix'] + username
+
+
+def get_download_file_name(database_name, table_name, username, format):
+    directory_name = os.path.join(settings.QUERY['download_dir'], username)
+    return os.path.join(directory_name, table_name + '.' + format['extension'])
 
 
 def fetch_user_database_metadata(user, jobs):

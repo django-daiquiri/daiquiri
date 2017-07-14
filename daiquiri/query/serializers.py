@@ -25,6 +25,15 @@ class DropdownSerializer(serializers.Serializer):
         return obj['options']
 
 
+class QueryJobSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = QueryJob
+        fields = (
+            'id',
+        )
+
+
 class QueryJobListSerializer(serializers.ModelSerializer):
 
     class Meta:

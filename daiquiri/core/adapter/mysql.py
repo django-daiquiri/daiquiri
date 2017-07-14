@@ -270,27 +270,6 @@ class MySQLAdapter(BaseAdapter):
 
         return column_metadata
 
-    def dump_table(self, database_name, table_name, username, format):
-
-        directory_name = os.path.join(settings.QUERY['download_dir'], username)
-        file_name = os.path.join(directory_name, table_name + '.' + format['extension'])
-
-        try:
-            os.mkdir(directory_name)
-        except OSError:
-            pass
-
-        if format['key'] == 'csv':
-            self.dump_table_csv(database_name, table_name, file_name)
-
-        elif format['key'] == 'votable':
-            self.dump_table_votable(database_name, table_name, file_name)
-
-        else:
-            raise Exception('Not supported.')
-
-        return file_name
-
     def _get_stream_table_cmd(self, database_name, table_name):
         cmd = 'mysqldump --user=\'%(USER)s\' --password=\'%(PASSWORD)s\'' % self.database_config
 

@@ -1,5 +1,9 @@
+import os
+
+from celery.result import AsyncResult
 from celery.task.control import revoke
 
+from django.conf import settings
 from django.contrib.auth.models import Group
 from django.db import models
 from django.db.utils import OperationalError, ProgrammingError
@@ -14,7 +18,8 @@ from daiquiri.uws.settings import PHASE_QUEUED, PHASE_EXECUTING, PHASE_COMPLETED
 
 from .managers import QueryJobManager
 from .exceptions import TableError
-
+from .utils import get_download_file_name
+from .tasks import create_download_file
 
 @python_2_unicode_compatible
 class QueryJob(Job):
@@ -102,14 +107,32 @@ class QueryJob(Job):
                 # the query was probably killed before
                 pass
 
-    def create_download_file(self, format):
-        adapter = get_adapter('data')
+    def download(self, format):
+        task_id = '%s-%s' % (self.id, format['key'])
+        file_name = get_download_file_name(self.database_name, self.table_name, self.owner_username, format)
+        task_args = (self.database_name, self.table_name, file_name, format['key'])
 
-        if self.owner:
-            return adapter.dump_table(self.database_name, self.table_name, self.owner.username, format)
+        try:
+            os.mkdir(os.path.dirname(file_name))
+        except OSError:
+            pass
+
+        if not settings.ASYNC:
+            if not os.path.isfile(file_name):
+                task_result = create_download_file.apply(task_args, task_id=task_id)
         else:
-            return adapter.dump_table(self.database_name, self.table_name, 'anonymous', format)
+            task_result = AsyncResult(task_id)
 
+            if not os.path.isfile(file_name):
+                if task_result.successful():
+                    # somebody or something removed the file. start all over again
+                    task_result.forget()
+                    task_result = create_download_file.apply_async(task_args, task_id=task_id)
+
+                else:
+                    task_result = create_download_file.apply_async(task_args, task_id=task_id)
+
+        return task_result, file_name
 
 @python_2_unicode_compatible
 class Example(models.Model):

@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import viewsets, mixins, filters
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError, NotFound, APIException
 from rest_framework.decorators import list_route, detail_route
 
 from daiquiri.core.viewsets import ChoicesViewSet
@@ -23,6 +23,7 @@ from .models import QueryJob, Example
 from .serializers import (
     FormSerializer,
     DropdownSerializer,
+    QueryJobSerializer,
     QueryJobListSerializer,
     QueryJobRetrieveSerializer,
     QueryJobCreateSerializer,
@@ -102,6 +103,8 @@ class QueryJobViewSet(viewsets.ModelViewSet):
             return QueryJobCreateSerializer
         elif self.action == 'update' or self.action == 'partial_update':
             return QueryJobUpdateSerializer
+        else:
+            return QueryJobSerializer
 
     def perform_create(self, serializer):
 
@@ -165,7 +168,7 @@ class QueryJobViewSet(viewsets.ModelViewSet):
         except QueryJob.DoesNotExist:
             raise Http404
 
-    @detail_route(methods=['put'], url_path='download/(?P<format_key>\w+)', url_name='download')
+    @detail_route(methods=['get','put'], url_path='download/(?P<format_key>\w+)', url_name='download')
     def download(self, request, pk=None, format_key=None):
         try:
             format = [f for f in settings.QUERY['download_formats'] if f['key'] == format_key][0]
@@ -174,14 +177,15 @@ class QueryJobViewSet(viewsets.ModelViewSet):
 
         try:
             job = self.get_queryset().get(pk=pk)
-            download_file = job.create_download_file(format)
-
-            if download_file:
-                return sendfile(request, download_file, attachment=True)
-            else:
-                return Response('PENDING')
         except QueryJob.DoesNotExist:
-            raise Http404
+            raise NotFound
+
+        result, file_name = job.download(format)
+
+        if result.successful():
+            return sendfile(request, file_name, attachment=True)
+        else:
+            return Response(result.status)
 
     @detail_route(methods=['get'], url_path='stream/(?P<format_key>\w+)', url_name='stream')
     def stream(self, request, pk=None, format_key=None):

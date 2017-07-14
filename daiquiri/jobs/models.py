@@ -113,6 +113,10 @@ class Job(models.Model):
         else:
             return {}
 
+    @property
+    def owner_username(self):
+        return self.owner.username if self.owner else 'anonymous'
+
     def get_str(self):
         return "id=%s; phase=%s; job_type=%s" % (str(self.id), self.phase, self.job_type)
 
