@@ -134,6 +134,10 @@ class QueryJob(Job):
 
         return task_result, file_name
 
+    def stream(self, format):
+        return None
+
+
 @python_2_unicode_compatible
 class Example(models.Model):
 

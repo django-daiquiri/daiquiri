@@ -3,7 +3,7 @@ from sendfile import sendfile
 
 from django.conf import settings
 from django.db.models import Sum
-from django.http import Http404
+from django.http import Http404, StreamingHttpResponse
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 
@@ -171,16 +171,11 @@ class QueryJobViewSet(viewsets.ModelViewSet):
     @detail_route(methods=['get','put'], url_path='download/(?P<format_key>\w+)', url_name='download')
     def download(self, request, pk=None, format_key=None):
         try:
-            format = [f for f in settings.QUERY['download_formats'] if f['key'] == format_key][0]
-        except IndexError:
-            raise ValidationError({'format': "Not supported."})
-
-        try:
             job = self.get_queryset().get(pk=pk)
         except QueryJob.DoesNotExist:
             raise NotFound
 
-        result, file_name = job.download(format)
+        result, file_name = job.download(self._get_format(format_key))
 
         if result.successful():
             return sendfile(request, file_name, attachment=True)
@@ -190,20 +185,17 @@ class QueryJobViewSet(viewsets.ModelViewSet):
     @detail_route(methods=['get'], url_path='stream/(?P<format_key>\w+)', url_name='stream')
     def stream(self, request, pk=None, format_key=None):
         try:
-            format = [f for f in settings.QUERY['download_formats'] if f['key'] == format_key][0]
+            job = self.get_queryset().get(pk=pk)
+        except QueryJob.DoesNotExist:
+            raise NotFound
+
+        return StreamingHttpResponse(job.stream(self._get_format(format_key)))
+
+    def _get_format(self, format_key):
+        try:
+            return [f for f in settings.QUERY['download_formats'] if f['key'] == format_key][0]
         except IndexError:
             raise ValidationError({'format': "Not supported."})
-
-        try:
-            job = self.get_queryset().get(pk=pk)
-            download_file = job.create_download_file(format)
-
-            if download_file:
-                return sendfile(request, download_file, attachment=True)
-            else:
-                return Response('PENDING')
-        except QueryJob.DoesNotExist:
-            raise Http404
 
 
 class ExampleViewSet(viewsets.ModelViewSet):
