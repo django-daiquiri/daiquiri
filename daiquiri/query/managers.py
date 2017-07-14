@@ -78,7 +78,7 @@ class QueryJobManager(models.Manager):
             query_language=query_language,
             query=query,
             actual_query=actual_query,
-            owner=owner if not user.is_anonymous() else None,
+            owner=user if not user.is_anonymous() else None,
             database_name=get_user_database_name(user),
             table_name=table_name,
             queue=queue,
@@ -149,11 +149,10 @@ class QueryJobManager(models.Manager):
                 continue
             else:
                 # check permission on function
-                function = Function.objects.filter_by_access_level(user).get(name=name)
+                function = Function.objects.filter_by_access_level(user).get(name=function_name)
                 if not function:
                     errors.append(_('Function %s not found.') % function_name)
                     continue
 
         # return the error stack
         return list(set(errors))
-

@@ -1,6 +1,6 @@
 import os
 
-from celery.result import AsyncResult
+from celery.result import AsyncResult, EagerResult
 from celery.task.control import revoke
 
 from django.conf import settings
@@ -118,7 +118,9 @@ class QueryJob(Job):
             pass
 
         if not settings.ASYNC:
-            if not os.path.isfile(file_name):
+            if os.path.isfile(file_name):
+                task_result = EagerResult(task_id, None, 'SUCCESS')
+            else:
                 task_result = create_download_file.apply(task_args, task_id=task_id)
         else:
             task_result = AsyncResult(task_id)

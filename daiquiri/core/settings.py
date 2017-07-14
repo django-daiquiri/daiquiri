@@ -159,5 +159,4 @@ EMAIL_FROM = 'info@example.com'
 
 TAP_ACCESS_LEVEL = 'PUBLIC'
 
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+SENDFILE_BACKEND = 'sendfile.backends.simple'
