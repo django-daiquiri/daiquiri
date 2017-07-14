@@ -183,6 +183,24 @@ class QueryJobViewSet(viewsets.ModelViewSet):
         except QueryJob.DoesNotExist:
             raise Http404
 
+    @detail_route(methods=['get'], url_path='stream/(?P<format_key>\w+)', url_name='stream')
+    def stream(self, request, pk=None, format_key=None):
+        try:
+            format = [f for f in settings.QUERY['download_formats'] if f['key'] == format_key][0]
+        except IndexError:
+            raise ValidationError({'format': "Not supported."})
+
+        try:
+            job = self.get_queryset().get(pk=pk)
+            download_file = job.create_download_file(format)
+
+            if download_file:
+                return sendfile(request, download_file, attachment=True)
+            else:
+                return Response('PENDING')
+        except QueryJob.DoesNotExist:
+            raise Http404
+
 
 class ExampleViewSet(viewsets.ModelViewSet):
     permission_classes = (HasModelPermission, )

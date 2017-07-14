@@ -104,7 +104,11 @@ class QueryJob(Job):
 
     def create_download_file(self, format):
         adapter = get_adapter('data')
-        return adapter.dump_table(self.database_name, self.table_name, self.owner.username, format)
+
+        if self.owner:
+            return adapter.dump_table(self.database_name, self.table_name, self.owner.username, format)
+        else:
+            return adapter.dump_table(self.database_name, self.table_name, 'anonymous', format)
 
 
 @python_2_unicode_compatible

@@ -39,10 +39,12 @@ def sync(request):
         except (ADQLSyntaxError, MySQLSyntaxError,PermissionError, ConnectionError, TableError) as e:
             return HttpResponseBadRequest(e.message)
 
-        return HttpResponseSeeOther(reverse('query:job-download', kwargs={
+        stream_url = request.build_absolute_uri(reverse('query:job-stream', kwargs={
             'pk': str(job_id),
             'format_key': 'votable'
         }))
+
+        return HttpResponseSeeOther(stream_url)
     else:
         return HttpResponseNotAllowed(['POST'])
 
