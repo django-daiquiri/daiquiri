@@ -141,7 +141,7 @@ def column_updated_handler(sender, **kwargs):
         column.arraysize = instance.size
         column.size = instance.size
         if instance.description:
-            schema.description = instance.description[:255]
+            column.description = instance.description[:255]
         column.utype = instance.utype
         column.unit = instance.unit
         column.ucd = instance.ucd
