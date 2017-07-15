@@ -1,4 +1,4 @@
-from django.db import models, ProgrammingError
+from django.db import models
 from django.contrib.auth.models import Group
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
@@ -7,7 +7,6 @@ from daiquiri.core.adapter import get_adapter
 
 from .settings import LICENSE_CHOICES, LICENSE_URLS, ACCESS_LEVEL_CHOICES
 from .managers import MetadataManager
-
 
 
 @python_2_unicode_compatible
@@ -84,7 +83,7 @@ class Database(models.Model):
 
     @property
     def query_string(self):
-        return get_adapter('data').escape_identifier(self.name)
+        return get_adapter().database.escape_identifier(self.name)
 
     @property
     def license_label(self):
@@ -127,7 +126,8 @@ class Table(models.Model):
         verbose_name=_('Title'),
         help_text=_('Human readable title of the table.')
     )
-    description = models.TextField(null=True, blank=True,
+    description = models.TextField(
+        null=True, blank=True,
         verbose_name=_('Description'),
         help_text=_('A brief description of the table to be displayed in the user interface.')
     )
@@ -184,10 +184,9 @@ class Table(models.Model):
 
     @property
     def query_string(self):
-        adapter = get_adapter('data')
         return '%(database)s.%(table)s' % {
-            'database': adapter.escape_identifier(self.database.name),
-            'table': adapter.escape_identifier(self.name)
+            'database': get_adapter().database.escape_identifier(self.database.name),
+            'table': get_adapter().database.escape_identifier(self.name)
         }
 
     @property
@@ -213,11 +212,13 @@ class Column(models.Model):
         verbose_name=_('Order'),
         help_text=_('Position in lists.')
     )
-    name = models.CharField(max_length=256,
+    name = models.CharField(
+        max_length=256,
         verbose_name=_('Name'),
         help_text=_('Identifier of the column on the database server.')
     )
-    description = models.TextField(null=True, blank=True,
+    description = models.TextField(
+        null=True, blank=True,
         verbose_name=_('Description'),
         help_text=_('A brief description of the column to be displayed in the user interface.')
     )
@@ -285,7 +286,7 @@ class Column(models.Model):
 
     @property
     def query_string(self):
-        return get_adapter('data').escape_identifier(self.name)
+        return get_adapter().database.escape_identifier(self.name)
 
 
 @python_2_unicode_compatible

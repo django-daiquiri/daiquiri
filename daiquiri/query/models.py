@@ -21,6 +21,7 @@ from .exceptions import TableError
 from .utils import get_download_file_name
 from .tasks import create_download_file
 
+
 @python_2_unicode_compatible
 class QueryJob(Job):
 
@@ -69,19 +70,16 @@ class QueryJob(Job):
     def rename_table(self, new_table_name):
         if self.table_name != new_table_name:
             try:
-                adapter = get_adapter('data')
                 # self.table is still the old name since Job is updated first
-                adapter.rename_table(self.database_name, self.table_name, new_table_name)
+                get_adapter().database.rename_table(self.database_name, self.table_name, new_table_name)
             except OperationalError as e:
                 raise TableError(e.args[1])
 
     def drop_table(self):
-        adapter = get_adapter('data')
-
         # drop the corresponding database table, but fail silently
         if self.phase == PHASE_COMPLETED:
             try:
-                adapter.drop_table(self.database_name, self.table_name)
+                get_adapter().database.drop_table(self.database_name, self.table_name)
             except ProgrammingError:
                 pass
 
@@ -101,8 +99,7 @@ class QueryJob(Job):
         elif phase == PHASE_EXECUTING:
             # kill the job on the database
             try:
-                adapter = get_adapter('data')
-                adapter.kill_query(self.pid)
+                get_adapter().database.kill_query(self.pid)
             except OperationalError:
                 # the query was probably killed before
                 pass
@@ -137,7 +134,7 @@ class QueryJob(Job):
         return task_result, file_name
 
     def stream(self, format):
-        return None
+        return get_adapter().download.stream_table_csv(self.database_name, self.table_name)
 
 
 @python_2_unicode_compatible

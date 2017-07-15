@@ -16,16 +16,16 @@ class Command(BaseCommand):
         tap = settings.DATABASES['tap']
         data = settings.DATABASES['data']
 
-        # check if the permissions for the tap adapter are ok
-        try:
-            get_adapter('tap')
-        except OperationalError:
-            sql.append('CREATE USER \'%(USER)s\'@\'localhost\' IDENTIFIED BY \'%(PASSWORD)s\';' % tap)
-            sql.append('GRANT ALL ON `%(NAME)s`.* TO \'%(USER)s\'@\'localhost\';' % tap)
+        # # check if the permissions for the tap adapter are ok
+        # try:
+        #     get_adapter('tap')
+        # except OperationalError:
+        #     sql.append('CREATE USER \'%(USER)s\'@\'localhost\' IDENTIFIED BY \'%(PASSWORD)s\';' % tap)
+        #     sql.append('GRANT ALL ON `%(NAME)s`.* TO \'%(USER)s\'@\'localhost\';' % tap)
 
         # check if the permissions for the data adapter are ok
         try:
-            data_adapter = get_adapter('data')
+            data_adapter = get_adapter()
         except OperationalError:
             sql.append('CREATE USER \'%(USER)s\'@\'localhost\' IDENTIFIED BY \'%(PASSWORD)s\';' % data)
             data.update({'NAME': get_user_database_name(None)})

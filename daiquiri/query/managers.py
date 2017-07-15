@@ -145,7 +145,7 @@ class QueryJobManager(models.Manager):
 
         # check permissions on functions
         for function_name in qp.functions:
-            if function_name.upper() in get_adapter('data').functions:
+            if function_name.upper() in get_adapter().database.FUNCTIONS:
                 continue
             else:
                 # check permission on function

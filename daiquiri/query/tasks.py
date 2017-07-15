@@ -18,11 +18,11 @@ def submit_query(job_id):
     job = QueryJob.objects.get(pk=job_id)
 
     # get the adapter with the database specific functions
-    adapter = get_adapter('data')
+    adapter = get_adapter()
 
     # create the database of the user if it not already exists
     try:
-        adapter.create_user_database_if_not_exists(job.database_name)
+        adapter.database.create_user_database_if_not_exists(job.database_name)
     except OperationalError as e:
         job.phase = PHASE_ERROR
         job.error_summary = str(e)
@@ -33,8 +33,8 @@ def submit_query(job_id):
     # set database and start time
     job.start_time = now()
 
-    job.pid = adapter.fetch_pid()
-    job.actual_query = adapter.build_query(job.database_name, job.table_name, job.actual_query)
+    job.pid = adapter.database.fetch_pid()
+    job.actual_query = adapter.database.build_query(job.database_name, job.table_name, job.actual_query)
     job.phase = PHASE_EXECUTING
     job.start_time = now()
     job.save()
@@ -42,7 +42,7 @@ def submit_query(job_id):
     # get the actual query and submit the job to the database
     try:
         # this is where the work ist done (and the time is spend)
-        adapter.execute(job.actual_query)
+        adapter.database.execute(job.actual_query)
 
     except ProgrammingError as e:
         job.phase = PHASE_ERROR
@@ -71,9 +71,9 @@ def submit_query(job_id):
 
         # get additional information about the completed job
         if job.phase == PHASE_COMPLETED:
-            job.nrows, job.size = adapter.fetch_stats(job.database_name, job.table_name)
-            job.metadata = adapter.fetch_table(job.database_name, job.table_name)
-            job.metadata['columns'] = adapter.fetch_columns(job.database_name, job.table_name)
+            job.nrows, job.size = adapter.database.fetch_stats(job.database_name, job.table_name)
+            job.metadata = adapter.database.fetch_table(job.database_name, job.table_name)
+            job.metadata['columns'] = adapter.database.fetch_columns(job.database_name, job.table_name)
 
         job.save()
 
@@ -85,8 +85,8 @@ def create_download_file(database_name, table_name, file_name, format_key):
     from daiquiri.core.adapter import get_adapter
 
     if format_key == 'csv':
-        get_adapter('data').dump_table_csv(database_name, table_name, file_name)
+        get_adapter().download.dump_table_csv(database_name, table_name, file_name)
     elif format_key == 'votable':
-        get_adapter('data').dump_table_votable(database_name, table_name, file_name)
+        get_adapter().download.dump_table_votable(database_name, table_name, file_name)
 
     return file_name

@@ -52,14 +52,14 @@ class RowViewSet(viewsets.ViewSet):
         page_size = self._get_page_size()
 
         # get database adapter
-        adapter = get_adapter('data')
+        adapter = get_adapter()
 
         # get query backend adapter
         user_database_name = get_user_database_name(self.request.user)
 
         if database_name == user_database_name:
             # get database adapter and fetch the columns
-            columns = adapter.fetch_columns(database_name, table_name)
+            columns = adapter.database.fetch_columns(database_name, table_name)
             column_names = [column['name'] for column in columns]
         else:
             # check permissions on the database
@@ -79,10 +79,10 @@ class RowViewSet(viewsets.ViewSet):
             column_names = [column.name for column in columns]
 
         # query the database for the total number of rows
-        count = adapter.count_rows(database_name, table_name, column_names, filter_string)
+        count = adapter.database.count_rows(database_name, table_name, column_names, filter_string)
 
         # query the paginated rowset
-        results = adapter.fetch_rows(database_name, table_name, column_names, ordering, page, page_size, filter_string)
+        results = adapter.database.fetch_rows(database_name, table_name, column_names, ordering, page, page_size, filter_string)
 
         # get the previous and next url
         next = self._get_next_url(page, page_size, count)
@@ -142,7 +142,7 @@ class ColumnViewSet(viewsets.ViewSet):
 
         if database_name == user_database_name:
             # get database adapter and fetch the columns
-            columns = get_adapter('data').fetch_columns(database_name, table_name)
+            columns = get_adapter().database.fetch_columns(database_name, table_name)
         else:
             # check permissions on the database
             try:
