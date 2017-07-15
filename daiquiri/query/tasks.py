@@ -85,4 +85,5 @@ def create_download_file(file_name, format_key, database_name, table_name, metad
     from daiquiri.core.adapter import get_adapter
 
     with open(file_name, 'w') as f:
-        get_adapter().download.write(f, format_key, database_name, table_name, metadata)
+        for line in get_adapter().download.generate(f, format_key, database_name, table_name, metadata):
+            f.write(line)

@@ -135,7 +135,7 @@ class QueryJob(Job):
         return task_result, file_name
 
     def stream(self, format):
-        return get_adapter().download.stream(format['key'], self.database_name, self.table_name, self.metadata)
+        return get_adapter().download.generate(format['key'], self.database_name, self.table_name, self.metadata)
 
 
 @python_2_unicode_compatible
