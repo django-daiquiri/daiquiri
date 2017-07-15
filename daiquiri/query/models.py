@@ -118,6 +118,7 @@ class QueryJob(Job):
             if os.path.isfile(file_name):
                 task_result = EagerResult(task_id, None, 'SUCCESS')
             else:
+                create_download_file(*task_args)
                 task_result = create_download_file.apply(task_args, task_id=task_id)
         else:
             task_result = AsyncResult(task_id)
@@ -134,7 +135,7 @@ class QueryJob(Job):
         return task_result, file_name
 
     def stream(self, format):
-        return get_adapter().download.stream_table_csv(self.database_name, self.table_name)
+        return get_adapter().download.stream(format['key'], self.database_name, self.table_name, self.metadata)
 
 
 @python_2_unicode_compatible
