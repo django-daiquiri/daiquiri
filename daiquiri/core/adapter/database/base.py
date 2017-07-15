@@ -1,23 +1,37 @@
+from django.db import connections
+
+
 class DatabaseAdapter(object):
 
+    def __init__(self, database_key, database_config):
+        self.database_key = database_key
+        self.database_config = database_config
+
+    def connection(self):
+        return connections[self.database_key]
+
     def execute(self, sql):
-        return self.cursor.execute(sql)
+        return self.connection().cursor().execute(sql)
 
     def fetchone(self, sql, args=None):
-        if args:
-            self.cursor.execute(sql, args)
-        else:
-            self.cursor.execute(sql)
+        cursor = self.connection().cursor()
 
-        return self.cursor.fetchone()
+        if args:
+            cursor.execute(sql, args)
+        else:
+            cursor.execute(sql)
+
+        return cursor.fetchone()
 
     def fetchall(self, sql, args=None):
-        if args:
-            self.cursor.execute(sql, args)
-        else:
-            self.cursor.execute(sql)
+        cursor = self.connection().cursor()
 
-        return self.cursor.fetchall()
+        if args:
+            cursor.execute(sql, args)
+        else:
+            cursor.execute(sql)
+
+        return cursor.fetchall()
 
     def fetch_pid(self):
         raise NotImplementedError()

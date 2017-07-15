@@ -26,14 +26,8 @@ class MySQLAdapter(DatabaseAdapter):
         'WEEKDAY', 'WEEKOFYEAR', 'YEAR', 'YEARWEEK',
     )
 
-    def __init__(self, database_key, database_config):
-        self.database_key = database_key
-        self.database_config = database_config
-        self.connection = connections[database_key]
-        self.cursor = self.connection.cursor()
-
     def fetch_pid(self):
-        return self.connection.connection.thread_id()
+        return self.connection().connection.thread_id()
 
     def escape_identifier(self, identifier):
         # escape backticks whithin the identifier and backtick the string
@@ -161,7 +155,10 @@ class MySQLAdapter(DatabaseAdapter):
         # execute query
         row = self.fetchone(sql)
 
-        return self.fetch_table_metadata(database_name, row[0], row[1])
+        return {
+            'name': row[0],
+            'type': 'view' if row[1] == 'VIEW' else 'table'
+        }
 
     def rename_table(self, database_name, table_name, new_table_name):
         sql = 'RENAME TABLE %(database)s.%(table)s to %(database)s.%(new_table)s;' % {
@@ -190,7 +187,11 @@ class MySQLAdapter(DatabaseAdapter):
         # execute query
         rows = self.fetchall(sql)
 
-        return [self.fetch_column_metadata(row[0], row[1], row[4], row[8]) for row in rows]
+        return [{
+            'name': row[0],
+            'datatype': row[1],
+            'indexed': row[4]
+        } for row in rows]
 
     def fetch_column(self, database_name, table_name, column_name):
         # prepare sql string
@@ -203,7 +204,11 @@ class MySQLAdapter(DatabaseAdapter):
         # execute query
         row = self.fetchone(sql)
 
-        return self.fetch_column_metadata(row[0], row[1], row[4], row[8])
+        return {
+            'name': row[0],
+            'datatype': row[1],
+            'indexed': row[4]
+        }
 
     def fetch_column_names(self, database_name, table_name):
         # prepare sql string
