@@ -107,7 +107,7 @@ class QueryJob(Job):
     def download(self, format):
         task_id = '%s-%s' % (self.id, format['key'])
         file_name = get_download_file_name(self.database_name, self.table_name, self.owner_username, format)
-        task_args = (self.database_name, self.table_name, file_name, format['key'])
+        task_args = (file_name, format['key'], self.database_name, self.table_name, self.metadata)
 
         try:
             os.mkdir(os.path.dirname(file_name))

@@ -81,12 +81,8 @@ def submit_query(job_id):
 
 
 @shared_task(track_started=True)
-def create_download_file(database_name, table_name, file_name, format_key):
+def create_download_file(file_name, format_key, database_name, table_name, metadata):
     from daiquiri.core.adapter import get_adapter
 
-    if format_key == 'csv':
-        get_adapter().download.dump_table_csv(database_name, table_name, file_name)
-    elif format_key == 'votable':
-        get_adapter().download.dump_table_votable(database_name, table_name, file_name)
-
-    return file_name
+    with open(file_name, 'w') as f:
+        get_adapter().download.write(f, format_key, database_name, table_name, metadata)
