@@ -1,3 +1,5 @@
+import iso8601
+
 from django.core.urlresolvers import reverse
 from django.db import IntegrityError
 from django.http import HttpResponse
@@ -6,8 +8,9 @@ from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.parsers import FormParser
 from rest_framework.response import Response
 
-import iso8601
+from daiquiri.jobs.models import Job
 
+from .serializers import JobsSerializer, JobSerializer
 from .renderers import UWSRenderer
 from .filters import UWSFilterBackend
 from .utils import UWSSuccessRedirect, UWSBadRequest
@@ -152,3 +155,14 @@ class UWSViewSet(ReadOnlyModelViewSet):
     def get_owner(self, request, pk):
         obj = self.get_object()
         return HttpResponse(obj.owner)
+
+
+class JobsViewSet(UWSViewSet):
+    queryset = Job.objects.all()
+    list_serializer_class = JobsSerializer
+    detail_serializer_class = JobSerializer
+
+
+class QueryJobsViewSet(JobsViewSet):
+    detail_url_name = 'uwsquery-detail'
+    job_type = Job.JOB_TYPE_QUERY

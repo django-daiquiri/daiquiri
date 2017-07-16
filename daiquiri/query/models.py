@@ -7,6 +7,7 @@ from django.conf import settings
 from django.contrib.auth.models import Group
 from django.db import models
 from django.db.utils import OperationalError, ProgrammingError
+from django.urls import reverse
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
@@ -66,6 +67,13 @@ class QueryJob(Job):
             'nrows': self.nrows,
             'size': self.size
         }
+
+    @property
+    def results(self):
+        return {download_format['key']: reverse('query:job-stream', kwargs={
+            'pk': str(self.id),
+            'format_key': download_format['key']
+        }) for download_format in settings.QUERY['download_formats']}
 
     def rename_table(self, new_table_name):
         if self.table_name != new_table_name:

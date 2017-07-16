@@ -99,12 +99,10 @@ class Job(models.Model):
 
     @property
     def results(self):
-        return {
-            'csv': {
-                'url': '/query/download/stream/table/test/format/csv',
-                'type': 'simple'
-            }
-        }
+        if hasattr(self, 'queryjob'):
+            return self.queryjob.results
+        else:
+            return []
 
     @property
     def parameters(self):

@@ -78,14 +78,13 @@ class UWSRenderer(BaseRenderer):
                 else:
                     xml.startElement('uws:results', root_attributes)
 
-                for result_id in data[key]:
-                    result = data[key][result_id]
-                    href = renderer_context['request'].build_absolute_uri(result['url'])
+                for format_key, url in data[key].items():
+                    href = renderer_context['request'].build_absolute_uri(url)
 
                     xml.startElement('uws:result', {
-                        'id': result_id,
+                        'id': format_key,
                         'xlink:href': href,
-                        'xlink:type': result['type']
+                        'xlink:type': format_key
                     })
                     xml.endElement('uws:result')
 

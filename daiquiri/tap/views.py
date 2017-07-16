@@ -48,13 +48,6 @@ def sync(request):
     else:
         return HttpResponseNotAllowed(['POST'])
 
-@csrf_exempt
-def async(request):
-    if request.method == 'POST':
-        return HttpResponse()
-    else:
-        return HttpResponseNotAllowed(['POST'])
-
 def capabilities(request):
     return render(request, 'tap/capabilities.xml', content_type='application/xml')
 
