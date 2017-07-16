@@ -35,15 +35,8 @@
                     ng-hide="['resource', 'groups', 'database', 'table'].indexOf(key) != -1">
 
                     <dt>{$ key | ucfirst | removeUnderscores $}</dt>
+                    <dd>{$ value $}&nbsp;</dd>
 
-                    <dd ng-hide="key === 'published_for'">{$ value $}&nbsp;</dd>
-                    <dd ng-show="key === 'published_for'">
-                        <ul class="list-unstyled">
-                            <li ng-repeat="group in service.active.published_for">
-                                {$ group.name $}
-                            </li>
-                        <ul>
-                    </dd>
                 </div>
             </dl>
         </div>
