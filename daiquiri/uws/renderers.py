@@ -42,7 +42,7 @@ class UWSRenderer(BaseRenderer):
         })
 
         for item in data:
-            url_name = renderer_context['view'].detail_url_name
+            url_name = renderer_context['view'].base_name + '-detail'
             href = reverse(url_name, args=[item['id']], request=renderer_context['request'])
 
             xml.startElement('uws:jobref', {
