@@ -95,12 +95,8 @@ class UWSRenderer(BaseRenderer):
                 else:
                     xml.startElement('uws:parameters', root_attributes)
 
-                for parameter_id in data[key]:
-                    xml.startElement('uws:parameter', {
-                        'id': parameter_id
-                    })
-                    xml.characters(smart_text(data[key][parameter_id]))
-                    xml.endElement('uws:parameter')
+                for parameter_id, parameter_value in data[key].items():
+                    self._render_text(xml, 'uws:parameter', {'id': parameter_id}, parameter_value)
 
                 xml.endElement('uws:parameters')
             else:
@@ -116,6 +112,16 @@ class UWSRenderer(BaseRenderer):
 
         if len(data) > 1:
             xml.endElement('uws:job')
+
+    def _render_text(self, xml, tag, attr, text):
+        if text:
+            xml.startElement(tag, attr)
+            xml.characters(smart_text(text))
+            xml.endElement(tag)
+        else:
+            attr.update({'xsi:nil': 'true'})
+            xml.startElement(tag, attr)
+            xml.endElement(tag)
 
     def _to_camel_case(self, snake_str):
         components = snake_str.split('_')

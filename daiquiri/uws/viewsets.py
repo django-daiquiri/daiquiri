@@ -7,18 +7,18 @@ from django.http import HttpResponse
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.parsers import FormParser
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
 
-from daiquiri.jobs.models import Job
+from daiquiri.query.models import QueryJob
 
-from .serializers import JobsSerializer, JobSerializer
+from .serializers import JobListSerializer, JobRetrieveSerializer, JobCreateSerializer, JobUpdateSerializer
 from .renderers import UWSRenderer
 from .filters import UWSFilterBackend
 from .utils import UWSSuccessRedirect, UWSBadRequest
 from .exceptions import UWSException
-from .settings import PHASE_RUN, PHASE_ABORT, PHASE_PENDING
 
 
-class UWSViewSet(ReadOnlyModelViewSet):
+class JobViewSet(ReadOnlyModelViewSet):
 
     renderer_classes = (UWSRenderer, )
     parser_classes = (FormParser, )
@@ -26,54 +26,73 @@ class UWSViewSet(ReadOnlyModelViewSet):
 
     job_type = None
 
-    def get_success_url(self, pk=None):
-        if pk:
-            kwargs = {'pk': pk}
+    list_serializer_class = JobListSerializer
+    detail_serializer_class = JobRetrieveSerializer
+    create_serializer_class = JobCreateSerializer
+    update_serializer_class = JobUpdateSerializer
+
+    def get_success_url(self, job=None):
+        if job:
+            kwargs = {'pk': job.pk}
         else:
             kwargs = self.kwargs
 
-        return reverse(self.detail_url_name, kwargs=kwargs)
+        return self.request.build_absolute_uri(reverse(self.detail_url_name, kwargs=kwargs))
 
     def get_serializer_class(self):
         if self.action == 'list':
             return self.list_serializer_class
+        elif self.action == 'create':
+            return self.create_serializer_class
+        elif self.action == 'update':
+            return self.update_serializer_class
         else:
             return self.detail_serializer_class
 
     def create(self, request, *args, **kwargs):
-        if not self.job_type:
-            return UWSBadRequest('job creation is forbidden on this ressource')
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-        if request.user.is_authenticated():
-            owner = request.user
-        else:
-            owner = None
+        # create the job objects
+        job = self.get_queryset().model(owner=(None if self.request.user.is_anonymous() else self.request.user))
 
-        obj = self.get_queryset().model(
-            owner=owner,
-            phase=PHASE_PENDING,
-            job_type=self.job_type
-        )
-        obj.save()
+        # add parameters to the job object
+        for parameter, model_field in self.parameter_map.items():
+            setattr(job, model_field, serializer.data.get(parameter))
 
-        if request.GET.get('PHASE') == PHASE_RUN:
-            try:
-                obj.run()
-            except UWSException as e:
-                return UWSBadRequest(e)
-        return UWSSuccessRedirect(self.get_success_url(obj.pk))
+        try:
+            job.clean()
+        except ValidationError as e:
+            return UWSBadRequest(e)
+
+        job.save()
+
+        if serializer.data.get('PHASE') == job.PHASE_RUN:
+            job.run()
+
+        return UWSSuccessRedirect(self.get_success_url(job))
 
     def update(self, request, *args, **kwargs):
-        if request.POST.get('ACTION') == 'DELETE':
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        job = self.get_object()
+        job.clean()
+
+        if serializer.data.get('PHASE') == job.PHASE_RUN:
+            job.clean()
+            job.run()
+            return UWSSuccessRedirect(self.get_success_url())
+
+        elif serializer.data.get('PHASE') == 'DELETE':
             return self.destroy(self, request)
         else:
-            # TODO: update parameters
             return UWSSuccessRedirect(self.get_success_url())
 
     def destroy(self, request, *args, **kwargs):
-        obj = self.get_object()
+        job = self.get_object()
         try:
-            obj.archive()
+            job.archive()
             return UWSSuccessRedirect(self.get_success_url())
         except UWSException as e:
             return UWSBadRequest(e)
@@ -83,61 +102,64 @@ class UWSViewSet(ReadOnlyModelViewSet):
             'results': self.get_object().results
         })
 
+    def get_result(self, request, pk):
+        return UWSSuccessRedirect(self.get_object().result)
+
     def get_parameters(self, request, pk):
         return Response({
             'parameters': self.get_object().parameters
         })
 
     def get_destruction(self, request, pk):
-        obj = self.get_object()
-        if obj.destruction_time:
-            return HttpResponse(obj.destruction_time)
+        job = self.get_object()
+        if job.destruction_time:
+            return HttpResponse(job.destruction_time)
         else:
             return HttpResponse()
 
     def post_destruction(self, request, pk):
-        obj = self.get_object()
+        job = self.get_object()
         try:
-            obj.destruction_time = iso8601.parse_date(request.POST.get('DESTRUCTION'))
-            obj.save()
+            job.destruction_time = iso8601.parse_date(request.POST.get('DESTRUCTION'))
+            job.save()
             return UWSSuccessRedirect(self.get_success_url(), status=303)
         except (TypeError, IntegrityError, ValueError) as e:
             return UWSBadRequest(e)
 
     def get_executionduration(self, request, pk):
-        obj = self.get_object()
-        if obj.execution_duration:
-            return HttpResponse(obj.execution_duration)
+        job = self.get_object()
+        if job.execution_duration:
+            return HttpResponse(job.execution_duration)
         else:
             return HttpResponse()
 
     def post_executionduration(self, request, pk):
-        obj = self.get_object()
+        job = self.get_object()
         try:
-            obj.execution_duration = request.POST.get('EXECUTIONDURATION')
-            obj.save()
+            job.execution_duration = request.POST.get('EXECUTIONDURATION')
+            job.save()
             return UWSSuccessRedirect(self.get_success_url(), status=303)
         except (IntegrityError, ValueError) as e:
             return UWSBadRequest(e)
 
     def get_phase(self, request, pk):
-        obj = self.get_object()
-        return HttpResponse(obj.phase)
+        job = self.get_object()
+        return HttpResponse(job.phase)
 
     def post_phase(self, request, pk):
-        obj = self.get_object()
+        job = self.get_object()
 
         phase = request.POST.get('PHASE')
 
-        if phase == PHASE_RUN:
+        if phase == job.PHASE_RUN:
             try:
-                obj.run()
+                job.run()
                 return UWSSuccessRedirect(self.get_success_url(), status=303)
             except UWSException as e:
                 return UWSBadRequest(e)
-        elif phase == PHASE_ABORT:
+        elif phase == job.PHASE_ABORT:
             try:
-                obj.abort()
+                job.abort()
                 return UWSSuccessRedirect(self.get_success_url(), status=303)
             except UWSException as e:
                 return UWSBadRequest(e)
@@ -145,24 +167,32 @@ class UWSViewSet(ReadOnlyModelViewSet):
             return UWSBadRequest('unsupported value for PHASE')
 
     def get_error(self, request, pk):
-        obj = self.get_object()
-        return HttpResponse(obj.error) if obj.error else HttpResponse()
+        job = self.get_object()
+        return HttpResponse(job.error) if job.error else HttpResponse()
 
     def get_quote(self, request, pk):
-        obj = self.get_object()
-        return HttpResponse(obj.quote) if obj.quote else HttpResponse()
+        job = self.get_object()
+        return HttpResponse(job.quote) if job.quote else HttpResponse()
 
     def get_owner(self, request, pk):
-        obj = self.get_object()
-        return HttpResponse(obj.owner)
+        job = self.get_object()
+        return HttpResponse(job.owner) if job.owner else HttpResponse()
 
 
-class JobsViewSet(UWSViewSet):
-    queryset = Job.objects.all()
-    list_serializer_class = JobsSerializer
-    detail_serializer_class = JobSerializer
+from .serializers import QueryJobCreateSerializer
+class QueryJobViewSet(JobViewSet):
 
-
-class QueryJobsViewSet(JobsViewSet):
     detail_url_name = 'uwsquery-detail'
-    job_type = Job.JOB_TYPE_QUERY
+    job_type = QueryJob.JOB_TYPE_QUERY
+
+    create_serializer_class = QueryJobCreateSerializer
+
+    parameter_map = {
+        'TABLE_NAME': 'table_name',
+        'LANG': 'query_language',
+        'QUEUE': 'queue',
+        'QUERY': 'query'
+    }
+
+    def get_queryset(self):
+        return QueryJob.objects.filter_by_owner(self.request.user).exclude(phase=QueryJob.PHASE_ARCHIVED)

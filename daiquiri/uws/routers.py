@@ -22,6 +22,12 @@ class UWSRouter(SimpleRouter):
             initkwargs={'suffix': 'Results'}
         ),
         Route(
+            url=r'^{prefix}/{lookup}/results/result$',
+            mapping={'get': 'get_result'},
+            name='{basename}-result',
+            initkwargs={'suffix': 'Result'}
+        ),
+        Route(
             url=r'^{prefix}/{lookup}/parameters$',
             mapping={'get': 'get_parameters'},
             name='{basename}-parameters',

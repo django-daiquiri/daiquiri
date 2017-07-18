@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from .models import QueryJob, Example
+from .validators import validate_table_name, validate_query_language, validate_queue
 
 
 class FormSerializer(serializers.Serializer):
@@ -65,6 +66,7 @@ class QueryJobRetrieveSerializer(serializers.ModelSerializer):
             'table_name',
             'query_language',
             'query',
+            'native_query',
             'actual_query',
             'queue',
             'nrows',
@@ -74,8 +76,10 @@ class QueryJobRetrieveSerializer(serializers.ModelSerializer):
 
 class QueryJobCreateSerializer(serializers.ModelSerializer):
 
-    query = serializers.CharField(required=False)
-    table_name = serializers.CharField(required=False)
+    table_name = serializers.CharField(required=False, allow_blank=True, validators=[validate_table_name])
+    queue = serializers.CharField(required=False, validators=[validate_queue])
+    query_language = serializers.CharField(required=True, validators=[validate_query_language])
+    query = serializers.CharField(required=True)
 
     class Meta:
         model = QueryJob
@@ -89,6 +93,8 @@ class QueryJobCreateSerializer(serializers.ModelSerializer):
 
 
 class QueryJobUpdateSerializer(serializers.ModelSerializer):
+
+    table_name = serializers.CharField(required=True, validators=[validate_table_name])
 
     class Meta:
         model = QueryJob

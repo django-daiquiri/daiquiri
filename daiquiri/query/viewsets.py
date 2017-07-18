@@ -1,16 +1,12 @@
-import json
 from sendfile import sendfile
 
 from django.conf import settings
 from django.db.models import Sum
 from django.http import Http404, StreamingHttpResponse
-from django.utils.timezone import now
-from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import viewsets, mixins, filters
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.exceptions import ValidationError, NotFound, APIException
+from rest_framework.exceptions import ValidationError, NotFound
 from rest_framework.decorators import list_route, detail_route
 
 from daiquiri.core.viewsets import ChoicesViewSet
@@ -31,16 +27,9 @@ from .serializers import (
     ExampleSerializer,
     UserExampleSerializer
 )
-from .exceptions import (
-    ADQLSyntaxError,
-    MySQLSyntaxError,
-    PermissionError,
-    TableError,
-    ConnectionError
-)
-from .permissions import HasPermission
-from .utils import get_default_table_name, fetch_user_database_metadata
 
+from .permissions import HasPermission
+from .utils import fetch_user_database_metadata
 
 class StatusViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     permission_classes = (HasPermission, )
@@ -97,7 +86,7 @@ class QueryJobViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == 'list':
             return QueryJobListSerializer
-        elif self.action == 'retrieve' or self.action == 'kill':
+        elif self.action == 'retrieve' or self.action == 'abort':
             return QueryJobRetrieveSerializer
         elif self.action == 'create':
             return QueryJobCreateSerializer
@@ -107,48 +96,22 @@ class QueryJobViewSet(viewsets.ModelViewSet):
             return QueryJobSerializer
 
     def perform_create(self, serializer):
+        job = QueryJob(
+            owner=(None if self.request.user.is_anonymous() else self.request.user),
+            table_name=serializer.data.get('table_name'),
+            query_language=serializer.data.get('query_language'),
+            query=serializer.data.get('query'),
+            queue=serializer.data.get('queue'),
+        )
+        job.clean()
+        job.save()
+        job.run()
 
-        if 'query' not in serializer.data:
-            raise ValidationError({
-                'query': {
-                    'messages': [_('Value is required and can\'t be empty')]
-                }
-            })
-
-        if 'table_name' in serializer.data:
-            table_name = serializer.data['table_name']
-        else:
-            table_name = get_default_table_name()
-
-        try:
-            job_id = QueryJob.objects.submit(
-                serializer.data['query_language'],
-                serializer.data['query'],
-                serializer.data['queue'],
-                table_name,
-                self.request.user
-            )
-
-            # inject the job id into the serializers data
-            serializer._data['id'] = job_id
-
-        except (ADQLSyntaxError, MySQLSyntaxError) as e:
-            raise ValidationError({
-                'query': {
-                    'messages': [_('There has been an error while parsing your query.')],
-                    'positions': json.dumps(e.message),
-                }
-            })
-        except (PermissionError, ConnectionError) as e:
-            raise ValidationError({'query': {'messages': e.message}})
-        except TableError as e:
-            raise ValidationError({'table_name': e.message})
+        # inject the job id into the serializers data
+        serializer._data['id'] = job.id
 
     def perform_update(self, serializer):
-        try:
-            serializer.save()
-        except TableError as e:
-            raise ValidationError({'table_name': [e.message]})
+        serializer.save()
 
     def perform_destroy(self, instance):
         instance.archive()
@@ -158,10 +121,10 @@ class QueryJobViewSet(viewsets.ModelViewSet):
         return Response(fetch_user_database_metadata(request.user, self.get_queryset()))
 
     @detail_route(methods=['put'])
-    def kill(self, request, pk=None):
+    def abort(self, request, pk=None):
         try:
             job = self.get_queryset().get(pk=pk)
-            job.kill()
+            job.abort()
 
             serializer = QueryJobRetrieveSerializer(instance=job)
             return Response(serializer.data)
@@ -224,4 +187,4 @@ class QueueViewSet(ChoicesViewSet):
 
 class QueryLanguageViewSet(ChoicesViewSet):
     permission_classes = (HasPermission, )
-    queryset = [(item['key'], item['label']) for item in settings.QUERY['query_languages']]
+    queryset = [('%(key)s-%(version)s' % item, item['label']) for item in settings.QUERY['query_languages']]

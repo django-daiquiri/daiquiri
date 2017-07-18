@@ -2,12 +2,12 @@ from django.conf.urls import url, include
 from django.views.generic import TemplateView
 
 from daiquiri.uws.routers import UWSRouter
+from daiquiri.uws.viewsets import QueryJobViewSet
 
 from .views import sync, capabilities, tables, examples
-from .viewsets import QueryJobsViewSet
 
 router = UWSRouter()
-router.register(r'async', QueryJobsViewSet, base_name='tapquery')
+router.register(r'async', QueryJobViewSet, base_name='tapquery')
 
 urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name='tap/root.html'), name='tap_root'),

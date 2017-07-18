@@ -1,6 +1,6 @@
 {% load i18n %}
 
-<div class="modal" id="kill-job-modal" tabindex="-1">
+<div class="modal" id="abort-job-modal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -8,14 +8,14 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
                 <h4 class="modal-title">
-                    {% trans 'Kill job' %}
+                    {% trans 'Abort job' %}
                 </h4>
             </div>
 
             <div class="modal-body">
                 <p>
                     {% blocktrans trimmed with table_name='{$ service.job.table_name $}' %}
-                    You are about to kill the job `{{ table_name }}`.
+                    You are about to abort the job `{{ table_name }}`.
                     {% endblocktrans %}
                 </p>
                 <p class="text-danger">
@@ -28,8 +28,8 @@
                     {% trans 'Close' %}
                 </button>
                 <button type="button" class="btn btn-danger"
-                        ng-click="service.killJob()">
-                    {% trans 'Kill' %}
+                        ng-click="service.abortJob()">
+                    {% trans 'Abort' %}
                 </button>
             </div>
         </div>

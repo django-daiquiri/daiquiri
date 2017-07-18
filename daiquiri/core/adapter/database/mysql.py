@@ -38,13 +38,13 @@ class MySQLAdapter(DatabaseAdapter):
 
     def build_query(self, database_name, table_name, query):
         # construct the actual query
-        return 'CREATE TABLE %(database)s.%(table)s ENGINE=MyISAM ( %(query)s );' % {
+        return 'CREATE TABLE %(database)s.%(table)s ENGINE=ARIA ( %(query)s );' % {
             'database': self.escape_identifier(database_name),
             'table': self.escape_identifier(table_name),
             'query': query
         }
 
-    def kill_query(self, pid):
+    def abort_query(self, pid):
         sql = 'KILL %(pid)i' % {'pid': pid}
         self.execute(sql)
 

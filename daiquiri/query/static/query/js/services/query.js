@@ -182,6 +182,7 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
             }
 
             CodeMirror.runMode(service.job.query, "text/x-mariadb", angular.element('#query')[0]);
+            CodeMirror.runMode(service.job.native_query, "text/x-mariadb", angular.element('#native-query')[0]);
             CodeMirror.runMode(service.job.actual_query, "text/x-mariadb", angular.element('#actual-query')[0]);
         });
     };
@@ -217,8 +218,8 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
         });
     };
 
-    service.killJob = function() {
-        resources.jobs.update({id: service.values.id, detail_route: 'kill'}, {}, function() {
+    service.abortJob = function() {
+        resources.jobs.update({id: service.values.id, detail_route: 'abort'}, {}, function() {
             service.fetchStatus();
             service.fetchJobs();
             $('.modal').modal('hide');

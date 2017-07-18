@@ -9,10 +9,9 @@ from django.utils.translation import ugettext_lazy as _
 
 
 @shared_task
-def submit_query(job_id):
+def run_query(job_id):
     from daiquiri.core.adapter import get_adapter
     from daiquiri.query.models import QueryJob
-    from daiquiri.uws.settings import PHASE_EXECUTING, PHASE_COMPLETED, PHASE_ERROR, PHASE_ABORTED
 
     # get the job object from the database
     job = QueryJob.objects.get(pk=job_id)
@@ -24,7 +23,7 @@ def submit_query(job_id):
     try:
         adapter.database.create_user_database_if_not_exists(job.database_name)
     except OperationalError as e:
-        job.phase = PHASE_ERROR
+        job.phase = job.PHASE_ERROR
         job.error_summary = str(e)
         job.save()
 
@@ -34,8 +33,8 @@ def submit_query(job_id):
     job.start_time = now()
 
     job.pid = adapter.database.fetch_pid()
-    job.actual_query = adapter.database.build_query(job.database_name, job.table_name, job.actual_query)
-    job.phase = PHASE_EXECUTING
+    job.actual_query = adapter.database.build_query(job.database_name, job.table_name, job.native_query)
+    job.phase = job.PHASE_EXECUTING
     job.start_time = now()
     job.save()
 
@@ -45,24 +44,24 @@ def submit_query(job_id):
         adapter.database.execute(job.actual_query)
 
     except ProgrammingError as e:
-        job.phase = PHASE_ERROR
+        job.phase = job.PHASE_ERROR
         job.error_summary = str(e)
 
     except OperationalError as e:
         # load the job again and check if the job was killed
         job = QueryJob.objects.get(pk=job_id)
 
-        if job.phase != PHASE_ABORTED:
-            job.phase = PHASE_ERROR
+        if job.phase != job.PHASE_ABORTED:
+            job.phase = job.PHASE_ERROR
             job.error_summary = str(e)
 
     except SoftTimeLimitExceeded:
-        job.phase = PHASE_ERROR
+        job.phase = job.PHASE_ERROR
         job.error_summary = _('The query exceeded the timelimit for this queue.')
 
     else:
         # get additional information about the completed job
-        job.phase = PHASE_COMPLETED
+        job.phase = job.PHASE_COMPLETED
 
     finally:
         # get timing and save the job object
@@ -70,7 +69,7 @@ def submit_query(job_id):
         job.execution_duration = (job.end_time - job.start_time).seconds
 
         # get additional information about the completed job
-        if job.phase == PHASE_COMPLETED:
+        if job.phase == job.PHASE_COMPLETED:
             job.nrows, job.size = adapter.database.fetch_stats(job.database_name, job.table_name)
             job.metadata = adapter.database.fetch_table(job.database_name, job.table_name)
             job.metadata['columns'] = adapter.database.fetch_columns(job.database_name, job.table_name)

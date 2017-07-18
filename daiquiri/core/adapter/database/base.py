@@ -45,7 +45,7 @@ class DatabaseAdapter(object):
     def build_query(self, database_name, table_name, query):
         raise NotImplementedError()
 
-    def kill_query(self, pid):
+    def abort_query(self, pid):
         raise NotImplementedError()
 
     def count_rows(self, database_name, table_name, column_names=None, filter_string=None):
