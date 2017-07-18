@@ -1,8 +1,8 @@
-from rest_framework.filters import BaseFilterBackend
-
 import iso8601
 
-from .settings import PHASE_ARCHIVED
+from rest_framework.filters import BaseFilterBackend
+
+from daiquiri.jobs.models import Job
 
 
 class UWSFilterBackend(BaseFilterBackend):
@@ -16,7 +16,7 @@ class UWSFilterBackend(BaseFilterBackend):
             if phases:
                 queryset = queryset.filter(phase__in=phases)
             else:
-                queryset = queryset.exclude(phase__exact=PHASE_ARCHIVED)
+                queryset = queryset.exclude(phase__exact=Job.PHASE_ARCHIVED)
 
             after = request.GET.get('AFTER')
             if after:

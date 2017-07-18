@@ -78,9 +78,6 @@ class QueryJob(Job):
         if not self.table_name:
             self.table_name = get_default_table_name()
 
-        if not self.queue:
-            self.queue = get_default_queue()
-
         if not self.query_language:
             raise ValidationError({
                  'query_language': [_('This field may not be blank.')]
@@ -181,6 +178,9 @@ class QueryJob(Job):
             if not settings.ASYNC or sync:
                 run_query.apply((job_id, ), task_id=job_id)
             else:
+                if not self.queue:
+                    self.queue = get_default_queue()
+                    self.save()
                 run_query.apply_async((job_id, ), task_id=job_id, queue=self.queue)
 
         else:

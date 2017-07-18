@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from daiquiri.uws.serializers import UWSJobCreateSerializer
+
 from .models import QueryJob, Example
 from .validators import validate_table_name, validate_query_language, validate_queue
 
@@ -130,3 +132,11 @@ class UserExampleSerializer(serializers.ModelSerializer):
             'query_string',
             'groups'
         )
+
+
+class UWSQueryJobCreateSerializer(UWSJobCreateSerializer):
+
+    TABLE_NAME = serializers.CharField(required=False, validators=[validate_table_name])
+    QUEUE = serializers.CharField(required=False, validators=[validate_queue])
+    LANG = serializers.CharField(required=True, validators=[validate_query_language])
+    QUERY = serializers.CharField(required=True)

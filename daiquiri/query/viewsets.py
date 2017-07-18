@@ -13,7 +13,8 @@ from daiquiri.core.viewsets import ChoicesViewSet
 from daiquiri.core.permissions import HasModelPermission
 from daiquiri.core.utils import human2bytes
 from daiquiri.core.paginations import ListPagination
-from daiquiri.uws.settings import PHASE_ARCHIVED
+
+from daiquiri.uws.viewsets import UWSJobViewSet
 
 from .models import QueryJob, Example
 from .serializers import (
@@ -25,11 +26,13 @@ from .serializers import (
     QueryJobCreateSerializer,
     QueryJobUpdateSerializer,
     ExampleSerializer,
-    UserExampleSerializer
+    UserExampleSerializer,
+    UWSQueryJobCreateSerializer
 )
 
 from .permissions import HasPermission
 from .utils import fetch_user_database_metadata
+
 
 class StatusViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     permission_classes = (HasPermission, )
@@ -47,7 +50,7 @@ class StatusViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
                 quota = group_quota if group_quota > quota else quota
 
         # get the size of all the tables of this user
-        jobs = QueryJob.objects.filter_by_owner(self.request.user).exclude(phase=PHASE_ARCHIVED)
+        jobs = QueryJob.objects.filter_by_owner(self.request.user).exclude(phase=QueryJob.PHASE_ARCHIVED)
 
         size = jobs.aggregate(Sum('size'))['size__sum'] or 0
 
@@ -81,7 +84,7 @@ class QueryJobViewSet(viewsets.ModelViewSet):
     permission_classes = (HasPermission, )
 
     def get_queryset(self):
-        return QueryJob.objects.filter_by_owner(self.request.user).exclude(phase=PHASE_ARCHIVED)
+        return QueryJob.objects.filter_by_owner(self.request.user).exclude(phase=QueryJob.PHASE_ARCHIVED)
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -131,7 +134,7 @@ class QueryJobViewSet(viewsets.ModelViewSet):
         except QueryJob.DoesNotExist:
             raise Http404
 
-    @detail_route(methods=['get','put'], url_path='download/(?P<format_key>\w+)', url_name='download')
+    @detail_route(methods=['put'], url_path='download/(?P<format_key>\w+)', url_name='download')
     def download(self, request, pk=None, format_key=None):
         try:
             job = self.get_queryset().get(pk=pk)
@@ -188,3 +191,19 @@ class QueueViewSet(ChoicesViewSet):
 class QueryLanguageViewSet(ChoicesViewSet):
     permission_classes = (HasPermission, )
     queryset = [('%(key)s-%(version)s' % item, item['label']) for item in settings.QUERY['query_languages']]
+
+
+class UWSQueryJobViewSet(UWSJobViewSet):
+
+    base_name = 'uws_query'
+    create_serializer_class = UWSQueryJobCreateSerializer
+
+    parameter_map = {
+        'TABLE_NAME': 'table_name',
+        'LANG': 'query_language',
+        'QUEUE': 'queue',
+        'QUERY': 'query'
+    }
+
+    def get_queryset(self):
+        return QueryJob.objects.filter_by_owner(self.request.user).exclude(phase=QueryJob.PHASE_ARCHIVED)

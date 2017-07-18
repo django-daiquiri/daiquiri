@@ -9,27 +9,28 @@ from rest_framework.parsers import FormParser
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 
-from daiquiri.query.models import QueryJob
-
-from .serializers import JobListSerializer, JobRetrieveSerializer, JobCreateSerializer, JobUpdateSerializer
+from .serializers import (
+    UWSJobListSerializer,
+    UWSJobRetrieveSerializer,
+    UWSJobCreateSerializer,
+    UWSJobUpdateSerializer
+)
 from .renderers import UWSRenderer
 from .filters import UWSFilterBackend
-from .utils import UWSSuccessRedirect, UWSBadRequest
+from .responses import UWSSuccessRedirect, UWSBadRequest
 from .exceptions import UWSException
 
 
-class JobViewSet(ReadOnlyModelViewSet):
+class UWSJobViewSet(ReadOnlyModelViewSet):
 
     renderer_classes = (UWSRenderer, )
     parser_classes = (FormParser, )
     filter_backends = (UWSFilterBackend, )
 
-    job_type = None
-
-    list_serializer_class = JobListSerializer
-    detail_serializer_class = JobRetrieveSerializer
-    create_serializer_class = JobCreateSerializer
-    update_serializer_class = JobUpdateSerializer
+    list_serializer_class = UWSJobListSerializer
+    detail_serializer_class = UWSJobRetrieveSerializer
+    create_serializer_class = UWSJobCreateSerializer
+    update_serializer_class = UWSJobUpdateSerializer
 
     def get_success_url(self, job=None):
         if job:
@@ -37,13 +38,14 @@ class JobViewSet(ReadOnlyModelViewSet):
         else:
             kwargs = self.kwargs
 
-        return self.request.build_absolute_uri(reverse(self.detail_url_name, kwargs=kwargs))
+        path = reverse(self.base_name + '-detail', kwargs=kwargs)
+        return self.request.build_absolute_uri(path)
 
     def get_serializer_class(self):
         if self.action == 'list':
             return self.list_serializer_class
         elif self.action == 'create':
-            return self.create_serializer_class
+            return self.serializer_class
         elif self.action == 'update':
             return self.update_serializer_class
         else:
@@ -177,22 +179,3 @@ class JobViewSet(ReadOnlyModelViewSet):
     def get_owner(self, request, pk):
         job = self.get_object()
         return HttpResponse(job.owner) if job.owner else HttpResponse()
-
-
-from .serializers import QueryJobCreateSerializer
-class QueryJobViewSet(JobViewSet):
-
-    detail_url_name = 'uwsquery-detail'
-    job_type = QueryJob.JOB_TYPE_QUERY
-
-    create_serializer_class = QueryJobCreateSerializer
-
-    parameter_map = {
-        'TABLE_NAME': 'table_name',
-        'LANG': 'query_language',
-        'QUEUE': 'queue',
-        'QUERY': 'query'
-    }
-
-    def get_queryset(self):
-        return QueryJob.objects.filter_by_owner(self.request.user).exclude(phase=QueryJob.PHASE_ARCHIVED)

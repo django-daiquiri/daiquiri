@@ -3,7 +3,7 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save, post_delete
 
 from daiquiri.metadata.models import Database, Table, Column
-from daiquiri.metadata.settings import ACCESS_LEVEL_PUBLIC, ACCESS_LEVEL_INTERNAL
+from daiquiri.metadata.settings import ACCESS_LEVEL_PUBLIC
 
 from .models import (
     Schema as TapSchema,
