@@ -18,6 +18,11 @@ def base_url(context):
 
 
 @register.simple_tag(takes_context=True)
+def absolute_url(context, *args, **kwargs):
+    return context.request.build_absolute_uri(reverse(*args, **kwargs))
+
+
+@register.simple_tag(takes_context=True)
 def bootstrap_form(context, **kwargs):
     form_context = {}
 

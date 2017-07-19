@@ -8,50 +8,44 @@
 
     <vosi:capability standardID="ivo://ivoa.net/std/TAP">
         <interface xsi:type="vs:ParamHTTP" role="std" version="1.0">
-            <accessURL use="base">
-                {% url 'tap_root' %}
-            </accessURL>
+            <accessURL use="base">{% absolute_url 'tap_root' %}</accessURL>
         </interface>
-
         {% for language in settings.QUERY.query_languages %}
         <language>
             <name>{{ language.key }}</name>
             <version>{{ language.version }}</version>
-            {% if language.description %}
             <description>{{ language.description }}</description>
-            {% endif %}
         </language>
         {% endfor %}
-
     </vosi:capability>
 
     <vosi:capability standardID="ivo://ivoa.net/std/TAP#async-1.1">
         <interface xsi:type="vs:ParamHTTP" role="std" version="1.1">
-            <accessURL use="base">{% url 'tapquery-list' %}</accessURL>
+            <accessURL use="base">{% absolute_url 'tap_async-list' %}</accessURL>
         </interface>
     </vosi:capability>
 
     <vosi:capability standardID="ivo://ivoa.net/std/TAP#sync-1.1">
         <interface xsi:type="vs:ParamHTTP" role="std" version="1.1">
-            <accessURL use="base">{% url 'tap_sync' %}</accessURL>
+            <accessURL use="base">{% absolute_url 'tap_sync-list' %}</accessURL>
         </interface>
     </vosi:capability>
 
     <vosi:capability standardID="ivo://ivoa.net/std/VOSI#capabilities">
         <interface xsi:type="vs:ParamHTTP">
-        <accessURL use="full">{% url 'tap_capabilities' %}</accessURL>
+            <accessURL use="full">{% absolute_url 'tap_capabilities' %}</accessURL>
         </interface>
     </vosi:capability>
 
     <vosi:capability standardID="ivo://ivoa.net/std/VOSI#tables">
         <interface xsi:type="vs:ParamHTTP">
-            <accessURL use="full">{% url 'tap_tables' %}</accessURL>
+            <accessURL use="full">{% absolute_url 'tap_tables' %}</accessURL>
         </interface>
     </vosi:capability>
 
     <vosi:capability standardID="ivo://ivoa.net/std/DALI#examples">
        <interface xsi:type="vr:WebBrowser">
-          <accessURL use="full">{% url 'tap_examples' %}</accessURL>
+          <accessURL use="full">{% absolute_url 'tap_examples' %}</accessURL>
        </interface>
     </vosi:capability>
 
