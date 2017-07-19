@@ -46,26 +46,6 @@ class XMLRenderer(BaseRenderer):
         return components[0] + "".join(x.title() for x in components[1:])
 
 
-class VOTableRenderer(XMLRenderer):
-
-    media_type = 'application/x-votable+xml'
-    format = 'votable'
-
-    root_attrs = {
-        'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
-        'xmlns': 'http://www.ivoa.net/xml/VOTable/v1.3',
-        'xmlns:stc': 'http://www.ivoa.net/xml/STC/v1.30'
-    }
-
-    def render_document(self, data, accepted_media_type=None, renderer_context=None):
-        self.xml.startElement('VOTABLE', self.root_attrs)
-        self.render_votable(data)
-        self.xml.endElement('VOTABLE')
-
-    def render_votable(self, data, accepted_media_type=None, renderer_context=None):
-        raise NotImplementedError()
-
-
 class UWSRenderer(XMLRenderer):
 
     media_type = 'application/xml'
@@ -153,6 +133,26 @@ class UWSRenderer(XMLRenderer):
         self.xml.endElement('uws:parameters')
 
 
+class VOTableRenderer(XMLRenderer):
+
+    media_type = 'application/x-votable+xml'
+    format = 'votable'
+
+    root_attrs = {
+        'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+        'xmlns': 'http://www.ivoa.net/xml/VOTable/v1.3',
+        'xmlns:stc': 'http://www.ivoa.net/xml/STC/v1.30'
+    }
+
+    def render_document(self, data, accepted_media_type=None, renderer_context=None):
+        self.xml.startElement('VOTABLE', self.root_attrs)
+        self.render_votable(data)
+        self.xml.endElement('VOTABLE')
+
+    def render_votable(self, data, accepted_media_type=None, renderer_context=None):
+        raise NotImplementedError()
+
+
 class ErrorRenderer(VOTableRenderer):
 
     def get_error_string(self, data):
@@ -174,3 +174,43 @@ class ErrorRenderer(VOTableRenderer):
             'value': 'ERROR'
         }, self.get_error_string(data))
         self.xml.endElement('RESOURCE')
+
+
+class TablesetRenderer(XMLRenderer):
+
+    def render_document(self, data, accepted_media_type=None, renderer_context=None):
+        self.xml.startElement('vosi:tableset', {
+            'xmlns:vosi': 'http://www.ivoa.net/xml/VOSITables/v1.0',
+            'xmlns:vod': 'http://www.ivoa.net/xml/VODataService/v1.1',
+            'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+            'xsi:schemaLocation': 'http://www.ivoa.net/xml/VODataService/v1.1 http://www.ivoa.net/xml/VOSITables/v1.0'
+        })
+
+        for schema in data['schemas']:
+            self.xml.startElement('vosi:schema')
+            self.render_text_node('name', {}, schema.schema_name)
+            self.render_text_node('description', {}, schema.description)
+
+            for table in schema['tables']:
+                self.xml.startElement('vosi:table')
+                self.render_text_node('name', {}, table.table_name)
+                self.render_text_node('description', {}, table.description)
+
+                for column in table['columns']:
+                    self.xml.startElement('vosi:column')
+                    self.render_text_node('name', {}, column.column_name)
+                    self.render_text_node('dataType', {'xsi:type': 'vod:TAPType'}, column.datatype)
+                    self.render_text_node('ucd', {}, column.ucd)
+                    if column.indexed:
+                        self.render_text_node('flag', {}, 'indexed')
+                    if column.primary:
+                        self.render_text_node('flag', {}, 'primary')
+                    if column.std:
+                        self.render_text_node('flag', {}, 'std')
+                    self.xml.endElement('vosi:column')
+
+                self.xml.endElement('vosi:table')
+
+            self.xml.endElement('vosi:schema')
+
+        self.xml.endElement('vosi:tableset')
