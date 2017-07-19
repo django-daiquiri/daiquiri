@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from daiquiri.uws.serializers import UWSJobCreateSerializer
+from daiquiri.dali.serializers import SyncJobSerializer, AsyncJobSerializer
 
 from .models import QueryJob, Example
 from .validators import validate_table_name, validate_query_language, validate_queue
@@ -134,7 +134,14 @@ class UserExampleSerializer(serializers.ModelSerializer):
         )
 
 
-class UWSQueryJobCreateSerializer(UWSJobCreateSerializer):
+class SyncQueryJobSerializer(SyncJobSerializer):
+
+    TABLE_NAME = serializers.CharField(required=False, validators=[validate_table_name])
+    LANG = serializers.CharField(required=True, validators=[validate_query_language])
+    QUERY = serializers.CharField(required=True)
+
+
+class AsyncQueryJobSerializer(AsyncJobSerializer):
 
     TABLE_NAME = serializers.CharField(required=False, validators=[validate_table_name])
     QUEUE = serializers.CharField(required=False, validators=[validate_queue])

@@ -20,34 +20,6 @@ from daiquiri.query.exceptions import (
 from .models import Schema, Table, Column
 
 
-@csrf_exempt
-def sync(request):
-    if request.method == 'POST':
-
-        query_language = request.POST.get('LANG').lower().split('-')[0]
-        query = request.POST.get('QUERY')
-
-        try:
-            job_id = QueryJob.objects.submit(
-                query_language,
-                query,
-                None,
-                get_default_table_name(),
-                request.user,
-                sync=True
-            )
-        except (ADQLSyntaxError, MySQLSyntaxError,PermissionError, ConnectionError, TableError) as e:
-            return HttpResponseBadRequest(e.message)
-
-        stream_url = request.build_absolute_uri(reverse('query:job-stream', kwargs={
-            'pk': str(job_id),
-            'format_key': 'votable'
-        }))
-
-        return HttpResponseSeeOther(stream_url)
-    else:
-        return HttpResponseNotAllowed(['POST'])
-
 def capabilities(request):
     return render(request, 'tap/capabilities.xml', content_type='application/xml')
 

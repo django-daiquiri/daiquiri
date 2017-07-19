@@ -1,17 +1,17 @@
 from rest_framework.routers import Route, SimpleRouter
 
 
-class UWSRouter(SimpleRouter):
+class DALIRouter(SimpleRouter):
     routes = [
         Route(
             url=r'^{prefix}$',
-            mapping={'get': 'list', 'post': 'create'},
+            mapping={'get': 'list_jobs', 'post': 'create_job'},
             name='{basename}-list',
             initkwargs={'suffix': 'List'}
         ),
         Route(
             url=r'^{prefix}/{lookup}$',
-            mapping={'get': 'retrieve', 'post': 'update', 'delete': 'destroy'},
+            mapping={'get': 'retrieve_job', 'post': 'update_job', 'delete': 'destroy_job'},
             name='{basename}-detail',
             initkwargs={'suffix': 'Detail'}
         ),
@@ -35,19 +35,19 @@ class UWSRouter(SimpleRouter):
         ),
         Route(
             url=r'^{prefix}/{lookup}/destruction$',
-            mapping={'get': 'get_destruction', 'post': 'post_destruction'},
+            mapping={'get': 'get_destruction', 'post': 'set_destruction'},
             name='{basename}-destruction',
             initkwargs={'suffix': 'Destruction'}
         ),
         Route(
             url=r'^{prefix}/{lookup}/executionduration$',
-            mapping={'get': 'get_executionduration', 'post': 'post_executionduration'},
+            mapping={'get': 'get_executionduration', 'post': 'set_executionduration'},
             name='{basename}-executionduration',
             initkwargs={'suffix': 'Executionduration'}
         ),
         Route(
             url=r'^{prefix}/{lookup}/phase$',
-            mapping={'get': 'get_phase', 'post': 'post_phase'},
+            mapping={'get': 'get_phase', 'post': 'set_phase'},
             name='{basename}-phase',
             initkwargs={'suffix': 'Phase'}
         ),

@@ -14,7 +14,7 @@ from daiquiri.core.permissions import HasModelPermission
 from daiquiri.core.utils import human2bytes
 from daiquiri.core.paginations import ListPagination
 
-from daiquiri.uws.viewsets import UWSJobViewSet
+from daiquiri.dali.viewsets import SyncJobViewSet, AsyncJobViewSet
 
 from .models import QueryJob, Example
 from .serializers import (
@@ -27,7 +27,8 @@ from .serializers import (
     QueryJobUpdateSerializer,
     ExampleSerializer,
     UserExampleSerializer,
-    UWSQueryJobCreateSerializer
+    SyncQueryJobSerializer,
+    AsyncQueryJobSerializer
 )
 
 from .permissions import HasPermission
@@ -193,10 +194,23 @@ class QueryLanguageViewSet(ChoicesViewSet):
     queryset = [('%(key)s-%(version)s' % item, item['label']) for item in settings.QUERY['query_languages']]
 
 
-class UWSQueryJobViewSet(UWSJobViewSet):
+class SyncQueryJobViewSet(SyncJobViewSet):
 
-    base_name = 'uws_query'
-    create_serializer_class = UWSQueryJobCreateSerializer
+    serializer_class = SyncQueryJobSerializer
+
+    parameter_map = {
+        'TABLE_NAME': 'table_name',
+        'LANG': 'query_language',
+        'QUERY': 'query'
+    }
+
+    def get_queryset(self):
+        return QueryJob.objects.filter_by_owner(self.request.user).exclude(phase=QueryJob.PHASE_ARCHIVED)
+
+
+class AsyncQueryJobViewSet(AsyncJobViewSet):
+
+    serializer_class = AsyncQueryJobSerializer
 
     parameter_map = {
         'TABLE_NAME': 'table_name',

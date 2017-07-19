@@ -1,5 +1,5 @@
 from django.http import HttpResponseRedirect
 
 
-class HttpResponseSeeOtherRedirect(HttpResponseRedirect):
+class HttpResponseSeeOther(HttpResponseRedirect):
     status_code = 303

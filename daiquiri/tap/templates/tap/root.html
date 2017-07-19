@@ -5,14 +5,12 @@
 
     <h1>{% trans 'TAP service' %}</h1>
 
-    <h1>{% trans 'Resources' %}</h1>
-
     <ul>
         <li>
-            <a href="">{% trans 'sync' %}</a>
+            <a href="{% url 'tap_sync-list' %}">{% trans 'sync' %}</a>
         </li>
         <li>
-            <a href="">{% trans 'async' %}</a>
+            <a href="{% url 'tap_async-list' %}">{% trans 'async' %}</a>
         </li>
         <li>
             <a href="{% url 'tap_capabilities' %}">{% trans 'capabilities' %}</a>

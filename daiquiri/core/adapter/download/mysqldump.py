@@ -68,7 +68,8 @@ class MysqldumpAdapter(DownloadAdapter):
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="http://www.ivoa.net/xml/VOTable/v1.3"
     xmlns:stc="http://www.ivoa.net/xml/STC/v1.30">
-    <RESOURCE name="%(database)s">
+    <RESOURCE name="%(database)s" type="results">
+        <INFO name="QUERY_STATUS" value="OK" />
         <TABLE name="%(table)s">''' % {
             'database': database_name,
             'table': table_name

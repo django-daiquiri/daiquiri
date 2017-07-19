@@ -1,2 +1,0 @@
-class UWSException(Exception):
-    pass
