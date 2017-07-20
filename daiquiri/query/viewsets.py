@@ -147,7 +147,10 @@ class QueryJobViewSet(viewsets.ModelViewSet):
         if result.successful():
             return sendfile(request, file_name, attachment=True)
         else:
-            return Response(result.status)
+            if result.status == 'FAILURE':
+                return Response(result.status, status=500)
+            else:
+                return Response(result.status)
 
     @detail_route(methods=['get'], url_path='stream/(?P<format_key>\w+)', url_name='stream')
     def stream(self, request, pk=None, format_key=None):

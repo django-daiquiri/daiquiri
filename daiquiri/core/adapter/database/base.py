@@ -42,7 +42,7 @@ class DatabaseAdapter(object):
     def escape_string(self, string):
         raise NotImplementedError()
 
-    def build_query(self, database_name, table_name, query):
+    def build_query(self, database_name, table_name, query, timeout):
         raise NotImplementedError()
 
     def abort_query(self, pid):

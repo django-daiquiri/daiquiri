@@ -24,7 +24,13 @@ from daiquiri.core.adapter import get_adapter
 from daiquiri.jobs.models import Job
 
 from .managers import QueryJobManager
-from .utils import get_default_table_name, get_default_queue, get_user_database_name, get_download_file_name, check_permissions
+from .utils import (
+    get_default_table_name,
+    get_default_queue,
+    get_user_database_name,
+    get_download_file_name,
+    check_permissions
+)
 from .tasks import run_query, create_download_file
 
 
@@ -138,6 +144,17 @@ class QueryJob(Job):
         }
 
     @property
+    def timeout(self):
+        if self.queue:
+            return (queue['timeout'] for queue in settings.QUERY['queues'] if queue['key'] == self.queue).next()
+        else:
+            return 10
+
+    @property
+    def priority(self):
+        return (queue['priority'] for queue in settings.QUERY['queues'] if queue['key'] == self.queue).next()
+
+    @property
     def results(self):
         if self.phase == self.PHASE_COMPLETED:
             # create dictionary of the form
@@ -177,11 +194,13 @@ class QueryJob(Job):
             job_id = str(self.id)
             if not settings.ASYNC or sync:
                 run_query.apply((job_id, ), task_id=job_id)
+
             else:
                 if not self.queue:
                     self.queue = get_default_queue()
                     self.save()
-                run_query.apply_async((job_id, ), task_id=job_id, queue=self.queue)
+
+                run_query.apply_async((job_id, ), task_id=job_id, queue='query', priority=self.priority)
 
         else:
             raise ValidationError({
@@ -236,7 +255,7 @@ class QueryJob(Job):
             pass
 
     def download(self, format):
-        if self.phase not in self.PHASE_ACTIVE:
+        if self.phase == self.PHASE_COMPLETED:
             task_id = '%s-%s' % (self.id, format['key'])
             file_name = get_download_file_name(self.database_name, self.table_name, self.owner_username, format)
             task_args = (file_name, format['key'], self.database_name, self.table_name, self.metadata)
@@ -261,22 +280,22 @@ class QueryJob(Job):
                         task_result = create_download_file.apply_async(task_args, task_id=task_id)
 
                     else:
-                        task_result = create_download_file.apply_async(task_args, task_id=task_id)
+                        task_result = create_download_file.apply_async(task_args, task_id=task_id, queue='download')
 
             return task_result, file_name
 
         else:
             raise ValidationError({
-                'phase': ['Job is ACTIVE.']
+                'phase': ['Job is not COMPLETED.']
             })
 
     def stream(self, format):
-        if self.phase not in self.PHASE_ACTIVE:
+        if self.phase == self.PHASE_COMPLETED:
             return get_adapter().download.generate(format['key'], self.database_name, self.table_name, self.metadata)
 
         else:
             raise ValidationError({
-                'phase': ['Job is ACTIVE.']
+                'phase': ['Job is not COMPLETED.']
             })
 
 @python_2_unicode_compatible

@@ -92,7 +92,7 @@
     </div>
 </div>
 
-<div class="panel panel-default">
+<div class="panel panel-default" ng-show="service.job.native_query">
     <div class="panel-heading">
         {% trans 'Native query' %}
     </div>
@@ -103,7 +103,7 @@
     </div>
 </div>
 
-<div class="panel panel-default">
+<div class="panel panel-default" ng-show="service.job.actual_query">
     <div class="panel-heading">
         {% trans 'Actual query' %}
     </div>

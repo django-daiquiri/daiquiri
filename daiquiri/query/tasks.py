@@ -1,12 +1,9 @@
 from __future__ import absolute_import, unicode_literals
 
 from celery import shared_task
-from celery.exceptions import SoftTimeLimitExceeded
 
-from django.db.utils import OperationalError, ProgrammingError
+from django.db.utils import OperationalError, ProgrammingError, InternalError
 from django.utils.timezone import now
-from django.utils.translation import ugettext_lazy as _
-
 
 @shared_task
 def run_query(job_id):
@@ -33,7 +30,7 @@ def run_query(job_id):
     job.start_time = now()
 
     job.pid = adapter.database.fetch_pid()
-    job.actual_query = adapter.database.build_query(job.database_name, job.table_name, job.native_query)
+    job.actual_query = adapter.database.build_query(job.database_name, job.table_name, job.native_query, job.timeout)
     job.phase = job.PHASE_EXECUTING
     job.start_time = now()
     job.save()
@@ -43,7 +40,7 @@ def run_query(job_id):
         # this is where the work ist done (and the time is spend)
         adapter.database.execute(job.actual_query)
 
-    except ProgrammingError as e:
+    except (ProgrammingError, InternalError) as e:
         job.phase = job.PHASE_ERROR
         job.error_summary = str(e)
 
@@ -54,10 +51,6 @@ def run_query(job_id):
         if job.phase != job.PHASE_ABORTED:
             job.phase = job.PHASE_ERROR
             job.error_summary = str(e)
-
-    except SoftTimeLimitExceeded:
-        job.phase = job.PHASE_ERROR
-        job.error_summary = _('The query exceeded the timelimit for this queue.')
 
     else:
         # get additional information about the completed job
@@ -84,5 +77,5 @@ def create_download_file(file_name, format_key, database_name, table_name, metad
     from daiquiri.core.adapter import get_adapter
 
     with open(file_name, 'w') as f:
-        for line in get_adapter().download.generate(f, format_key, database_name, table_name, metadata):
+        for line in get_adapter().download.generate(format_key, database_name, table_name, metadata):
             f.write(line)
