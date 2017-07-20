@@ -4,10 +4,10 @@ from django.conf import settings
 from django.conf.urls import url, include
 from django.views.generic import TemplateView
 
-from daiquiri.dali.routers import DALIRouter
+from daiquiri.dali.routers import JobRouter
 
 
-router = DALIRouter(trailing_slash=False)
+router = JobRouter(trailing_slash=False)
 
 '''
 add uws routes for the resources specified in the settings

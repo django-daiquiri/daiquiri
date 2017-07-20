@@ -48,9 +48,6 @@ class XMLRenderer(BaseRenderer):
 
 class UWSRenderer(XMLRenderer):
 
-    media_type = 'application/xml'
-    format = 'uws'
-
     root_attrs = {
         'xmlns:uws': 'http://www.ivoa.net/xml/UWS/v1.0',
         'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',

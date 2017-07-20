@@ -1,7 +1,7 @@
 from rest_framework.routers import Route, SimpleRouter
 
 
-class DALIRouter(SimpleRouter):
+class JobRouter(SimpleRouter):
     routes = [
         Route(
             url=r'^{prefix}$',
