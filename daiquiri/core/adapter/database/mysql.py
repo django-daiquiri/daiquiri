@@ -1,5 +1,3 @@
-from django.db import connections
-
 from .base import DatabaseAdapter
 
 
@@ -147,7 +145,10 @@ class MySQLAdapter(DatabaseAdapter):
         # execute query
         rows = self.fetchall(sql)
 
-        return [self.fetch_table_metadata(database_name, row[0], row[1]) for row in rows]
+        return [{
+            'name': row[0],
+            'type': 'view' if row[1] == 'VIEW' else 'table'
+        } for row in rows]
 
     def fetch_table(self, database_name, table_name):
         # prepare sql string
@@ -194,7 +195,7 @@ class MySQLAdapter(DatabaseAdapter):
         return [{
             'name': row[0],
             'datatype': row[1],
-            'indexed': row[4]
+            'indexed': bool(row[4])
         } for row in rows]
 
     def fetch_column(self, database_name, table_name, column_name):
@@ -211,7 +212,7 @@ class MySQLAdapter(DatabaseAdapter):
         return {
             'name': row[0],
             'datatype': row[1],
-            'indexed': row[4]
+            'indexed': bool(row[4])
         }
 
     def fetch_column_names(self, database_name, table_name):
