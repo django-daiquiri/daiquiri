@@ -25,7 +25,7 @@
     </div>
 </script>
 
-<div class="daiquiri-table">
+<div class="daiquiri-table" ng-show="table.ready">
     <div class="row daiquiri-table-header">
         <div class="col-sm-6">
             <form class="daiquiri-table-search" ng-submit="table.filter()">
@@ -107,8 +107,8 @@
         </div>
 
         <div class="col-sm-4 daiquiri-table-page-size">
-            <select class="form-control" ng-model="table.config.page_size" ng-change="table.fetch()" by-number>
-                <option value="{$ value $}" ng-repeat="value in values">
+            <select class="form-control" ng-model="table.params.page_size" ng-change="table.fetch()" by-number>
+                <option value="{$ value $}" ng-repeat="value in table.page_sizes">
                     {$ table.i18n.page_size(value) $}
                 </option>
             </select>

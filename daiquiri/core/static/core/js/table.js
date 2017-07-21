@@ -95,22 +95,31 @@ angular.module('core')
             'indexed': gettext('Indexed'),
             'std': gettext('STD'),
         },
+        page_sizes: [10, 20, 100],
         filter_string: null,
         updated: false
     };
 
     service.init = function(database, table) {
-        service.params.database = database;
-        service.params.table = table;
+        service.ready = false;
 
-        service.columns = resources.columns.query(service.params);
-        service.reset();
+        if (angular.isDefined(database) && angular.isDefined(table)) {
+            service.params.database = database;
+            service.params.table = table;
+
+            service.columns = resources.columns.query(service.params);
+            service.reset();
+        } else {
+            service.columns = [];
+            service.rows = [];
+        }
     };
 
     service.fetch = function() {
         resources.rows.paginate(service.params, function(response) {
             service.count = response.count;
             service.rows = response.results;
+            service.ready = true;
         });
     };
 
