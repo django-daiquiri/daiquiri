@@ -1,15 +1,8 @@
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
-from django.db import connections
-from django.db.utils import OperationalError, ProgrammingError
+from django.db.utils import OperationalError
 
-from daiquiri.core.adapter import get_adapter
 from daiquiri.metadata.models import Database
-from daiquiri.query.utils import get_user_database_name
-
-
-
 
 
 class Command(BaseCommand):
