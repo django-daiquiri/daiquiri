@@ -109,7 +109,7 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
     };
 
     service.fetchStatus = function() {
-        resources.status.query(function(response) {
+        return resources.status.query(function(response) {
             service.status = response[0];
         }).$promise;
     };

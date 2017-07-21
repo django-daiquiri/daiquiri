@@ -1,82 +1,85 @@
 {% load i18n %}
 
-<div class="panel panel-default">
-    <div class="panel-heading">
-        {% trans 'Database status' %}
+<div ng-show="service.status">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            {% trans 'Database status' %}
+        </div>
+        <div class="panel-body">
+            <p ng-show="service.status.queued_jobs == 1">
+                {% blocktrans %}
+                There is one job in the queue.
+                {% endblocktrans %}
+            </p>
+            <p ng-show="service.status.queued_jobs > 1">
+                {% blocktrans with queued_jobs='{$ service.status.queued_jobs $}' %}
+                There are {{ queued_jobs }} jobs in the queue.
+                {% endblocktrans %}
+            </p>
+            <p ng-show="service.status.guest">
+                {% url 'account_signup' as register_url %}
+                {% blocktrans %}
+                You are using the guest user. For a personal account, please sign up <a href="{{ register_url }}">here</a>.
+                {% endblocktrans %}
+            </p>
+            <p ng-show="service.status.guest">
+                {% blocktrans with size='{$ service.status.size | bytes $}' quota='{$ service.status.quota | bytes $}' %}
+                The guest user is using {{ size }} of its quota of {{ quota }}.
+                {% endblocktrans %}
+            </p>
+            <p ng-hide="service.status.guest">
+                {% blocktrans with size='{$ service.status.size | bytes $}' quota='{$ service.status.quota | bytes $}' %}
+                You are using {{ size }} of your quota of {{ quota }}.
+                {% endblocktrans %}
+            </p>
+        </div>
     </div>
-    <div class="panel-body">
-        <p ng-show="service.status.queued_jobs == 1">
-            {% blocktrans %}
-            There is one job in the queue.
-            {% endblocktrans %}
-        </p>
-        <p ng-show="service.status.queued_jobs > 1">
-            {% blocktrans with queued_jobs='{$ service.status.queued_jobs $}' %}
-            There are {{ queued_jobs }} jobs in the queue.
-            {% endblocktrans %}
-        </p>
-        <p ng-show="service.status.guest">
-            {% url 'account_signup' as register_url %}
-            {% blocktrans %}
-            You are using the guest user. For a personal account, please sign up <a href="{{ register_url }}">here</a>.
-            {% endblocktrans %}
-        </p>
-        <p ng-show="service.status.guest">
-            {% blocktrans with size='{$ service.status.size | bytes $}' quota='{$ service.status.quota | bytes $}' %}
-            The guest user is using {{ size }} of its quota of {{ quota }}.
-            {% endblocktrans %}
-        </p>
-        <p ng-hide="service.status.guest">
-            {% blocktrans with size='{$ service.status.size | bytes $}' quota='{$ service.status.quota | bytes $}' %}
-            You are using {{ size }} of your quota of {{ quota }}.
-            {% endblocktrans %}
-        </p>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            {% trans 'New query job' %}
+        </div>
+        <ul class="list-group">
+            {% for form in settings.QUERY.forms %}
+
+            <li class="list-group-item list-group-link">
+                <a href=""
+                    ng-click="service.forms['{{ form.key }}'].activate()"
+                    ng-class="{active: service.form == '{{ form.key }}'}">
+                    {{ form.label }}
+                </a>
+            </li>
+
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            {% trans 'Job list' %}
+        </div>
+        <ul class="list-group daiquiri-query-joblist">
+            <li class="list-group-item" ng-if="!service.jobs.length">
+                {% trans 'No jobs found.' %}
+            </li>
+            <li class="list-group-item list-group-link" ng-repeat="job in service.jobs | orderBy: '-creation_time'">
+                <a href="" ng-click="service.activateJob(job)" ng-class="{active: service.job.id == job.id}">
+                    <div class="pull-right">
+                        <i class="fa fa-pause" title="PENDING" ng-show="job.phase == 'PENDING'"></i>
+                        <i class="fa fa-spinner fa-spin" title="QUEUED" ng-show="job.phase == 'QUEUED'"></i>
+                        <i class="fa fa-play" title="EXECUTING" ng-show="job.phase == 'EXECUTING'"></i>
+                        <i class="fa fa-check" title="COMPLETED" ng-show="job.phase == 'COMPLETED'"></i>
+                        <i class="fa fa-warning" title="ERROR" ng-show="job.phase == 'ERROR'"></i>
+                        <i class="fa fa-remove" title="ABORTED" ng-show="job.phase == 'ABORTED'"></i>
+                        <i class="fa fa-question" title="UNKNOWN" ng-show="job.phase == 'UNKNOWN'"></i>
+                        <i class="fa fa-stop" title="HELD" ng-show="job.phase == 'HELD'"></i>
+                        <i class="fa fa-pause" title="SUSPENDED" ng-show="job.phase == 'SUSPENDED'"></i>
+                        <i class="fa fa-ban" title="ARCHIVED" ng-show="job.phase == 'ARCHIVED'"></i>
+                    </div>
+                    <div>{$ job.table_name $}</div>
+                </a>
+            </li>
+        </ul>
     </div>
 </div>
 
-<div class="panel panel-default">
-    <div class="panel-heading">
-        {% trans 'New query job' %}
-    </div>
-    <ul class="list-group">
-        {% for form in settings.QUERY.forms %}
-
-        <li class="list-group-item list-group-link">
-            <a href=""
-                ng-click="service.forms['{{ form.key }}'].activate()"
-                ng-class="{active: service.form == '{{ form.key }}'}">
-                {{ form.label }}
-            </a>
-        </li>
-
-        {% endfor %}
-    </ul>
-</div>
-
-<div class="panel panel-default">
-    <div class="panel-heading">
-        {% trans 'Job list' %}
-    </div>
-    <ul class="list-group daiquiri-query-joblist">
-        <li class="list-group-item" ng-if="!service.jobs.length">
-            {% trans 'No jobs found.' %}
-        </li>
-        <li class="list-group-item list-group-link" ng-repeat="job in service.jobs | orderBy: '-creation_time'">
-            <a href="" ng-click="service.activateJob(job)" ng-class="{active: service.job.id == job.id}">
-                <div class="pull-right">
-                    <i class="fa fa-pause" title="PENDING" ng-show="job.phase == 'PENDING'"></i>
-                    <i class="fa fa-spinner fa-spin" title="QUEUED" ng-show="job.phase == 'QUEUED'"></i>
-                    <i class="fa fa-play" title="EXECUTING" ng-show="job.phase == 'EXECUTING'"></i>
-                    <i class="fa fa-check" title="COMPLETED" ng-show="job.phase == 'COMPLETED'"></i>
-                    <i class="fa fa-warning" title="ERROR" ng-show="job.phase == 'ERROR'"></i>
-                    <i class="fa fa-remove" title="ABORTED" ng-show="job.phase == 'ABORTED'"></i>
-                    <i class="fa fa-question" title="UNKNOWN" ng-show="job.phase == 'UNKNOWN'"></i>
-                    <i class="fa fa-stop" title="HELD" ng-show="job.phase == 'HELD'"></i>
-                    <i class="fa fa-pause" title="SUSPENDED" ng-show="job.phase == 'SUSPENDED'"></i>
-                    <i class="fa fa-ban" title="ARCHIVED" ng-show="job.phase == 'ARCHIVED'"></i>
-                </div>
-                <div>{$ job.table_name $}</div>
-            </a>
-        </li>
-    </ul>
-</div>
