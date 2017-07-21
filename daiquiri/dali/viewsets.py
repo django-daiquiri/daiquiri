@@ -6,7 +6,7 @@ from django.http import HttpResponse
 
 from rest_framework import viewsets
 from rest_framework.parsers import FormParser
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError, NotFound
 
 from daiquiri.core.responses import HttpResponseSeeOther
 
@@ -40,11 +40,6 @@ class SyncJobViewSet(JobViewSet):
     serializer_class = SyncJobSerializer
 
     renderer_classes = (ErrorRenderer, )
-
-    def list_jobs(self, request, *args, **kwargs):
-        # redirect to the last job of this user
-        job = self.get_queryset().last()
-        return HttpResponseSeeOther(self.request.build_absolute_uri(job.result))
 
     def create_job(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
