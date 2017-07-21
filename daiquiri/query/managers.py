@@ -1,5 +1,7 @@
 from django.db import models
 
+from daiquiri.metadata.managers import MetadataManager
+
 
 class QueryJobManager(models.Manager):
 
@@ -8,3 +10,7 @@ class QueryJobManager(models.Manager):
             return self.get_queryset().filter(owner=None)
         else:
             return self.get_queryset().filter(owner=user)
+
+class ExampleManager(MetadataManager):
+
+    pass

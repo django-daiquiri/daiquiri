@@ -3,6 +3,9 @@ from django.contrib.auth.mixins import AccessMixin
 from django.views.generic import TemplateView
 
 from daiquiri.core.views import ModelPermissionMixin
+from daiquiri.core.utils import get_model_field_meta
+
+from .models import Example
 
 
 class QueryView(AccessMixin, TemplateView):
@@ -15,5 +18,13 @@ class QueryView(AccessMixin, TemplateView):
 
 
 class ExamplesView(ModelPermissionMixin, TemplateView):
+
     template_name = 'query/examples.html'
     permission_required = 'daiquiri_query.view_example'
+
+    def get_context_data(self, **kwargs):
+        context = super(ExamplesView, self).get_context_data(**kwargs)
+        context['meta'] = {
+            'Example': get_model_field_meta(Example)
+        }
+        return context

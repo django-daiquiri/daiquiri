@@ -115,7 +115,9 @@ class ExampleSerializer(serializers.ModelSerializer):
             'order',
             'name',
             'description',
+            'query_language',
             'query_string',
+            'access_level',
             'groups'
         )
 

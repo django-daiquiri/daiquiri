@@ -22,8 +22,9 @@ from queryparser.adql import ADQLQueryTranslator
 
 from daiquiri.core.adapter import get_adapter
 from daiquiri.jobs.models import Job
+from daiquiri.metadata.settings import ACCESS_LEVEL_CHOICES
 
-from .managers import QueryJobManager
+from .managers import QueryJobManager, ExampleManager
 from .utils import (
     get_default_table_name,
     get_default_queue,
@@ -301,14 +302,41 @@ class QueryJob(Job):
 @python_2_unicode_compatible
 class Example(models.Model):
 
-    order = models.IntegerField(null=True, blank=True)
+    objects = ExampleManager()
 
-    name = models.CharField(max_length=256)
-    description = models.TextField(null=True, blank=True)
-
-    query_string = models.TextField()
-
-    groups = models.ManyToManyField(Group, blank=True)
+    order = models.IntegerField(
+        null=True, blank=True,
+        verbose_name=_('Order'),
+        help_text=_('Position in lists.')
+    )
+    name = models.CharField(
+        max_length=256,
+        verbose_name=_('Name'),
+        help_text=_('Identifier of the example.')
+    )
+    description = models.TextField(
+        null=True, blank=True,
+        verbose_name=_('Description'),
+        help_text=_('A brief description of the example to be displayed in the user interface.')
+    )
+    query_language = models.CharField(
+        max_length=16,
+        verbose_name=_('Query language'),
+        help_text=_('The query language for this example.')
+    )
+    query_string = models.TextField(
+        verbose_name=_('Query string'),
+        help_text=_('The query string (SQL) for this example.')
+    )
+    access_level = models.CharField(
+        max_length=8, choices=ACCESS_LEVEL_CHOICES,
+        verbose_name=_('Access level')
+    )
+    groups = models.ManyToManyField(
+        Group, blank=True,
+        verbose_name=_('Groups'),
+        help_text=_('The groups which have access to the examples.')
+    )
 
     class Meta:
         ordering = ('order',)

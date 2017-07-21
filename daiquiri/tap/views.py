@@ -2,6 +2,7 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.urls import reverse
 
+from daiquiri.metadata.models import Database
 from daiquiri.query.models import Example
 
 from .models import Schema
@@ -15,7 +16,8 @@ from .renderers import (
 
 
 def examples(request):
-    serializer = ExampleSerializer(Example.objects.all(), many=True)
+    queryset = Example.objects.filter_by_access_level(request.user)
+    serializer = ExampleSerializer(queryset, many=True)
     return HttpResponse(ExampleRenderer().render(serializer.data), content_type="application/xml")
 
 
@@ -127,5 +129,6 @@ def capabilities(request):
     return HttpResponse(CapabilitiesRenderer().render(data), content_type="application/xml")
 
 def tables(request):
-    serializer = SchemaSerializer(Schema.objects.using('tap').all(), many=True)
+    queryset = Database.objects.filter_by_access_level(request.user)
+    serializer = SchemaSerializer(queryset, many=True)
     return HttpResponse(TablesetRenderer().render(serializer.data), content_type="application/xml")

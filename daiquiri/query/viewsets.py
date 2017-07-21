@@ -182,7 +182,7 @@ class ExampleViewSet(viewsets.ModelViewSet):
 
     @list_route(methods=['get'], permission_classes=(HasPermission, ))
     def user(self, request):
-        examples = Example.objects.filter(groups__in=self.request.user.groups.all())
+        examples = Example.objects.filter_by_access_level(self.request.user)
         serializer = UserExampleSerializer(examples, many=True)
         return Response(serializer.data)
 

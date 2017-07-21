@@ -260,11 +260,11 @@ class Column(models.Model):
         help_text=_('Designates whether the column is defined by some standard.')
     )
     access_level = models.CharField(
-        max_length=8, choices=ACCESS_LEVEL_CHOICES, null=True, blank=True,
+        max_length=8, choices=ACCESS_LEVEL_CHOICES,
         verbose_name=_('Access level')
     )
     metadata_access_level = models.CharField(
-        max_length=8, choices=ACCESS_LEVEL_CHOICES, null=True, blank=True,
+        max_length=8, choices=ACCESS_LEVEL_CHOICES,
         verbose_name=_('Metadata access level')
     )
     groups = models.ManyToManyField(
