@@ -38,25 +38,29 @@
 
     <h1>Metadata management</h1>
 
-    <p>
-        {% trans 'Please click on a database, a table, a column or a function to show or edit its metadata.' %}
-    </p>
+    <div ng-cloak>
+        <div ng-show="service.ready">
+            <p>
+                {% trans 'Please click on a database, a table, a column or a function to show or edit its metadata.' %}
+            </p>
 
-    <div class="row">
-        <div class="col-md-9">
-            <div daiquiri-browser data-browser-id="databases" class="daiquiri-metadata-browser"></div>
-        </div>
-        <div class="col-md-3">
-            <div daiquiri-browser data-browser-id="functions" class="daiquiri-metadata-browser"></div>
-        </div>
-    </div>
+            <div class="row">
+                <div class="col-md-9">
+                    <div daiquiri-browser data-browser-id="databases" class="daiquiri-metadata-browser"></div>
+                </div>
+                <div class="col-md-3">
+                    <div daiquiri-browser data-browser-id="functions" class="daiquiri-metadata-browser"></div>
+                </div>
+            </div>
 
-    <div class="row">
-        <div class="col-md-9">
-            {% include 'metadata/management_display.html' %}
-        </div>
-        <div class="col-md-3">
-            {% include 'metadata/management_options.html' %}
+            <div class="row">
+                <div class="col-md-9">
+                    {% include 'metadata/management_display.html' %}
+                </div>
+                <div class="col-md-3">
+                    {% include 'metadata/management_options.html' %}
+                </div>
+            </div>
         </div>
     </div>
 

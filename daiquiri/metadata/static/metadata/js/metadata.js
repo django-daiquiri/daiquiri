@@ -1,6 +1,6 @@
 angular.module('metadata', ['core'])
 
-.factory('MetadataService', ['$http', '$resource', '$filter', '$timeout', 'BrowserService', function($http, $resource, $filter, $timeout, BrowserService) {
+.factory('MetadataService', ['$resource', '$q', '$filter', '$timeout', 'BrowserService', function($resource, $q, $filter, $timeout, BrowserService) {
 
     /* get the base url */
 
@@ -9,6 +9,7 @@ angular.module('metadata', ['core'])
     /* create the metadata service */
 
     var service = {
+        ready: false,
         browser: BrowserService
     };
 
@@ -73,12 +74,16 @@ angular.module('metadata', ['core'])
         BrowserService.init('databases', ['databases','tables','columns']);
         BrowserService.init('functions', ['functions']);
 
-        service.initDatabasesBrowser();
-        service.initFunctionsBrowser();
+        databases_promise = service.initDatabasesBrowser();
+        functions_promise = service.initFunctionsBrowser();
+
+        $q.all([databases_promise, functions_promise]).then(function() {
+            service.ready = true;
+        })
     };
 
     service.initDatabasesBrowser = function() {
-        resources.databases.query({'list_route': 'management'}, function(response) {
+        return resources.databases.query({'list_route': 'management'}, function(response) {
             service.databases = response;
 
             service.tables = [];
@@ -91,15 +96,15 @@ angular.module('metadata', ['core'])
             });
 
             BrowserService.render('databases', service.databases, service.active);
-        });
+        }).$promise;
     };
 
     service.initFunctionsBrowser = function() {
-        resources.functions.query({'list_route': 'management'}, function(response) {
+        return resources.functions.query({'list_route': 'management'}, function(response) {
             service.functions = response;
 
             BrowserService.render('functions', service.functions, service.active);
-        });
+        }).$promise;
     };
 
     service.activateItem = function(resource, id) {
