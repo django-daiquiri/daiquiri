@@ -1,6 +1,8 @@
 import os
 import inspect
 
+from kombu import Exchange, Queue
+
 from django.utils.translation import ugettext_lazy as _
 
 # second entry in the call stach is the script that imported settings.py
@@ -160,3 +162,14 @@ EMAIL_FROM = 'info@example.com'
 TAP_ACCESS_LEVEL = 'PUBLIC'
 
 SENDFILE_BACKEND = 'sendfile.backends.simple'
+
+CELERY_BROKER_URL = 'amqp://'
+CELERY_RESULT_BACKEND = 'amqp://redis://localhost:6379/0'
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1
+CELERY_TASK_DEFAULT_QUEUE = 'daiquiri'
+CELERY_TASK_ACKS_LATE = True
+CELERY_TASK_QUEUES = (
+    Queue('daiquiri', Exchange('daiquiri'), routing_key='daiquiri'),
+    Queue('download', Exchange('download'), routing_key='download'),
+    Queue('query', Exchange('query'), routing_key='query', queue_arguments={'x-max-priority': 5}),
+)
