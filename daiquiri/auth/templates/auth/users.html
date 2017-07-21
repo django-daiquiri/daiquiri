@@ -29,71 +29,73 @@
 
 {% block wide %}
 
-    <h1>User management</h1>
+    <div ng-cloak ng-show="service.list.ready">
+        <h1>User management</h1>
 
-    <div class="daiquiri-list">
-        <div class="row daiquiri-list-header">
-            <form class="col-sm-6" ng-submit="service.list.search()">
-                <div class="input-group">
-                    <input class="form-control"
-                           id="table-pager-search-input"
-                           placeholder="{% trans 'Search entries' %}"
-                           type="text" ng-model="service.list.search_string">
-                    <a href="" class="input-group-addon" ng-click="service.list.search()">
-                        <span class="fa fa-search"></span>
-                    </a>
-                </div>
-            </form>
-
-            <div class="col-sm-3">
-                <ul class="pagination">
-                    <li>
-                        <a href="" ng-click="service.list.reset()">{% trans 'Reset' %}</a>
-                    </li>
-                </ul>
-            </div>
-            <div class="col-sm-3 count text-right">
-                {$ service.list.count $} {% trans 'users found' %}
-            </div>
-        </div>
-
-        <table class="table daiquiri-list-table" infinite-scroll="service.list.fetch()" infinite-scroll-distance="0.2">
-            <thead>
-                <th style="width: 30%;">Name (Username)</th>
-                <th style="width: 30%;">Email</th>
-                <th style="width: 20%;">Information</th>
-                <th style="width: 20%;"></th>
-            </thead>
-            <tbody>
-                <tr ng-repeat="row in service.list.rows">
-                    <td>
-                        <a href="" ng-click="service.modal('show-user-modal', $index)">
-                            {$ row.user.first_name $} {$ row.user.last_name $}
+        <div class="daiquiri-list">
+            <div class="row daiquiri-list-header">
+                <form class="col-sm-6" ng-submit="service.list.search()">
+                    <div class="input-group">
+                        <input class="form-control"
+                               id="table-pager-search-input"
+                               placeholder="{% trans 'Search entries' %}"
+                               type="text" ng-model="service.list.search_string">
+                        <a href="" class="input-group-addon" ng-click="service.list.search()">
+                            <span class="fa fa-search"></span>
                         </a>
-                        <em>{$ row.user.username $}</em>
-                    </td>
-                    <td>
-                        <div ng-repeat="email in row.emails">
-                            <a href="mailto:{$ row.user.first_name $} {$ row.user.last_name $} <{$ email.email $}>">
-                                {$ email.email $}
+                    </div>
+                </form>
+
+                <div class="col-sm-3">
+                    <ul class="pagination">
+                        <li>
+                            <a href="" ng-click="service.list.reset()">{% trans 'Reset' %}</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-sm-3 count text-right">
+                    {$ service.list.count $} {% trans 'users found' %}
+                </div>
+            </div>
+
+            <table class="table daiquiri-list-table" infinite-scroll="service.list.fetch()" infinite-scroll-distance="0.2">
+                <thead>
+                    <th style="width: 30%;">Name (Username)</th>
+                    <th style="width: 30%;">Email</th>
+                    <th style="width: 20%;">Information</th>
+                    <th style="width: 20%;"></th>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="row in service.list.rows">
+                        <td>
+                            <a href="" ng-click="service.modal('show-user-modal', $index)">
+                                {$ row.user.first_name $} {$ row.user.last_name $}
                             </a>
-                            <span ng-show="!email.verified">({% trans 'not verified' %})</span>
-                        </div>
-                    </td>
-                    <td>
-                        <span ng-show="row.user.is_superuser">{% trans 'Admin' %}</span>
-                        <span ng-hide="row.user.is_active">{% trans 'Disabled' %}</span>
-                        <span ng-show="row.is_pending">{% trans 'Pending' %}</span>
-                        <span ng-show="row.is_confirmed">{% trans 'Confirmed' %}</span>
-                    </td>
-                    <td class="text-right options">
+                            <em>{$ row.user.username $}</em>
+                        </td>
+                        <td>
+                            <div ng-repeat="email in row.emails">
+                                <a href="mailto:{$ row.user.first_name $} {$ row.user.last_name $} <{$ email.email $}>">
+                                    {$ email.email $}
+                                </a>
+                                <span ng-show="!email.verified">({% trans 'not verified' %})</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span ng-show="row.user.is_superuser">{% trans 'Admin' %}</span>
+                            <span ng-hide="row.user.is_active">{% trans 'Disabled' %}</span>
+                            <span ng-show="row.is_pending">{% trans 'Pending' %}</span>
+                            <span ng-show="row.is_confirmed">{% trans 'Confirmed' %}</span>
+                        </td>
+                        <td class="text-right options">
 
-                        {% include 'auth/users_options.html' %}
+                            {% include 'auth/users_options.html' %}
 
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     {% include 'auth/users_modal_show_user.html' %}

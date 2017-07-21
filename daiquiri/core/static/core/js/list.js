@@ -24,6 +24,7 @@ angular.module('list', ['core'])
 .factory('ListService', ['$window', function($window) {
 
     var service = {
+        ready: false,
         params: {
             page: 1,
             ordering: null,
@@ -57,6 +58,7 @@ angular.module('list', ['core'])
                     }
                 }
                 service.idle = true;
+                service.ready = true;
 
                 if (response.next) {
                     service.fetch();
