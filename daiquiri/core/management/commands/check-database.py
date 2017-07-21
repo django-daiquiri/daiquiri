@@ -10,11 +10,17 @@ class Command(BaseCommand):
     requires_system_checks = False
     can_import_settings = True
 
+    def get_config(self, key):
+        config = settings.DATABASES.get(key)
+        if 'HOST' not in config:
+            config['HOST'] = 'localhost'
+        return config
+
     def handle(self, *args, **options):
 
-        default = settings.DATABASES.get('default')
-        tap = settings.DATABASES.get('tap')
-        data = settings.DATABASES.get('data')
+        default = self.get_config('default')
+        tap = self.get_config('tap')
+        data = self.get_config('data')
 
         print('')
         print('CREATE DATABASE `%(NAME)s`;' % default)
@@ -32,5 +38,6 @@ class Command(BaseCommand):
             for database in Database.objects.all():
                 data.update({'NAME': database.name})
                 print('GRANT SELECT ON `%(NAME)s`.* to \'%(USER)s\'@\'%(HOST)s\' identified by \'%(PASSWORD)s\';' % data)
+            print('')
         except (OperationalError, ProgrammingError):
             pass
