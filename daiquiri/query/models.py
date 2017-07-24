@@ -26,6 +26,7 @@ from daiquiri.metadata.settings import ACCESS_LEVEL_CHOICES
 
 from .managers import QueryJobManager, ExampleManager
 from .utils import (
+    get_quota,
     get_default_table_name,
     get_default_queue,
     get_user_database_name,
@@ -94,6 +95,12 @@ class QueryJob(Job):
             raise ValidationError({
                  'query': [_('This field may not be blank.')]
             })
+
+        # check quota
+        if QueryJob.objects.get_size(self.owner) > get_quota(self.owner):
+            raise ValidationError({
+                    'query': [_('Quota is exceeded. Please remove some of your jobs.')]
+                })
 
         # remove trailing semicolon from the query
         self.query = self.query.strip(';')

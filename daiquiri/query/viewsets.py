@@ -1,7 +1,6 @@
 from sendfile import sendfile
 
 from django.conf import settings
-from django.db.models import Sum
 from django.http import Http404, StreamingHttpResponse
 
 from rest_framework import viewsets, mixins, filters
@@ -11,7 +10,6 @@ from rest_framework.decorators import list_route, detail_route
 
 from daiquiri.core.viewsets import ChoicesViewSet
 from daiquiri.core.permissions import HasModelPermission
-from daiquiri.core.utils import human2bytes
 from daiquiri.core.paginations import ListPagination
 
 from daiquiri.dali.viewsets import SyncJobViewSet, AsyncJobViewSet
@@ -32,7 +30,7 @@ from .serializers import (
 )
 
 from .permissions import HasPermission
-from .utils import fetch_user_database_metadata
+from .utils import get_quota, fetch_user_database_metadata
 
 
 class StatusViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -42,24 +40,11 @@ class StatusViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         return []
 
     def list(self, request):
-        # get quota from settings
-        quota = 0
-        for group in request.user.groups.all():
-            group_quota = settings.QUERY['quota'].get(group.name)
-            if group_quota:
-                group_quota = human2bytes(group_quota)
-                quota = group_quota if group_quota > quota else quota
-
-        # get the size of all the tables of this user
-        jobs = QueryJob.objects.filter_by_owner(self.request.user).exclude(phase=QueryJob.PHASE_ARCHIVED)
-
-        size = jobs.aggregate(Sum('size'))['size__sum'] or 0
-
         return Response([{
             'guest': not request.user.is_authenticated(),
             'queued_jobs': None,
-            'size': size,
-            'quota': quota
+            'size': QueryJob.objects.get_size(request.user),
+            'quota': get_quota(request.user)
         }])
 
 

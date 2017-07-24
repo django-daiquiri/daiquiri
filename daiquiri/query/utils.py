@@ -6,6 +6,7 @@ from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 
 from daiquiri.core.adapter import get_adapter
+from daiquiri.core.utils import human2bytes
 from daiquiri.metadata.models import Database, Table, Column, Function
 
 
@@ -32,6 +33,33 @@ def get_user_database_name(user):
         username = user.username
 
     return settings.QUERY['user_database_prefix'] + username
+
+
+def get_quota(user):
+    if not user or user.is_anonymous():
+        anonymous_quota = human2bytes(settings.QUERY['quota'].get('anonymous'))
+        return anonymous_quota if anonymous_quota else 0
+
+    else:
+        user_quota = human2bytes(settings.QUERY['quota'].get('user'))
+        quota = user_quota if user_quota else 0
+
+        # apply quota for user
+        user_quotas = settings.QUERY['quota'].get('users')
+        if user_quotas:
+            user_quota = human2bytes(user_quotas.get(user.username))
+            if user_quota:
+                quota = user_quota if user_quota > quota else quota
+
+        # apply quota for group
+        group_quotas = settings.QUERY['quota'].get('groups')
+        if group_quotas:
+            for group in user.groups.all():
+                group_quota = human2bytes(group_quotas.get(group.name))
+                if group_quota:
+                    quota = group_quota if group_quota > quota else quota
+
+    return quota
 
 
 def get_download_file_name(database_name, table_name, username, format):

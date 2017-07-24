@@ -22,16 +22,22 @@
                 You are using the guest user. For a personal account, please sign up <a href="{{ register_url }}">here</a>.
                 {% endblocktrans %}
             </p>
-            <p ng-show="service.status.guest">
-                {% blocktrans with size='{$ service.status.size | bytes $}' quota='{$ service.status.quota | bytes $}' %}
-                The guest user is using {{ size }} of its quota of {{ quota }}.
-                {% endblocktrans %}
-            </p>
-            <p ng-hide="service.status.guest">
-                {% blocktrans with size='{$ service.status.size | bytes $}' quota='{$ service.status.quota | bytes $}' %}
-                You are using {{ size }} of your quota of {{ quota }}.
-                {% endblocktrans %}
-            </p>
+
+            <div ng-class="{'text-danger': service.status.size > service.status.quota}">
+                <p ng-show="service.status.guest">
+                    {% blocktrans with size='{$ service.status.size | bytes $}' quota='{$ service.status.quota | bytes $}' %}
+                    The guest user is using {{ size }} of its quota of {{ quota }}.
+                    {% endblocktrans %}
+                </p>
+                <p ng-hide="service.status.guest">
+                    {% blocktrans with size='{$ service.status.size | bytes $}' quota='{$ service.status.quota | bytes $}' %}
+                    You are using {{ size }} of your quota of {{ quota }}.
+                    {% endblocktrans %}
+                </p>
+                <p ng-show="service.status.size > service.status.quota">
+                    {% trans 'The Quota is exceeded. Please remove some  jobs.' %}
+                </p>
+            </div>
         </div>
     </div>
 
