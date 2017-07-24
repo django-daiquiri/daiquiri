@@ -44,7 +44,7 @@ class MySQLAdapter(DatabaseAdapter):
             'max_records': max_records
         }
 
-        if max_records:
+        if max_records is not None:
             return 'CREATE TABLE %(database)s.%(table)s ENGINE=MyISAM ( %(query)s ) LIMIT %(max_records)s;' % params
         else:
             return 'CREATE TABLE %(database)s.%(table)s ENGINE=MyISAM ( %(query)s );' % params
