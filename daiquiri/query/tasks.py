@@ -30,7 +30,7 @@ def run_query(job_id):
     job.start_time = now()
 
     job.pid = adapter.database.fetch_pid()
-    job.actual_query = adapter.database.build_query(job.database_name, job.table_name, job.native_query, job.timeout)
+    job.actual_query = adapter.database.build_query(job.database_name, job.table_name, job.native_query, job.timeout, job.max_records)
     job.phase = job.PHASE_EXECUTING
     job.start_time = now()
     job.save()

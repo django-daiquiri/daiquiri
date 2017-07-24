@@ -6,7 +6,7 @@ from django.http import HttpResponse
 
 from rest_framework import viewsets
 from rest_framework.parsers import FormParser
-from rest_framework.exceptions import ValidationError, NotFound
+from rest_framework.exceptions import ValidationError
 
 from daiquiri.core.responses import HttpResponseSeeOther
 
@@ -27,6 +27,8 @@ class JobViewSet(viewsets.GenericViewSet):
 
     parameter_map = {}
 
+    default_responseformat = 'votable'
+
     def rewrite_exception(self, exception):
         detail = {}
         for field, field_errors in exception.detail.items():
@@ -46,11 +48,18 @@ class SyncJobViewSet(JobViewSet):
         serializer.is_valid(raise_exception=True)
 
         # create the job objects
-        job = self.get_queryset().model(owner=(None if self.request.user.is_anonymous() else self.request.user))
+        job = self.get_queryset().model(
+            owner=(None if self.request.user.is_anonymous() else self.request.user),
+            response_format=serializer.data.get('RESPONSEFORMAT', self.default_responseformat),
+            max_records=serializer.data.get('MAXREC'),
+            run_id=serializer.data.get('RUNID')
+        )
 
         # add parameters to the job object
         for parameter, model_field in self.parameter_map.items():
-            setattr(job, model_field, serializer.data.get(parameter))
+            value = serializer.data.get(parameter)
+            if value is not None:
+                setattr(job, model_field, value)
 
         try:
             job.clean()
@@ -102,11 +111,18 @@ class AsyncJobViewSet(JobViewSet):
         serializer.is_valid(raise_exception=True)
 
         # create the job objects
-        job = self.get_queryset().model(owner=(None if self.request.user.is_anonymous() else self.request.user))
+        job = self.get_queryset().model(
+            owner=(None if self.request.user.is_anonymous() else self.request.user),
+            response_format=serializer.data.get('RESPONSEFORMAT', self.default_responseformat),
+            max_records=serializer.data.get('MAXREC'),
+            run_id=serializer.data.get('RUNID')
+        )
 
         # add parameters to the job object
         for parameter, model_field in self.parameter_map.items():
-            setattr(job, model_field, serializer.data.get(parameter))
+            value = serializer.data.get(parameter)
+            if value is not None:
+                setattr(job, model_field, value)
 
         try:
             job.clean()

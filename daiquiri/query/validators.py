@@ -23,3 +23,9 @@ def validate_query_language(query_language):
 def validate_queue(queue):
     if queue.lower() not in [item['key'] for item in settings.QUERY['queues']]:
         raise ValidationError([_('This queue is not supported.')])
+
+
+def validate_response_format(response_format):
+
+    if response_format.lower() not in [item['key'] for item in settings.QUERY['download_formats']]:
+        raise ValidationError([_('This response format is not supported.')])

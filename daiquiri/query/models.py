@@ -183,7 +183,7 @@ class QueryJob(Job):
         if self.phase == self.PHASE_COMPLETED:
             return reverse('query:job-stream', kwargs={
                 'pk': str(self.id),
-                'format_key': 'votable'
+                'format_key': self.response_format
             })
 
         else:

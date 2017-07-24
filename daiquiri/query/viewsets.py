@@ -187,6 +187,7 @@ class SyncQueryJobViewSet(SyncJobViewSet):
     serializer_class = SyncQueryJobSerializer
 
     parameter_map = {
+        'FORMAT': 'response_format',
         'TABLE_NAME': 'table_name',
         'LANG': 'query_language',
         'QUERY': 'query'
@@ -201,6 +202,7 @@ class AsyncQueryJobViewSet(AsyncJobViewSet):
     serializer_class = AsyncQueryJobSerializer
 
     parameter_map = {
+        'FORMAT': 'response_format',
         'TABLE_NAME': 'table_name',
         'LANG': 'query_language',
         'QUEUE': 'queue',

@@ -34,13 +34,20 @@ class MySQLAdapter(DatabaseAdapter):
     def escape_string(self, string):
         return "'%s'" % string
 
-    def build_query(self, database_name, table_name, query, timeout):
+    def build_query(self, database_name, table_name, query, timeout, max_records):
         # construct the actual query
-        return 'CREATE TABLE %(database)s.%(table)s ENGINE=MyISAM ( %(query)s );' % {
+        params = {
             'database': self.escape_identifier(database_name),
             'table': self.escape_identifier(table_name),
-            'query': query
+            'query': query,
+            'timeout': timeout,
+            'max_records': max_records
         }
+
+        if max_records:
+            return 'CREATE TABLE %(database)s.%(table)s ENGINE=MyISAM ( %(query)s ) LIMIT %(max_records)s;' % params
+        else:
+            return 'CREATE TABLE %(database)s.%(table)s ENGINE=MyISAM ( %(query)s );' % params
 
     def abort_query(self, pid):
         sql = 'KILL %(pid)i' % {'pid': pid}

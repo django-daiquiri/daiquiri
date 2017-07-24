@@ -52,7 +52,9 @@ class Job(models.Model):
 
     owner = models.ForeignKey(User, blank=True, null=True)
 
-    run_id = models.CharField(max_length=256, blank=True)
+    response_format = models.CharField(max_length=64, blank=True, null=True)
+    max_records = models.IntegerField(blank=True, null=True)
+    run_id = models.CharField(max_length=64, blank=True, null=True)
 
     phase = models.CharField(max_length=10, choices=PHASE_CHOICES)
 
@@ -93,6 +95,10 @@ class Job(models.Model):
         raise NotImplementedError
 
     @property
+    def result(self):
+        raise NotImplementedError
+
+    @property
     def error(self):
         raise NotImplementedError
 
@@ -108,27 +114,3 @@ class Job(models.Model):
 
     def archive(self):
         raise NotImplementedError
-
-    # def run(self):
-    #     if self.phase == PHASE_PENDING:
-    #         self.phase = PHASE_QUEUED
-    #         self.save()
-    #     else:
-    #         raise UWSException('Job is not in PENDING phase')
-
-    # def abort(self):
-    #     if self.phase in PHASE_ACTIVE:
-    #         self.phase = PHASE_ABORTED
-    #         self.save()
-    #     else:
-    #         raise UWSException('Job is not in PENDING, QUEUED or EXECUTING phase')
-
-    # def archive(self):
-    #     if hasattr(self, 'queryjob'):
-    #         self.queryjob.drop_table()
-
-    #     if self.phase != PHASE_ARCHIVED:
-    #         self.phase = PHASE_ARCHIVED
-    #         self.save()
-    #     else:
-    #         raise UWSException('Job is already in ARCHIVED phase')

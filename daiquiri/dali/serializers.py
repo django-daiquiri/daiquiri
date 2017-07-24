@@ -37,9 +37,13 @@ class JobUpdateSerializer(serializers.Serializer):
 
 class SyncJobSerializer(serializers.Serializer):
 
-    pass
+    RESPONSEFORMAT = serializers.CharField(required=False)
+    MAXREC = serializers.IntegerField(required=False)
+    RUNID = serializers.CharField(required=False)
 
+class AsyncJobSerializer(serializers.Serializer):
 
-class AsyncJobSerializer(JobUpdateSerializer):
-
-    pass
+    PHASE = serializers.CharField(required=False)
+    RESPONSEFORMAT = serializers.CharField(required=False)
+    MAXREC = serializers.IntegerField(required=False)
+    RUNID = serializers.CharField(required=False)
