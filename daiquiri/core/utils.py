@@ -1,3 +1,4 @@
+import importlib
 import re
 
 from django.conf import settings
@@ -6,6 +7,11 @@ from django.core.mail import EmailMultiAlternatives, EmailMessage
 from django.template.loader import render_to_string
 from django.template import TemplateDoesNotExist
 from django.utils.six.moves.urllib.parse import urlparse
+
+
+def import_class(string):
+    module_name, class_name = string.rsplit('.', 1)
+    return getattr(importlib.import_module(module_name), class_name)
 
 
 def get_script_alias(request):

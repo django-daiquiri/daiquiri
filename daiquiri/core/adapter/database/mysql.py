@@ -24,8 +24,6 @@ class MySQLAdapter(DatabaseAdapter):
         'WEEKDAY', 'WEEKOFYEAR', 'YEAR', 'YEARWEEK',
     )
 
-    ENGINE = 'MyISAM'
-
     def fetch_pid(self):
         return self.connection().connection.thread_id()
 
@@ -38,12 +36,10 @@ class MySQLAdapter(DatabaseAdapter):
 
     def build_query(self, database_name, table_name, query, timeout):
         # construct the actual query
-        return 'SET STATEMENT max_statement_time=%(timeout)s FOR CREATE TABLE %(database)s.%(table)s ENGINE=%(engine)s ( %(query)s );' % {
-            'timeout': timeout,
+        return 'CREATE TABLE %(database)s.%(table)s ENGINE=MyISAM ( %(query)s );' % {
             'database': self.escape_identifier(database_name),
             'table': self.escape_identifier(table_name),
-            'engine': self.ENGINE,
-            'query': query,
+            'query': query
         }
 
     def abort_query(self, pid):
