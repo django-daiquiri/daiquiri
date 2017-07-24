@@ -137,6 +137,10 @@ class QueryJob(Job):
                 'query': permission_messages
             })
 
+        # set clean flag
+        self.is_clean = True
+
+
     @property
     def parameters(self):
         return {
@@ -194,6 +198,9 @@ class QueryJob(Job):
         return None
 
     def run(self, sync=False):
+        if not self.is_clean:
+            raise Exception('job.clean() was not called.')
+
         if self.phase == self.PHASE_PENDING:
             self.phase = self.PHASE_QUEUED
             self.save()

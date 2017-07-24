@@ -202,6 +202,7 @@ class AsyncJobViewSet(JobViewSet):
 
         phase = request.POST.get('PHASE')
         if phase == job.PHASE_RUN:
+            job.clean()
             job.run()
             return HttpResponseSeeOther(self.get_success_url())
 
