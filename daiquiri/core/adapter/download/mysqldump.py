@@ -1,8 +1,5 @@
 import csv
 import io
-import json
-import os
-import pipes
 import re
 import subprocess
 
@@ -37,18 +34,18 @@ class MysqldumpAdapter(DownloadAdapter):
         else:
             return None
 
-    def generate(self, format_key, database_name, table_name, metadata):
+    def generate(self, format_key, database_name, table_name, metadata, status=None):
 
         if format_key == 'csv':
-            return self.generate_csv(database_name, table_name, metadata)
+            return self.generate_csv(database_name, table_name, metadata, status)
 
         elif format_key == 'votable':
-            return self.generate_votable(database_name, table_name, metadata)
+            return self.generate_votable(database_name, table_name, metadata, status)
 
         else:
             raise Exception('Not supported.')
 
-    def generate_csv(self, database_name, table_name, metadata):
+    def generate_csv(self, database_name, table_name, metadata, status):
         args = self.args + [database_name, table_name]
         process = subprocess.Popen(args, stdout=subprocess.PIPE)
 
@@ -59,7 +56,7 @@ class MysqldumpAdapter(DownloadAdapter):
                 csv.writer(f, quotechar='"', quoting=csv.QUOTE_ALL).writerow(row)
                 yield f.getvalue()
 
-    def generate_votable(self, database_name, table_name, metadata):
+    def generate_votable(self, database_name, table_name, metadata, status):
         args = self.args + [database_name, table_name]
         process = subprocess.Popen(args, stdout=subprocess.PIPE)
 
@@ -68,8 +65,15 @@ class MysqldumpAdapter(DownloadAdapter):
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="http://www.ivoa.net/xml/VOTable/v1.3"
     xmlns:stc="http://www.ivoa.net/xml/STC/v1.30">
-    <RESOURCE name="%(database)s" type="results">
-        <INFO name="QUERY_STATUS" value="OK" />
+    <RESOURCE name="%(database)s" type="results">'''
+        if status == 'OK':
+            yield '''
+        <INFO name="QUERY_STATUS" value="OK" />'''
+        elif status == 'OVERFLOW':
+            yield '''
+        <INFO name="QUERY_STATUS" value="OVERFLOW" />'''
+
+        yield '''
         <TABLE name="%(table)s">''' % {
             'database': database_name,
             'table': table_name
@@ -80,27 +84,31 @@ class MysqldumpAdapter(DownloadAdapter):
                 yield '''
             <FIELD name="%(name)s" datatype="%(datatype)s"/>''' % column
 
-        yield '''
-            <DATA>'''
-
-        yield '''
-                <TABLEDATA>'''
-
-
+        first = True
         for line in process.stdout:
             parsed_line = self.parse_line(line)
             if parsed_line:
+                if first:
+                    first = False
+                    yield '''
+            <DATA>'''
+
+                    yield '''
+                <TABLEDATA>'''
+
                 yield '''
                 <TR>
                     <TD>%s</TD>
                 </TR>''' % '''</TD>
                     <TD>'''.join(parsed_line)
 
-        yield '''
+        if first is False:
+            yield '''
                 </TABLEDATA>'''
 
+            yield '''
+            </DATA>'''
         yield '''
-            </DATA>
         </TABLE>
     </RESOURCE>
 </VOTABLE>

@@ -167,6 +167,10 @@ class QueryJob(Job):
         return (queue['priority'] for queue in settings.QUERY['queues'] if queue['key'] == self.queue).next()
 
     @property
+    def result_status(self):
+        return 'OK' if self.max_records is None else 'OVERFLOW'
+
+    @property
     def results(self):
         if self.phase == self.PHASE_COMPLETED:
             # create dictionary of the form
@@ -273,7 +277,7 @@ class QueryJob(Job):
         if self.phase == self.PHASE_COMPLETED:
             task_id = '%s-%s' % (self.id, format['key'])
             file_name = get_download_file_name(self.database_name, self.table_name, self.owner_username, format)
-            task_args = (file_name, format['key'], self.database_name, self.table_name, self.metadata)
+            task_args = (file_name, format['key'], self.database_name, self.table_name, self.metadata, self.result_status)
 
             try:
                 os.mkdir(os.path.dirname(file_name))
@@ -306,7 +310,7 @@ class QueryJob(Job):
 
     def stream(self, format):
         if self.phase == self.PHASE_COMPLETED:
-            return get_adapter().download.generate(format['key'], self.database_name, self.table_name, self.metadata)
+            return get_adapter().download.generate(format['key'], self.database_name, self.table_name, self.metadata, self.result_status)
 
         else:
             raise ValidationError({
