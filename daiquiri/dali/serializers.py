@@ -31,17 +31,29 @@ class JobRetrieveSerializer(serializers.ModelSerializer):
             'parameters'
         )
 
-class JobUpdateSerializer(serializers.Serializer):
+
+class CaseInsensitiveSerializer(serializers.Serializer):
+
+    def __init__(self, **kwargs):
+        # make all the keys in kwargs['data'] upper case
+        kwargs['data'] = {key.upper(): value for (key, value) in kwargs.get('data', {}).items()}
+
+        super(CaseInsensitiveSerializer, self).__init__(**kwargs)
+
+
+class JobUpdateSerializer(CaseInsensitiveSerializer):
 
     PHASE = serializers.CharField(required=False)
 
-class SyncJobSerializer(serializers.Serializer):
+
+class SyncJobSerializer(CaseInsensitiveSerializer):
 
     RESPONSEFORMAT = serializers.CharField(required=False)
     MAXREC = serializers.IntegerField(required=False)
     RUNID = serializers.CharField(required=False)
 
-class AsyncJobSerializer(serializers.Serializer):
+
+class AsyncJobSerializer(CaseInsensitiveSerializer):
 
     PHASE = serializers.CharField(required=False)
     RESPONSEFORMAT = serializers.CharField(required=False)
