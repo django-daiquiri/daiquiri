@@ -146,14 +146,19 @@ class VOTableRenderer(XMLRenderer):
 class ErrorRenderer(VOTableRenderer):
 
     def get_error_string(self, data):
-        errors = []
-        for parameter, parameter_errors in data.items():
-            if isinstance(parameter_errors, (list, tuple)):
-                errors.append('%s: %s' % (parameter, ', '.join(parameter_errors)))
-            else:
-                errors.append('%s: %s' % (parameter, parameter_errors))
+        if isinstance(data, dict):
+            errors = []
+            for parameter, parameter_errors in data.items():
+                if isinstance(parameter_errors, (list, tuple)):
+                    errors.append('%s: %s' % (parameter, ', '.join(parameter_errors)))
+                else:
+                    errors.append('%s: %s' % (parameter, parameter_errors))
+            return '\n'.join(errors)
+        elif isinstance(data, (list, tuple)):
+            return '\n'.join(data)
+        else:
+            return data
 
-        return '\n'.join(errors)
 
     def render_votable(self, data, accepted_media_type=None, renderer_context=None):
         self.start('RESOURCE', {

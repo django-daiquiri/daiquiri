@@ -99,10 +99,6 @@ class Job(models.Model):
         raise NotImplementedError
 
     @property
-    def error(self):
-        raise NotImplementedError
-
-    @property
     def quote(self):
         raise NotImplementedError
 

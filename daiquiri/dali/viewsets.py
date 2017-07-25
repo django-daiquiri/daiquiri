@@ -5,6 +5,7 @@ from django.db import IntegrityError
 from django.http import HttpResponse
 
 from rest_framework import viewsets
+from rest_framework.response import Response
 from rest_framework.parsers import FormParser
 from rest_framework.exceptions import ValidationError
 
@@ -233,7 +234,7 @@ class AsyncJobViewSet(JobViewSet):
 
     def get_error(self, request, pk):
         job = self.get_object()
-        return HttpResponse(job.error) if job.error else HttpResponse()
+        return Response(job.error_summary, content_type='application/xml') if job.error_summary else HttpResponse()
 
     def get_quote(self, request, pk):
         job = self.get_object()

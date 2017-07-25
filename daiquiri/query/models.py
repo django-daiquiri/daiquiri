@@ -197,10 +197,6 @@ class QueryJob(Job):
     def quote(self):
         return None
 
-    @property
-    def error(self):
-        return None
-
     def run(self, sync=False):
         if not self.is_clean:
             raise Exception('job.clean() was not called.')
