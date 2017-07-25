@@ -239,9 +239,9 @@ class Column(models.Model):
         verbose_name=_('Datatype'),
         help_text=_('The datatype of the column on the database server.')
     )
-    size = models.IntegerField(
+    arraysize = models.IntegerField(
         null=True, blank=True,
-        verbose_name=_('Size'),
+        verbose_name=_('Arraysize'),
         help_text=_('The length of variable length datatypes, e.g. varchar(256).')
     )
     principal = models.BooleanField(

@@ -82,8 +82,13 @@ class MysqldumpAdapter(DownloadAdapter):
 
         if 'columns' in metadata:
             for column in metadata['columns']:
+                attrs = []
+                for key in ['name', 'datatype', 'arraysize', 'unit', 'ucd', 'utype']:
+                    if key in column and column[key]:
+                        attrs.append('%s="%s"' % (key, column[key]))
+
                 yield '''
-            <FIELD name="%(name)s" datatype="%(datatype)s" ucd="%(ucd)s"/>''' % column
+            <FIELD %s />''' % ' '.join(attrs)
 
         first = True
         for line in process.stdout:

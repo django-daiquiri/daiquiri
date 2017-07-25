@@ -15,7 +15,7 @@ class ColumnSerializer(serializers.ModelSerializer):
             'unit',
             'ucd',
             'datatype',
-            'size',
+            'arraysize',
             'principal',
             'indexed',
             'std'

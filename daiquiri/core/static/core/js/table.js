@@ -90,7 +90,7 @@ angular.module('core')
             'unit': gettext('Unit'),
             'ucd': gettext('UCD'),
             'datatype': gettext('Data type'),
-            'size': gettext('Size'),
+            'arraysize': gettext('Size'),
             'principal': gettext('Principal'),
             'indexed': gettext('Indexed'),
             'std': gettext('STD'),

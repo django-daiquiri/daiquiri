@@ -138,8 +138,8 @@ def column_updated_handler(sender, **kwargs):
         column.table_name = str(instance.table)
         column.column_name = instance.name
         column.datatype = instance.datatype
-        column.arraysize = instance.size
-        column.size = instance.size
+        column.arraysize = instance.arraysize
+        column.size = instance.arraysize
         if instance.description:
             column.description = instance.description[:255]
         column.utype = instance.utype
