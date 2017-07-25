@@ -1,3 +1,5 @@
+import re
+
 from .base import DatabaseAdapter
 
 
@@ -23,6 +25,41 @@ class MySQLAdapter(DatabaseAdapter):
         'TO_SECONDS', 'UNIX_TIMESTAMP', 'UTC_DATE', 'UTC_TIME', 'UTC_TIMESTAMP', 'WEEK',
         'WEEKDAY', 'WEEKOFYEAR', 'YEAR', 'YEARWEEK',
     )
+
+    DATATYPES = {
+        'char': {
+            'datatype': 'char',
+            'arraysize': True
+        },
+        'varchar': {
+            'datatype': 'char',
+            'arraysize': True
+        },
+        'tinyint': {
+            'datatype': 'unsignedByte',
+            'arraysize': False
+        },
+        'smallint': {
+            'datatype': 'short',
+            'arraysize': False
+        },
+        'int': {
+            'datatype': 'int',
+            'arraysize': False
+        },
+        'bigint': {
+            'datatype': 'long',
+            'arraysize': False
+        },
+        'float': {
+            'datatype': 'float',
+            'arraysize': False
+        },
+        'double': {
+            'datatype': 'double',
+            'arraysize': False
+        }
+    }
 
     def fetch_pid(self):
         return self.connection().connection.thread_id()
@@ -195,11 +232,18 @@ class MySQLAdapter(DatabaseAdapter):
         # execute query
         rows = self.fetchall(sql)
 
-        return [{
-            'name': row[0],
-            'datatype': row[1],
-            'indexed': bool(row[4])
-        } for row in rows]
+        column_metadata = []
+        for row in rows:
+            datatype, arraysize = self.convert_datatype(row[1])
+
+            column_metadata.append({
+                'name': row[0],
+                'datatype': datatype,
+                'arraysize': arraysize,
+                'indexed': bool(row[4])
+            })
+
+        return column_metadata
 
     def fetch_column(self, database_name, table_name, column_name):
         # prepare sql string
@@ -225,3 +269,23 @@ class MySQLAdapter(DatabaseAdapter):
             'table': self.escape_identifier(table_name),
         }
         return [column[0] for column in self.fetchall(sql)]
+
+    def convert_datatype(self, datatype_string):
+        result = re.match('([a-z]+)\(*(\d*)\)*', datatype_string)
+
+        if result:
+            native_datatype, native_arraysize = result.group(1), result.group(2)
+
+            if native_datatype in self.DATATYPES:
+                datatype = self.DATATYPES[native_datatype]['datatype']
+
+                if self.DATATYPES[native_datatype]['arraysize']:
+                    arraysize = int(native_arraysize)
+                else:
+                    arraysize = None
+
+                return datatype, arraysize
+            else:
+                return native_datatype, int(native_arraysize)
+        else:
+            return datatype_string, None

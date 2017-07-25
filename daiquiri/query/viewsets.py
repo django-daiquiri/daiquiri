@@ -120,7 +120,7 @@ class QueryJobViewSet(viewsets.ModelViewSet):
         except QueryJob.DoesNotExist:
             raise Http404
 
-    @detail_route(methods=['put'], url_path='download/(?P<format_key>\w+)', url_name='download')
+    @detail_route(methods=['get', 'put'], url_path='download/(?P<format_key>\w+)', url_name='download')
     def download(self, request, pk=None, format_key=None):
         try:
             job = self.get_queryset().get(pk=pk)
