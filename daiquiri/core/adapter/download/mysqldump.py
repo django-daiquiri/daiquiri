@@ -11,7 +11,7 @@ class MysqldumpAdapter(DownloadAdapter):
     insert_pattern = re.compile('^INSERT INTO .*? VALUES \((.*?)\);')
 
     def __init__(self, database_key, database_config):
-        self.args = ['mysqldump','--compact','--skip-extended-insert']
+        self.args = ['mysqldump', '--compact', '--skip-extended-insert']
 
         if 'USER' in database_config and database_config['USER']:
             self.args.append('--user=%(USER)s' % database_config)
@@ -65,7 +65,9 @@ class MysqldumpAdapter(DownloadAdapter):
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="http://www.ivoa.net/xml/VOTable/v1.3"
     xmlns:stc="http://www.ivoa.net/xml/STC/v1.30">
-    <RESOURCE name="%(database)s" type="results">'''
+    <RESOURCE name="%(database)s" type="results">''' % {
+            'database': database_name
+        }
         if status == 'OK':
             yield '''
         <INFO name="QUERY_STATUS" value="OK" />'''
@@ -75,14 +77,13 @@ class MysqldumpAdapter(DownloadAdapter):
 
         yield '''
         <TABLE name="%(table)s">''' % {
-            'database': database_name,
             'table': table_name
         }
 
         if 'columns' in metadata:
             for column in metadata['columns']:
                 yield '''
-            <FIELD name="%(name)s" datatype="%(datatype)s"/>''' % column
+            <FIELD name="%(name)s" datatype="%(datatype)s" ucd="%(ucd)s"/>''' % column
 
         first = True
         for line in process.stdout:
