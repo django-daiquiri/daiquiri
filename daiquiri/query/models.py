@@ -289,13 +289,14 @@ class QueryJob(Job):
                 task_result = AsyncResult(task_id)
 
                 if not os.path.isfile(file_name):
+                    # create an empty file to prevent multiple pending tasks
+                    open(file_name, 'a').close()
+
                     if task_result.successful():
                         # somebody or something removed the file. start all over again
                         task_result.forget()
-                        task_result = create_download_file.apply_async(task_args, task_id=task_id)
 
-                    else:
-                        task_result = create_download_file.apply_async(task_args, task_id=task_id, queue='download')
+                    task_result = create_download_file.apply_async(task_args, task_id=task_id, queue='download')
 
             return task_result, file_name
 

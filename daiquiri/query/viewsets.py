@@ -1,6 +1,7 @@
 from sendfile import sendfile
 
 from django.conf import settings
+from django.urls import reverse
 from django.http import Http404, StreamingHttpResponse
 
 from rest_framework import viewsets, mixins, filters
@@ -130,7 +131,11 @@ class QueryJobViewSet(viewsets.ModelViewSet):
         result, file_name = job.download(self._get_format(format_key))
 
         if result.successful():
-            return sendfile(request, file_name, attachment=True)
+            if self.request.method == 'GET':
+                return sendfile(request, file_name, attachment=True)
+            else:
+                return Response(result.status)
+
         else:
             if result.status == 'FAILURE':
                 return Response(result.status, status=500)

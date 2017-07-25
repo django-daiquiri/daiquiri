@@ -15,23 +15,15 @@ app.factory('DownloadService', ['$http', 'FileSaver', 'Blob', 'PollingService', 
     service.download = function(job, format) {
         job.download_failed = false;
 
-        $http.put(baseurl + 'query/api/jobs/' + job.id + '/download/' + format + '/')
+        var url = baseurl + 'query/api/jobs/' + job.id + '/download/' + format + '/';
+        $http.put(url)
             .then(function(result) {
-                var content_type = result.headers()['content-type'];
-
-                if (content_type != 'application/json') {
+                if (result.data == 'SUCCESS') {
                     service.unregister(job, format);
 
-                    // get the filename from the Content-Disposition header
-                    var content_disposition = result.headers()['content-disposition'];
-                    var m = content_disposition.match(/filename[^;=\n]*=['"'](.*?[^'";\n]*)['"']/);
-                    var filename = (m === null) ? 'download.dat' : m[1];
+                    // append iframe
+                    angular.element('body').append('<iframe style="display: none;" src="' + url + '"></iframe>');
 
-                    // store payload using angular-file-saver
-                    var blob = new Blob([result.data], { type: content_type });
-                    FileSaver.saveAs(blob, filename);
-
-                    service.unregister(job, format);
                 } else {
                     service.register(job, format);
                 }
