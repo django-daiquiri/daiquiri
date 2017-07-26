@@ -148,7 +148,7 @@ class MysqldumpAdapter(DownloadAdapter):
                     <TR>
                         <TD>%s</TD>
                     </TR>''' % '''</TD>
-                    <TD>'''.join([('' if cell == 'NULL' else cell) for cell in parsed_line])
+                        <TD>'''.join([('' if cell == 'NULL' else cell) for cell in parsed_line])
 
                     elif serialization == 'BINARY':
                         values, null_mask = self._get_binary_values(parsed_line, fmt_list, null_value_list)
