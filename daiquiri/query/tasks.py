@@ -73,9 +73,9 @@ def run_query(job_id):
 
 
 @shared_task(track_started=True)
-def create_download_file(file_name, format_key, database_name, table_name, metadata, status):
+def create_download_file(file_name, format_key, database_name, table_name, metadata, status, empty):
     from daiquiri.core.adapter import get_adapter
 
     with open(file_name, 'w') as f:
-        for line in get_adapter().download.generate(format_key, database_name, table_name, metadata, status):
+        for line in get_adapter().download.generate(format_key, database_name, table_name, metadata, status, empty):
             f.write(line)

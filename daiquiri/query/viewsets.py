@@ -121,7 +121,7 @@ class QueryJobViewSet(viewsets.ModelViewSet):
         except QueryJob.DoesNotExist:
             raise Http404
 
-    @detail_route(methods=['get', 'put'], url_path='download/(?P<format_key>\w+)', url_name='download')
+    @detail_route(methods=['get', 'put'], url_path='download/(?P<format_key>[A-Za-z0-9\-]+)', url_name='download')
     def download(self, request, pk=None, format_key=None):
         try:
             job = self.get_queryset().get(pk=pk)
@@ -142,14 +142,15 @@ class QueryJobViewSet(viewsets.ModelViewSet):
             else:
                 return Response(result.status)
 
-    @detail_route(methods=['get'], url_path='stream/(?P<format_key>\w+)', url_name='stream')
+    @detail_route(methods=['get'], url_path='stream/(?P<format_key>[A-Za-z0-9\-]+)', url_name='stream')
     def stream(self, request, pk=None, format_key=None):
         try:
             job = self.get_queryset().get(pk=pk)
         except QueryJob.DoesNotExist:
             raise NotFound
 
-        return StreamingHttpResponse(job.stream(self._get_format(format_key)))
+        format_config = self._get_format(format_key)
+        return StreamingHttpResponse(job.stream(format_config), content_type=format_config['content_type'])
 
     def _get_format(self, format_key):
         try:
