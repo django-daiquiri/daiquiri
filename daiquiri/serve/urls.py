@@ -2,7 +2,8 @@ from django.conf.urls import url, include
 
 from rest_framework import routers
 
-from .views import *
+from .views import serve_table
+from .viewsets import RowViewSet, ColumnViewSet
 
 router = routers.DefaultRouter()
 router.register(r'rows', RowViewSet, base_name='row')
