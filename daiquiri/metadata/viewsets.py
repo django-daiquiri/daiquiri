@@ -1,11 +1,12 @@
-from django.contrib.auth.models import Group
-
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import list_route
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 
 from daiquiri.core.adapter import get_adapter
 from daiquiri.core.viewsets import ChoicesViewSet
+from daiquiri.core.permissions import HasModelPermission
 
 from .models import Database, Table, Column, Function, LICENSE_CHOICES, ACCESS_LEVEL_CHOICES
 from .serializers import (
@@ -25,6 +26,9 @@ from .serializers.user import (
 
 
 class DatabaseViewSet(viewsets.ModelViewSet):
+    permission_classes = (HasModelPermission, )
+    authentication_classes = (SessionAuthentication, TokenAuthentication)
+
     queryset = Database.objects.all()
     serializer_class = DatabaseSerializer
 
@@ -76,6 +80,9 @@ class DatabaseViewSet(viewsets.ModelViewSet):
 
 
 class TableViewSet(viewsets.ModelViewSet):
+    permission_classes = (HasModelPermission, )
+    authentication_classes = (SessionAuthentication, TokenAuthentication)
+
     queryset = Table.objects.all()
     serializer_class = TableSerializer
 
@@ -114,6 +121,9 @@ class TableViewSet(viewsets.ModelViewSet):
 
 
 class ColumnViewSet(viewsets.ModelViewSet):
+    permission_classes = (HasModelPermission, )
+    authentication_classes = (SessionAuthentication, TokenAuthentication)
+
     queryset = Column.objects.all()
     serializer_class = ColumnSerializer
 
@@ -130,6 +140,9 @@ class ColumnViewSet(viewsets.ModelViewSet):
 
 
 class FunctionViewSet(viewsets.ModelViewSet):
+    permission_classes = (HasModelPermission, )
+    authentication_classes = (SessionAuthentication, TokenAuthentication)
+
     queryset = Function.objects.all()
     serializer_class = FunctionSerializer
 
@@ -147,12 +160,21 @@ class FunctionViewSet(viewsets.ModelViewSet):
 
 
 class TableTypeViewSet(ChoicesViewSet):
+    permission_classes = (IsAuthenticated, )
+    authentication_classes = (SessionAuthentication, TokenAuthentication)
+
     queryset = Table.TYPE_CHOICES
 
 
 class LicenseViewSet(ChoicesViewSet):
+    permission_classes = (IsAuthenticated, )
+    authentication_classes = (SessionAuthentication, TokenAuthentication)
+
     queryset = LICENSE_CHOICES
 
 
 class AccessLevelViewSet(ChoicesViewSet):
+    permission_classes = (IsAuthenticated, )
+    authentication_classes = (SessionAuthentication, TokenAuthentication)
+
     queryset = ACCESS_LEVEL_CHOICES

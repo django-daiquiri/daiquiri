@@ -1,5 +1,6 @@
 from rest_framework import viewsets, filters
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 
 from daiquiri.core.viewsets import ChoicesViewSet
 from daiquiri.core.permissions import HasModelPermission
@@ -12,6 +13,7 @@ from .filters import SpamBackend
 
 class ContactMessageViewSet(viewsets.ModelViewSet):
     permission_classes = (HasModelPermission, )
+    authentication_classes = (SessionAuthentication, TokenAuthentication)
 
     queryset = ContactMessage.objects.all()
 
