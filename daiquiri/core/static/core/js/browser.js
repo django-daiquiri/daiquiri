@@ -47,12 +47,8 @@ angular.module('core')
         // set up the first column
         column0.items = browser[browser_id].data;
 
-        if (angular.isDefined(active_item)) {
-            if (active_item) {
-                browser.findActiveItem(browser_id, active_item);
-            } else {
-                // do nothing
-            }
+        if (angular.isDefined(active_item) && active_item) {
+            browser.findActiveItem(browser_id, active_item);
         } else {
             if (angular.isDefined(column1) && angular.isDefined(column1.selected) && column1.selected) {
                 // something in the SECOND column has been selected before:
@@ -72,7 +68,9 @@ angular.module('core')
                 browser.selectItem(browser_id, 0, 0);
             }
 
-            if (angular.isDefined(browser.active) && browser.active.browser_id == browser_id) {
+            if (angular.isDefined(active_item) && active_item === false)  {
+                // do nothing it active_item is set to false
+            } else if (angular.isDefined(browser.active) && browser.active.browser_id == browser_id) {
                 browser.activateItem(browser_id, browser.active.column_index, browser.active.row_index);
             }
         }
