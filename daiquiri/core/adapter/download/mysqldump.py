@@ -71,7 +71,7 @@ class MysqldumpAdapter(DownloadAdapter):
         process = subprocess.Popen(args, stdout=subprocess.PIPE)
 
         for line in process.stdout:
-            row = self.parse_line(line)
+            row = self._parse_line(line)
             if row:
                 f = io.BytesIO()
                 csv.writer(f, quotechar='"', quoting=csv.QUOTE_ALL).writerow(row)
