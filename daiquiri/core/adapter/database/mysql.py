@@ -1,5 +1,7 @@
 import re
 
+from django.db import OperationalError, ProgrammingError
+
 from .base import DatabaseAdapter
 
 
@@ -183,12 +185,15 @@ class MySQLAdapter(DatabaseAdapter):
         }
 
         # execute query
-        rows = self.fetchall(sql)
-
-        return [{
-            'name': row[0],
-            'type': 'view' if row[1] == 'VIEW' else 'table'
-        } for row in rows]
+        try:
+            rows = self.fetchall(sql)
+        except OperationalError:
+            return []
+        else:
+            return [{
+                'name': row[0],
+                'type': 'view' if row[1] == 'VIEW' else 'table'
+            } for row in rows]
 
     def fetch_table(self, database_name, table_name):
         # prepare sql string
@@ -198,12 +203,15 @@ class MySQLAdapter(DatabaseAdapter):
         }
 
         # execute query
-        row = self.fetchone(sql)
-
-        return {
-            'name': row[0],
-            'type': 'view' if row[1] == 'VIEW' else 'table'
-        }
+        try:
+            row = self.fetchone(sql)
+        except OperationalError:
+            return {}
+        else:
+            return {
+                'name': row[0],
+                'type': 'view' if row[1] == 'VIEW' else 'table'
+            }
 
     def rename_table(self, database_name, table_name, new_table_name):
         sql = 'RENAME TABLE %(database)s.%(table)s to %(database)s.%(new_table)s;' % {
@@ -230,20 +238,23 @@ class MySQLAdapter(DatabaseAdapter):
         }
 
         # execute query
-        rows = self.fetchall(sql)
+        try:
+            rows = self.fetchall(sql)
+        except ProgrammingError:
+            return []
+        else:
+            column_metadata = []
+            for row in rows:
+                datatype, arraysize = self.convert_datatype(row[1])
 
-        column_metadata = []
-        for row in rows:
-            datatype, arraysize = self.convert_datatype(row[1])
+                column_metadata.append({
+                    'name': row[0],
+                    'datatype': datatype,
+                    'arraysize': arraysize,
+                    'indexed': bool(row[4])
+                })
 
-            column_metadata.append({
-                'name': row[0],
-                'datatype': datatype,
-                'arraysize': arraysize,
-                'indexed': bool(row[4])
-            })
-
-        return column_metadata
+            return column_metadata
 
     def fetch_column(self, database_name, table_name, column_name):
         # prepare sql string
@@ -254,13 +265,16 @@ class MySQLAdapter(DatabaseAdapter):
         }
 
         # execute query
-        row = self.fetchone(sql)
-
-        return {
-            'name': row[0],
-            'datatype': row[1],
-            'indexed': bool(row[4])
-        }
+        try:
+            row = self.fetchone(sql)
+        except ProgrammingError:
+            return {}
+        else:
+            return {
+                'name': row[0],
+                'datatype': row[1],
+                'indexed': bool(row[4])
+            }
 
     def fetch_column_names(self, database_name, table_name):
         # prepare sql string

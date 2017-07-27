@@ -89,7 +89,7 @@ class TableViewSet(viewsets.ModelViewSet):
         if request.data.get('discover'):
             adapter = get_adapter()
 
-            for column_metadata in adapter.fetch_columns(table.database.name, table.name):
+            for column_metadata in adapter.database.fetch_columns(table.database.name, table.name):
                 column_metadata['table'] = table.id
                 column_metadata['groups'] = request.data['groups']
                 for key in ['access_level', 'metadata_access_level']:
