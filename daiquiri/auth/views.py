@@ -8,6 +8,8 @@ from django.views.generic import TemplateView
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 
+from rest_framework.authtoken.models import Token
+
 from allauth.account.views import logout as allauth_logout
 
 from daiquiri.core.views import ModelPermissionMixin
@@ -41,6 +43,20 @@ def profile_update(request):
 def profile_json(request):
     return JsonResponse({
         'username': request.user.username
+    })
+
+
+@login_required()
+def token(request):
+    if request.method == 'POST':
+        try:
+            Token.objects.get(user=request.user).delete()
+        except Token.DoesNotExist:
+            pass
+
+    token, created = Token.objects.get_or_create(user=request.user)
+    return render(request, 'account/account_token.html', {
+        'token': token
     })
 
 

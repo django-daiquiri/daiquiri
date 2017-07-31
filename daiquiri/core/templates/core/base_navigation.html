@@ -90,6 +90,9 @@
                             <li>
                                 <a href="{% url 'socialaccount_connections' %}">{% trans 'Account connections' %}</a>
                             </li>
+                            <li>
+                                <a href="{% url 'account_token' %}">{% trans 'API token' %}</a>
+                            </li>
                             <li role="separator" class="divider"></li>
                             <li>
                                 {% include 'account/logout_form.html' %}
