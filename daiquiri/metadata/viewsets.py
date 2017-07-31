@@ -1,4 +1,4 @@
-from rest_framework import viewsets, status
+from rest_framework import viewsets, filters, status
 from rest_framework.response import Response
 from rest_framework.decorators import list_route
 from rest_framework.permissions import IsAuthenticated
@@ -31,6 +31,11 @@ class DatabaseViewSet(viewsets.ModelViewSet):
 
     queryset = Database.objects.all()
     serializer_class = DatabaseSerializer
+
+    filter_backends = (filters.DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
+    filter_fields = ('name', 'access_level', 'metadata_access_level')
+    search_fields = ('name', 'description')
+    ordering_fields = ('name', 'access_level', 'metadata_access_level')
 
     def create(self, request, *args, **kwargs):
 
@@ -71,7 +76,7 @@ class DatabaseViewSet(viewsets.ModelViewSet):
         serializer = ManagementDatabaseSerializer(queryset, many=True)
         return Response(serializer.data)
 
-    @list_route(methods=['get'])
+    @list_route(methods=['get'], permission_classes=[])
     def user(self, request):
         # filter the databases which are published for the groups of the user
         queryset = Database.objects.filter_by_access_level(self.request.user)
@@ -85,6 +90,11 @@ class TableViewSet(viewsets.ModelViewSet):
 
     queryset = Table.objects.all()
     serializer_class = TableSerializer
+
+    filter_backends = (filters.DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
+    filter_fields = ('name', 'access_level', 'metadata_access_level')
+    search_fields = ('name', 'description')
+    ordering_fields = ('name', 'access_level', 'metadata_access_level')
 
     def create(self, request, *args, **kwargs):
 
@@ -109,7 +119,7 @@ class TableViewSet(viewsets.ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-    @list_route(methods=['get'], permission_classes=[])
+    @list_route(methods=['get'])
     def discover(self, request):
         database_name = request.GET.get('database')
         table_name = request.GET.get('table')
@@ -127,7 +137,12 @@ class ColumnViewSet(viewsets.ModelViewSet):
     queryset = Column.objects.all()
     serializer_class = ColumnSerializer
 
-    @list_route(methods=['get'], permission_classes=[])
+    filter_backends = (filters.DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
+    filter_fields = ('name', 'access_level', 'metadata_access_level')
+    search_fields = ('name', 'description')
+    ordering_fields = ('name', 'access_level', 'metadata_access_level')
+
+    @list_route(methods=['get'])
     def discover(self, request):
         database_name = request.GET.get('database')
         table_name = request.GET.get('table')
@@ -146,15 +161,20 @@ class FunctionViewSet(viewsets.ModelViewSet):
     queryset = Function.objects.all()
     serializer_class = FunctionSerializer
 
+    filter_backends = (filters.DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
+    filter_fields = ('name', 'access_level', 'metadata_access_level')
+    search_fields = ('name', 'description')
+    ordering_fields = ('name', 'access_level', 'metadata_access_level')
+
     @list_route(methods=['get'])
     def management(self, request):
         queryset = Function.objects.all()
         serializer = ManagementFunctionSerializer(queryset, many=True)
         return Response(serializer.data)
 
-    @list_route(methods=['get'])
+    @list_route(methods=['get'], permission_classes=[])
     def user(self, request):
-        queryset = Function.objects.filter(groups__in=self.request.user.groups.all())
+        queryset = Function.objects.filter_by_access_level(self.request.user)
         serializer = UserFunctionSerializer(queryset, many=True)
         return Response(serializer.data)
 
