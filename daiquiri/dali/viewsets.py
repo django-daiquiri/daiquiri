@@ -8,6 +8,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.parsers import FormParser
 from rest_framework.exceptions import ValidationError
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
 
 from daiquiri.core.responses import HttpResponseSeeOther
 
@@ -24,6 +25,7 @@ from .filters import UWSFilterBackend
 
 class JobViewSet(viewsets.GenericViewSet):
 
+    authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
     parser_classes = (FormParser, )
 
     parameter_map = {}
@@ -76,7 +78,10 @@ class SyncJobViewSet(JobViewSet):
         # reload the job from the database since job.run() doesn't work on the same job object
         job = self.get_queryset().get(pk=job.pk)
 
-        return HttpResponseSeeOther(self.request.build_absolute_uri(job.result))
+        if job.phase == job.PHASE_COMPLETED:
+            return HttpResponseSeeOther(self.request.build_absolute_uri(job.result))
+        else:
+            return Response(job.error_summary, content_type='application/xml')
 
 
 class AsyncJobViewSet(JobViewSet):
