@@ -16,9 +16,9 @@ class Command(BaseCommand):
         config = settings.DATABASES.get(key)
         if not config['HOST']:
             config['HOST'] = 'localhost'
-            config['CLIENT'] = socket.gethostname()
-        else:
             config['CLIENT'] = 'localhost'
+        else:
+            config['CLIENT'] = socket.gethostname()
 
         return config
 
