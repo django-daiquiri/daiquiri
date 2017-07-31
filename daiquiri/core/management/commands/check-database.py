@@ -18,7 +18,7 @@ class Command(BaseCommand):
             config['HOST'] = 'localhost'
             config['CLIENT'] = socket.gethostname()
         else:
-            config['CLIENT'] = socket.gethostname()
+            config['CLIENT'] = 'localhost'
 
         return config
 
