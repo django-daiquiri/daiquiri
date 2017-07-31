@@ -1,3 +1,5 @@
+import socket
+
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db.utils import OperationalError, ProgrammingError
@@ -12,8 +14,12 @@ class Command(BaseCommand):
 
     def get_config(self, key):
         config = settings.DATABASES.get(key)
-        if 'HOST' not in config:
+        if not config['HOST']:
             config['HOST'] = 'localhost'
+            config['CLIENT'] = socket.gethostname()
+        else:
+            config['CLIENT'] = socket.gethostname()
+
         return config
 
     def handle(self, *args, **options):
@@ -24,20 +30,20 @@ class Command(BaseCommand):
 
         print('')
         print('CREATE DATABASE `%(NAME)s`;' % default)
-        print('GRANT ALL PRIVILEGES ON `%(NAME)s`.* to \'%(USER)s\'@\'%(HOST)s\' identified by \'%(PASSWORD)s\';' % default)
+        print('GRANT ALL PRIVILEGES ON `%(NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\' identified by \'%(PASSWORD)s\';' % default)
         print('')
         print('CREATE DATABASE `%(NAME)s`;' % tap)
-        print('GRANT ALL PRIVILEGES ON `%(NAME)s`.* to \'%(USER)s\'@\'%(HOST)s\' identified by \'%(PASSWORD)s\';' % tap)
+        print('GRANT ALL PRIVILEGES ON `%(NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\' identified by \'%(PASSWORD)s\';' % tap)
         print('')
 
         data.update({'NAME': settings.QUERY['user_database_prefix'] + '%'})
-        print('GRANT ALL PRIVILEGES ON `%(NAME)s`.* to \'%(USER)s\'@\'%(HOST)s\' identified by \'%(PASSWORD)s\';' % data)
+        print('GRANT ALL PRIVILEGES ON `%(NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\' identified by \'%(PASSWORD)s\';' % data)
         print('')
 
         try:
             for database in Database.objects.all():
                 data.update({'NAME': database.name})
-                print('GRANT SELECT ON `%(NAME)s`.* to \'%(USER)s\'@\'%(HOST)s\' identified by \'%(PASSWORD)s\';' % data)
+                print('GRANT SELECT ON `%(NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\' identified by \'%(PASSWORD)s\';' % data)
             print('')
         except (OperationalError, ProgrammingError):
             pass
