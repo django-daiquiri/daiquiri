@@ -130,5 +130,5 @@ def capabilities(request):
 
 def tables(request):
     queryset = Database.objects.filter_by_access_level(request.user)
-    serializer = SchemaSerializer(queryset, many=True)
+    serializer = SchemaSerializer(queryset, context={'request': request}, many=True)
     return HttpResponse(TablesetRenderer().render(serializer.data), content_type="application/xml")
