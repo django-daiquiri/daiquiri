@@ -34,7 +34,7 @@
     <h2>{% trans 'Tables' %}</h2>
 
     <ul class="list-unstyled">
-        {% for table in database.tables.all %}
+        {% for table in tables %}
         <li>
             <h6>
                 <a href="{% url 'metadata_table' database.name table.name %}">

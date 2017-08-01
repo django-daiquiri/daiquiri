@@ -3,9 +3,9 @@
     <a href="{% url 'metadata_database' database.name %}">{{ database.name }}</a>
 
     <ul class="sub-menu">
-        {% for table in database.tables.all %}
+        {% for table_name in database.tables %}
         <li>
-            <a href="{% url 'metadata_table' database.name table.name %}">{{ table }}</a>
+            <a href="{% url 'metadata_table' database.name table_name %}">{{ table_name }}</a>
         </li>
         {% endfor %}
     </ul>
