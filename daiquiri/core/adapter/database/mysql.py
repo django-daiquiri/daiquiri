@@ -60,6 +60,10 @@ class MySQLAdapter(DatabaseAdapter):
         'double': {
             'datatype': 'double',
             'arraysize': False
+        },
+        'timestamp': {
+            'datatype': 'timestamp',
+            'arraysize': False
         }
     }
 
@@ -288,18 +292,23 @@ class MySQLAdapter(DatabaseAdapter):
         result = re.match('([a-z]+)\(*(\d*)\)*', datatype_string)
 
         if result:
-            native_datatype, native_arraysize = result.group(1), result.group(2)
+            native_datatype = result.group(1)
+
+            try:
+                native_arraysize = int(result.group(2))
+            except ValueError:
+                native_arraysize = None
 
             if native_datatype in self.DATATYPES:
                 datatype = self.DATATYPES[native_datatype]['datatype']
 
                 if self.DATATYPES[native_datatype]['arraysize']:
-                    arraysize = int(native_arraysize)
+                    arraysize = native_arraysize
                 else:
                     arraysize = None
 
                 return datatype, arraysize
             else:
-                return native_datatype, int(native_arraysize)
+                return native_datatype, native_arraysize
         else:
             return datatype_string, None
