@@ -11,6 +11,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
 
 from daiquiri.core.responses import HttpResponseSeeOther
+from daiquiri.core.utils import get_client_ip
 
 from .serializers import (
     JobListSerializer,
@@ -55,7 +56,8 @@ class SyncJobViewSet(JobViewSet):
             owner=(None if self.request.user.is_anonymous() else self.request.user),
             response_format=serializer.data.get('RESPONSEFORMAT', self.default_responseformat),
             max_records=serializer.data.get('MAXREC'),
-            run_id=serializer.data.get('RUNID')
+            run_id=serializer.data.get('RUNID'),
+            client_ip=get_client_ip(self.request)
         )
 
         # add parameters to the job object
@@ -121,7 +123,8 @@ class AsyncJobViewSet(JobViewSet):
             owner=(None if self.request.user.is_anonymous() else self.request.user),
             response_format=serializer.data.get('RESPONSEFORMAT', self.default_responseformat),
             max_records=serializer.data.get('MAXREC'),
-            run_id=serializer.data.get('RUNID')
+            run_id=serializer.data.get('RUNID'),
+            client_ip=get_client_ip(self.request)
         )
 
         # add parameters to the job object

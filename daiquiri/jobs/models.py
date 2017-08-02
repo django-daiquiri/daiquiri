@@ -52,6 +52,8 @@ class Job(models.Model):
 
     owner = models.ForeignKey(User, blank=True, null=True)
 
+    client_ip = models.GenericIPAddressField(blank=True, null=True)
+
     response_format = models.CharField(max_length=64, blank=True, null=True)
     max_records = models.IntegerField(blank=True, null=True)
     run_id = models.CharField(max_length=64, blank=True, null=True)

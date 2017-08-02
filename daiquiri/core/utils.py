@@ -1,3 +1,6 @@
+from __future__ import unicode_literals
+
+import ipaddress
 import importlib
 import re
 
@@ -7,6 +10,8 @@ from django.core.mail import EmailMultiAlternatives, EmailMessage
 from django.template.loader import render_to_string
 from django.template import TemplateDoesNotExist
 from django.utils.six.moves.urllib.parse import urlparse
+
+from ipware.ip import get_real_ip
 
 
 def import_class(string):
@@ -20,6 +25,20 @@ def get_script_alias(request):
 
 def get_referer(request, default=None):
     return request.META.get('HTTP_REFERER', default)
+
+
+def get_client_ip(request):
+    ip = get_real_ip(request)
+
+    if ip:
+        try:
+            interface = ipaddress.IPv6Interface('%s/%i' % (ip, settings.IPV6_PRIVACY_MASK))
+        except ipaddress.AddressValueError:
+            interface = ipaddress.IPv4Interface('%s/%i' % (ip, settings.IPV4_PRIVACY_MASK))
+
+        return str(interface.network.network_address)
+    else:
+        return None
 
 
 def get_referer_path_info(request, default=None):

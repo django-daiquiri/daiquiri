@@ -174,3 +174,6 @@ CELERY_TASK_QUEUES = (
     Queue('download', Exchange('download'), routing_key='download'),
     Queue('query', Exchange('query'), routing_key='query', queue_arguments={'x-max-priority': 5}),
 )
+
+IPV4_PRIVACY_MASK = 16
+IPV6_PRIVACY_MASK = 32

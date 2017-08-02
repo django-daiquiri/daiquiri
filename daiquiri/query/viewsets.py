@@ -12,6 +12,7 @@ from rest_framework.decorators import list_route, detail_route
 from daiquiri.core.viewsets import ChoicesViewSet
 from daiquiri.core.permissions import HasModelPermission
 from daiquiri.core.paginations import ListPagination
+from daiquiri.core.utils import get_client_ip
 
 from daiquiri.dali.viewsets import SyncJobViewSet, AsyncJobViewSet
 
@@ -92,6 +93,7 @@ class QueryJobViewSet(viewsets.ModelViewSet):
             query_language=serializer.data.get('query_language'),
             query=serializer.data.get('query'),
             queue=serializer.data.get('queue'),
+            client_ip=get_client_ip(self.request)
         )
         job.clean()
         job.save()
