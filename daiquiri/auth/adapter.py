@@ -18,7 +18,7 @@ class DaiquiriAccountAdapter(DefaultAccountAdapter):
         return hasattr(settings, 'ACCOUNT_WORKFLOW') and settings.ACCOUNT_WORKFLOW in self.WORKFLOWS
 
     def save_user(self, request, user, form, commit=True):
-        super(DaiquiriAccountAdapter, self).save_user(request, user, form, False)
+        super(DaiquiriAccountAdapter, self).save_user(request, user, form)
 
         if self.has_workflow():
             user.save()
