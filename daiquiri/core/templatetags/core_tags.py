@@ -75,3 +75,9 @@ def next(value, arg):
 @stringfilter
 def markdown(value):
     return mark_safe(markdown_function(force_text(value)))
+
+
+@register.filter(is_safe=True)
+@stringfilter
+def semicolonbr(value):
+    return mark_safe(value.replace(';','<br />'))

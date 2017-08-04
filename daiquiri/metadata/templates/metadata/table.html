@@ -51,7 +51,7 @@
                     {{ column.datatype }}
                 </td>
                 <td>
-                    {{ column.ucd|default_if_none:'' }}
+                    {{ column.ucd|default_if_none:''|semicolonbr }}
                 </td>
                 <td>
                     {{ column.unit|default_if_none:'' }}
