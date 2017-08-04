@@ -18,6 +18,9 @@ def get_logging_settings(logging_dir):
             },
             'name': {
                 'format': '[%(asctime)s] %(levelname)s %(name)s: %(message)s'
+            },
+            'console': {
+                'format': '[%(asctime)s] %(message)s'
             }
         },
         'handlers': {
@@ -56,7 +59,7 @@ def get_logging_settings(logging_dir):
                 'level': 'DEBUG',
                 'filters': ['require_debug_true'],
                 'class': 'logging.StreamHandler',
-                'formatter': 'default'
+                'formatter': 'console'
             }
         },
         'loggers': {
