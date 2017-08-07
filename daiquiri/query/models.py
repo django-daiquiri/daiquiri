@@ -1,5 +1,6 @@
 import os
 import json
+import logging
 
 from celery.result import AsyncResult, EagerResult
 from celery.task.control import revoke
@@ -208,6 +209,7 @@ class QueryJob(Job):
             # start the submit_query task in a syncronous or asuncronous way
             job_id = str(self.id)
             if not settings.ASYNC or sync:
+                logging.getLogger(__name__).info('run_query %s submitted (sync)' % self.id)
                 run_query.apply((job_id, ), task_id=job_id)
 
             else:
@@ -215,6 +217,7 @@ class QueryJob(Job):
                     self.queue = get_default_queue()
                     self.save()
 
+                logging.getLogger(__name__).info('run_query %s submitted (async, priority=%s)' % (self.id, self.priority))
                 run_query.apply_async((job_id, ), task_id=job_id, queue='query', priority=self.priority)
 
         else:
@@ -279,6 +282,7 @@ class QueryJob(Job):
                 if os.path.isfile(file_name):
                     task_result = EagerResult(task_id, None, 'SUCCESS')
                 else:
+                    logging.getLogger(__name__).info('create_download_file %s submitted (sync)' % self.id)
                     task_result = create_download_file.apply(task_args, task_id=task_id)
             else:
                 task_result = AsyncResult(task_id)
@@ -291,6 +295,7 @@ class QueryJob(Job):
                         # somebody or something removed the file. start all over again
                         task_result.forget()
 
+                    logging.getLogger(__name__).info('create_download_file %s submitted (async)' % self.id)
                     task_result = create_download_file.apply_async(task_args, task_id=task_id, queue='download')
 
             return task_result, file_name
