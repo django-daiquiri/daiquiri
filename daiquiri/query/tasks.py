@@ -4,6 +4,8 @@ from celery import shared_task
 
 from django.db.utils import OperationalError, ProgrammingError, InternalError
 from django.utils.timezone import now
+from django.utils.translation import ugettext_lazy as _
+
 
 @shared_task
 def run_query(job_id):
@@ -11,6 +13,7 @@ def run_query(job_id):
 
     from daiquiri.core.adapter import get_adapter
     from daiquiri.query.models import QueryJob
+    from daiquiri.query.utils import get_quota
 
     # get logger
     logger = logging.getLogger(__name__)
@@ -27,6 +30,14 @@ def run_query(job_id):
     except OperationalError as e:
         job.phase = job.PHASE_ERROR
         job.error_summary = str(e)
+        job.save()
+
+        return job.phase
+
+    # check if the quota is exceeded
+    if QueryJob.objects.get_size(job.owner) > get_quota(job.owner):
+        job.phase = job.PHASE_ERROR
+        job.error_summary = str(_('Quota is exceeded. Please remove some of your jobs.'))
         job.save()
 
         return job.phase

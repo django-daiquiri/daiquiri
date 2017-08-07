@@ -11,6 +11,9 @@ class TableNameValidator(object):
     message = _('A job with this table name aready exists.')
 
     def set_context(self, serializer_field):
+        request = serializer_field.parent.context['request']
+        self.user = None if request.user.is_anonymous() else request.user
+
         if serializer_field.parent.instance:
             self.current_table_name = serializer_field.parent.instance.table_name
         else:
@@ -22,7 +25,7 @@ class TableNameValidator(object):
                 pass
             else:
                 try:
-                    QueryJob.objects.exclude(phase=QueryJob.PHASE_ARCHIVED).get(table_name=table_name)
+                    QueryJob.objects.filter(owner=self.user).exclude(phase=QueryJob.PHASE_ARCHIVED).get(table_name=table_name)
                     raise ValidationError([self.message])
                 except QueryJob.DoesNotExist:
                     pass
