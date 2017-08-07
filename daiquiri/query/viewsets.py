@@ -1,13 +1,13 @@
 from sendfile import sendfile
 
 from django.conf import settings
-from django.urls import reverse
 from django.http import Http404, StreamingHttpResponse
 
 from rest_framework import viewsets, mixins, filters
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError, NotFound
 from rest_framework.decorators import list_route, detail_route
+from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 
 from daiquiri.core.viewsets import ChoicesViewSet
 from daiquiri.core.permissions import HasModelPermission
@@ -70,6 +70,7 @@ class DropdownViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
 class QueryJobViewSet(viewsets.ModelViewSet):
     permission_classes = (HasPermission, )
+    authentication_classes = (SessionAuthentication, TokenAuthentication)
 
     def get_queryset(self):
         return QueryJob.objects.filter_by_owner(self.request.user).exclude(phase=QueryJob.PHASE_ARCHIVED)
