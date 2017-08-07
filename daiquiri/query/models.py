@@ -226,13 +226,15 @@ class QueryJob(Job):
         # first, revoke the task in celery, regardless the phase
         revoke(str(self.id))
 
-        if self.phase in self.PHASE_ACTIVE:
+        current_phase = self.phase
+
+        if current_phase in self.PHASE_ACTIVE:
             # next, set the phase to ABORTED
             self.phase = self.PHASE_ABORTED
             self.save()
 
             # finally, abort query, this will trigger OperationalError in the run_query task
-            if self.phase == self.PHASE_EXECUTING:
+            if current_phase == self.PHASE_EXECUTING:
                 self.abort_query()
 
     def archive(self):
