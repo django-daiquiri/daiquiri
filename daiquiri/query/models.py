@@ -223,27 +223,19 @@ class QueryJob(Job):
             })
 
     def abort(self):
-        old_phase = self.phase
+        if self.phase in self.PHASE_ACTIVE:
+            if self.phase == self.PHASE_QUEUED:
+                revoke(str(self.id))
 
-        self.phase = self.PHASE_ABORTED
-        self.save()
+            elif self.phase == self.PHASE_EXECUTING:
+                self.abort_query()
 
-        if old_phase == self.PHASE_PENDING:
-            pass
-
-        elif old_phase == self.PHASE_QUEUED:
-            revoke(str(self.id))
-
-        elif old_phase == self.PHASE_EXECUTING:
-            self.abort_query()
-
-        else:
-            self.drop_table()
-            self.nrows = None
-            self.size = None
+            self.phase = self.PHASE_ABORTED
             self.save()
 
     def archive(self):
+        self.abort()
+
         self.drop_table()
         self.phase = self.PHASE_ARCHIVED
         self.nrows = None

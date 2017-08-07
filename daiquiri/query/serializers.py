@@ -3,7 +3,7 @@ from rest_framework import serializers
 from daiquiri.dali.serializers import SyncJobSerializer, AsyncJobSerializer
 
 from .models import QueryJob, Example
-from .validators import validate_table_name, validate_query_language, validate_queue, validate_response_format
+from .validators import TableNameValidator, QueryLanguageValidator, QueueValidator, ResponseFormatValidator
 
 
 class FormSerializer(serializers.Serializer):
@@ -78,9 +78,9 @@ class QueryJobRetrieveSerializer(serializers.ModelSerializer):
 
 class QueryJobCreateSerializer(serializers.ModelSerializer):
 
-    table_name = serializers.CharField(required=False, allow_blank=True, validators=[validate_table_name])
-    queue = serializers.CharField(required=False, validators=[validate_queue])
-    query_language = serializers.CharField(required=True, validators=[validate_query_language])
+    table_name = serializers.CharField(required=False, allow_blank=True, validators=[TableNameValidator()])
+    queue = serializers.CharField(required=False, validators=[QueueValidator()])
+    query_language = serializers.CharField(required=True, validators=[QueryLanguageValidator()])
     query = serializers.CharField(required=True)
 
     class Meta:
@@ -96,7 +96,7 @@ class QueryJobCreateSerializer(serializers.ModelSerializer):
 
 class QueryJobUpdateSerializer(serializers.ModelSerializer):
 
-    table_name = serializers.CharField(required=True, validators=[validate_table_name])
+    table_name = serializers.CharField(required=True, validators=[TableNameValidator()])
 
     class Meta:
         model = QueryJob
@@ -138,21 +138,20 @@ class UserExampleSerializer(serializers.ModelSerializer):
 
 class SyncQueryJobSerializer(SyncJobSerializer):
 
-    RESPONSEFORMAT = serializers.CharField(required=False, validators=[validate_response_format])
-    FORMAT = serializers.CharField(required=False, validators=[validate_response_format])
+    RESPONSEFORMAT = serializers.CharField(required=False, validators=[ResponseFormatValidator()])
+    FORMAT = serializers.CharField(required=False, validators=[ResponseFormatValidator()])
 
-    TABLE_NAME = serializers.CharField(required=False, validators=[validate_table_name])
-    LANG = serializers.CharField(required=True, validators=[validate_query_language])
+    TABLE_NAME = serializers.CharField(required=False, validators=[TableNameValidator()])
+    LANG = serializers.CharField(required=True, validators=[QueryLanguageValidator()])
     QUERY = serializers.CharField(required=True)
 
 
 class AsyncQueryJobSerializer(AsyncJobSerializer):
 
-    RESPONSEFORMAT = serializers.CharField(required=False, validators=[validate_response_format])
-    FORMAT = serializers.CharField(required=False, validators=[validate_response_format])
+    RESPONSEFORMAT = serializers.CharField(required=False, validators=[ResponseFormatValidator()])
+    FORMAT = serializers.CharField(required=False, validators=[ResponseFormatValidator()])
 
-    TABLE_NAME = serializers.CharField(required=False, validators=[validate_table_name])
-    QUEUE = serializers.CharField(required=False, validators=[validate_queue])
-    LANG = serializers.CharField(required=True, validators=[validate_query_language])
+    TABLE_NAME = serializers.CharField(required=False, validators=[TableNameValidator()])
+    QUEUE = serializers.CharField(required=False, validators=[QueueValidator()])
+    LANG = serializers.CharField(required=True, validators=[QueryLanguageValidator()])
     QUERY = serializers.CharField(required=True)
-
