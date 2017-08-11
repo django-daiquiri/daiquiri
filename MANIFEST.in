@@ -1,0 +1,3 @@
+recursive-include daiquiri *.scss *.js *.html *.ttf *.png *.jpg *.ico
+prune testing
+prune docs
