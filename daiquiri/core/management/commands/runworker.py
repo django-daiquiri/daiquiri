@@ -8,11 +8,11 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('queue', help='Name of the worker.')
-        parser.add_argument('concurrency', type=int, help='Concurrency for the worker.')
+        parser.add_argument('-c', type=int, default=1, help='Concurrency for the worker.')
 
     def handle(self, *args, **options):
         queue = options['queue']
-        concurrency = str(options['concurrency'])
+        concurrency = str(options['c'])
 
         node = '%s_%s' % (settings.DAIQUIRI_APP, queue)
 
