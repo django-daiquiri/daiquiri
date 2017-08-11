@@ -1,6 +1,7 @@
 import os
 import json
 import logging
+import six
 
 from celery.result import AsyncResult, EagerResult
 from celery.task.control import revoke
@@ -159,13 +160,13 @@ class QueryJob(Job):
     @property
     def timeout(self):
         if self.queue:
-            return (queue['timeout'] for queue in settings.QUERY['queues'] if queue['key'] == self.queue).next()
+            return six.next((queue['timeout'] for queue in settings.QUERY['queues'] if queue['key'] == self.queue))
         else:
             return 10
 
     @property
     def priority(self):
-        return (queue['priority'] for queue in settings.QUERY['queues'] if queue['key'] == self.queue).next()
+        return six.next((queue['priority'] for queue in settings.QUERY['queues'] if queue['key'] == self.queue))
 
     @property
     def result_status(self):
