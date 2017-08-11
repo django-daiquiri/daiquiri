@@ -1,3 +1,6 @@
-recursive-include daiquiri *.scss *.js *.html *.ttf *.png *.jpg *.ico
+graft daiquiri
 prune testing
 prune docs
+
+global-exclude __pycache__
+global-exclude *.py[co]
