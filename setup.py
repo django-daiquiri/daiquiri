@@ -47,6 +47,7 @@ setup(
     maintainer_email=u'jklar@aip.de',
     license=u'Apache License (2.0)',
     packages=find_packages(),
+    include_package_data=True,
     install_requires=requirements,
     classifiers=[
         'Development Status :: 1 - Planning',
