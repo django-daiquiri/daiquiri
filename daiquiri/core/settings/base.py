@@ -1,17 +1,13 @@
+import imp
 import os
-import inspect
 
 from kombu import Exchange, Queue
 
 from django.utils.translation import ugettext_lazy as _
 
-# second entry in the call stach is the script that imported settings.py
-# this is the BASE_DIR/PROJECT_DIR/settings/__init__.py file
-settings_init_filename = inspect.stack()[1][1]
-
-PROJECT_DIR = os.path.dirname(os.path.dirname(settings_init_filename))
+DAIQUIRI_APP = os.environ['DJANGO_SETTINGS_MODULE'].replace('.settings', '')
+PROJECT_DIR = imp.find_module(DAIQUIRI_APP)[1]
 BASE_DIR = os.path.dirname(PROJECT_DIR)
-DAIQUIRI_APP = os.path.basename(PROJECT_DIR)
 
 DEBUG = False
 
