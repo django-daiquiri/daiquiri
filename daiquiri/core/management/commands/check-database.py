@@ -14,7 +14,8 @@ class Command(BaseCommand):
 
     def get_config(self, key):
         config = settings.DATABASES.get(key)
-        if not config['HOST']:
+
+        if 'HOST' not in config or not config['HOST']:
             config['HOST'] = 'localhost'
             config['CLIENT'] = 'localhost'
         else:
