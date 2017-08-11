@@ -59,7 +59,7 @@
 
     <h1>{% trans 'Query interface' %}</h1>
 
-    <div class="row">
+    <div class="row" ng-cloak>
         <div class="col-md-3">
             {% include 'query/query_sidebar.html' %}
         </div>
@@ -102,7 +102,7 @@
     </div>
 
 {% include 'query/query_modal_rename_job.html' %}
-{% include 'query/query_modal_kill_job.html' %}
+{% include 'query/query_modal_abort_job.html' %}
 {% include 'query/query_modal_remove_job.html' %}
 
 {% endblock %}

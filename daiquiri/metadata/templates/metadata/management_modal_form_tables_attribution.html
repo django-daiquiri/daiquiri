@@ -1,0 +1,42 @@
+{% load i18n %}
+
+    <div class="modal" id="tables-attribution-form-modal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" tabindex="-1">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">
+                        {% trans 'Tables' %}
+                    </h4>
+                </div>
+
+                <div class="modal-body">
+                    <formgroup
+                        data-id="tables-attribution"
+                        data-type="codemirror"
+                        data-label="{{ meta.Table.attribution.verbose_name }}"
+                        data-help="{{ meta.Table.attribution.help_text }}"
+                        data-model="service.values.attribution"
+                        data-errors="service.errors.attribution"
+                        data-mode="markdown">
+                    </formgroup>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                        {% trans 'Close' %}
+                    </button>
+                    <button type="button" class="btn btn-default"
+                            ng-click="service.submitFormModal('tables', false)">
+                        {% trans 'Save' %}
+                    </button>
+                    <button type="button" class="btn btn-primary"
+                            ng-click="service.submitFormModal('tables')">
+                        {% trans 'Save and close' %}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>

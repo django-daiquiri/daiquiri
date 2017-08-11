@@ -1,6 +1,7 @@
 {% extends 'core/page.html' %}
 {% load i18n %}
 {% load static %}
+{% load core_tags %}
 
 {% block page %}
 
@@ -15,23 +16,19 @@
     {% if table.long_description %}
 
     <h2>Description</h2>
-    <p>{{ table.long_description }}</p>
+    <p>{{ table.long_description | markdown }}</p>
 
     {% elif table.description %}
 
     <h2>Description</h2>
-    <p>{{ table.description }}</p>
+    <p>{{ table.description | markdown }}</p>
 
     {% endif %}
 
     {% if table.attribution %}
     <h2>Attribution</h2>
-    <p>
-        Any paper making substantial use of this table is kindly requested to include this acknowledgement:
-    </p>
-    <blockquote>
-        {{ table.attribution }}
-    </blockquote>
+
+    {{ table.attribution | markdown }}
     {% endif %}
 
     <h2>{% trans 'Columns' %}</h2>
@@ -54,7 +51,7 @@
                     {{ column.datatype }}
                 </td>
                 <td>
-                    {{ column.ucd|default_if_none:'' }}
+                    {{ column.ucd|default_if_none:''|semicolonbr }}
                 </td>
                 <td>
                     {{ column.unit|default_if_none:'' }}
@@ -96,13 +93,5 @@
         </div>
     </div>
     {% endif %}
-
-    <div class="panel panel-default">
-        <div class="panel-heading">Contributors</div>
-        <ul class="list-group">
-            <li class="list-group-item">Jochen Klar</li>
-            <li class="list-group-item">Harry Enke</li>
-        </ul>
-    </div>
 
 {% endblock %}

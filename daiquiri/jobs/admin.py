@@ -4,6 +4,7 @@ from .models import Job
 
 
 class JobAdmin(admin.ModelAdmin):
-    pass
+    search_fields = ('id', 'owner__username', 'phase')
+    list_display = ('id', 'owner', 'phase', 'creation_time')
 
 admin.site.register(Job, JobAdmin)

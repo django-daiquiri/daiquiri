@@ -1,8 +1,11 @@
+import logging
+
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 
 from allauth.account.adapter import DefaultAccountAdapter
+from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from allauth.exceptions import ImmediateHttpResponse
 
 
@@ -18,7 +21,7 @@ class DaiquiriAccountAdapter(DefaultAccountAdapter):
         return hasattr(settings, 'ACCOUNT_WORKFLOW') and settings.ACCOUNT_WORKFLOW in self.WORKFLOWS
 
     def save_user(self, request, user, form, commit=True):
-        super(DaiquiriAccountAdapter, self).save_user(request, user, form, False)
+        super(DaiquiriAccountAdapter, self).save_user(request, user, form)
 
         if self.has_workflow():
             user.save()
@@ -30,3 +33,10 @@ class DaiquiriAccountAdapter(DefaultAccountAdapter):
             raise ImmediateHttpResponse(HttpResponseRedirect(reverse('account_pending')))
         else:
             super(DaiquiriAccountAdapter, self).login(request, user)
+
+
+class DaiquiriSocialAccountAdapter(DefaultSocialAccountAdapter):
+
+    def authentication_error(self, request, provider_id, error=None, exception=None, extra_context=None):
+        logging.getLogger(__name__).error([provider_id, error, exception])
+        super(DaiquiriSocialAccountAdapter, self).authentication_error(request, provider_id, error, exception, extra_context)

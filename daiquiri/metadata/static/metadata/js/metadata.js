@@ -1,6 +1,6 @@
 angular.module('metadata', ['core'])
 
-.factory('MetadataService', ['$http', '$resource', '$filter', '$timeout', 'BrowserService', function($http, $resource, $filter, $timeout, BrowserService) {
+.factory('MetadataService', ['$resource', '$q', '$filter', '$timeout', 'BrowserService', function($resource, $q, $filter, $timeout, BrowserService) {
 
     /* get the base url */
 
@@ -9,6 +9,7 @@ angular.module('metadata', ['core'])
     /* create the metadata service */
 
     var service = {
+        ready: false,
         browser: BrowserService
     };
 
@@ -20,6 +21,8 @@ angular.module('metadata', ['core'])
         'columns': $resource(baseurl + 'metadata/api/columns/:list_route/:id/'),
         'functions': $resource(baseurl + 'metadata/api/functions/:list_route/:id/'),
         'tabletypes': $resource(baseurl + 'metadata/api/tabletypes/:id/'),
+        'licenses': $resource(baseurl + 'metadata/api/licenses/:id/'),
+        'accesslevels': $resource(baseurl + 'metadata/api/accesslevels/:id/'),
         'groups': $resource(baseurl + 'auth/api/groups/:id/'),
     };
 
@@ -28,23 +31,33 @@ angular.module('metadata', ['core'])
     service.factory = {
         databases: function() {
             return {
+                access_level: 'PRIVATE',
+                metadata_access_level: 'PRIVATE',
+                discover: true,
                 groups: []
             };
          },
         tables: function() {
             return {
                 database: service.browser.getSelectedItem('databases', 0).id,
+                access_level: 'PRIVATE',
+                metadata_access_level: 'PRIVATE',
+                discover: true,
                 groups: []
             };
         },
         columns: function() {
             return {
                 table: service.browser.getSelectedItem('databases', 1).id,
+                access_level: 'PRIVATE',
+                metadata_access_level: 'PRIVATE',
                 groups: []
             };
         },
         functions: function() {
             return {
+                access_level: 'PRIVATE',
+                metadata_access_level: 'PRIVATE',
                 groups: []
             };
         }
@@ -55,16 +68,22 @@ angular.module('metadata', ['core'])
     service.init = function() {
         service.tabletypes = resources.tabletypes.query();
         service.groups = resources.groups.query();
+        service.licenses = resources.licenses.query();
+        service.accesslevels = resources.accesslevels.query();
 
         BrowserService.init('databases', ['databases','tables','columns']);
         BrowserService.init('functions', ['functions']);
 
-        service.initDatabasesBrowser();
-        service.initFunctionsBrowser();
+        databases_promise = service.initDatabasesBrowser();
+        functions_promise = service.initFunctionsBrowser();
+
+        $q.all([databases_promise, functions_promise]).then(function() {
+            service.ready = true;
+        })
     };
 
     service.initDatabasesBrowser = function() {
-        resources.databases.query({'list_route': 'management'}, function(response) {
+        return resources.databases.query({'list_route': 'management'}, function(response) {
             service.databases = response;
 
             service.tables = [];
@@ -77,30 +96,33 @@ angular.module('metadata', ['core'])
             });
 
             BrowserService.render('databases', service.databases, service.active);
-        });
+        }).$promise;
     };
 
     service.initFunctionsBrowser = function() {
-        resources.functions.query({'list_route': 'management'}, function(response) {
+        return resources.functions.query({'list_route': 'management'}, function(response) {
             service.functions = response;
 
             BrowserService.render('functions', service.functions, service.active);
-        });
+        }).$promise;
     };
 
     service.activateItem = function(resource, id) {
         return resources[resource].get({id: id}, function(item) {
             item.resource = resource;
 
+            // create a string for the groups
             item.published_for = $filter('filter')(service.groups, function(group) {
                 return item.groups.indexOf(group.id) !== -1;
-            });
+            }).map(function(group) {
+                return group.name;
+            }).join(', ');
 
             service.active = item;
         });
     };
 
-    service.openFormModal = function(resource, create) {
+    service.openFormModal = function(resource, create, modal) {
         service.errors = {};
         service.values = {};
 
@@ -111,11 +133,24 @@ angular.module('metadata', ['core'])
         }
 
         $timeout(function() {
-            $('#' + resource + '-form-modal').modal('show');
+            var modal_id;
+            if (angular.isDefined(modal) && modal) {
+                modal_id = '#' + resource + '-' + modal + '-form-modal';
+            } else {
+                modal_id = '#' + resource + '-form-modal';
+            }
+
+            $(modal_id).modal('show');
+
+            $timeout(function() {
+                if (angular.element(modal_id + ' .CodeMirror').length) {
+                    angular.element(modal_id + ' .CodeMirror')[0].CodeMirror.refresh();
+                }
+            });
         });
     };
 
-    service.submitFormModal = function(resource) {
+    service.submitFormModal = function(resource, close) {
 
         var promise;
         if (angular.isDefined(service.values.id)) {
@@ -125,16 +160,17 @@ angular.module('metadata', ['core'])
         }
 
         promise.then(function(result) {
-            $('#' + resource + '-form-modal').modal('hide');
+            if (angular.isUndefined(close) || close) {
+                $('.modal').modal('hide');
 
-            service.activateItem(resource, result.id).$promise.then(function () {
-                if (resource === 'functions') {
-                    service.initFunctionsBrowser();
-                } else {
-                    service.initDatabasesBrowser();
-                }
-            });
-
+                service.activateItem(resource, result.id).$promise.then(function () {
+                    if (resource === 'functions') {
+                        service.initFunctionsBrowser();
+                    } else {
+                        service.initDatabasesBrowser();
+                    }
+                });
+            }
         }, function(result) {
             service.errors = result.data;
         });

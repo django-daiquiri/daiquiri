@@ -80,8 +80,8 @@
             </button>
         </div>
         <div ng-show="service.job.phase == 'EXECUTING' || service.job.phase == 'PENDING' || service.job.phase == 'QUEUED'">
-            <a href="" ng-click="service.showModal('kill-job', service.job)">
-                {% trans 'Kill the job' %}
+            <a href="" ng-click="service.showModal('abort-job', service.job)">
+                {% trans 'Abort the job' %}
             </a>
         </div>
         <div ng-hide="service.job.phase == 'EXECUTING' || service.job.phase == 'PENDING' || service.job.phase == 'QUEUED'">
@@ -92,7 +92,18 @@
     </div>
 </div>
 
-<div class="panel panel-default">
+<div class="panel panel-default" ng-show="service.job.native_query">
+    <div class="panel-heading">
+        {% trans 'Native query' %}
+    </div>
+    <div class="panel-body">
+        <div class="cm-s-default" id="native-query">
+            {$ service.job.native_query $}
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-default" ng-show="service.job.actual_query">
     <div class="panel-heading">
         {% trans 'Actual query' %}
     </div>

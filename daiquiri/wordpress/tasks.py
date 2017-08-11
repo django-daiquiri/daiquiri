@@ -9,36 +9,39 @@ from celery import shared_task
 
 @shared_task
 def create_wordpress_user(username, email, first_name, last_name):
-    subprocess.check_call([
+    return subprocess.check_output([
         settings.WORDPRESS_CLI,
         'user',
         'create',
         username,
         email,
         '--first_name=%s' % first_name,
-        '--last_name=%s' % last_name
+        '--last_name=%s' % last_name,
+        '--path=%s' % settings.WORDPRESS_PATH
     ])
 
 
 @shared_task
 def update_wordpress_user(username, email, first_name, last_name):
-    subprocess.check_call([
+    return subprocess.check_output([
         settings.WORDPRESS_CLI,
         'user',
         'update',
         username,
         '--user_email=%s' % email,
         '--first_name=%s' % first_name,
-        '--last_name=%s' % last_name
+        '--last_name=%s' % last_name,
+        '--path=%s' % settings.WORDPRESS_PATH
     ])
 
 
 @shared_task
 def update_wordpress_role(username, role):
-    subprocess.check_call([
+    return subprocess.check_output([
         settings.WORDPRESS_CLI,
         'user',
         'set-role',
         username,
-        role
+        role,
+        '--path=%s' % settings.WORDPRESS_PATH
     ])

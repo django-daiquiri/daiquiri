@@ -15,21 +15,15 @@ app.factory('DownloadService', ['$http', 'FileSaver', 'Blob', 'PollingService', 
     service.download = function(job, format) {
         job.download_failed = false;
 
-        $http.put(baseurl + 'query/api/jobs/' + job.id + '/download/' + format + '/')
+        var url = baseurl + 'query/api/jobs/' + job.id + '/download/' + format + '/';
+        $http.put(url)
             .then(function(result) {
-                var content_type = result.headers()['content-type'];
-
-                if (content_type != 'application/json') {
-                    // get the filename from the Content-Disposition header
-                    var content_disposition = result.headers()['content-disposition'];
-                    var m = content_disposition.match(/filename[^;=\n]*=['"'](.*?[^'";\n]*)['"']/);
-                    var filename = (m === null) ? 'download.dat' : m[1];
-
-                    // store payload using angular-file-saver
-                    var blob = new Blob([result.data], { type: content_type });
-                    FileSaver.saveAs(blob, filename);
-
+                if (result.data == 'SUCCESS') {
                     service.unregister(job, format);
+
+                    // append iframe
+                    angular.element('body').append('<iframe style="display: none;" src="' + url + '"></iframe>');
+
                 } else {
                     service.register(job, format);
                 }
@@ -43,21 +37,26 @@ app.factory('DownloadService', ['$http', 'FileSaver', 'Blob', 'PollingService', 
     };
 
     service.register = function(job, format) {
-        service.pending_downloads++;
-        PollingService.register(getPollingId(job, format), service.check, {
-            'format': format,
-            'job': job
-        });
+        var polling_id = getPollingId(job, format);
+
+        if (!PollingService.isRegistered(polling_id)) {
+            service.pending_downloads++;
+
+            PollingService.register(polling_id, service.check, {
+                'format': format,
+                'job': job
+            });
+        }
     };
 
     service.unregister  = function(job, format) {
         var polling_id = getPollingId(job, format);
         if (PollingService.isRegistered(polling_id)) {
             // remove download from pending downloads
-            job.pending_downloads--;
+            service.pending_downloads--;
 
             // remove download from PollingService
-            PollingService.unregister(getPollingId(job, format));
+            PollingService.unregister(polling_id);
         }
     };
 

@@ -1,0 +1,26 @@
+{% extends 'core/wide.html' %}
+{% load i18n %}
+
+{% block wide %}
+
+    <h1>{% trans 'TAP service' %}</h1>
+
+    <ul>
+        <li>
+            <a href="{% url 'tap_sync-list' %}">{% trans 'sync' %}</a>
+        </li>
+        <li>
+            <a href="{% url 'tap_async-list' %}">{% trans 'async' %}</a>
+        </li>
+        <li>
+            <a href="{% url 'tap_capabilities' %}">{% trans 'capabilities' %}</a>
+        </li>
+        <li>
+            <a href="{% url 'tap_tables' %}">{% trans 'tables' %}</a>
+        </li>
+        <li>
+            <a href="{% url 'tap_examples' %}">{% trans 'examples' %}</a>
+        </li>
+    </ul>
+
+{% endblock %}

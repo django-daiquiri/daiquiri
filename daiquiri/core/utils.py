@@ -1,3 +1,7 @@
+from __future__ import unicode_literals
+
+import ipaddress
+import importlib
 import re
 
 from django.conf import settings
@@ -7,6 +11,13 @@ from django.template.loader import render_to_string
 from django.template import TemplateDoesNotExist
 from django.utils.six.moves.urllib.parse import urlparse
 
+from ipware.ip import get_real_ip
+
+
+def import_class(string):
+    module_name, class_name = string.rsplit('.', 1)
+    return getattr(importlib.import_module(module_name), class_name)
+
 
 def get_script_alias(request):
     return request.path[:-len(request.path_info)]
@@ -14,6 +25,20 @@ def get_script_alias(request):
 
 def get_referer(request, default=None):
     return request.META.get('HTTP_REFERER', default)
+
+
+def get_client_ip(request):
+    ip = get_real_ip(request)
+
+    if ip:
+        try:
+            interface = ipaddress.IPv6Interface('%s/%i' % (ip, settings.IPV6_PRIVACY_MASK))
+        except ipaddress.AddressValueError:
+            interface = ipaddress.IPv4Interface('%s/%i' % (ip, settings.IPV4_PRIVACY_MASK))
+
+        return str(interface.network.network_address)
+    else:
+        return None
 
 
 def get_referer_path_info(request, default=None):
@@ -35,9 +60,25 @@ def get_next(request):
         return get_script_alias(request) + next
 
 
+def get_model_field_meta(model):
+    meta = {}
+
+    for field in model._meta.get_fields():
+        meta[field.name] = {}
+        if hasattr(field, 'verbose_name'):
+            meta[field.name]['verbose_name'] = field.verbose_name
+        if hasattr(field, 'help_text'):
+            meta[field.name]['help_text'] = field.help_text
+
+    return meta
+
+
 def human2bytes(string):
+    if not string:
+        return 0
+
     m = re.match('([0-9.]+)\s*([A-Za-z]+)', string)
-    number, unit =  float(m.group(1)), m.group(2).strip().lower()
+    number, unit = float(m.group(1)), m.group(2).strip().lower()
 
     if unit == 'kb' or unit == 'k':
         return number * 1000

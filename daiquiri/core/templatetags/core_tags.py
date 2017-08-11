@@ -18,6 +18,11 @@ def base_url(context):
 
 
 @register.simple_tag(takes_context=True)
+def absolute_url(context, *args, **kwargs):
+    return context.request.build_absolute_uri(reverse(*args, **kwargs))
+
+
+@register.simple_tag(takes_context=True)
 def bootstrap_form(context, **kwargs):
     form_context = {}
 
@@ -70,3 +75,9 @@ def next(value, arg):
 @stringfilter
 def markdown(value):
     return mark_safe(markdown_function(force_text(value)))
+
+
+@register.filter(is_safe=True)
+@stringfilter
+def semicolonbr(value):
+    return mark_safe(value.replace(';','<br />'))

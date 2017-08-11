@@ -34,15 +34,19 @@ app.factory('SqlFormService', ['$timeout', 'QueryService', 'BrowserService', fun
                 service.errors = response.data;
 
                 var editor = $('.CodeMirror')[0].CodeMirror;
-                var positions = angular.fromJson(service.errors.query.positions);
-                angular.forEach(positions, function(position) {
-                    editor.markText(
-                        {line: position[0] - 1, ch: position[1]},
-                        {line: position[0] - 1, ch: position[1] + position[2].length},
-                        {className: 'codemirror-error'},
-                        {clearOnEnter: true}
-                    );
-                });
+
+                if (angular.isDefined(service.errors.query.positions)) {
+                    angular.forEach(angular.fromJson(service.errors.query.positions), function(position) {
+                        editor.markText(
+                            {line: position[0] - 1, ch: position[1]},
+                            {line: position[0] - 1, ch: position[1] + position[2].length},
+                            {className: 'codemirror-error'},
+                            {clearOnEnter: true}
+                        );
+                    });
+
+                    service.errors.query = service.errors.query.messages;
+                }
             });
     };
 

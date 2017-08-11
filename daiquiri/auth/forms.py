@@ -9,7 +9,7 @@ from .models import Profile
 class UserForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'email')
+        fields = ('first_name', 'last_name')
 
 
 class ProfileForm(forms.ModelForm):
@@ -72,8 +72,8 @@ class SignupForm(ProfileForm):
         user.profile.details = {}
 
         # store the form date for each detail key
-        for detail_key in self.detail_keys:
-            user.profile.details[detail_key.key] = self.cleaned_data[detail_key.key]
+        for detail_key in settings.AUTH['detail_keys']:
+            user.profile.details[detail_key['key']] = self.cleaned_data[detail_key['key']]
 
         # save the profile model
         user.profile.save()

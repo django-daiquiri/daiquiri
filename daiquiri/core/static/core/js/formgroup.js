@@ -13,7 +13,8 @@ angular.module('core')
             options: '=',
             optionsLabel: '@',
             optionsFilter: '=',
-            optionsNull: '@'
+            optionsNull: '@',
+            optionsEmpty: '@'
         },
         templateUrl: function(element, attrs) {
             var staticurl = angular.element('meta[name="staticurl"]').attr('content');

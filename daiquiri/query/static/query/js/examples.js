@@ -10,6 +10,8 @@ app.factory('ExamplesService', ['$resource', '$timeout', 'ListService', function
 
     var resources = {
         examples: $resource(baseurl + 'query/api/examples/:id/'),
+        accesslevels: $resource(baseurl + 'metadata/api/accesslevels/:id/'),
+        querylanguages: $resource(baseurl + 'query/api/querylanguages/'),
         groups: $resource(baseurl + 'auth/api/groups/:id/'),
     }
 
@@ -34,6 +36,9 @@ app.factory('ExamplesService', ['$resource', '$timeout', 'ListService', function
     };
 
     service.init = function() {
+        service.accesslevels = resources.accesslevels.query();
+        service.query_languages = resources.querylanguages.query();
+
         resources.groups.query(function(response) {
             service.groups = response;
             service.groups_map = {};
@@ -54,8 +59,12 @@ app.factory('ExamplesService', ['$resource', '$timeout', 'ListService', function
             service.errors = {};
         }
 
+        $('#' + modal_id).modal('show');
+
         $timeout(function() {
-            $('#' + modal_id).modal('show');
+            if (angular.element('#' + modal_id + ' .CodeMirror').length) {
+                angular.element('#' + modal_id + ' .CodeMirror')[0].CodeMirror.refresh();
+            }
         });
     };
 

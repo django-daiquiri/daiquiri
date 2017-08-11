@@ -1,6 +1,9 @@
 from rest_framework import serializers
 
+from daiquiri.dali.serializers import SyncJobSerializer, AsyncJobSerializer
+
 from .models import QueryJob, Example
+from .validators import TableNameValidator, QueryLanguageValidator, QueueValidator, ResponseFormatValidator
 
 
 class FormSerializer(serializers.Serializer):
@@ -23,6 +26,15 @@ class DropdownSerializer(serializers.Serializer):
 
     def get_options(self, obj):
         return obj['options']
+
+
+class QueryJobSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = QueryJob
+        fields = (
+            'id',
+        )
 
 
 class QueryJobListSerializer(serializers.ModelSerializer):
@@ -56,6 +68,7 @@ class QueryJobRetrieveSerializer(serializers.ModelSerializer):
             'table_name',
             'query_language',
             'query',
+            'native_query',
             'actual_query',
             'queue',
             'nrows',
@@ -65,8 +78,10 @@ class QueryJobRetrieveSerializer(serializers.ModelSerializer):
 
 class QueryJobCreateSerializer(serializers.ModelSerializer):
 
-    query = serializers.CharField(required=False)
-    table_name = serializers.CharField(required=False)
+    table_name = serializers.CharField(required=False, allow_blank=True, validators=[TableNameValidator()])
+    queue = serializers.CharField(required=False, validators=[QueueValidator()])
+    query_language = serializers.CharField(required=True, validators=[QueryLanguageValidator()])
+    query = serializers.CharField(required=True)
 
     class Meta:
         model = QueryJob
@@ -80,6 +95,8 @@ class QueryJobCreateSerializer(serializers.ModelSerializer):
 
 
 class QueryJobUpdateSerializer(serializers.ModelSerializer):
+
+    table_name = serializers.CharField(required=True, validators=[TableNameValidator()])
 
     class Meta:
         model = QueryJob
@@ -98,7 +115,9 @@ class ExampleSerializer(serializers.ModelSerializer):
             'order',
             'name',
             'description',
+            'query_language',
             'query_string',
+            'access_level',
             'groups'
         )
 
@@ -115,3 +134,24 @@ class UserExampleSerializer(serializers.ModelSerializer):
             'query_string',
             'groups'
         )
+
+
+class SyncQueryJobSerializer(SyncJobSerializer):
+
+    RESPONSEFORMAT = serializers.CharField(required=False, validators=[ResponseFormatValidator()])
+    FORMAT = serializers.CharField(required=False, validators=[ResponseFormatValidator()])
+
+    TABLE_NAME = serializers.CharField(required=False, validators=[TableNameValidator()])
+    LANG = serializers.CharField(required=True, validators=[QueryLanguageValidator()])
+    QUERY = serializers.CharField(required=True)
+
+
+class AsyncQueryJobSerializer(AsyncJobSerializer):
+
+    RESPONSEFORMAT = serializers.CharField(required=False, validators=[ResponseFormatValidator()])
+    FORMAT = serializers.CharField(required=False, validators=[ResponseFormatValidator()])
+
+    TABLE_NAME = serializers.CharField(required=False, validators=[TableNameValidator()])
+    QUEUE = serializers.CharField(required=False, validators=[QueueValidator()])
+    LANG = serializers.CharField(required=True, validators=[QueryLanguageValidator()])
+    QUERY = serializers.CharField(required=True)

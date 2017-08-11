@@ -4,8 +4,8 @@
     {% trans 'For further processing of the data, you can download the results table to your local machine. For this file several formats are available. Please choose a format for the download from the list below.' %}
 </p>
 
-<div class="row">
 {% for download_format in settings.QUERY.download_formats %}
+<div class="row">
     <div class="col-md-3">
         <p>
             <a href="" ng-click="service.downloads.download( service.job, '{{ download_format.key }}')">{{ download_format.label }}</a>
@@ -16,14 +16,14 @@
             {{ download_format.help }}
         </p>
     </div>
-{% endfor %}
 </div>
+{% endfor %}
 
 <div class="row">
     <div class="col-md-3">
     </div>
     <div class="col-md-9">
-        <p class="text-info" ng-show="service.downloads.pending_downloads[job]">
+        <p class="text-info" ng-show="service.downloads.pending_downloads">
             {% trans 'Your file is being created. Please wait...' %}
         </p>
         <p class="text-danger" ng-show="service.job.download_failed">

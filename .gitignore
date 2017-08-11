@@ -9,5 +9,10 @@ testing/local.py
 
 env
 
+build
+dist
+*.egg-info
+
 .coverage
 htmlcov
+

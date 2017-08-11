@@ -5,6 +5,7 @@ from rest_framework import viewsets, mixins, filters
 from rest_framework.decorators import detail_route
 from rest_framework.exceptions import MethodNotAllowed
 from rest_framework.response import Response
+from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 
 from daiquiri.core.permissions import HasModelPermission
 from daiquiri.core.paginations import ListPagination
@@ -16,6 +17,7 @@ from .serializers import ProfileSerializer, GroupSerializer
 
 class ProfileViewSet(mixins.UpdateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     permission_classes = (HasModelPermission, )
+    authentication_classes = (SessionAuthentication, TokenAuthentication)
 
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
@@ -57,5 +59,8 @@ class ProfileViewSet(mixins.UpdateModelMixin, mixins.ListModelMixin, mixins.Retr
 
 
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = (HasModelPermission, )
+    authentication_classes = (SessionAuthentication, TokenAuthentication)
+
     queryset = Group.objects.all()
     serializer_class = GroupSerializer

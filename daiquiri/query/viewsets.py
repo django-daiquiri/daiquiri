@@ -1,74 +1,57 @@
-import json
 from sendfile import sendfile
 
 from django.conf import settings
-from django.db.models import Sum
-from django.http import Http404
-from django.utils.timezone import now
-from django.utils.translation import ugettext_lazy as _
+from django.http import Http404, StreamingHttpResponse
 
 from rest_framework import viewsets, mixins, filters
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError, NotFound
 from rest_framework.decorators import list_route, detail_route
+from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 
 from daiquiri.core.viewsets import ChoicesViewSet
 from daiquiri.core.permissions import HasModelPermission
-from daiquiri.core.utils import human2bytes
 from daiquiri.core.paginations import ListPagination
-from daiquiri.uws.settings import PHASE_ARCHIVED
+from daiquiri.core.utils import get_client_ip
+
+from daiquiri.dali.viewsets import SyncJobViewSet, AsyncJobViewSet
 
 from .models import QueryJob, Example
 from .serializers import (
     FormSerializer,
     DropdownSerializer,
+    QueryJobSerializer,
     QueryJobListSerializer,
     QueryJobRetrieveSerializer,
     QueryJobCreateSerializer,
     QueryJobUpdateSerializer,
     ExampleSerializer,
-    UserExampleSerializer
+    UserExampleSerializer,
+    SyncQueryJobSerializer,
+    AsyncQueryJobSerializer
 )
-from .exceptions import (
-    ADQLSyntaxError,
-    MySQLSyntaxError,
-    PermissionError,
-    TableError,
-    ConnectionError
-)
-from utils import fetch_user_database_metadata
+
+from .permissions import HasPermission
+from .utils import get_quota, fetch_user_database_metadata
 
 
 class StatusViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (HasPermission, )
 
     def get_queryset(self):
         return []
 
     def list(self, request):
-        # get quota from settings
-        quota = 0
-        for group in request.user.groups.all():
-            group_quota = settings.QUERY['quota'].get(group.name)
-            if group_quota:
-                group_quota = human2bytes(group_quota)
-                quota = group_quota if group_quota > quota else quota
-
-        # get the size of all the tables of this user
-        jobs = QueryJob.objects.filter(owner=self.request.user).exclude(phase=PHASE_ARCHIVED)
-        size = jobs.aggregate(Sum('size'))['size__sum']
-
         return Response([{
             'guest': not request.user.is_authenticated(),
             'queued_jobs': None,
-            'size': size,
-            'quota': quota
+            'size': QueryJob.objects.get_size(request.user),
+            'quota': get_quota(request.user)
         }])
 
 
 class FormViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (HasPermission, )
 
     serializer_class = FormSerializer
 
@@ -77,7 +60,7 @@ class FormViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
 
 class DropdownViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (HasPermission, )
 
     serializer_class = DropdownSerializer
 
@@ -86,101 +69,97 @@ class DropdownViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
 
 class QueryJobViewSet(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (HasPermission, )
+    authentication_classes = (SessionAuthentication, TokenAuthentication)
 
     def get_queryset(self):
-        return QueryJob.objects.filter(owner=self.request.user).exclude(phase=PHASE_ARCHIVED)
+        return QueryJob.objects.filter_by_owner(self.request.user).exclude(phase=QueryJob.PHASE_ARCHIVED)
 
     def get_serializer_class(self):
         if self.action == 'list':
             return QueryJobListSerializer
-        elif self.action == 'retrieve' or self.action == 'kill':
+        elif self.action == 'retrieve' or self.action == 'abort':
             return QueryJobRetrieveSerializer
         elif self.action == 'create':
             return QueryJobCreateSerializer
         elif self.action == 'update' or self.action == 'partial_update':
             return QueryJobUpdateSerializer
+        else:
+            return QueryJobSerializer
 
     def perform_create(self, serializer):
+        job = QueryJob(
+            owner=(None if self.request.user.is_anonymous() else self.request.user),
+            table_name=serializer.data.get('table_name'),
+            query_language=serializer.data.get('query_language'),
+            query=serializer.data.get('query'),
+            queue=serializer.data.get('queue'),
+            client_ip=get_client_ip(self.request)
+        )
+        job.clean()
+        job.save()
+        job.run()
 
-        if 'query' not in serializer.data:
-            raise ValidationError({
-                'query': {
-                    'messages': [_('Value is required and can\'t be empty')]
-                }
-            })
-
-        if 'table_name' in serializer.data:
-            table_name = serializer.data['table_name']
-        else:
-            table_name = now().strftime("%Y-%m-%d-%H-%M-%S")
-
-        try:
-            job_id = QueryJob.objects.submit(
-                serializer.data['query_language'],
-                serializer.data['query'],
-                serializer.data['queue'],
-                table_name,
-                self.request.user
-            )
-
-            # inject the job id into the serializers data
-            serializer._data['id'] = job_id
-
-        except (ADQLSyntaxError, MySQLSyntaxError) as e:
-            raise ValidationError({
-                'query': {
-                    'messages': [_('There has been an error while parsing your query.')],
-                    'positions': json.dumps(e.message),
-                }
-            })
-        except (PermissionError, ConnectionError) as e:
-            raise ValidationError({'query': {'messages': e.message}})
-        except TableError as e:
-            raise ValidationError({'table_name': e.message})
+        # inject the job id into the serializers data
+        serializer._data['id'] = job.id
 
     def perform_update(self, serializer):
-        try:
-            serializer.save()
-        except TableError as e:
-            raise ValidationError({'table_name': [e.message]})
+        serializer.save()
 
     def perform_destroy(self, instance):
         instance.archive()
 
     @list_route(methods=['get'])
     def tables(self, request):
-        jobs = QueryJob.objects.filter(owner=self.request.user).exclude(phase=PHASE_ARCHIVED)
-        return Response([fetch_user_database_metadata(jobs, request.user.username)])
+        return Response(fetch_user_database_metadata(request.user, self.get_queryset()))
 
     @detail_route(methods=['put'])
-    def kill(self, request, pk=None):
+    def abort(self, request, pk=None):
         try:
             job = self.get_queryset().get(pk=pk)
-            job.kill()
+            job.abort()
 
             serializer = QueryJobRetrieveSerializer(instance=job)
             return Response(serializer.data)
         except QueryJob.DoesNotExist:
             raise Http404
 
-    @detail_route(methods=['put'], url_path='download/(?P<format_key>\w+)')
+    @detail_route(methods=['get', 'put'], url_path='download/(?P<format_key>[A-Za-z0-9\-]+)', url_name='download')
     def download(self, request, pk=None, format_key=None):
         try:
-            format = [f for f in settings.QUERY['download_formats'] if f['key'] == format_key][0]
-        except IndexError:
-            raise ValidationError({'format': "Not supported."})
+            job = self.get_queryset().get(pk=pk)
+        except QueryJob.DoesNotExist:
+            raise NotFound
 
+        result, file_name = job.download(self._get_format(format_key))
+
+        if result.successful():
+            if self.request.method == 'GET':
+                return sendfile(request, file_name, attachment=True)
+            else:
+                return Response(result.status)
+
+        else:
+            if result.status == 'FAILURE':
+                return Response(result.status, status=500)
+            else:
+                return Response(result.status)
+
+    @detail_route(methods=['get'], url_path='stream/(?P<format_key>[A-Za-z0-9\-]+)', url_name='stream')
+    def stream(self, request, pk=None, format_key=None):
         try:
             job = self.get_queryset().get(pk=pk)
-            download_file = job.create_download_file(format)
-
-            if download_file:
-                return sendfile(request, download_file, attachment=True)
-            else:
-                return Response('PENDING')
         except QueryJob.DoesNotExist:
-            raise Http404
+            raise NotFound
+
+        format_config = self._get_format(format_key)
+        return StreamingHttpResponse(job.stream(format_config), content_type=format_config['content_type'])
+
+    def _get_format(self, format_key):
+        try:
+            return [f for f in settings.QUERY['download_formats'] if f['key'] == format_key][0]
+        except IndexError:
+            raise ValidationError({'format': "Not supported."})
 
 
 class ExampleViewSet(viewsets.ModelViewSet):
@@ -195,18 +174,49 @@ class ExampleViewSet(viewsets.ModelViewSet):
     )
     search_fields = ('name', 'description', 'query_string')
 
-    @list_route(methods=['get'], permission_classes=(IsAuthenticated, ))
+    @list_route(methods=['get'], permission_classes=(HasPermission, ))
     def user(self, request):
-        examples = Example.objects.filter(groups__in=self.request.user.groups.all())
+        examples = Example.objects.filter_by_access_level(self.request.user)
         serializer = UserExampleSerializer(examples, many=True)
         return Response(serializer.data)
 
 
 class QueueViewSet(ChoicesViewSet):
-    permission_classes = (IsAuthenticated, )
-    queryset = settings.QUERY['queues']
+    permission_classes = (HasPermission, )
+    queryset = [(item['key'], item['label']) for item in settings.QUERY['queues']]
 
 
 class QueryLanguageViewSet(ChoicesViewSet):
-    permission_classes = (IsAuthenticated, )
-    queryset = settings.QUERY['query_languages']
+    permission_classes = (HasPermission, )
+    queryset = [('%(key)s-%(version)s' % item, item['label']) for item in settings.QUERY['query_languages']]
+
+
+class SyncQueryJobViewSet(SyncJobViewSet):
+
+    serializer_class = SyncQueryJobSerializer
+
+    parameter_map = {
+        'FORMAT': 'response_format',
+        'TABLE_NAME': 'table_name',
+        'LANG': 'query_language',
+        'QUERY': 'query'
+    }
+
+    def get_queryset(self):
+        return QueryJob.objects.filter_by_owner(self.request.user).exclude(phase=QueryJob.PHASE_ARCHIVED)
+
+
+class AsyncQueryJobViewSet(AsyncJobViewSet):
+
+    serializer_class = AsyncQueryJobSerializer
+
+    parameter_map = {
+        'FORMAT': 'response_format',
+        'TABLE_NAME': 'table_name',
+        'LANG': 'query_language',
+        'QUEUE': 'queue',
+        'QUERY': 'query'
+    }
+
+    def get_queryset(self):
+        return QueryJob.objects.filter_by_owner(self.request.user).exclude(phase=QueryJob.PHASE_ARCHIVED)
