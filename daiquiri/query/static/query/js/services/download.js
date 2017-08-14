@@ -1,4 +1,4 @@
-app.factory('DownloadService', ['$http', 'FileSaver', 'Blob', 'PollingService', function($http, FileSaver, Blob, PollingService) {
+app.factory('DownloadService', ['$http', 'PollingService', function($http, PollingService) {
 
     /* get the base url */
 
