@@ -6,4 +6,4 @@ from rest_framework.compat import is_authenticated
 class HasPermission(BasePermission):
 
     def has_permission(self, request, view):
-        return settings.QUERY['anonymous'] or (request.user and is_authenticated(request.user))
+        return settings.QUERY_ANONYMOUS or (request.user and is_authenticated(request.user))

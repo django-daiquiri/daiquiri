@@ -47,7 +47,7 @@ def capabilities(request):
                 'name': language['key'],
                 'version': language['version'],
                 'description': language['description'],
-            } for language in settings.QUERY['query_languages']]
+            } for language in settings.QUERY_LANGUAGES]
 
         },
         {

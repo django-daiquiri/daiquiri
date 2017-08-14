@@ -4,7 +4,7 @@
     {% trans 'For further processing of the data, you can download the results table to your local machine. For this file several formats are available. Please choose a format for the download from the list below.' %}
 </p>
 
-{% for download_format in settings.QUERY.download_formats %}
+{% for download_format in settings.QUERY_DOWNLOAD_FORMATS %}
 <div class="row">
     <div class="col-md-3">
         <p>

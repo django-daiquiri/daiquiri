@@ -12,7 +12,7 @@ class QueryView(AccessMixin, TemplateView):
     template_name = 'query/query.html'
 
     def dispatch(self, request, *args, **kwargs):
-        if not settings.QUERY['anonymous'] and not request.user.is_authenticated:
+        if not settings.QUERY_ANONYMOUS and not request.user.is_authenticated:
             return self.handle_no_permission()
         return super(QueryView, self).dispatch(request, *args, **kwargs)
 

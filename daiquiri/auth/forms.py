@@ -22,7 +22,7 @@ class ProfileForm(forms.ModelForm):
         super(ProfileForm, self).__init__(*args, **kwargs)
 
         # add a field for each detail key
-        for detail_key in settings.AUTH['detail_keys']:
+        for detail_key in settings.AUTH_DETAIL_KEYS:
 
             choices = [(option['id'], option['label']) for option in detail_key['options']]
 
@@ -56,7 +56,7 @@ class ProfileForm(forms.ModelForm):
             self.instance.details = {}
 
         # store the form date for each detail key
-        for detail_key in settings.AUTH['detail_keys']:
+        for detail_key in settings.AUTH_DETAIL_KEYS:
             self.instance.details[detail_key['key']] = self.cleaned_data[detail_key['key']]
 
         return super(ProfileForm, self).save(*args, **kwargs)
@@ -72,7 +72,7 @@ class SignupForm(ProfileForm):
         user.profile.details = {}
 
         # store the form date for each detail key
-        for detail_key in settings.AUTH['detail_keys']:
+        for detail_key in settings.AUTH_DETAIL_KEYS:
             user.profile.details[detail_key['key']] = self.cleaned_data[detail_key['key']]
 
         # save the profile model

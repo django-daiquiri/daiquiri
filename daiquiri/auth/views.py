@@ -80,7 +80,7 @@ class UsersView(ModelPermissionMixin, TemplateView):
         user_admin_url = reverse('admin:auth_user_change', args=['row.id']).replace('row.id', '{$ row.id $}')
         profile_admin_url = reverse('admin:daiquiri_auth_profile_change', args=['row.id']).replace('row.id', '{$ row.id $}')
 
-        detail_keys = settings.AUTH['detail_keys']
+        detail_keys = settings.AUTH_DETAIL_KEYS
         for detail_key in detail_keys:
             detail_key['options_json'] = json.dumps(detail_key['options'])
             detail_key['model'] = 'service.current_row.details.%s' % detail_key['key']

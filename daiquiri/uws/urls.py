@@ -18,7 +18,7 @@ resources need to be of the form
 }
 '''
 try:
-    resources = settings.UWS['resources']
+    resources = settings.UWS_RESOURCES
 except AttributeError:
     pass
 else:

@@ -37,7 +37,7 @@ class Command(BaseCommand):
         print('GRANT ALL PRIVILEGES ON `%(NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\' identified by \'%(PASSWORD)s\';' % tap)
         print('')
 
-        data.update({'NAME': settings.QUERY['user_database_prefix'] + '%'})
+        data.update({'NAME': settings.QUERY_USER_DATABASE_PREFIX + '%'})
         print('GRANT ALL PRIVILEGES ON `%(NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\' identified by \'%(PASSWORD)s\';' % data)
         print('')
 

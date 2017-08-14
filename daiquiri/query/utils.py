@@ -15,15 +15,15 @@ def get_default_table_name():
 
 
 def get_default_queue():
-    return settings.QUERY['queues'][0]['key']
+    return settings.QUERY_QUEUES[0]['key']
 
 
 def get_query_language_choices():
-    return [('%(key)s-%(version)s' % item, item['label']) for item in settings.QUERY['query_languages']]
+    return [('%(key)s-%(version)s' % item, item['label']) for item in settings.QUERY_LANGUAGES]
 
 
 def get_queue_choices():
-    return [(item['key'], item['label']) for item in settings.QUERY['queues']]
+    return [(item['key'], item['label']) for item in settings.QUERY_QUEUES]
 
 
 def get_user_database_name(user):
@@ -32,27 +32,27 @@ def get_user_database_name(user):
     else:
         username = user.username
 
-    return settings.QUERY['user_database_prefix'] + username
+    return settings.QUERY_USER_DATABASE_PREFIX + username
 
 
 def get_quota(user):
     if not user or user.is_anonymous():
-        anonymous_quota = human2bytes(settings.QUERY['quota'].get('anonymous'))
+        anonymous_quota = human2bytes(settings.QUERY_QUOTA.get('anonymous'))
         return anonymous_quota if anonymous_quota else 0
 
     else:
-        user_quota = human2bytes(settings.QUERY['quota'].get('user'))
+        user_quota = human2bytes(settings.QUERY_QUOTA.get('user'))
         quota = user_quota if user_quota else 0
 
         # apply quota for user
-        user_quotas = settings.QUERY['quota'].get('users')
+        user_quotas = settings.QUERY_QUOTA.get('users')
         if user_quotas:
             user_quota = human2bytes(user_quotas.get(user.username))
             if user_quota:
                 quota = user_quota if user_quota > quota else quota
 
         # apply quota for group
-        group_quotas = settings.QUERY['quota'].get('groups')
+        group_quotas = settings.QUERY_QUOTA.get('groups')
         if group_quotas:
             for group in user.groups.all():
                 group_quota = human2bytes(group_quotas.get(group.name))
@@ -63,7 +63,7 @@ def get_quota(user):
 
 
 def get_download_file_name(database_name, table_name, username, format):
-    directory_name = os.path.join(settings.QUERY['download_dir'], username)
+    directory_name = os.path.join(settings.QUERY_DOWNLOAD_DIR, username)
     return os.path.join(directory_name, table_name + '.' + format['extension'])
 
 

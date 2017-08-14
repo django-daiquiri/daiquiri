@@ -9,7 +9,7 @@
     {% include 'query/query_dropdown_columns.html' %}
     {% include 'query/query_dropdown_functions.html' %}
 
-    {% for dropdown in settings.QUERY.dropdowns %}
+    {% for dropdown in settings.QUERY_DROPDOWNS %}
     {% include dropdown.template %}
     {% endfor %}
 

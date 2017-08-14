@@ -160,13 +160,13 @@ class QueryJob(Job):
     @property
     def timeout(self):
         if self.queue:
-            return six.next((queue['timeout'] for queue in settings.QUERY['queues'] if queue['key'] == self.queue))
+            return six.next((queue['timeout'] for queue in settings.QUERY_QUEUES if queue['key'] == self.queue))
         else:
             return 10
 
     @property
     def priority(self):
-        return six.next((queue['priority'] for queue in settings.QUERY['queues'] if queue['key'] == self.queue))
+        return six.next((queue['priority'] for queue in settings.QUERY_QUEUES if queue['key'] == self.queue))
 
     @property
     def result_status(self):
@@ -180,7 +180,7 @@ class QueryJob(Job):
             return {download_format['key']: reverse('query:job-stream', kwargs={
                 'pk': str(self.id),
                 'format_key': download_format['key']
-            }) for download_format in settings.QUERY['download_formats']}
+            }) for download_format in settings.QUERY_DOWNLOAD_FORMATS}
         else:
             return {}
 

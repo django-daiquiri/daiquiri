@@ -139,15 +139,17 @@ SOCIALACCOUNT_ADAPTER = 'daiquiri.auth.adapter.DaiquiriSocialAccountAdapter'
 SETTINGS_EXPORT = [
     'LOGIN_URL',
     'LOGOUT_URL',
-    'QUERY'
+    'QUERY_DROPDOWNS',
+    'QUERY_FORMS',
+    'QUERY_DOWNLOAD_FORMATS'
 ]
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_FROM = 'info@example.com'
 
-TAP_ACCESS_LEVEL = 'PUBLIC'
-
 SENDFILE_BACKEND = 'sendfile.backends.simple'
+
+LOGGING_DIR = os.path.join(BASE_DIR, 'log')
 
 CELERY_BROKER_URL = 'amqp://'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
@@ -159,6 +161,3 @@ CELERY_TASK_QUEUES = (
     Queue('download', Exchange('download'), routing_key='download'),
     Queue('query', Exchange('query'), routing_key='query', queue_arguments={'x-max-priority': 5}),
 )
-
-IPV4_PRIVACY_MASK = 16
-IPV6_PRIVACY_MASK = 32

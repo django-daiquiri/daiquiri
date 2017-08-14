@@ -56,7 +56,7 @@ class FormViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     serializer_class = FormSerializer
 
     def get_queryset(self):
-        return settings.QUERY['forms']
+        return settings.QUERY_FORMS
 
 
 class DropdownViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -65,7 +65,7 @@ class DropdownViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     serializer_class = DropdownSerializer
 
     def get_queryset(self):
-        return settings.QUERY['dropdowns']
+        return settings.QUERY_DROPDOWNS
 
 
 class QueryJobViewSet(viewsets.ModelViewSet):
@@ -157,7 +157,7 @@ class QueryJobViewSet(viewsets.ModelViewSet):
 
     def _get_format(self, format_key):
         try:
-            return [f for f in settings.QUERY['download_formats'] if f['key'] == format_key][0]
+            return [f for f in settings.QUERY_DOWNLOAD_FORMATS if f['key'] == format_key][0]
         except IndexError:
             raise ValidationError({'format': "Not supported."})
 
@@ -183,12 +183,12 @@ class ExampleViewSet(viewsets.ModelViewSet):
 
 class QueueViewSet(ChoicesViewSet):
     permission_classes = (HasPermission, )
-    queryset = [(item['key'], item['label']) for item in settings.QUERY['queues']]
+    queryset = [(item['key'], item['label']) for item in settings.QUERY_QUEUES]
 
 
 class QueryLanguageViewSet(ChoicesViewSet):
     permission_classes = (HasPermission, )
-    queryset = [('%(key)s-%(version)s' % item, item['label']) for item in settings.QUERY['query_languages']]
+    queryset = [('%(key)s-%(version)s' % item, item['label']) for item in settings.QUERY_LANGUAGES]
 
 
 class SyncQueryJobViewSet(SyncJobViewSet):
