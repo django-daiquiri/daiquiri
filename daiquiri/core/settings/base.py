@@ -113,14 +113,14 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static_root/')
 
 STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'node_modules/'),
     os.path.join(BASE_DIR, 'static/'),
 )
 
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    'compressor.finders.CompressorFinder',
-    'djangobower.finders.BowerFinder',
+    'compressor.finders.CompressorFinder'
 )
 
 AUTHENTICATION_BACKENDS = (
@@ -135,19 +135,6 @@ ACCOUNT_USER_DISPLAY = 'daiquiri.auth.utils.get_full_name'
 ACCOUNT_EMAIL_MAX_LENGTH = 190
 
 SOCIALACCOUNT_ADAPTER = 'daiquiri.auth.adapter.DaiquiriSocialAccountAdapter'
-
-BOWER_COMPONENTS_ROOT = os.path.join(BASE_DIR, 'bower_root/')
-
-BOWER_INSTALLED_APPS = (
-    'angular#1.5.8',
-    'angular-resource#1.5.8',
-    'bootstrap#3.3.7',
-    'ngInfiniteScroll#1.3.0',
-    'codemirror#~5.18.2',
-    'components-font-awesome#~4.6.3',
-    'moment#~2.14.1',
-    'angular-file-saver'
-)
 
 SETTINGS_EXPORT = [
     'LOGIN_URL',
