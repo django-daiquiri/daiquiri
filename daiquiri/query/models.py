@@ -132,6 +132,11 @@ class QueryJob(Job):
                 }
             })
 
+        # initialize metadata and store map of aliases
+        self.metadata = {
+            'column_aliases': processor.column_aliases
+        }
+
         # check permissions
         permission_messages = check_permissions(self.owner, processor.keywords, processor.columns, processor.functions)
         if permission_messages:

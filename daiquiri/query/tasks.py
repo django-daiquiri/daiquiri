@@ -12,6 +12,7 @@ def run_query(job_id):
     import logging
 
     from daiquiri.core.adapter import get_adapter
+    from daiquiri.metadata.models import Column
     from daiquiri.query.models import QueryJob
     from daiquiri.query.utils import get_quota
 
@@ -85,8 +86,34 @@ def run_query(job_id):
         # get additional information about the completed job
         if job.phase == job.PHASE_COMPLETED:
             job.nrows, job.size = adapter.database.fetch_stats(job.database_name, job.table_name)
-            job.metadata = adapter.database.fetch_table(job.database_name, job.table_name)
+
+            # fetch the name and the type of the table
+            job.metadata.update(adapter.database.fetch_table(job.database_name, job.table_name))
+
+            # fetch the metadata for the columns
             job.metadata['columns'] = adapter.database.fetch_columns(job.database_name, job.table_name)
+
+            # fetch additional metadata from the metadata store
+            for column in job.metadata['columns']:
+                if column['name'] in job.metadata['column_aliases']:
+                    database_name, table_name, column_name = \
+                        job.metadata['column_aliases'][column['name']].split('.')
+
+                    original_column = Column.objects.get(
+                        name=column_name,
+                        table__name=table_name,
+                        table__database__name=database_name
+                    )
+
+                    column.update({
+                        'description': original_column.description,
+                        'unit': original_column.unit,
+                        'ucd': original_column.ucd,
+                        'utype': original_column.utype,
+                        'principal': original_column.principal,
+                        'indexed': False,
+                        'std': original_column.std
+                    })
 
         job.save()
 
