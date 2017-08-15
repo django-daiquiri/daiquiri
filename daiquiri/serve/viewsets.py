@@ -8,6 +8,7 @@ from rest_framework.reverse import reverse
 from daiquiri.core.adapter import get_adapter
 
 from daiquiri.metadata.models import Database, Table, Column
+from daiquiri.query.models import QueryJob
 from daiquiri.query.utils import get_user_database_name
 
 from .serializers import ColumnSerializer
@@ -123,8 +124,13 @@ class ColumnViewSet(viewsets.ViewSet):
         user_database_name = get_user_database_name(self.request.user)
 
         if database_name == user_database_name:
-            # get database adapter and fetch the columns
-            columns = get_adapter().database.fetch_columns(database_name, table_name)
+            # get the job fetch the columns
+            job = QueryJob.objects.filter_by_owner(request.user).get(
+                database_name=database_name,
+                table_name=table_name
+            )
+            columns = job.metadata['columns']
+
         else:
             # check permissions on the database
             try:
