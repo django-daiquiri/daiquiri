@@ -157,14 +157,13 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
             service.job.time_queue = moment.duration(moment(service.job.start_time) - moment(service.job.creation_time)).seconds();
             service.job.time_query = moment.duration(moment(service.job.end_time) - moment(service.job.start_time)).seconds();
 
-            // get the phase of the current job in the jobs list
-            var phase = $filter('filter')(service.jobs, {'id': service.job.id})[0].phase;
+            // get the current job in the jobs list
+            var jobs_job = $filter('filter')(service.jobs, {'id': service.job.id})[0]
 
-            // if the phase has changed, fetch the job list again
-            if (phase != service.job.phase) {
+            if (angular.isUndefined(jobs_job) || jobs_job.phase != service.job.phase) {
+                // if the phase has changed, fetch the job list again
                 service.fetchJobs();
             }
-
         }).$promise;
     };
 
@@ -176,7 +175,6 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
     service.activateJob = function(job) {
         service.form = null;
         service.fetchJob(job).then(function() {
-
             if (service.job.phase == 'COMPLETED') {
                 TableService.init(service.job.database_name, service.job.table_name);
             } else {
@@ -200,7 +198,6 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
 
         return resources.jobs.save(values).$promise.then(function(job) {
             service.fetchStatus();
-            service.fetchJobs();
             service.activateJob(job);
         });
     };
