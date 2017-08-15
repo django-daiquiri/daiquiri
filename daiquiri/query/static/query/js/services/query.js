@@ -144,7 +144,7 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
 
                 // if the phase has changed, fetch it again
                 if (phase != service.job.phase) {
-                    service.fetchJob(service.job);
+                    service.activateJob(service.job);
                 }
             }
 
