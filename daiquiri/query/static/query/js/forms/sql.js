@@ -64,7 +64,8 @@ app.factory('SqlFormService', ['$timeout', 'QueryService', 'BrowserService', fun
         $('.daiquiri-query-dropdowns .btn-group').removeClass('open');
     }
 
-    service.replaceQuery = function(query) {
+    service.copyQuery = function(query_language, query) {
+        service.values.query_language = query_language;
         service.values.query = query;
         service.activate();
     }
