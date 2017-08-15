@@ -113,7 +113,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static_root/')
 
 STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'node_modules/'),
+    os.path.join(BASE_DIR, 'webpack/'),
     os.path.join(BASE_DIR, 'static/'),
 )
 

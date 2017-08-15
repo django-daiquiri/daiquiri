@@ -7,20 +7,16 @@
 
 {% block headextra %}
     {% compress css %}
+    <link rel="stylesheet" href="{% static 'lib/examples.css' %}" />
+
     <link rel="stylesheet" href="{% static 'codemirror/lib/codemirror.css' %}" />
     <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/list.scss' %}" />
     <link rel="stylesheet" type="text/x-scss" href="{% static 'query/css/examples.scss' %}" />
     <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/codemirror.scss' %}" />
-    {% endcompress %}
+    {% endcompress css %}
 
     {% compress js %}
-    <script type="text/javascript" src="{% static 'angular/angular.min.js' %}" ></script>
-    <script type="text/javascript" src="{% static 'angular-resource/angular-resource.min.js' %}" ></script>
-    <script type='text/javascript' src="{% static 'ng-infinite-scroll/build/ng-infinite-scroll.min.js' %}"></script>
-
-    <script type="text/javascript" src="{% static 'codemirror/lib/codemirror.js' %}" ></script>
-    <script type="text/javascript" src="{% static 'codemirror/addon/mode/overlay.js' %}" ></script>
-    <script type="text/javascript" src="{% static 'codemirror/mode/markdown/markdown.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'lib/examples.js' %}"></script>
 
     <script type="text/javascript" src="{% static 'core/js/core.js' %}" ></script>
     <script type="text/javascript" src="{% static 'core/js/list.js' %}" ></script>
@@ -30,7 +26,7 @@
     <script type="text/javascript" src="{% static 'core/js/formgroup.js' %}" ></script>
 
     <script type="text/javascript" src="{% static 'query/js/examples.js' %}" ></script>
-    {% endcompress %}
+    {% endcompress js %}
 {% endblock %}
 
 {% block wide %}

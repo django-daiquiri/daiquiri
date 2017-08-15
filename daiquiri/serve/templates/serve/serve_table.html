@@ -11,20 +11,19 @@
     <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/browser.scss' %}" />
     <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/table.scss' %}" />
     <link rel="stylesheet" type="text/x-scss" href="{% static 'serve/css/serve_table.scss' %}" />
-    {% endcompress %}
-
-    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
+    {% endcompress css %}
 
     {% compress js %}
-    <script type="text/javascript" src="{% static 'angular/angular.min.js' %}" ></script>
-    <script type="text/javascript" src="{% static 'angular-resource/angular-resource.min.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'lib/serve.js' %}" ></script>
 
     <script type="text/javascript" src="{% static 'core/js/core.js' %}" ></script>
     <script type="text/javascript" src="{% static 'core/js/byNumber.js' %}" ></script>
     <script type="text/javascript" src="{% static 'core/js/table.js' %}" ></script>
 
     <script type="text/javascript" src="{% static 'serve/js/serve_table.js' %}" ></script>
-    {% endcompress %}
+    {% endcompress js %}
+
+    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
 {% endblock %}
 
 {% block wide %}

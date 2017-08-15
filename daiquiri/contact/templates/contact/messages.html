@@ -9,12 +9,10 @@
     {% compress css %}
     <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/list.scss' %}" />
     <link rel="stylesheet" type="text/x-scss" href="{% static 'contact/css/messages.scss' %}" />
-    {% endcompress %}
+    {% endcompress css %}
 
     {% compress js %}
-    <script type="text/javascript" src="{% static 'angular/angular.min.js' %}" ></script>
-    <script type="text/javascript" src="{% static 'angular-resource/angular-resource.min.js' %}" ></script>
-    <script type='text/javascript' src="{% static 'ng-infinite-scroll/build/ng-infinite-scroll.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'lib/messages.js' %}"></script>
 
     <script type="text/javascript" src="{% static 'core/js/core.js' %}" ></script>
     <script type="text/javascript" src="{% static 'core/js/list.js' %}" ></script>
@@ -24,7 +22,7 @@
     <script type="text/javascript" src="{% static 'core/js/formgroup.js' %}" ></script>
 
     <script type="text/javascript" src="{% static 'contact/js/messages.js' %}" ></script>
-    {% endcompress %}
+    {% endcompress js %}
 {% endblock %}
 
 {% block wide %}

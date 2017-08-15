@@ -7,27 +7,17 @@
 {% block bodyargs %}ng-app="query" ng-controller="QueryController"{% endblock %}
 
 {% block headextra %}
-
     {% compress css %}
-    <link rel="stylesheet" href="{% static 'codemirror/lib/codemirror.css' %}" />
+    <link rel="stylesheet" href="{% static 'lib/query.css' %}" />
+
     <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/browser.scss' %}" />
     <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/table.scss' %}" />
     <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/codemirror.scss' %}" />
     <link rel="stylesheet" type="text/x-scss" href="{% static 'query/css/query.scss' %}" />
-    {% endcompress %}
-
-    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
+    {% endcompress css %}
 
     {% compress js %}
-    <script type="text/javascript" src="{% static 'angular/angular.min.js' %}" ></script>
-    <script type="text/javascript" src="{% static 'angular-resource/angular-resource.min.js' %}" ></script>
-
-    <script type="text/javascript" src="{% static 'moment/moment.js' %}" ></script>
-
-    <script type="text/javascript" src="{% static 'codemirror/lib/codemirror.js' %}" ></script>
-    <script type="text/javascript" src="{% static 'codemirror/addon/mode/overlay.js' %}" ></script>
-    <script type="text/javascript" src="{% static 'codemirror/addon/runmode/runmode.js' %}" ></script>
-    <script type="text/javascript" src="{% static 'codemirror/mode/sql/sql.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'lib/query.js' %}"></script>
 
     <script type="text/javascript" src="{% static 'core/js/core.js' %}" ></script>
     <script type="text/javascript" src="{% static 'core/js/filter.js' %}" ></script>
@@ -49,8 +39,9 @@
     {% for form in settings.QUERY_FORMS %}
     <script type="text/javascript" src="{% static form.service %}" ></script>
     {% endfor %}
+    {% endcompress js %}
 
-    {% endcompress %}
+    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
 {% endblock %}
 
 {% block wide %}
