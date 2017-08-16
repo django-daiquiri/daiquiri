@@ -13,6 +13,6 @@ install:
 before_script:
 - cp testing/config/settings/travis.local.py testing/config/settings/local.py
 script:
-- coverage run runtests.py
+- coverage run testing/runtests.py
 after_success:
 - coveralls
