@@ -5,8 +5,8 @@ source = .
 omit =
     env/*
     setup.py
-    runtests.py
-    runcoverage.py
+    testing/runtests.py
+    testing/runcoverage.py
 
 exclude_lines =
     pass
