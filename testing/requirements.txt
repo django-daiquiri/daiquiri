@@ -29,3 +29,6 @@ ipaddress==1.0.18
 mysqlclient==1.3.10
 
 antlr4_python2_runtime
+
+coverage
+coveralls
