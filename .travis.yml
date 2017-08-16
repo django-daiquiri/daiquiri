@@ -2,14 +2,13 @@ language: python
 cache:
   directories:
   - $HOME/virtualenv
-services:
-- postgresql
+addons:
+  mariadb: '10.1'
 python:
 - 2.7
 - 3.4
 install:
 - pip install -r testing/requirements.txt
-- pip install psycopg2
 - pip install coveralls
 before_script:
 - cp testing/travis.local.py testing/local.py

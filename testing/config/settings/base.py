@@ -1,3 +1,7 @@
+import os
+
+from daiquiri.core.settings.base import BASE_DIR
+
 DAIQUIRI_APPS = [
     'daiquiri.auth',
     'daiquiri.contact',
@@ -13,3 +17,7 @@ DAIQUIRI_APPS = [
 ]
 
 INSTALLED_APPS = []
+
+FIXTURE_DIRS = (
+    os.path.join(BASE_DIR, 'fixtures'),
+)

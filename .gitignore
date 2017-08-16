@@ -1,6 +1,9 @@
 testing/local.py
 testing/log
+testing/webpack
+testing/static_root
 
+*-
 *~
 *.pyc
 *.swp

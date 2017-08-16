@@ -1,78 +1,33 @@
-from django.core.urlresolvers import reverse
-from django.forms.models import model_to_dict
+from django.test import TestCase
+
+from test_generator.views import TestListViewMixin
 
 
-class TestSingleObjectMixin():
+class CoreTestCase(TestCase):
 
-    def model_to_dict(self, instance=None):
-        if instance is None:
-            instance = self.instance
+    fixtures = (
+        'auth.json',
+    )
 
-        model_dict = model_to_dict(instance)
-        model_data = {}
-        for key in model_dict:
-            if model_dict[key] is not None:
-                model_data[key] = model_dict[key]
+    languages = (
+        'en',
+    )
 
-        return model_data
+    users = (
+        ('admin', 'admin'),
+        ('user', 'user'),
+        ('anonymous', None),
+    )
 
-
-class TestListViewMixin():
-
-    def test_list_view(self):
-        url = reverse(self.list_url_name)
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-
-
-class TestRetrieveViewMixin():
-
-    def test_retrieve_view(self):
-        url = reverse(self.retrieve_url_name, args=[self.instance.pk])
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+    status_map = {
+        'list_view': {
+            'admin': 200, 'user': 200, 'anonymous': 200
+        }
+    }
 
 
-class TestCreateViewMixin(TestSingleObjectMixin):
+class HomeTests(TestListViewMixin, CoreTestCase):
 
-    def test_create_view_get(self):
-        url = reverse(self.create_url_name)
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-
-    def test_create_view_post(self):
-        url = reverse(self.create_url_name)
-        response = self.client.post(url, self.model_to_dict())
-        self.assertEqual(response.status_code, 302)
-
-
-class TestUpdateViewMixin(TestSingleObjectMixin):
-
-    def test_update_view_get(self):
-        url = reverse(self.update_url_name, args=[self.instance.pk])
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-
-    def test_update_view_post(self):
-        url = reverse(self.update_url_name, args=[self.instance.pk])
-        response = self.client.post(url, self.model_to_dict())
-        self.assertEqual(response.status_code, 302)
-
-
-class TestDeleteViewMixin(TestSingleObjectMixin):
-
-    def test_delete_view_get(self):
-        url = reverse(self.delete_url_name, args=[self.instance.pk])
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-
-    def test_delete_view_post(self):
-        url = reverse(self.delete_url_name, args=[self.instance.pk])
-        response = self.client.post(url)
-        self.assertEqual(response.status_code, 302)
-
-
-class TestModelStringMixin(TestSingleObjectMixin):
-
-    def test_model_str(self):
-        self.assertIsNotNone(self.instance.__str__())
+    url_names = {
+        'list_view': 'home'
+    }
