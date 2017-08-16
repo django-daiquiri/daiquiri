@@ -121,14 +121,21 @@ def run_query(job_id):
             # fetch additional metadata from the metadata store
             for column in job.metadata['columns']:
                 if column['name'] in job.metadata['column_aliases']:
-                    database_name, table_name, column_name = \
-                        job.metadata['column_aliases'][column['name']].split('.')
 
-                    original_column = Column.objects.get(
-                        name=column_name,
-                        table__name=table_name,
-                        table__database__name=database_name
-                    )
+                    try:
+                        database_name, table_name, column_name = \
+                            job.metadata['column_aliases'][column['name']].split('.')
+                    except ValueError:
+                        continue
+
+                    try:
+                        original_column = Column.objects.get(
+                            name=column_name,
+                            table__name=table_name,
+                            table__database__name=database_name
+                        )
+                    except Column.DoesNotExist:
+                        continue
 
                     column.update({
                         'description': original_column.description,
