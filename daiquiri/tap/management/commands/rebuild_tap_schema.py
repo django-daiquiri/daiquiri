@@ -12,9 +12,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        TapSchema.objects.using('tap').all().delete()
-        TapTable.objects.using('tap').all().delete()
-        TapColumn.objects.using('tap').all().delete()
+        TapSchema.objects.all().delete()
+        TapTable.objects.all().delete()
+        TapColumn.objects.all().delete()
 
         for database in Database.objects.all():
             database_updated_handler(Database, instance=database)

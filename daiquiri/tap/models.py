@@ -11,7 +11,6 @@ class Schema(models.Model):
 
     class Meta:
         db_table = 'schemas'
-        managed = False
 
     def __str__(self):
         return self.schema_name
@@ -31,7 +30,6 @@ class Table(models.Model):
 
     class Meta:
         db_table = 'tables'
-        managed = False
 
     def __str__(self):
         return '%s.%s' % (self.schema_name, self.table_name)
@@ -58,7 +56,6 @@ class Column(models.Model):
 
     class Meta:
         db_table = 'columns'
-        managed = False
 
     def __str__(self):
         return '%s.%s' % (self.table_name, self.column_name)

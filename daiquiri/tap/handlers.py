@@ -23,9 +23,9 @@ def database_updated_handler(sender, **kwargs):
 
     if tap:
         try:
-            schema = TapSchema.objects.using('tap').get(pk=instance.id)
+            schema = TapSchema.objects.get(pk=instance.id)
         except TapSchema.DoesNotExist:
-            schema = TapSchema.objects.using('tap').create(pk=instance.id)
+            schema = TapSchema.objects.create(pk=instance.id)
 
         schema.schema_name = instance.name
         schema.utype = None
@@ -36,7 +36,7 @@ def database_updated_handler(sender, **kwargs):
     else:
         # remove the database from the TAP_SCHEMA (if it exists)
         try:
-            TapSchema.objects.using('tap').get(pk=instance.id).delete()
+            TapSchema.objects.get(pk=instance.id).delete()
         except TapSchema.DoesNotExist:
             pass
 
@@ -52,7 +52,7 @@ def database_deleted_handler(sender, **kwargs):
 
     # remove the database from the TAP_SCHEMA (if it exists)
     try:
-        TapSchema.objects.using('tap').get(pk=instance.id).delete()
+        TapSchema.objects.get(pk=instance.id).delete()
     except TapSchema.DoesNotExist:
         pass
 
@@ -68,16 +68,16 @@ def table_updated_handler(sender, **kwargs):
 
     # get the schema from the TAP_SCHEMA
     try:
-        schema = TapSchema.objects.using('tap').get(pk=instance.database.id)
+        schema = TapSchema.objects.get(pk=instance.database.id)
     except TapSchema.DoesNotExist:
         schema = None
 
     if tap and schema:
         try:
-            table = TapTable.objects.using('tap').get(pk=instance.id)
+            table = TapTable.objects.get(pk=instance.id)
             table.schema = schema
         except TapTable.DoesNotExist:
-            table = TapTable.objects.using('tap').create(pk=instance.id, schema=schema)
+            table = TapTable.objects.create(pk=instance.id, schema=schema)
 
         table.schema_name = str(instance.database)
         table.table_name = instance.name
@@ -92,7 +92,7 @@ def table_updated_handler(sender, **kwargs):
     else:
         # remove the table from the TAP_SCHEMA (if it exists)
         try:
-            TapTable.objects.using('tap').get(pk=instance.id).delete()
+            TapTable.objects.get(pk=instance.id).delete()
         except TapTable.DoesNotExist:
             pass
 
@@ -108,7 +108,7 @@ def table_deleted_handler(sender, **kwargs):
 
     # remove the table from the TAP_SCHEMA (if it exists)
     try:
-        TapTable.objects.using('tap').get(pk=instance.id).delete()
+        TapTable.objects.get(pk=instance.id).delete()
     except TapTable.DoesNotExist:
         pass
 
@@ -124,16 +124,16 @@ def column_updated_handler(sender, **kwargs):
 
     # get the table from the TAP_SCHEMA
     try:
-        table = TapTable.objects.using('tap').get(pk=instance.table.id)
+        table = TapTable.objects.get(pk=instance.table.id)
     except TapTable.DoesNotExist:
         table = None
 
     if tap and table:
         try:
-            column = TapColumn.objects.using('tap').get(pk=instance.id)
+            column = TapColumn.objects.get(pk=instance.id)
             column.table = table
         except TapColumn.DoesNotExist:
-            column = TapColumn.objects.using('tap').create(pk=instance.id, table=table)
+            column = TapColumn.objects.create(pk=instance.id, table=table)
 
         column.table_name = str(instance.table)
         column.column_name = instance.name
@@ -153,7 +153,7 @@ def column_updated_handler(sender, **kwargs):
     else:
         # remove the column from the TAP_SCHEMA (if it exists)
         try:
-            TapColumn.objects.using('tap').get(pk=instance.id).delete()
+            TapColumn.objects.get(pk=instance.id).delete()
         except TapColumn.DoesNotExist:
             pass
 
@@ -165,6 +165,6 @@ def column_deleted_handler(sender, **kwargs):
 
     # remove the column from the TAP_SCHEMA (if it exists)
     try:
-        TapColumn.objects.using('tap').get(pk=instance.id).delete()
+        TapColumn.objects.get(pk=instance.id).delete()
     except TapColumn.DoesNotExist:
         pass
