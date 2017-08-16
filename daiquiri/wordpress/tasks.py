@@ -6,8 +6,10 @@ from django.conf import settings
 
 from celery import shared_task
 
+from daiquiri.core.tasks import Task
 
-@shared_task
+
+@shared_task(base=Task)
 def create_wordpress_user(username, email, first_name, last_name):
     return subprocess.check_output([
         settings.WORDPRESS_CLI,
@@ -21,7 +23,7 @@ def create_wordpress_user(username, email, first_name, last_name):
     ])
 
 
-@shared_task
+@shared_task(base=Task)
 def update_wordpress_user(username, email, first_name, last_name):
     return subprocess.check_output([
         settings.WORDPRESS_CLI,
@@ -35,7 +37,7 @@ def update_wordpress_user(username, email, first_name, last_name):
     ])
 
 
-@shared_task
+@shared_task(base=Task)
 def update_wordpress_role(username, role):
     return subprocess.check_output([
         settings.WORDPRESS_CLI,

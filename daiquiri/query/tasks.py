@@ -1,16 +1,41 @@
 from __future__ import absolute_import, unicode_literals
 
+import logging
+
 from celery import shared_task
 
 from django.db.utils import OperationalError, ProgrammingError, InternalError
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 
+from daiquiri.core.tasks import Task
 
-@shared_task
+
+class RunQueryTask(Task):
+
+    def on_failure(self, exc, task_id, args, kwargs, einfo):
+        super(RunQueryTask, self).on_failure(exc, task_id, args, kwargs, einfo)
+
+        # always import daiquiri packages inside the task
+        from daiquiri.query.models import QueryJob
+
+        # get job_id from the original task args
+        job_id = args[0]
+
+        # get logger and log raised exception
+        logger = logging.getLogger(__name__)
+        logger.error('run_query %s raised an exception (%s)' % (job_id, exc))
+
+        # set phase and error_summary of the crashed job
+        job = QueryJob.objects.get(pk=job_id)
+        job.phase = job.PHASE_ERROR
+        job.error_summary = str(_('There has been an server error with your job.'))
+        job.save()
+
+
+@shared_task(base=RunQueryTask)
 def run_query(job_id):
-    import logging
-
+    # always import daiquiri packages inside the task
     from daiquiri.core.adapter import get_adapter
     from daiquiri.metadata.models import Column
     from daiquiri.query.models import QueryJob
@@ -120,18 +145,19 @@ def run_query(job_id):
     return job.phase
 
 
-@shared_task(track_started=True)
+@shared_task(track_started=True, base=Task)
 def create_download_file(file_name, format_key, database_name, table_name, metadata, status, empty):
-    import logging
-
+    # always import daiquiri packages inside the task
     from daiquiri.core.adapter import get_adapter
 
-    # get logger
+    # get logger and log start
     logger = logging.getLogger(__name__)
     logger.info('create_download_file %s started' % file_name)
 
+    # write file using the generator in the adapter
     with open(file_name, 'w') as f:
         for line in get_adapter().download.generate(format_key, database_name, table_name, metadata, status, empty):
             f.write(line)
 
+    # log completion
     logger.info('create_download_file %s completed' % file_name)
