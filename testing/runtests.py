@@ -19,10 +19,6 @@ def main():
 
     args = parser.parse_args()
 
-    testing_path = os.path.dirname(__file__)
-    daiquiri_path = os.path.dirname(testing_path)
-
-    sys.path.append(daiquiri_path)
     os.environ['DJANGO_SETTINGS_MODULE'] = 'config.settings'
 
     django.setup()

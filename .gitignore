@@ -12,6 +12,7 @@ testing/static_root
 *.sqlite3
 
 env
+env3
 
 build
 dist

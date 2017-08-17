@@ -1,19 +1,25 @@
 language: python
-cache:
-  directories:
-  - $HOME/virtualenv
+cache: pip
+
 service:
   - mysql
+
 python:
 - 2.7
 - 3.4
+- 3.5
+- 3.6
+
 install:
 - mkdir testing/log
-- pip install -r testing/requirements.txt
-- pip install coveralls
+- pip install --ignore-installed .
+- pip install coverage coveralls mysqlclient django-test-generator
+
 before_script:
 - cp testing/config/settings/travis.local.py testing/config/settings/local.py
+
 script:
 - coverage run testing/runtests.py
+
 after_success:
 - coveralls

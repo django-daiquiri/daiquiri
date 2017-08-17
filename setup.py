@@ -7,8 +7,7 @@ version = '0.1.0'
 
 python_version = sys.version_info.major
 
-requirements = (
-    'wheel',
+requirements = [
     'Django==1.11',
     'djangorestframework==3.6.2',
     'drf-extensions==0.3.1',
@@ -31,9 +30,12 @@ requirements = (
     'lxml==3.7.3',
     'bitstring==3.1.5',
     'ipaddress==1.0.18',
-    'queryparser_python%d' % python_version,
-    'mysqlclient==1.3.10',
-)
+    'queryparser_python%d' % sys.version_info.major
+]
+
+# work around for python 3.4 and antlr4-python3-runtime
+if sys.version_info.major == 3 and sys.version_info.minor < 5:
+    requirements += ['typing']
 
 setup(
     name='django-daiquiri',
