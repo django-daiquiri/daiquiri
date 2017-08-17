@@ -12,8 +12,8 @@ python:
 
 install:
 - mkdir testing/log
-- pip install --ignore-installed .
-- pip install coverage coveralls mysqlclient django-test-generator
+- pip install -e .
+- pip install mysqlclient django-test-generator coverage coveralls
 
 before_script:
 - cp testing/config/settings/travis.local.py testing/config/settings/local.py

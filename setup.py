@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import sys
 
 from setuptools import setup, find_packages
@@ -32,10 +31,6 @@ requirements = [
     'ipaddress==1.0.18',
     'queryparser_python%d' % sys.version_info.major
 ]
-
-# work around for python 3.4 and antlr4-python3-runtime
-if sys.version_info.major == 3 and sys.version_info.minor < 5:
-    requirements += ['typing']
 
 setup(
     name='django-daiquiri',

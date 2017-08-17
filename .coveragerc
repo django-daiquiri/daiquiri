@@ -1,14 +1,2 @@
 [run]
-source = .
-
-[report]
-omit =
-    env/*
-    setup.py
-    testing/runtests.py
-    testing/runcoverage.py
-
-exclude_lines =
-    pass
-    raise Exception
-    except ImportError:
+source = daiquiri
