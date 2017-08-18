@@ -5,9 +5,9 @@ from kombu import Exchange, Queue
 
 from django.utils.translation import ugettext_lazy as _
 
-DAIQUIRI_APP = os.environ['DJANGO_SETTINGS_MODULE'].replace('.settings', '')
-PROJECT_DIR = imp.find_module(DAIQUIRI_APP)[1]
-BASE_DIR = os.path.dirname(PROJECT_DIR)
+CONFIG_DIR = imp.find_module('config')[1]
+BASE_DIR = os.path.dirname(CONFIG_DIR)
+DAIQUIRI_APP = os.path.basename(BASE_DIR).replace('-', '_')
 
 DEBUG = False
 
@@ -21,9 +21,9 @@ ALLOWED_HOSTS = ['localhost']
 
 INTERNAL_IPS = ('127.0.0.1',)
 
-ROOT_URLCONF = DAIQUIRI_APP + '.urls'
+ROOT_URLCONF = 'config.urls'
 
-WSGI_APPLICATION = DAIQUIRI_APP + '.wsgi.application'
+WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASE_ROUTERS = ['daiquiri.tap.routers.TapRouter', 'daiquiri.core.routers.DataRouter']
 
@@ -123,6 +123,10 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'compressor.finders.CompressorFinder'
+)
+
+FIXTURE_DIRS = (
+    os.path.join(BASE_DIR, 'fixtures'),
 )
 
 AUTHENTICATION_BACKENDS = (

@@ -104,9 +104,6 @@ class QueryJob(Job):
                     'query': [_('Quota is exceeded. Please remove some of your jobs.')]
                 })
 
-        # remove trailing semicolon from the query
-        self.query = self.query.strip(';')
-
         # translate adql -> mysql string
         if self.query_language == 'adql-2.0':
             try:
@@ -143,6 +140,9 @@ class QueryJob(Job):
             raise ValidationError({
                 'query': permission_messages
             })
+
+        # remove trailing semicolon from the native_query
+        self.native_query = self.native_query.rstrip(';')
 
         # set clean flag
         self.is_clean = True

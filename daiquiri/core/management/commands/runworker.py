@@ -16,5 +16,12 @@ class Command(BaseCommand):
 
         node = '%s_%s' % (settings.DAIQUIRI_APP, queue)
 
-        args = ['celery', 'worker', '-A', settings.DAIQUIRI_APP, '-Q', queue, '-c', concurrency, '-n', node, '-l',  'info']
+        args = [
+            'celery', 'worker',
+            '-A', 'config',
+            '-Q', queue,
+            '-c', concurrency,
+            '-n', node,
+            '-l',  'info'
+        ]
         subprocess.call(args)
