@@ -34,28 +34,43 @@ class Command(BaseCommand):
         print('''-- Run the following commands on \'%(HOST)s\':
 
 CREATE DATABASE `%(NAME)s`;
-CREATE USER \'%(USER)s\'@\'%(CLIENT)s\' identified by \'%(PASSWORD)s\'
-GRANT ALL PRIVILEGES ON `%(NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\'
+CREATE USER \'%(USER)s\'@\'%(CLIENT)s\' identified by \'%(PASSWORD)s\';
+GRANT ALL PRIVILEGES ON `%(NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\';
 ''' % default)
 
         print('''-- Run the following commands on \'%(HOST)s\':
 
 CREATE DATABASE `%(NAME)s`;
-CREATE USER \'%(USER)s\'@\'%(CLIENT)s\' identified by \'%(PASSWORD)s\'
-GRANT ALL PRIVILEGES ON `%(NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\'
+CREATE USER \'%(USER)s\'@\'%(CLIENT)s\' identified by \'%(PASSWORD)s\';
+GRANT ALL PRIVILEGES ON `%(NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\';
 ''' % tap)
 
         print('''-- Run the following commands on \'%(HOST)s\':
 
-CREATE USER \'%(USER)s\'@\'%(CLIENT)s\' identified by \'%(PASSWORD)s\'
-GRANT ALL PRIVILEGES ON `%(PREFIX)s`%%.* to \'%(USER)s\'@\'%(CLIENT)s\'
+CREATE USER \'%(USER)s\'@\'%(CLIENT)s\' identified by \'%(PASSWORD)s\';
+GRANT ALL PRIVILEGES ON `%(PREFIX)s%%`.* to \'%(USER)s\'@\'%(CLIENT)s\';
 ''' % data)
 
         try:
             for database in Database.objects.all():
                 data.update({'DATABASE_NAME': database.name})
-                print('GRANT SELECT ON `%(DATABASE_NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\'' % data)
+                print('GRANT SELECT ON `%(DATABASE_NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\';' % data)
         except (OperationalError, ProgrammingError):
             pass
         else:
             print('')
+
+        print('''-- For testing, run the following commands on \'%(HOST)s\':
+
+GRANT ALL PRIVILEGES ON `test_%(NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\';
+''' % default)
+
+        print('''-- For testing, run the following commands on \'%(HOST)s\':
+
+GRANT ALL PRIVILEGES ON `test_%(NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\';
+''' % tap)
+
+        print('''-- For testing, run the following commands on \'%(HOST)s\':
+
+GRANT ALL PRIVILEGES ON `test_`.* to \'%(USER)s\'@\'%(CLIENT)s\';
+''' % data)
