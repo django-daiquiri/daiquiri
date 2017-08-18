@@ -1,3 +1,4 @@
+import logging
 import re
 
 from django.db import OperationalError, ProgrammingError
@@ -180,6 +181,8 @@ class MySQLAdapter(DatabaseAdapter):
         self.execute(sql)
 
     def fetch_tables(self, database_name):
+        logger = logging.getLogger(__name__)
+
         # escape input
         escaped_database_name = self.escape_identifier(database_name)
 
@@ -191,7 +194,8 @@ class MySQLAdapter(DatabaseAdapter):
         # execute query
         try:
             rows = self.fetchall(sql)
-        except OperationalError:
+        except OperationalError as e:
+            logger.error('Could not fetch from %s (%s)' % (database_name, e))
             return []
         else:
             return [{
@@ -200,6 +204,8 @@ class MySQLAdapter(DatabaseAdapter):
             } for row in rows]
 
     def fetch_table(self, database_name, table_name):
+        logger = logging.getLogger(__name__)
+
         # prepare sql string
         sql = 'SHOW FULL TABLES FROM %(database)s LIKE %(table)s' % {
             'database': self.escape_identifier(database_name),
@@ -209,7 +215,8 @@ class MySQLAdapter(DatabaseAdapter):
         # execute query
         try:
             row = self.fetchone(sql)
-        except OperationalError:
+        except OperationalError as e:
+            logger.error('Could not fetch %s.%s (%s)' % (database_name, table_name, e))
             return {}
         else:
             return {
@@ -235,6 +242,8 @@ class MySQLAdapter(DatabaseAdapter):
         self.execute(sql)
 
     def fetch_columns(self, database_name, table_name):
+        logger = logging.getLogger(__name__)
+
         # prepare sql string
         sql = 'SHOW FULL COLUMNS FROM %(database)s.%(table)s;' % {
             'database': self.escape_identifier(database_name),
@@ -244,7 +253,8 @@ class MySQLAdapter(DatabaseAdapter):
         # execute query
         try:
             rows = self.fetchall(sql)
-        except ProgrammingError:
+        except ProgrammingError as e:
+            logger.error('Could not fetch from %s.%s (%s)' % (database_name, table_name, e))
             return []
         else:
             column_metadata = []
@@ -261,6 +271,8 @@ class MySQLAdapter(DatabaseAdapter):
             return column_metadata
 
     def fetch_column(self, database_name, table_name, column_name):
+        logger = logging.getLogger(__name__)
+
         # prepare sql string
         sql = 'SHOW FULL COLUMNS FROM %(database)s.%(table)s WHERE `Field` = %(column)s' % {
             'database': self.escape_identifier(database_name),
@@ -271,7 +283,8 @@ class MySQLAdapter(DatabaseAdapter):
         # execute query
         try:
             row = self.fetchone(sql)
-        except ProgrammingError:
+        except ProgrammingError as e:
+            logger.error('Could not fetch %s.%s.%s (%s)' % (database_name, table_name, column_name, e))
             return {}
         else:
             return {
