@@ -29,6 +29,8 @@ requirements = [
     'lxml==3.7.3',
     'bitstring==3.1.5',
     'ipaddress==1.0.18',
+    'django-test-generator',
+    'coverage',
     'queryparser_python%d' % sys.version_info.major
 ]
 
