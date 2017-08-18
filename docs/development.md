@@ -1,68 +1,92 @@
-Development setup
------------------
+Install prerequisites
+---------------------
 
-Install `npm`:
+Install `node` and `npm`:
 
-```
-sudo apt-get install npm
-```
 
-Install `bower`:
+Set up Daiquiri
+---------------
 
-```
-sudo npm -g install bower
-```
-
-Create a `django-daiquiri` directory at a convenient place:
+Create a `daiquiri` directory at a convenient place:
 
 ```
-mkdir django-daiquiri
-cd django-daiquiri
-mkdir log
+mkdir daiquiri
+cd daiquiri
 ```
 
-Set up a virtualenv in this directory:
-
-```
-virtualenv env
-source env/bin/activate
-```
-
-Clone the repositories and call the `daiquiri` and `app`:
+Clone the repositories and call the `daiquiri`, `app`, and `queryparser`:
 
 ```
 git clone https://github.com/aipescience/django-daiquiri daiquiri
 git clone https://github.com/aipescience/django-daiquiri-app app
+git clone https://github.com/aipescience/queryparser queryparser
 ```
 
-Install the requirements:
+Change to the `app` directory and create a virtualenv:
 
 ```
 cd app
-pip install -r requirements/base.txt
-pip install -r requirements/mysql.txt
+virtualenv env
+source env/bin/activate
+```
+
+or for `python3`:
+
+```
+cd app
+python3 -m venv env3
+source env3/bin/activate
+```
+
+```
+Install the requirements in editable mode:
+
+```
+pip install -I -e ../daiquiri
+pip install -I -e ../queryparser
+pip install mysqlclient
+```
+
+Create a `log` and a `download` directory:
+
+```
+mkdir log download
+```
+
+Create front end library bundles:
+
+```
+npm install
+npm run webpack
 ```
 
 Copy the `local.py` settings file:
 
 ```
-cp daiquiri_app/settings/sample.local.py daiquiri_app/settings/local.py
+cp config/settings/sample.local.py config/settings/local.py
 ```
 
-Edit daiquiri_app/settings/local.py for database settings and 'DEBUG = True' and add
+Edit config/settings/local.py for database settings and 'DEBUG = True'.
+
+Create databases on `mysql`:
 
 ```
-import sys; sys.path.append('../daiquiri/')
+mysql -u root -p -e 'create database daiquiri_app';
+mysql -u root -p -e 'create database TAP_SCHEMA';
 ```
-
-at the top of the file.
 
 Run:
 
 ```
 ./manage.py migrate
-./manage.py bower install
-./manage.py createsuperuser
+./manage.py migrate --database=tap
+./manage.py loaddata ../daiquiri/testing/fixtures/*
+```
+
+Run the tests:
+
+```
+ ./manage.py test daiquiri --keepdb
 ```
 
 Run the development server:
@@ -73,45 +97,40 @@ Run the development server:
 
 Go to `http://localhost:8000` in your web browser.
 
-### Additional settings 
 
-### Antlr
-You have to have Antlr installed. Please check [Antlr website](wwww. antlr.org) for the newest version of the installation script! 
+Open three other terminals, got to the `daiquiri/app` directory, activate the virtualenv, and run
 
 ```
-cd /usr/local/lib
-wget http://www.antlr.org/download/antlr-4.5.3-complete.jar
-export CLASSPATH=".:/usr/local/lib/antlr-4.5.3-complete.jar:$CLASSPATH"
-alias antlr4='java -jar /usr/local/lib/antlr-4.5.3-complete.jar'
-alias grun='java org.antlr.v4.gui.TestRig'
+./manage.py runworker default
 ```
 
-### Queryparser
-As long as pip install is in development, install the [Queryparser](https://github.com/aipescience/queryparser). 
+```
+./manage.py runworker query
+```
+
+```
+./manage.py runworker download
+```
+
+to start the different workers.
 
 
-#### MariaDB
+Additioal information
+---------------------
+
+MariaDB
+~~~~~~~
 
 The default character set in MariaDB 10.0.27 is utf8b4. This causes a django-error for the migration:
 
 ```
 django.db.utils.OperationalError: (1071, 'Specified key was too long; max key length is 767 bytes')
 ```
+
 Solution 1: set the django DB settings: [https://docs.djangoproject.com/el/1.10/ref/settings/#charset]
 
-
 Solution 2: create your database with the utf8 character set.
+
 ```
 create database <DBname> CHARACTER SET utf8;
-```
-
-#### Ubuntu 16.04
-Errror:
-```
-./manage.py bower install
-Problem:/usr/bin/env: ‘node’: No such file or directory
-```
-Solution:
-```
-sudo apt-get install nodejs-legacy
 ```
