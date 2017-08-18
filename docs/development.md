@@ -53,13 +53,6 @@ Create a `log` and a `download` directory:
 mkdir log download
 ```
 
-Create front end library bundles:
-
-```
-npm install
-npm run webpack
-```
-
 Copy the `local.py` settings file:
 
 ```
@@ -87,6 +80,13 @@ Run the tests:
 
 ```
  ./manage.py test daiquiri --keepdb
+```
+
+Create the front end library bundles:
+
+```
+npm install
+npm run webpack
 ```
 
 Run the development server:
