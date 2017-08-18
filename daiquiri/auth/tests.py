@@ -1,4 +1,3 @@
-from django.test import TestCase
 from django.contrib.auth.models import User, Group
 
 from test_generator.views import TestListViewMixin
@@ -7,6 +6,8 @@ from test_generator.viewsets import (
     TestRetrieveViewsetMixin,
     TestUpdateViewsetMixin
 )
+
+from daiquiri.core.tests import TestCase
 
 from .models import Profile
 

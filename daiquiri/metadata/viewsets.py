@@ -49,7 +49,7 @@ class DatabaseViewSet(viewsets.ModelViewSet):
 
             for table_metadata in adapter.database.fetch_tables(database.name):
                 table_metadata['database'] = database.id
-                table_metadata['groups'] = request.data['groups']
+                table_metadata['groups'] = [group.id for group in database.groups.all()]
                 for key in ['license', 'access_level', 'metadata_access_level']:
                     table_metadata[key] = getattr(database, key)
 
@@ -59,7 +59,7 @@ class DatabaseViewSet(viewsets.ModelViewSet):
 
                     for column_metadata in adapter.database.fetch_columns(database.name, table.name):
                         column_metadata['table'] = table.id
-                        column_metadata['groups'] = request.data['groups']
+                        column_metadata['groups'] = [group.id for group in table.groups.all()]
                         for key in ['access_level', 'metadata_access_level']:
                             column_metadata[key] = getattr(table, key)
 
@@ -108,7 +108,7 @@ class TableViewSet(viewsets.ModelViewSet):
 
             for column_metadata in adapter.database.fetch_columns(table.database.name, table.name):
                 column_metadata['table'] = table.id
-                column_metadata['groups'] = request.data['groups']
+                column_metadata['groups'] = [group.id for group in table.groups.all()]
                 for key in ['access_level', 'metadata_access_level']:
                     column_metadata[key] = getattr(table, key)
 

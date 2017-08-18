@@ -1,6 +1,13 @@
-from django.test import TestCase
+from django.test import TestCase as DjangoTestCase
 
 from test_generator.views import TestListViewMixin
+
+
+class TestCase(DjangoTestCase):
+
+    languages = (
+        'en',
+    )
 
 
 class CoreTestCase(TestCase):
