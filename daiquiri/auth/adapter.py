@@ -8,6 +8,8 @@ from allauth.account.adapter import DefaultAccountAdapter
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from allauth.exceptions import ImmediateHttpResponse
 
+logger = logging.getLogger(__name__)
+
 
 class DaiquiriAccountAdapter(DefaultAccountAdapter):
 
@@ -38,5 +40,5 @@ class DaiquiriAccountAdapter(DefaultAccountAdapter):
 class DaiquiriSocialAccountAdapter(DefaultSocialAccountAdapter):
 
     def authentication_error(self, request, provider_id, error=None, exception=None, extra_context=None):
-        logging.getLogger(__name__).error([provider_id, error, exception])
+        logger.error([provider_id, error, exception])
         super(DaiquiriSocialAccountAdapter, self).authentication_error(request, provider_id, error, exception, extra_context)

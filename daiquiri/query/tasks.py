@@ -19,11 +19,13 @@ class RunQueryTask(Task):
         # always import daiquiri packages inside the task
         from daiquiri.query.models import QueryJob
 
+        # get logger
+        logger = logging.getLogger(__name__)
+
         # get job_id from the original task args
         job_id = args[0]
 
-        # get logger and log raised exception
-        logger = logging.getLogger(__name__)
+        # log raised exception
         logger.error('run_query %s raised an exception (%s)' % (job_id, exc))
 
         # set phase and error_summary of the crashed job
@@ -157,8 +159,10 @@ def create_download_file(file_name, format_key, database_name, table_name, metad
     # always import daiquiri packages inside the task
     from daiquiri.core.adapter import get_adapter
 
-    # get logger and log start
+    # get logger
     logger = logging.getLogger(__name__)
+
+    # log start
     logger.info('create_download_file %s started' % file_name)
 
     # write file using the generator in the adapter

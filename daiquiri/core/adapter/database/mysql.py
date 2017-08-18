@@ -5,6 +5,8 @@ from django.db import OperationalError, ProgrammingError
 
 from .base import DatabaseAdapter
 
+logger = logging.getLogger(__name__)
+
 
 class MySQLAdapter(DatabaseAdapter):
 
@@ -181,8 +183,6 @@ class MySQLAdapter(DatabaseAdapter):
         self.execute(sql)
 
     def fetch_tables(self, database_name):
-        logger = logging.getLogger(__name__)
-
         # escape input
         escaped_database_name = self.escape_identifier(database_name)
 
@@ -204,8 +204,6 @@ class MySQLAdapter(DatabaseAdapter):
             } for row in rows]
 
     def fetch_table(self, database_name, table_name):
-        logger = logging.getLogger(__name__)
-
         # prepare sql string
         sql = 'SHOW FULL TABLES FROM %(database)s LIKE %(table)s' % {
             'database': self.escape_identifier(database_name),
@@ -242,8 +240,6 @@ class MySQLAdapter(DatabaseAdapter):
         self.execute(sql)
 
     def fetch_columns(self, database_name, table_name):
-        logger = logging.getLogger(__name__)
-
         # prepare sql string
         sql = 'SHOW FULL COLUMNS FROM %(database)s.%(table)s;' % {
             'database': self.escape_identifier(database_name),
@@ -271,8 +267,6 @@ class MySQLAdapter(DatabaseAdapter):
             return column_metadata
 
     def fetch_column(self, database_name, table_name, column_name):
-        logger = logging.getLogger(__name__)
-
         # prepare sql string
         sql = 'SHOW FULL COLUMNS FROM %(database)s.%(table)s WHERE `Field` = %(column)s' % {
             'database': self.escape_identifier(database_name),
