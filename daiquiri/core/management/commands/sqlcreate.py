@@ -21,6 +21,8 @@ class Command(BaseCommand):
         else:
             config['CLIENT'] = socket.gethostname()
 
+        config['PREFIX'] = settings.QUERY_USER_DATABASE_PREFIX
+
         return config
 
     def handle(self, *args, **options):
@@ -29,22 +31,31 @@ class Command(BaseCommand):
         tap = self.get_config('tap')
         data = self.get_config('data')
 
-        print('')
-        print('CREATE DATABASE `%(NAME)s`;' % default)
-        print('GRANT ALL PRIVILEGES ON `%(NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\' identified by \'%(PASSWORD)s\';' % default)
-        print('')
-        print('CREATE DATABASE `%(NAME)s`;' % tap)
-        print('GRANT ALL PRIVILEGES ON `%(NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\' identified by \'%(PASSWORD)s\';' % tap)
-        print('')
+        print('''-- Run the following commands on \'%(HOST)s\':
 
-        data.update({'NAME': settings.QUERY_USER_DATABASE_PREFIX + '%'})
-        print('GRANT ALL PRIVILEGES ON `%(NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\' identified by \'%(PASSWORD)s\';' % data)
-        print('')
+CREATE DATABASE `%(NAME)s`;
+CREATE USER \'%(USER)s\'@\'%(CLIENT)s\' identified by \'%(PASSWORD)s\'
+GRANT ALL PRIVILEGES ON `%(NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\'
+''' % default)
+
+        print('''-- Run the following commands on \'%(HOST)s\':
+
+CREATE DATABASE `%(NAME)s`;
+CREATE USER \'%(USER)s\'@\'%(CLIENT)s\' identified by \'%(PASSWORD)s\'
+GRANT ALL PRIVILEGES ON `%(NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\'
+''' % tap)
+
+        print('''-- Run the following commands on \'%(HOST)s\':
+
+CREATE USER \'%(USER)s\'@\'%(CLIENT)s\' identified by \'%(PASSWORD)s\'
+GRANT ALL PRIVILEGES ON `%(PREFIX)s`%%.* to \'%(USER)s\'@\'%(CLIENT)s\'
+''' % data)
 
         try:
             for database in Database.objects.all():
-                data.update({'NAME': database.name})
-                print('GRANT SELECT ON `%(NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\' identified by \'%(PASSWORD)s\';' % data)
-            print('')
+                data.update({'DATABASE_NAME': database.name})
+                print('GRANT SELECT ON `%(DATABASE_NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\'' % data)
         except (OperationalError, ProgrammingError):
             pass
+        else:
+            print('')
