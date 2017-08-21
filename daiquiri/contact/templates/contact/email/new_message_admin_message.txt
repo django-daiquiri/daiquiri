@@ -1,0 +1,18 @@
+{% load i18n %}
+{% blocktrans with site_name=current_site.name trimmed %}
+Dear {{ site_name }} Team,
+{% endblocktrans %}
+
+{% blocktrans with site_name=current_site.name trimmed %}
+You have just received a contact message on {{ site_name }}:
+{% endblocktrans %}
+
+User name: {{ author }}
+Email: {{ email }}
+Subject: {{ subject }}
+
+{{ message }}
+
+{% blocktrans with url=url trimmed %}
+Please log in to {{ url }} to reply to the message of the user.
+{% endblocktrans %}

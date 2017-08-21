@@ -1,1 +1,1 @@
-{% load i18n %}{% trans 'Your contact message:' %}
+{% load i18n %}{% trans 'Your contact message' %}

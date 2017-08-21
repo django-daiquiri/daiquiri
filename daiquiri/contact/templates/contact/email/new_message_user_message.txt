@@ -1,19 +1,16 @@
 {% load i18n %}
-{% blocktrans %}
 Dear {{ author }},
+
+{% blocktrans with site_name=current_site.name trimmed %}
+Thank you for your message. We will answer your message as soon as possible.
+
+Here is a copy of the message:
 {% endblocktrans %}
-{% blocktrans with site_name=current_site.name %}
-You have just sent a contact message to the Team of the {{site_name}}. We will answer your message as soon as possible.
-{% endblocktrans %}
-{% blocktrans with site_domain=current_site.domain %}
-Here a copy of the message:
-{% endblocktrans %}
-{% blocktrans %}
+
 Subject: {{subject}}
-{% endblocktrans %}
-{% blocktrans %}
+
 {{message}}
-{% endblocktrans %}
-{% blocktrans with site_name=current_site.name %}
-Best regards, your {{site_name}} Team
+
+{% blocktrans with site_name=current_site.name trimmed %}
+Best regards, {{site_name}} team
 {% endblocktrans %}
