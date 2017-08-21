@@ -12,5 +12,5 @@ def send_contact_message(request, message):
         'subject': message.subject,
         'message': message.message,
     }
-    send_mail(request, 'contact/email/new_message_admins', context, emails)
+    send_mail(request, 'contact/email/new_message_admin', context, emails)
     send_mail(request, 'contact/email/new_message_user', context, [message.email])
