@@ -38,13 +38,26 @@ python3 -m venv env3
 source env3/bin/activate
 ```
 
-```
 Install the requirements in editable mode:
 
 ```
 pip install -I -e ../daiquiri
-pip install -I -e ../queryparser
 pip install mysqlclient
+```
+
+
+Install the queryparser: install antlr from [www.antlr.org] and run make.
+
+```
+cd ../queryparser
+curl -O http://www.antlr.org/download/antlr-4.7-complete.jar
+make
+```
+
+Go back to ../app and pip install queryparser.
+```
+cd ../app
+pip install -I -e ../queryparser
 ```
 
 Create a `log` and a `download` directory:
@@ -68,6 +81,11 @@ mysql -u root -p -e 'create database daiquiri_app';
 mysql -u root -p -e 'create database TAP_SCHEMA';
 ```
 
+See the sql commands:
+```
+./manage.py sqlcreate
+```
+
 Run:
 
 ```
@@ -76,18 +94,22 @@ Run:
 ./manage.py loaddata ../daiquiri/testing/fixtures/*
 ```
 
+Install npm from [https://nodejs.org/en/]
+
+Create the front end library bundles.
+
+```
+npm install
+npm run webpack
+```
+
+
 Run the tests:
 
 ```
  ./manage.py test daiquiri --keepdb
 ```
 
-Create the front end library bundles:
-
-```
-npm install
-npm run webpack
-```
 
 Run the development server:
 
@@ -134,3 +156,7 @@ Solution 2: create your database with the utf8 character set.
 ```
 create database <DBname> CHARACTER SET utf8;
 ```
+
+Queryparser
+~~~~~~~~~~~
+
