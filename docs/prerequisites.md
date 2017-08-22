@@ -7,7 +7,7 @@ Centos 6
 ### Distribution packages
 
 ```
-yum install -y git gcc gcc-c++ libxml2-devel libxslt-devel
+yum install -y epel-release git gcc gcc-c++ libxml2-devel libxslt-devel openssl-devel
 ```
 
 ### Python
@@ -15,20 +15,35 @@ yum install -y git gcc gcc-c++ libxml2-devel libxslt-devel
 ```
 # for python2
 yum install -y centos-release-scl
-yum install -y python27-devel python27-virtualenv
-scl enable python27 bash
+yum install -y python27-python-devel python27-python-virtualenv
 
 # for python3
 yum install -y python34-devel
 ```
 
-### MariaDB 10.2
+```
+# for python2, this needs to be done in every new shell
+scl enable python27 bash
+```
+
+### GCC 6
+
+```
+yum install -y devtoolset-6-gcc devtoolset-6-gcc-c++
+```
+
+```
+# this needs to be done in every new shell
+source /opt/rh/devtoolset-6/enable
+```
+
+### MariaDB 10.1
 
 ```
 # in /etc/yum.repos.d/MariaDB.repo
 [mariadb]
 name = MariaDB
-baseurl = http://yum.mariadb.org/10.2/centos6-amd64
+baseurl = http://yum.mariadb.org/10.1/centos6-amd64
 gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
 gpgcheck=1
 ```
@@ -56,7 +71,6 @@ enabled=1
 ```
 
 ```
-yum install -y epel-release
 yum install -y erlang socat
 
 wget https://github.com/rabbitmq/rabbitmq-server/releases/download/rabbitmq_v3_6_11/rabbitmq-server-3.6.11-1.el6.noarch.rpm
@@ -97,7 +111,7 @@ Centos 7.3
 ### Distribution packages
 
 ```
-yum install -y git gcc gcc-c++ libxml2-devel libxslt-devel openssl-devel
+yum install -y epel-release git gcc gcc-c++ libxml2-devel libxslt-devel openssl-devel
 ```
 
 ### Python
@@ -308,7 +322,7 @@ apt-get install -y git build-essential libxml2-dev libxslt-dev zlib1g-dev
 apt-get install -y python-dev python-virtualenv
 
 # for python3
-apt-get install -y python3-dev python3-venv
+apt-get install -y python3-dev python3.4-venv
 ```
 
 ### MariaDB 10.1

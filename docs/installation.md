@@ -1,6 +1,15 @@
 Installation
 ============
 
+Create user
+-----------
+
+Don't run Daiquiri as root! Create a dedicated user:
+
+```
+useradd -m -d /srv/daiquiri daiquiri -s /bin/bash
+```
+
 Set up Daiquiri
 ---------------
 
@@ -86,7 +95,7 @@ Create users, permissions, and databases on `mysql`.
 Run the tests:
 
 ```
- ./manage.py test daiquiri --keepdb
+./manage.py test daiquiri --keepdb
 ```
 
 Run the database migrations:
