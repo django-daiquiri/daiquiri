@@ -1,8 +1,5 @@
-Install prerequisites
----------------------
-
-Install `node` and `npm`:
-
+Installation
+============
 
 Set up Daiquiri
 ---------------
@@ -22,10 +19,18 @@ git clone https://github.com/aipescience/django-daiquiri-app app
 git clone https://github.com/aipescience/queryparser queryparser
 ```
 
+Change to the queryparser directory, install antlr and run make:
+
+```
+cd queryparser
+wget http://www.antlr.org/download/antlr-4.7-complete.jar
+make
+```
+
 Change to the `app` directory and create a virtualenv:
 
 ```
-cd app
+cd ../app
 virtualenv env
 source env/bin/activate
 ```
@@ -42,28 +47,23 @@ Install the requirements in editable mode:
 
 ```
 pip install -I -e ../daiquiri
-pip install mysqlclient
-```
-
-
-Install the queryparser: install antlr from [www.antlr.org] and run make.
-
-```
-cd ../queryparser
-curl -O http://www.antlr.org/download/antlr-4.7-complete.jar
-make
-```
-
-Go back to ../app and pip install queryparser.
-```
-cd ../app
 pip install -I -e ../queryparser
+pip install mysqlclient
 ```
 
 Create a `log` and a `download` directory:
 
 ```
 mkdir log download
+```
+
+Create test databases from `/data`:
+
+```
+mysql -e 'CREATE DATABASE daiquiri_data_obs'
+mysql daiquiri_data_obs < data/daiquiri_data_obs.sql
+mysql -e 'CREATE DATABASE daiquiri_data_sim'
+mysql daiquiri_data_sim < data/daiquiri_data_sim.sql
 ```
 
 Copy the `local.py` settings file:
@@ -74,35 +74,13 @@ cp config/settings/sample.local.py config/settings/local.py
 
 Edit config/settings/local.py for database settings and 'DEBUG = True'.
 
-Create databases on `mysql`:
+Create users, permissions, and databases on `mysql`.
+
+Run `sqlcreate` to see what needs to be created on the database
 
 ```
-mysql -u root -p -e 'create database daiquiri_app';
-mysql -u root -p -e 'create database TAP_SCHEMA';
+./manage.py sqlcreate daiquiri_data_obs daiquiri_data_sim
 ```
-
-See the sql commands:
-```
-./manage.py sqlcreate
-```
-
-Run:
-
-```
-./manage.py migrate
-./manage.py migrate --database=tap
-./manage.py loaddata ../daiquiri/testing/fixtures/*
-```
-
-Install npm from [https://nodejs.org/en/]
-
-Create the front end library bundles.
-
-```
-npm install
-npm run webpack
-```
-
 
 Run the tests:
 
@@ -110,6 +88,26 @@ Run the tests:
  ./manage.py test daiquiri --keepdb
 ```
 
+Create the database tables and import the fixtures:
+
+```
+./manage.py migrate
+./manage.py migrate --database=tap
+./manage.py loaddata fixtures/*
+```
+
+Create the front end library bundles:
+
+```
+npm install
+npm run webpack
+```
+
+Run the tests:
+
+```
+./manage.py test daiquiri
+```
 
 Run the development server:
 
