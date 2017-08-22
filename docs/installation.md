@@ -4,14 +4,7 @@ Installation
 Set up Daiquiri
 ---------------
 
-Create a `daiquiri` directory at a convenient place:
-
-```
-mkdir daiquiri
-cd daiquiri
-```
-
-Clone the repositories and call the `daiquiri`, `app`, and `queryparser`:
+Clone the repositories and call them `daiquiri`, `app`, and `queryparser`:
 
 ```
 git clone https://github.com/aipescience/django-daiquiri daiquiri
@@ -19,7 +12,7 @@ git clone https://github.com/aipescience/django-daiquiri-app app
 git clone https://github.com/aipescience/queryparser queryparser
 ```
 
-Change to the queryparser directory, install antlr and run make:
+Change to the queryparser directory, fetch `antlr` and run `make`:
 
 ```
 cd queryparser
@@ -57,12 +50,13 @@ Create a `log` and a `download` directory:
 mkdir log download
 ```
 
-Create test databases from `/data`:
+Create the test databases from `/data`:
 
 ```
 mysql -e 'CREATE DATABASE daiquiri_data_obs'
-mysql daiquiri_data_obs < data/daiquiri_data_obs.sql
 mysql -e 'CREATE DATABASE daiquiri_data_sim'
+
+mysql daiquiri_data_obs < data/daiquiri_data_obs.sql
 mysql daiquiri_data_sim < data/daiquiri_data_sim.sql
 ```
 
@@ -72,9 +66,14 @@ Copy the `local.py` settings file:
 cp config/settings/sample.local.py config/settings/local.py
 ```
 
-Edit config/settings/local.py for database settings and 'DEBUG = True'.
+Edit config/settings/local.py for database settings, `ASYNC = True` and `DEBUG = True`.
 
-Create users, permissions, and databases on `mysql`.
+Create the front end library vendor bundles:
+
+```
+npm install
+npm run webpack
+```
 
 Run `sqlcreate` to see what needs to be created on the database
 
@@ -82,31 +81,25 @@ Run `sqlcreate` to see what needs to be created on the database
 ./manage.py sqlcreate daiquiri_data_obs daiquiri_data_sim
 ```
 
+Create users, permissions, and databases on `mysql`.
+
 Run the tests:
 
 ```
  ./manage.py test daiquiri --keepdb
 ```
 
-Create the database tables and import the fixtures:
+Run the database migrations:
 
 ```
 ./manage.py migrate
 ./manage.py migrate --database=tap
+```
+
+Import the fixtures:
+
+```
 ./manage.py loaddata fixtures/*
-```
-
-Create the front end library bundles:
-
-```
-npm install
-npm run webpack
-```
-
-Run the tests:
-
-```
-./manage.py test daiquiri
 ```
 
 Run the development server:
@@ -118,7 +111,7 @@ Run the development server:
 Go to `http://localhost:8000` in your web browser.
 
 
-Open three other terminals, got to the `daiquiri/app` directory, activate the virtualenv, and run
+Open three other terminals, got to the `app` directory, activate the virtual environment, and run:
 
 ```
 ./manage.py runworker default
@@ -154,7 +147,3 @@ Solution 2: create your database with the utf8 character set.
 ```
 create database <DBname> CHARACTER SET utf8;
 ```
-
-Queryparser
-~~~~~~~~~~~
-
