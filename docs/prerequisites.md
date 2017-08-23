@@ -10,7 +10,7 @@ Centos 6
 yum install -y epel-release git gcc gcc-c++ libxml2-devel libxslt-devel openssl-devel
 ```
 
-### Python
+### Python >= 2.7 or >= 3.4
 
 ```
 # for python2
@@ -26,7 +26,7 @@ yum install -y python34-devel
 scl enable python27 bash
 ```
 
-### GCC 6
+### GCC >= 4.6
 
 ```
 yum install -y devtoolset-6-gcc devtoolset-6-gcc-c++
@@ -37,7 +37,7 @@ yum install -y devtoolset-6-gcc devtoolset-6-gcc-c++
 source /opt/rh/devtoolset-6/enable
 ```
 
-### MariaDB 10.1
+### MariaDB >= 10.1
 
 ```
 # in /etc/yum.repos.d/MariaDB.repo
@@ -57,7 +57,7 @@ chkconfig mysql on
 mysql_secure_installation
 ```
 
-### RabbitMQ
+### RabbitMQ >= 3.5
 
 ```
 # in /etc/yum.repos.d/rabbitmq-erlang.repo
@@ -90,13 +90,13 @@ service redis start
 chkconfig redis on
 ```
 
-### Java
+### Java >= 1.7
 
 ```
 yum install -y java-1.8.0-openjdk-headless
 ```
 
-### Node.js and npm
+### Node.js >= 5.10
 
 ```
 curl --silent --location https://rpm.nodesource.com/setup_6.x | sudo bash -
@@ -114,7 +114,7 @@ Centos 7.3
 yum install -y epel-release git gcc gcc-c++ libxml2-devel libxslt-devel openssl-devel
 ```
 
-### Python
+### Python >= 2.7 or >= 3.4
 
 ```
 # for python2
@@ -124,7 +124,7 @@ yum install -y python-devel python-virtualenv
 yum install -y python34-devel
 ```
 
-### MariaDB 10.1
+### MariaDB >= 10.1
 
 ```
 # in /etc/yum.repos.d/MariaDB.repo
@@ -144,7 +144,7 @@ systemctl enable mariadb
 mysql_secure_installation
 ```
 
-### RabbitMQ
+### RabbitMQ >= 3.5
 
 ```
 # In /etc/yum.repos.d/rabbitmq-erlang.repo
@@ -178,13 +178,13 @@ systemctl enable redis
 
 ```
 
-### Java
+### Java >= 1.7
 
 ```
 yum install -y java-1.8.0-openjdk-headless
 ```
 
-### Node.js and npm
+### Node.js >= 5.10
 
 ```
 curl --silent --location https://rpm.nodesource.com/setup_6.x | sudo bash -
@@ -201,7 +201,7 @@ debian 8 (jessie)
 apt-get install -y git build-essential libxml2-dev libxslt-dev zlib1g-dev libssl-dev
 ```
 
-### Python
+### Python >= 2.7 or >= 3.4
 
 ```
 # for python2
@@ -211,7 +211,7 @@ apt-get install -y python-dev python-virtualenv
 apt-get install -y python3-dev
 ```
 
-### MariaDB 10.1
+### MariaDB >= 10.1
 
 ```
 apt-get install -y software-properties-common
@@ -222,7 +222,7 @@ apt-get update
 apt-get install -y mariadb-client mariadb-server libmariadbd-dev libmariadbclient-dev
 ```
 
-### RabbitMQ
+### RabbitMQ >= 3.5
 
 ```
 apt-get install -y erlang socat
@@ -241,13 +241,19 @@ systemctl enable rabbitmq-server
 apt-get install -y redis-server
 ```
 
-### Java
+### Java >= 1.7
 
 ```
 apt-get install -y openjdk-7-jre-headless
 ```
 
-### Node.js and npm
+### Node.js >= 5.10
+
+```
+curl -sL https://deb.nodesource.com/setup_6.x | bash -
+
+apt-get install nodejs
+```
 
 debian 9 (strech)
 -----------------
@@ -258,7 +264,7 @@ debian 9 (strech)
 apt-get install -y git build-essential libxml2-dev libxslt-dev zlib1g-dev libssl-dev
 ```
 
-### Python
+### Python >= 2.7 or >= 3.4
 
 ```
 # for python2
@@ -268,13 +274,13 @@ apt-get install -y python-dev python-virtualenv
 apt-get install -y python3-dev
 ```
 
-### MariaDB 10.1
+### MariaDB >= 10.1
 
 ```
 apt-get install -y mariadb-client mariadb-server libmariadb-dev libmariadbclient-dev
 ```
 
-### RabbitMQ
+### RabbitMQ >= 3.5
 
 ```
 apt-get install -y rabbitmq-server
@@ -292,13 +298,13 @@ systemctl start redis-server
 systemctl enable redis-server
 ```
 
-### Java
+### Java >= 1.7
 
 ```
 apt-get install -y openjdk-8-jre-headless
 ```
 
-### Node.js and npm
+### Node.js >= 5.10
 
 ```
 curl -sL https://deb.nodesource.com/setup_6.x | bash -
@@ -315,7 +321,7 @@ Ubuntu 14.04 (Trusty Tahr)
 apt-get install -y git build-essential libxml2-dev libxslt-dev zlib1g-dev
 ```
 
-### Python
+### Python >= 2.7 or >= 3.4
 
 ```
 # for python2
@@ -325,7 +331,7 @@ apt-get install -y python-dev python-virtualenv
 apt-get install -y python3-dev python3.4-venv
 ```
 
-### MariaDB 10.1
+### MariaDB >= 10.1
 
 ```
 sudo apt-get install software-properties-common
@@ -336,7 +342,7 @@ apt-get update
 apt-get install -y mariadb-client mariadb-server libmariadbd-dev libmariadbclient-dev
 ```
 
-### RabbitMQ
+### RabbitMQ >= 3.5
 
 ```
 apt-get install -y erlang-nox socat
@@ -352,13 +358,13 @@ dpkg -i rabbitmq-server_3.6.11-1_all.deb
 apt-get install -y redis-server
 ```
 
-### Java
+### Java >= 1.7
 
 ```
 apt-get install -y openjdk-7-jre-headless
 ```
 
-### Node.js and npm
+### Node.js >= 5.10
 
 ```
 curl -sL https://deb.nodesource.com/setup_6.x | bash -
@@ -375,7 +381,7 @@ Ubuntu 16.04 (Xenial Xerus)
 apt-get install -y git build-essential libxml2-dev libxslt-dev zlib1g-dev libssl-dev
 ```
 
-### Python
+### Python >= 2.7 or >= 3.4
 
 ```
 # for python2
@@ -385,7 +391,7 @@ apt-get install -y python-dev python-virtualenv
 apt-get install -y python3-dev
 ```
 
-### MariaDB 10.1
+### MariaDB >= 10.1
 
 ```
 apt-get install software-properties-common
@@ -396,7 +402,7 @@ apt-get update
 apt-get install -y mariadb-client mariadb-server libmariadbd-dev libmariadbclient-dev
 ```
 
-### RabbitMQ
+### RabbitMQ >= 3.5
 
 ```
 apt-get install -y rabbitmq-server
@@ -411,13 +417,13 @@ systemctl enable rabbitmq-server
 apt-get install -y redis-server
 ```
 
-### Java
+### Java >= 1.7
 
 ```
 apt-get install -y openjdk-8-jre-headless
 ```
 
-### Node.js and npm
+### Node.js >= 5.10
 
 ```
 curl -sL https://deb.nodesource.com/setup_6.x | bash -

@@ -4,14 +4,18 @@ Installation
 Create user
 -----------
 
-Don't run Daiquiri as root! Create a dedicated user:
+Either run Daiquiri as your regular Desktop user or create a dedicated user:
 
 ```
 useradd -m -d /srv/daiquiri daiquiri -s /bin/bash
+su - daiquiri
 ```
 
-Set up Daiquiri
----------------
+Don't run Daiquiri as root!
+
+
+Obtain repositories
+-------------------
 
 Clone the repositories and call them `daiquiri`, `app`, and `queryparser`:
 
@@ -21,6 +25,9 @@ git clone https://github.com/aipescience/django-daiquiri-app app
 git clone https://github.com/aipescience/queryparser queryparser
 ```
 
+Build the queryparser
+---------------------
+
 Change to the queryparser directory, fetch `antlr` and run `make`:
 
 ```
@@ -28,6 +35,9 @@ cd queryparser
 wget http://www.antlr.org/download/antlr-4.7-complete.jar
 make
 ```
+
+Install python dependencies
+---------------------------
 
 Change to the `app` directory and create a virtualenv:
 
@@ -52,6 +62,9 @@ pip install -I -e ../daiquiri
 pip install -I -e ../queryparser
 pip install mysqlclient
 ```
+
+Setup the app
+-------------
 
 Create a `log` and a `download` directory:
 
@@ -84,13 +97,17 @@ npm install
 npm run webpack
 ```
 
-Run `sqlcreate` to see what needs to be created on the database
+Next, the differenet users and permissions need to be created on `mysql`. For this purpose, the `sqlcreate` can be used to see what needs to be executed on the database:
 
 ```
 ./manage.py sqlcreate daiquiri_data_obs daiquiri_data_sim
 ```
 
-Create users, permissions, and databases on `mysql`.
+Either copy the output line by line to a mysql shell, or use a pipe:
+
+```
+./manage.py sqlcreate daiquiri_data_obs daiquiri_data_sim | mysql
+```
 
 Run the tests:
 
