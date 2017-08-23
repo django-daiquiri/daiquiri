@@ -3,6 +3,8 @@ import json
 import logging
 import six
 
+from collections import OrderedDict
+
 from celery.result import AsyncResult, EagerResult
 from celery.task.control import revoke
 
@@ -131,9 +133,25 @@ class QueryJob(Job):
                 }
             })
 
+        # check for duplicate columns in processor.display_columns
+        display_columns = []
+        duplicate_columns = []
+        for column_name, column in processor.display_columns:
+            if column_name not in display_columns:
+                display_columns.append(column_name)
+            else:
+                duplicate_columns.append(column_name)
+
+        if duplicate_columns:
+            raise ValidationError({
+                'query': [_('Duplicate column name \'%(column)s\'') % {
+                    'column': duplicate_column
+                } for duplicate_column in duplicate_columns]
+            })
+
         # initialize metadata and store map of aliases
         self.metadata = {
-            'column_aliases': processor.column_aliases
+            'display_columns': OrderedDict(processor.display_columns)
         }
 
         # check permissions

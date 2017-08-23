@@ -122,11 +122,10 @@ def run_query(job_id):
 
             # fetch additional metadata from the metadata store
             for column in job.metadata['columns']:
-                if column['name'] in job.metadata['column_aliases']:
+                if column['name'] in job.metadata['display_columns']:
 
                     try:
-                        database_name, table_name, column_name = \
-                            job.metadata['column_aliases'][column['name']].split('.')
+                        database_name, table_name, column_name = job.metadata['display_columns'][column['name']]
                     except ValueError:
                         continue
 

@@ -106,7 +106,7 @@ def check_permissions(user, keywords, columns, functions):
     # check permissions on databases/tables/columns
     for column in columns:
         try:
-            database_name, table_name, column_name = column.split('.')
+            database_name, table_name, column_name = column
 
             # check permission on database
             try:
