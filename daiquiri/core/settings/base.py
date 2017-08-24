@@ -44,7 +44,6 @@ ADDITIONAL_APPS = [
     'django_extensions',
     'markdown',
     'compressor',
-    'djangobower',
     'widget_tweaks',
     'allauth',
     'allauth.account',
