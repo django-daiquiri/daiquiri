@@ -50,6 +50,11 @@ app.factory('SqlFormService', ['$timeout', 'QueryService', 'BrowserService', fun
             });
     };
 
+    service.clearQuery = function(string) {
+        service.values.query = '';
+        $('.CodeMirror')[0].CodeMirror.focus();
+    };
+
     service.pasteItem = function(resource, item) {
         var editor = $('.CodeMirror')[0].CodeMirror;
         editor.replaceSelection(item.query_string);
