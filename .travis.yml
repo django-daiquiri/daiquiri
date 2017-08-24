@@ -18,6 +18,10 @@ install:
 
 before_script:
 - cp testing/config/settings/travis.local.py testing/config/settings/local.py
+- mysql -e 'CREATE DATABASE daiquiri_data_obs'
+- mysql -e 'CREATE DATABASE daiquiri_data_sim'
+- mysql daiquiri_data_obs < testing/sql/daiquiri_data_obs.sql
+- mysql daiquiri_data_sim < testing/sql/daiquiri_data_sim.sql
 
 script:
 - coverage run testing/runtests.py
