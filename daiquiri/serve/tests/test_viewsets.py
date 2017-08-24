@@ -1,8 +1,6 @@
-from django.core.urlresolvers import reverse
+from django.test import TestCase
 
-from test_generator.viewsets import TestListViewsetMixin
-
-from daiquiri.core.tests import TestCase
+from test_generator.viewsets import TestViewsetMixin
 
 
 class ServeTestCase(TestCase):
@@ -19,9 +17,6 @@ class ServeTestCase(TestCase):
     )
 
     status_map = {
-        'list_view': {
-            'admin': 200, 'user': 403, 'anonymous': 302
-        },
         'list_viewset': {
             'admin': 200, 'user': 403, 'anonymous': 403
         },
@@ -49,7 +44,11 @@ class ServeTestCase(TestCase):
     }
 
 
-class PublicRowTests(TestListViewsetMixin, ServeTestCase):
+class PublicRowTests(TestViewsetMixin, ServeTestCase):
+
+    url_names = {
+        'viewset': 'serve:row'
+    }
 
     status_map = {
         'list_viewset': {
@@ -57,18 +56,18 @@ class PublicRowTests(TestListViewsetMixin, ServeTestCase):
         }
     }
 
+    def _test_list_viewset(self, username):
+        self.assert_list_viewset(username, query_params={
+            'database': 'daiquiri_data_obs',
+            'table':'stars'
+        })
+
+
+class InternalRowTests(TestViewsetMixin, ServeTestCase):
+
     url_names = {
         'viewset': 'serve:row'
     }
-
-    def get_list_viewset_query_params(self):
-        return {
-            'database': 'daiquiri_data_obs',
-            'table': 'stars'
-        }
-
-
-class InternalRowTests(TestListViewsetMixin, ServeTestCase):
 
     status_map = {
         'list_viewset': {
@@ -76,18 +75,18 @@ class InternalRowTests(TestListViewsetMixin, ServeTestCase):
         }
     }
 
-    url_names = {
-        'viewset': 'serve:row'
-    }
-
-    def get_list_viewset_query_params(self):
-        return {
+    def _test_list_viewset(self, username):
+        self.assert_list_viewset(username, query_params={
             'database': 'daiquiri_data_sim',
-            'table': 'particles'
-        }
+            'table':'particles'
+        })
 
 
-class PublicColumnTests(TestListViewsetMixin, ServeTestCase):
+class PublicColumnTests(TestViewsetMixin, ServeTestCase):
+
+    url_names = {
+        'viewset': 'serve:column'
+    }
 
     status_map = {
         'list_viewset': {
@@ -95,18 +94,18 @@ class PublicColumnTests(TestListViewsetMixin, ServeTestCase):
         }
     }
 
+    def _test_list_viewset(self, username):
+        self.assert_list_viewset(username, query_params={
+            'database': 'daiquiri_data_obs',
+            'table':'stars'
+        })
+
+
+class InternalColumnTests(TestViewsetMixin, ServeTestCase):
+
     url_names = {
         'viewset': 'serve:column'
     }
-
-    def get_list_viewset_query_params(self):
-        return {
-            'database': 'daiquiri_data_obs',
-            'table': 'stars'
-        }
-
-
-class InternalColumnTests(TestListViewsetMixin, ServeTestCase):
 
     status_map = {
         'list_viewset': {
@@ -114,12 +113,8 @@ class InternalColumnTests(TestListViewsetMixin, ServeTestCase):
         }
     }
 
-    url_names = {
-        'viewset': 'serve:column'
-    }
-
-    def get_list_viewset_query_params(self):
-        return {
+    def _test_list_viewset(self, username):
+        self.assert_list_viewset(username, query_params={
             'database': 'daiquiri_data_sim',
-            'table': 'particles'
-        }
+            'table':'particles'
+        })

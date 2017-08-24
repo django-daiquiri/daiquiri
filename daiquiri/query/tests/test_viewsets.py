@@ -1,16 +1,16 @@
+from django.test import TestCase
+
 from test_generator.viewsets import TestModelViewsetMixin
 
-from daiquiri.core.tests import TestCase
-
-from .models import ContactMessage
+from ..models import Example
 
 
-class ContactTestCase(TestCase):
+class QueryTestCase(TestCase):
 
     fixtures = (
         'auth.json',
         'metadata.json',
-        'contact.json'
+        'examples.json'
     )
 
     users = (
@@ -20,13 +20,10 @@ class ContactTestCase(TestCase):
     )
 
     status_map = {
-        'list_view': {
-            'admin': 200, 'user': 403, 'anonymous': 302
-        },
         'list_viewset': {
             'admin': 200, 'user': 403, 'anonymous': 403
         },
-        'retrieve_viewset': {
+        'detail_viewset': {
             'admin': 200, 'user': 403, 'anonymous': 403
         },
         'create_viewset': {
@@ -43,10 +40,13 @@ class ContactTestCase(TestCase):
         }
     }
 
-class MessagesTests(TestModelViewsetMixin, ContactTestCase):
 
-    instances = ContactMessage.objects.all()
+class ExampleTests(TestModelViewsetMixin, QueryTestCase):
+
+    instances = Example.objects.all()
     url_names = {
-        'viewset': 'contact:message'
+        'viewset': 'query:example'
     }
 
+    def _test_user_viewset(self, username):
+        self.assert_list_viewset(username, list_route='user')
