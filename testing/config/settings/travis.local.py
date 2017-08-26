@@ -13,7 +13,9 @@ DATABASES = {
     },
     'data': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'daiquiri_data',
         'USER': 'root'
     }
 }
+
+LOGGING_DIR = '/tmp'
+QUERY_DOWNLOAD_DIR = '/tmp'

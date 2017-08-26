@@ -58,7 +58,9 @@ class ProfileTests(TestListViewsetMixin, TestDetailViewsetMixin, TestUpdateViews
                 'groups': [group.id for group in instance.user.groups.all()]
             }
 
-            self.assert_update_viewset(username, instance.pk, data)
+            self.assert_update_viewset(username, kwargs={
+                'pk': instance.pk
+            }, data=data)
 
 
 class GroupViewSet(TestListViewsetMixin, TestDetailViewsetMixin, AuthTestCase):

@@ -1,0 +1,36 @@
+[
+  {
+    "model": "daiquiri_query.queryjob",
+    "pk": "1b6c93ef-4161-4402-b1a7-d1237657e807",
+    "fields": {
+      "database_name": "daiquiri_user_user",
+      "table_name": "test",
+      "query_language": "adql-2.0",
+      "query": "SELECT id, ra`, de, parallax FROM daiquiri_data_obs.stars",
+      "native_query": "SELECT `id`, `ra`, `de`, `parallax` FROM `daiquiri_data_obs`.`stars`",
+      "actual_query": "SET STATEMENT max_statement_time=30 FOR CREATE TABLE `daiquiri_user_user`.`test` ENGINE=ARIA ( SELECT `id`, `ra`, `de`, `parallax` FROM `daiquiri_data_obs`.`stars` );",
+      "queue": "30s",
+      "nrows": 10000,
+      "size": 450560,
+      "metadata": "{\"type\":\"table\",\"display_columns\":{\"ra\":[\"daiquiri_data_obs\",\"stars\",\"ra\"],\"de\":[\"daiquiri_data_obs\",\"stars\",\"de\"],\"parallax\":[\"daiquiri_data_obs\",\"stars\",\"parallax\"],\"id\":[\"daiquiri_data_obs\",\"stars\",\"id\"]},\"columns\":[{\"std\":false,\"name\":\"id\",\"datatype\":\"int\",\"description\":\"unique identifier\",\"utype\":null,\"ucd\":\"meta.id; meta.main\",\"arraysize\":null,\"indexed\":false,\"unit\":null,\"principal\":false},{\"std\":false,\"name\":\"ra\",\"datatype\":\"int\",\"description\":\"Right ascension\",\"utype\":null,\"ucd\":\"pos.eq.ra; meta.main\",\"arraysize\":null,\"indexed\":false,\"unit\":\"Angle[deg]\",\"principal\":false},{\"std\":false,\"name\":\"de\",\"datatype\":\"double\",\"description\":\"Declination\",\"utype\":null,\"ucd\":\"pos.eq.de; meta.main\",\"arraysize\":null,\"indexed\":false,\"unit\":\"Angle[deg]\",\"principal\":false},{\"std\":false,\"name\":\"parallax\",\"datatype\":\"double\",\"description\":\"Parallax\",\"utype\":null,\"ucd\":\"pos.parallax\",\"arraysize\":null,\"indexed\":false,\"unit\":\"Angle[mas]\",\"principal\":false}],\"name\":\"test\"}",
+      "pid": 950
+    }
+  },
+  {
+    "model": "daiquiri_query.queryjob",
+    "pk": "679b5ce8-bbcf-41c2-ba45-2340910bcfae",
+    "fields": {
+      "database_name": "daiquiri_user_user",
+      "table_name": "test_executing",
+      "query_language": "adql-2.0",
+      "query": "SELECT id, ra`, de, parallax FROM daiquiri_data_obs.stars",
+      "native_query": "SELECT `id`, `ra`, `de`, `parallax` FROM `daiquiri_data_obs`.`stars`",
+      "actual_query": "SET STATEMENT max_statement_time=30 FOR CREATE TABLE `daiquiri_user_user`.`test_executing` ENGINE=ARIA ( SELECT `id`, `ra`, `de`, `parallax` FROM `daiquiri_data_obs`.`stars` );",
+      "queue": "30s",
+      "nrows": 10000,
+      "size": 450560,
+      "metadata": "{\"type\":\"table\",\"display_columns\":{\"ra\":[\"daiquiri_data_obs\",\"stars\",\"ra\"],\"de\":[\"daiquiri_data_obs\",\"stars\",\"de\"],\"parallax\":[\"daiquiri_data_obs\",\"stars\",\"parallax\"],\"id\":[\"daiquiri_data_obs\",\"stars\",\"id\"]},\"columns\":[{\"std\":false,\"name\":\"id\",\"datatype\":\"int\",\"description\":\"unique identifier\",\"utype\":null,\"ucd\":\"meta.id; meta.main\",\"arraysize\":null,\"indexed\":false,\"unit\":null,\"principal\":false},{\"std\":false,\"name\":\"ra\",\"datatype\":\"int\",\"description\":\"Right ascension\",\"utype\":null,\"ucd\":\"pos.eq.ra; meta.main\",\"arraysize\":null,\"indexed\":false,\"unit\":\"Angle[deg]\",\"principal\":false},{\"std\":false,\"name\":\"de\",\"datatype\":\"double\",\"description\":\"Declination\",\"utype\":null,\"ucd\":\"pos.eq.de; meta.main\",\"arraysize\":null,\"indexed\":false,\"unit\":\"Angle[deg]\",\"principal\":false},{\"std\":false,\"name\":\"parallax\",\"datatype\":\"double\",\"description\":\"Parallax\",\"utype\":null,\"ucd\":\"pos.parallax\",\"arraysize\":null,\"indexed\":false,\"unit\":\"Angle[mas]\",\"principal\":false}],\"name\":\"test_executing\"}",
+      "pid": 950
+    }
+  }
+]

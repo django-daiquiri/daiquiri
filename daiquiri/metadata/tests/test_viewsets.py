@@ -57,13 +57,13 @@ class DatabaseTests(TestModelViewsetMixin, MetadataViewsetTestCase):
         for instance in self.instances:
             data = self.get_instance_as_dict(instance)
             data['discover'] = True
-            self.assert_create_viewset(username, data)
+            self.assert_create_viewset(username, data=data)
 
     def _test_management_viewset(self, username):
-        self.assert_list_viewset(username, list_route='management')
+        self.assert_viewset('management_viewset', 'get', 'management', username)
 
     def _test_user_viewset(self, username):
-        self.assert_list_viewset(username, list_route='user')
+        self.assert_viewset('user_viewset', 'get', 'user', username)
 
 
 class TableTests(TestModelViewsetMixin, MetadataViewsetTestCase):
@@ -77,11 +77,11 @@ class TableTests(TestModelViewsetMixin, MetadataViewsetTestCase):
         for instance in self.instances:
             data = self.get_instance_as_dict(instance)
             data['discover'] = True
-            self.assert_create_viewset(username, data)
+            self.assert_create_viewset(username, data=data)
 
     def _test_discover_viewset(self, username):
         for instance in self.instances:
-            self.assert_list_viewset(username, list_route='discover', query_params={
+            self.assert_viewset('discover_viewset', 'get', 'discover', username, query_params={
                 'database': instance.database.name,
                 'table': instance.name
             })
@@ -96,7 +96,7 @@ class ColumnTests(TestModelViewsetMixin, MetadataViewsetTestCase):
 
     def _test_discover_viewset(self, username):
         for instance in self.instances:
-            self.assert_list_viewset(username, list_route='discover', query_params={
+            self.assert_viewset('discover_viewset', 'get', 'discover', username, query_params={
                 'database': instance.table.database.name,
                 'table': instance.table.name,
                 'column': instance.name
@@ -111,7 +111,7 @@ class FunctionTests(TestModelViewsetMixin, MetadataViewsetTestCase):
     }
 
     def _test_management_viewset(self, username):
-        self.assert_list_viewset(username, list_route='management')
+        self.assert_viewset('management_viewset', 'get', 'management', username)
 
     def _test_user_viewset(self, username):
-        self.assert_list_viewset(username, list_route='user')
+        self.assert_viewset('user_viewset', 'get', 'user', username)

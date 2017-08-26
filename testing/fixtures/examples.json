@@ -1,1 +1,28 @@
-[{"model": "daiquiri_query.example", "pk": 1, "fields": {"order": 0, "name": "Select all stars from daiquiri_data_obs.stars", "description": "", "query_language": "mariadb-10.1", "query_string": "SELECT `id`, `ra`, `de`, `parallax` FROM `daiquiri_data_obs`.`stars`", "access_level": "PUBLIC", "groups": []}}, {"model": "daiquiri_query.example", "pk": 2, "fields": {"order": 1, "name": "Select all particles from daiquiri_data_sim.particles", "description": "", "query_language": "mariadb-10.1", "query_string": "SELECT `id`, `x`, `y`, `z`, `vx`, `vy`, `vz` FROM `daiquiri_data_sim`.`particles`", "access_level": "PUBLIC", "groups": []}}]
+[
+  {
+    "model": "daiquiri_query.example",
+    "pk": 1,
+    "fields": {
+      "order": 0,
+      "name": "Select all stars from daiquiri_data_obs.stars",
+      "description": "",
+      "query_language": "mariadb-10.1",
+      "query_string": "SELECT `id`, `ra`, `de`, `parallax` FROM `daiquiri_data_obs`.`stars`",
+      "access_level": "PUBLIC",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_query.example",
+    "pk": 2,
+    "fields": {
+      "order": 1,
+      "name": "Select all particles from daiquiri_data_sim.particles",
+      "description": "",
+      "query_language": "mariadb-10.1",
+      "query_string": "SELECT `id`, `x`, `y`, `z`, `vx`, `vy`, `vz` FROM `daiquiri_data_sim`.`particles`",
+      "access_level": "PUBLIC",
+      "groups": []
+    }
+  }
+]

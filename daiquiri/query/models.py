@@ -252,8 +252,9 @@ class QueryJob(Job):
             })
 
     def abort(self):
-        # first, revoke the task in celery, regardless the phase
-        revoke(str(self.id))
+        if settings.ASYNC:
+            # first, revoke the task in celery, regardless the phase
+            revoke(str(self.id))
 
         current_phase = self.phase
 
