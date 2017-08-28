@@ -2,7 +2,6 @@ import os
 import mock
 
 from django.conf import settings
-from django.db import connections
 from django.test import TestCase
 
 from test_generator.viewsets import (
@@ -113,10 +112,10 @@ class JobTests(TestViewsetMixin, QueryViewsetTestCase):
         with mock.patch.object(adapter.database, 'execute') and \
             mock.patch.object(adapter.database, 'fetch_stats', return_value=(1,2)):
 
-            for instance in self.instances:
+            for example in Example.objects.all():
                 self.assert_create_viewset(username, data={
-                    'query_language': instance.query_language,
-                    'query': instance.query
+                    'query_language': example.query_language,
+                    'query': example.query
                 })
 
     def _test_update_viewset(self, username):

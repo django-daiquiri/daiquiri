@@ -7,7 +7,7 @@
       "name": "Select all stars from daiquiri_data_obs.stars",
       "description": "",
       "query_language": "mariadb-10.1",
-      "query_string": "SELECT `id`, `ra`, `de`, `parallax` FROM `daiquiri_data_obs`.`stars`",
+      "query_string": "SELECT id, ra, de, parallax FROM daiquiri_data_obs.stars",
       "access_level": "PUBLIC",
       "groups": []
     }
@@ -20,7 +20,7 @@
       "name": "Select all particles from daiquiri_data_sim.particles",
       "description": "",
       "query_language": "mariadb-10.1",
-      "query_string": "SELECT `id`, `x`, `y`, `z`, `vx`, `vy`, `vz` FROM `daiquiri_data_sim`.`particles`",
+      "query_string": "SELECT id, x, y, z, vx, vy, vz FROM daiquiri_data_sim.particles",
       "access_level": "PUBLIC",
       "groups": []
     }
