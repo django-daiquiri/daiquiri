@@ -1,0 +1,40 @@
+[
+  {
+    "model": "daiquiri_jobs.job",
+    "pk": "1b6c93ef-4161-4402-b1a7-d1237657e807",
+    "fields": {
+      "owner": 2,
+      "client_ip": null,
+      "response_format": null,
+      "max_records": null,
+      "run_id": null,
+      "phase": "COMPLETED",
+      "creation_time": "2017-08-25T08:38:56.233Z",
+      "start_time": "2017-08-25T08:38:56.269Z",
+      "end_time": "2017-08-25T08:38:56.338Z",
+      "execution_duration": 0,
+      "destruction_time": null,
+      "error_summary": null,
+      "job_type": "QUERY"
+    }
+  },
+  {
+    "model": "daiquiri_jobs.job",
+    "pk": "679b5ce8-bbcf-41c2-ba45-2340910bcfae",
+    "fields": {
+      "owner": 2,
+      "client_ip": null,
+      "response_format": null,
+      "max_records": null,
+      "run_id": null,
+      "phase": "EXECUTING",
+      "creation_time": "2017-08-25T08:38:56.233Z",
+      "start_time": "2017-08-25T08:38:56.269Z",
+      "end_time": "2017-08-25T08:38:56.338Z",
+      "execution_duration": 0,
+      "destruction_time": null,
+      "error_summary": null,
+      "job_type": "QUERY"
+    }
+  }
+]

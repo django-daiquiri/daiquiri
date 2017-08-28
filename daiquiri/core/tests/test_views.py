@@ -1,23 +1,12 @@
-from django.test import TestCase as DjangoTestCase
+from django.test import TestCase
 
 from test_generator.views import TestListViewMixin
 
 
-class TestCase(DjangoTestCase):
-
-    languages = (
-        'en',
-    )
-
-
-class CoreTestCase(TestCase):
+class CoreViewTestCase(TestCase):
 
     fixtures = (
         'auth.json',
-    )
-
-    languages = (
-        'en',
     )
 
     users = (
@@ -33,7 +22,7 @@ class CoreTestCase(TestCase):
     }
 
 
-class HomeTests(TestListViewMixin, CoreTestCase):
+class HomeTests(TestListViewMixin, CoreViewTestCase):
 
     url_names = {
         'list_view': 'home'

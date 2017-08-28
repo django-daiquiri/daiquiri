@@ -1,0 +1,499 @@
+[
+  {
+    "model": "daiquiri_metadata.database",
+    "pk": 110,
+    "fields": {
+      "order": 1,
+      "name": "daiquiri_data_obs",
+      "title": null,
+      "description": "A database of generated observational data.",
+      "long_description": null,
+      "attribution": null,
+      "license": "CC0",
+      "pid": null,
+      "utype": null,
+      "access_level": "PUBLIC",
+      "metadata_access_level": "PUBLIC",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_metadata.database",
+    "pk": 111,
+    "fields": {
+      "order": 2,
+      "name": "daiquiri_data_sim",
+      "title": null,
+      "description": "A database of generated simulation data.",
+      "long_description": null,
+      "attribution": null,
+      "license": "PD",
+      "pid": null,
+      "utype": null,
+      "access_level": "INTERNAL",
+      "metadata_access_level": "INTERNAL",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_metadata.table",
+    "pk": 203,
+    "fields": {
+      "database": 110,
+      "order": 1,
+      "name": "images",
+      "title": null,
+      "description": "",
+      "long_description": null,
+      "attribution": null,
+      "license": null,
+      "pid": null,
+      "type": "table",
+      "utype": null,
+      "access_level": "PRIVATE",
+      "metadata_access_level": "PRIVATE",
+      "groups": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "daiquiri_metadata.table",
+    "pk": 204,
+    "fields": {
+      "database": 110,
+      "order": 0,
+      "name": "stars",
+      "title": null,
+      "description": null,
+      "long_description": null,
+      "attribution": null,
+      "license": "CC0",
+      "pid": null,
+      "type": "table",
+      "utype": null,
+      "access_level": "PUBLIC",
+      "metadata_access_level": "PUBLIC",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_metadata.table",
+    "pk": 205,
+    "fields": {
+      "database": 111,
+      "order": null,
+      "name": "particles",
+      "title": null,
+      "description": null,
+      "long_description": null,
+      "attribution": null,
+      "license": "PD",
+      "pid": null,
+      "type": "table",
+      "utype": null,
+      "access_level": "INTERNAL",
+      "metadata_access_level": "INTERNAL",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_metadata.column",
+    "pk": 1654,
+    "fields": {
+      "table": 203,
+      "order": 0,
+      "name": "id",
+      "description": "unique identifier",
+      "unit": null,
+      "ucd": "meta.id; meta.main",
+      "utype": null,
+      "datatype": "int(11)",
+      "arraysize": null,
+      "principal": false,
+      "indexed": true,
+      "std": false,
+      "access_level": "PRIVATE",
+      "metadata_access_level": "PRIVATE",
+      "groups": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "daiquiri_metadata.column",
+    "pk": 1655,
+    "fields": {
+      "table": 203,
+      "order": 1,
+      "name": "RA",
+      "description": "Right ascension",
+      "unit": "Angle[deg]",
+      "ucd": "pos.eq.ra; meta.main",
+      "utype": null,
+      "datatype": "double",
+      "arraysize": null,
+      "principal": false,
+      "indexed": false,
+      "std": false,
+      "access_level": "PRIVATE",
+      "metadata_access_level": "PRIVATE",
+      "groups": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "daiquiri_metadata.column",
+    "pk": 1656,
+    "fields": {
+      "table": 203,
+      "order": 2,
+      "name": "DE",
+      "description": "Declination",
+      "unit": "Angle[deg]",
+      "ucd": "pos.eq.de; meta.main",
+      "utype": null,
+      "datatype": "double",
+      "arraysize": null,
+      "principal": false,
+      "indexed": false,
+      "std": false,
+      "access_level": "PRIVATE",
+      "metadata_access_level": "PRIVATE",
+      "groups": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "daiquiri_metadata.column",
+    "pk": 1657,
+    "fields": {
+      "table": 203,
+      "order": 3,
+      "name": "preview",
+      "description": null,
+      "unit": null,
+      "ucd": "meta.ref; meta.file",
+      "utype": null,
+      "datatype": "varchar(64)",
+      "arraysize": null,
+      "principal": false,
+      "indexed": false,
+      "std": false,
+      "access_level": "PRIVATE",
+      "metadata_access_level": "PRIVATE",
+      "groups": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "daiquiri_metadata.column",
+    "pk": 1658,
+    "fields": {
+      "table": 203,
+      "order": 4,
+      "name": "fits",
+      "description": null,
+      "unit": null,
+      "ucd": "meta.ref meta.file",
+      "utype": null,
+      "datatype": "varchar(64)",
+      "arraysize": null,
+      "principal": false,
+      "indexed": false,
+      "std": false,
+      "access_level": "PRIVATE",
+      "metadata_access_level": "PRIVATE",
+      "groups": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "daiquiri_metadata.column",
+    "pk": 1659,
+    "fields": {
+      "table": 203,
+      "order": 5,
+      "name": "links",
+      "description": null,
+      "unit": null,
+      "ucd": null,
+      "utype": null,
+      "datatype": "varchar(64)",
+      "arraysize": null,
+      "principal": false,
+      "indexed": false,
+      "std": false,
+      "access_level": "PRIVATE",
+      "metadata_access_level": "PRIVATE",
+      "groups": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "daiquiri_metadata.column",
+    "pk": 1660,
+    "fields": {
+      "table": 204,
+      "order": 0,
+      "name": "id",
+      "description": "unique identifier",
+      "unit": null,
+      "ucd": "meta.id; meta.main",
+      "utype": null,
+      "datatype": "int(11)",
+      "arraysize": null,
+      "principal": false,
+      "indexed": true,
+      "std": false,
+      "access_level": "PUBLIC",
+      "metadata_access_level": "PUBLIC",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_metadata.column",
+    "pk": 1661,
+    "fields": {
+      "table": 204,
+      "order": 1,
+      "name": "RA",
+      "description": "Right ascension",
+      "unit": "Angle[deg]",
+      "ucd": "pos.eq.ra; meta.main",
+      "utype": null,
+      "datatype": "int(11)",
+      "arraysize": null,
+      "principal": false,
+      "indexed": false,
+      "std": false,
+      "access_level": "PUBLIC",
+      "metadata_access_level": "PUBLIC",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_metadata.column",
+    "pk": 1662,
+    "fields": {
+      "table": 204,
+      "order": 2,
+      "name": "DE",
+      "description": "Declination",
+      "unit": "Angle[deg]",
+      "ucd": "pos.eq.de; meta.main",
+      "utype": null,
+      "datatype": "double",
+      "arraysize": null,
+      "principal": false,
+      "indexed": false,
+      "std": false,
+      "access_level": "PUBLIC",
+      "metadata_access_level": "PUBLIC",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_metadata.column",
+    "pk": 1663,
+    "fields": {
+      "table": 204,
+      "order": 3,
+      "name": "parallax",
+      "description": "Parallax",
+      "unit": "Angle[mas]",
+      "ucd": "pos.parallax",
+      "utype": null,
+      "datatype": "double",
+      "arraysize": null,
+      "principal": false,
+      "indexed": true,
+      "std": false,
+      "access_level": "PUBLIC",
+      "metadata_access_level": "PUBLIC",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_metadata.column",
+    "pk": 1664,
+    "fields": {
+      "table": 205,
+      "order": 0,
+      "name": "id",
+      "description": "unique id for particle",
+      "unit": null,
+      "ucd": "meta.id; meta.main",
+      "utype": null,
+      "datatype": "int(11)",
+      "arraysize": null,
+      "principal": false,
+      "indexed": true,
+      "std": false,
+      "access_level": "INTERNAL",
+      "metadata_access_level": "INTERNAL",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_metadata.column",
+    "pk": 1665,
+    "fields": {
+      "table": 205,
+      "order": 1,
+      "name": "x",
+      "description": "comoving position, x-component",
+      "unit": "1/h Mpc",
+      "ucd": "pos.cartesian.x",
+      "utype": null,
+      "datatype": "double",
+      "arraysize": null,
+      "principal": false,
+      "indexed": false,
+      "std": false,
+      "access_level": "INTERNAL",
+      "metadata_access_level": "INTERNAL",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_metadata.column",
+    "pk": 1666,
+    "fields": {
+      "table": 205,
+      "order": 2,
+      "name": "y",
+      "description": "comoving position, y-component",
+      "unit": "1/h Mpc",
+      "ucd": "pos.cartesian.y",
+      "utype": null,
+      "datatype": "double",
+      "arraysize": null,
+      "principal": false,
+      "indexed": false,
+      "std": false,
+      "access_level": "INTERNAL",
+      "metadata_access_level": "INTERNAL",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_metadata.column",
+    "pk": 1667,
+    "fields": {
+      "table": 205,
+      "order": 3,
+      "name": "z",
+      "description": "comoving position, z-component",
+      "unit": "1/h Mpc",
+      "ucd": "pos.cartesian.z",
+      "utype": null,
+      "datatype": "double",
+      "arraysize": null,
+      "principal": false,
+      "indexed": false,
+      "std": false,
+      "access_level": "INTERNAL",
+      "metadata_access_level": "INTERNAL",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_metadata.column",
+    "pk": 1668,
+    "fields": {
+      "table": 205,
+      "order": 4,
+      "name": "vx",
+      "description": "peculiar velocity, x-component",
+      "unit": "km/s",
+      "ucd": "phys.veloc; pos.cartesian.x",
+      "utype": null,
+      "datatype": "double",
+      "arraysize": null,
+      "principal": false,
+      "indexed": false,
+      "std": false,
+      "access_level": "INTERNAL",
+      "metadata_access_level": "INTERNAL",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_metadata.column",
+    "pk": 1669,
+    "fields": {
+      "table": 205,
+      "order": 5,
+      "name": "vy",
+      "description": "peculiar velocity, y-component",
+      "unit": "km/s",
+      "ucd": "phys.veloc; pos.cartesian.y",
+      "utype": null,
+      "datatype": "double",
+      "arraysize": null,
+      "principal": false,
+      "indexed": false,
+      "std": false,
+      "access_level": "INTERNAL",
+      "metadata_access_level": "INTERNAL",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_metadata.column",
+    "pk": 1670,
+    "fields": {
+      "table": 205,
+      "order": 6,
+      "name": "vz",
+      "description": "peculiar velocity, z-component",
+      "unit": "km/s",
+      "ucd": "phys.veloc; pos.cartesian.z",
+      "utype": null,
+      "datatype": "double",
+      "arraysize": null,
+      "principal": false,
+      "indexed": false,
+      "std": false,
+      "access_level": "INTERNAL",
+      "metadata_access_level": "INTERNAL",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_metadata.function",
+    "pk": 1,
+    "fields": {
+      "order": 1,
+      "name": "angdist",
+      "description": "The angular distance between two objects.",
+      "query_string": "angdist(ra, de, radius)",
+      "access_level": "PUBLIC",
+      "metadata_access_level": "PUBLIC",
+      "groups": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "daiquiri_metadata.function",
+    "pk": 2,
+    "fields": {
+      "order": 2,
+      "name": "idle",
+      "description": "Wait for n seconds.",
+      "query_string": "idle()",
+      "access_level": "PUBLIC",
+      "metadata_access_level": "PUBLIC",
+      "groups": [
+        1
+      ]
+    }
+  }
+]

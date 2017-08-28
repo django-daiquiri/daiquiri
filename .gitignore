@@ -1,6 +1,7 @@
-testing/local.py
+testing/config/settings/local.py
 testing/log
-testing/webpack
+testing/download
+testing/media_root
 testing/static_root
 
 *-

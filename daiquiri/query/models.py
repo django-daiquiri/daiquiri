@@ -236,7 +236,7 @@ class QueryJob(Job):
             job_id = str(self.id)
             if not settings.ASYNC or sync:
                 logger.info('run_query %s submitted (sync)' % self.id)
-                run_query.apply((job_id, ), task_id=job_id)
+                run_query.apply((job_id, ), task_id=job_id, throw=True)
 
             else:
                 if not self.queue:
@@ -252,8 +252,9 @@ class QueryJob(Job):
             })
 
     def abort(self):
-        # first, revoke the task in celery, regardless the phase
-        revoke(str(self.id))
+        if settings.ASYNC:
+            # first, revoke the task in celery, regardless the phase
+            revoke(str(self.id))
 
         current_phase = self.phase
 
@@ -309,7 +310,7 @@ class QueryJob(Job):
                     task_result = EagerResult(task_id, None, 'SUCCESS')
                 else:
                     logger.info('create_download_file %s submitted (sync)' % self.id)
-                    task_result = create_download_file.apply(task_args, task_id=task_id)
+                    task_result = create_download_file.apply(task_args, task_id=task_id, throw=True)
             else:
                 task_result = AsyncResult(task_id)
 

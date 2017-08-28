@@ -1,5 +1,6 @@
 import logging
 import re
+import warnings
 
 from django.db import OperationalError, ProgrammingError
 
@@ -180,7 +181,10 @@ class MySQLAdapter(DatabaseAdapter):
             'database': escaped_database_name
         }
 
-        self.execute(sql)
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            self.execute(sql)
+
 
     def fetch_tables(self, database_name):
         # escape input

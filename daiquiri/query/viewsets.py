@@ -37,9 +37,7 @@ from .utils import get_quota, fetch_user_database_metadata
 
 class StatusViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     permission_classes = (HasPermission, )
-
-    def get_queryset(self):
-        return []
+    queryset = []
 
     def list(self, request):
         return Response([{

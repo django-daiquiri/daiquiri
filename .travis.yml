@@ -1,23 +1,25 @@
 language: python
 cache: pip
 
-service:
-  - mysql
-
 python:
 - 2.7
 - 3.4
 - 3.5
 - 3.6
 
+addons:
+  mariadb: '10.1'
+
 install:
-- mkdir testing/log
 - pip install -e .
 - pip install mysqlclient
 - pip install coveralls
 
 before_script:
 - cp testing/config/settings/travis.local.py testing/config/settings/local.py
+- mysql < testing/sql/daiquiri_data_obs.sql
+- mysql < testing/sql/daiquiri_data_sim.sql
+- mysql < testing/sql/daiquiri_user_user.sql
 
 script:
 - coverage run testing/runtests.py

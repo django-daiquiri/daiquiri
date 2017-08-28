@@ -1,8 +1,8 @@
+from django.test import TestCase
+
 from test_generator.viewsets import TestModelViewsetMixin
 
-from daiquiri.core.tests import TestCase
-
-from .models import ContactMessage
+from ..models import ContactMessage
 
 
 class ContactTestCase(TestCase):
@@ -20,13 +20,10 @@ class ContactTestCase(TestCase):
     )
 
     status_map = {
-        'list_view': {
-            'admin': 200, 'user': 403, 'anonymous': 302
-        },
         'list_viewset': {
             'admin': 200, 'user': 403, 'anonymous': 403
         },
-        'retrieve_viewset': {
+        'detail_viewset': {
             'admin': 200, 'user': 403, 'anonymous': 403
         },
         'create_viewset': {
@@ -43,10 +40,10 @@ class ContactTestCase(TestCase):
         }
     }
 
+
 class MessagesTests(TestModelViewsetMixin, ContactTestCase):
 
     instances = ContactMessage.objects.all()
     url_names = {
         'viewset': 'contact:message'
     }
-

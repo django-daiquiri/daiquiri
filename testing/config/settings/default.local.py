@@ -15,7 +15,6 @@ DATABASES = {
     },
     'data': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'daiquiri_data',
         'USER': 'daiquiri_data',
         'PASSWORD': 'daiquiri_data'
     }
