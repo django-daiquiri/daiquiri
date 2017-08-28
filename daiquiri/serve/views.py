@@ -2,18 +2,19 @@ from django.shortcuts import render
 from django.http import Http404
 
 from daiquiri.metadata.models import Database, Table
+from daiquiri.query.models import QueryJob
+
+from .utils import get_columns
 
 
 def serve_table(request, database_name, table_name):
 
-    # check permission on database
-    database = Database.objects.filter_by_access_level(request.user).get(name=database_name)
-    table = Table.objects.filter_by_access_level(request.user).filter(database=database).get(name=table_name)
+    try:
+        get_columns(request.user, database_name, table_name)
+    except (QueryJob.DoesNotExist, Database.DoesNotExist, Table.DoesNotExist):
+        raise Http404
 
-    if not (database or table):
-        raise Http404()
-    else:
-        return render(request, 'serve/serve_table.html', {
-            'database': database_name,
-            'table': table_name
-        })
+    return render(request, 'serve/serve_table.html', {
+        'database': database_name,
+        'table': table_name
+    })

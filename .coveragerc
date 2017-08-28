@@ -1,2 +1,7 @@
 [run]
 source = daiquiri
+
+[report]
+omit = \
+    */tests/test_*
+    */migrations/*

@@ -7,7 +7,9 @@ class ServeTestCase(TestCase):
 
     fixtures = (
         'auth.json',
-        'metadata.json'
+        'metadata.json',
+        'jobs.json',
+        'queryjobs.json'
     )
 
     users = (
@@ -82,6 +84,56 @@ class InternalRowTests(TestViewsetMixin, ServeTestCase):
         })
 
 
+class UserRowTests(TestViewsetMixin, ServeTestCase):
+
+    url_names = {
+        'viewset': 'serve:row'
+    }
+
+    status_map = {
+        'list_viewset': {
+            'admin': 404, 'user': 200, 'anonymous': 404
+        }
+    }
+
+    def _test_list_viewset(self, username):
+        self.assert_list_viewset(username, query_params={
+            'database': 'daiquiri_user_user',
+            'table':'test'
+        })
+
+
+class NotFoundRowTests(TestViewsetMixin, ServeTestCase):
+
+    url_names = {
+        'viewset': 'serve:row'
+    }
+
+    status_map = {
+        'list_viewset': {
+            'admin': 404, 'user': 404, 'anonymous': 404
+        }
+    }
+
+    def _test_non_existing_database_viewset(self, username):
+        self.assert_list_viewset(username, query_params={
+            'database': 'non_existing',
+            'table':'stars'
+        })
+
+    def _test_non_existing_table_viewset(self, username):
+        self.assert_list_viewset(username, query_params={
+            'database': 'daiquiri_data_obs',
+            'table':'non_existing'
+        })
+
+    def _test_non_existing_user_table_viewset(self, username):
+        self.assert_list_viewset(username, query_params={
+            'database': 'daiquiri_user_user',
+            'table':'non_existing'
+        })
+
+
 class PublicColumnTests(TestViewsetMixin, ServeTestCase):
 
     url_names = {
@@ -117,4 +169,54 @@ class InternalColumnTests(TestViewsetMixin, ServeTestCase):
         self.assert_list_viewset(username, query_params={
             'database': 'daiquiri_data_sim',
             'table':'particles'
+        })
+
+
+class UserColumnTests(TestViewsetMixin, ServeTestCase):
+
+    url_names = {
+        'viewset': 'serve:column'
+    }
+
+    status_map = {
+        'list_viewset': {
+            'admin': 404, 'user': 200, 'anonymous': 404
+        }
+    }
+
+    def _test_list_viewset(self, username):
+        self.assert_list_viewset(username, query_params={
+            'database': 'daiquiri_user_user',
+            'table':'test'
+        })
+
+
+class NotFoundColumnTests(TestViewsetMixin, ServeTestCase):
+
+    url_names = {
+        'viewset': 'serve:column'
+    }
+
+    status_map = {
+        'list_viewset': {
+            'admin': 404, 'user': 404, 'anonymous': 404
+        }
+    }
+
+    def _test_non_existing_database_viewset(self, username):
+        self.assert_list_viewset(username, query_params={
+            'database': 'non_existing',
+            'table':'stars'
+        })
+
+    def _test_non_existing_table_viewset(self, username):
+        self.assert_list_viewset(username, query_params={
+            'database': 'daiquiri_data_obs',
+            'table':'non_existing'
+        })
+
+    def _test_non_existing_user_table_viewset(self, username):
+        self.assert_list_viewset(username, query_params={
+            'database': 'daiquiri_user_user',
+            'table':'non_existing'
         })

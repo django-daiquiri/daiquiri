@@ -7,11 +7,11 @@ from rest_framework.reverse import reverse
 
 from daiquiri.core.adapter import get_adapter
 
-from daiquiri.metadata.models import Database, Table, Column
+from daiquiri.metadata.models import Database, Table
 from daiquiri.query.models import QueryJob
-from daiquiri.query.utils import get_user_database_name
 
 from .serializers import ColumnSerializer
+from .utils import get_columns
 
 
 class RowViewSet(viewsets.ViewSet):
@@ -34,32 +34,16 @@ class RowViewSet(viewsets.ViewSet):
         # get the page_size from the querystring and make sure it is an int
         page_size = self._get_page_size()
 
+        # get the columns using the utils function
+        try:
+            columns = get_columns(self.request.user, database_name, table_name)
+        except (QueryJob.DoesNotExist, Database.DoesNotExist, Table.DoesNotExist):
+            raise NotFound()
+
+        column_names = [column['name'] for column in columns]
+
         # get database adapter
         adapter = get_adapter()
-
-        # get query backend adapter
-        user_database_name = get_user_database_name(self.request.user)
-
-        if database_name == user_database_name:
-            # get database adapter and fetch the columns
-            columns = adapter.database.fetch_columns(database_name, table_name)
-            column_names = [column['name'] for column in columns]
-        else:
-            # check permissions on the database
-            try:
-                database = Database.objects.filter_by_access_level(self.request.user).get(name=database_name)
-            except Database.DoesNotExist:
-                raise NotFound()
-
-            # check permissions on the table
-            try:
-                table = Table.objects.filter_by_access_level(self.request.user).filter(database=database).get(name=table_name)
-            except Table.DoesNotExist:
-                raise NotFound()
-
-            # get columns for this table
-            columns = Column.objects.filter_by_access_level(self.request.user).filter(table=table)
-            column_names = [column.name for column in columns]
 
         # query the database for the total number of rows
         count = adapter.database.count_rows(database_name, table_name, column_names, filter_string)
@@ -120,31 +104,10 @@ class ColumnViewSet(viewsets.ViewSet):
         database_name = self.request.GET.get('database')
         table_name = self.request.GET.get('table')
 
-        # get database adapter
-        user_database_name = get_user_database_name(self.request.user)
-
-        if database_name == user_database_name:
-            # get the job fetch the columns
-            job = QueryJob.objects.filter_by_owner(request.user).get(
-                database_name=database_name,
-                table_name=table_name
-            )
-            columns = job.metadata['columns']
-
-        else:
-            # check permissions on the database
-            try:
-                database = Database.objects.filter_by_access_level(self.request.user).get(name=database_name)
-            except Database.DoesNotExist:
-                raise NotFound()
-
-            # check permissions on the table
-            try:
-                table = Table.objects.filter_by_access_level(self.request.user).filter(database=database).get(name=table_name)
-            except Table.DoesNotExist:
-                raise NotFound()
-
-            # get columns for this table
-            columns = Column.objects.filter_by_access_level(self.request.user).filter(table=table)
+        # get the columns using the utils function
+        try:
+            columns = get_columns(self.request.user, database_name, table_name)
+        except (QueryJob.DoesNotExist, Database.DoesNotExist, Table.DoesNotExist):
+            raise NotFound()
 
         return Response(ColumnSerializer(columns, many=True).data)
