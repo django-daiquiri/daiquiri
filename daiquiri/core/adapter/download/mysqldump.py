@@ -2,8 +2,10 @@ import base64
 import csv
 import io
 import re
+import six
 import struct
 import subprocess
+import sys
 
 from bitstring import BitArray
 
@@ -70,11 +72,16 @@ class MysqldumpAdapter(DownloadAdapter):
         args = self.args + [database_name, table_name]
         process = subprocess.Popen(args, stdout=subprocess.PIPE)
 
+        if sys.version_info.major >= 3:
+            io_class = io.StringIO
+        else:
+            io_class = io.BytesIO
+
         for line in process.stdout:
             row = self._parse_line(line)
             if row:
-                f = io.BytesIO()
-                csv.writer(f, quotechar='"', quoting=csv.QUOTE_ALL).writerow(row)
+                f = io_class()
+                csv.writer(f, quotechar='"').writerow(row)
                 yield f.getvalue()
 
     def generate_votable(self, serialization, database_name, table_name, metadata, status, empty):
@@ -153,12 +160,12 @@ class MysqldumpAdapter(DownloadAdapter):
                     elif serialization == 'BINARY':
                         values, null_mask = self._get_binary_values(parsed_line, fmt_list, null_value_list)
                         binary_string = struct.pack('>' + ''.join(fmt_list), *values)
-                        yield base64.b64encode(binary_string)
+                        yield base64.b64encode(binary_string).decode()
 
                     elif serialization == 'BINARY2':
                         values, null_mask = self._get_binary_values(parsed_line, fmt_list, null_value_list)
                         binary_string = BitArray(bin=null_mask).tobytes() + struct.pack('>' + ''.join(fmt_list), *values)
-                        yield base64.b64encode(binary_string)
+                        yield base64.b64encode(binary_string).decode()
 
             # write serialization specific closing tag
             if serialization == 'TABLEDATA':
@@ -198,11 +205,11 @@ class MysqldumpAdapter(DownloadAdapter):
         return fmt_list, null_value_list
 
     def _parse_line(self, line):
-        insert_result = self.insert_pattern.match(line)
+        insert_result = self.insert_pattern.match(line.decode())
         if insert_result:
             row = insert_result.group(1)
             reader = csv.reader([row], quotechar="'")
-            return reader.next()
+            return six.next(reader)
         else:
             return None
 

@@ -11,6 +11,8 @@ from test_generator.viewsets import (
     TestViewsetMixin
 )
 
+from daiquiri.core.adapter import get_adapter
+
 from ..models import QueryJob, Example
 
 
@@ -107,7 +109,10 @@ class JobTests(TestViewsetMixin, QueryViewsetTestCase):
             self.assert_detail_viewset(username, kwargs={'pk': instance.pk})
 
     def _test_create_viewset(self, username):
-        with mock.patch.object(connections['data'], 'cursor', lambda *args: mock.Mock()):
+        adapter = get_adapter()
+        with mock.patch.object(adapter.database, 'execute') and \
+            mock.patch.object(adapter.database, 'fetch_stats', return_value=(1,2)):
+
             for instance in self.instances:
                 self.assert_create_viewset(username, data={
                     'query_language': instance.query_language,
@@ -115,7 +120,8 @@ class JobTests(TestViewsetMixin, QueryViewsetTestCase):
                 })
 
     def _test_update_viewset(self, username):
-        with mock.patch.object(connections['data'], 'cursor', lambda *args: mock.Mock()):
+        adapter = get_adapter()
+        with mock.patch.object(adapter.database, 'execute'):
             for instance in self.instances:
                 self.assert_update_viewset(username, kwargs={
                     'pk': instance.pk
@@ -124,7 +130,8 @@ class JobTests(TestViewsetMixin, QueryViewsetTestCase):
                 })
 
     def _test_delete_viewset(self, username):
-        with mock.patch.object(connections['data'], 'cursor', lambda *args: mock.Mock()):
+        adapter = get_adapter()
+        with mock.patch.object(adapter.database, 'execute'):
             for instance in self.instances:
                 self.assert_delete_viewset(username, kwargs={
                     'pk': instance.pk
