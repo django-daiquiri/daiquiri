@@ -13,4 +13,4 @@ Daiquiri (Django version)
 
 This project is currently in an early stage of development and by no means production ready.
 
-The PHP version of Daiquiri can be found [here](https://github.com/aipescience/daiquiri).
+The PHP version of Daiquiri can be found `here <https://github.com/aipescience/daiquiri>`_.
