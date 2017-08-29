@@ -7,7 +7,7 @@ from django.core.management.base import BaseCommand
 class Command(BaseCommand):
 
     def add_arguments(self, parser):
-        parser.add_argument('queue', help='Name of the worker.')
+        parser.add_argument('queue', nargs='?', default='default', help='Name of the worker [default=default].')
         parser.add_argument('-c', type=int, default=1, help='Concurrency for the worker.')
 
     def handle(self, *args, **options):
