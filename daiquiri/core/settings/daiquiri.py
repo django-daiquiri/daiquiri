@@ -80,6 +80,7 @@ QUERY_DROPDOWNS = [
 ]
 
 QUERY_DOWNLOAD_DIR = os.path.join(BASE_DIR, 'download')
+QUERY_DEFAULT_DOWNLOAD_FORMAT = 'votable'
 QUERY_DOWNLOAD_FORMATS = [
     {
         'key': 'csv',

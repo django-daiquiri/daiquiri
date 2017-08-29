@@ -84,6 +84,9 @@ class QueryJob(Job):
         return super(QueryJob, self).save(*args, **kwargs)
 
     def clean(self):
+        if not self.response_format:
+            self.response_format = settings.QUERY_DEFAULT_DOWNLOAD_FORMAT
+
         # set the database name
         if not self.database_name:
             self.database_name = get_user_database_name(self.owner)
