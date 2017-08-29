@@ -11,17 +11,17 @@ class Command(BaseCommand):
         parser.add_argument('-c', type=int, default=1, help='Concurrency for the worker.')
 
     def handle(self, *args, **options):
-        queue = options['queue']
         concurrency = str(options['c'])
 
-        node = '%s_%s' % (settings.DAIQUIRI_APP, queue)
+        queue = '%s_%s' % (settings.DAIQUIRI_APP, options['queue'])
 
         args = [
             'celery', 'worker',
             '-A', 'config',
             '-Q', queue,
             '-c', concurrency,
-            '-n', node,
+            '-n', queue,
             '-l',  'info'
         ]
+
         subprocess.call(args)

@@ -242,8 +242,9 @@ class QueryJob(Job):
                     self.queue = get_default_queue()
                     self.save()
 
-                logger.info('run_query %s submitted (async, priority=%s)' % (self.id, self.priority))
-                run_query.apply_async((job_id, ), task_id=job_id, queue='query', priority=self.priority)
+                queue = '%s_query' % settings.DAIQUIRI_APP
+                logger.info('run_query %s submitted (async, queue=%s, priority=%s)' % (self.id, queue, self.priority))
+                run_query.apply_async((job_id, ), task_id=job_id, queue=queue, priority=self.priority)
 
         else:
             raise ValidationError({
@@ -321,8 +322,9 @@ class QueryJob(Job):
                         # somebody or something removed the file. start all over again
                         task_result.forget()
 
-                    logger.info('create_download_file %s submitted (async)' % self.id)
-                    task_result = create_download_file.apply_async(task_args, task_id=task_id, queue='download')
+                    queue = '%s_download' % settings.DAIQUIRI_APP
+                    logger.info('create_download_file %s submitted (async, queue=%s)' % (self.id, queue))
+                    task_result = create_download_file.apply_async(task_args, task_id=task_id, queue=queue)
 
             return task_result, file_name
 

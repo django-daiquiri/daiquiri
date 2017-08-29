@@ -1,8 +1,6 @@
 import imp
 import os
 
-from kombu import Exchange, Queue
-
 from django.utils.translation import ugettext_lazy as _
 
 CONFIG_DIR = imp.find_module('config')[1]
@@ -155,14 +153,3 @@ EMAIL_FROM = 'info@example.com'
 SENDFILE_BACKEND = 'sendfile.backends.simple'
 
 LOGGING_DIR = os.path.join(BASE_DIR, 'log')
-
-CELERY_BROKER_URL = 'amqp://'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
-CELERY_WORKER_PREFETCH_MULTIPLIER = 1
-CELERY_TASK_DEFAULT_QUEUE = 'default'
-CELERY_TASK_ACKS_LATE = True
-CELERY_TASK_QUEUES = (
-    Queue('default', Exchange('default'), routing_key='default'),
-    Queue('download', Exchange('download'), routing_key='download'),
-    Queue('query', Exchange('query'), routing_key='query', queue_arguments={'x-max-priority': 5}),
-)
