@@ -23,10 +23,10 @@ router.register(r'licenses', LicenseViewSet, base_name='license')
 router.register(r'accesslevels', AccessLevelViewSet, base_name='accesslevel')
 
 urlpatterns = [
-    url(r'^api/', include(router.urls, namespace='metadata')),
+    url(r'^api/', include(router.urls)),
 
-    url(r'^management/$', ManagementView.as_view(), name='metadata_management'),
+    url(r'^management/$', ManagementView.as_view(), name='management'),
 
-    url(r'^(?P<database_name>\w+)/$', DatabaseView.as_view(), name='metadata_database'),
-    url(r'^(?P<database_name>\w+)/(?P<table_name>\w+)/$', TableView.as_view(), name='metadata_table'),
+    url(r'^(?P<database_name>\w+)/$', DatabaseView.as_view(), name='database'),
+    url(r'^(?P<database_name>\w+)/(?P<table_name>\w+)/$', TableView.as_view(), name='table'),
 ]

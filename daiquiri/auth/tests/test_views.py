@@ -25,5 +25,5 @@ class AuthTestCase(TestCase):
 class UsersTests(TestListViewMixin, AuthTestCase):
 
     url_names = {
-        'list_view': 'users'
+        'list_view': 'auth:users'
     }

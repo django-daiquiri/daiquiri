@@ -14,5 +14,5 @@ urlpatterns = [
     url(r'^messages/', MessagesView.as_view(), name='messages'),
 
     # rest api
-    url(r'^api/', include(router.urls, namespace='contact')),
+    url(r'^api/', include(router.urls)),
 ]

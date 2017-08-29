@@ -5,7 +5,6 @@ from django.urls import reverse
 from daiquiri.metadata.models import Database
 from daiquiri.query.models import Example
 
-from .models import Schema
 from .serializers import ExampleSerializer, SchemaSerializer
 from .renderers import (
     ExampleRenderer,
@@ -40,7 +39,7 @@ def capabilities(request):
                 },
                 'accessURL': {
                     'attrs': {},
-                    'text': request.build_absolute_uri(reverse('tap_root'))
+                    'text': request.build_absolute_uri(reverse('tap:root'))
                 }
             },
             'languages': [{
@@ -62,7 +61,7 @@ def capabilities(request):
                     'attrs': {
                         'use': 'base'
                     },
-                    'text': request.build_absolute_uri(reverse('tap_async-list'))
+                    'text': request.build_absolute_uri(reverse('tap:async-list'))
                 }
             }
         },
@@ -78,7 +77,7 @@ def capabilities(request):
                     'attrs': {
                         'use': 'base'
                     },
-                    'text': request.build_absolute_uri(reverse('tap_sync-list'))
+                    'text': request.build_absolute_uri(reverse('tap:sync-list'))
                 }
             }
         },
@@ -92,7 +91,7 @@ def capabilities(request):
                     'attrs': {
                         'use': 'full'
                     },
-                    'text': request.build_absolute_uri(reverse('tap_capabilities'))
+                    'text': request.build_absolute_uri(reverse('tap:capabilities'))
                 }
             }
         },
@@ -106,7 +105,7 @@ def capabilities(request):
                     'attrs': {
                         'use': 'full'
                     },
-                    'text': request.build_absolute_uri(reverse('tap_tables'))
+                    'text': request.build_absolute_uri(reverse('tap:tables'))
                 }
             }
         },
@@ -120,7 +119,7 @@ def capabilities(request):
                     'attrs': {
                         'use': 'full'
                     },
-                    'text': request.build_absolute_uri(reverse('tap_examples'))
+                    'text': request.build_absolute_uri(reverse('tap:examples'))
                 }
             }
         }

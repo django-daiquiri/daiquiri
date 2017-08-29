@@ -27,14 +27,14 @@ class ContactViewTestCase(TestCase):
 class MessagesTests(TestListViewMixin, ContactViewTestCase):
 
     url_names = {
-        'list_view': 'messages'
+        'list_view': 'contact:messages'
     }
 
 
 class ContactTests(TestViewMixin, ContactViewTestCase):
 
     url_names = {
-        'create_view': 'contact'
+        'create_view': 'contact:contact'
     }
 
     status_map = {

@@ -22,7 +22,7 @@ class ServeViewTestCase(TestCase):
 class PublicTests(TestViewMixin, ServeViewTestCase):
 
     url_names = {
-        'list_view': 'serve_table'
+        'list_view': 'serve:table'
     }
 
     status_map = {
@@ -41,7 +41,7 @@ class PublicTests(TestViewMixin, ServeViewTestCase):
 class InternalTests(TestViewMixin, ServeViewTestCase):
 
     url_names = {
-        'list_view': 'serve_table'
+        'list_view': 'serve:table'
     }
 
     status_map = {
@@ -60,7 +60,7 @@ class InternalTests(TestViewMixin, ServeViewTestCase):
 class UserTests(TestViewMixin, ServeViewTestCase):
 
     url_names = {
-        'list_view': 'serve_table'
+        'list_view': 'serve:table'
     }
 
     status_map = {
@@ -79,7 +79,7 @@ class UserTests(TestViewMixin, ServeViewTestCase):
 class NotFoundTests(TestViewMixin, ServeViewTestCase):
 
     url_names = {
-        'list_view': 'serve_table'
+        'list_view': 'serve:table'
     }
 
     status_map = {

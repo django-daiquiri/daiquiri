@@ -40,7 +40,7 @@ class AsyncTestCase(SyncTestMixin, TestCase):
     )
 
     url_names = {
-        'list': 'tap_sync-list'
+        'list': 'tap:sync-list'
     }
 
     jobs = QueryJob.objects.filter(owner__username='user')

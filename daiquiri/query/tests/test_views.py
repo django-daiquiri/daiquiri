@@ -19,7 +19,7 @@ class QueryViewTestCase(TestCase):
 class QueryTests(TestListViewMixin, QueryViewTestCase):
 
     url_names = {
-        'list_view': 'query'
+        'list_view': 'query:query'
     }
 
     status_map = {
@@ -32,7 +32,7 @@ class QueryTests(TestListViewMixin, QueryViewTestCase):
 class ExamplesTests(TestListViewMixin, QueryViewTestCase):
 
     url_names = {
-        'list_view': 'examples'
+        'list_view': 'query:examples'
     }
 
     status_map = {

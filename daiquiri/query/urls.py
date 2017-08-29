@@ -27,5 +27,5 @@ urlpatterns = [
     url(r'^examples/', ExamplesView.as_view(), name='examples'),
 
     # rest api
-    url(r'^api/', include(router.urls, namespace='query')),
+    url(r'^api/', include(router.urls)),
 ]

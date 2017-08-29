@@ -8,15 +8,15 @@ from .views import availability, capabilities, tables, examples
 
 
 router = JobRouter(trailing_slash=False)
-router.register(r'sync', SyncQueryJobViewSet, base_name='tap_sync')
-router.register(r'async', AsyncQueryJobViewSet, base_name='tap_async')
+router.register(r'sync', SyncQueryJobViewSet, base_name='sync')
+router.register(r'async', AsyncQueryJobViewSet, base_name='async')
 
 urlpatterns = [
-    url(r'^$', TemplateView.as_view(template_name='tap/root.html'), name='tap_root'),
-    url(r'^availability$', availability, name='tap_availability'),
-    url(r'^capabilities$', capabilities, name='tap_capabilities'),
-    url(r'^tables$', tables, name='tap_tables'),
-    url(r'^examples$', examples, name='tap_examples'),
+    url(r'^$', TemplateView.as_view(template_name='tap/root.html'), name='root'),
+    url(r'^availability$', availability, name='availability'),
+    url(r'^capabilities$', capabilities, name='capabilities'),
+    url(r'^tables$', tables, name='tables'),
+    url(r'^examples$', examples, name='examples'),
 
     url(r'^', include(router.urls)),
 ]

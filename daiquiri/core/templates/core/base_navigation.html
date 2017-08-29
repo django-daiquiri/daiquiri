@@ -18,10 +18,10 @@
                 <ul class="nav navbar-nav">
 
                     <li>
-                        <a href="{% url 'query' %}">{% trans 'Query' %}</a>
+                        <a href="{% url 'query:query' %}">{% trans 'Query' %}</a>
                     </li>
                     <li>
-                        <a href="{% url 'contact' %}">{% trans 'Contact' %}</a>
+                        <a href="{% url 'contact:contact' %}">{% trans 'Contact' %}</a>
                     </li>
 
                 </ul>
@@ -44,25 +44,25 @@
                         <ul class="dropdown-menu">
                             {% if can_view_view_profile %}
                             <li>
-                                <a href="{% url 'users' %}">{% trans 'User management' %}</a>
+                                <a href="{% url 'auth:users' %}">{% trans 'User management' %}</a>
                             </li>
                             {% endif %}
 
                             {% if can_view_contactmessages %}
                             <li>
-                                <a href="{% url 'messages' %}">{% trans 'Contact messages' %}</a>
+                                <a href="{% url 'contact:messages' %}">{% trans 'Contact messages' %}</a>
                             </li>
                             {% endif %}
 
                             {% if can_view_databases %}
                             <li>
-                                <a href="{% url 'metadata_management' %}">{% trans 'Metadata management' %}</a>
+                                <a href="{% url 'metadata:management' %}">{% trans 'Metadata management' %}</a>
                             </li>
                             {% endif %}
 
                             {% if can_view_examples %}
                             <li>
-                                <a href="{% url 'examples' %}">{% trans 'Query examples' %}</a>
+                                <a href="{% url 'query:examples' %}">{% trans 'Query examples' %}</a>
                             </li>
                             {% endif %}
                         </ul>

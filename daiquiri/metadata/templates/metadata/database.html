@@ -37,7 +37,7 @@
         {% for table in tables %}
         <li>
             <h6>
-                <a href="{% url 'metadata_table' database.name table.name %}">
+                <a href="{% url 'metadata:table' database.name table.name %}">
                     {% if table.title %}
                     {{ table.title }} ({{ table }})
                     {% else %}

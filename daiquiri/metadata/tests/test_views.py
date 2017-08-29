@@ -20,7 +20,7 @@ class MetadataViewTestCase(TestViewMixin, TestCase):
 class ManagementTests(TestListViewMixin, MetadataViewTestCase):
 
     url_names = {
-        'list_view': 'metadata_management'
+        'list_view': 'metadata:management'
     }
 
     status_map = {
@@ -33,7 +33,7 @@ class ManagementTests(TestListViewMixin, MetadataViewTestCase):
 class PublicDatabaseTests(MetadataViewTestCase):
 
     url_names = {
-        'list_view': 'metadata_database'
+        'list_view': 'metadata:database'
     }
 
     status_map = {
@@ -51,7 +51,7 @@ class PublicDatabaseTests(MetadataViewTestCase):
 class InternalDatabaseTests(MetadataViewTestCase):
 
     url_names = {
-        'list_view': 'metadata_database'
+        'list_view': 'metadata:database'
     }
 
     status_map = {
@@ -70,7 +70,7 @@ class InternalDatabaseTests(MetadataViewTestCase):
 class PublicTableTests(MetadataViewTestCase):
 
     url_names = {
-        'list_view': 'metadata_table'
+        'list_view': 'metadata:table'
     }
 
     status_map = {
@@ -89,7 +89,7 @@ class PublicTableTests(MetadataViewTestCase):
 class InternalTableTests(MetadataViewTestCase):
 
     url_names = {
-        'list_view': 'metadata_table'
+        'list_view': 'metadata:table'
     }
 
     status_map = {

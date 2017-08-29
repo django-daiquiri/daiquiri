@@ -40,17 +40,17 @@ class AsyncTestCase(AsyncTestMixin, TestCase):
     )
 
     url_names = {
-        'list': 'tap_async-list',
-        'detail': 'tap_async-detail',
-        'results': 'tap_async-results',
-        'result': 'tap_async-result',
-        'parameters': 'tap_async-parameters',
-        'destruction': 'tap_async-destruction',
-        'executionduration': 'tap_async-executionduration',
-        'phase': 'tap_async-phase',
-        'error': 'tap_async-error',
-        'quote': 'tap_async-quote',
-        'owner': 'tap_async-owner'
+        'list': 'tap:async-list',
+        'detail': 'tap:async-detail',
+        'results': 'tap:async-results',
+        'result': 'tap:async-result',
+        'parameters': 'tap:async-parameters',
+        'destruction': 'tap:async-destruction',
+        'executionduration': 'tap:async-executionduration',
+        'phase': 'tap:async-phase',
+        'error': 'tap:async-error',
+        'quote': 'tap:async-quote',
+        'owner': 'tap:async-owner'
     }
 
     jobs = QueryJob.objects.filter(owner__username='user')

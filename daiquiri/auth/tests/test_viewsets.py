@@ -44,7 +44,7 @@ class ProfileTests(TestListViewsetMixin, TestDetailViewsetMixin, TestUpdateViews
 
     instances = Profile.objects.all()
     url_names = {
-        'viewset': 'profile'
+        'viewset': 'auth:profile'
     }
 
     def _test_update_viewset(self, username):
@@ -67,5 +67,5 @@ class GroupViewSet(TestListViewsetMixin, TestDetailViewsetMixin, AuthTestCase):
 
     instances = Group.objects.all()
     url_names = {
-        'viewset': 'group'
+        'viewset': 'auth:group'
     }

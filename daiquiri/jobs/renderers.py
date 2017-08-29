@@ -3,8 +3,8 @@ from django.utils.six.moves import StringIO
 from django.utils.encoding import smart_text
 
 from rest_framework.renderers import BaseRenderer
-from rest_framework.reverse import reverse
 
+from .utils import get_job_url
 
 class XMLRenderer(BaseRenderer):
 
@@ -72,12 +72,9 @@ class UWSRenderer(XMLRenderer):
         self.start('uws:jobs', self.root_attrs)
 
         for item in data:
-            base_name = request.resolver_match.url_name.rsplit('-', 1)[0]
-            href = reverse(base_name + '-detail', args=[item['id']], request=request)
-
             self.start('uws:jobref', {
                 'id': item['id'],
-                'xlink:href': href,
+                'xlink:href': get_job_url(request, kwargs={'pk': item['id']}),
                 'xlink:type': 'simple'
             })
             self.node('uws:phase', {}, item['phase'])

@@ -21,7 +21,7 @@ class TapViewTestCase(TestCase):
 class RootTests(TestListViewMixin, TapViewTestCase):
 
     url_names = {
-        'list_view': 'tap_root'
+        'list_view': 'tap:root'
     }
 
     status_map = {
@@ -34,7 +34,7 @@ class RootTests(TestListViewMixin, TapViewTestCase):
 class AvailabilityTests(TestListViewMixin, TapViewTestCase):
 
     url_names = {
-        'list_view': 'tap_availability'
+        'list_view': 'tap:availability'
     }
 
     status_map = {
@@ -47,7 +47,7 @@ class AvailabilityTests(TestListViewMixin, TapViewTestCase):
 class CapabilitiesTests(TestListViewMixin, TapViewTestCase):
 
     url_names = {
-        'list_view': 'tap_capabilities'
+        'list_view': 'tap:capabilities'
     }
 
     status_map = {
@@ -60,7 +60,7 @@ class CapabilitiesTests(TestListViewMixin, TapViewTestCase):
 class TablesTests(TestListViewMixin, TapViewTestCase):
 
     url_names = {
-        'list_view': 'tap_tables'
+        'list_view': 'tap:tables'
     }
 
     status_map = {
@@ -73,7 +73,7 @@ class TablesTests(TestListViewMixin, TapViewTestCase):
 class ExamplesTests(TestListViewMixin, TapViewTestCase):
 
     url_names = {
-        'list_view': 'tap_examples'
+        'list_view': 'tap:examples'
     }
 
     status_map = {

@@ -1,4 +1,3 @@
-from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 
 from rest_framework import viewsets
@@ -19,6 +18,7 @@ from .serializers import (
 )
 from .renderers import UWSRenderer, ErrorRenderer
 from .filters import UWSFilterBackend
+from .utils import get_job_url
 
 
 class JobViewSet(viewsets.GenericViewSet):
@@ -90,9 +90,7 @@ class AsyncJobViewSet(JobViewSet):
         else:
             kwargs = self.kwargs
 
-        base_name = self.request.resolver_match.url_name.rsplit('-', 1)[0]
-        path = reverse(base_name + '-detail', kwargs=kwargs)
-        return self.request.build_absolute_uri(path)
+        return get_job_url(self.request, kwargs=kwargs)
 
     def list_jobs(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
