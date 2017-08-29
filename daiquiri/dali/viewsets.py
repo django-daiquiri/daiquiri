@@ -74,9 +74,6 @@ class SyncJobViewSet(JobViewSet):
         job.save()
         job.run(sync=True)
 
-        if serializer.data.get('PHASE') == job.PHASE_RUN:
-            job.run()
-
         # reload the job from the database since job.run() doesn't work on the same job object
         job = self.get_queryset().get(pk=job.pk)
 
@@ -146,13 +143,22 @@ class AsyncJobViewSet(JobViewSet):
         return HttpResponseSeeOther(self.get_success_url(job))
 
     def update_job(self, request, *args, **kwargs):
+        self.get_object()  # necessary to check permissions
+
         serializer = JobUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        if serializer.data.get('PHASE') == 'DELETE':
-            return self.destroy(self, request)
+        if 'ACTION' in serializer.data:
+            if serializer.data['ACTION'] == 'DELETE':
+                return self.destroy_job(self, request)
+            else:
+                raise ValidationError({
+                    'PHASE': 'Unsupported value.'
+                })
         else:
-            return HttpResponseSeeOther(self.get_success_url())
+            raise ValidationError({
+                'ACTION': 'Parameter not found.'
+            })
 
     def destroy_job(self, request, *args, **kwargs):
         job = self.get_object()
@@ -160,13 +166,16 @@ class AsyncJobViewSet(JobViewSet):
         return HttpResponseSeeOther(self.get_success_url())
 
     def get_results(self, request, pk):
+        job = self.get_object()
+
         renderered_data = UWSRenderer().render({
-            'results': self.get_object().results
+            'results': job.results
         }, renderer_context=self.get_renderer_context())
         return HttpResponse(renderered_data, content_type=UWSRenderer.media_type)
 
     def get_result(self, request, pk):
-        return HttpResponseSeeOther(self.get_object().result)
+        job = self.get_object()
+        return HttpResponseSeeOther(job.result)
 
     def get_parameters(self, request, pk):
         renderered_data = UWSRenderer().render({
@@ -176,44 +185,47 @@ class AsyncJobViewSet(JobViewSet):
 
     def get_destruction(self, request, pk):
         job = self.get_object()
+
         if job.destruction_time:
-            return HttpResponse(job.destruction_time)
+            # use the JobUpdateSerializer to create timestamp
+            serializer = JobUpdateSerializer({
+                'DESTRUCTION': job.destruction_time
+            })
+
+            return HttpResponse(serializer.data['DESTRUCTION'])
         else:
             return HttpResponse()
 
     def set_destruction(self, request, pk):
         job = self.get_object()
-        try:
-            job.destruction_time = iso8601.parse_date(request.POST['DESTRUCTION'])
+
+        serializer = JobUpdateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        if 'DESTRUCTION' in serializer.data:
+            job.destruction_time = serializer.data['DESTRUCTION']
             job.save()
             return HttpResponseSeeOther(self.get_success_url(), status=303)
-        except (TypeError, IntegrityError, ValueError) as e:
-            raise ValidationError({
-                'DESTRUCTION': 'Unsupported value.'
-            })
-        except KeyError as e:
+        else:
             raise ValidationError({
                 'DESTRUCTION': 'Parameter not found.'
             })
 
     def get_executionduration(self, request, pk):
         job = self.get_object()
-        if job.execution_duration:
-            return HttpResponse(job.execution_duration)
-        else:
-            return HttpResponse()
+        return HttpResponse(job.execution_duration)
 
     def set_executionduration(self, request, pk):
         job = self.get_object()
-        try:
-            job.execution_duration = request.POST['EXECUTIONDURATION']
+
+        serializer = JobUpdateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        if 'EXECUTIONDURATION' in serializer.data:
+            job.execution_duration = serializer.data['EXECUTIONDURATION']
             job.save()
             return HttpResponseSeeOther(self.get_success_url())
-        except (IntegrityError, ValueError) as e:
-            raise ValidationError({
-                'EXECUTIONDURATION': 'Unsupported value.'
-            })
-        except KeyError as e:
+        else:
             raise ValidationError({
                 'EXECUTIONDURATION': 'Parameter not found.'
             })
@@ -225,19 +237,25 @@ class AsyncJobViewSet(JobViewSet):
     def set_phase(self, request, pk):
         job = self.get_object()
 
-        phase = request.POST.get('PHASE')
-        if phase == job.PHASE_RUN:
-            job.clean()
-            job.run()
-            return HttpResponseSeeOther(self.get_success_url())
+        serializer = JobUpdateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-        elif phase == job.PHASE_ABORT:
-            job.abort()
-            return HttpResponseSeeOther(self.get_success_url())
-
+        if 'PHASE' in serializer.data:
+            phase = serializer.data['PHASE']
+            if phase == job.PHASE_RUN:
+                job.clean()
+                job.run()
+                return HttpResponseSeeOther(self.get_success_url())
+            elif phase == job.PHASE_ABORT:
+                job.abort()
+                return HttpResponseSeeOther(self.get_success_url())
+            else:
+                raise ValidationError({
+                    'PHASE': 'Unsupported value.'
+                })
         else:
             raise ValidationError({
-                'PHASE': 'Unsupported value.'
+                'PHASE': 'Parameter not found.'
             })
 
     def get_error(self, request, pk):

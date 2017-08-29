@@ -22,7 +22,7 @@ class UWSFilterBackend(BaseFilterBackend):
 
             after = query_dict.get('AFTER')
             if after:
-                queryset = queryset.filter(start_time__gt=iso8601.parse_date(after))
+                queryset = queryset.filter(creation_time__gt=iso8601.parse_date(after))
 
             last = query_dict.get('LAST')
             if last:

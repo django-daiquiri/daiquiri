@@ -5,14 +5,14 @@
     "fields": {
       "owner": 2,
       "client_ip": null,
-      "response_format": null,
+      "response_format": "votable",
       "max_records": null,
       "run_id": null,
       "phase": "COMPLETED",
-      "creation_time": "2017-08-25T08:38:56.233Z",
-      "start_time": "2017-08-25T08:38:56.269Z",
-      "end_time": "2017-08-25T08:38:56.338Z",
-      "execution_duration": 0,
+      "creation_time": "2017-01-01T00:00:00.000Z",
+      "start_time": "2017-01-01T00:00:00.000Z",
+      "end_time": "2017-01-01T00:00:10.000Z",
+      "execution_duration": 60,
       "destruction_time": null,
       "error_summary": null,
       "job_type": "QUERY"
@@ -24,16 +24,54 @@
     "fields": {
       "owner": 2,
       "client_ip": null,
-      "response_format": null,
+      "response_format": "votable",
       "max_records": null,
       "run_id": null,
       "phase": "EXECUTING",
-      "creation_time": "2017-08-25T08:38:56.233Z",
-      "start_time": "2017-08-25T08:38:56.269Z",
-      "end_time": "2017-08-25T08:38:56.338Z",
+      "creation_time": "2017-01-01T00:00:00.000Z",
+      "start_time": "2017-01-01T00:00:10.000Z",
+      "end_time": null,
       "execution_duration": 0,
       "destruction_time": null,
       "error_summary": null,
+      "job_type": "QUERY"
+    }
+  },
+  {
+    "model": "daiquiri_jobs.job",
+    "pk": "5527f2b0-7130-466d-b8d2-dbf6c5f700bf",
+    "fields": {
+      "owner": 2,
+      "client_ip": null,
+      "response_format": "votable",
+      "max_records": null,
+      "run_id": null,
+      "phase": "PENDING",
+      "creation_time": "2017-01-01T02:00:00.000Z",
+      "start_time": null,
+      "end_time": null,
+      "execution_duration": 0,
+      "destruction_time": null,
+      "error_summary": null,
+      "job_type": "QUERY"
+    }
+  },
+  {
+    "model": "daiquiri_jobs.job",
+    "pk": "c87926e4-8e5f-4032-a764-826b6a39c171",
+    "fields": {
+      "owner": 2,
+      "client_ip": null,
+      "response_format": "votable",
+      "max_records": null,
+      "run_id": null,
+      "phase": "ERROR",
+      "creation_time": "2017-01-01T02:00:00.000Z",
+      "start_time": "2017-01-01T02:00:09.000Z",
+      "end_time": null,
+      "execution_duration": 0,
+      "destruction_time": "2017-01-01T02:00:10.000Z",
+      "error_summary": "There has been an error.",
       "job_type": "QUERY"
     }
   }

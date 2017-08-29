@@ -7,7 +7,9 @@ class ServeViewTestCase(TestCase):
 
     fixtures = (
         'auth.json',
-        'metadata.json'
+        'metadata.json',
+        'jobs.json',
+        'queryjobs.json'
     )
 
     users = (

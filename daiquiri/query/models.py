@@ -211,14 +211,10 @@ class QueryJob(Job):
 
     @property
     def result(self):
-        if self.phase == self.PHASE_COMPLETED:
-            return reverse('query:job-stream', kwargs={
-                'pk': str(self.id),
-                'format_key': self.response_format
-            })
-
-        else:
-            return None
+        return reverse('query:job-stream', kwargs={
+            'pk': str(self.id),
+            'format_key': self.response_format
+        })
 
     @property
     def quote(self):

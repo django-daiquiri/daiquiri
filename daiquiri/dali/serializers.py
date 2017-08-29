@@ -36,15 +36,19 @@ class JobRetrieveSerializer(serializers.ModelSerializer):
 
 class CaseInsensitiveSerializer(serializers.Serializer):
 
-    def __init__(self, **kwargs):
+    def __init__(self, *args, **kwargs):
         # make all the keys in kwargs['data'] upper case
-        kwargs['data'] = make_query_dict_upper_case(kwargs.get('data'))
+        if 'data' in kwargs:
+            kwargs['data'] = make_query_dict_upper_case(kwargs['data'])
 
-        super(CaseInsensitiveSerializer, self).__init__(**kwargs)
+        super(CaseInsensitiveSerializer, self).__init__(*args, **kwargs)
 
 
 class JobUpdateSerializer(CaseInsensitiveSerializer):
 
+    ACTION = serializers.CharField(required=False)
+    DESTRUCTION = serializers.DateTimeField(required=False)
+    EXECUTIONDURATION = serializers.IntegerField(required=False)
     PHASE = serializers.CharField(required=False)
 
 

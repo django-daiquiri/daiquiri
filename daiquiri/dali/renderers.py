@@ -56,18 +56,17 @@ class UWSRenderer(XMLRenderer):
     }
 
     def render_document(self, data, accepted_media_type=None, renderer_context=None):
-        if data:
-            request = renderer_context['request']
+        request = renderer_context['request']
 
-            if isinstance(data, dict):
-                if data.keys() == ['results']:
-                    self.render_results(data['results'], request, root=True)
-                elif data.keys() == ['parameters']:
-                    self.render_parameters(data['parameters'], request, root=True)
-                else:
-                    self.render_job(data, request)
+        if isinstance(data, dict):
+            if list(data.keys()) == ['results']:
+                self.render_results(data['results'], request, root=True)
+            elif list(data.keys()) == ['parameters']:
+                self.render_parameters(data['parameters'], request, root=True)
             else:
-                self.render_jobs(data, request)
+                self.render_job(data, request)
+        else:
+            self.render_jobs(data, request)
 
     def render_jobs(self, data, request):
         self.start('uws:jobs', self.root_attrs)

@@ -201,7 +201,7 @@ class SyncQueryJobViewSet(SyncJobViewSet):
     }
 
     def get_queryset(self):
-        return QueryJob.objects.filter_by_owner(self.request.user).exclude(phase=QueryJob.PHASE_ARCHIVED)
+        return QueryJob.objects.filter_by_owner(self.request.user)
 
 
 class AsyncQueryJobViewSet(AsyncJobViewSet):
@@ -217,4 +217,4 @@ class AsyncQueryJobViewSet(AsyncJobViewSet):
     }
 
     def get_queryset(self):
-        return QueryJob.objects.filter_by_owner(self.request.user).exclude(phase=QueryJob.PHASE_ARCHIVED)
+        return QueryJob.objects.filter_by_owner(self.request.user)
