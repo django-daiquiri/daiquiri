@@ -37,7 +37,7 @@ setup(
         'lxml>=3.7.3',
         'bitstring>=3.1.5',
         'ipaddress>=1.0.18',
-        'django-test-generator>=0.3.0',
+        'django-test-generator>=0.3.3',
         'mock',
         'coverage',
         'queryparser_python%d>=0.1.3' % sys.version_info.major
