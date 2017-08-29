@@ -1,4 +1,4 @@
-from daiquiri.dali.renderers import XMLRenderer
+from daiquiri.jobs.renderers import XMLRenderer
 
 
 class ExampleRenderer(XMLRenderer):

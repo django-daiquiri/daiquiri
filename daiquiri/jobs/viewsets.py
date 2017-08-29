@@ -1,7 +1,4 @@
-import iso8601
-
 from django.core.urlresolvers import reverse
-from django.db import IntegrityError
 from django.http import HttpResponse
 
 from rest_framework import viewsets

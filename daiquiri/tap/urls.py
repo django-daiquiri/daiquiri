@@ -1,7 +1,7 @@
 from django.conf.urls import url, include
 from django.views.generic import TemplateView
 
-from daiquiri.dali.routers import JobRouter
+from daiquiri.jobs.routers import JobRouter
 from daiquiri.query.viewsets import SyncQueryJobViewSet, AsyncQueryJobViewSet
 
 from .views import availability, capabilities, tables, examples

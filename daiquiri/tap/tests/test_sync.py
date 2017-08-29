@@ -3,7 +3,7 @@ import mock
 from django.test import TestCase
 
 from daiquiri.core.adapter import get_adapter
-from daiquiri.dali.tests.mixins import SyncTestMixin
+from daiquiri.jobs.tests.mixins import SyncTestMixin
 from daiquiri.query.models import QueryJob, Example
 
 adapter = get_adapter()

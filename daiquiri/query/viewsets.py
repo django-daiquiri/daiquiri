@@ -14,7 +14,7 @@ from daiquiri.core.permissions import HasModelPermission
 from daiquiri.core.paginations import ListPagination
 from daiquiri.core.utils import get_client_ip
 
-from daiquiri.dali.viewsets import SyncJobViewSet, AsyncJobViewSet
+from daiquiri.jobs.viewsets import SyncJobViewSet, AsyncJobViewSet
 
 from .models import QueryJob, Example
 from .serializers import (

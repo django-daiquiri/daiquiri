@@ -3,7 +3,7 @@ from django.conf.urls import url, include
 from django.views.generic import TemplateView
 
 from daiquiri.core.utils import import_class
-from daiquiri.dali.routers import JobRouter
+from daiquiri.jobs.routers import JobRouter
 
 
 router = JobRouter(trailing_slash=False)

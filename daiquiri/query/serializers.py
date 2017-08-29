@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from daiquiri.dali.serializers import SyncJobSerializer, AsyncJobSerializer
+from daiquiri.jobs.serializers import SyncJobSerializer, AsyncJobSerializer
 
 from .models import QueryJob, Example
 from .validators import TableNameValidator, QueryLanguageValidator, QueueValidator, ResponseFormatValidator
