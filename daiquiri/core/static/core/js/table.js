@@ -62,7 +62,7 @@ angular.module('core')
     /* create the metadata service */
 
     var service = {
-        files_url: baseurl + 'serve/api/files/',
+        files_url: baseurl + 'serve/files/',
         params: {
             page: 1,
             page_size: 10,
@@ -192,14 +192,14 @@ angular.module('core')
         $document.on('mouseup', exitResize);
     };
 
-    service.download = function(event, file_name) {
+    service.download = function(event, file_path) {
         event.preventDefault();
-        console.log('download ' + service.files_url + file_name);
+        console.log('download ' + service.files_url + file_path);
     }
 
-    service.open = function(event, file_name) {
+    service.open = function(event, file_path) {
         event.preventDefault();
-        console.log('open ' + service.files_url + file_name);
+        console.log('open ' + service.files_url + file_path);
     }
 
     return service;

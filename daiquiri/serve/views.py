@@ -1,3 +1,5 @@
+from sendfile import sendfile
+
 from django.shortcuts import render
 from django.http import Http404
 
@@ -18,3 +20,9 @@ def serve_table(request, database_name, table_name):
         'database': database_name,
         'table': table_name
     })
+
+
+def files(request, file_path):
+    absolute_path = file_path
+
+    return sendfile(request, absolute_path, attachment=True)
