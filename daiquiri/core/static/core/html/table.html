@@ -91,9 +91,24 @@
             </thead>
             <tbody>
                 <tr ng-repeat="row in table.rows">
-                    <td ng-repeat="element in row track by $index">
-                        <div class="cell">
-                            {$ element $}
+                    <td ng-repeat="column in table.columns" data-column-index="{$ $index $}">
+                        <div class="cell" ng-if="column.mode == 'file'">
+                            <a href="{$ table.files_url $}{$ row[$index] $}" ng-click="table.download($event, row[$index])">
+                                {$ row[$index] $}
+                            </a>
+                        </div>
+                        <div class="cell" ng-if="column.mode == 'note'">
+                            <a href="{$ table.files_url $}{$ row[$index] $}" ng-click="table.open($event, row[$index])">
+                                {$ row[$index] $}
+                            </a>
+                        </div>
+                        <div class="cell" ng-if="column.mode == 'link'">
+                            <a href="{$ row[$index] $}" target="blank">
+                                {$ row[$index] $}
+                            </a>
+                        </div>
+                        <div class="cell" ng-if="column.mode == 'default'">
+                            {$ row[$index] $}
                         </div>
                     </td>
                 </tr>
