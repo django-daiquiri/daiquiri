@@ -28,7 +28,7 @@ setup(
         'django-settings-export>=1.2.1',
         'django-sendfile>=0.3.11',
         'django-ipware>=1.1.6',
-        'celery>=4.0.2',
+        'celery>=4.1.0',
         'redis>=2.10.5',
         'rules>=1.2',
         'jsonfield==1.0.0',

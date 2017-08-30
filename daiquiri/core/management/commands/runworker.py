@@ -13,14 +13,15 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         concurrency = str(options['c'])
 
-        queue = '%s_%s' % (settings.DAIQUIRI_APP, options['queue'])
+        queue = options['queue']
+        hostname = '%s_%s@%%h' % (settings.DAIQUIRI_APP, options['queue'])
 
         args = [
             'celery', 'worker',
             '-A', 'config',
             '-Q', queue,
             '-c', concurrency,
-            '-n', queue,
+            '-n', hostname,
             '-l',  'info'
         ]
 
