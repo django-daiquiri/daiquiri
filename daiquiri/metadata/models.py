@@ -338,3 +338,39 @@ class Function(models.Model):
 
     def __str__(self):
         return self.name
+
+
+@python_2_unicode_compatible
+class Directory(models.Model):
+
+    objects = MetadataManager()
+
+    path = models.CharField(
+        max_length=256,
+        verbose_name=_('Path'),
+        help_text=_('Path of the directory.')
+    )
+    access_level = models.CharField(
+        max_length=8, choices=ACCESS_LEVEL_CHOICES,
+        verbose_name=_('Access level')
+    )
+    metadata_access_level = models.CharField(
+        max_length=8, choices=ACCESS_LEVEL_CHOICES,
+        verbose_name=_('Metadata access level')
+    )
+    groups = models.ManyToManyField(
+        Group, blank=True,
+        verbose_name=_('Groups'),
+        help_text=_('The groups which have access to this function.')
+    )
+
+    class Meta:
+        ordering = ('path', )
+
+        verbose_name = _('Directory')
+        verbose_name_plural = _('Directory')
+
+        permissions = (('view_function', 'Can view Directory'),)
+
+    def __str__(self):
+        return self.path

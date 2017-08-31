@@ -90,25 +90,26 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="row in table.rows">
-                    <td ng-repeat="column in table.columns" data-column-index="{$ $index $}">
+                <tr ng-repeat="row in table.rows" ng-init="row_index = $index">
+                    <td ng-repeat="column in table.columns" ng-init="column_index = $index">
                         <div class="cell" ng-if="column.mode == 'file'">
-                            <a href="{$ table.files_url $}{$ row[$index] $}" ng-click="table.download($event, row[$index])">
-                                {$ row[$index] $}
+                            <a href="{$ table.files_url $}{$ row[column_index] $}">
+                                {$ row[column_index] $}
                             </a>
                         </div>
                         <div class="cell" ng-if="column.mode == 'note'">
-                            <a href="{$ table.files_url $}{$ row[$index] $}" ng-click="table.open($event, row[$index])">
-                                {$ row[$index] $}
+                            <a href="{$ table.files_url $}{$ row[column_index] $}"
+                                ng-click="table.open_modal($event, column_index, row_index)">
+                                {$ row[column_index] $}
                             </a>
                         </div>
                         <div class="cell" ng-if="column.mode == 'link'">
-                            <a href="{$ row[$index] $}" target="blank">
-                                {$ row[$index] $}
+                            <a href="{$ row[column_index] $}" target="blank">
+                                {$ row[column_index] $}
                             </a>
                         </div>
                         <div class="cell" ng-if="column.mode == 'default'">
-                            {$ row[$index] $}
+                            {$ row[column_index] $}
                         </div>
                     </td>
                 </tr>
@@ -121,12 +122,40 @@
             {$ table.i18n.count() $}
         </div>
 
-        <div class="col-sm-4 daiquiri-table-page-size">
+        <div class="col-sm-4 daiquiri-table-page-size" ng-show="table.page_sizes.length > 1">
             <select class="form-control" ng-model="table.params.page_size" ng-change="table.fetch()" by-number>
                 <option value="{$ value $}" ng-repeat="value in table.page_sizes">
                     {$ table.i18n.page_size(value) $}
                 </option>
             </select>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="daiquiri-table-modal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">
+                    {$ table.modal.title $}
+                </h4>
+            </div>
+
+            <div class="modal-body">
+                <pre ng-show="table.modal.pre">{$ table.modal.pre $}</pre>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" ng-click="table.previous_modal()">
+                    {$ table.i18n.previous $}
+                </button>
+                <button type="button" class="btn btn-default" ng-click="table.next_modal()">
+                    {$ table.i18n.next $}
+                </button>
+            </div>
         </div>
     </div>
 </div>

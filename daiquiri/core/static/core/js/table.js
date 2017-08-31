@@ -7,13 +7,13 @@ angular.module('core')
             return staticurl + 'core/html/table.html';
         },
         scope: {
-            'values': '='
+            'pageSizes': '='
         },
         link: function(scope, element, attrs) {
             scope.table = TableService;
 
             if (angular.isDefined(attrs.database) && angular.isDefined(attrs.table)) {
-                TableService.init(attrs.database, attrs.table);
+                TableService.init(attrs.database, attrs.table, scope.pageSizes);
             }
 
             // refresh the tooltips everytime a new set of columns is fetched
@@ -46,7 +46,7 @@ angular.module('core')
     };
 }])
 
-.factory('TableService', ['$resource', '$document', function($resource, $document) {
+.factory('TableService', ['$http', '$resource', '$q', '$document', function($http, $resource, $q, $document) {
 
     /* get the base url */
 
@@ -62,7 +62,7 @@ angular.module('core')
     /* create the metadata service */
 
     var service = {
-        files_url: baseurl + 'serve/files/',
+        file_base_url: baseurl + 'serve/files/',
         params: {
             page: 1,
             page_size: 10,
@@ -98,11 +98,17 @@ angular.module('core')
         },
         page_sizes: [10, 20, 100],
         filter_string: null,
-        updated: false
+        updated: false,
+        modal: {}
     };
 
-    service.init = function(database, table) {
+    service.init = function(database, table, page_sizes) {
         service.ready = false;
+
+        if (angular.isDefined(page_sizes)) {
+            service.page_sizes = page_sizes;
+            service.params.page_size = page_sizes[0];
+        }
 
         if (angular.isDefined(database) && angular.isDefined(table)) {
             service.params.database = database;
@@ -117,35 +123,43 @@ angular.module('core')
     };
 
     service.fetch = function() {
-        resources.rows.paginate(service.params, function(response) {
+        return resources.rows.paginate(service.params, function(response) {
             service.count = response.count;
             service.rows = response.results;
+
+            service.first_page = (service.params.page == 1);
+            service.last_page = (service.params.page * service.params.page_size > service.count);
+
             service.ready = true;
-        });
+        }).$promise;
     };
 
     service.first = function() {
-        service.params.page = 1;
-        service.fetch();
+        if (!service.first_page) {
+            service.params.page = 1;
+            service.fetch();
+        }
     };
 
     service.previous = function() {
-        if (service.params.page > 1) {
+        if (!service.first_page) {
             service.params.page -= 1;
-            service.fetch();
+            return service.fetch();
         }
     };
 
     service.next = function() {
-        if (service.params.page * service.params.page_size < service.count) {
+        if (!service.last_page) {
             service.params.page += 1;
-            service.fetch();
+            return service.fetch();
         }
     };
 
     service.last = function() {
-        service.params.page = Math.ceil(service.count / service.params.page_size);
-        service.fetch();
+        if (!service.last_page) {
+            service.params.page = Math.ceil(service.count / service.params.page_size);
+            service.fetch();
+        }
     };
 
     service.reset = function() {
@@ -192,14 +206,59 @@ angular.module('core')
         $document.on('mouseup', exitResize);
     };
 
-    service.download = function(event, file_path) {
+    service.open_modal = function(event, column_index, row_index) {
         event.preventDefault();
-        console.log('download ' + service.files_url + file_path);
+
+        service.modal.column_index = column_index;
+        service.modal.row_index = row_index;
+
+        service.update_modal().then(function() {
+            $('#daiquiri-table-modal').modal('show');
+        })
     }
 
-    service.open = function(event, file_path) {
-        event.preventDefault();
-        console.log('open ' + service.files_url + file_path);
+    service.update_modal = function() {
+        var file_path = service.rows[service.modal.row_index][service.modal.column_index];
+        var url = service.file_base_url + file_path;
+
+        if (service.columns[service.modal.column_index].mode == 'note') {
+            return $http.get(url).then(function(result) {
+                service.modal.title = file_path;
+                service.modal.pre = result.data;
+            });
+        } else {
+            return $q.when();
+        }
+    };
+
+    service.previous_modal = function() {
+        if (service.modal.row_index > 0) {
+            // decrement the row_index and update modal
+            service.modal.row_index -= 1;
+            service.update_modal();
+        } else if (!service.first_page) {
+            // first load previous page
+            service.previous().then(function() {
+                // set row_index to the last row and update modal
+                service.modal.row_index = service.rows.length - 1;
+                service.update_modal();
+            });
+        }
+    }
+
+    service.next_modal = function() {
+        if (service.modal.row_index < service.rows.length - 1) {
+            // increment the row_index and update modal
+            service.modal.row_index += 1;
+            service.update_modal();
+        } else if (!service.last_page) {
+            // first load next page
+            service.next().then(function() {
+                // set row_index to 0 and update modal
+                service.modal.row_index = 0;
+                service.update_modal();
+            });
+        }
     }
 
     return service;
