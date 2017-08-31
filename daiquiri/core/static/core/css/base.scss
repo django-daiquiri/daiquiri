@@ -133,7 +133,9 @@ blockquote {
     max-height: calc(100vh - 225px);
     overflow-y: auto;
 }
-
+.modal-body img {
+    width: 100%;
+}
 .modal-body dl {
     margin-top: 5px;
     margin-bottom: 0;

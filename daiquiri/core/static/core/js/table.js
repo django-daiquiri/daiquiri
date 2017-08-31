@@ -99,6 +99,7 @@ angular.module('core')
         page_sizes: [10, 20, 100],
         filter_string: null,
         updated: false,
+        active: {},
         modal: {}
     };
 
@@ -206,11 +207,18 @@ angular.module('core')
         $document.on('mouseup', exitResize);
     };
 
+    service.activate = function(column_index, row_index) {
+        service.active = {
+            column_index: column_index,
+            row_index: row_index
+        }
+    }
+
     service.open_modal = function(event, column_index, row_index) {
         event.preventDefault();
+        event.stopPropagation();
 
-        service.modal.column_index = column_index;
-        service.modal.row_index = row_index;
+        service.activate(column_index, row_index);
 
         service.update_modal().then(function() {
             $('#daiquiri-table-modal').modal('show');
@@ -218,44 +226,47 @@ angular.module('core')
     }
 
     service.update_modal = function() {
-        var file_path = service.rows[service.modal.row_index][service.modal.column_index];
+        var file_path = service.rows[service.active.row_index][service.active.column_index];
         var url = service.file_base_url + file_path;
 
-        if (service.columns[service.modal.column_index].mode == 'note') {
+        if (service.columns[service.active.column_index].mode == 'note') {
             return $http.get(url).then(function(result) {
                 service.modal.title = file_path;
                 service.modal.pre = result.data;
             });
+        } else if (service.columns[service.active.column_index].mode == 'preview') {
+            service.modal.src = url;
+            return $q.when();
         } else {
             return $q.when();
         }
     };
 
     service.previous_modal = function() {
-        if (service.modal.row_index > 0) {
+        if (service.active.row_index > 0) {
             // decrement the row_index and update modal
-            service.modal.row_index -= 1;
+            service.active.row_index -= 1;
             service.update_modal();
         } else if (!service.first_page) {
             // first load previous page
             service.previous().then(function() {
                 // set row_index to the last row and update modal
-                service.modal.row_index = service.rows.length - 1;
+                service.active.row_index = service.rows.length - 1;
                 service.update_modal();
             });
         }
     }
 
     service.next_modal = function() {
-        if (service.modal.row_index < service.rows.length - 1) {
+        if (service.active.row_index < service.rows.length - 1) {
             // increment the row_index and update modal
-            service.modal.row_index += 1;
+            service.active.row_index += 1;
             service.update_modal();
         } else if (!service.last_page) {
             // first load next page
             service.next().then(function() {
                 // set row_index to 0 and update modal
-                service.modal.row_index = 0;
+                service.active.row_index = 0;
                 service.update_modal();
             });
         }

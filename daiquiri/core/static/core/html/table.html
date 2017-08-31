@@ -91,25 +91,30 @@
             </thead>
             <tbody>
                 <tr ng-repeat="row in table.rows" ng-init="row_index = $index">
-                    <td ng-repeat="column in table.columns" ng-init="column_index = $index">
-                        <div class="cell" ng-if="column.mode == 'file'">
-                            <a href="{$ table.files_url $}{$ row[column_index] $}">
+                    <td ng-repeat="column in table.columns" ng-init="column_index = $index" ng-class="{
+                            'active': row_index == table.active.row_index
+                        }">
+
+                        <div class="cell" ng-click="table.activate(column_index, row_index)">
+                            <div ng-if="column.mode == 'file'">
+                                <a href="{$ table.file_base_url $}{$ row[column_index] $}">
+                                    {$ row[column_index] $}
+                                </a>
+                            </div>
+                            <div ng-if="column.mode == 'note' || column.mode == 'preview'">
+                                <a href="{$ table.file_base_url $}{$ row[column_index] $}"
+                                    ng-click="table.open_modal($event, column_index, row_index)">
+                                    {$ row[column_index] $}
+                                </a>
+                            </div>
+                            <div ng-if="column.mode == 'link'">
+                                <a href="{$ row[column_index] $}" target="blank">
+                                    {$ row[column_index] $}
+                                </a>
+                            </div>
+                            <div ng-if="column.mode == 'default'">
                                 {$ row[column_index] $}
-                            </a>
-                        </div>
-                        <div class="cell" ng-if="column.mode == 'note'">
-                            <a href="{$ table.files_url $}{$ row[column_index] $}"
-                                ng-click="table.open_modal($event, column_index, row_index)">
-                                {$ row[column_index] $}
-                            </a>
-                        </div>
-                        <div class="cell" ng-if="column.mode == 'link'">
-                            <a href="{$ row[column_index] $}" target="blank">
-                                {$ row[column_index] $}
-                            </a>
-                        </div>
-                        <div class="cell" ng-if="column.mode == 'default'">
-                            {$ row[column_index] $}
+                            </div>
                         </div>
                     </td>
                 </tr>
@@ -146,6 +151,7 @@
 
             <div class="modal-body">
                 <pre ng-show="table.modal.pre">{$ table.modal.pre $}</pre>
+                <img ng-show="table.modal.src" ng-src="{$ table.modal.src $}" />
             </div>
 
             <div class="modal-footer">

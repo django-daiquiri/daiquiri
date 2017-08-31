@@ -30,6 +30,8 @@ class ColumnSerializer(serializers.ModelSerializer):
                 return 'file'
             elif 'meta.note' in obj['ucd']:
                 return 'note'
+            elif 'meta.preview' in obj['ucd']:
+                return 'preview'
             elif 'meta.ref' in obj['ucd']:
                 return 'link'
         except (AttributeError, TypeError):
