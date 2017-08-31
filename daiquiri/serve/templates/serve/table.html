@@ -4,13 +4,13 @@
 {% load i18n %}
 {% load core_tags %}
 
-{% block bodyargs %}ng-app="serve_table" ng-controller="ServeTableController"{% endblock %}
+{% block bodyargs %}ng-app="table" ng-controller="TableController"{% endblock %}
 
 {% block headextra %}
     {% compress css %}
     <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/browser.scss' %}" />
     <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/table.scss' %}" />
-    <link rel="stylesheet" type="text/x-scss" href="{% static 'serve/css/serve_table.scss' %}" />
+    <link rel="stylesheet" type="text/x-scss" href="{% static 'serve/css/table.scss' %}" />
     {% endcompress css %}
 
     {% compress js %}
@@ -20,7 +20,7 @@
     <script type="text/javascript" src="{% static 'core/js/byNumber.js' %}" ></script>
     <script type="text/javascript" src="{% static 'core/js/table.js' %}" ></script>
 
-    <script type="text/javascript" src="{% static 'serve/js/serve_table.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'serve/js/table.js' %}" ></script>
     {% endcompress js %}
 
     <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
@@ -31,7 +31,6 @@
     <h1>{{ database }}.{{ table }}</h1>
 
     <div daiquiri-table
-        data-values="[10, 20, 100]"
         data-database="{{ database }}"
         data-table="{{ table }}">
     </div>

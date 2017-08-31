@@ -30,7 +30,18 @@ def get_columns(user, database_name, table_name):
         return Column.objects.filter_by_access_level(user).filter(table=table).values()
 
 
-def get_full_path(directory_path, file_path):
+def get_column(user, database_name, table_name, column_name):
+
+    columns = get_columns(user, database_name, table_name)
+
+    try:
+        return [column for column in columns if column['name'] == column_name][0]
+    except IndexError:
+        # column_name is not in columns
+        return None
+
+
+def normalize_file_path(directory_path, file_path):
 
     directory_path_tokens = directory_path.rstrip('/').split('/')
     file_path_tokens = file_path.lstrip('/').split('/')
@@ -40,4 +51,4 @@ def get_full_path(directory_path, file_path):
         if file_path_tokens[:i] == directory_path_tokens[-i:]:
             match = i
 
-    return os.path.join(directory_path, *file_path_tokens[match:])
+    return os.path.join(*file_path_tokens[match:])
