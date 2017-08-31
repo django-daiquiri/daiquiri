@@ -34,7 +34,7 @@ class ColumnSerializer(serializers.ModelSerializer):
                 return 'preview'
             elif 'meta.ref' in obj['ucd']:
                 return 'link'
-        except (AttributeError, TypeError):
+        except (AttributeError, TypeError,  KeyError):
             pass
 
         return 'default'
