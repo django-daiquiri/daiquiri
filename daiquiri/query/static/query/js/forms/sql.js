@@ -10,7 +10,8 @@ app.factory('SqlFormService', ['$timeout', 'QueryService', 'BrowserService', fun
         values: {
             'query_language': QueryService.query_languages[0].id
         },
-        errors: {}
+        errors: {},
+        markers: []
     };
 
     /* create and configure the browser service */
@@ -24,6 +25,11 @@ app.factory('SqlFormService', ['$timeout', 'QueryService', 'BrowserService', fun
     };
 
     service.submit = function() {
+        // reset markers and errors
+        angular.forEach(service.markers, function(marker) {
+            marker.clear();
+        });
+        service.markers = [];
         service.errors = {};
 
         QueryService.submitJob(service.values)
@@ -36,13 +42,16 @@ app.factory('SqlFormService', ['$timeout', 'QueryService', 'BrowserService', fun
                 var editor = $('.CodeMirror')[0].CodeMirror;
 
                 if (angular.isDefined(service.errors.query.positions)) {
+
+                    var editor = $('.CodeMirror')[0].CodeMirror;
+
                     angular.forEach(angular.fromJson(service.errors.query.positions), function(position) {
-                        editor.markText(
+                        service.markers.push(editor.markText(
                             {line: position[0] - 1, ch: position[1]},
                             {line: position[0] - 1, ch: position[1] + position[2].length},
                             {className: 'codemirror-error'},
                             {clearOnEnter: true}
-                        );
+                        ));
                     });
 
                     service.errors.query = service.errors.query.messages;

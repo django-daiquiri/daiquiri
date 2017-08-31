@@ -98,5 +98,6 @@ p.daiquiri-query-form-help {
 }
 
 .codemirror-error {
-    background-color: $error-color;
+    border-radius: 1px;
+    background-color: $error-background-color;
 }

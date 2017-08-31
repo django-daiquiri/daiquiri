@@ -23,6 +23,7 @@ from jsonfield import JSONField
 
 from queryparser.mysql import MySQLQueryProcessor
 from queryparser.adql import ADQLQueryTranslator
+from queryparser.exceptions import QueryError, QuerySyntaxError
 
 from daiquiri.core.adapter import get_adapter
 from daiquiri.jobs.models import Job
@@ -116,23 +117,38 @@ class QueryJob(Job):
             try:
                 translator = ADQLQueryTranslator(self.query)
                 self.native_query = translator.to_mysql()
-            except RuntimeError as e:
+            except QuerySyntaxError as e:
                 raise ValidationError({
-                     'query': [e.message]
+                    'query': {
+                        'messages': [_('There has been an error while parsing your query.')],
+                        'positions': json.dumps(e.syntax_errors),
+                    }
                 })
+            except QueryError as e:
+                raise ValidationError({
+                    'query': {
+                        'messages': e.messages,
+                    }
+                })
+
         else:
             self.native_query = self.query
 
         # parse the query
-        processor = MySQLQueryProcessor(self.native_query)
-        processor.process_query()
-
-        # check for syntax errors
-        if processor.syntax_errors:
+        try:
+            processor = MySQLQueryProcessor(self.native_query)
+            processor.process_query()
+        except QuerySyntaxError as e:
             raise ValidationError({
                 'query': {
                     'messages': [_('There has been an error while parsing your query.')],
-                    'positions': json.dumps(processor.syntax_errors),
+                    'positions': json.dumps(e.syntax_errors),
+                }
+            })
+        except QueryError as e:
+            raise ValidationError({
+                'query': {
+                    'messages': e.messages,
                 }
             })
 
