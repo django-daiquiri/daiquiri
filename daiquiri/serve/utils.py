@@ -12,7 +12,7 @@ def get_columns(user, database_name, table_name):
 
     if database_name == user_database_name:
         # get the job fetch the columns
-        job = QueryJob.objects.filter_by_owner(user).get(
+        job = QueryJob.objects.filter_by_owner(user).exclude(phase=QueryJob.PHASE_ARCHIVED).get(
             database_name=database_name,
             table_name=table_name
         )
