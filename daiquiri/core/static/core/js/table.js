@@ -98,9 +98,9 @@ angular.module('core')
         },
         page_sizes: [10, 20, 100],
         filter_string: null,
-        updated: false,
+        files: false,
         active: {},
-        modal: {}
+        modal: {},
     };
 
     service.init = function(database, table, page_sizes) {
@@ -115,7 +115,28 @@ angular.module('core')
             service.params.database = database;
             service.params.table = table;
 
-            service.columns = resources.columns.query(service.params);
+            resources.columns.query(service.params, function(response) {
+                service.columns = response;
+
+                // check column ucds for display mode
+                angular.forEach(service.columns, function(column) {
+                    // the default display mode is 'text'
+                    column.display = 'text'
+
+                    if (column.ucd) {
+                        if (column.ucd.indexOf('meta.file') > -1) {
+                            column.display = 'file_link';
+                        } else if (column.ucd.indexOf('meta.note') > -1) {
+                            column.display = 'modal';
+                        } else if (column.ucd.indexOf('meta.preview') > -1) {
+                            column.display = 'modal';
+                        } else if (column.ucd.indexOf('meta.ref') > -1) {
+                            column.display = 'link';
+                        }
+                    }
+                })
+            });
+
             service.reset();
         } else {
             service.columns = [];
@@ -228,13 +249,14 @@ angular.module('core')
     service.update_modal = function() {
         var file_path = service.rows[service.active.row_index][service.active.column_index];
         var url = service.file_base_url + file_path;
+        var column = service.columns[service.active.column_index];
 
-        if (service.columns[service.active.column_index].mode == 'note') {
+        if (column.ucd.indexOf('meta.note') > -1) {
             return $http.get(url).then(function(result) {
                 service.modal.title = file_path;
                 service.modal.pre = result.data;
             });
-        } else if (service.columns[service.active.column_index].mode == 'preview') {
+        } else if (column.ucd.indexOf('meta.preview') > -1) {
             service.modal.src = url;
             return $q.when();
         } else {
