@@ -354,10 +354,6 @@ class Directory(models.Model):
         max_length=8, choices=ACCESS_LEVEL_CHOICES,
         verbose_name=_('Access level')
     )
-    metadata_access_level = models.CharField(
-        max_length=8, choices=ACCESS_LEVEL_CHOICES,
-        verbose_name=_('Metadata access level')
-    )
     groups = models.ManyToManyField(
         Group, blank=True,
         verbose_name=_('Groups'),
