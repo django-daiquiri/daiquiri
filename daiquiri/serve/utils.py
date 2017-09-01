@@ -14,19 +14,27 @@ def get_columns(user, database_name, table_name):
 
     if database_name == user_database_name:
         # get the job fetch the columns
-        job = QueryJob.objects.filter_by_owner(user).exclude(phase=QueryJob.PHASE_ARCHIVED).get(
-            database_name=database_name,
-            table_name=table_name
-        )
-
-        return job.metadata['columns']
+        try:
+            job = QueryJob.objects.filter_by_owner(user).exclude(phase=QueryJob.PHASE_ARCHIVED).get(
+                database_name=database_name,
+                table_name=table_name
+            )
+            return job.metadata['columns']
+        except QueryJob.DoesNotExist:
+            return []
 
     else:
         # check permissions on the database
-        database = Database.objects.filter_by_access_level(user).get(name=database_name)
+        try:
+            database = Database.objects.filter_by_access_level(user).get(name=database_name)
+        except Database.DoesNotExist:
+            return []
 
         # check permissions on the table
-        table = Table.objects.filter_by_access_level(user).filter(database=database).get(name=table_name)
+        try:
+            table = Table.objects.filter_by_access_level(user).filter(database=database).get(name=table_name)
+        except Table.DoesNotExist:
+            return []
 
         # get columns for this table
         return Column.objects.filter_by_access_level(user).filter(table=table).values()
@@ -80,7 +88,7 @@ def get_files(user, database_name, table_name, column_name):
     return files
 
 
-def get_download_file_name(user, table_name, column_name):
+def get_archive_file_name(user, table_name, column_name):
     if not user or user.is_anonymous():
         username = 'anonymous'
     else:

@@ -5,7 +5,7 @@ app.factory('DownloadService', ['$http', 'PollingService', function($http, Polli
     var baseurl = angular.element('meta[name="baseurl"]').attr('content');
 
     var base_download_url = baseurl + 'query/api/jobs/';
-    var base_archive_url = baseurl + 'serve/archive/';
+    var base_archive_url = baseurl + 'serve/archives/';
 
     var service = {
         pending_downloads: 0

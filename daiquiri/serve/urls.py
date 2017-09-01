@@ -2,7 +2,7 @@ from django.conf.urls import url, include
 
 from rest_framework import routers
 
-from .views import table, files, archive
+from .views import table, file, archive
 from .viewsets import RowViewSet, ColumnViewSet
 
 router = routers.DefaultRouter()
@@ -11,7 +11,7 @@ router.register(r'columns', ColumnViewSet, base_name='column')
 
 urlpatterns = [
     url(r'^table/(?P<database_name>[A-Za-z0-9_]+)/(?P<table_name>[A-Za-z0-9_]+)/$', table, name='table'),
-    url(r'^files/(?P<file_path>.+)$', files, name='files'),
+    url(r'^file/(?P<file_path>.+)$', file, name='file'),
     url(r'^archive/(?P<database_name>[\w-]+)/(?P<table_name>[\w-]+)/(?P<column_name>[\w-]+)/$', archive, name='archive'),
 
     # rest api

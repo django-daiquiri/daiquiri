@@ -9,43 +9,43 @@ from django.conf import settings
 from django.shortcuts import render
 from django.http import HttpResponse, Http404
 
-from daiquiri.metadata.models import Database, Table
-from daiquiri.query.models import QueryJob
-
 from .tasks import create_download_archive
-from .utils import get_columns, get_file, get_files, get_download_file_name
+from .utils import get_columns, get_file, get_files, get_archive_file_name
 
 logger = logging.getLogger(__name__)
 
 
 def table(request, database_name, table_name):
 
-    try:
-        get_columns(request.user, database_name, table_name)
-    except (QueryJob.DoesNotExist, Database.DoesNotExist, Table.DoesNotExist):
-        raise Http404
+    columns = get_columns(request.user, database_name, table_name)
 
-    return render(request, 'serve/table.html', {
-        'database': database_name,
-        'table': table_name
-    })
+    if columns:
+        return render(request, 'serve/table.html', {
+            'database': database_name,
+            'table': table_name
+        })
+
+    # if nothing worked, return 404
+    raise Http404
 
 
-def files(request, file_path):
+def file(request, file_path):
 
-    file = get_file(request.user, file_path)
+    file_name = get_file(request.user, file_path)
 
-    if file:
-        return sendfile(request, file, attachment=False)
+    if file_name:
+        return sendfile(request, file_name, attachment=False)
 
+    # if nothing worked, return 404
     raise Http404
 
 
 def archive(request, database_name, table_name, column_name):
 
     files = get_files(request.user, database_name, table_name, column_name)
+
     if files:
-        file_name = get_download_file_name(request.user, table_name, column_name)
+        file_name = get_archive_file_name(request.user, table_name, column_name)
 
         task_id = file_name
         task_args = (file_name, files)

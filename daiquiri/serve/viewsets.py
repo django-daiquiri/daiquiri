@@ -35,9 +35,8 @@ class RowViewSet(viewsets.ViewSet):
         page_size = self._get_page_size()
 
         # get the columns using the utils function
-        try:
-            columns = get_columns(self.request.user, database_name, table_name)
-        except (QueryJob.DoesNotExist, Database.DoesNotExist, Table.DoesNotExist):
+        columns = get_columns(self.request.user, database_name, table_name)
+        if not columns:
             raise NotFound()
 
         column_names = [column['name'] for column in columns]
@@ -105,9 +104,8 @@ class ColumnViewSet(viewsets.ViewSet):
         table_name = self.request.GET.get('table')
 
         # get the columns using the utils function
-        try:
-            columns = get_columns(self.request.user, database_name, table_name)
-        except (QueryJob.DoesNotExist, Database.DoesNotExist, Table.DoesNotExist):
+        columns = get_columns(self.request.user, database_name, table_name)
+        if not columns:
             raise NotFound()
 
         return Response(ColumnSerializer(columns, many=True).data)
