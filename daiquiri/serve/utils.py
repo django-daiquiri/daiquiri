@@ -81,7 +81,12 @@ def get_files(user, database_name, table_name, column_name):
 
 
 def get_download_file_name(user, table_name, column_name):
-    directory_name = os.path.join(settings.SERVE_DOWNLOAD_DIR, user.username)
+    if not user or user.is_anonymous():
+        username = 'anonymous'
+    else:
+        username = user.username
+
+    directory_name = os.path.join(settings.SERVE_DOWNLOAD_DIR, username)
     return os.path.join(directory_name, '%s_%s.zip' % (table_name, column_name))
 
 

@@ -311,7 +311,7 @@ class QueryJob(Job):
 
     def download(self, format):
         if self.phase == self.PHASE_COMPLETED:
-            file_name = get_download_file_name(self.database_name, self.table_name, self.owner_username, format)
+            file_name = get_download_file_name(self.owner, self.table_name, format)
 
             task_id = file_name
             task_args = (file_name, format['key'], self.database_name, self.table_name, self.metadata, self.result_status, (self.nrows == 0))

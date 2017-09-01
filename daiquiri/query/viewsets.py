@@ -32,7 +32,7 @@ from .serializers import (
 )
 
 from .permissions import HasPermission
-from .utils import get_quota, fetch_user_database_metadata
+from .utils import get_format_config, get_quota, fetch_user_database_metadata
 
 
 class StatusViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -129,7 +129,12 @@ class QueryJobViewSet(viewsets.ModelViewSet):
         except QueryJob.DoesNotExist:
             raise NotFound
 
-        result, file_name = job.download(self._get_format(format_key))
+        try:
+            format_config = get_format_config(format_key)
+        except IndexError:
+            raise ValidationError({'format': "Not supported."})
+
+        result, file_name = job.download(format_config)
 
         if result.successful():
             if self.request.method == 'GET':
@@ -150,14 +155,12 @@ class QueryJobViewSet(viewsets.ModelViewSet):
         except QueryJob.DoesNotExist:
             raise NotFound
 
-        format_config = self._get_format(format_key)
-        return StreamingHttpResponse(job.stream(format_config), content_type=format_config['content_type'])
-
-    def _get_format(self, format_key):
         try:
-            return [f for f in settings.QUERY_DOWNLOAD_FORMATS if f['key'] == format_key][0]
+            format_config = get_format_config(format_key)
         except IndexError:
             raise ValidationError({'format': "Not supported."})
+
+        return StreamingHttpResponse(job.stream(format_config), content_type=format_config['content_type'])
 
 
 class ExampleViewSet(viewsets.ModelViewSet):
