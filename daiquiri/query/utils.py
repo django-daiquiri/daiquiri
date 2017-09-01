@@ -123,11 +123,12 @@ def check_permissions(user, keywords, columns, functions):
                 continue
 
             # check permission on column
-            try:
-                column = Column.objects.filter_by_access_level(user).filter(table=table).get(name=column_name)
-            except Column.DoesNotExist:
-                messages.append(_('Column %s not found.') % column_name)
-                continue
+            if column_name is not None:
+                try:
+                    column = Column.objects.filter_by_access_level(user).filter(table=table).get(name=column_name)
+                except Column.DoesNotExist:
+                    messages.append(_('Column %s not found.') % column_name)
+                    continue
 
         except ValueError:
             messages.append(_('No database given for column %s') % column)
