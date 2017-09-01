@@ -4,30 +4,46 @@
     {% trans 'For further processing of the data, you can download the results table to your local machine. For this file several formats are available. Please choose a format for the download from the list below.' %}
 </p>
 
-{% for download_format in settings.QUERY_DOWNLOAD_FORMATS %}
-<div class="row">
-    <div class="col-md-3">
-        <p>
-            <a href="" ng-click="service.downloads.download( service.job, '{{ download_format.key }}')">{{ download_format.label }}</a>
-        </p>
-    </div>
-    <div class="col-md-9">
-        <p>
-            {{ download_format.help }}
-        </p>
-    </div>
-</div>
-{% endfor %}
+<div>
 
-<div class="row">
-    <div class="col-md-3">
+    <h4>{% trans 'Download table' %}</h4>
+
+    {% for download_format in settings.QUERY_DOWNLOAD_FORMATS %}
+    <div class="row">
+        <div class="col-md-3">
+            <p>
+                <a href="" ng-click="service.downloads.download(service.job, '{{ download_format.key }}')">{{ download_format.label }}</a>
+            </p>
+        </div>
+        <div class="col-md-9">
+            <p>
+                {{ download_format.help }}
+            </p>
+        </div>
     </div>
-    <div class="col-md-9">
-        <p class="text-info" ng-show="service.downloads.pending_downloads">
-            {% trans 'Your file is being created. Please wait...' %}
-        </p>
-        <p class="text-danger" ng-show="service.job.download_failed">
-            {% trans 'The download file could not be created.' %}
-        </p>
-    </div>
+    {% endfor %}
+
 </div>
+
+<div ng-show="(service.table.columns | filterAgainstList:{'display': ['file_link', 'modal']}).length > 0">
+
+    <h4>{% trans 'Download files' %}</h4>
+
+    <ul class="list-unstyled">
+        <li ng-repeat="column in service.table.columns | filterAgainstList:{'display': ['file_link', 'modal']}">
+            <a href="" ng-click="service.downloads.archive(service.job, column.name)">
+            {% blocktrans with '{$ column.name $}' as column_name trimmed %}
+                Download all files in the column "{{ column_name }} as a zip archive"
+            {% endblocktrans %}
+            </a>
+        </li>
+    </ul>
+
+</div>
+
+<p class="text-info" ng-show="service.downloads.pending_downloads">
+    <i class="fa fa-cog fa-spin fa-fw"></i> {% trans 'Your file is being created. Please wait...' %}
+</p>
+<p class="text-danger" ng-show="service.job.download_failed">
+    {% trans 'The download file could not be created.' %}
+</p>

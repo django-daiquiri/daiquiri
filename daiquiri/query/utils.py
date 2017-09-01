@@ -10,6 +10,10 @@ from daiquiri.core.utils import human2bytes
 from daiquiri.metadata.models import Database, Table, Column, Function
 
 
+def get_format_config(format_key):
+    return [f for f in settings.QUERY_DOWNLOAD_FORMATS if f['key'] == format_key][0]
+
+
 def get_default_table_name():
     return now().strftime("%Y-%m-%d-%H-%M-%S")
 
@@ -62,9 +66,14 @@ def get_quota(user):
     return quota
 
 
-def get_download_file_name(database_name, table_name, username, format):
+def get_download_file_name(user, table_name, format_config):
+    if not user or user.is_anonymous():
+        username = 'anonymous'
+    else:
+        username = user.username
+
     directory_name = os.path.join(settings.QUERY_DOWNLOAD_DIR, username)
-    return os.path.join(directory_name, table_name + '.' + format['extension'])
+    return os.path.join(directory_name, table_name + '.' + format_config['extension'])
 
 
 def fetch_user_database_metadata(user, jobs):

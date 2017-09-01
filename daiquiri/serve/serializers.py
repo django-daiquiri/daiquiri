@@ -5,8 +5,6 @@ from daiquiri.metadata.models import Column
 
 class ColumnSerializer(serializers.ModelSerializer):
 
-    mode = serializers.SerializerMethodField()
-
     class Meta:
         model = Column
         fields = (
@@ -20,19 +18,5 @@ class ColumnSerializer(serializers.ModelSerializer):
             'arraysize',
             'principal',
             'indexed',
-            'std',
-            'mode'
+            'std'
         )
-
-    def get_mode(self, obj):
-        try:
-            if 'meta.file' in obj['ucd']:
-                return 'file'
-            elif 'meta.note' in obj['ucd']:
-                return 'note'
-            elif 'meta.ref' in obj['ucd']:
-                return 'link'
-        except (AttributeError, TypeError):
-            pass
-
-        return 'default'

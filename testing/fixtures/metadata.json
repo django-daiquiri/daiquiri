@@ -175,7 +175,7 @@
       "name": "preview",
       "description": null,
       "unit": null,
-      "ucd": "meta.ref; meta.file",
+      "ucd": "meta.preview",
       "utype": null,
       "datatype": "varchar(64)",
       "arraysize": null,
@@ -198,7 +198,7 @@
       "name": "fits",
       "description": null,
       "unit": null,
-      "ucd": "meta.ref meta.file",
+      "ucd": "meta.file",
       "utype": null,
       "datatype": "varchar(64)",
       "arraysize": null,
@@ -221,7 +221,7 @@
       "name": "links",
       "description": null,
       "unit": null,
-      "ucd": null,
+      "ucd": "meta.ref",
       "utype": null,
       "datatype": "varchar(64)",
       "arraysize": null,
@@ -494,6 +494,15 @@
       "groups": [
         1
       ]
+    }
+  },
+  {
+    "model": "daiquiri_metadata.directory",
+    "pk": 1,
+    "fields": {
+      "path": "/tmp/daiquiri",
+      "access_level": "INTERNAL",
+      "groups": []
     }
   }
 ]
