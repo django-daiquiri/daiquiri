@@ -176,13 +176,15 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
         service.form = null;
         service.fetchJob(job).then(function() {
             if (service.job.phase == 'COMPLETED') {
-                TableService.init(service.job.database_name, service.job.table_name);
+                service.table = TableService;
+                service.table.init(service.job.database_name, service.job.table_name);
             } else {
                 // activate overview tab
                 service.tab = 'overview';
 
                 // empty table
-                TableService.init();
+                service.table = TableService;
+                service.table = TableService.init();
             }
 
             CodeMirror.runMode(service.job.query, "text/x-mariadb", angular.element('#query')[0]);

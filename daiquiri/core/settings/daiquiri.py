@@ -112,6 +112,8 @@ QUERY_DOWNLOAD_FORMATS = [
     }
 ]
 
+SERVE_DOWNLOAD_DIR = os.path.join(BASE_DIR, 'download')
+
 TAP_ACCESS_LEVEL = 'PUBLIC'
 
 UWS_RESOURCES = []

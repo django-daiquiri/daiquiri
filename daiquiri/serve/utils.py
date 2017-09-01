@@ -1,8 +1,10 @@
 import os
 
-from daiquiri.query.utils import get_user_database_name
+from django.conf import settings
 
-from daiquiri.metadata.models import Database, Table, Column
+from daiquiri.query.utils import get_user_database_name
+from daiquiri.core.adapter import get_adapter
+from daiquiri.metadata.models import Database, Table, Column, Directory
 from daiquiri.query.models import QueryJob
 
 
@@ -39,6 +41,48 @@ def get_column(user, database_name, table_name, column_name):
     except IndexError:
         # column_name is not in columns
         return None
+
+
+def get_file(user, file_path):
+    # get directories this user has access to
+    directories = Directory.objects.filter_by_access_level(user)
+
+    for directory in directories:
+        file_path = normalize_file_path(directory.path, file_path)
+        full_path = os.path.join(directory.path, file_path)
+
+        if os.path.isfile(full_path):
+            return full_path
+
+
+def get_files(user, database_name, table_name, column_name):
+    files = []
+
+    if database_name and table_name and column_name:
+        # get directories this user has access to
+        directories = Directory.objects.filter_by_access_level(user)
+
+        # get columns of this table the user is allowed to access
+        column = get_column(user, database_name, table_name, column_name)
+        if column:
+            # get the filenames
+            adapter = get_adapter()
+            count = adapter.database.count_rows(database_name, table_name)
+            rows = adapter.database.fetch_rows(database_name, table_name, [column['name']], page_size=count)
+
+            for row in rows:
+                for file_path in row:
+                    for directory in directories:
+                        file_path = normalize_file_path(directory.path, file_path)
+                        if os.path.isfile(os.path.join(directory.path, file_path)):
+                            files.append((directory.path, file_path))
+
+    return files
+
+
+def get_download_file_name(user, table_name, column_name):
+    directory_name = os.path.join(settings.SERVE_DOWNLOAD_DIR, user.username)
+    return os.path.join(directory_name, '%s_%s.zip' % (table_name, column_name))
 
 
 def normalize_file_path(directory_path, file_path):

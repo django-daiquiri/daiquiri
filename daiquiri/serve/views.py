@@ -1,17 +1,21 @@
-import io
+import logging
 import os
-import zipfile
+
+from celery.result import AsyncResult, EagerResult
 
 from sendfile import sendfile
 
+from django.conf import settings
 from django.shortcuts import render
 from django.http import HttpResponse, Http404
 
-from daiquiri.core.adapter import get_adapter
-from daiquiri.metadata.models import Database, Table, Directory
+from daiquiri.metadata.models import Database, Table
 from daiquiri.query.models import QueryJob
 
-from .utils import get_columns, get_column, normalize_file_path
+from .tasks import create_download_archive
+from .utils import get_columns, get_file, get_files, get_download_file_name
+
+logger = logging.getLogger(__name__)
 
 
 def table(request, database_name, table_name):
@@ -29,50 +33,55 @@ def table(request, database_name, table_name):
 
 def files(request, file_path):
 
-    directories = Directory.objects.filter_by_access_level(request.user)
-    for directory in directories:
-        file_path = normalize_file_path(directory.path, file_path)
-        full_path = os.path.join(directory.path, file_path)
+    file = get_file(request.user, file_path)
 
-        if os.path.isfile(full_path):
-            return sendfile(request, full_path, attachment=False)
+    if file:
+        return sendfile(request, file, attachment=False)
 
     raise Http404
 
 
-def archive(request):
+def archive(request, database_name, table_name, column_name):
 
-    directories = Directory.objects.filter_by_access_level(request.user)
-
-    database_name = request.GET.get('database')
-    table_name = request.GET.get('table')
-    column_name = request.GET.get('column')
-
-    files = []
-
-    if database_name and table_name and column_name:
-        # get columns of this table the user is allowed to access
-        column = get_column(request.user, database_name, table_name, column_name)
-        if column:
-            # get the filenames
-            adapter = get_adapter()
-            count = adapter.database.count_rows(database_name, table_name)
-            rows = adapter.database.fetch_rows(database_name, table_name, [column['name']], page_size=count)
-
-            for row in rows:
-                for file_path in row:
-                    for directory in directories:
-                        file_path = normalize_file_path(directory.path, file_path)
-                        if os.path.isfile(os.path.join(directory.path, file_path)):
-                            files.append((directory.path, file_path))
-
+    files = get_files(request.user, database_name, table_name, column_name)
     if files:
-        f = io.BytesIO()
-        with zipfile.ZipFile(f, 'w') as z:
-            for directory_path, file_path in files:
-                os.chdir(directory_path)
-                z.write(file_path)
+        file_name = get_download_file_name(request.user, table_name, column_name)
 
-        return HttpResponse(f.getvalue(), content_type='application/zip')
-    else:
-        raise Http404
+        task_id = file_name
+        task_args = (file_name, files)
+
+        if not settings.ASYNC:
+            if os.path.isfile(file_name):
+                task_result = EagerResult(task_id, None, 'SUCCESS')
+            else:
+                logger.info('create_download_archive %s submitted (sync)' % file_name)
+                task_result = create_download_archive.apply(task_args, task_id=task_id, throw=True)
+
+        else:
+            task_result = AsyncResult(task_id)
+
+            if not os.path.isfile(file_name):
+                # create an empty file to prevent multiple pending tasks
+                open(file_name, 'a').close()
+
+                if task_result.successful():
+                    # somebody or something removed the file. start all over again
+                    task_result.forget()
+
+                logger.info('create_download_archive %s submitted (async, queue=download)' % file_name)
+                task_result = create_download_archive.apply_async(task_args, task_id=task_id)
+
+        if task_result.successful():
+            if request.method == 'GET':
+                return sendfile(request, file_name, attachment=True)
+            else:
+                return HttpResponse(task_result.status)
+
+        else:
+            if task_result.status == 'FAILURE':
+                return HttpResponse(task_result.status, status=500)
+            else:
+                return HttpResponse(task_result.status)
+
+    # if nothing worked, return 404
+    raise Http404
