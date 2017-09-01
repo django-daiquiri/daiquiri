@@ -7,9 +7,6 @@ from rest_framework.reverse import reverse
 
 from daiquiri.core.adapter import get_adapter
 
-from daiquiri.metadata.models import Database, Table
-from daiquiri.query.models import QueryJob
-
 from .serializers import ColumnSerializer
 from .utils import get_columns
 
@@ -36,31 +33,33 @@ class RowViewSet(viewsets.ViewSet):
 
         # get the columns using the utils function
         columns = get_columns(self.request.user, database_name, table_name)
-        if not columns:
-            raise NotFound()
 
-        column_names = [column['name'] for column in columns]
+        if columns:
+            column_names = [column['name'] for column in columns]
 
-        # get database adapter
-        adapter = get_adapter()
+            # get database adapter
+            adapter = get_adapter()
 
-        # query the database for the total number of rows
-        count = adapter.database.count_rows(database_name, table_name, column_names, filter_string)
+            # query the database for the total number of rows
+            count = adapter.database.count_rows(database_name, table_name, column_names, filter_string)
 
-        # query the paginated rowset
-        results = adapter.database.fetch_rows(database_name, table_name, column_names, ordering, page, page_size, filter_string)
+            # query the paginated rowset
+            results = adapter.database.fetch_rows(database_name, table_name, column_names, ordering, page, page_size, filter_string)
 
-        # get the previous and next url
-        next = self._get_next_url(page, page_size, count)
-        previous = self._get_previous_url(page)
+            # get the previous and next url
+            next = self._get_next_url(page, page_size, count)
+            previous = self._get_previous_url(page)
 
-        # return ordered dict to be send as json
-        return Response(OrderedDict((
-            ('count', count),
-            ('next', next),
-            ('previous', previous),
-            ('results', results)
-        )))
+            # return ordered dict to be send as json
+            return Response(OrderedDict((
+                ('count', count),
+                ('next', next),
+                ('previous', previous),
+                ('results', results)
+            )))
+
+        # if nothing worked, return 404
+        raise NotFound()
 
     def _get_page(self):
         try:
@@ -105,7 +104,9 @@ class ColumnViewSet(viewsets.ViewSet):
 
         # get the columns using the utils function
         columns = get_columns(self.request.user, database_name, table_name)
-        if not columns:
-            raise NotFound()
 
-        return Response(ColumnSerializer(columns, many=True).data)
+        if columns:
+            return Response(ColumnSerializer(columns, many=True).data)
+
+        # if nothing worked, return 404
+        raise NotFound()
