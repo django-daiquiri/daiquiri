@@ -90,9 +90,11 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="row in table.rows" ng-init="row_index = $index">
+                <tr ng-repeat="row in table.rows" ng-init="row_index = $index"
+                    ng-class="{'active': row_index == table.active.row_index}">
+
                     <td ng-repeat="column in table.columns" ng-init="column_index = $index"
-                        ng-class="{'active': row_index == table.active.row_index}"  >
+                        ng-class="{'active': column_index == table.active.column_index}">
 
                         <div class="cell" ng-click="table.activate(column_index, row_index)">
                             <div ng-if="column.display == 'file_link'">
@@ -102,7 +104,7 @@
                             </div>
                             <div ng-if="column.display == 'modal'">
                                 <a href="{$ table.file_base_url $}{$ row[column_index] $}"
-                                    ng-click="table.open_modal($event, column_index, row_index)">
+                                    ng-click="table.modal_open($event, column_index, row_index)">
                                     {$ row[column_index] $}
                                 </a>
                             </div>
@@ -154,12 +156,22 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-default pull-left" ng-click="table.previous_modal()">
-                    {$ table.i18n.previous $}
-                </button>
-                <button type="button" class="btn btn-default" ng-click="table.next_modal()">
-                    {$ table.i18n.next $}
-                </button>
+                <div class="pull-left">
+                    <button type="button" class="btn btn-default" ng-click="table.modal_left()">
+                        {$ table.i18n.previous_column $}
+                    </button>
+                    <button type="button" class="btn btn-default" ng-click="table.modal_right()">
+                        {$ table.i18n.next_column $}
+                    </button>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-default" ng-click="table.modal_up()">
+                        {$ table.i18n.previous_row $}
+                    </button>
+                    <button type="button" class="btn btn-default" ng-click="table.modal_down()">
+                        {$ table.i18n.next_row $}
+                    </button>
+                </div>
             </div>
         </div>
     </div>

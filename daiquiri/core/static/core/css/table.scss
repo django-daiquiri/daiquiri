@@ -40,10 +40,6 @@
                 width: 200px;
                 padding: 0;
                 border-right: 1px solid $border-color;
-
-                &.active {
-                    background-color: $table-active-background-color;
-                }
             }
             th:last-child,
             td:last-child {
@@ -55,6 +51,13 @@
                 position: relative;
 
                 overflow: hidden;
+            }
+            tr.active {
+                td.active {
+                    .cell {
+                        background-color: $table-active-background-color;
+                    }
+                }
             }
             th {
                 position: relative;

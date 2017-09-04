@@ -67,13 +67,13 @@ angular.module('core')
             filter: null
         },
         i18n: {
-            first: gettext('First'),
-            previous: gettext('Previous'),
-            next: gettext('Next'),
-            last: gettext('Last'),
-            reset: gettext('Reset'),
-            filter: gettext('Filter'),
-            count: function() {
+            'first': gettext('First'),
+            'previous': gettext('Previous'),
+            'next': gettext('Next'),
+            'last': gettext('Last'),
+            'reset': gettext('Reset'),
+            'filter': gettext('Filter'),
+            'count': function() {
                 var page_count = Math.ceil(service.count / service.params.page_size);
                 if (service.params.filter) {
                     return interpolate(gettext('Page %s of %s (%s rows total, filtering for "%s")'), [service.params.page,page_count, service.count, service.params.filter]);
@@ -81,7 +81,7 @@ angular.module('core')
                     return interpolate(gettext('Page %s of %s (%s rows total)'), [service.params.page,page_count, service.count]);
                 }
             },
-            page_size: function(value) {
+            'page_size': function(value) {
                 return interpolate(gettext('Show %s of %s rows'), [value, service.count]);
             },
             'description': gettext('Description'),
@@ -92,6 +92,10 @@ angular.module('core')
             'principal': gettext('Principal'),
             'indexed': gettext('Indexed'),
             'std': gettext('STD'),
+            'previous_column': gettext('Previous column'),
+            'next_column': gettext('Next column'),
+            'previous_row': gettext('Previous row'),
+            'next_row': gettext('Next row'),
         },
         page_sizes: [10, 20, 100],
         filter_string: null,
@@ -249,7 +253,7 @@ angular.module('core')
         }
     }
 
-    service.open_modal = function(event, column_index, row_index) {
+    service.modal_open = function(event, column_index, row_index) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -258,7 +262,7 @@ angular.module('core')
 
         service.activate(column_index, row_index);
 
-        service.update_modal().then(function() {
+        service.modal_update().then(function() {
             // add a litte delay to the modal so that a change in service.modal.src
             // does not make the image flicker/change in size after opening.
             $timeout(function() {
@@ -267,7 +271,7 @@ angular.module('core')
         })
     }
 
-    service.update_modal = function() {
+    service.modal_update = function() {
         var file_path = service.rows[service.active.row_index][service.active.column_index];
         var url = service.file_base_url + file_path;
         var column = service.columns[service.active.column_index];
@@ -288,34 +292,76 @@ angular.module('core')
         }
     };
 
-    service.previous_modal = function() {
+    service.modal_up = function() {
         if (service.active.row_index > 0) {
             // decrement the row_index and update modal
             service.active.row_index -= 1;
-            service.update_modal();
+            service.modal_update();
         } else if (!service.first_page) {
             // first load previous page
             service.previous().then(function() {
                 // set row_index to the last row and update modal
                 service.active.row_index = service.rows.length - 1;
-                service.update_modal();
+                service.modal_update();
             });
         }
     }
 
-    service.next_modal = function() {
+    service.modal_down = function() {
         if (service.active.row_index < service.rows.length - 1) {
             // increment the row_index and update modal
             service.active.row_index += 1;
-            service.update_modal();
+            service.modal_update();
         } else if (!service.last_page) {
             // first load next page
             service.next().then(function() {
                 // set row_index to 0 and update modal
                 service.active.row_index = 0;
-                service.update_modal();
+                service.modal_update();
             });
         }
+    }
+
+    service.modal_left = function() {
+        var next_column_index = null,
+            current_column_index = service.active.column_index;
+
+        while(next_column_index === null) {
+            if (current_column_index > 0) {
+                current_column_index -= 1;
+            } else {
+                current_column_index = service.columns.length - 1;
+            }
+
+            var column = service.columns[current_column_index];
+            if (column.ucd !== null && (column.ucd.indexOf('meta.note') > -1 || column.ucd.indexOf('meta.preview') > -1)) {
+                next_column_index = current_column_index;
+            }
+        }
+
+        service.active.column_index = current_column_index;
+        service.modal_update();
+    }
+
+    service.modal_right = function() {
+        var next_column_index = null,
+            current_column_index = service.active.column_index;
+
+        while(next_column_index === null) {
+            if (current_column_index < service.columns.length - 1) {
+                current_column_index += 1;
+            } else {
+                current_column_index = 0;
+            }
+
+            var column = service.columns[current_column_index];
+            if (column.ucd !== null && (column.ucd.indexOf('meta.note') > -1 || column.ucd.indexOf('meta.preview') > -1)) {
+                next_column_index = current_column_index;
+            }
+        }
+
+        service.active.column_index = current_column_index;
+        service.modal_update();
     }
 
     return service;
