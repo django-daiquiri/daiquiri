@@ -177,7 +177,10 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
         service.fetchJob(job).then(function() {
             if (service.job.phase == 'COMPLETED') {
                 service.table = TableService;
-                service.table.init(service.job.database_name, service.job.table_name);
+                service.table = TableService.init('serve/api/rows/', 'serve/api/columns/', 'serve/file/', {
+                    database: service.job.database_name,
+                    table: service.job.table_name
+                });
             } else {
                 // activate overview tab
                 service.tab = 'overview';

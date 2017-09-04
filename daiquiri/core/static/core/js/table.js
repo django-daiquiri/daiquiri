@@ -7,14 +7,15 @@ angular.module('core')
             return staticurl + 'core/html/table.html';
         },
         scope: {
+            'rowsUrl': '@',
+            'columnsUrl': '@',
+            'fileBaseUrl': '@',
+            'params': '=',
             'pageSizes': '='
         },
         link: function(scope, element, attrs) {
             scope.table = TableService;
-
-            if (angular.isDefined(attrs.database) && angular.isDefined(attrs.table)) {
-                TableService.init(attrs.database, attrs.table, scope.pageSizes);
-            }
+            scope.table.init(scope.rowsUrl, scope.columnsUrl, scope.fileBaseUrl, scope.params, scope.pageSizes);
 
             // refresh the tooltips everytime a new set of columns is fetched
             scope.$watch(function() {
@@ -54,15 +55,11 @@ angular.module('core')
 
     /* configure the resources */
 
-    var resources = {
-        rows: $resource(baseurl + 'serve/api/rows/'),
-        columns: $resource(baseurl + 'serve/api/columns/'),
-    };
+    var resources = {};
 
     /* create the metadata service */
 
     var service = {
-        file_base_url: baseurl + 'serve/files/',
         params: {
             page: 1,
             page_size: 10,
@@ -103,18 +100,35 @@ angular.module('core')
         modal: {},
     };
 
-    service.init = function(database, table, page_sizes) {
+    service.init = function(rows_url, columns_url, file_base_url, params, page_sizes) {
         service.ready = false;
 
+        // set up resources
+        if (angular.isDefined(rows_url)) {
+            resources.rows = $resource(baseurl + rows_url);
+        }
+        if (angular.isDefined(columns_url)) {
+            resources.columns = $resource(baseurl + columns_url);
+        }
+
+        // setup file base url
+        if (angular.isDefined(file_base_url)) {
+            service.file_base_url = baseurl + file_base_url
+        }
+
+        // add params from the dom to service.params
+        if (angular.isDefined(params)) {
+            angular.extend(service.params, params);
+        }
+
+        // update pages_sizes
         if (angular.isDefined(page_sizes)) {
             service.page_sizes = page_sizes;
             service.params.page_size = page_sizes[0];
         }
 
-        if (angular.isDefined(database) && angular.isDefined(table)) {
-            service.params.database = database;
-            service.params.table = table;
-
+        // fetch the columns
+        if (angular.isDefined(resources.rows) && angular.isDefined(resources.columns)) {
             resources.columns.query(service.params, function(response) {
                 service.columns = response;
 
@@ -134,14 +148,14 @@ angular.module('core')
                             column.display = 'link';
                         }
                     }
-                })
-            });
+                });
 
-            service.reset();
+                service.reset();
+            });
         } else {
             service.columns = [];
             service.rows = [];
-        }
+        };
     };
 
     service.fetch = function() {
@@ -251,12 +265,15 @@ angular.module('core')
         var url = service.file_base_url + file_path;
         var column = service.columns[service.active.column_index];
 
+        service.modal.title = file_path;
+
         if (column.ucd.indexOf('meta.note') > -1) {
             return $http.get(url).then(function(result) {
-                service.modal.title = file_path;
                 service.modal.pre = result.data;
+                service.modal.src = null;
             });
         } else if (column.ucd.indexOf('meta.preview') > -1) {
+            service.modal.pre = null;
             service.modal.src = url;
             return $q.when();
         } else {

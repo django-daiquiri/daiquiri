@@ -31,8 +31,10 @@
     <h1>{{ database }}.{{ table }}</h1>
 
     <div daiquiri-table
-        data-database="{{ database }}"
-        data-table="{{ table }}">
+        data-rows-url="serve/api/rows/"
+        data-columns-url="serve/api/columns/"
+        data-file-base-url="serve/file/"
+        data-params="{database: '{{ database }}', table: '{{ table }}'}">
     </div>
 
 {% endblock %}
