@@ -47,7 +47,7 @@ angular.module('core')
     };
 }])
 
-.factory('TableService', ['$http', '$resource', '$q', '$document', function($http, $resource, $q, $document) {
+.factory('TableService', ['$http', '$resource', '$q', '$document', '$timeout', function($http, $resource, $q, $document, $timeout) {
 
     /* get the base url */
 
@@ -253,10 +253,17 @@ angular.module('core')
         event.preventDefault();
         event.stopPropagation();
 
+        service.modal.pre = null;
+        service.modal.src = null;
+
         service.activate(column_index, row_index);
 
         service.update_modal().then(function() {
-            $('#daiquiri-table-modal').modal('show');
+            // add a litte delay to the modal so that a change in service.modal.src
+            // does not make the image flicker/change in size after opening.
+            $timeout(function() {
+                $('#daiquiri-table-modal').modal('show');
+            }, 100);
         })
     }
 
