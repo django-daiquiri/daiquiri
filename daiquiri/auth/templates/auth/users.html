@@ -85,6 +85,12 @@
                             'text-danger': !row.user.is_active,
                             'text-info': row.is_pending || row.is_confirmed
                         }">
+                            <span ng-show="row.user.is_superuser">
+                                {% trans 'admin' %},
+                            </span>
+                            <span ng-show="row.user.is_staff && !row.user.is_superuser">
+                                {% trans 'staff' %},
+                            </span>
                             <span ng-show="row.user.is_active && !row.is_pending && !row.is_confirmed">
                                 {% trans 'active' %}
                             </span>
@@ -96,12 +102,6 @@
                             </span>
                             <span ng-show="row.is_confirmed">
                                 {% trans 'confirmed' %}
-                            </span>
-                            <span ng-show="row.user.is_superuser">
-                                {% trans 'admin' %}
-                            </span>
-                            <span ng-show="row.user.is_staff && !row.user.is_superuser">
-                                {% trans 'staff' %}
                             </span>
                         </td>
                         <td>
