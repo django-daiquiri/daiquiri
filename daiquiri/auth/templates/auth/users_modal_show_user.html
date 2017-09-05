@@ -35,6 +35,7 @@
                         <dd>{$ service.current_row.user.last_name $}</dd>
                     </dl>
 
+{% if detail_keys %}
                     <div class="modal-seperator"></div>
 
 {% for detail_key in detail_keys %}
@@ -45,6 +46,8 @@
                     </dl>
 
 {% endfor %}
+
+{% endif %}
 
                     <div ng-show="service.current_row.attributes" class="modal-seperator"></div>
 
@@ -57,11 +60,11 @@
 
                     <dl>
                         <dt>{% trans 'Date joined' %}</dt>
-                        <dd>{$ service.current_row.user.date_joined $}</dd>
+                        <dd>{$ service.current_row.user.date_joined | date:'medium' $}</dd>
                     </dl>
                     <dl>
                         <dt>{% trans 'Last login' %}</dt>
-                        <dd ng-show="service.current_row.user.last_login">{$ service.current_row.user.last_login $}</dd>
+                        <dd ng-show="service.current_row.user.last_login">{$ service.current_row.user.last_login | date:'medium' $}</dd>
                         <dd ng-hide="service.current_row.user.last_login">{% trans 'Never' %}</dd>
                     </dl>
 
