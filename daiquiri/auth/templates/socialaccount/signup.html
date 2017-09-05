@@ -1,0 +1,38 @@
+{% extends 'core/page.html' %}
+{% load i18n %}
+
+{% block page %}
+
+    <h1>{% trans "Create a new account" %}</h1>
+
+    <p>
+        {% blocktrans trimmed with provider_name=account.get_provider.name site_name=site.name %}
+        You are about to use your <strong>{{provider_name}}</strong> account to login to {{site_name}}.
+        {% endblocktrans %}
+    </p>
+
+    {% if settings.AUTH_WORKFLOW %}
+    <p>
+        {% trans 'Please note that after registration, your account needs to be manually activated by an admin. This can take one or two days. You will receive an email when you can log in.'%}
+    </p>
+    {% endif %}
+
+    <form method="post" action="{% url 'socialaccount_signup' %}">
+        {% csrf_token %}
+
+        {% if redirect_field_value %}
+        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+        {% endif %}
+
+        {% include 'core/bootstrap_form_fields.html' %}
+
+        <input type="submit" class="btn btn-primary" value="{% trans 'Create account' %}" />
+    </form>
+
+    <ul class="list-unstyled text-danger">
+    {% for error in form.non_field_errors %}
+        <li>{{ error }}</li>
+    {% endfor %}
+    </ul>
+
+{% endblock %}
