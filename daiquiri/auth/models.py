@@ -50,7 +50,6 @@ class Profile(models.Model):
         self.save()
 
         user_confirmed.send(sender=self.__class__, request=request, user=self.user)
-        logger.info('User \'%s\' confirmed by \'%s\'.' % (self.user.username, request.user.username))
 
     def reject(self, request):
         self.is_pending = False
@@ -58,7 +57,7 @@ class Profile(models.Model):
         self.save()
 
         user_rejected.send(sender=self.__class__, request=request, user=self.user)
-        logger.info('User \'%s\' rejected by \'%s\'.' % (self.user.username, request.user.username))
+
 
     def activate(self, request):
         self.is_confirmed = True
@@ -66,18 +65,17 @@ class Profile(models.Model):
         self.save()
 
         user_activated.send(sender=self.__class__, request=request, user=self.user)
-        logger.info('User \'%s\' activated by \'%s\'.' % (self.user.username, request.user.username))
+
 
     def disable(self, request):
         self.user.is_active = False
-        self.user.save()
+        self.user.save(update_fields=['is_active'])
 
         user_disabled.send(sender=self.__class__, request=request, user=self.user)
-        logger.info('User \'%s\' disabled by \'%s\'.' % (self.user.username, request.user.username))
+
 
     def enable(self, request):
         self.user.is_active = True
-        self.user.save()
+        self.user.save(update_fields=['is_active'])
 
         user_enabled.send(sender=self.__class__, request=request, user=self.user)
-        logger.info('User \'%s\' enabled by \'%s\'.' % (self.user.username, request.user.username))

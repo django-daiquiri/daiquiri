@@ -15,7 +15,9 @@ from .signals import (
     user_groups_updated,
     user_confirmed,
     user_rejected,
-    user_activated
+    user_activated,
+    user_disabled,
+    user_enabled
 )
 
 from .utils import (
@@ -41,12 +43,12 @@ def post_save_user(sender, **kwargs):
             profile.save()
 
             user_created.send(sender=User, user=user)
-            logger.info('User \'%s\' created.' % user.username)
+            logger.info('user \'%s\' created.' % user.username)
 
         elif kwargs['update_fields'] is None:
             # a login triggers this handler with update_fields=last_login
             user_updated.send(sender=User, user=user)
-            logger.info('User \'%s\' updated.' % user.username)
+            logger.info('user \'%s\' updated.' % user.username)
 
 
 @receiver(m2m_changed, sender=User.groups.through)
@@ -57,47 +59,86 @@ def m2m_changed_user(sender, **kwargs):
         # fire the signal only one per change
         if kwargs['action'] in ('post_add', 'post_remove', 'post_clear'):
             user_groups_updated.send(sender=User, user=user)
-            logger.info('Groups for user \'%s\' updated.' % user.username)
+            logger.info('groups for user \'%s\' updated.' % user.username)
 
 
 @receiver(email_confirmed)
 def email_confirmed_handler(sender, **kwargs):
     '''
-    Sends an email to the admins when a user has validated his/her email address.
+    Gets notified when a user has validated his/her email address.
     '''
+    request = kwargs['request']
+    user = kwargs['email_address'].user
+
+    logger.info('user \'%s\' validated his/her email address.' % user.username)
+
     if settings.AUTH_WORKFLOW:
         user = kwargs['email_address'].user
 
         if user.profile.is_pending:
             if settings.AUTH_WORKFLOW == 'confirmation':
-                send_request_confirmation(kwargs['request'], user)
+                send_request_confirmation(request, user)
             elif settings.AUTH_WORKFLOW == 'activation':
-                send_request_activation(kwargs['request'], user)
+                send_request_activation(request, user)
 
 
 @receiver(user_confirmed)
 def user_confirmed_handler(sender, **kwargs):
     '''
-    Sends an email to the admins when a user was confirmed by a manager.
+    Gets notified when a user was confirmed by a manager.
     '''
+    request = kwargs['request']
+    user = kwargs['user']
+
+    logger.info('user \'%s\' confirmed by \'%s\'.' % (user.username, request.user.username))
     if settings.AUTH_WORKFLOW:
-        send_notify_confirmation(kwargs['request'], kwargs['user'])
+        send_notify_confirmation(request, user)
 
 
 @receiver(user_rejected)
 def user_rejected_handler(sender, **kwargs):
     '''
-    Sends an email to the admins when a user was rejected by a manager.
+    Gets notified when a user was rejected by a manager.
     '''
+    request = kwargs['request']
+    user = kwargs['user']
+
+    logger.info('user \'%s\' rejected by \'%s\'.' % (user.username, request.user.username))
     if settings.AUTH_WORKFLOW:
-        send_notify_rejection(kwargs['request'], kwargs['user'])
+        send_notify_rejection(request, user)
 
 
 @receiver(user_activated)
 def user_activated_handler(sender, **kwargs):
     '''
-    Sends an email to the user and another email to the admins once a user was activated by an admin.
+    Gets notified when a user was activated by an admin.
     '''
+    request = kwargs['request']
+    user = kwargs['user']
+
+    logger.info('user \'%s\' activated by \'%s\'.' % (user.username, request.user.username))
     if settings.AUTH_WORKFLOW:
-        send_notify_activation(kwargs['request'], kwargs['user'])
-        send_activation(kwargs['request'], kwargs['user'])
+        send_notify_activation(request, user)
+        send_activation(request, user)
+
+
+@receiver(user_disabled)
+def user_disabled_handler(sender, **kwargs):
+    '''
+    Gets notified when a user was disabled by a manager.
+    '''
+    request = kwargs['request']
+    user = kwargs['user']
+
+    logger.info('user \'%s\' disabled by \'%s\'.' % (user.username, request.user.username))
+
+
+@receiver(user_enabled)
+def user_enabled_handler(sender, **kwargs):
+    '''
+    Gets notified when a user was disabled by a manager.
+    '''
+    request = kwargs['request']
+    user = kwargs['user']
+
+    logger.info('user \'%s\' enabled by \'%s\'.' % (user.username, request.user.username))
