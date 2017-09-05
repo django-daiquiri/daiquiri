@@ -6,7 +6,7 @@ from daiquiri.tap.models import (
     Table as TapTable,
     Column as TapColumn,
 )
-from daiquiri.tap.handlers import database_updated_handler
+from daiquiri.tap.utils import update_database
 
 class Command(BaseCommand):
 
@@ -17,4 +17,4 @@ class Command(BaseCommand):
         TapColumn.objects.all().delete()
 
         for database in Database.objects.all():
-            database_updated_handler(Database, instance=database)
+            update_database(database)
