@@ -10,12 +10,18 @@ python:
 addons:
   mariadb: '10.1'
 
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install -y libmariadbd-dev libmariadbclient-dev
+
 install:
 - pip install -e .
 - pip install mysqlclient
 - pip install coveralls
 
 before_script:
+- mkdir testing/log testing/download
+- cp -r testing/files /tmp/daiquiri
 - cp testing/config/settings/travis.local.py testing/config/settings/local.py
 - mysql < testing/sql/daiquiri_data_obs.sql
 - mysql < testing/sql/daiquiri_data_sim.sql
