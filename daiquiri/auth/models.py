@@ -17,6 +17,7 @@ from .signals import (
     user_updated,
     user_groups_updated,
     user_confirmed,
+    user_rejected,
     user_activated,
     user_disabled,
     user_enabled
@@ -55,6 +56,14 @@ class Profile(models.Model):
 
         user_confirmed.send(sender=self.__class__, request=request, user=self.user)
         logger.info('User \'%s\' confirmed by \'%s\'.' % (self.user.username, request.user.username))
+
+    def reject(self, request):
+        self.is_pending = False
+        self.user.is_active = False
+        self.save()
+
+        user_rejected.send(sender=self.__class__, request=request, user=self.user)
+        logger.info('User \'%s\' rejected by \'%s\'.' % (self.user.username, request.user.username))
 
     def activate(self, request):
         self.is_confirmed = True

@@ -1,15 +1,7 @@
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
 from daiquiri.core.utils import send_mail
-
-
-def get_account_workflow():
-    if hasattr(settings, 'ACCOUNT_WORKFLOW') and settings.ACCOUNT_WORKFLOW in ['confirmation', 'activation']:
-        return settings.ACCOUNT_WORKFLOW
-    else:
-        return None
 
 
 def get_full_name(user):
@@ -24,24 +16,33 @@ def get_admin_emails():
 
 
 def send_request_confirmation(request, user):
+    '''
+    Sends an email to the admins once a users email was validated.
+    '''
     emails = get_admin_emails()
     context = {
         'user': user,
-        'users_url': request.build_absolute_uri(reverse('users'))
+        'users_url': request.build_absolute_uri(reverse('auth:users'))
     }
     send_mail(request, 'account/email/request_confirmation', context, emails)
 
 
 def send_request_activation(request, user):
+    '''
+    Sends an email to the admins once a users email was validated.
+    '''
     emails = get_admin_emails()
     context = {
         'user': user,
-        'users_url': request.build_absolute_uri(reverse('users'))
+        'users_url': request.build_absolute_uri(reverse('auth:users'))
     }
     send_mail(request, 'account/email/request_activation', context, emails)
 
 
 def send_notify_confirmation(request, user):
+    '''
+    Sends an email to the admins once a user was confirmed.
+    '''
     emails = get_admin_emails()
     context = {
         'user': user,
@@ -50,7 +51,22 @@ def send_notify_confirmation(request, user):
     send_mail(request, 'account/email/notify_confirmation', context, emails)
 
 
+def send_notify_rejection(request, user):
+    '''
+    Sends an email to the admins once a user was rejected.
+    '''
+    emails = get_admin_emails()
+    context = {
+        'user': user,
+        'request_user': request.user
+    }
+    send_mail(request, 'account/email/notify_rejection', context, emails)
+
+
 def send_notify_activation(request, user):
+    '''
+    Sends an email to the admins once a user was activated.
+    '''
     emails = get_admin_emails()
     context = {
         'user': user,
@@ -60,9 +76,11 @@ def send_notify_activation(request, user):
 
 
 def send_activation(request, user):
-    emails = get_admin_emails()
+    '''
+    Sends an email to the once he/she was activated.
+    '''
     context = {
         'user': user,
         'login_url': request.build_absolute_uri(reverse('account_login'))
     }
-    send_mail(request, 'account/email/activation', context, emails)
+    send_mail(request, 'account/email/activation', context, [user.email])

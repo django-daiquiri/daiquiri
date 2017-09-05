@@ -5,6 +5,12 @@
 
     <h1>{% trans "Create a new account" %}</h1>
 
+    {% if settings.AUTH_WORKFLOW %}
+    <p>
+        {% trans 'Please note that after registration, your account needs to be manually activated by an admin. This can take one or two days. You will receive an email when you can log in.'%}
+    </p>
+    {% endif %}
+
     <p>{% blocktrans %}Already have an account? Then please <a href="{{ login_url }}">sign in</a>.{% endblocktrans %}</p>
 
     <form method="post" action="{% url 'account_signup' %}">

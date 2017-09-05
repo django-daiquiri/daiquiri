@@ -14,7 +14,6 @@ from allauth.account.views import logout as allauth_logout
 
 from daiquiri.core.views import ModelPermissionMixin
 
-from .utils import get_account_workflow
 from .forms import UserForm, ProfileForm
 
 
@@ -89,7 +88,6 @@ class UsersView(ModelPermissionMixin, TemplateView):
         context = super(UsersView, self).get_context_data(**kwargs)
         context.update({
             'detail_keys': detail_keys,
-            'account_workflow': get_account_workflow(),
             'user_admin_url': user_admin_url,
             'profile_admin_url': profile_admin_url
         })

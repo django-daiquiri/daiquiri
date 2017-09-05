@@ -37,7 +37,7 @@ app.factory('UsersService', ['$resource', '$timeout', 'ListService', function($r
         });
     };
 
-    service.storeProfile = function(action) {
+    service.store_profile = function(action) {
         service.errors = {};
 
         resources.profiles.update({

@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.models import Group
 from django.shortcuts import get_object_or_404
 
@@ -11,7 +12,6 @@ from daiquiri.core.permissions import HasModelPermission
 from daiquiri.core.paginations import ListPagination
 
 from .models import Profile
-from .utils import get_account_workflow
 from .serializers import ProfileSerializer, GroupSerializer
 
 
@@ -29,7 +29,7 @@ class ProfileViewSet(mixins.UpdateModelMixin, mixins.ListModelMixin, mixins.Retr
 
     @detail_route(methods=['put'], permission_classes=[HasModelPermission])
     def confirm(self, request, pk=None):
-        if not get_account_workflow():
+        if not settings.AUTH_WORKFLOW:
             raise MethodNotAllowed()
 
         profile = get_object_or_404(Profile, pk=pk)
@@ -37,8 +37,17 @@ class ProfileViewSet(mixins.UpdateModelMixin, mixins.ListModelMixin, mixins.Retr
         return Response(self.get_serializer(profile).data)
 
     @detail_route(methods=['put'], permission_classes=[HasModelPermission])
+    def reject(self, request, pk=None):
+        if not settings.AUTH_WORKFLOW:
+            raise MethodNotAllowed()
+
+        profile = get_object_or_404(Profile, pk=pk)
+        profile.reject(request)
+        return Response(self.get_serializer(profile).data)
+
+    @detail_route(methods=['put'], permission_classes=[HasModelPermission])
     def activate(self, request, pk=None):
-        if not get_account_workflow():
+        if not settings.AUTH_WORKFLOW:
             raise MethodNotAllowed()
 
         profile = get_object_or_404(Profile, pk=pk)
