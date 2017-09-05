@@ -4,8 +4,6 @@ import logging
 
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models.signals import post_save, m2m_changed
-from django.dispatch import receiver
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
@@ -13,9 +11,6 @@ from jsonfield import JSONField
 
 from .utils import get_full_name
 from .signals import (
-    user_created,
-    user_updated,
-    user_groups_updated,
     user_confirmed,
     user_rejected,
     user_activated,
@@ -86,30 +81,3 @@ class Profile(models.Model):
 
         user_enabled.send(sender=self.__class__, request=request, user=self.user)
         logger.info('User \'%s\' enabled by \'%s\'.' % (self.user.username, request.user.username))
-
-
-@receiver(post_save, sender=User)
-def post_save_user(sender, **kwargs):
-    if not kwargs.get('raw', False):
-        user = kwargs['instance']
-
-        if kwargs['created']:
-            profile = Profile()
-            profile.user = user
-            profile.save()
-
-            user_created.send(sender=User, user=user)
-            logger.info('User \'%s\' created.' % user.username)
-        else:
-            user_updated.send(sender=User, user=user)
-            logger.info('User \'%s\' updated.' % user.username)
-
-
-@receiver(m2m_changed, sender=User.groups.through)
-def m2m_changed_user(sender, **kwargs):
-    if not kwargs.get('raw', False):
-        user = kwargs['instance']
-
-        # fire the signal only one per change
-        if kwargs['action'] in ('post_add', 'post_remove', 'post_clear'):
-            user_groups_updated.send(sender=User, user=user)
