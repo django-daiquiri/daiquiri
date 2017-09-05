@@ -3,7 +3,7 @@ from django.test import TestCase
 from test_generator.views import TestListViewMixin
 
 
-class AuthTestCase(TestCase):
+class AuthViewTestCase(TestCase):
 
     fixtures = (
         'auth.json',
@@ -22,7 +22,7 @@ class AuthTestCase(TestCase):
     }
 
 
-class UsersTests(TestListViewMixin, AuthTestCase):
+class UsersTests(TestListViewMixin, AuthViewTestCase):
 
     url_names = {
         'list_view': 'auth:users'

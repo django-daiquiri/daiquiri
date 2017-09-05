@@ -17,6 +17,7 @@ class ServeViewTestCase(TestCase):
 
     users = (
         ('admin', 'admin'),
+        ('manager', 'manager'),
         ('user', 'user'),
         ('anonymous', None),
     )
@@ -30,7 +31,7 @@ class PublicTests(TestViewMixin, ServeViewTestCase):
 
     status_map = {
         'list_view': {
-            'admin': 200, 'user': 200, 'anonymous': 200
+            'admin': 200, 'manager': 200, 'user': 200, 'anonymous': 200
         }
     }
 
@@ -49,7 +50,7 @@ class InternalTests(TestViewMixin, ServeViewTestCase):
 
     status_map = {
         'list_view': {
-            'admin': 200, 'user': 200, 'anonymous': 404
+            'admin': 200, 'manager': 200, 'user': 200, 'anonymous': 404
         }
     }
 
@@ -68,7 +69,7 @@ class UserTests(TestViewMixin, ServeViewTestCase):
 
     status_map = {
         'list_view': {
-            'admin': 404, 'user': 200, 'anonymous': 404
+            'admin': 404, 'manager': 404, 'user': 200, 'anonymous': 404
         }
     }
 
@@ -87,7 +88,7 @@ class NotFoundTests(TestViewMixin, ServeViewTestCase):
 
     status_map = {
         'list_view': {
-            'admin': 404, 'user': 404, 'anonymous': 404
+            'admin': 404, 'manager': 404, 'user': 404, 'anonymous': 404
         }
     }
 
@@ -118,7 +119,7 @@ class FileTests(TestViewMixin, ServeViewTestCase):
 
     status_map = {
         'list_view': {
-            'admin': 200, 'user': 200, 'anonymous': 404
+            'admin': 200, 'manager': 200, 'user': 200, 'anonymous': 404
         }
     }
 
@@ -136,7 +137,7 @@ class ArchiveTests(TestViewMixin, ServeViewTestCase):
 
     status_map = {
         'list_view': {
-            'admin': 200, 'user': 200, 'anonymous': 404
+            'admin': 404, 'manager': 200, 'user': 404, 'anonymous': 404
         }
     }
 

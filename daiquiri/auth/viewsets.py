@@ -30,7 +30,7 @@ class ProfileViewSet(mixins.UpdateModelMixin, mixins.ListModelMixin, mixins.Retr
     @detail_route(methods=['put'], permission_classes=[HasModelPermission])
     def confirm(self, request, pk=None):
         if not settings.AUTH_WORKFLOW:
-            raise MethodNotAllowed()
+            raise MethodNotAllowed('put')
 
         profile = get_object_or_404(Profile, pk=pk)
         profile.confirm(request)
@@ -39,7 +39,7 @@ class ProfileViewSet(mixins.UpdateModelMixin, mixins.ListModelMixin, mixins.Retr
     @detail_route(methods=['put'], permission_classes=[HasModelPermission])
     def reject(self, request, pk=None):
         if not settings.AUTH_WORKFLOW:
-            raise MethodNotAllowed()
+            raise MethodNotAllowed('put')
 
         profile = get_object_or_404(Profile, pk=pk)
         profile.reject(request)
@@ -48,7 +48,7 @@ class ProfileViewSet(mixins.UpdateModelMixin, mixins.ListModelMixin, mixins.Retr
     @detail_route(methods=['put'], permission_classes=[HasModelPermission])
     def activate(self, request, pk=None):
         if not settings.AUTH_WORKFLOW:
-            raise MethodNotAllowed()
+            raise MethodNotAllowed('put')
 
         profile = get_object_or_404(Profile, pk=pk)
         profile.activate(request)

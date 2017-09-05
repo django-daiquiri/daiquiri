@@ -502,7 +502,9 @@
     "fields": {
       "path": "/tmp/daiquiri",
       "access_level": "INTERNAL",
-      "groups": []
+        "groups": [
+            1
+        ]
     }
   }
 ]

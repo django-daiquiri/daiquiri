@@ -20,3 +20,5 @@ INSTALLED_APPS = []
 FIXTURE_DIRS = (
     os.path.join(BASE_DIR, 'fixtures'),
 )
+
+AUTH_WORKFLOW = 'confirmation'
