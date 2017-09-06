@@ -1,4 +1,4 @@
-app.factory('SqlFormService', ['$timeout', 'QueryService', 'BrowserService', function($timeout, QueryService, BrowserService) {
+app.factory('SqlFormService', ['$timeout', '$filter', 'QueryService', 'BrowserService', function($timeout, $filter, QueryService, BrowserService) {
 
     /* get the base url */
 
@@ -65,8 +65,25 @@ app.factory('SqlFormService', ['$timeout', 'QueryService', 'BrowserService', fun
     };
 
     service.pasteItem = function(resource, item) {
+        var string = '';
+        if (angular.isDefined(item.query_strings)) {
+            var query_language = $filter('filter')(QueryService.query_languages, {id: service.values.query_language})[0];
+            var quote_char = query_language.quote_char
+            var strings = [];
+
+            angular.forEach(item.query_strings, function(query_string) {
+                strings.push(quote_char + query_string + quote_char);
+            })
+
+            string = strings.join('.')
+        } else if (angular.isDefined(item.query_string)) {
+            string = item.query_string;
+        } else {
+            string = item.name;
+        }
+
         var editor = $('.CodeMirror')[0].CodeMirror;
-        editor.replaceSelection(item.query_string);
+        editor.replaceSelection(string);
         editor.focus();
         $('.daiquiri-query-dropdowns .btn-group').removeClass('open');
     }

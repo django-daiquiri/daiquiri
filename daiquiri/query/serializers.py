@@ -106,6 +106,16 @@ class QueryJobUpdateSerializer(serializers.ModelSerializer):
         )
 
 
+class QueryLanguageSerializer(serializers.Serializer):
+
+    id = serializers.SerializerMethodField(required=False)
+    text = serializers.CharField(source='label')
+    quote_char = serializers.CharField()
+
+    def get_id(self, obj):
+        return '%(key)s-%(version)s' % obj
+
+
 class ExampleSerializer(serializers.ModelSerializer):
 
     class Meta:

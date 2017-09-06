@@ -25,6 +25,7 @@ from .serializers import (
     QueryJobRetrieveSerializer,
     QueryJobCreateSerializer,
     QueryJobUpdateSerializer,
+    QueryLanguageSerializer,
     ExampleSerializer,
     UserExampleSerializer,
     SyncQueryJobSerializer,
@@ -187,9 +188,10 @@ class QueueViewSet(ChoicesViewSet):
     queryset = [(item['key'], item['label']) for item in settings.QUERY_QUEUES]
 
 
-class QueryLanguageViewSet(ChoicesViewSet):
+class QueryLanguageViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     permission_classes = (HasPermission, )
-    queryset = [('%(key)s-%(version)s' % item, item['label']) for item in settings.QUERY_LANGUAGES]
+    serializer_class = QueryLanguageSerializer
+    queryset = settings.QUERY_LANGUAGES
 
 
 class SyncQueryJobViewSet(SyncJobViewSet):

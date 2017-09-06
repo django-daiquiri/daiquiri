@@ -82,8 +82,8 @@ class Database(models.Model):
         return self.name
 
     @property
-    def query_string(self):
-        return get_adapter().database.escape_identifier(self.name)
+    def query_strings(self):
+        return [self.name]
 
     @property
     def license_label(self):
@@ -183,11 +183,8 @@ class Table(models.Model):
         return self.database.name + '.' + self.name
 
     @property
-    def query_string(self):
-        return '%(database)s.%(table)s' % {
-            'database': get_adapter().database.escape_identifier(self.database.name),
-            'table': get_adapter().database.escape_identifier(self.name)
-        }
+    def query_strings(self):
+        return [self.database.name, self.name]
 
     @property
     def license_label(self):
@@ -285,8 +282,8 @@ class Column(models.Model):
         return self.table.database.name + '.' + self.table.name + '.' + self.name
 
     @property
-    def query_string(self):
-        return get_adapter().database.escape_identifier(self.name)
+    def query_strings(self):
+        return [self.name]
 
 
 @python_2_unicode_compatible

@@ -36,7 +36,8 @@ QUERY_LANGUAGES = [
         'key': 'adql',
         'version': 2.0,
         'label': 'ADQL',
-        'description': ''
+        'description': '',
+        'quote_char': '"'
     }
 ]
 
