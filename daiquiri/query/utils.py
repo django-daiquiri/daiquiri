@@ -77,14 +77,13 @@ def get_download_file_name(user, table_name, format_config):
 
 
 def fetch_user_database_metadata(user, jobs):
-    adapter = get_adapter()
 
     database_name = get_user_database_name(user)
 
     database = {
         'order': sys.maxsize,
         'name': database_name,
-        'query_string': adapter.database.escape_identifier(database_name),
+        'query_strings': [database_name],
         'description': _('Your personal database'),
         'tables': []
     }
@@ -92,13 +91,10 @@ def fetch_user_database_metadata(user, jobs):
     for job in jobs:
         if job.phase == job.PHASE_COMPLETED:
             table = job.metadata
-            table['query_string'] = '%(database)s.%(table)s' % {
-                'database': adapter.database.escape_identifier(database_name),
-                'table': adapter.database.escape_identifier(table['name'])
-            }
+            table['query_strings'] = [database_name, table['name']]
 
             for column in table['columns']:
-                column['query_string'] = adapter.database.escape_identifier(column['name'])
+                column['query_strings'] = [column['name']]
 
             database['tables'].append(table)
 
