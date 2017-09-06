@@ -135,6 +135,16 @@ def check_permissions(user, keywords, columns, functions):
         # check permission on column
         if column_name is None:
             continue
+        elif column_name is '*':
+            columns = Column.objects.filter_by_access_level(user).filter(table=table)
+            actual_columns = get_adapter().database.fetch_columns(database_name, table_name)
+
+            column_names_set = set([column.name for column in columns])
+            actual_column_names_set = set([column['name'] for column in actual_columns])
+
+            if column_names_set != actual_column_names_set:
+                messages.append(_('The asterisk (*) is not allowed for this table.'))
+                continue
         else:
             try:
                 column = Column.objects.filter_by_access_level(user).filter(table=table).get(name=column_name)
