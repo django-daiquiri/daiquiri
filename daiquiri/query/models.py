@@ -34,6 +34,7 @@ from .utils import (
     get_quota,
     get_default_table_name,
     get_default_queue,
+    get_tap_schema_name,
     get_user_database_name,
     get_download_file_name,
     check_permissions
@@ -116,7 +117,7 @@ class QueryJob(Job):
         if self.query_language == 'adql-2.0':
             try:
                 translator = ADQLQueryTranslator(self.query)
-                self.native_query = translator.to_mysql()
+                translated_query = translator.to_mysql()
             except QuerySyntaxError as e:
                 raise ValidationError({
                     'query': {
@@ -132,12 +133,20 @@ class QueryJob(Job):
                 })
 
         else:
-            self.native_query = self.query
+            translated_query = self.query
 
         # parse the query
         try:
-            processor = MySQLQueryProcessor(self.native_query)
-            processor.process_query()
+            processor = MySQLQueryProcessor(translated_query)
+
+            tap_schema_name = get_tap_schema_name()
+            if tap_schema_name:
+                processor.process_query(replace_schema_name={
+                    'TAP_SCHEMA': tap_schema_name
+                })
+            else:
+                processor.process_query()
+
         except QuerySyntaxError as e:
             raise ValidationError({
                 'query': {
@@ -180,8 +189,8 @@ class QueryJob(Job):
                 'query': permission_messages
             })
 
-        # remove trailing semicolon from the native_query
-        self.native_query = self.native_query.rstrip(';')
+        # get the native query from the processor (without trailing semicolon)
+        self.native_query = processor.query.rstrip(';')
 
         # set clean flag
         self.is_clean = True
@@ -293,6 +302,9 @@ class QueryJob(Job):
     def rename_table(self, new_table_name):
         if self.table_name != new_table_name:
             get_adapter().database.rename_table(self.database_name, self.table_name, new_table_name)
+
+            self.metadata['name'] = new_table_name
+            self.save()
 
     def drop_table(self):
         # drop the corresponding database table, but fail silently

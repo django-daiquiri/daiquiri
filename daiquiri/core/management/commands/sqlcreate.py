@@ -51,12 +51,15 @@ CREATE USER \'%(USER)s\'@\'%(CLIENT)s\' identified by \'%(PASSWORD)s\';
 GRANT ALL PRIVILEGES ON `%(PREFIX)s%%`.* to \'%(USER)s\'@\'%(CLIENT)s\';
 ''' % data)
 
+        data.update({'DATABASE_NAME': tap['NAME']})
+        print('GRANT SELECT ON `%(DATABASE_NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\';' % data)
+
         if options['database']:
             for database_name in options['database']:
                 data.update({'DATABASE_NAME': database_name})
                 print('GRANT SELECT ON `%(DATABASE_NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\';' % data)
-            print('')
 
+        print('')
         print('''-- For testing, run the following commands on \'%(HOST)s\':
 
 GRANT ALL PRIVILEGES ON `test_%(NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\';

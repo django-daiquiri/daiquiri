@@ -30,6 +30,14 @@ def get_queue_choices():
     return [(item['key'], item['label']) for item in settings.QUERY_QUEUES]
 
 
+def get_tap_schema_name():
+    tap_config = settings.DATABASES.get('tap')
+    if tap_config:
+        return tap_config['NAME']
+    else:
+        return None
+
+
 def get_user_database_name(user):
     if not user or user.is_anonymous():
         username = 'anonymous'
@@ -90,8 +98,11 @@ def fetch_user_database_metadata(user, jobs):
 
     for job in jobs:
         if job.phase == job.PHASE_COMPLETED:
-            table = job.metadata
-            table['query_strings'] = [database_name, table['name']]
+            table = {
+                'name': job.table_name,
+                'query_strings': [database_name, job.table_name],
+                'columns': job.metadata['columns']
+            }
 
             for column in table['columns']:
                 column['query_strings'] = [column['name']]
@@ -115,6 +126,10 @@ def check_permissions(user, keywords, columns, functions):
         # check permission on database
         if database_name is None:
             continue
+        elif database_name == get_tap_schema_name():
+            continue
+        elif database_name == get_user_database_name(user):
+            continue
         else:
             try:
                 database = Database.objects.filter_by_access_level(user).get(name=database_name)
@@ -135,7 +150,7 @@ def check_permissions(user, keywords, columns, functions):
         # check permission on column
         if column_name is None:
             continue
-        elif column_name is '*':
+        elif column_name == '*':
             columns = Column.objects.filter_by_access_level(user).filter(table=table)
             actual_columns = get_adapter().database.fetch_columns(database_name, table_name)
 

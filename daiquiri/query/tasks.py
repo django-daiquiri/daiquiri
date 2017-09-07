@@ -115,9 +115,6 @@ def run_query(job_id):
         if job.phase == job.PHASE_COMPLETED:
             job.nrows, job.size = adapter.database.fetch_stats(job.database_name, job.table_name)
 
-            # fetch the name and the type of the table
-            job.metadata.update(adapter.database.fetch_table(job.database_name, job.table_name))
-
             # fetch the metadata for the columns
             job.metadata['columns'] = adapter.database.fetch_columns(job.database_name, job.table_name)
 
