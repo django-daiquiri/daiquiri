@@ -16,6 +16,7 @@ class QueryViewTestCase(TestCase):
         ('anonymous', None),
     )
 
+
 class QueryTests(TestListViewMixin, QueryViewTestCase):
 
     url_names = {

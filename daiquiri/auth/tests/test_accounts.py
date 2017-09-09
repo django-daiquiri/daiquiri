@@ -47,8 +47,8 @@ class AccountsTestCase(TestCase):
             'password2': 'testing'
         })
 
-        # check that the signup redirects to the pending page
-        self.assertRedirects(response, reverse('account_pending'))
+        # check that the signup redirects to the pending page or the confirm email page
+        self.assertEqual(response.status_code, 302)
 
         # check that a profile was created
         profile = Profile.objects.get(user__username='test')

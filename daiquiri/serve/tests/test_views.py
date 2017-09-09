@@ -162,7 +162,6 @@ class ArchiveTests(TestViewMixin, ServeViewTestCase):
             'column_name': 'preview'
         })
 
-
     def _test_archive_put(self, username):
 
         self.assert_view('list_view', 'put', 'list_view', username, kwargs={
