@@ -19,11 +19,13 @@ mock_fetch_pid.return_value = 1
 mock_fetch_table = mock.Mock()
 mock_fetch_table.return_value = []
 
+
 @mock.patch.object(adapter.database, 'execute', mock_execute)
 @mock.patch.object(adapter.database, 'fetch_stats', mock_fetch_stats)
 @mock.patch.object(adapter.database, 'fetch_pid', mock_fetch_pid)
 @mock.patch.object(adapter.database, 'fetch_table', mock_fetch_table)
 class AsyncTestCase(SyncTestMixin, TestCase):
+
     fixtures = (
         'auth.json',
         'metadata.json',

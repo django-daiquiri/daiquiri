@@ -61,7 +61,7 @@ class PublicRowTests(TestViewsetMixin, ServeTestCase):
     def _test_list_viewset(self, username):
         self.assert_list_viewset(username, query_params={
             'database': 'daiquiri_data_obs',
-            'table':'stars'
+            'table': 'stars'
         })
 
 
@@ -80,7 +80,7 @@ class InternalRowTests(TestViewsetMixin, ServeTestCase):
     def _test_list_viewset(self, username):
         self.assert_list_viewset(username, query_params={
             'database': 'daiquiri_data_sim',
-            'table':'particles'
+            'table': 'particles'
         })
 
 
@@ -99,7 +99,7 @@ class UserRowTests(TestViewsetMixin, ServeTestCase):
     def _test_list_viewset(self, username):
         self.assert_list_viewset(username, query_params={
             'database': 'daiquiri_user_user',
-            'table':'test'
+            'table': 'test'
         })
 
 
@@ -118,19 +118,19 @@ class NotFoundRowTests(TestViewsetMixin, ServeTestCase):
     def _test_non_existing_database_viewset(self, username):
         self.assert_list_viewset(username, query_params={
             'database': 'non_existing',
-            'table':'stars'
+            'table': 'stars'
         })
 
     def _test_non_existing_table_viewset(self, username):
         self.assert_list_viewset(username, query_params={
             'database': 'daiquiri_data_obs',
-            'table':'non_existing'
+            'table': 'non_existing'
         })
 
     def _test_non_existing_user_table_viewset(self, username):
         self.assert_list_viewset(username, query_params={
             'database': 'daiquiri_user_user',
-            'table':'non_existing'
+            'table': 'non_existing'
         })
 
 
@@ -149,7 +149,7 @@ class PublicColumnTests(TestViewsetMixin, ServeTestCase):
     def _test_list_viewset(self, username):
         self.assert_list_viewset(username, query_params={
             'database': 'daiquiri_data_obs',
-            'table':'stars'
+            'table': 'stars'
         })
 
 
@@ -168,7 +168,7 @@ class InternalColumnTests(TestViewsetMixin, ServeTestCase):
     def _test_list_viewset(self, username):
         self.assert_list_viewset(username, query_params={
             'database': 'daiquiri_data_sim',
-            'table':'particles'
+            'table': 'particles'
         })
 
 
@@ -187,7 +187,7 @@ class UserColumnTests(TestViewsetMixin, ServeTestCase):
     def _test_list_viewset(self, username):
         self.assert_list_viewset(username, query_params={
             'database': 'daiquiri_user_user',
-            'table':'test'
+            'table': 'test'
         })
 
 
@@ -206,17 +206,17 @@ class NotFoundColumnTests(TestViewsetMixin, ServeTestCase):
     def _test_non_existing_database_viewset(self, username):
         self.assert_list_viewset(username, query_params={
             'database': 'non_existing',
-            'table':'stars'
+            'table': 'stars'
         })
 
     def _test_non_existing_table_viewset(self, username):
         self.assert_list_viewset(username, query_params={
             'database': 'daiquiri_data_obs',
-            'table':'non_existing'
+            'table': 'non_existing'
         })
 
     def _test_non_existing_user_table_viewset(self, username):
         self.assert_list_viewset(username, query_params={
             'database': 'daiquiri_user_user',
-            'table':'non_existing'
+            'table': 'non_existing'
         })

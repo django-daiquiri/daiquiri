@@ -61,6 +61,12 @@ def get_file(user, file_path):
 
         if os.path.isfile(full_path):
             return full_path
+        else:
+            # try again with 'index.html' appended
+            full_path = os.path.join(full_path, 'index.html')
+
+            if os.path.isfile(full_path):
+                return full_path
 
 
 def get_files(user, database_name, table_name, column_name):
