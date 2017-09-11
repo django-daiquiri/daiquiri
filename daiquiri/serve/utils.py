@@ -52,21 +52,33 @@ def get_column(user, database_name, table_name, column_name):
 
 
 def get_file(user, file_path):
+    # append 'index.html' when the file_path is a directory
+    if file_path.endswith('/'):
+        file_path += 'index.html'
+
     # get directories this user has access to
     directories = Directory.objects.filter_by_access_level(user)
 
+    results = set()
     for directory in directories:
-        file_path = normalize_file_path(directory.path, file_path)
-        full_path = os.path.join(directory.path, file_path)
+        for directory_path, dirs, files in os.walk(directory.path):
+            # normalize the file path so that /a/b/c and b/c/d/e become /a/b/c and d/e
+            normalized_file_path = normalize_file_path(directory_path, file_path)
 
-        if os.path.isfile(full_path):
-            return full_path
-        else:
-            # try again with 'index.html' appended
-            full_path = os.path.join(full_path, 'index.html')
+            # join directory_path and file_path so that it becomes /a/b/c/d/e
+            absolute_file_path = os.path.join(directory_path, normalized_file_path)
 
-            if os.path.isfile(full_path):
-                return full_path
+            # check if absolute_file_path is actually a file
+            if os.path.isfile(absolute_file_path):
+                results.add(absolute_file_path)
+
+    # check if we found the file more than once
+    if len(results) > 1:
+        raise Exception('More than one file found in %s.get_file().' % __name__)
+    elif len(results) == 1:
+        return results.pop()
+    else:
+        return None
 
 
 def get_files(user, database_name, table_name, column_name):
@@ -106,8 +118,8 @@ def get_archive_file_name(user, table_name, column_name):
 
 def normalize_file_path(directory_path, file_path):
 
-    directory_path_tokens = directory_path.rstrip('/').split('/')
-    file_path_tokens = file_path.lstrip('/').split('/')
+    directory_path_tokens = os.path.normpath(directory_path).split(os.path.sep)
+    file_path_tokens = os.path.normpath(file_path).split(os.path.sep)
 
     match = 0
     for i in range(len(file_path_tokens)):
