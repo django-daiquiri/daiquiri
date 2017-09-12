@@ -2,21 +2,22 @@
 {% load staticfiles %}
 {% load i18n %}
 {% load compress %}
+{% load core_tags %}
 
 {% block bodyargs %}ng-app="examples" ng-controller="ExamplesController"{% endblock %}
 
 {% block headextra %}
-    {% compress css %}
-    <link rel="stylesheet" href="{% static 'lib/examples.css' %}" />
+    {% vendor 'angular' %}
+    {% vendor 'ng-infinite-scroll' %}
+    {% vendor 'codemirror' %}
 
+    {% compress css %}
     <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/list.scss' %}" />
     <link rel="stylesheet" type="text/x-scss" href="{% static 'query/css/examples.scss' %}" />
     <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/codemirror.scss' %}" />
     {% endcompress css %}
 
     {% compress js %}
-    <script type="text/javascript" src="{% static 'lib/examples.js' %}"></script>
-
     <script type="text/javascript" src="{% static 'core/js/core.js' %}" ></script>
     <script type="text/javascript" src="{% static 'core/js/list.js' %}" ></script>
     <script type="text/javascript" src="{% static 'core/js/filter.js' %}" ></script>

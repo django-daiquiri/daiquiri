@@ -90,18 +90,10 @@ service redis start
 chkconfig redis on
 ```
 
-### Java >= 1.7
+### Java >= 1.7 (only for development setup)
 
 ```
 yum install -y java-1.8.0-openjdk-headless
-```
-
-### Node.js >= 5.10
-
-```
-curl --silent --location https://rpm.nodesource.com/setup_6.x | sudo bash -
-
-yum install -y nodejs
 ```
 
 
@@ -178,19 +170,12 @@ systemctl enable redis
 
 ```
 
-### Java >= 1.7
+### Java >= 1.7 (only for development setup)
 
 ```
 yum install -y java-1.8.0-openjdk-headless
 ```
 
-### Node.js >= 5.10
-
-```
-curl --silent --location https://rpm.nodesource.com/setup_6.x | sudo bash -
-
-yum install -y nodejs
-```
 
 debian 8 (jessie)
 -----------------
@@ -241,19 +226,12 @@ systemctl enable rabbitmq-server
 apt-get install -y redis-server
 ```
 
-### Java >= 1.7
+### Java >= 1.7 (only for development setup)
 
 ```
 apt-get install -y openjdk-7-jre-headless
 ```
 
-### Node.js >= 5.10
-
-```
-curl -sL https://deb.nodesource.com/setup_6.x | bash -
-
-apt-get install nodejs
-```
 
 debian 9 (strech)
 -----------------
@@ -298,19 +276,12 @@ systemctl start redis-server
 systemctl enable redis-server
 ```
 
-### Java >= 1.7
+### Java >= 1.7 (only for development setup)
 
 ```
 apt-get install -y openjdk-8-jre-headless
 ```
 
-### Node.js >= 5.10
-
-```
-curl -sL https://deb.nodesource.com/setup_6.x | bash -
-
-apt-get install nodejs
-```
 
 Ubuntu 14.04 (Trusty Tahr)
 --------------------------
@@ -358,19 +329,12 @@ dpkg -i rabbitmq-server_3.6.11-1_all.deb
 apt-get install -y redis-server
 ```
 
-### Java >= 1.7
+### Java >= 1.7 (only for development setup)
 
 ```
 apt-get install -y openjdk-7-jre-headless
 ```
 
-### Node.js >= 5.10
-
-```
-curl -sL https://deb.nodesource.com/setup_6.x | bash -
-
-apt-get install nodejs
-```
 
 Ubuntu 16.04 (Xenial Xerus)
 ---------------------------
@@ -417,18 +381,10 @@ systemctl enable rabbitmq-server
 apt-get install -y redis-server
 ```
 
-### Java >= 1.7
+### Java >= 1.7 (only for development setup)
 
 ```
 apt-get install -y openjdk-8-jre-headless
-```
-
-### Node.js >= 5.10
-
-```
-curl -sL https://deb.nodesource.com/setup_6.x | bash -
-
-apt-get install nodejs
 ```
 
 Further reading
@@ -436,4 +392,3 @@ Further reading
 
 * https://downloads.mariadb.org/mariadb/repositories
 * https://www.rabbitmq.com/download.html.
-* https://nodejs.org/en/download/package-manager

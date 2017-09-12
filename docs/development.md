@@ -107,8 +107,7 @@ at the end of the file.
 Create the front end library vendor bundles:
 
 ```
-npm install
-npm run webpack
+./manage.py download_vendor_files
 ```
 
 Next, the differenet users and permissions need to be created on `mysql`. For this purpose, the `sqlcreate` can be used to see what needs to be executed on the database:

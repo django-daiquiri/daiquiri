@@ -7,9 +7,12 @@
 {% block bodyargs %}ng-app="query" ng-controller="QueryController"{% endblock %}
 
 {% block headextra %}
-    {% compress css %}
-    <link rel="stylesheet" href="{% static 'lib/query.css' %}" />
+    {% vendor 'angular' %}
+    {% vendor 'ng-infinite-scroll' %}
+    {% vendor 'codemirror' %}
+    {% vendor 'moment' %}
 
+    {% compress css %}
     <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/browser.scss' %}" />
     <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/table.scss' %}" />
     <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/codemirror.scss' %}" />
@@ -17,8 +20,6 @@
     {% endcompress css %}
 
     {% compress js %}
-    <script type="text/javascript" src="{% static 'lib/query.js' %}"></script>
-
     <script type="text/javascript" src="{% static 'core/js/core.js' %}" ></script>
     <script type="text/javascript" src="{% static 'core/js/filter.js' %}" ></script>
     <script type="text/javascript" src="{% static 'core/js/multiCheckbox.js' %}" ></script>

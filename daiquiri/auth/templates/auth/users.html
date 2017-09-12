@@ -2,25 +2,26 @@
 {% load staticfiles %}
 {% load i18n %}
 {% load compress %}
+{% load core_tags %}
 
 {% block bodyargs %}ng-app="users" ng-controller="UsersController"{% endblock %}
 
 {% block headextra %}
+    {% vendor 'angular' %}
+    {% vendor 'ng-infinite-scroll' %}
+
     {% compress css %}
     <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/list.scss' %}" />
     <link rel="stylesheet" type="text/x-scss" href="{% static 'auth/css/users.scss' %}" />
     {% endcompress css %}
 
     {% compress js %}
-    <script type="text/javascript" src="{% static 'lib/users.js' %}"></script>
-
     <script type="text/javascript" src="{% static 'core/js/core.js' %}" ></script>
     <script type="text/javascript" src="{% static 'core/js/list.js' %}" ></script>
     <script type="text/javascript" src="{% static 'core/js/filter.js' %}" ></script>
     <script type="text/javascript" src="{% static 'core/js/multiCheckbox.js' %}" ></script>
     <script type="text/javascript" src="{% static 'core/js/byNumber.js' %}" ></script>
     <script type="text/javascript" src="{% static 'core/js/formgroup.js' %}" ></script>
-
     <script type="text/javascript" src="{% static 'auth/js/users.js' %}" ></script>
     {% endcompress js %}
 {% endblock %}

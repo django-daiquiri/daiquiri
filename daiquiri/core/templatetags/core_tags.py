@@ -1,6 +1,7 @@
 from markdown import markdown as markdown_function
 
 from django import template
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.template.loader import render_to_string
 from django.template.defaultfilters import stringfilter
@@ -20,6 +21,51 @@ def base_url(context):
 @register.simple_tag(takes_context=True)
 def absolute_url(context, *args, **kwargs):
     return context.request.build_absolute_uri(reverse(*args, **kwargs))
+
+
+@register.simple_tag()
+@stringfilter
+def vendor(vendor_key):
+    vendor_config = settings.VENDOR[vendor_key]
+
+    tags = []
+
+    if 'js' in vendor_config:
+        for file in vendor_config['js']:
+            if settings.VENDOR_CDN:
+                tag = '<script src="%(url)s/%(path)s" integrity="%(sri)s" crossorigin="anonymous"></script>' % {
+                    'url': vendor_config['url'],
+                    'path': file['path'],
+                    'sri': file['sri'] if 'sri' in file else ''
+                }
+            else:
+                tag = '<script src="%(static_url)s/%(vendor_key)s/%(path)s"></script>' % {
+                    'static_url': settings.STATIC_URL.rstrip('/'),
+                    'vendor_key': vendor_key,
+                    'path': file['path']
+                }
+
+            tags.append(tag)
+
+
+    if 'css' in vendor_config:
+        for file in vendor_config['css']:
+            if settings.VENDOR_CDN:
+                tag = '<link rel="stylesheet" href="%(url)s/%(path)s" integrity="%(sri)s" crossorigin="anonymous" />' % {
+                    'url': vendor_config['url'],
+                    'path': file['path'],
+                    'sri': file['sri'] if 'sri' in file else ''
+                }
+            else:
+                tag = '<link rel="stylesheet" href="%(static_url)s/%(vendor_key)s/%(path)s" />' % {
+                    'static_url': settings.STATIC_URL.rstrip('/'),
+                    'vendor_key': vendor_key,
+                    'path': file['path']
+                }
+
+            tags.append(tag)
+
+    return mark_safe(''.join(tags))
 
 
 @register.simple_tag(takes_context=True)

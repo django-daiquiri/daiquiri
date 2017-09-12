@@ -70,13 +70,12 @@ Copy the `local.py` settings file:
 cp config/settings/sample.local.py config/settings/local.py
 ```
 
-Edit config/settings/local.py for database settings, `ASYNC = True` and `DEBUG = True`.
+Edit config/settings/local.py for database settings, `ASYNC = True`, `DEBUG = True`, and `VENDOR_CDN`.
 
 Create the front end library vendor bundles:
 
 ```
-npm install
-npm run webpack
+./manage.py download_vendor_files
 ```
 
 Next, the differenet users and permissions need to be created on `mysql`. For this purpose, the `sqlcreate` can be used to see what needs to be executed on the database:
