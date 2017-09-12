@@ -24,9 +24,14 @@ app.controller('QueryController', ['$scope', 'QueryService', function($scope, Qu
     $scope.$on('browserDblItemClicked', function(event, resource, item) {
         $scope.service.forms.sql.pasteItem(resource, item);
     });
-    $scope.$watch(function() {
-        return $scope.service.plot.values.x + $scope.service.plot.values.y;
-    }, function(value) {
-        $scope.service.plot.update();
+    $scope.$watch('service.plot.values.x', function(value) {
+        if (angular.isDefined(value)) {
+            $scope.service.plot.update();
+        }
+    });
+    $scope.$watch('service.plot.values.y', function(value) {
+        if (angular.isDefined(value)) {
+            $scope.service.plot.update();
+        }
     });
 }]);

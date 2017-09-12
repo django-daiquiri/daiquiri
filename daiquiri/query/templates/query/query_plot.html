@@ -1,7 +1,7 @@
 {% load i18n %}
 
     <div class="row fieldset">
-        <div class="col-md-4">
+        <div class="col-md-6">
             <formgroup
                 data-id="plot_x"
                 data-type="select"
@@ -13,7 +13,7 @@
                 data-options-label="name">
             </formgroup>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-6">
             <formgroup
                 data-id="plot_y"
                 data-type="select"
@@ -27,4 +27,10 @@
         </div>
     </div>
 
-    <div id="canvas"></div>
+    <div id="canvas" class="daiquiri-query-plot-canvas"></div>
+
+    <p class="text-muted small" ng-show="service.plot.source">
+        {% blocktrans with page_size='{$ service.plot.page_size $}' trimmed %}
+        For performance reasons, we plot only the first {{ page_size }} rows.
+        {% endblocktrans %}
+    </p>

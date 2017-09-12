@@ -108,8 +108,6 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
         service.table = TableService;
         service.plot = PlotService;
         service.downloads = DownloadService;
-
-        console.log(Bokeh);
     };
 
     service.fetchStatus = function() {
