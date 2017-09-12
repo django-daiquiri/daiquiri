@@ -16,7 +16,8 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
         values: {},
         errors: {},
         data: {},
-        page_size: 10000
+        page_size: 10000,
+        idle: true
     };
 
     service.init = function(job) {
@@ -29,29 +30,33 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
     };
 
     service.update = function() {
-        var canvas = $('#canvas');
-        canvas.empty();
+        if (service.idle) {
+            service.idle = false;
 
-        x_column = $filter('filter')(service.job.columns, {name: service.values.x}, true)[0];
-        y_column = $filter('filter')(service.job.columns, {name: service.values.y}, true)[0];
+            var canvas = $('#canvas');
+            canvas.empty();
 
-        if (['int', 'long', 'float', 'double'].indexOf(x_column.datatype) > -1) {
-            service.errors.x = null;
-        } else {
-            service.errors.x = [interpolate(gettext('Columns of the type %s can not be plotted'), [x_column.datatype])];
-        }
-        if (['int', 'long', 'float', 'double'].indexOf(y_column.datatype) > -1) {
-            service.errors.y = null;
-        } else {
-            service.errors.y = [interpolate(gettext('Columns of the type %s can not be plotted'), [y_column.datatype])];
-        }
+            x_column = $filter('filter')(service.job.columns, {name: service.values.x}, true)[0];
+            y_column = $filter('filter')(service.job.columns, {name: service.values.y}, true)[0];
 
-        if (service.errors.x === null && service.errors.y === null) {
-            service.fetch().then(function() {
-                service.draw();
-            });
-        } else {
-            service.source = null;
+            if (['int', 'long', 'float', 'double'].indexOf(x_column.datatype) > -1) {
+                service.errors.x = null;
+            } else {
+                service.errors.x = [interpolate(gettext('Columns of the type %s can not be plotted'), [x_column.datatype])];
+            }
+            if (['int', 'long', 'float', 'double'].indexOf(y_column.datatype) > -1) {
+                service.errors.y = null;
+            } else {
+                service.errors.y = [interpolate(gettext('Columns of the type %s can not be plotted'), [y_column.datatype])];
+            }
+
+            if (service.errors.x === null && service.errors.y === null) {
+                service.fetch().then(function() {
+                    service.draw();
+                });
+            } else {
+                service.source = null;
+            }
         }
     };
 
@@ -123,6 +128,8 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
 
             Bokeh.Plotting.show(figure, $('#canvas'));
         }
+
+        service.idle = true;
     }
 
     return service;
