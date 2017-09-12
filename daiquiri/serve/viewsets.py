@@ -18,6 +18,7 @@ class RowViewSet(viewsets.ViewSet):
         # get database and table from the querystring
         database_name = self.request.GET.get('database')
         table_name = self.request.GET.get('table')
+        column_name = self.request.GET.get('column')
 
         # get the ordering
         ordering = self.request.GET.get('ordering')
@@ -36,6 +37,12 @@ class RowViewSet(viewsets.ViewSet):
 
         if columns:
             column_names = [column['name'] for column in columns]
+
+            if column_name:
+                if column_name not in column_names:
+                    raise NotFound()
+                else:
+                    column_names = [column_name]
 
             # get database adapter
             adapter = get_adapter()

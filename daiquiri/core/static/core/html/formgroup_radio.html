@@ -1,7 +1,7 @@
 <div class="form-group" ng-class="{'has-error': errors }">
     <div class="radio" ng-repeat="option in options">
         <label>
-            <input type="radio" ng-model="$parent.model" ng-value="option.id" />
+            <input type="radio" ng-model="$parent.model" ng-value="option[optionsId]" />
             <span>{$ option[optionsLabel] $}</span>
         </label>
     </div>

@@ -1,0 +1,30 @@
+{% load i18n %}
+
+    <div class="row fieldset">
+        <div class="col-md-4">
+            <formgroup
+                data-id="plot_x"
+                data-type="select"
+                data-label="{% trans 'X axis'%}"
+                data-model="service.plot.values.x"
+                data-errors="service.plot.errors.x"
+                data-options="service.job.columns"
+                data-options-id="name"
+                data-options-label="name">
+            </formgroup>
+        </div>
+        <div class="col-md-4">
+            <formgroup
+                data-id="plot_y"
+                data-type="select"
+                data-label="{% trans 'Y axis'%}"
+                data-model="service.plot.values.y"
+                data-errors="service.plot.errors.y"
+                data-options="service.job.columns"
+                data-options-id="name"
+                data-options-label="name">
+            </formgroup>
+        </div>
+    </div>
+
+    <div id="canvas"></div>

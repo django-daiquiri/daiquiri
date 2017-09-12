@@ -1,4 +1,4 @@
-app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'PollingService', 'DownloadService', 'TableService', 'BrowserService', function($resource, $injector, $q, $filter, PollingService, DownloadService, TableService, BrowserService) {
+app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'PollingService', 'PlotService', 'DownloadService', 'TableService', 'BrowserService', function($resource, $injector, $q, $filter, PollingService, PlotService, DownloadService, TableService, BrowserService) {
 
     /* get the base url */
 
@@ -104,8 +104,12 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
         PollingService.register('jobs', service.fetchJobs);
         PollingService.register('database', service.fetchUserDatabase);
 
-        // load the download service
+        // load the other services
+        service.table = TableService;
+        service.plot = PlotService;
         service.downloads = DownloadService;
+
+        console.log(Bokeh);
     };
 
     service.fetchStatus = function() {
@@ -176,17 +180,18 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
         service.form = null;
         service.fetchJob(job).then(function() {
             if (service.job.phase == 'COMPLETED') {
-                service.table = TableService;
                 service.table = TableService.init('serve/api/rows/', 'serve/api/columns/', 'serve/file/', {
                     database: service.job.database_name,
                     table: service.job.table_name
                 });
+
+                service.plot.init(service.job);
+
             } else {
                 // activate overview tab
                 service.tab = 'overview';
 
                 // empty table
-                service.table = TableService;
                 service.table = TableService.init();
             }
 

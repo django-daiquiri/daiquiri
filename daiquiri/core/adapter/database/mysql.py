@@ -165,10 +165,11 @@ class MySQLAdapter(DatabaseAdapter):
                 }
 
         # process page and page_size
-        sql += ' LIMIT %(limit)s OFFSET %(offset)s' % {
-            'limit': page_size,
-            'offset': (int(page) - 1) * int(page_size)
-        }
+        if page_size > 0:
+            sql += ' LIMIT %(limit)s OFFSET %(offset)s' % {
+                'limit': page_size,
+                'offset': (int(page) - 1) * int(page_size)
+            }
 
         return self.fetchall(sql, args=sql_args)
 

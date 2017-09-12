@@ -11,11 +11,13 @@
     {% vendor 'ng-infinite-scroll' %}
     {% vendor 'codemirror' %}
     {% vendor 'moment' %}
+    {% vendor 'Bokeh' %}
 
     {% compress css %}
     <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/browser.scss' %}" />
     <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/table.scss' %}" />
     <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/codemirror.scss' %}" />
+
     <link rel="stylesheet" type="text/x-scss" href="{% static 'query/css/query.scss' %}" />
     {% endcompress css %}
 
@@ -31,6 +33,7 @@
     <script type="text/javascript" src="{% static 'query/js/query.js' %}" ></script>
     <script type="text/javascript" src="{% static 'query/js/services/query.js' %}" ></script>
     <script type="text/javascript" src="{% static 'query/js/services/polling.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'query/js/services/plot.js' %}" ></script>
     <script type="text/javascript" src="{% static 'query/js/services/download.js' %}" ></script>
 
     {% for dropdown in settings.QUERY_DROPDOWNS %}
@@ -71,6 +74,9 @@
                     <li role="presentation" ng-class="{active: service.tab == 'results'}" ng-show="service.job.phase == 'COMPLETED'">
                         <a href="" ng-click="service.tab = 'results'">{% trans 'Results table' %}</a>
                     </li>
+                    <li role="presentation" ng-class="{active: service.tab == 'plot'}" ng-show="service.job.phase == 'COMPLETED'">
+                        <a href="" ng-click="service.tab = 'plot'">{% trans 'Plot' %}</a>
+                    </li>
                     <li role="presentation" ng-class="{active: service.tab == 'download'}" ng-show="service.job.phase == 'COMPLETED'">
                         <a href="" ng-click="service.tab = 'download'">{% trans 'Download' %}</a>
                     </li>
@@ -81,6 +87,9 @@
                 </div>
                 <div ng-show="service.tab == 'results'">
                     {% include 'query/query_results.html' %}
+                </div>
+                <div ng-show="service.tab == 'plot'">
+                    {% include 'query/query_plot.html' %}
                 </div>
                 <div ng-show="service.tab == 'download'">
                     {% include 'query/query_download.html' %}

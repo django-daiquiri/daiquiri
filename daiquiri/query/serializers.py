@@ -51,6 +51,8 @@ class QueryJobListSerializer(serializers.ModelSerializer):
 
 class QueryJobRetrieveSerializer(serializers.ModelSerializer):
 
+    columns = serializers.SerializerMethodField()
+
     class Meta:
         model = QueryJob
         fields = (
@@ -72,8 +74,15 @@ class QueryJobRetrieveSerializer(serializers.ModelSerializer):
             'actual_query',
             'queue',
             'nrows',
-            'size'
+            'size',
+            'columns'
         )
+
+    def get_columns(self, obj):
+        if 'columns' in obj.metadata:
+            return obj.metadata['columns']
+        else:
+            return []
 
 
 class QueryJobCreateSerializer(serializers.ModelSerializer):
