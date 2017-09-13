@@ -1,14 +1,14 @@
 {% load i18n %}
 
-    <div class="btn-group wide">
-        <button type="button" class="btn btn-default dropdown-toggle"
-            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            {% trans 'Databases' %} <span class="caret"></span>
-        </button>
-        <div class="dropdown-menu">
-            <div daiquiri-browser data-browser-id="databases" class="daiquiri-metadata-browser"></div>
-            <p class="help-block small">
-                {% trans 'A double click will paste the database/table/column into the query field.' %}
-            </p>
-        </div>
+<div class="btn-group">
+    <button type="button" class="btn btn-default dropdown-toggle"
+        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        {% trans 'Databases' %} <span class="caret"></span>
+    </button>
+    <div class="dropdown-menu">
+        <div daiquiri-browser data-browser-id="databases" class="daiquiri-metadata-browser"></div>
+        <p class="help-block small">
+            {% trans 'A double click will paste the database/table/column into the query field.' %}
+        </p>
     </div>
+</div>
