@@ -12,10 +12,9 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
 
     var service = {
         job: null,
-        source: null,
         values: {},
         errors: {},
-        data: {},
+        labels: {},
         page_size: 10000,
         idle: true
     };
@@ -30,22 +29,34 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
     };
 
     service.update = function() {
-        if (service.idle) {
+
+        var x_column = $filter('filter')(service.job.columns, {name: service.values.x}, true)[0],
+            y_column = $filter('filter')(service.job.columns, {name: service.values.y}, true)[0];
+
+        if (service.idle && angular.isDefined(x_column) && angular.isDefined(y_column)) {
             service.idle = false;
 
-            var canvas = $('#canvas');
-            canvas.empty();
-
-            x_column = $filter('filter')(service.job.columns, {name: service.values.x}, true)[0];
-            y_column = $filter('filter')(service.job.columns, {name: service.values.y}, true)[0];
+            // remove the old plot
+            $('#canvas').empty();
 
             if (['int', 'long', 'float', 'double'].indexOf(x_column.datatype) > -1) {
                 service.errors.x = null;
+
+                service.labels.x = x_column.name;
+                if (x_column.unit && x_column.unit.length > 0) {
+                    service.labels.x += ' [' + x_column.unit + ']';
+                }
             } else {
                 service.errors.x = [interpolate(gettext('Columns of the type %s can not be plotted'), [x_column.datatype])];
             }
+
             if (['int', 'long', 'float', 'double'].indexOf(y_column.datatype) > -1) {
                 service.errors.y = null;
+
+                service.labels.y = y_column.name;
+                if (y_column.unit && y_column.unit.length > 0) {
+                    service.labels.y += ' [' + y_column.unit + ']';
+                }
             } else {
                 service.errors.y = [interpolate(gettext('Columns of the type %s can not be plotted'), [y_column.datatype])];
             }
@@ -56,7 +67,6 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
                     service.idle = true;
                 });
             } else {
-                service.source = null;
                 service.idle = true;
             }
         }
@@ -74,32 +84,34 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
             column: service.values.y,
             page_size: service.page_size
         }).$promise]).then(function(results) {
-            service.x = [].concat.apply([], results[0].results);
-            service.y = [].concat.apply([], results[1].results);
+            service.source = new Bokeh.ColumnDataSource({
+                data: {
+                    x: results[0].results,
+                    y: results[1].results
+                }
+            });
         });
     };
 
     service.draw = function() {
-        service.source = new Bokeh.ColumnDataSource({ data: {x: service.x, y: service.y} });
-
-        var xmin = Math.min.apply(null, service.x),
-            xmax = Math.max.apply(null, service.x),
-            ymin = Math.min.apply(null, service.y),
-            ymax = Math.max.apply(null, service.y);
+        var xmin = Math.min.apply(null, service.source.data.x),
+            xmax = Math.max.apply(null, service.source.data.x),
+            ymin = Math.min.apply(null, service.source.data.y),
+            ymax = Math.max.apply(null, service.source.data.y);
 
         if (!isNaN(xmin) && !isNaN(xmax) && !isNaN(ymin) && !isNaN(ymax)) {
 
-            // compute a 10% padding around the data
+            // compute a 1% padding around the data
             var xpad, ypad;
             if (xmax == xmin) {
                 xpad = 0.001 * xmax;
             } else {
-                xpad = 0.1 * (xmax - xmin);
+                xpad = 0.01 * (xmax - xmin);
             }
             if (ymax == ymin) {
                 ypad = 0.001 * ymax;
             } else {
-                ypad = 0.1 * (ymax - ymin);
+                ypad = 0.01 * (ymax - ymin);
             }
 
             // create some ranges for the plot
@@ -119,16 +131,26 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
                 y_range: y_range,
                 plot_width: $('.col-md-9').width(),
                 tools: tools,
-                output_backend: 'webgl'
+                output_backend: 'webgl',
+                background_fill_color: '#f5f5f5'
             });
+
+            figure.xaxis.axis_label = service.labels.x;
+            figure.yaxis.axis_label = service.labels.y;
+            figure.toolbar.active_scroll = figure.toolbar.wheel_zoom;
+            figure.outline_line_color = '#dddddd';
+            figure.toolbar.logo = null;
 
             var circles = figure.circle({
                 x: { field: "x" },
                 y: { field: "y" },
                 source: service.source,
+                fill_alpha: 0.5
             });
 
             Bokeh.Plotting.show(figure, $('#canvas'));
+            $('.bk-button-bar-list[type="scroll"] .bk-toolbar-button').click();
+            $('.bk-button-bar-list[type="inspectors"] .bk-toolbar-button').click();
         }
     }
 

@@ -53,6 +53,10 @@ class RowViewSet(viewsets.ViewSet):
             # query the paginated rowset
             results = adapter.database.fetch_rows(database_name, table_name, column_names, ordering, page, page_size, filter_string)
 
+            # flatten the list if only one column is retrieved
+            if column_name:
+                results = [element for row in results for element in row]
+
             # get the previous and next url
             next = self._get_next_url(page, page_size, count)
             previous = self._get_previous_url(page)
