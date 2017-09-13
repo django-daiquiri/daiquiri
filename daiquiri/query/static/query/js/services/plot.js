@@ -53,9 +53,11 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
             if (service.errors.x === null && service.errors.y === null) {
                 service.fetch().then(function() {
                     service.draw();
+                    service.idle = true;
                 });
             } else {
                 service.source = null;
+                service.idle = true;
             }
         }
     };
@@ -128,8 +130,6 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
 
             Bokeh.Plotting.show(figure, $('#canvas'));
         }
-
-        service.idle = true;
     }
 
     return service;
