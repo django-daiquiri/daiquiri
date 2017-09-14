@@ -7,7 +7,6 @@ class ServeTestCase(TestCase):
 
     fixtures = (
         'auth.json',
-        'files.json',
         'metadata.json',
         'jobs.json',
         'queryjobs.json'

@@ -10,6 +10,7 @@ class ServeViewTestCase(TestCase):
 
     fixtures = (
         'auth.json',
+        'files.json',
         'metadata.json',
         'jobs.json',
         'queryjobs.json'
@@ -23,7 +24,7 @@ class ServeViewTestCase(TestCase):
     )
 
 
-class PublicTests(TestViewMixin, ServeViewTestCase):
+class PublicTableTests(TestViewMixin, ServeViewTestCase):
 
     url_names = {
         'list_view': 'serve:table'
@@ -42,7 +43,7 @@ class PublicTests(TestViewMixin, ServeViewTestCase):
         })
 
 
-class InternalTests(TestViewMixin, ServeViewTestCase):
+class InternalTableTests(TestViewMixin, ServeViewTestCase):
 
     url_names = {
         'list_view': 'serve:table'
@@ -61,7 +62,7 @@ class InternalTests(TestViewMixin, ServeViewTestCase):
         })
 
 
-class UserTests(TestViewMixin, ServeViewTestCase):
+class UserTableTests(TestViewMixin, ServeViewTestCase):
 
     url_names = {
         'list_view': 'serve:table'
@@ -80,7 +81,7 @@ class UserTests(TestViewMixin, ServeViewTestCase):
         })
 
 
-class NotFoundTests(TestViewMixin, ServeViewTestCase):
+class NotFoundTableTests(TestViewMixin, ServeViewTestCase):
 
     url_names = {
         'list_view': 'serve:table'
@@ -108,24 +109,6 @@ class NotFoundTests(TestViewMixin, ServeViewTestCase):
         self.assert_list_view(username, {
             'database_name': 'daiquiri_user_user',
             'table_name': 'non_existing'
-        })
-
-
-class FileTests(TestViewMixin, ServeViewTestCase):
-
-    url_names = {
-        'list_view': 'serve:file'
-    }
-
-    status_map = {
-        'list_view': {
-            'admin': 200, 'manager': 200, 'user': 200, 'anonymous': 404
-        }
-    }
-
-    def _test_archive_get(self, username):
-        self.assert_list_view(username, kwargs={
-            'file_path': 'image_00.jpg'
         })
 
 

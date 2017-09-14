@@ -7,8 +7,9 @@ from rest_framework.authentication import SessionAuthentication, TokenAuthentica
 from daiquiri.core.adapter import get_adapter
 from daiquiri.core.viewsets import ChoicesViewSet
 from daiquiri.core.permissions import HasModelPermission
+from daiquiri.core.constants import LICENSE_CHOICES, ACCESS_LEVEL_CHOICES
 
-from .models import Database, Table, Column, Function, LICENSE_CHOICES, ACCESS_LEVEL_CHOICES
+from .models import Database, Table, Column, Function
 from .serializers import (
     DatabaseSerializer,
     TableSerializer,

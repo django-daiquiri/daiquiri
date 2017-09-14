@@ -1,9 +1,9 @@
 from django.db import models
 
-from .settings import ACCESS_LEVEL_PUBLIC, ACCESS_LEVEL_INTERNAL
+from .constants import ACCESS_LEVEL_PUBLIC, ACCESS_LEVEL_INTERNAL
 
 
-class MetadataManager(models.Manager):
+class AccessLevelManager(models.Manager):
 
     def filter_by_access_level(self, user):
         if not user or user.is_anonymous():

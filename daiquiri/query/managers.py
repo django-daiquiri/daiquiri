@@ -1,6 +1,6 @@
 from django.db import models
 
-from daiquiri.metadata.managers import MetadataManager
+from daiquiri.core.managers import AccessLevelManager
 
 
 class QueryJobManager(models.Manager):
@@ -16,6 +16,6 @@ class QueryJobManager(models.Manager):
         return self.filter_by_owner(user).exclude(phase=self.model.PHASE_ARCHIVED).aggregate(models.Sum('size'))['size__sum'] or 0
 
 
-class ExampleManager(MetadataManager):
+class ExampleManager(AccessLevelManager):
 
     pass

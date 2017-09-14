@@ -26,8 +26,8 @@ from queryparser.adql import ADQLQueryTranslator
 from queryparser.exceptions import QueryError, QuerySyntaxError
 
 from daiquiri.core.adapter import get_adapter
+from daiquiri.core.constants import ACCESS_LEVEL_CHOICES
 from daiquiri.jobs.models import Job
-from daiquiri.metadata.settings import ACCESS_LEVEL_CHOICES
 
 from .managers import QueryJobManager, ExampleManager
 from .utils import (

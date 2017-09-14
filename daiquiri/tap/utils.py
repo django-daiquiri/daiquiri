@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from daiquiri.metadata.settings import ACCESS_LEVEL_PUBLIC
+from daiquiri.core.constants import ACCESS_LEVEL_PUBLIC
 
 from .models import (
     Schema as TapSchema,

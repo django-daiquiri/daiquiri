@@ -10,7 +10,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, Http404
 
 from .tasks import create_download_archive
-from .utils import get_columns, get_file, get_files, get_archive_file_name
+from .utils import get_columns, get_archive_files, get_archive_file_name
 
 logger = logging.getLogger(__name__)
 
@@ -29,20 +29,9 @@ def table(request, database_name, table_name):
     raise Http404
 
 
-def file(request, file_path):
-
-    file_name = get_file(request.user, file_path)
-
-    if file_name:
-        return sendfile(request, file_name, attachment=False)
-
-    # if nothing worked, return 404
-    raise Http404
-
-
 def archive(request, database_name, table_name, column_name):
 
-    files = get_files(request.user, database_name, table_name, column_name)
+    files = get_archive_files(request.user, database_name, table_name, column_name)
 
     if files:
         file_name = get_archive_file_name(request.user, table_name, column_name)

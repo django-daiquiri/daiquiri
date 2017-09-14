@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Database, Table, Column, Function, Directory
+from .models import Database, Table, Column, Function
 
 
 class DatabaseAdmin(admin.ModelAdmin):
@@ -27,14 +27,7 @@ class FunctionAdmin(admin.ModelAdmin):
     list_display_links = ('name', )
 
 
-class DirectoryAdmin(admin.ModelAdmin):
-    search_fields = ('path', )
-    list_display = ('path', )
-    list_display_links = ('path', )
-
-
 admin.site.register(Database, DatabaseAdmin)
 admin.site.register(Table, TableAdmin)
 admin.site.register(Column, ColumnAdmin)
 admin.site.register(Function, FunctionAdmin)
-admin.site.register(Directory, DirectoryAdmin)

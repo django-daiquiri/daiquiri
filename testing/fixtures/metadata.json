@@ -495,16 +495,5 @@
         1
       ]
     }
-  },
-  {
-    "model": "daiquiri_metadata.directory",
-    "pk": 1,
-    "fields": {
-      "path": "/tmp/daiquiri",
-      "access_level": "INTERNAL",
-        "groups": [
-            1
-        ]
-    }
   }
 ]
