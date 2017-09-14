@@ -112,6 +112,12 @@ def fetch_user_database_metadata(user, jobs):
     return [database]
 
 
+def get_asterisk_columns(display_column):
+    database_name, table_name, _ = display_column[1]
+    column_names = get_adapter().database.fetch_column_names(database_name, table_name)
+    return [(column_name, (database_name, table_name, column_name)) for column_name in column_names]
+
+
 def check_permissions(user, keywords, columns, functions):
     messages = []
 

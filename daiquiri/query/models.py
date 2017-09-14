@@ -37,6 +37,7 @@ from .utils import (
     get_tap_schema_name,
     get_user_database_name,
     get_download_file_name,
+    get_asterisk_columns,
     check_permissions
 )
 from .tasks import run_query, create_download_file
@@ -161,14 +162,32 @@ class QueryJob(Job):
                 }
             })
 
-        # check for duplicate columns in processor.display_columns
+        # check permissions
+        permission_messages = check_permissions(self.owner, processor.keywords, processor.columns, processor.functions)
+        if permission_messages:
+            raise ValidationError({
+                'query': permission_messages
+            })
+
+        # process display_columns to expand *
         display_columns = []
+        for display_column in processor.display_columns:
+            if display_column[0] == '*':
+                display_columns += get_asterisk_columns(display_column)
+            else:
+                display_columns.append(display_column)
+
+        # check for duplicate columns in display_columns
+        display_column_names = [column_name for column_name, column in display_columns]
+        seen = set()
         duplicate_columns = []
-        for column_name, column in processor.display_columns:
-            if column_name not in display_columns:
-                display_columns.append(column_name)
+        for column_name in display_column_names:
+            if column_name not in seen:
+                seen.add(column_name)
             else:
                 duplicate_columns.append(column_name)
+
+        print(duplicate_columns)
 
         if duplicate_columns:
             raise ValidationError({
@@ -179,15 +198,8 @@ class QueryJob(Job):
 
         # initialize metadata and store map of aliases
         self.metadata = {
-            'display_columns': OrderedDict(processor.display_columns)
+            'display_columns': OrderedDict(display_columns)
         }
-
-        # check permissions
-        permission_messages = check_permissions(self.owner, processor.keywords, processor.columns, processor.functions)
-        if permission_messages:
-            raise ValidationError({
-                'query': permission_messages
-            })
 
         # get the native query from the processor (without trailing semicolon)
         self.native_query = processor.query.rstrip(';')
