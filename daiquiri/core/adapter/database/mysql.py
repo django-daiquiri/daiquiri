@@ -101,6 +101,10 @@ class MySQLAdapter(DatabaseAdapter):
         self.execute(sql)
 
     def count_rows(self, database_name, table_name, column_names=None, filter_string=None):
+        # if no column names are provided get all column_names from the table
+        if not column_names:
+            column_names= self.fetch_column_names(database_name, table_name)
+
         # prepare sql string
         sql = 'SELECT COUNT(*) FROM %(database)s.%(table)s' % {
             'database': self.escape_identifier(database_name),
@@ -128,7 +132,11 @@ class MySQLAdapter(DatabaseAdapter):
         sql = 'SELECT table_rows as nrows, data_length + index_length AS size FROM `information_schema`.`tables` WHERE `table_schema` = %s AND table_name = %s;'
         return self.fetchone(sql, (database_name, table_name))
 
-    def fetch_rows(self, database_name, table_name, column_names, ordering=None, page=1, page_size=10, filter_string=None):
+    def fetch_rows(self, database_name, table_name, column_names=None, ordering=None, page=1, page_size=10, filter_string=None):
+        # if no column names are provided get all column_names from the table
+        if not column_names:
+            column_names= self.fetch_column_names(database_name, table_name)
+
         # create a list of escaped columns
         escaped_column_names = [self.escape_identifier(column_name) for column_name in column_names]
 
@@ -172,6 +180,16 @@ class MySQLAdapter(DatabaseAdapter):
             }
 
         return self.fetchall(sql, args=sql_args)
+
+    def fetch_row(self, database_name, table_name, column_name, value):
+        # prepare sql string
+        sql = 'SELECT * FROM %(database)s.%(table)s WHERE %(column)s = %%s' % {
+            'database': self.escape_identifier(database_name),
+            'table': self.escape_identifier(table_name),
+            'column': self.escape_identifier(column_name)
+        }
+
+        return self.fetchone(sql, args=(value, ))
 
     def create_user_database_if_not_exists(self, database_name):
         # escape input

@@ -51,7 +51,10 @@ class DatabaseAdapter(object):
     def count_rows(self, database_name, table_name, column_names=None, filter_string=None):
         raise NotImplementedError()
 
-    def fetch_rows(self, database_name, table_name, column_names, ordering=None, page=1, page_size=10, filter_string=None):
+    def fetch_rows(self, database_name, table_name, column_names=None, ordering=None, page=1, page_size=10, filter_string=None):
+        raise NotImplementedError()
+
+    def fetch_row(self, database_name, table_name, column_name, value):
         raise NotImplementedError()
 
     def create_user_database_if_not_exists(self, database_name):
