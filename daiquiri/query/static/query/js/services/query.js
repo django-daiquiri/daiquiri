@@ -178,7 +178,7 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
         service.form = null;
         service.fetchJob(job).then(function() {
             if (service.job.phase == 'COMPLETED') {
-                service.table = TableService.init('serve/api/rows/', 'serve/api/columns/', 'serve/file/', {
+                service.table = TableService.init('serve/api/rows/', 'serve/api/columns/', 'files/api/files/', {
                     database: service.job.database_name,
                     table: service.job.table_name
                 });

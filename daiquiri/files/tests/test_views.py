@@ -1,12 +1,9 @@
-import os
-
-from django.conf import settings
 from django.test import TestCase
 
 from test_generator.views import TestViewMixin
 
 
-class ServeViewTestCase(TestCase):
+class FilesViewTestCase(TestCase):
 
     fixtures = (
         'auth.json',
@@ -21,7 +18,7 @@ class ServeViewTestCase(TestCase):
     )
 
 
-class InternalFileTests(TestViewMixin, ServeViewTestCase):
+class InternalFileTests(TestViewMixin, FilesViewTestCase):
 
     url_names = {
         'list_view': 'files:file'
@@ -35,11 +32,11 @@ class InternalFileTests(TestViewMixin, ServeViewTestCase):
 
     def _test_get(self, username):
         self.assert_list_view(username, kwargs={
-            'file_path': 'www/'
+            'file_path': 'html/'
         })
 
 
-class PrivateFileTests(TestViewMixin, ServeViewTestCase):
+class PrivateFileTests(TestViewMixin, FilesViewTestCase):
 
     url_names = {
         'list_view': 'files:file'

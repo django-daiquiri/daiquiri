@@ -13,7 +13,11 @@ def get_file(user, file_path):
 
     results = set()
     for directory in directories:
-        absolute_file_path = os.path.join(directory.path, file_path)
+        # normalize the file path so that /a/b/c and b/c/d/e become /a/b/c and d/e
+        normalized_file_path = normalize_file_path(directory.path, file_path)
+
+        # join directory_path and file_path so that it becomes /a/b/c/d/e
+        absolute_file_path = os.path.join(directory.path, normalized_file_path)
 
         # check if absolute_file_path is actually a file
         if os.path.isfile(absolute_file_path):
@@ -40,7 +44,7 @@ def search_file(user, file_path):
 
             # join directory_path and file_path so that it becomes /a/b/c/d/e
             absolute_file_path = os.path.join(directory_path, normalized_file_path)
-            print(os.path.isfile(absolute_file_path))
+
             # check if absolute_file_path is actually a file
             if os.path.isfile(absolute_file_path):
                 results.add(absolute_file_path)

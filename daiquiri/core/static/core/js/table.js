@@ -9,13 +9,13 @@ angular.module('core')
         scope: {
             'rowsUrl': '@',
             'columnsUrl': '@',
-            'fileBaseUrl': '@',
+            'filesUrl': '@',
             'params': '=',
             'pageSizes': '='
         },
         link: function(scope, element, attrs) {
             scope.table = TableService;
-            scope.table.init(scope.rowsUrl, scope.columnsUrl, scope.fileBaseUrl, scope.params, scope.pageSizes);
+            scope.table.init(scope.rowsUrl, scope.columnsUrl, scope.filesUrl, scope.params, scope.pageSizes);
 
             // refresh the tooltips everytime a new set of columns is fetched
             scope.$watch(function() {
@@ -104,7 +104,7 @@ angular.module('core')
         modal: {},
     };
 
-    service.init = function(rows_url, columns_url, file_base_url, params, page_sizes) {
+    service.init = function(rows_url, columns_url, files_url, params, page_sizes) {
         service.ready = false;
 
         // set up resources
@@ -116,8 +116,8 @@ angular.module('core')
         }
 
         // setup file base url
-        if (angular.isDefined(file_base_url)) {
-            service.file_base_url = baseurl + file_base_url
+        if (angular.isDefined(files_url)) {
+            service.file_base_url = baseurl + files_url + '?search=';
         }
 
         // add params from the dom to service.params
