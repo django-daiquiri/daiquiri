@@ -10,6 +10,10 @@ class UserForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ('first_name', 'last_name')
+        widgets = {
+            'first_name': forms.TextInput(attrs={'placeholder': _('First name')}),
+            'last_name': forms.TextInput(attrs={'placeholder': _('Last name')})
+        }
 
 
 class ProfileForm(forms.ModelForm):
@@ -27,9 +31,9 @@ class ProfileForm(forms.ModelForm):
             choices = [(option['id'], option['label']) for option in detail_key['options']]
 
             if detail_key['data_type'] == 'text':
-                field = forms.CharField(widget=forms.TextInput(attrs={'placeholder': detail_key.label}))
+                field = forms.CharField(widget=forms.TextInput(attrs={'placeholder': detail_key['label']}))
             elif detail_key['data_type'] == 'textarea':
-                field = forms.CharField(widget=forms.Textarea(attrs={'placeholder': detail_key.label}))
+                field = forms.CharField(widget=forms.Textarea(attrs={'placeholder': detail_key['label']}))
             elif detail_key['data_type'] == 'select':
                 field = forms.ChoiceField(choices=choices)
             elif detail_key['data_type'] == 'radio':
@@ -41,9 +45,14 @@ class ProfileForm(forms.ModelForm):
             else:
                 raise Exception('Unknown detail key data type.')
 
-            field.label = detail_key['label']
-            field.required = detail_key['required']
-            field.help_text = detail_key['help_text']
+            if 'label' in detail_key:
+                field.label = detail_key['label']
+
+            if 'required' in detail_key:
+                field.required = detail_key['required']
+
+            if 'help_text' in detail_key:
+                field.help_text = detail_key['help_text']
 
             if self.instance.details and detail_key['key'] in self.instance.details:
                 field.initial = self.instance.details[detail_key['key']]
