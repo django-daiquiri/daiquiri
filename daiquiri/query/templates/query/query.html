@@ -52,7 +52,7 @@
 
     <h1>{% trans 'Query interface' %}</h1>
 
-    <div class="row" ng-cloak>
+    <div class="daiquiri-query row" ng-cloak>
         <div class="col-md-3">
             {% include 'query/query_sidebar.html' %}
         </div>
@@ -69,16 +69,24 @@
 
                 <ul class="nav nav-tabs daiquiri-query-job-tabs">
                     <li role="presentation" ng-class="{active: service.tab == 'overview'}">
-                        <a href="" ng-click="service.tab = 'overview'">{% trans 'Job overview' %}</a>
+                        <a href="" ng-click="service.activateTab('overview')">
+                            {% trans 'Job overview' %}
+                        </a>
                     </li>
                     <li role="presentation" ng-class="{active: service.tab == 'results'}" ng-show="service.job.phase == 'COMPLETED'">
-                        <a href="" ng-click="service.tab = 'results'">{% trans 'Results table' %}</a>
+                        <a href="" ng-click="service.activateTab('results');">
+                            {% trans 'Results table' %}
+                        </a>
                     </li>
                     <li role="presentation" ng-class="{active: service.tab == 'plot'}" ng-show="service.job.phase == 'COMPLETED'">
-                        <a href="" ng-click="service.tab = 'plot'">{% trans 'Plot' %}</a>
+                        <a href="" ng-click="service.activateTab('plot');">
+                            {% trans 'Plot' %}
+                        </a>
                     </li>
                     <li role="presentation" ng-class="{active: service.tab == 'download'}" ng-show="service.job.phase == 'COMPLETED'">
-                        <a href="" ng-click="service.tab = 'download'">{% trans 'Download' %}</a>
+                        <a href="" ng-click="service.activateTab('download');">
+                            {% trans 'Download' %}
+                        </a>
                     </li>
                 </ul>
 

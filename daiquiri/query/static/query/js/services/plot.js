@@ -11,31 +11,33 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
     }
 
     var service = {
-        job: null,
+        params: {
+            page_size: 10000,
+        },
+        columns: null,
         values: {},
         errors: {},
         labels: {},
-        page_size: 10000,
-        idle: true
+        ready: false
     };
 
-    service.init = function(job) {
-        service.job = job;
+    service.init = function(rows_url, params, columns) {
+        service.ready = false;
 
-        service.values.x = job.columns[0].name;
-        service.values.y = job.columns[1].name;
+        angular.extend(service.params, params);
+        service.columns = columns;
+
+        service.values.x = service.columns[0].name;
+        service.values.y = service.columns[1].name;
 
         service.update();
     };
 
     service.update = function() {
+        var x_column = $filter('filter')(service.columns, {name: service.values.x}, true)[0],
+            y_column = $filter('filter')(service.columns, {name: service.values.y}, true)[0];
 
-        var x_column = $filter('filter')(service.job.columns, {name: service.values.x}, true)[0],
-            y_column = $filter('filter')(service.job.columns, {name: service.values.y}, true)[0];
-
-        if (service.idle && angular.isDefined(x_column) && angular.isDefined(y_column)) {
-            service.idle = false;
-
+        if (angular.isDefined(x_column) && angular.isDefined(y_column)) {
             // remove the old plot
             $('#canvas').empty();
 
@@ -64,26 +66,29 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
             if (service.errors.x === null && service.errors.y === null) {
                 service.fetch().then(function() {
                     service.draw();
-                    service.idle = true;
+                    service.ready = true;
                 });
             } else {
-                service.idle = true;
+                service.ready = true;
             }
         }
     };
 
     service.fetch = function() {
-        return $q.all([resources.rows.paginate({
-            database: service.job.database_name,
-            table: service.job.table_name,
+
+        var x_params = angular.extend({}, service.params, {
             column: service.values.x,
             page_size: service.page_size
-        }).$promise, resources.rows.paginate({
-            database: service.job.database_name,
-            table: service.job.table_name,
+        });
+        var y_params = angular.extend({}, service.params, {
             column: service.values.y,
             page_size: service.page_size
-        }).$promise]).then(function(results) {
+        });
+
+        return $q.all([
+            resources.rows.paginate(x_params).$promise,
+            resources.rows.paginate(y_params).$promise
+        ]).then(function(results) {
             service.source = new Bokeh.ColumnDataSource({
                 data: {
                     x: results[0].results,
@@ -127,6 +132,7 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
             // make the plot
             var tools = "pan,crosshair,wheel_zoom,box_zoom,reset,save";
             var figure = new Bokeh.Plotting.figure({
+                height: 500,
                 x_range: x_range,
                 y_range: y_range,
                 plot_width: $('.col-md-9').width(),

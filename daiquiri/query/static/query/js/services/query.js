@@ -177,20 +177,15 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
     service.activateJob = function(job) {
         service.form = null;
         service.fetchJob(job).then(function() {
+            service.table.ready = false;
+            service.plot.ready = false;
+
             if (service.job.phase == 'COMPLETED') {
-                service.table = TableService.init('serve/api/rows/', 'serve/api/columns/', 'files/api/files/', {
-                    database: service.job.database_name,
-                    table: service.job.table_name
-                });
-
-                service.plot.init(service.job);
-
+                // re-init current tab
+                service.initTab(service.tab);
             } else {
                 // activate overview tab
-                service.tab = 'overview';
-
-                // empty table
-                service.table = TableService.init();
+                service.activateTab('overview');
             }
 
             CodeMirror.runMode(service.job.query, "text/x-mariadb", angular.element('#query')[0]);
@@ -254,6 +249,37 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
             $('.modal').modal('hide');
         });
     };
+
+    service.activateTab = function(tab) {
+        service.initTab(tab);
+        service.tab = tab;
+    };
+
+    service.initTab = function(tab) {
+        if (tab == 'results') {
+            if (!service.table.ready) {
+                if (service.job && service.job.phase == 'COMPLETED') {
+                    service.table.init('serve/api/rows/', 'serve/api/columns/', 'files/api/files/', {
+                        database: service.job.database_name,
+                        table: service.job.table_name
+                    });
+                } else {
+                    service.table.clear();
+                }
+            }
+        } else if (tab == 'plot') {
+            if (!service.plot.ready) {
+                if (service.job && service.job.phase == 'COMPLETED') {
+                    service.plot.init('serve/api/rows/', {
+                        database: service.job.database_name,
+                        table: service.job.table_name
+                    }, service.job.columns);
+                } else {
+                    service.plot.clear();
+                }
+            }
+        }
+    }
 
     return service;
 

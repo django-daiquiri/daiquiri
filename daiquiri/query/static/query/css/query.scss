@@ -1,5 +1,9 @@
 @import 'core/css/variables';
 
+.daiquiri-query {
+    min-height: 750px;
+}
+
 h2.daiquiri-query-form-title,
 h2.daiquiri-query-job-title {
     margin-top: 0;
@@ -19,8 +23,13 @@ p.daiquiri-query-form-help {
     margin-bottom: 20px;
 }
 
+.daiquiri-query-plot-button {
+    margin-top: 25px;
+}
+
 .daiquiri-query-plot-canvas {
     margin-bottom: 10px;
+    height: 500px;
 }
 
 .daiquiri-query-joblist {

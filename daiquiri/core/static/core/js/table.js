@@ -156,11 +156,14 @@ angular.module('core')
 
                 service.reset();
             });
-        } else {
-            service.columns = [];
-            service.rows = [];
-        };
+        }
     };
+
+    service.clear = function() {
+        service.columns = [];
+        service.rows = [];
+        service.ready = true;
+    }
 
     service.fetch = function() {
         return resources.rows.paginate(service.params, function(response) {
