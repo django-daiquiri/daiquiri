@@ -132,17 +132,22 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
             // make the plot
             var tools = "pan,crosshair,wheel_zoom,box_zoom,reset,save";
             var figure = new Bokeh.Plotting.figure({
+                height: 840,
                 height: 500,
                 x_range: x_range,
                 y_range: y_range,
                 plot_width: $('.col-md-9').width(),
                 tools: tools,
-                output_backend: 'webgl',
+                // output_backend: 'webgl',
                 background_fill_color: '#f5f5f5'
             });
 
             figure.xaxis.axis_label = service.labels.x;
+            figure.xaxis.axis_label_text_font = 'DroidSans'
+
             figure.yaxis.axis_label = service.labels.y;
+            figure.yaxis.axis_label_text_font = 'DroidSans'
+
             figure.toolbar.active_scroll = figure.toolbar.wheel_zoom;
             figure.outline_line_color = '#dddddd';
             figure.toolbar.logo = null;
