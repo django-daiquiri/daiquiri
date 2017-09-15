@@ -23,23 +23,29 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
 
     service.init = function(rows_url, params, columns) {
         service.ready = false;
+        service.clear();
 
         angular.extend(service.params, params);
         service.columns = columns;
 
-        service.values.x = service.columns[0].name;
-        service.values.y = service.columns[1].name;
+        if (angular.isDefined(service.columns[0])) {
+            service.values.x = service.columns[0].name;
+        } else {
+            service.values.x = null;
+        }
+
+        if (angular.isDefined(service.columns[1])) {
+            service.values.y = service.columns[1].name;
+        } else {
+            service.values.y = null;
+        }
 
         service.update();
     };
 
     service.update = function() {
-        var x_column = $filter('filter')(service.columns, {name: service.values.x}, true)[0],
-            y_column = $filter('filter')(service.columns, {name: service.values.y}, true)[0];
-
-        if (angular.isDefined(x_column) && angular.isDefined(y_column)) {
-            // remove the old plot
-            $('#canvas').empty();
+        if (service.values.x) {
+            var x_column = $filter('filter')(service.columns, {name: service.values.x}, true)[0];
 
             if (['int', 'long', 'float', 'double'].indexOf(x_column.datatype) > -1) {
                 service.errors.x = null;
@@ -51,6 +57,12 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
             } else {
                 service.errors.x = [interpolate(gettext('Columns of the type %s can not be plotted'), [x_column.datatype])];
             }
+        } else {
+            service.errors.x = [gettext('No column selected')];
+        }
+
+        if (service.values.y) {
+            var y_column = $filter('filter')(service.columns, {name: service.values.y}, true)[0];
 
             if (['int', 'long', 'float', 'double'].indexOf(y_column.datatype) > -1) {
                 service.errors.y = null;
@@ -62,17 +74,23 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
             } else {
                 service.errors.y = [interpolate(gettext('Columns of the type %s can not be plotted'), [y_column.datatype])];
             }
+        } else {
+            service.errors.y = [gettext('No column selected')];
+        }
 
-            if (service.errors.x === null && service.errors.y === null) {
-                service.fetch().then(function() {
-                    service.draw();
-                    service.ready = true;
-                });
-            } else {
+        if (service.errors.x === null && service.errors.y === null) {
+            service.fetch().then(function() {
+                service.draw();
                 service.ready = true;
-            }
+            });
+        } else {
+            service.ready = true;
         }
     };
+
+    service.clear = function() {
+        $('#canvas').empty();
+    }
 
     service.fetch = function() {
 
