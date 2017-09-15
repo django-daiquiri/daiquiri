@@ -23,7 +23,6 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
 
     service.init = function(rows_url, params, columns) {
         service.ready = false;
-        service.clear();
 
         angular.extend(service.params, params);
         service.columns = columns;
@@ -44,6 +43,8 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
     };
 
     service.update = function() {
+        service.clear();
+
         if (service.values.x) {
             var x_column = $filter('filter')(service.columns, {name: service.values.x}, true)[0];
 
