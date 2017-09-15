@@ -102,7 +102,7 @@ class QueryJobViewSet(viewsets.ModelViewSet):
             queue=serializer.data.get('queue'),
             client_ip=get_client_ip(self.request)
         )
-        job.clean()
+        job.process()
         job.save()
         job.run()
 

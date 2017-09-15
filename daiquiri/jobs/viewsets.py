@@ -64,7 +64,7 @@ class SyncJobViewSet(JobViewSet):
                 setattr(job, model_field, value)
 
         try:
-            job.clean()
+            job.process()
         except ValidationError as e:
             raise ValidationError(self.rewrite_exception(e))
 
@@ -127,7 +127,7 @@ class AsyncJobViewSet(JobViewSet):
                 setattr(job, model_field, value)
 
         try:
-            job.clean()
+            job.process()
         except ValidationError as e:
             raise ValidationError(self.rewrite_exception(e))
 
@@ -239,7 +239,7 @@ class AsyncJobViewSet(JobViewSet):
         if 'PHASE' in serializer.data:
             phase = serializer.data['PHASE']
             if phase == job.PHASE_RUN:
-                job.clean()
+                job.process()
                 job.run()
                 return HttpResponseSeeOther(self.get_success_url())
             elif phase == job.PHASE_ABORT:

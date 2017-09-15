@@ -85,7 +85,7 @@ class QueryJob(Job):
 
         return super(QueryJob, self).save(*args, **kwargs)
 
-    def clean(self):
+    def process(self):
         if not self.response_format:
             self.response_format = settings.QUERY_DEFAULT_DOWNLOAD_FORMAT
 
@@ -259,7 +259,7 @@ class QueryJob(Job):
 
     def run(self, sync=False):
         if not self.is_clean:
-            raise Exception('job.clean() was not called.')
+            raise Exception('job.process() was not called.')
 
         if self.phase == self.PHASE_PENDING:
             self.phase = self.PHASE_QUEUED
