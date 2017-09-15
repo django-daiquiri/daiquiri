@@ -9,6 +9,7 @@ from rest_framework.authentication import SessionAuthentication, BasicAuthentica
 from daiquiri.core.responses import HttpResponseSeeOther
 from daiquiri.core.utils import get_client_ip
 
+from .models import Job
 from .serializers import (
     JobListSerializer,
     JobRetrieveSerializer,
@@ -48,6 +49,7 @@ class SyncJobViewSet(JobViewSet):
 
         # create the job objects
         job = self.get_queryset().model(
+            job_type=Job.JOB_TYPE_SYNC,
             owner=(None if self.request.user.is_anonymous() else self.request.user),
             response_format=serializer.data.get('RESPONSEFORMAT'),
             max_records=serializer.data.get('MAXREC'),
@@ -110,6 +112,7 @@ class AsyncJobViewSet(JobViewSet):
 
         # create the job objects
         job = self.get_queryset().model(
+            job_type=Job.JOB_TYPE_ASYNC,
             owner=(None if self.request.user.is_anonymous() else self.request.user),
             response_format=serializer.data.get('RESPONSEFORMAT'),
             max_records=serializer.data.get('MAXREC'),

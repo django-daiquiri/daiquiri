@@ -41,11 +41,13 @@ class Job(models.Model):
         (PHASE_ARCHIVED, _('Archived'))
     )
 
-    JOB_TYPE_QUERY = 'QUERY'
-    JOB_TYPE_CUTOUT = 'CUTOUT'
+    JOB_TYPE_SYNC = 'SYNC'
+    JOB_TYPE_ASYNC = 'ASYNC'
+    JOB_TYPE_INTERFACE = 'INTERFACE'
     JOB_TYPE_CHOICES = (
-        (JOB_TYPE_QUERY, _('Query')),
-        (JOB_TYPE_CUTOUT, _('Cutout')),
+        (JOB_TYPE_SYNC, _('Syncronous')),
+        (JOB_TYPE_ASYNC, _('Asyncronous')),
+        (JOB_TYPE_INTERFACE, _('Interface')),
     )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

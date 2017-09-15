@@ -72,7 +72,13 @@ class QueryJobViewSet(viewsets.ModelViewSet):
     authentication_classes = (SessionAuthentication, TokenAuthentication)
 
     def get_queryset(self):
-        return QueryJob.objects.filter_by_owner(self.request.user).exclude(phase=QueryJob.PHASE_ARCHIVED)
+        queryset = QueryJob.objects.filter_by_owner(self.request.user).exclude(phase=QueryJob.PHASE_ARCHIVED)
+
+        # hide TAP jobs for the anonymous user
+        if self.request.user.is_anonymous:
+            queryset = queryset.filter(job_type=QueryJob.JOB_TYPE_INTERFACE)
+
+        return queryset
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -88,6 +94,7 @@ class QueryJobViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         job = QueryJob(
+            job_type=QueryJob.JOB_TYPE_INTERFACE,
             owner=(None if self.request.user.is_anonymous() else self.request.user),
             table_name=serializer.data.get('table_name'),
             query_language=serializer.data.get('query_language'),

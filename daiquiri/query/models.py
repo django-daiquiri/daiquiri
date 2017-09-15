@@ -81,7 +81,6 @@ class QueryJob(Job):
     def save(self, *args, **kwargs):
         if self.pk is None:
             self.phase = self.PHASE_PENDING
-            self.job_type = self.JOB_TYPE_QUERY
             self.creation_time = now()
 
         return super(QueryJob, self).save(*args, **kwargs)
@@ -186,8 +185,6 @@ class QueryJob(Job):
                 seen.add(column_name)
             else:
                 duplicate_columns.append(column_name)
-
-        print(duplicate_columns)
 
         if duplicate_columns:
             raise ValidationError({

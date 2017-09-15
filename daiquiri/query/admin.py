@@ -4,8 +4,8 @@ from .models import QueryJob, Example
 
 
 class QueryJobAdmin(admin.ModelAdmin):
-    search_fields = ('id', 'owner__username', 'phase', 'database_name', 'table_name')
-    list_display = ('id', 'owner', 'phase', 'creation_time', 'database_name', 'table_name', 'nrows')
+    search_fields = ('id', 'job_type', 'owner__username', 'phase', 'database_name', 'table_name')
+    list_display = ('id', 'job_type', 'owner', 'phase', 'creation_time', 'database_name', 'table_name', 'nrows')
 
 
 class ExampleAdmin(admin.ModelAdmin):
