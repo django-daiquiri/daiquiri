@@ -156,8 +156,6 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
     service.fetchJob = function(job) {
         return resources.jobs.get({id: job.id}, function(response) {
             service.job = response;
-            service.job.time_queue = moment.duration(moment(service.job.start_time) - moment(service.job.creation_time)).seconds();
-            service.job.time_query = moment.duration(moment(service.job.end_time) - moment(service.job.start_time)).seconds();
 
             // get the current job in the jobs list
             var jobs_job = $filter('filter')(service.jobs, {'id': service.job.id})[0]

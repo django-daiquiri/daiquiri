@@ -257,6 +257,14 @@ class QueryJob(Job):
     def quote(self):
         return None
 
+    @property
+    def time_queue(self):
+        return (self.start_time - self.creation_time).total_seconds()
+
+    @property
+    def time_query(self):
+        return (self.end_time - self.start_time).total_seconds()
+
     def run(self, sync=False):
         if not self.is_clean:
             raise Exception('job.process() was not called.')

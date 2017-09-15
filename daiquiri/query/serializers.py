@@ -63,6 +63,8 @@ class QueryJobRetrieveSerializer(serializers.ModelSerializer):
             'start_time',
             'end_time',
             'execution_duration',
+            'time_queue',
+            'time_query',
             'destruction_time',
             'error_summary',
             'job_type',
