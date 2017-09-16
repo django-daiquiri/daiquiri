@@ -39,13 +39,28 @@ p.daiquiri-query-form-help {
 
 .daiquiri-query-dropdowns {
     position: relative;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
+
+    @media (max-width: $screen-xs-max) {
+        >button {
+            width: 100%;
+            margin-bottom: 10px;
+            text-align: left;
+
+            &.pull-right {
+                float: none !important;
+            }
+        }
+    }
 
     .daiquiri-query-dropdown {
-        position: absolute;
-        top: 39px;
-        left: 0;
-        right: 0;
+
+        @media (min-width: $screen-xs-max) {
+            position: absolute;
+            top: 39px;
+            left: 0;
+            right: 0;
+        }
 
         .daiquiri-browser {
             margin-bottom: 5px;
@@ -85,8 +100,10 @@ p.daiquiri-query-form-help {
     }
 }
 
-.daiquiri-query-dropdowns-area {
-    height: 220px;
+@media (min-width: $screen-xs-max) {
+    .daiquiri-query-dropdowns-area {
+        height: 220px;
+    }
 }
 
 .CodeMirror {
