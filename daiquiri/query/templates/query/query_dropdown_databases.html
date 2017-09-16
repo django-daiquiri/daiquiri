@@ -1,6 +1,9 @@
 {% load i18n %}
 
-<button type="button" class="btn btn-default" ng-click="service.forms.sql.toggleDropdown('databases')">
+<button type="button" class="btn btn-default"
+    ng-click="service.forms.sql.toggleDropdown('databases')"
+    ng-class="{'active': service.forms.sql.dropdown == 'databases'}">
+
     {% trans 'Databases' %} <span class="caret"></span>
 </button>
 
