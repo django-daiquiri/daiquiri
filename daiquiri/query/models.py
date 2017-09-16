@@ -351,6 +351,12 @@ class QueryJob(Job):
             task_id = file_name
             task_args = (file_name, format['key'], self.database_name, self.table_name, self.metadata, self.result_status, (self.nrows == 0))
 
+            # create directory if necessary
+            try:
+                os.mkdir(os.path.dirname(file_name))
+            except OSError:
+                pass
+
             if not settings.ASYNC:
                 if os.path.isfile(file_name):
                     task_result = EagerResult(task_id, None, 'SUCCESS')
