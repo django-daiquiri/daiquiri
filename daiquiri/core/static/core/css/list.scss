@@ -1,15 +1,21 @@
+@import 'core/css/variables';
+
 .daiquiri-list {
     .daiquiri-list-header {
         margin-top: 20px;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
 
         form,
         .pagination {
             margin-top: 0;
-            margin-bottom: 0;
+            margin-bottom: 10px;
         }
         .count {
+            display: inline-block;
             line-height: 34px;
+        }
+        .pagination {
+            margin-left: 5px;
         }
     }
     .daiquiri-list-table {
