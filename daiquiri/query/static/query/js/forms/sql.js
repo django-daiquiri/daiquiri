@@ -11,7 +11,8 @@ app.factory('SqlFormService', ['$timeout', '$filter', 'QueryService', 'BrowserSe
             'query_language': QueryService.query_languages[0].id
         },
         errors: {},
-        markers: []
+        markers: [],
+        dropdown: null
     };
 
     /* create and configure the browser service */
@@ -99,6 +100,14 @@ app.factory('SqlFormService', ['$timeout', '$filter', 'QueryService', 'BrowserSe
         service.values.query_language = query_language;
         service.values.query = query;
         service.activate();
+    }
+
+    service.toggleDropdown = function(dropdown) {
+        if (service.dropdown === dropdown) {
+            service.dropdown = null;
+        } else {
+            service.dropdown = dropdown;
+        }
     }
 
     return service;

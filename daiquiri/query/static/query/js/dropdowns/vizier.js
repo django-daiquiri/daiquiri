@@ -17,12 +17,12 @@ app.factory('VizierDropdownService', ['$http', function($http) {
                 '-sort': '_r',
                 '-out.max': 5
             }
-        }).success(function(response) {
+        }).then(function(result) {
             service.results = [];
             service.errors = [];
 
             // parse votable output
-            xmlDoc = $.parseXML(response);
+            xmlDoc = $.parseXML(result.data);
             xml = $(xmlDoc);
 
             angular.forEach(service.options.catalogs, function(catalog) {

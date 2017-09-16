@@ -1,11 +1,11 @@
 {% load i18n %}
 
-<div class="btn-group">
-    <button type="button" class="btn btn-default dropdown-toggle"
-        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        {% trans 'VizieR' %} <span class="caret"></span>
-    </button>
-    <div class="dropdown-menu">
+<button type="button" class="btn btn-default" ng-click="service.forms.sql.toggleDropdown('vizier')">
+    {% trans 'VizieR' %} <span class="caret"></span>
+</button>
+
+<div class="daiquiri-query-dropdown" ng-show="service.forms.sql.dropdown == 'vizier'">
+    <div class="daiquiri-query-dropdown-head">
         <div class="input-group">
             <input type="text" class="form-control"
                 placeholder="{% trans 'Object name or coordinates' %}"
@@ -16,7 +16,9 @@
                 </button>
             </span>
         </div>
+    </div>
 
+    <div class="daiquiri-query-dropdown-body">
         <ul class="text-danger list-unstyled">
             <li ng-repeat="error in service.dropdowns.vizier.errors">{$ error $}</li>
         </ul>
@@ -59,4 +61,7 @@
             </tbody>
         </table>
     </div>
+    <p class="help-block small">
+        {% trans 'A click will paste a value into the query field.' %}
+    </p>
 </div>

@@ -6,7 +6,13 @@
 }
 
 .daiquiri-browser-head {
-    border: 1px solid $border-color;
+    border-right: 1px solid $border-color;
+    border-bottom: 1px solid $border-color;
+    border-left: 1px solid $border-color;
+}
+
+.daiquiri-browser-head:first-child {
+    border-top: 1px solid $border-color;
 }
 
 .daiquiri-browser-body {

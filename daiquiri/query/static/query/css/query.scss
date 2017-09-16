@@ -41,65 +41,52 @@ p.daiquiri-query-form-help {
     position: relative;
     margin-bottom: 20px;
 
-    .btn-group {
-        .dropdown-menu {
-            min-width: 225px;
-        }
-    }
-    .btn-group {
-        position: static;
-
-        .dropdown-menu {
-            right: 0;
-        }
-    }
-
-    .btn-group.pull-right {
-        position: static;
-
-        .dropdown-menu {
-            left: 0;
-        }
-    }
-
-    .dropdown-menu {
-        padding: 0;
+    .daiquiri-query-dropdown {
+        position: absolute;
+        top: 39px;
+        left: 0;
+        right: 0;
 
         .daiquiri-browser {
             margin-bottom: 5px;
-
-            :first-child {
-                .daiquiri-browser-head,
-                .daiquiri-browser-body {
-                    border-left: none;
-                }
-            }
-            :last-child {
-                .daiquiri-browser-head,
-                .daiquiri-browser-body {
-                    border-right: none;
-                }
-            }
-            .daiquiri-browser-head {
-                border-top: none;
-            }
+        }
+        .daiquiri-browser-body {
+            height: 168px; /* 200 - 30 (head) - 2 (border) */
+        }
+        &.daiquiri-query-dropdown-filter {
             .daiquiri-browser-body {
-                height: 200px;
+                height: 123px; /* 200 - 30 (head) - 44 (filter) - 3 (border) */
             }
         }
-        .help-block {
-            margin-bottom: 5px;
-            padding-left: 15px;
-            padding-right: 15px;
+        .daiquiri-query-dropdown-head {
+            border-top: 1px solid $border-color;
+            border-right: 1px solid $border-color;
+            border-left: 1px solid $border-color;
+
+            padding: 5px 15px;
         }
-        ul.text-danger,
-        .input-group {
-            margin: 5px;
-        }
-        .table {
-            margin-bottom: 5px;
+        .daiquiri-query-dropdown-body {
+            border: 1px solid $border-color;
+            height: 154px; /* 200 - 44 (input) - 2 (border) */
+
+            overflow-y: auto;
+
+            ul.text-danger {
+                margin: 0;
+
+                li {
+                    margin: 8px;
+                }
+            }
+            table {
+                margin: 0;
+            }
         }
     }
+}
+
+.daiquiri-query-dropdowns-area {
+    height: 220px;
 }
 
 .CodeMirror {

@@ -14,12 +14,12 @@ app.factory('SimbadDropdownService', ['$http', function($http) {
                 'output.format': 'votable',
                 'output.params': 'main_id,coo(d),otype(V)'
             }
-        }).success(function(response) {
+        }).then(function(result) {
             service.results = [];
             service.errors = [];
 
             // parse votable output
-            xmlDoc = $.parseXML(response);
+            xmlDoc = $.parseXML(result.data);
             $xml = $(xmlDoc);
             rows = $xml.find('TABLEDATA TR');
 
