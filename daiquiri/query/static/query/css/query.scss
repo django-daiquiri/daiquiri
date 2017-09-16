@@ -66,11 +66,11 @@ p.daiquiri-query-form-help {
             margin-bottom: 5px;
         }
         .daiquiri-browser-body {
-            height: 168px; /* 200 - 30 (head) - 2 (border) */
+            height: 168px;
         }
         &.daiquiri-query-dropdown-filter {
             .daiquiri-browser-body {
-                height: 123px; /* 200 - 30 (head) - 44 (filter) - 3 (border) */
+                height: 123px;
             }
         }
         .daiquiri-query-dropdown-head {
@@ -82,7 +82,7 @@ p.daiquiri-query-form-help {
         }
         .daiquiri-query-dropdown-body {
             border: 1px solid $border-color;
-            height: 154px; /* 200 - 44 (input) - 2 (border) */
+            height: 155px;
 
             overflow-y: auto;
 
