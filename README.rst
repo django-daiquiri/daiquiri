@@ -34,7 +34,7 @@ Install prerequisites
     apt-get install -y git build-essential libxml2-dev libxslt-dev zlib1g-dev libssl-dev
     apt-get install -y mariadb-client mariadb-server libmariadb-dev libmariadbclient-dev
 
-More about Daiquiri's prerequisites including different Linux distributions can be found `here <https://github.com/aipescience/django-daiquiri/docs/prerequisites.md>`_.
+More about Daiquiri's prerequisites including different Linux distributions can be found `here <https://github.com/aipescience/django-daiquiri/tree/master/docs/prerequisites.md>`_.
 
 Fork the daiquiri-app
 ~~~~~~~~~~~~~~~~~~~~~
@@ -61,7 +61,7 @@ Setup Daiquiri
     cp config/settings/sample.local.py config/settings/local.py
     mkdir log download
 
-    ./manage.py sqlcreate               # shows to be executed on MariaDB
+    ./manage.py sqlcreate               # shows the commands to be executed on MariaDB
     ./manage.py migrate                 # creates database and tables
     ./manage.py migrate --database=tap  # creates TAP_SCHEMA
     ./manage.py createsuperuser         # creates admin user
@@ -69,6 +69,8 @@ Setup Daiquiri
 
 Navigate to http://localhost:8000 in your browser.
 
-More detailed installation instructions can be found `here <https://github.com/aipescience/django-daiquiri/docs/installation.md>`_.
+More detailed installation instructions can be found `here <https://github.com/aipescience/django-daiquiri/tree/master/docs/installation.md>`_.
 
-Our development setup is documented `here <https://github.com/aipescience/django-daiquiri/docs/development.md>`_.
+Our development setup is documented `here <https://github.com/aipescience/django-daiquiri/tree/master/docs/development.md>`_.
+
+More documentation will be added soon.
