@@ -74,8 +74,8 @@ class QueryJobViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = QueryJob.objects.filter_by_owner(self.request.user).exclude(phase=QueryJob.PHASE_ARCHIVED)
 
-        # hide TAP jobs for the anonymous user
-        if self.request.user.is_anonymous:
+        # hide TAP jobs in the list for the anonymous user
+        if self.action == 'list' and self.request.user.is_anonymous:
             queryset = queryset.filter(job_type=QueryJob.JOB_TYPE_INTERFACE)
 
         return queryset
