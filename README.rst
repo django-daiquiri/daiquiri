@@ -31,13 +31,10 @@ Install prerequisites
 
 .. code:: bash
 
-    # debian/Ubuntu
     apt-get install -y git build-essential libxml2-dev libxslt-dev zlib1g-dev libssl-dev
+    apt-get install -y mariadb-client mariadb-server libmariadb-dev libmariadbclient-dev
 
-    # Centos 7
-    yum install -y epel-release git gcc gcc-c++ libxml2-devel libxslt-devel openssl-devel
-
-More about Daiquiri's prerequisites can be found `here <https://github.com/aipescience/django-daiquiri/docs/prerequisites.md>`_.
+More about Daiquiri's prerequisites including different Linux distributions can be found `here <https://github.com/aipescience/django-daiquiri/docs/prerequisites.md>`_.
 
 Fork the daiquiri-app
 ~~~~~~~~~~~~~~~~~~~~~
@@ -64,7 +61,7 @@ Setup Daiquiri
     cp config/settings/sample.local.py config/settings/local.py
     mkdir log download
 
-    ./manage.py sqlcreate               # shows commands for MariaDB
+    ./manage.py sqlcreate               # shows to be executed on MariaDB
     ./manage.py migrate                 # creates database and tables
     ./manage.py migrate --database=tap  # creates TAP_SCHEMA
     ./manage.py createsuperuser         # creates admin user
