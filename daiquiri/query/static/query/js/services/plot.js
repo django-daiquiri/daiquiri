@@ -96,12 +96,10 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
     service.fetch = function() {
 
         var x_params = angular.extend({}, service.params, {
-            column: service.values.x,
-            page_size: service.page_size
+            column: service.values.x
         });
         var y_params = angular.extend({}, service.params, {
-            column: service.values.y,
-            page_size: service.page_size
+            column: service.values.y
         });
 
         return $q.all([
@@ -157,7 +155,7 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
                 y_range: y_range,
                 plot_width: $('.col-md-9').width(),
                 tools: tools,
-                // output_backend: 'webgl',
+                output_backend: 'webgl',
                 background_fill_color: '#f5f5f5'
             });
 

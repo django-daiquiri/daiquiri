@@ -45,77 +45,79 @@
                     </div>
                 </form>
 
-                <div class="col-sm-3">
-                    <ul class="pagination">
+                <div class="col-sm-6">
+                    <p class="count">
+                        {$ service.list.count $} {% trans 'users found' %}
+                    </p>
+                    <ul class="pagination pull-right">
                         <li>
                             <a href="" ng-click="service.list.reset()">{% trans 'Reset' %}</a>
                         </li>
                     </ul>
                 </div>
-                <div class="col-sm-3 count text-right">
-                    {$ service.list.count $} {% trans 'users found' %}
-                </div>
             </div>
 
-            <table class="table daiquiri-list-table" infinite-scroll="service.list.fetch()" infinite-scroll-distance="0.2">
-                <thead>
-                    <th style="width: 25%;">{% trans 'Name (Username)' %}</th>
-                    <th style="width: 25%;">{% trans 'Email' %}</th>
-                    <th style="width: 20%;">{% trans 'Status' %}</th>
-                    <th style="width: 20%;">{% trans 'Groups' %}</th>
-                    <th style="width: 10%;"></th>
-                </thead>
-                <tbody>
-                    <tr ng-repeat="row in service.list.rows">
-                        <td>
-                            <a href="" ng-click="service.modal('show-user-modal', $index)">
-                                {$ row.user.first_name $} {$ row.user.last_name $}
-                            </a>
-                            <em>{$ row.user.username $}</em>
-                        </td>
-                        <td>
-                            <div ng-repeat="email in row.emails">
-                                <a href="mailto:{$ row.user.first_name $} {$ row.user.last_name $} <{$ email.email $}>">
-                                    {$ email.email $}
+            <div class="table-responsive">
+                <table class="table daiquiri-list-table" infinite-scroll="service.list.fetch()" infinite-scroll-distance="0.2">
+                    <thead>
+                        <th style="width: 25%;">{% trans 'Name (Username)' %}</th>
+                        <th style="width: 25%;">{% trans 'Email' %}</th>
+                        <th style="width: 20%;">{% trans 'Status' %}</th>
+                        <th style="width: 20%;">{% trans 'Groups' %}</th>
+                        <th style="width: 10%;"></th>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="row in service.list.rows">
+                            <td>
+                                <a href="" ng-click="service.modal('show-user-modal', $index)">
+                                    {$ row.user.first_name $} {$ row.user.last_name $}
                                 </a>
-                                <span ng-show="!email.verified">({% trans 'not verified' %})</span>
-                            </div>
-                        </td>
-                        <td ng-class="{
-                            'text-success': row.user.is_active && !row.is_pending && !row.is_confirmed,
-                            'text-danger': !row.user.is_active,
-                            'text-info': row.is_pending || row.is_confirmed
-                        }">
-                            <span ng-show="row.user.is_superuser">
-                                {% trans 'admin' %},
-                            </span>
-                            <span ng-show="row.user.is_staff && !row.user.is_superuser">
-                                {% trans 'staff' %},
-                            </span>
-                            <span ng-show="row.user.is_active && !row.is_pending && !row.is_confirmed">
-                                {% trans 'active' %}
-                            </span>
-                            <span ng-hide="row.user.is_active">
-                                {% trans 'disabled' %}
-                            </span>
-                            <span ng-show="row.is_pending">
-                                {% trans 'pending' %}
-                            </span>
-                            <span ng-show="row.is_confirmed">
-                                {% trans 'confirmed' %}
-                            </span>
-                        </td>
-                        <td>
-                            <span ng-repeat="group in service.groups|filterAgainstList:{'id': row.user.groups}">
-                                {$ group.name $}{$ $last ? '' : ', ' $}
-                            </span>
-                        </td>
-                        <td class="text-right options">
-                            {% include 'auth/users_options.html' %}
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                                <em>{$ row.user.username $}</em>
+                            </td>
+                            <td>
+                                <div ng-repeat="email in row.emails">
+                                    <a href="mailto:{$ row.user.first_name $} {$ row.user.last_name $} <{$ email.email $}>">
+                                        {$ email.email $}
+                                    </a>
+                                    <span ng-show="!email.verified">({% trans 'not verified' %})</span>
+                                </div>
+                            </td>
+                            <td ng-class="{
+                                'text-success': row.user.is_active && !row.is_pending && !row.is_confirmed,
+                                'text-danger': !row.user.is_active,
+                                'text-info': row.is_pending || row.is_confirmed
+                            }">
+                                <span ng-show="row.user.is_superuser">
+                                    {% trans 'admin' %},
+                                </span>
+                                <span ng-show="row.user.is_staff && !row.user.is_superuser">
+                                    {% trans 'staff' %},
+                                </span>
+                                <span ng-show="row.user.is_active && !row.is_pending && !row.is_confirmed">
+                                    {% trans 'active' %}
+                                </span>
+                                <span ng-hide="row.user.is_active">
+                                    {% trans 'disabled' %}
+                                </span>
+                                <span ng-show="row.is_pending">
+                                    {% trans 'pending' %}
+                                </span>
+                                <span ng-show="row.is_confirmed">
+                                    {% trans 'confirmed' %}
+                                </span>
+                            </td>
+                            <td>
+                                <span ng-repeat="group in service.groups|filterAgainstList:{'id': row.user.groups}">
+                                    {$ group.name $}{$ $last ? '' : ', ' $}
+                                </span>
+                            </td>
+                            <td class="text-right options">
+                                {% include 'auth/users_options.html' %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 

@@ -3,6 +3,7 @@ angular.module('core')
 .directive('formgroup', function() {
 
     return {
+        replace: true,
         scope: {
             id: '@',
             label: '@',

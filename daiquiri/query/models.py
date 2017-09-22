@@ -259,11 +259,17 @@ class QueryJob(Job):
 
     @property
     def time_queue(self):
-        return (self.start_time - self.creation_time).total_seconds()
+        if self.start_time and self.creation_time:
+            return (self.start_time - self.creation_time).total_seconds()
+        else:
+            return None
 
     @property
     def time_query(self):
-        return (self.end_time - self.start_time).total_seconds()
+        if self.end_time and self.start_time:
+            return (self.end_time - self.start_time).total_seconds()
+        else:
+            return None
 
     def run(self, sync=False):
         if not self.is_clean:
@@ -344,6 +350,12 @@ class QueryJob(Job):
 
             task_id = file_name
             task_args = (file_name, format['key'], self.database_name, self.table_name, self.metadata, self.result_status, (self.nrows == 0))
+
+            # create directory if necessary
+            try:
+                os.mkdir(os.path.dirname(file_name))
+            except OSError:
+                pass
 
             if not settings.ASYNC:
                 if os.path.isfile(file_name):

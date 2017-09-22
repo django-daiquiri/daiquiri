@@ -162,12 +162,6 @@ def create_download_file(file_name, format_key, database_name, table_name, metad
     # log start
     logger.info('create_download_file %s started' % file_name)
 
-    # create directory if necessary
-    try:
-        os.mkdir(os.path.dirname(file_name))
-    except OSError:
-        pass
-
     # write file using the generator in the adapter
     with open(file_name, 'w') as f:
         for line in get_adapter().download.generate(format_key, database_name, table_name, metadata, status, empty):

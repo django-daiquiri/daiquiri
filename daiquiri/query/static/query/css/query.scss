@@ -39,66 +39,70 @@ p.daiquiri-query-form-help {
 
 .daiquiri-query-dropdowns {
     position: relative;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 
-    .btn-group {
-        .dropdown-menu {
-            min-width: 225px;
+    @media (max-width: $screen-xs-max) {
+        >button {
+            width: 100%;
+            margin-bottom: 10px;
+            text-align: left;
+
+            &.pull-right {
+                float: none !important;
+            }
         }
     }
-    .btn-group {
-        position: static;
 
-        .dropdown-menu {
+    .daiquiri-query-dropdown {
+
+        @media (min-width: $screen-xs-max) {
+            position: absolute;
+            top: 39px;
+            left: 0;
             right: 0;
         }
-    }
-
-    .btn-group.pull-right {
-        position: static;
-
-        .dropdown-menu {
-            left: 0;
-        }
-    }
-
-    .dropdown-menu {
-        padding: 0;
 
         .daiquiri-browser {
             margin-bottom: 5px;
-
-            :first-child {
-                .daiquiri-browser-head,
-                .daiquiri-browser-body {
-                    border-left: none;
-                }
-            }
-            :last-child {
-                .daiquiri-browser-head,
-                .daiquiri-browser-body {
-                    border-right: none;
-                }
-            }
-            .daiquiri-browser-head {
-                border-top: none;
-            }
+        }
+        .daiquiri-browser-body {
+            height: 168px;
+        }
+        &.daiquiri-query-dropdown-filter {
             .daiquiri-browser-body {
-                height: 200px;
+                height: 123px;
             }
         }
-        .help-block {
-            margin-bottom: 5px;
-            padding-left: 15px;
-            padding-right: 15px;
+        .daiquiri-query-dropdown-head {
+            border-top: 1px solid $border-color;
+            border-right: 1px solid $border-color;
+            border-left: 1px solid $border-color;
+
+            padding: 5px 15px;
         }
-        ul.text-danger,
-        .input-group {
-            margin: 5px;
+        .daiquiri-query-dropdown-body {
+            border: 1px solid $border-color;
+            height: 155px;
+
+            overflow-y: auto;
+
+            ul.text-danger {
+                margin: 0;
+
+                li {
+                    margin: 8px;
+                }
+            }
+            table {
+                margin: 0;
+            }
         }
-        .table {
-            margin-bottom: 5px;
-        }
+    }
+}
+
+@media (min-width: $screen-xs-max) {
+    .daiquiri-query-dropdowns-area {
+        height: 220px;
     }
 }
 

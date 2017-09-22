@@ -1,14 +1,15 @@
 {% load i18n %}
 
-<div class="btn-group">
-    <button type="button" class="btn btn-default dropdown-toggle"
-        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        {% trans 'Columns' %} <span class="caret"></span>
-    </button>
-    <div class="dropdown-menu">
-        <div daiquiri-browser data-browser-id="columns" class="daiquiri-metadata-browser"></div>
-        <p class="help-block small">
-            {% trans 'A double click will paste the column into the query field.' %}
-        </p>
-    </div>
+<button type="button" class="btn btn-default"
+    ng-click="service.forms.sql.toggleDropdown('columns')"
+    ng-class="{'active': service.forms.sql.dropdown == 'columns'}">
+
+    {% trans 'Columns' %} <span class="caret"></span>
+</button>
+
+<div class="daiquiri-query-dropdown daiquiri-query-dropdown-filter" ng-show="service.forms.sql.dropdown == 'columns'">
+    <div daiquiri-browser data-browser-id="columns"></div>
+    <p class="help-block small">
+        {% trans 'A double click will paste the column into the query field.' %}
+    </p>
 </div>

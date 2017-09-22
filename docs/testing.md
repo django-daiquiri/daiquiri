@@ -1,6 +1,24 @@
 Testing
 =======
 
+Running tests
+-------------
+
+```
+testing/runtests.py
+testing/runtests.py -k              # keep the database between test runs
+testing/runtests.py daiquiri.query  # test only the query app
+```
+
+Coverage
+--------
+
+```
+coverage run testing/runtests.py
+coverage report                     # show a coverage report in the terminal
+coverage html                       # create browsable coverage report in htmlcov/
+```
+
 Fixtures
 --------
 
