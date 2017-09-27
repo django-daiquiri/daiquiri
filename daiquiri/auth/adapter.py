@@ -31,6 +31,9 @@ class DaiquiriAccountAdapter(DefaultAccountAdapter):
         else:
             super(DaiquiriAccountAdapter, self).login(request, user)
 
+    def is_open_for_signup(self, request):
+        return settings.AUTH_SIGNUP
+
 
 class DaiquiriSocialAccountAdapter(DefaultSocialAccountAdapter):
 
