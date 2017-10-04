@@ -1,3 +1,5 @@
+@import 'core/css/variables';
+
 .wordpress {
     h1 a, h1 a:hover, h1 a:focus, h1 a:visited,
     h2 a, h2 a:hover, h2 a:focus, h2 a:visited {
@@ -46,17 +48,14 @@
         .news-entry-date {
             text-overflow: ellipsis;
         }
-
-
     }
     .wp-caption {
-        padding: 10px 10px 10px 10px;
-        border: 1px solid #ccc;
+        padding: 0 5px;
         border-radius: 5px;
     }
     .wp-caption-text {
         font-size: small;
-        margin-top: 10px;
+        margin-top: 5px;
     }
     .alignright {
         margin-left: 20px;
@@ -67,6 +66,14 @@
         margin-right: 20px;
         margin-bottom: 20px;
         float: left;
+    }
+    .alignright,
+    .alignleft {
+        @media screen and (max-width: $screen-xs-max) {
+            float: none;
+            margin: 0 auto;
+            max-width: 100%;
+        }
     }
     .aligncenter {
         display: block;
