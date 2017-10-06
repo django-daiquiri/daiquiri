@@ -10,18 +10,20 @@ class Command(BaseCommand):
     can_import_settings = True
 
     def add_arguments(self, parser):
-        parser.add_argument('database', nargs='*', help='List of additional databases.')
+        parser.add_argument('--database', help='Show commands for a science database.')
+        parser.add_argument('--test', action='store_true', help='Show commands for the test databases.')
 
     def get_config(self, key):
         config = settings.DATABASES.get(key)
 
-        if 'HOST' not in config or not config['HOST']:
-            config['HOST'] = 'localhost'
-            config['CLIENT'] = 'localhost'
-        else:
-            config['CLIENT'] = socket.gethostname()
+        if config:
+            if 'HOST' not in config or not config['HOST']:
+                config['HOST'] = 'localhost'
+                config['CLIENT'] = 'localhost'
+            else:
+                config['CLIENT'] = socket.gethostname()
 
-        config['PREFIX'] = settings.QUERY_USER_DATABASE_PREFIX
+            config['PREFIX'] = settings.QUERY_USER_DATABASE_PREFIX
 
         return config
 
@@ -31,46 +33,55 @@ class Command(BaseCommand):
         tap = self.get_config('tap')
         data = self.get_config('data')
 
-        print('''-- Run the following commands on \'%(HOST)s\':
-
-CREATE DATABASE `%(NAME)s`;
-CREATE USER \'%(USER)s\'@\'%(CLIENT)s\' identified by \'%(PASSWORD)s\';
-GRANT ALL PRIVILEGES ON `%(NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\';
-''' % default)
-
-        print('''-- Run the following commands on \'%(HOST)s\':
-
-CREATE DATABASE `%(NAME)s`;
-CREATE USER \'%(USER)s\'@\'%(CLIENT)s\' identified by \'%(PASSWORD)s\';
-GRANT ALL PRIVILEGES ON `%(NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\';
-''' % tap)
-
-        print('''-- Run the following commands on \'%(HOST)s\':
-
-CREATE USER \'%(USER)s\'@\'%(CLIENT)s\' identified by \'%(PASSWORD)s\';
-GRANT ALL PRIVILEGES ON `%(PREFIX)s%%`.* to \'%(USER)s\'@\'%(CLIENT)s\';
-''' % data)
-
-        data.update({'DATABASE_NAME': tap['NAME']})
-        print('GRANT SELECT ON `%(DATABASE_NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\';' % data)
+        print('')
 
         if options['database']:
-            for database_name in options['database']:
-                data.update({'DATABASE_NAME': database_name})
-                print('GRANT SELECT ON `%(DATABASE_NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\';' % data)
+            if data:
+                data.update({'DATABASE_NAME': options['database']})
+                print('''-- Run the following commands on \'%(HOST)s\':
+GRANT SELECT ON `%(DATABASE_NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\';''' % data)
+            else:
+                raise RuntimeError('No \'data\' database connection configured.')
 
-        print('')
-        print('''-- For testing, run the following commands on \'%(HOST)s\':
+        elif options['test']:
 
+            if default:
+                print('''-- For testing, run the following commands on \'%(HOST)s\':
 GRANT ALL PRIVILEGES ON `test_%(NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\';
 ''' % default)
 
-        print('''-- For testing, run the following commands on \'%(HOST)s\':
-
+            if tap:
+                print('''-- For testing, run the following commands on \'%(HOST)s\':
 GRANT ALL PRIVILEGES ON `test_%(NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\';
 ''' % tap)
 
-        print('''-- For testing, run the following commands on \'%(HOST)s\':
-
+            if data:
+                print('''-- For testing, run the following commands on \'%(HOST)s\':
 GRANT ALL PRIVILEGES ON `test_`.* to \'%(USER)s\'@\'%(CLIENT)s\';
 ''' % data)
+
+        else:
+
+            if default:
+                print('''-- Run the following commands on \'%(HOST)s\':
+CREATE DATABASE `%(NAME)s`;
+CREATE USER \'%(USER)s\'@\'%(CLIENT)s\' identified by \'%(PASSWORD)s\';
+GRANT ALL PRIVILEGES ON `%(NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\';
+''' % default)
+
+            if tap:
+                print('''-- Run the following commands on \'%(HOST)s\':
+CREATE DATABASE `%(NAME)s`;
+CREATE USER \'%(USER)s\'@\'%(CLIENT)s\' identified by \'%(PASSWORD)s\';
+GRANT ALL PRIVILEGES ON `%(NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\';
+''' % tap)
+
+            if data:
+                print('''-- Run the following commands on \'%(HOST)s\':
+CREATE USER \'%(USER)s\'@\'%(CLIENT)s\' identified by \'%(PASSWORD)s\';
+GRANT ALL PRIVILEGES ON `%(PREFIX)s%%`.* to \'%(USER)s\'@\'%(CLIENT)s\';''' % data)
+                if tap:
+                    data.update({'DATABASE_NAME': tap['NAME']})
+                    print('GRANT SELECT ON `%(DATABASE_NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\';' % data)
+
+        print('')
