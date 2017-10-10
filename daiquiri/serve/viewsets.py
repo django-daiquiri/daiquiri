@@ -2,7 +2,7 @@ from collections import OrderedDict
 
 from rest_framework import viewsets
 from rest_framework.response import Response
-from rest_framework.exceptions import ParseError, NotFound
+from rest_framework.exceptions import ValidationError, ParseError, NotFound
 from rest_framework.reverse import reverse
 
 from daiquiri.core.adapter import get_adapter
@@ -26,6 +26,9 @@ class RowViewSet(viewsets.ViewSet):
         # get the search string
         filter_string = self.request.GET.get('filter')
 
+        # get additional filters from the querystring
+        filters = self._get_filters()
+
         # get the page from the querystring and make sure it is an int
         page = self._get_page()
 
@@ -34,6 +37,10 @@ class RowViewSet(viewsets.ViewSet):
 
         # get the columns using the utils function
         columns = get_columns(self.request.user, database_name, table_name)
+
+        # check
+        if filter_string and filters:
+            raise ValidationError('Filtering by \'filter=filter_string\' and \'column_name=value\' is mutually exclusive.')
 
         if columns:
             column_names = [column['name'] for column in columns]
@@ -48,10 +55,10 @@ class RowViewSet(viewsets.ViewSet):
             adapter = get_adapter()
 
             # query the database for the total number of rows
-            count = adapter.database.count_rows(database_name, table_name, column_names, filter_string)
+            count = adapter.database.count_rows(database_name, table_name, column_names, filter_string, filters)
 
             # query the paginated rowset
-            results = adapter.database.fetch_rows(database_name, table_name, column_names, ordering, page, page_size, filter_string)
+            results = adapter.database.fetch_rows(database_name, table_name, column_names, ordering, page, page_size, filter_string, filters)
 
             # flatten the list if only one column is retrieved
             if column_name:
@@ -83,6 +90,13 @@ class RowViewSet(viewsets.ViewSet):
             return int(self.request.GET.get('page_size', '10'))
         except ValueError:
             raise ParseError('page_size must be an integer')
+
+    def _get_filters(self):
+        filters = {}
+        for key, value in self.request.GET.items():
+            if key not in ['database', 'table', 'column', 'ordering', 'filter', 'page', 'page_size']:
+                filters[key] = value
+        return filters
 
     def _get_next_url(self, page, page_size, count):
         url = reverse('serve:row-list', request=self.request)

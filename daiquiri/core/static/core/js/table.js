@@ -11,11 +11,21 @@ angular.module('core')
             'columnsUrl': '@',
             'filesUrl': '@',
             'params': '=',
-            'pageSizes': '='
+            'pageSizes': '=',
+            'columnWidths': '=',
+            'round': '='
         },
         link: function(scope, element, attrs) {
             scope.table = TableService;
-            scope.table.init(scope.rowsUrl, scope.columnsUrl, scope.filesUrl, scope.params, scope.pageSizes);
+            scope.table.init({
+                rows_url: scope.rowsUrl,
+                columns_url: scope.columnsUrl,
+                files_url: scope.filesUrl,
+                params: scope.params,
+                page_sizes: scope.pageSizes,
+                column_widths: scope.columnWidths,
+                round: scope.round
+            });
 
             // refresh the tooltips everytime a new set of columns is fetched
             scope.$watch(function() {
@@ -102,33 +112,42 @@ angular.module('core')
         files: false,
         active: {},
         modal: {},
+        round: false
     };
 
-    service.init = function(rows_url, columns_url, files_url, params, page_sizes) {
+    service.init = function(opt) {
         service.ready = false;
 
         // set up resources
-        if (angular.isDefined(rows_url)) {
-            resources.rows = $resource(baseurl + rows_url);
+        if (angular.isDefined(opt.rows_url)) {
+            resources.rows = $resource(baseurl + opt.rows_url);
         }
-        if (angular.isDefined(columns_url)) {
-            resources.columns = $resource(baseurl + columns_url);
+        if (angular.isDefined(opt.columns_url)) {
+            resources.columns = $resource(baseurl + opt.columns_url);
         }
 
         // setup file base url
-        if (angular.isDefined(files_url)) {
-            service.file_base_url = baseurl + files_url + '?search=';
+        if (angular.isDefined(opt.files_url)) {
+            service.file_base_url = baseurl + opt.files_url + '?search=';
         }
 
         // add params from the dom to service.params
-        if (angular.isDefined(params)) {
-            angular.extend(service.params, params);
+        if (angular.isDefined(opt.params)) {
+            angular.extend(service.params, opt.params);
         }
 
         // update pages_sizes
-        if (angular.isDefined(page_sizes)) {
-            service.page_sizes = page_sizes;
-            service.params.page_size = page_sizes[0];
+        if (angular.isDefined(opt.page_sizes)) {
+            service.page_sizes = opt.page_sizes;
+            service.params.page_size = opt.page_sizes[0];
+        }
+
+        // setup initial column width and rounding of cells
+        if (angular.isDefined(opt.column_widths)) {
+            service.column_widths = opt.column_widths;
+        }
+        if (angular.isDefined(opt.round)) {
+            service.round = opt.round;
         }
 
         // fetch the columns
@@ -152,6 +171,12 @@ angular.module('core')
                             column.display = 'link';
                         }
                     }
+                });
+
+                $timeout(function() {
+                    angular.forEach(service.column_widths, function(column_width, column_index) {
+                        angular.element('[data-column-index="' + column_index + '"]').width(column_width);
+                    });
                 });
 
                 service.reset();

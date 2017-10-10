@@ -100,39 +100,11 @@ class MySQLAdapter(DatabaseAdapter):
         sql = 'KILL %(pid)i' % {'pid': pid}
         self.execute(sql)
 
-    def count_rows(self, database_name, table_name, column_names=None, filter_string=None):
-        # if no column names are provided get all column_names from the table
-        if not column_names:
-            column_names= self.fetch_column_names(database_name, table_name)
-
-        # prepare sql string
-        sql = 'SELECT COUNT(*) FROM %(database)s.%(table)s' % {
-            'database': self.escape_identifier(database_name),
-            'table': self.escape_identifier(table_name)
-        }
-
-        # process filtering
-        if filter_string:
-            # create a list of escaped columns
-            escaped_column_names = [self.escape_identifier(column_name) for column_name in column_names]
-
-            sql_args = []
-            where_stmts = []
-            for escaped_column_name in escaped_column_names:
-                sql_args.append('%' + filter_string + '%')
-                where_stmts.append(escaped_column_name + ' LIKE %s')
-
-            sql += ' WHERE ' + ' OR '.join(where_stmts)
-        else:
-            sql_args = None
-
-        return self.fetchone(sql, args=sql_args)[0]
-
     def fetch_stats(self, database_name, table_name):
         sql = 'SELECT table_rows as nrows, data_length + index_length AS size FROM `information_schema`.`tables` WHERE `table_schema` = %s AND table_name = %s;'
         return self.fetchone(sql, (database_name, table_name))
 
-    def fetch_rows(self, database_name, table_name, column_names=None, ordering=None, page=1, page_size=10, filter_string=None):
+    def count_rows(self, database_name, table_name, column_names=None, filter_string=None, filters=None):
         # if no column names are provided get all column_names from the table
         if not column_names:
             column_names= self.fetch_column_names(database_name, table_name)
@@ -141,25 +113,100 @@ class MySQLAdapter(DatabaseAdapter):
         escaped_column_names = [self.escape_identifier(column_name) for column_name in column_names]
 
         # prepare sql string
+        sql = 'SELECT COUNT(*) FROM %(database)s.%(table)s' % {
+            'database': self.escape_identifier(database_name),
+            'table': self.escape_identifier(table_name)
+        }
+        sql_args = []
+
+        # process filtering
+        sql, sql_args = self._process_filtering(sql, sql_args, filter_string, filters, escaped_column_names)
+
+        return self.fetchone(sql, args=sql_args)[0]
+
+    def fetch_row(self, database_name, table_name, column_names=None, filter_string=None, filters=None):
+
+        # if no column names are provided get all column_names from the table
+        if not column_names:
+            column_names = self.fetch_column_names(database_name, table_name)
+
+        # create a list of escaped columns
+        escaped_column_names = [self.escape_identifier(column_name) for column_name in column_names]
+
+        # prepare sql string
+        sql = 'SELECT * FROM %(database)s.%(table)s' % {
+            'database': self.escape_identifier(database_name),
+            'table': self.escape_identifier(table_name)
+        }
+        sql_args = []
+
+        # process filtering
+        sql, sql_args = self._process_filtering(sql, sql_args, filter_string, filters, escaped_column_names)
+
+        return self.fetchone(sql, args=sql_args)
+
+    def fetch_rows(self, database_name, table_name, column_names=None, ordering=None, page=1, page_size=10, filter_string=None, filters=None):
+
+        # if no column names are provided get all column_names from the table
+        if not column_names:
+            column_names = self.fetch_column_names(database_name, table_name)
+
+        # create a list of escaped columns
+        escaped_column_names = [self.escape_identifier(column_name) for column_name in column_names]
+
+        # init sql string and sql_args list
         sql = 'SELECT %(columns)s FROM %(database)s.%(table)s' % {
             'database': self.escape_identifier(database_name),
             'table': self.escape_identifier(table_name),
             'columns': ', '.join(escaped_column_names)
         }
+        sql_args = []
 
         # process filtering
-        if filter_string:
-            sql_args = []
+        sql, sql_args = self._process_filtering(sql, sql_args, filter_string, filters, escaped_column_names)
+
+        # process ordering
+        sql = self._process_ordering(sql, ordering, escaped_column_names)
+
+        # process page and page_size
+        if page_size > 0:
+            sql += ' LIMIT %(limit)s OFFSET %(offset)s' % {
+                'limit': page_size,
+                'offset': (int(page) - 1) * int(page_size)
+            }
+
+        return self.fetchall(sql, args=sql_args)
+
+    def _process_filtering(self, sql, sql_args, filter_string, filters, escaped_column_names):
+        if filter_string and filters:
+            raise Exception('filter_string and filters are mutually exclusive.')
+
+        elif filter_string:
+            # append a WHERE/OR condition fo every column
             where_stmts = []
             for escaped_column_name in escaped_column_names:
                 sql_args.append('%' + filter_string + '%')
                 where_stmts.append(escaped_column_name + ' LIKE %s')
 
-            sql += ' WHERE ' + ' OR '.join(where_stmts)
-        else:
-            sql_args = None
+            if where_stmts:
+                sql += ' WHERE ' + ' OR '.join(where_stmts)
 
-        # process ordering
+        elif filters:
+            # append a WHERE/AND condition for entry in filters
+            where_stmts = []
+            for column_name, string in filters.items():
+                escaped_column_name = self.escape_identifier(column_name)
+
+                if escaped_column_name in escaped_column_names:
+                    sql_args.append(string)
+                    where_stmts.append(escaped_column_name + ' = %s')
+
+            if where_stmts:
+                sql += ' WHERE ' + ' AND '.join(where_stmts)
+
+        return sql, sql_args
+
+    def _process_ordering(self, sql, ordering, escaped_column_names):
         if ordering:
             if ordering.startswith('-'):
                 escaped_ordering_column, ordering_direction = self.escape_identifier(ordering[1:]), 'DESC'
@@ -172,24 +219,7 @@ class MySQLAdapter(DatabaseAdapter):
                     'direction': ordering_direction
                 }
 
-        # process page and page_size
-        if page_size > 0:
-            sql += ' LIMIT %(limit)s OFFSET %(offset)s' % {
-                'limit': page_size,
-                'offset': (int(page) - 1) * int(page_size)
-            }
-
-        return self.fetchall(sql, args=sql_args)
-
-    def fetch_row(self, database_name, table_name, column_name, value):
-        # prepare sql string
-        sql = 'SELECT * FROM %(database)s.%(table)s WHERE %(column)s = %%s' % {
-            'database': self.escape_identifier(database_name),
-            'table': self.escape_identifier(table_name),
-            'column': self.escape_identifier(column_name)
-        }
-
-        return self.fetchone(sql, args=(value, ))
+        return sql
 
     def create_user_database_if_not_exists(self, database_name):
         # escape input
