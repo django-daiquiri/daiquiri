@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from daiquiri.core.constants import ACCESS_LEVEL_PUBLIC
+from daiquiri.core.constants import ACCESS_LEVEL_PUBLIC, ACCESS_LEVEL_INTERNAL
 
 from .models import (
     Schema as TapSchema,
@@ -13,9 +13,9 @@ def update_database(database):
     '''
     Update or create the database in the TAP_SCHEMA.
     '''
-    # check if the metadata_access_level is public or it matches the TAP_ACCESS_LEVEL
+    # check if the metadata_access_level is (a) PUBLIC or (b) INTRENAL and QUERY_ANONYMOUS is False
     tap = (database.metadata_access_level == ACCESS_LEVEL_PUBLIC) or \
-        (database.metadata_access_level == settings.TAP_ACCESS_LEVEL)
+        (database.metadata_access_level == ACCESS_LEVEL_INTERNAL and not settings.QUERY_ANONYMOUS)
 
     if tap:
         try:
@@ -55,9 +55,9 @@ def update_table(table):
     '''
     Update or create the table in the TAP_SCHEMA.
     '''
-    # check if the metadata_access_level is public or it matches the TAP_ACCESS_LEVEL
+    # check if the metadata_access_level is (a) PUBLIC or (b) INTRENAL and QUERY_ANONYMOUS is False
     tap = (table.metadata_access_level == ACCESS_LEVEL_PUBLIC) or \
-        (table.metadata_access_level == settings.TAP_ACCESS_LEVEL)
+        (table.metadata_access_level == ACCESS_LEVEL_INTERNAL and not settings.QUERY_ANONYMOUS)
 
     # get the schema from the TAP_SCHEMA
     try:
@@ -108,9 +108,9 @@ def update_column(column):
     '''
     Update or create the column in the TAP_SCHEMA.
     '''
-    # check if the metadata_access_level is public or it matches the TAP_ACCESS_LEVEL
+    # check if the metadata_access_level is (a) PUBLIC or (b) INTRENAL and QUERY_ANONYMOUS is False
     tap = (column.metadata_access_level == ACCESS_LEVEL_PUBLIC) or \
-        (column.metadata_access_level == settings.TAP_ACCESS_LEVEL)
+        (column.metadata_access_level == ACCESS_LEVEL_INTERNAL and not settings.QUERY_ANONYMOUS)
 
     # get the table from the TAP_SCHEMA
     try:
