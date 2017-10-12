@@ -96,7 +96,9 @@
                                 {$ row.author $}
                             </td>
                             <td>
-                                {% include 'contact/messages_reply_link.html' %}
+                                <a href="{% include 'contact/messages_mailto.html' %}">
+                                    {$ row.email $}
+                                </a>
                             </td>
                             <td>
                                 {$ row.created | date: 'MMM d, yyyy hh:mm' $}

@@ -1,6 +1,10 @@
 {% load i18n %}
 {% load core_tags %}
 
+    <a href="{% include 'contact/messages_mailto.html' %}" class="fa fa-reply"
+        title="{% trans 'Reply to message' %}">
+    </a>
+
     <a href="" class="fa fa-eye" title="{% trans 'Show message details' %}"
         ng-click="service.modal('show-message-modal', $index)">
     </a>
