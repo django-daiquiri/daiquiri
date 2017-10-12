@@ -2,37 +2,21 @@
 <html>
 
 <head>
-    {% include 'core/base_head.html' %}
-    {% block headextra %}
-    {% endblock %}
+
+{% include 'core/base_head.html' %}
+{% block headextra %}{% endblock %}
+
 </head>
 
 <body {% block bodyargs %}{% endblock %}>
 
-<!-- begin navigation -->
-    {% include 'core/base_navigation.html' %}
-<!-- end navigation -->
+{% include 'core/base_navigation.html' %}
 
-<!-- begin content -->
+{% block content %}{% endblock %}
 
-    <div class="content">
-        <div class="container">
-        {% block content %}
-        <!-- content placeholder -->
-        {% endblock %}
-        </div>
-    </div>
+{% include 'core/base_footer.html' %}
 
-<!-- end content -->
-
-<!-- begin footer -->
-    {% include 'core/base_footer.html' %}
-<!-- end footer -->
-
-{% if not debug %}
-<!-- begin analytics -->
-    {% include 'core/base_analytics.html' %}
-<!-- end analytics -->
-{% endif %}
+{% if not debug %}{% include 'core/base_analytics.html' %}{% endif %}
 </body>
+
 </html>

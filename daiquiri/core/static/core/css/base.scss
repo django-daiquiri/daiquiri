@@ -1,14 +1,40 @@
 @import 'core/css/variables';
 
+/* layout */
+
+
+html {
+    // make footer sticky
+    position: relative;
+    min-height: 100%;
+}
+body {
+    // make footer sticky
+    margin: 0 0 ($footer-content-height + $footer-bottom-height);
+}
+
+.page, .wide, .sidebar {
+    margin-top: 100px;
+    margin-bottom: 100px;
+}
+
+/* typography */
+
 html, body {
     color: $text-color;
     background-color: $background-color;
+
+    font-family: DroidSans, sans;
 }
+
 h1, h2, h3, h4 {
     color: $headline-color;
     background-color: $headline-background-color;
 }
-h1:first-child {
+h1:first-child,
+h2:first-child,
+h3:first-child,
+h4:first-child {
     margin-top: 0;
 }
 h2 {
@@ -18,10 +44,6 @@ h1, h2, h3 {
     line-height: 40px;
     margin-bottom: 20px;
 }
-h3:first-child {
-    margin-top: 0;
-    margin-bottom: 20px;
-}
 h4 {
     margin-top: 20px;
 }
@@ -29,6 +51,7 @@ h5, h6 {
     font-size: medium;
     line-height: 20px;
 }
+
 form {
     margin-top: 20px;
     margin-bottom: 20px;
@@ -58,15 +81,6 @@ a,
 blockquote {
     padding: 5px 8px;
     font-size: inherit;
-}
-
-.expand {
-    display: block;
-    width: 100%;
-}
-
-.break {
-    word-wrap: break-word;
 }
 
 /* navbar */
@@ -113,40 +127,66 @@ blockquote {
     }
 }
 
-/* content */
-
-.content {
-
-}
-.sidebar {
-    margin-top: 60px;
-}
-.page, .wide, .sidebar {
-    padding-top: 90px;
-    padding-bottom: 40px;
-}
-
 /* footer */
 
 footer {
-    color: $footer-color;
-    background-color: $footer-background-color;
+    // make footer sticky
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    overflow: hidden;
 
-    a {
-        color: $footer-link-color;
+    .content {
+        height: 250px;
+        padding-top: 40px;
 
-        &:visited {
-            color: $footer-link-color-visited;
-        }
-        &:hover {
-            color: $footer-link-color-hover;
-        }
-        &:focus {
-            color: $footer-link-color-focus;
-        }
+        color: $footer-content-color;
+        background-color: $footer-content-background-color;
 
-        &.fa {
-            text-decoration: none;
+        a {
+            color: $footer-content-link-color;
+
+            &:visited {
+                color: $footer-content-link-color-visited;
+            }
+            &:hover {
+                color: $footer-content-link-color-hover;
+            }
+            &:focus {
+                color: $footer-content-link-color-focus;
+            }
+
+            &.fa {
+                text-decoration: none;
+            }
+        }
+    }
+
+    .bottom {
+        height: 50px;
+        padding-top: 15px;
+        padding-bottom: 15px;
+
+        color: $footer-bottom-color;
+        background-color: $footer-bottom-background-color;
+
+        a {
+            color: $footer-bottom-link-color;
+
+            &:visited {
+                color: $footer-bottom-link-color-visited;
+            }
+            &:hover {
+                color: $footer-bottom-link-color-hover;
+            }
+            &:focus {
+                color: $footer-bottom-link-color-focus;
+            }
+
+            &.fa {
+                text-decoration: none;
+            }
         }
     }
 }
@@ -237,6 +277,15 @@ div.fieldset {
 }
 
 /* misc */
+
+.expand {
+    display: block;
+    width: 100%;
+}
+
+.break {
+    word-wrap: break-word;
+}
 
 .email-form label,
 .connections-form label {
