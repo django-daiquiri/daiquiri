@@ -121,7 +121,6 @@ class UWSRenderer(XMLRenderer):
 
 class VOTableRenderer(XMLRenderer):
 
-    media_type = 'application/x-votable+xml'
     format = 'votable'
 
     root_attrs = {

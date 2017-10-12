@@ -202,7 +202,7 @@ class QueryLanguageViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
 
 class SyncQueryJobViewSet(SyncJobViewSet):
-
+    permission_classes = (HasPermission, )
     serializer_class = SyncQueryJobSerializer
 
     parameter_map = {
@@ -217,7 +217,7 @@ class SyncQueryJobViewSet(SyncJobViewSet):
 
 
 class AsyncQueryJobViewSet(AsyncJobViewSet):
-
+    permission_classes = (HasPermission, )
     serializer_class = AsyncQueryJobSerializer
 
     parameter_map = {
