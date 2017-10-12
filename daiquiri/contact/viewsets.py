@@ -2,6 +2,8 @@ from rest_framework import viewsets, filters
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 
+from django_filters.rest_framework import DjangoFilterBackend
+
 from daiquiri.core.viewsets import ChoicesViewSet
 from daiquiri.core.permissions import HasModelPermission
 from daiquiri.core.paginations import ListPagination
@@ -23,7 +25,7 @@ class ContactMessageViewSet(viewsets.ModelViewSet):
     filter_backends = (
         filters.SearchFilter,
         filters.OrderingFilter,
-        filters.DjangoFilterBackend,
+        DjangoFilterBackend,
         SpamBackend
     )
     search_fields = ('author', 'email', 'subject', 'message', 'status')
