@@ -112,11 +112,13 @@ angular.module('metadata', ['core'])
             item.resource = resource;
 
             // create a string for the groups
-            item.published_for = $filter('filter')(service.groups, function(group) {
-                return item.groups.indexOf(group.id) !== -1;
-            }).map(function(group) {
-                return group.name;
-            }).join(', ');
+            if (angular.isDefined(item.groups)) {
+                item.published_for = $filter('filter')(service.groups, function(group) {
+                    return item.groups.indexOf(group.id) !== -1;
+                }).map(function(group) {
+                    return group.name;
+                }).join(', ');
+            }
 
             service.active = item;
         });

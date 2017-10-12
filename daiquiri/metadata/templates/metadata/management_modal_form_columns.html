@@ -122,6 +122,7 @@
                         data-model="service.values.std"
                         data-errors="service.errors.std">
                     </formgroup>
+                    {% if settings.METADATA_COLUMN_PERMISSIONS %}
                     <div class="row">
                         <formgroup
                             class="col-md-6"
@@ -155,6 +156,7 @@
                         data-options="service.groups"
                         data-options-label="name">
                     </formgroup>
+                    {% endif %}
                 </div>
 
                 <div class="modal-footer">

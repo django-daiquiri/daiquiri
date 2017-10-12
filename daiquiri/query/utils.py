@@ -118,62 +118,81 @@ def get_asterisk_columns(display_column):
     return [(column_name, (database_name, table_name, column_name)) for column_name in column_names]
 
 
-def check_permissions(user, keywords, columns, functions):
+def check_permissions(user, keywords, tables, columns, functions):
     messages = []
 
     # check keywords against whitelist
     for keywords in keywords:
         pass
 
-    # check permissions on databases/tables/columns
-    for column in columns:
-        database_name, table_name, column_name = column
+    if not settings.METADATA_COLUMN_PERMISSIONS:
+        # check permissions on databases/tables
+        for database_name, table_name in tables:
 
-        # check permission on database
-        if database_name is None:
-            continue
-        elif database_name == get_tap_schema_name():
-            continue
-        elif database_name == get_user_database_name(user):
-            continue
-        else:
-            try:
-                database = Database.objects.filter_by_access_level(user).get(name=database_name)
-            except Database.DoesNotExist:
-                messages.append(_('Database %s not found.') % database_name)
+            # check permission on database
+            if database_name in [None, get_tap_schema_name(), get_user_database_name(user)]:
                 continue
+            else:
+                try:
+                    database = Database.objects.filter_by_access_level(user).get(name=database_name)
+                except Database.DoesNotExist:
+                    messages.append(_('Database %s not found.') % database_name)
+                    continue
 
-        # check permission on table
-        if table_name is None:
-            continue
-        else:
-            try:
-                table = Table.objects.filter_by_access_level(user).filter(database=database).get(name=table_name)
-            except Table.DoesNotExist:
-                messages.append(_('Table %s not found.') % table_name)
+            # check permission on table
+            if table_name is None:
                 continue
+            else:
+                try:
+                    Table.objects.filter_by_access_level(user).filter(database=database).get(name=table_name)
+                except Table.DoesNotExist:
+                    messages.append(_('Table %s not found.') % table_name)
+                    continue
 
-        # check permission on column
-        if column_name is None:
-            continue
-        elif column_name == '*':
-            columns = Column.objects.filter_by_access_level(user).filter(table=table)
-            actual_columns = get_adapter().database.fetch_columns(database_name, table_name)
+    else:
+        # check permissions on databases/tables/columns
+        for column in columns:
+            database_name, table_name, column_name = column
 
-            column_names_set = set([column.name for column in columns])
-            actual_column_names_set = set([column['name'] for column in actual_columns])
-
-            if column_names_set != actual_column_names_set:
-                messages.append(_('The asterisk (*) is not allowed for this table.'))
+            # check permission on database
+            if database_name in [None, get_tap_schema_name(), get_user_database_name(user)]:
                 continue
-        else:
-            try:
-                column = Column.objects.filter_by_access_level(user).filter(table=table).get(name=column_name)
-            except Column.DoesNotExist:
-                messages.append(_('Column %s not found.') % column_name)
+            else:
+                try:
+                    database = Database.objects.filter_by_access_level(user).get(name=database_name)
+                except Database.DoesNotExist:
+                    messages.append(_('Database %s not found.') % database_name)
+                    continue
+
+            # check permission on table
+            if table_name is None:
                 continue
+            else:
+                try:
+                    table = Table.objects.filter_by_access_level(user).filter(database=database).get(name=table_name)
+                except Table.DoesNotExist:
+                    messages.append(_('Table %s not found.') % table_name)
+                    continue
 
+            # check permission on column
+            if column_name is None:
+                continue
+            elif column_name == '*':
+                columns = Column.objects.filter_by_access_level(user).filter(table=table)
+                actual_columns = get_adapter().database.fetch_columns(database_name, table_name)
 
+                column_names_set = set([column.name for column in columns])
+                actual_column_names_set = set([column['name'] for column in actual_columns])
+
+                if column_names_set != actual_column_names_set:
+                    messages.append(_('The asterisk (*) is not allowed for this table.'))
+                    continue
+            else:
+                try:
+                    column = Column.objects.filter_by_access_level(user).filter(table=table).get(name=column_name)
+                except Column.DoesNotExist:
+                    messages.append(_('Column %s not found.') % column_name)
+                    continue
 
     # check permissions on functions
     for function_name in functions:

@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.models import Group
 
 from rest_framework import serializers
@@ -27,7 +28,28 @@ class ColumnSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Column
-        fields = '__all__'
+
+        # only show access_level, metadata_access_level, and groups when
+        # settings.METADATA_COLUMN_PERMISSIONS is set
+        if settings.METADATA_COLUMN_PERMISSIONS:
+            fields = '__all__'
+        else:
+            fields = (
+                'id',
+                'label',
+                'order',
+                'name',
+                'description',
+                'unit',
+                'ucd',
+                'utype',
+                'datatype',
+                'arraysize',
+                'principal',
+                'indexed',
+                'std',
+                'table'
+            )
 
 
 class TableSerializer(serializers.ModelSerializer):

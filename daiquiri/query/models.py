@@ -162,7 +162,7 @@ class QueryJob(Job):
             })
 
         # check permissions
-        permission_messages = check_permissions(self.owner, processor.keywords, processor.columns, processor.functions)
+        permission_messages = check_permissions(self.owner, processor.keywords, processor.tables, processor.columns, processor.functions)
         if permission_messages:
             raise ValidationError({
                 'query': permission_messages
