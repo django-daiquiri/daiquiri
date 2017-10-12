@@ -4,7 +4,7 @@ Dear {{ site_name }} Team,
 {% endblocktrans %}
 
 {% blocktrans with site_name=current_site.name trimmed %}
-You have just received a contact message on {{ site_name }}:
+You have just received a contact message!
 {% endblocktrans %}
 
 User name: {{ author }}
@@ -13,6 +13,6 @@ Subject: {{ subject }}
 
 {{ message }}
 
-{% blocktrans with url=url trimmed %}
-Please log in to {{ url }} to reply to the message of the user.
+{% blocktrans trimmed %}
+Please log in to {{ url }} to reply.
 {% endblocktrans %}
