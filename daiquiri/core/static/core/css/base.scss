@@ -138,7 +138,7 @@ footer {
     overflow: hidden;
 
     .content {
-        height: 250px;
+        height: $footer-content-height;
         padding-top: 40px;
 
         color: $footer-content-color;
@@ -164,7 +164,7 @@ footer {
     }
 
     .bottom {
-        height: 50px;
+        height: $footer-bottom-height;
         padding-top: 15px;
         padding-bottom: 15px;
 
