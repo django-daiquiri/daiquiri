@@ -70,9 +70,9 @@
                         <tr ng-repeat="row in service.list.rows">
                             <td>
                                 <a href="" ng-click="service.modal('show-user-modal', $index)">
-                                    {$ row.user.first_name $} {$ row.user.last_name $}
+                                    {$ row.full_name $}
                                 </a>
-                                <em>{$ row.user.username $}</em>
+                                <em>({$ row.user.username $})</em>
                             </td>
                             <td>
                                 <div ng-repeat="email in row.emails">

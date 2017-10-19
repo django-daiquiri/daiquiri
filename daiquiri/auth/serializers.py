@@ -57,7 +57,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('id', 'user', 'is_confirmed', 'is_pending', 'emails', 'details', 'attributes')
+        fields = ('id', 'full_name', 'user', 'is_confirmed', 'is_pending', 'emails', 'details', 'attributes')
 
     def update(self, obj, validated_data):
         user = validated_data.pop('user')
