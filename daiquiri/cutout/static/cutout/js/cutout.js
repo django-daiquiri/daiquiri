@@ -1,6 +1,6 @@
 angular.module('cutout', ['core'])
 
-.factory('CutoutService', ['$httpParamSerializer', function($httpParamSerializer) {
+.factory('CutoutService', ['$http', '$httpParamSerializer', function($http, $httpParamSerializer) {
 
     /* get the base url */
 
@@ -38,10 +38,15 @@ angular.module('cutout', ['core'])
 
     service.download = function() {
         // construct the url for the cutout
-        var url = cutout_url + '?' + $httpParamSerializer(service.values);
+        var validate_url = cutout_url + '/validate/?' + $httpParamSerializer(service.values);
+            download_url = cutout_url + '?' + $httpParamSerializer(service.values);
 
-        // append iframe
-        angular.element('body').append('<iframe style="display: none;" src="' + url + '"></iframe>');
+        $http.get(validate_url).then(function() {
+            // append iframe
+            angular.element('body').append('<iframe style="display: none;" src="' + download_url + '"></iframe>');
+        }, function(result) {
+            service.errors = result.data;
+        })
     }
 
     return service;
