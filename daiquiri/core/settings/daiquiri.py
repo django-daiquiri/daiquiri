@@ -13,6 +13,10 @@ AUTH_WORKFLOW = None
 
 AUTH_DETAIL_KEYS = []
 
+CUTOUT_ADAPTER = 'daiquiri.cutout.utils.CutoutAdapter'
+
+CUTOUT_ANONYMOUS = False
+
 METADATA_COLUMN_PERMISSIONS = False
 
 QUERY_ANONYMOUS = False
