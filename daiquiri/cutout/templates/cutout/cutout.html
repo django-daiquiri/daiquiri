@@ -1,0 +1,73 @@
+{% extends 'core/wide.html' %}
+{% load staticfiles %}
+{% load compress %}
+{% load i18n %}
+{% load core_tags %}
+
+{% block bodyargs %}ng-app="cutout" ng-controller="CutoutController" ng-init="service.init({{ defaults | dict2js }})"{% endblock %}
+
+{% block headextra %}
+    {% vendor 'angular' %}
+
+    {% compress js %}
+    <script type="text/javascript" src="{% static 'core/js/core.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'core/js/formgroup.js' %}" ></script>
+
+    <script type="text/javascript" src="{% static 'cutout/js/cutout.js' %}" ></script>
+    {% endcompress js %}
+{% endblock %}
+
+{% block wide %}
+
+    <h1>{% trans 'Cut-Out Service' %}</h1>
+
+    <div class="row">
+        <formgroup
+            class="col-md-3"
+            data-id="ra"
+            data-type="number"
+            data-label="{% trans 'RA' %}"
+            data-help="Central right ascension (J2000) in deg"
+            data-model="service.values.ra"
+            data-errors="service.errors.ra">
+        </formgroup>
+        <formgroup
+            class="col-md-3"
+            data-id="a"
+            data-type="number"
+            data-label="{% trans 'a' %}"
+            data-help="Radius in RA in arcsec"
+            data-model="service.values.a"
+            data-errors="service.errors.a">
+        </formgroup>
+    </div>
+
+    <div class="row">
+        <formgroup
+            class="col-md-3"
+            data-id="dec"
+            data-type="number"
+            data-label="{% trans 'DEC' %}"
+            data-help="Central declination (J2000) in deg"
+            data-model="service.values.dec"
+            data-errors="service.errors.dec">
+        </formgroup>
+        <formgroup
+            class="col-md-3"
+            data-id="a"
+            data-type="number"
+            data-label="{% trans 'b' %}"
+            data-help="Radius in DEC in arcsec"
+            data-model="service.values.b"
+            data-errors="service.errors.b">
+        </formgroup>
+    </div>
+
+    <button type="button" class="btn btn-primary" ng-click="service.download()">
+        {% trans 'Download cut-out' %}
+    </button>
+    <button type="button" class="btn btn-default" ng-click="service.reset()">
+        {% trans 'Reset values' %}
+    </button>
+
+{% endblock %}

@@ -1,4 +1,4 @@
-angular.module('core', ['ngResource'])
+angular.module('core', ['ngResource', 'ngSanitize'])
 
 .config(['$httpProvider', '$interpolateProvider', '$resourceProvider', function($httpProvider, $interpolateProvider, $resourceProvider) {
 

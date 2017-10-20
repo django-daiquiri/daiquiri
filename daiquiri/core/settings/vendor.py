@@ -58,6 +58,9 @@ VENDOR = {
             },
             {
                 'path': 'angular-resource.min.js'
+            },
+            {
+                'path': 'angular-sanitize.min.js'
             }
         ]
     },

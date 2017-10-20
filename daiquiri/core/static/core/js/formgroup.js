@@ -1,6 +1,6 @@
 angular.module('core')
 
-.directive('formgroup', function() {
+.directive('formgroup', ['$sce', function($sce) {
 
     return {
         replace: true,
@@ -22,10 +22,12 @@ angular.module('core')
             var staticurl = angular.element('meta[name="staticurl"]').attr('content');
             return staticurl + 'core/html/formgroup_' + attrs.type + '.html';
         },
-        compile: function(element, attrs){
+        link: function(scope, element, attrs) {
             if (!attrs.optionsId) {
                 attrs.optionsId = 'id';
             }
+
+            scope.label = $sce.trustAsHtml(scope.label);
         }
     };
-});
+}]);
