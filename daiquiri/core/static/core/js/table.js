@@ -13,7 +13,7 @@ angular.module('core')
             'params': '=',
             'pageSizes': '=',
             'columnWidths': '=',
-            'round': '='
+            'columnRound': '='
         },
         link: function(scope, element, attrs) {
             scope.table = TableService;
@@ -24,7 +24,7 @@ angular.module('core')
                 params: scope.params,
                 page_sizes: scope.pageSizes,
                 column_widths: scope.columnWidths,
-                round: scope.round
+                column_round: scope.columnRound
             });
 
             // refresh the tooltips everytime a new set of columns is fetched
@@ -146,8 +146,8 @@ angular.module('core')
         if (angular.isDefined(opt.column_widths)) {
             service.column_widths = opt.column_widths;
         }
-        if (angular.isDefined(opt.round)) {
-            service.round = opt.round;
+        if (angular.isDefined(opt.column_round)) {
+            service.column_round = opt.column_round;
         }
 
         // fetch the columns

@@ -18,7 +18,7 @@ class RowViewSet(viewsets.ViewSet):
         # get database and table from the querystring
         database_name = self.request.GET.get('database')
         table_name = self.request.GET.get('table')
-        column_name = self.request.GET.get('column')
+        column_names = self.request.GET.getlist('column')
 
         # get the ordering
         ordering = self.request.GET.get('ordering')
@@ -36,7 +36,7 @@ class RowViewSet(viewsets.ViewSet):
         page_size = self._get_page_size()
 
         # get the columns using the utils function
-        columns = get_columns(self.request.user, database_name, table_name)
+        columns = get_columns(self.request.user, database_name, table_name, column_names)
 
         # check
         if filter_string and filters:
@@ -44,12 +44,6 @@ class RowViewSet(viewsets.ViewSet):
 
         if columns:
             column_names = [column['name'] for column in columns]
-
-            if column_name:
-                if column_name not in column_names:
-                    raise NotFound()
-                else:
-                    column_names = [column_name]
 
             # get database adapter
             adapter = get_adapter()
@@ -61,8 +55,8 @@ class RowViewSet(viewsets.ViewSet):
             results = adapter.database.fetch_rows(database_name, table_name, column_names, ordering, page, page_size, filter_string, filters)
 
             # flatten the list if only one column is retrieved
-            if column_name:
-                results = [element for row in results for element in row]
+            # if column_name:
+            #     results = [element for row in results for element in row]
 
             # get the previous and next url
             next = self._get_next_url(page, page_size, count)
@@ -126,9 +120,10 @@ class ColumnViewSet(viewsets.ViewSet):
         # get database and table from the querystring
         database_name = self.request.GET.get('database')
         table_name = self.request.GET.get('table')
+        column_names = self.request.GET.getlist('column')
 
         # get the columns using the utils function
-        columns = get_columns(self.request.user, database_name, table_name)
+        columns = get_columns(self.request.user, database_name, table_name, column_names)
 
         if columns:
             return Response(ColumnSerializer(columns, many=True).data)

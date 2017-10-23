@@ -10,7 +10,7 @@ from daiquiri.query.models import QueryJob
 from daiquiri.query.utils import get_user_database_name
 
 
-def get_columns(user, database_name, table_name):
+def get_columns(user, database_name, table_name, column_names=None):
 
     user_database_name = get_user_database_name(user)
 
@@ -21,7 +21,7 @@ def get_columns(user, database_name, table_name):
                 database_name=database_name,
                 table_name=table_name
             )
-            return job.metadata['columns']
+            columns = job.metadata['columns']
         except QueryJob.DoesNotExist:
             return []
 
@@ -39,7 +39,15 @@ def get_columns(user, database_name, table_name):
             return []
 
         # get columns for this table
-        return Column.objects.filter_by_access_level(user).filter(table=table).values()
+        if settings.METADATA_COLUMN_PERMISSIONS:
+            columns = Column.objects.filter_by_access_level(user).filter(table=table).values()
+        else:
+            columns = Column.objects.filter(table=table).values()
+
+    if column_names:
+        return [column for column in columns if column['name'] in column_names]
+    else:
+        return columns
 
 
 def get_column(user, database_name, table_name, column_name):

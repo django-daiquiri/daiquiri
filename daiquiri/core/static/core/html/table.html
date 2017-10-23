@@ -114,10 +114,10 @@
                                 </a>
                             </div>
                             <div ng-if="column.display == 'text'">
-                                <div ng-if="table.round[column_index]">
-                                    {$ row[column_index] | number : table.round[column_index] $}
+                                <div ng-if="table.column_round[column_index]">
+                                    {$ row[column_index] | number : table.column_round[column_index] $}
                                 </div>
-                                <div ng-if="!table.round[column_index]">
+                                <div ng-if="!table.column_round[column_index]">
                                     {$ row[column_index] $}
                                 </div>
                             </div>
