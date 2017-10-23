@@ -145,6 +145,18 @@ class MySQLAdapter(DatabaseAdapter):
 
         return self.fetchone(sql, args=sql_args)
 
+    def fetch_dict(self, database_name, table_name, column_names=None, filter_string=None, filters=None):
+
+        # if no column names are provided get all column_names from the table
+        if not column_names:
+            column_names = self.fetch_column_names(database_name, table_name)
+
+        row = self.fetch_row(database_name, table_name, column_names, filter_string, filters)
+
+        return {
+            column_name: value for column_name, value in zip(column_names, row)
+        }
+
     def fetch_rows(self, database_name, table_name, column_names=None, ordering=None, page=1, page_size=10, filter_string=None, filters=None):
 
         # if no column names are provided get all column_names from the table
