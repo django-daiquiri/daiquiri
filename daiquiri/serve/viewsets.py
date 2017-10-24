@@ -1,5 +1,7 @@
 from collections import OrderedDict
 
+from django.utils.translation import ugettext_lazy as _
+
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError, ParseError, NotFound
@@ -36,14 +38,24 @@ class RowViewSet(viewsets.ViewSet):
         page_size = self._get_page_size()
 
         # get the columns using the utils function
-        columns = get_columns(self.request.user, database_name, table_name, column_names)
+        columns = get_columns(self.request.user, database_name, table_name)
 
         # check
         if filter_string and filters:
-            raise ValidationError('Filtering by \'filter=filter_string\' and \'column_name=value\' is mutually exclusive.')
+            raise ValidationError(_('Filtering by \'filter=filter_string\' and \'column_name=value\' is mutually exclusive.'))
+
+        if filters:
+            for column_name in filters:
+                if column_name not in [column['name'] for column in columns]:
+                    raise ValidationError({
+                            column_name: _('Column not found.')
+                        })
 
         if columns:
-            column_names = [column['name'] for column in columns]
+            if column_names:
+                column_names = [column['name'] for column in columns if column['name'] in column_names]
+            else:
+                return [column['name'] for column in columns]
 
             # get database adapter
             adapter = get_adapter()
@@ -123,9 +135,12 @@ class ColumnViewSet(viewsets.ViewSet):
         column_names = self.request.GET.getlist('column')
 
         # get the columns using the utils function
-        columns = get_columns(self.request.user, database_name, table_name, column_names)
+        columns = get_columns(self.request.user, database_name, table_name)
 
         if columns:
+            if column_names:
+                columns = [column for column in columns if column['name'] in column_names]
+
             return Response(ColumnSerializer(columns, many=True).data)
 
         # if nothing worked, return 404

@@ -209,9 +209,8 @@ class MySQLAdapter(DatabaseAdapter):
             for column_name, string in filters.items():
                 escaped_column_name = self.escape_identifier(column_name)
 
-                if escaped_column_name in escaped_column_names:
-                    sql_args.append(string)
-                    where_stmts.append(escaped_column_name + ' = %s')
+                sql_args.append(string)
+                where_stmts.append(escaped_column_name + ' = %s')
 
             if where_stmts:
                 sql += ' WHERE ' + ' AND '.join(where_stmts)
