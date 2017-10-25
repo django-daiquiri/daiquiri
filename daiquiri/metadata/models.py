@@ -46,9 +46,9 @@ class Database(models.Model):
         max_length=8, choices=LICENSE_CHOICES, null=True, blank=True,
         verbose_name=_('License')
     )
-    pid = models.URLField(
+    doi = models.CharField(
         max_length=256, null=True, blank=True,
-        verbose_name=_('Persistent identifier'),
+        verbose_name=_('Digital object identifier')
     )
     utype = models.CharField(
         max_length=256, null=True, blank=True,
@@ -143,9 +143,9 @@ class Table(models.Model):
         max_length=8, choices=LICENSE_CHOICES, null=True, blank=True,
         verbose_name=_('License')
     )
-    pid = models.URLField(
+    doi = models.CharField(
         max_length=256, null=True, blank=True,
-        verbose_name=_('Persistent identifier')
+        verbose_name=_('Digital object identifier')
     )
     type = models.CharField(
         max_length=8, choices=TYPE_CHOICES,

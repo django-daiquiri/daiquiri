@@ -68,13 +68,13 @@
 
 {% block sidebar %}
 
-    {% if table.pid %}
+    {% if table.doi %}
     <div class="panel panel-default">
         <div class="panel-heading">Persistant identifier</div>
         <div class="panel-body">
             <p>Please use the following identifier to cite this table:</p>
             <p>
-                <a class="break" href="{{ table.pid }}">{{ table.pid }}</a>
+                <a class="break" href="https://dx.doi.org/{{ table.doi }}">doi:{{ table.doi }}</a>
             </p>
         </div>
     </div>
