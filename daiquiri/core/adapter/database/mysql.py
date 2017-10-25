@@ -153,9 +153,12 @@ class MySQLAdapter(DatabaseAdapter):
 
         row = self.fetch_row(database_name, table_name, column_names, filter_string, filters)
 
-        return {
-            column_name: value for column_name, value in zip(column_names, row)
-        }
+        if row:
+            return {
+                column_name: value for column_name, value in zip(column_names, row)
+            }
+        else:
+            return {}
 
     def fetch_rows(self, database_name, table_name, column_names=None, ordering=None, page=1, page_size=10, filter_string=None, filters=None):
 
