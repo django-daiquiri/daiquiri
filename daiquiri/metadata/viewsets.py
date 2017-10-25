@@ -1,6 +1,6 @@
 from rest_framework import viewsets, filters, status
 from rest_framework.response import Response
-from rest_framework.decorators import list_route
+from rest_framework.decorators import list_route, detail_route
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 
@@ -17,6 +17,10 @@ from .serializers import (
     TableSerializer,
     ColumnSerializer,
     FunctionSerializer
+)
+from .serializers.export import (
+    DatabaseSerializer as ExportDatabaseSerializer,
+    FunctionSerializer as ExportFunctionSerializer
 )
 from .serializers.management import (
     DatabaseSerializer as ManagementDatabaseSerializer,
@@ -84,6 +88,18 @@ class DatabaseViewSet(viewsets.ModelViewSet):
         # filter the databases which are published for the groups of the user
         queryset = Database.objects.filter_by_access_level(self.request.user)
         serializer = UserDatabaseSerializer(queryset, context={'request': request}, many=True)
+        return Response(serializer.data)
+
+    @list_route(methods=['get'], url_path='export', url_name='export-detail')
+    def export_list(self, request):
+        queryset = Database.objects.all()
+        serializer = ExportDatabaseSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @detail_route(methods=['get'], url_path='export', url_name='export-detail')
+    def export_detail(self, request, pk=None):
+        queryset = Database.objects.get(pk=pk)
+        serializer = ExportDatabaseSerializer(queryset)
         return Response(serializer.data)
 
 
@@ -173,6 +189,12 @@ class FunctionViewSet(viewsets.ModelViewSet):
     def management(self, request):
         queryset = Function.objects.all()
         serializer = ManagementFunctionSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @list_route(methods=['get'])
+    def export(self, request):
+        queryset = Function.objects.all()
+        serializer = ExportFunctionSerializer(queryset, many=True)
         return Response(serializer.data)
 
     @list_route(methods=['get'], permission_classes=[])
