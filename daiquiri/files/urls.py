@@ -11,5 +11,5 @@ router.register(r'files', FileViewSet, base_name='file')
 urlpatterns = [
     # rest api
     url(r'^api/', include(router.urls)),
-    url(r'^(?P<file_path>.+)$', file, name='file'),
+    url(r'^(?P<file_path>.*)$', file, name='file'),
 ]

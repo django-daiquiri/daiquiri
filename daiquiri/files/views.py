@@ -10,6 +10,8 @@ logger = logging.getLogger(__name__)
 
 
 def file(request, file_path):
+    if not file_path:
+        raise Http404
 
     file_name = get_file(request.user, file_path)
 
