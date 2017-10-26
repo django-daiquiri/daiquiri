@@ -55,7 +55,7 @@ class RowViewSet(viewsets.ViewSet):
             if column_names:
                 column_names = [column['name'] for column in columns if column['name'] in column_names]
             else:
-                return [column['name'] for column in columns]
+                column_names = [column['name'] for column in columns]
 
             # get database adapter
             adapter = get_adapter()
@@ -67,8 +67,8 @@ class RowViewSet(viewsets.ViewSet):
             results = adapter.database.fetch_rows(database_name, table_name, column_names, ordering, page, page_size, filter_string, filters)
 
             # flatten the list if only one column is retrieved
-            # if column_name:
-            #     results = [element for row in results for element in row]
+            if len(column_names) == 1:
+                results = [element for row in results for element in row]
 
             # get the previous and next url
             next = self._get_next_url(page, page_size, count)
