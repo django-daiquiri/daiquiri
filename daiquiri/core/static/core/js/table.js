@@ -10,6 +10,7 @@ angular.module('core')
             'rowsUrl': '@',
             'columnsUrl': '@',
             'filesUrl': '@',
+            'referencesUrl': '@',
             'params': '=',
             'pageSizes': '=',
             'columnWidths': '=',
@@ -21,6 +22,7 @@ angular.module('core')
                 rows_url: scope.rowsUrl,
                 columns_url: scope.columnsUrl,
                 files_url: scope.filesUrl,
+                references_url: scope.referencesUrl,
                 params: scope.params,
                 page_sizes: scope.pageSizes,
                 column_widths: scope.columnWidths,
@@ -126,14 +128,12 @@ angular.module('core')
             resources.columns = $resource(baseurl + opt.columns_url);
         }
 
-        // setup file base url
+        // setup files url and reference
         if (angular.isDefined(opt.files_url)) {
-            service.file_base_url = baseurl + opt.files_url + '?search=';
+            service.files_url = baseurl + opt.files_url;
         }
-
-        // add params from the dom to service.params
-        if (angular.isDefined(opt.params)) {
-            angular.extend(service.params, opt.params);
+        if (angular.isDefined(opt.references_url)) {
+            service.references_url = baseurl + opt.references_url;
         }
 
         // update pages_sizes
@@ -150,8 +150,10 @@ angular.module('core')
             service.column_round = opt.column_round;
         }
 
-        // fetch the columns
-        if (angular.isDefined(resources.rows) && angular.isDefined(resources.columns)) {
+        // add params from the dom to service.params and fetch the data
+        if (angular.isDefined(opt.params)) {
+            angular.extend(service.params, opt.params);
+
             resources.columns.query(service.params, function(response) {
                 service.columns = response;
 
@@ -161,13 +163,33 @@ angular.module('core')
                     column.display = 'text'
 
                     if (column.ucd) {
-                        if (column.ucd.indexOf('meta.file') > -1) {
-                            column.display = 'file_link';
-                        } else if (column.ucd.indexOf('meta.note') > -1) {
-                            column.display = 'modal';
+                        if (column.ucd.indexOf('meta.note') > -1) {
+                            if (service.files_url) {
+                                column.display = 'modal';
+                            } else {
+                                column.display = 'link';
+                            }
                         } else if (column.ucd.indexOf('meta.preview') > -1) {
-                            column.display = 'modal';
+                            if (service.files_url) {
+                                column.display = 'modal';
+                            } else {
+                                column.display = 'link';
+                            }
+                        } else if (column.ucd.indexOf('meta.file') > -1) {
+                            if (service.files_url) {
+                                column.display = 'file';
+                            } else {
+                                column.display = 'link';
+                            }
                         } else if (column.ucd.indexOf('meta.ref') > -1) {
+                            if (service.references_url) {
+                                column.display = 'reference';
+                            } else {
+                                column.display = 'link';
+                            }
+                        } else if (column.ucd.indexOf('meta.ref.uri') > -1) {
+                            column.display = 'link';
+                        } else if (column.ucd.indexOf('meta.ref.url') > -1) {
                             column.display = 'link';
                         }
                     }

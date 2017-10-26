@@ -258,9 +258,6 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
             if (!service.table.ready) {
                 if (service.job && service.job.phase == 'COMPLETED') {
                     service.table.init({
-                        rows_url: 'serve/api/rows/',
-                        columns_url: 'serve/api/columns/',
-                        files_url: 'files/api/files/',
                         params: {
                             database: service.job.database_name,
                             table: service.job.table_name

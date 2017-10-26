@@ -27,4 +27,8 @@ angular.module('core')
         return output_values;
     };
 })
+
+.filter('encodeURIComponent', function() {
+    return window.encodeURIComponent;
+});
 ;

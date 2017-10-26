@@ -124,6 +124,7 @@ QUERY_DOWNLOAD_FORMATS = [
 ]
 
 SERVE_DOWNLOAD_DIR = os.path.join(BASE_DIR, 'download')
+SERVE_RESOLVER = None
 
 UWS_RESOURCES = []
 

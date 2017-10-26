@@ -3,6 +3,7 @@ import os
 from django.conf import settings
 
 from daiquiri.core.adapter import get_adapter
+from daiquiri.core.utils import import_class
 from daiquiri.metadata.models import Database, Table, Column
 from daiquiri.files.models import Directory
 from daiquiri.files.utils import normalize_file_path
@@ -89,3 +90,10 @@ def get_archive_file_name(user, table_name, column_name):
 
     directory_name = os.path.join(settings.SERVE_DOWNLOAD_DIR, username)
     return os.path.join(directory_name, '%s_%s.zip' % (table_name, column_name))
+
+
+def get_resolver():
+    if settings.SERVE_RESOLVER:
+        return import_class(settings.SERVE_RESOLVER)()
+    else:
+        return None

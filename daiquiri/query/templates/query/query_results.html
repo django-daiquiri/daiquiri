@@ -1,3 +1,8 @@
 {% load i18n %}
 
-    <div daiquiri-table></div>
+    <div daiquiri-table
+        data-rows-url="serve/api/rows/"
+        data-columns-url="serve/api/columns/"
+        data-files-url="files/api/files/"
+        data-references-url="serve/api/references/"
+    ></div>

@@ -1,5 +1,6 @@
 from collections import OrderedDict
 
+from django.shortcuts import redirect
 from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import viewsets
@@ -10,7 +11,7 @@ from rest_framework.reverse import reverse
 from daiquiri.core.adapter import get_adapter
 
 from .serializers import ColumnSerializer
-from .utils import get_columns
+from .utils import get_columns, get_resolver
 
 
 class RowViewSet(viewsets.ViewSet):
@@ -145,3 +146,21 @@ class ColumnViewSet(viewsets.ViewSet):
 
         # if nothing worked, return 404
         raise NotFound()
+
+
+class ReferenceViewSet(viewsets.ViewSet):
+
+    def list(self, request):
+
+        key = request.GET.get('key', None)
+        value = request.GET.get('value', None)
+
+        resolver = get_resolver()
+        if resolver is None:
+            raise NotFound()
+
+        url = resolver.resolve(key, value)
+        if url is None:
+            raise NotFound()
+
+        return redirect(url)

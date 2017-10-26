@@ -97,14 +97,19 @@
                         ng-class="{'active': column_index == table.active.column_index}">
 
                         <div class="cell" ng-click="table.activate(column_index, row_index)">
-                            <div ng-if="column.display == 'file_link'">
-                                <a href="{$ table.file_base_url $}{$ row[column_index] $}">
+                            <div ng-if="column.display == 'modal'">
+                                <a href="{$ table.files_url $}?search={$ row[column_index] | encodeURIComponent $}"
+                                    ng-click="table.modal_open($event, column_index, row_index)">
                                     {$ row[column_index] $}
                                 </a>
                             </div>
-                            <div ng-if="column.display == 'modal'">
-                                <a href="{$ table.file_base_url $}{$ row[column_index] $}"
-                                    ng-click="table.modal_open($event, column_index, row_index)">
+                            <div ng-if="column.display == 'file'">
+                                <a href="{$ table.files_url $}?search={$ row[column_index] | encodeURIComponent $}">
+                                    {$ row[column_index] $}
+                                </a>
+                            </div>
+                            <div ng-if="column.display == 'reference'">
+                                <a href="{$ table.references_url $}?key={$ column.name | encodeURIComponent $}&value={$ row[column_index] | encodeURIComponent $}" target="blank">
                                     {$ row[column_index] $}
                                 </a>
                             </div>
