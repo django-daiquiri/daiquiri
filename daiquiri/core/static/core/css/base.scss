@@ -164,7 +164,12 @@ footer {
     }
 
     .bottom {
-        height: $footer-bottom-height;
+        min-height: $footer-bottom-height;
+
+        p {
+            margin: 0;
+        }
+
         padding-top: 15px;
         padding-bottom: 15px;
 
