@@ -1,0 +1,16 @@
+{% load static %}
+{% load i18n %}
+
+<div class="panel panel-default">
+    <div class="panel-heading">{% trans 'License' %}</div>
+    <div class="panel-body">
+        <p class="text-center">
+            <img src="{% static 'metadata/img' %}/{{ license | lower }}.png" />
+        </p>
+        <p>
+            {% blocktrans %}
+            This database is published under the <a href="{{ license_url }}" target="_blank">{{ license_label }}</a>.
+            {% endblocktrans %}
+        </p>
+    </div>
+</div>

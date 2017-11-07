@@ -2,6 +2,7 @@
 {% load i18n %}
 {% load static %}
 {% load core_tags %}
+{% load metadata_tags %}
 
 {% block page %}
 
@@ -58,29 +59,11 @@
 {% block sidebar %}
 
     {% if database.doi %}
-    <div class="panel panel-default">
-        <div class="panel-heading">Digital object identifier</div>
-        <div class="panel-body">
-            <p>You can use the following <a href="https://www.doi.org">DOI</a> to cite this database:</p>
-            <p>
-                <a class="break" href="https://dx.doi.org/{{ database.doi }}">doi:{{ database.doi }}</a>
-            </p>
-        </div>
-    </div>
+    {% doi_panel database.doi _('database') %}
     {% endif %}
 
     {% if database.license %}
-    <div class="panel panel-default">
-        <div class="panel-heading">License</div>
-        <div class="panel-body">
-            <p class="text-center">
-                <img src="{% static 'metadata/img' %}/{{ database.license | lower }}.png" />
-            </p>
-            <p>
-                This database is published under the <a href="{{ database.license_url }}">{{ database.license_label }}</a>.
-            </p>
-        </div>
-    </div>
+    {% license_panel database.license %}
     {% endif %}
 
 {% endblock %}

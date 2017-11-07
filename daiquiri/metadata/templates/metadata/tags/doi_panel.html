@@ -1,0 +1,14 @@
+{% load i18n %}
+
+<div class="panel panel-default">
+    <div class="panel-heading">{% trans 'Digital object identifier' %}</div>
+    <div class="panel-body">
+        <p>
+            {% blocktrans %}
+            You can use the following <a href="https://www.doi.org" target="_blank">DOI</a> to cite this {{ dataset }} in a publication:</p>
+            {% endblocktrans %}
+        <p>
+            <a class="break" href="https://dx.doi.org/{{ doi }}">doi:{{ doi }}</a>
+        </p>
+    </div>
+</div>

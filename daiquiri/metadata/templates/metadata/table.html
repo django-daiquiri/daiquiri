@@ -2,6 +2,7 @@
 {% load i18n %}
 {% load static %}
 {% load core_tags %}
+{% load metadata_tags %}
 
 {% block page %}
 
@@ -69,29 +70,11 @@
 {% block sidebar %}
 
     {% if table.doi %}
-    <div class="panel panel-default">
-        <div class="panel-heading">Digital object identifier</div>
-        <div class="panel-body">
-            <p>You can use the following <a href="https://www.doi.org">DOI</a> to cite this table:</p>
-            <p>
-                <a class="break" href="https://dx.doi.org/{{ table.doi }}">doi:{{ table.doi }}</a>
-            </p>
-        </div>
-    </div>
+    {% doi_panel table.doi _('table') %}
     {% endif %}
 
     {% if table.license %}
-    <div class="panel panel-default">
-        <div class="panel-heading">License</div>
-        <div class="panel-body">
-            <p class="text-center">
-                <img src="{% static 'metadata/img' %}/{{ table.license | lower }}.png" />
-            </p>
-            <p>
-                This table is published under the <a href="{{ table.license_url }}">{{ table.license_label }}</a>.
-            </p>
-        </div>
-    </div>
+    {% license_panel table.license %}
     {% endif %}
 
 {% endblock %}
