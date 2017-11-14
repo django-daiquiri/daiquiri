@@ -9,6 +9,9 @@ from django.conf import settings
 from django.shortcuts import render
 from django.http import HttpResponse, Http404
 
+from daiquiri.core.utils import get_client_ip
+from daiquiri.stats.models import Record
+
 from .tasks import create_download_archive
 from .utils import get_columns, get_archive_files, get_archive_file_name
 
@@ -62,6 +65,20 @@ def archive(request, database_name, table_name, column_name):
 
         if task_result.successful():
             if request.method == 'GET':
+                # create a stats record for this job
+                Record.objects.create(
+                    resource_type='ARCHIVE',
+                    resource={
+                        'database_name': database_name,
+                        'table_name': table_name,
+                        'column_name': column_name,
+                        'file_name': file_name
+                    },
+                    client_ip=get_client_ip(request),
+                    user=request.user
+                )
+
+                # send the file to the client
                 return sendfile(request, file_name, attachment=True)
             else:
                 return HttpResponse(task_result.status)
