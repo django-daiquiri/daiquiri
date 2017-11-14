@@ -3,6 +3,7 @@ import logging
 from sendfile import sendfile
 
 from django.http import Http404
+from django.utils.timezone import now
 
 from daiquiri.core.utils import get_client_ip
 from daiquiri.stats.models import Record
@@ -21,6 +22,7 @@ def file(request, file_path):
     if file_name:
         # create a stats record for this job
         Record.objects.create(
+            time=now(),
             resource_type='FILE',
             resource={
                 'file_name': file_name

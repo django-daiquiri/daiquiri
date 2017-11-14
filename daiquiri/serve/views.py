@@ -8,6 +8,7 @@ from sendfile import sendfile
 from django.conf import settings
 from django.shortcuts import render
 from django.http import HttpResponse, Http404
+from django.utils.timezone import now
 
 from daiquiri.core.utils import get_client_ip
 from daiquiri.stats.models import Record
@@ -67,6 +68,7 @@ def archive(request, database_name, table_name, column_name):
             if request.method == 'GET':
                 # create a stats record for this job
                 Record.objects.create(
+                    time=now(),
                     resource_type='ARCHIVE',
                     resource={
                         'database_name': database_name,

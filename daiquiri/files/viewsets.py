@@ -1,5 +1,7 @@
 from sendfile import sendfile
 
+from django.utils.timezone import now
+
 from rest_framework import viewsets
 from rest_framework.exceptions import NotFound
 
@@ -21,6 +23,7 @@ class FileViewSet(viewsets.GenericViewSet):
             if file_name:
                 # create a stats record for this job
                 Record.objects.create(
+                    time=now(),
                     resource_type='FILE',
                     resource={
                         'file_name': file_name

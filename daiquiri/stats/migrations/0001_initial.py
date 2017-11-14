@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
             name='Record',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('time', models.DateTimeField(auto_now_add=True)),
+                ('time', models.DateTimeField()),
                 ('resource_type', models.CharField(max_length=32)),
                 ('resource', jsonfield.fields.JSONField()),
                 ('client_ip', models.GenericIPAddressField(blank=True, null=True)),

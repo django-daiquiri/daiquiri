@@ -11,7 +11,7 @@ from jsonfield import JSONField
 @python_2_unicode_compatible
 class Record(models.Model):
 
-    time = models.DateTimeField(auto_now_add=True)
+    time = models.DateTimeField()
 
     resource_type = models.CharField(max_length=32)
     resource = JSONField()
