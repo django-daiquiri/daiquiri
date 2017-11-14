@@ -42,10 +42,14 @@ angular.module('cutout', ['core'])
             download_url = cutout_url + '?' + $httpParamSerializer(service.values);
 
         $http.get(validate_url).then(function() {
-            // append iframe
-            angular.element('body').append('<iframe style="display: none;" src="' + download_url + '"></iframe>');
+
+            // download the file, headers will prevent the browser reloading the page
+            window.location.href = download_url;
+
         }, function(result) {
+
             service.errors = result.data;
+
         })
     }
 
