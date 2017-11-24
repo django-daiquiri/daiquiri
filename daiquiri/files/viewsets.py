@@ -4,6 +4,7 @@ from django.utils.timezone import now
 
 from rest_framework import viewsets
 from rest_framework.exceptions import NotFound
+from rest_framework.response import Response
 
 from daiquiri.core.utils import get_client_ip
 from daiquiri.stats.models import Record
@@ -21,19 +22,23 @@ class FileViewSet(viewsets.GenericViewSet):
             file_name = search_file(request.user, search)
 
             if file_name:
-                # create a stats record for this job
-                Record.objects.create(
-                    time=now(),
-                    resource_type='FILE',
-                    resource={
-                        'file_name': file_name
-                    },
-                    client_ip=get_client_ip(request),
-                    user=request.user
-                )
+                if request.GET.get('download', True):
+                    # create a stats record for this download
+                    Record.objects.create(
+                        time=now(),
+                        resource_type='FILE',
+                        resource={
+                            'file_name': file_name
+                        },
+                        client_ip=get_client_ip(request),
+                        user=request.user
+                    )
 
-                # send the file to the client
-                return sendfile(request, file_name, attachment=False)
+                    # send the file to the client
+                    return sendfile(request, file_name, attachment=False)
+                else:
+                    # send an empty response
+                    return Response()
             else:
                 raise NotFound()
 

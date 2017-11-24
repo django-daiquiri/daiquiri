@@ -20,7 +20,7 @@ class DatacubeViewSet(viewsets.GenericViewSet):
         adapter.clean(request)
 
         if request.GET.get('download', True):
-            # create a stats record for this job
+            # create a stats record for this cutout
             Record.objects.create(
                 time=now(),
                 resource_type='CUTOUT',
@@ -29,6 +29,8 @@ class DatacubeViewSet(viewsets.GenericViewSet):
                 user=request.user
             )
 
+            # perform the cutout and send the file
             return adapter.perform_cutout(request)
         else:
+            # send an empty response
             return Response()
