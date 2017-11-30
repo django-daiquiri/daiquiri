@@ -2,14 +2,14 @@ from django.conf.urls import url, include
 
 from rest_framework import routers
 
-from .views import CutoutView
-from .viewsets import CutoutViewSet
+from .views import DatacubeView
+from .viewsets import DatacubeViewSet
 
 router = routers.DefaultRouter()
-router.register(r'cutout', CutoutViewSet, base_name='cutout')
+router.register(r'datacubes', DatacubeViewSet, base_name='datacube')
 
 urlpatterns = [
-    url(r'^$', CutoutView.as_view(), name='cutout'),
+    url(r'^datacube/$', DatacubeView.as_view(), name='datacube'),
 
     # rest api
     url(r'^api/', include(router.urls)),

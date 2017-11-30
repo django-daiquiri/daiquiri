@@ -23,7 +23,7 @@
 
     <div class="row">
         <formgroup
-            class="col-md-3"
+            class="col-md-4"
             data-id="ra"
             data-type="number"
             data-label="{% trans 'RA' %}"
@@ -32,7 +32,7 @@
             data-errors="service.errors.ra">
         </formgroup>
         <formgroup
-            class="col-md-3"
+            class="col-md-4"
             data-id="a"
             data-type="number"
             data-label="{% trans 'a' %}"
@@ -44,7 +44,7 @@
 
     <div class="row">
         <formgroup
-            class="col-md-3"
+            class="col-md-4"
             data-id="dec"
             data-type="number"
             data-label="{% trans 'DEC' %}"
@@ -53,7 +53,7 @@
             data-errors="service.errors.dec">
         </formgroup>
         <formgroup
-            class="col-md-3"
+            class="col-md-4"
             data-id="a"
             data-type="number"
             data-label="{% trans 'b' %}"
@@ -63,11 +63,44 @@
         </formgroup>
     </div>
 
+    <div class="row">
+        <formgroup
+            class="col-md-4"
+            data-id="l0"
+            data-type="number"
+            data-label="&#955;<sub>0</sub>"
+            data-help="Start of the wavelength in &Aring;"
+            data-model="service.values.l0"
+            data-errors="service.errors.l0">
+        </formgroup>
+        <formgroup
+            class="col-md-4"
+            data-id="l1"
+            data-type="number"
+            data-label="&#955;<sub>1</sub>"
+            data-help="End of the wavelength range in &Aring;"
+            data-model="service.values.l1"
+            data-errors="service.errors.l1">
+        </formgroup>
+    </div>
+
     <button type="button" class="btn btn-primary" ng-click="service.download()">
         {% trans 'Download cut-out' %}
     </button>
     <button type="button" class="btn btn-default" ng-click="service.reset()">
         {% trans 'Reset values' %}
     </button>
+
+    <p style="margin-top: 20px">
+        {% trans 'It can take a moment until the download starts. Please be patient.' %}
+    </p>
+    <p>
+        {% trans 'This datacube can also be directly downloaded using the following url:' %}
+    </p>
+    <p>
+        <a href="{% absolute_url 'cutout:datacube-list' %}?{$ service.query_params $}">
+            {% absolute_url 'cutout:datacube-list' %}?{$ service.query_params $}
+        </a>
+    </p>
 
 {% endblock %}

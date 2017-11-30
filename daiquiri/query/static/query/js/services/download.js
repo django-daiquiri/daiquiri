@@ -20,8 +20,8 @@ app.factory('DownloadService', ['$http', 'PollingService', function($http, Polli
                 if (result.data == 'SUCCESS') {
                     service.unregister(url);
 
-                    // append iframe
-                    angular.element('body').append('<iframe style="display: none;" src="' + url + '"></iframe>');
+                    // download the file, headers will prevent the browser reloading the page
+                    window.location.href = url;
 
                 } else {
                     service.register(url, service.poll_download, {
@@ -47,8 +47,8 @@ app.factory('DownloadService', ['$http', 'PollingService', function($http, Polli
                 if (result.data == 'SUCCESS') {
                     service.unregister(url);
 
-                    // append iframe
-                    angular.element('body').append('<iframe style="display: none;" src="' + url + '"></iframe>');
+                    // download the file, headers will prevent the browser reloading the page
+                    window.location.href = url;
 
                 } else {
                     service.register(url, service.poll_archive, {'job': job, 'column_name': column_name });

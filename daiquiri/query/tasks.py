@@ -43,6 +43,7 @@ def run_query(job_id):
     from daiquiri.metadata.models import Column
     from daiquiri.query.models import QueryJob
     from daiquiri.query.utils import get_quota
+    from daiquiri.stats.models import Record
 
     # get logger
     logger = logging.getLogger(__name__)
@@ -145,6 +146,19 @@ def run_query(job_id):
                         'indexed': False,
                         'std': original_column.std
                     })
+
+        # create a stats record for this job
+        Record.objects.create(
+            time=job.end_time,
+            resource_type='QUERY_JOB',
+            resource={
+                'job_id': job.id,
+                'job_type': job.job_type,
+                'tables': job.metadata['source_tables']
+            },
+            client_ip=job.client_ip,
+            user=job.owner
+        )
 
         job.save()
 

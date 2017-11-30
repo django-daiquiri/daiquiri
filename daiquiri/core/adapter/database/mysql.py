@@ -134,9 +134,10 @@ class MySQLAdapter(DatabaseAdapter):
         escaped_column_names = [self.escape_identifier(column_name) for column_name in column_names]
 
         # prepare sql string
-        sql = 'SELECT * FROM %(database)s.%(table)s' % {
+        sql = 'SELECT %(columns)s FROM %(database)s.%(table)s' % {
             'database': self.escape_identifier(database_name),
-            'table': self.escape_identifier(table_name)
+            'table': self.escape_identifier(table_name),
+            'columns': ', '.join(escaped_column_names)
         }
         sql_args = []
 
