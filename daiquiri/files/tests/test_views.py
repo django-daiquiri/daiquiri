@@ -2,12 +2,13 @@ from django.test import TestCase
 
 from test_generator.views import TestViewMixin
 
+from .utils import setUp_directories
+
 
 class FilesViewTestCase(TestCase):
 
     fixtures = (
         'auth.json',
-        'files.json'
     )
 
     users = (
@@ -16,6 +17,9 @@ class FilesViewTestCase(TestCase):
         ('user', 'user'),
         ('anonymous', None),
     )
+
+    def setUp(self):
+        setUp_directories()
 
 
 class InternalFileTests(TestViewMixin, FilesViewTestCase):

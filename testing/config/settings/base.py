@@ -12,6 +12,7 @@ DAIQUIRI_APPS = [
     'daiquiri.metadata',
     'daiquiri.query',
     'daiquiri.serve',
+    'daiquiri.stats',
     'daiquiri.tap',
     'daiquiri.uws'
 ]
@@ -21,5 +22,7 @@ INSTALLED_APPS = []
 FIXTURE_DIRS = (
     os.path.join(BASE_DIR, 'fixtures'),
 )
+
+AUTH_SIGNUP = True
 
 AUTH_WORKFLOW = 'confirmation'

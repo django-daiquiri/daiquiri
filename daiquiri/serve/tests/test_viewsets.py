@@ -2,12 +2,13 @@ from django.test import TestCase
 
 from test_generator.viewsets import TestViewsetMixin
 
+from daiquiri.files.tests.utils import setUp_directories
+
 
 class ServeTestCase(TestCase):
 
     fixtures = (
         'auth.json',
-        'files.json',
         'metadata.json',
         'jobs.json',
         'queryjobs.json'
@@ -45,6 +46,9 @@ class ServeTestCase(TestCase):
             'admin': 200, 'user': 200, 'anonymous': 200
         }
     }
+
+    def setUp(self):
+        setUp_directories()
 
 
 class PublicRowTests(TestViewsetMixin, ServeTestCase):

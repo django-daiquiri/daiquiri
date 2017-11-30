@@ -5,12 +5,13 @@ from django.test import TestCase
 
 from test_generator.views import TestViewMixin
 
+from daiquiri.files.tests.utils import setUp_directories
+
 
 class ServeViewTestCase(TestCase):
 
     fixtures = (
         'auth.json',
-        'files.json',
         'metadata.json',
         'jobs.json',
         'queryjobs.json'
@@ -23,6 +24,8 @@ class ServeViewTestCase(TestCase):
         ('anonymous', None),
     )
 
+    def setUp(self):
+        setUp_directories()
 
 class PublicTableTests(TestViewMixin, ServeViewTestCase):
 
@@ -125,6 +128,8 @@ class ArchiveTests(TestViewMixin, ServeViewTestCase):
     }
 
     def setUp(self):
+        setUp_directories()
+
         for username, password in self.users:
             try:
                 os.remove(os.path.join(settings.SERVE_DOWNLOAD_DIR, username, 'images_preview.zip'))

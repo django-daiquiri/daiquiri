@@ -1,6 +1,6 @@
 import mock
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from daiquiri.core.adapter import get_adapter
 from daiquiri.jobs.tests.mixins import AsyncTestMixin
@@ -20,6 +20,7 @@ mock_fetch_table = mock.Mock()
 mock_fetch_table.return_value = []
 
 
+@override_settings(QUERY_ANONYMOUS=True)
 @mock.patch.object(adapter.database, 'execute', mock_execute)
 @mock.patch.object(adapter.database, 'fetch_stats', mock_fetch_stats)
 @mock.patch.object(adapter.database, 'fetch_pid', mock_fetch_pid)
