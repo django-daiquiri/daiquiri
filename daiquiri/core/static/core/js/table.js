@@ -323,7 +323,7 @@ angular.module('core')
 
     service.modal_update = function() {
         var file_path = service.rows[service.active.row_index][service.active.column_index];
-        var url = service.file_base_url + file_path;
+        var url = service.files_url + '?search=' + file_path;
         var column = service.columns[service.active.column_index];
 
         service.modal.title = file_path;
