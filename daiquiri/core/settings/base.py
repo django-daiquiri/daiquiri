@@ -146,6 +146,7 @@ SOCIALACCOUNT_ADAPTER = 'daiquiri.auth.adapter.DaiquiriSocialAccountAdapter'
 SETTINGS_EXPORT = [
     'LOGIN_URL',
     'LOGOUT_URL',
+    'ARCHIVE_COLUMNS',
     'AUTH_WORKFLOW',
     'METADATA_COLUMN_PERMISSIONS',
     'QUERY_DROPDOWNS',

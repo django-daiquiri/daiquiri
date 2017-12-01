@@ -28,9 +28,9 @@
 <div class="daiquiri-table" ng-show="table.ready">
     <div class="row daiquiri-table-header">
         <div class="col-sm-6">
-            <form class="daiquiri-table-search" ng-submit="table.filter()">
+            <form class="daiquiri-table-search" ng-submit="table.search()">
                 <div class="input-group">
-                    <input type="search" class="form-control" placeholder="{$ table.i18n.filter $}" ng-model="table.filter_string">
+                    <input type="search" class="form-control" placeholder="{$ table.i18n.filter $}" ng-model="table.search_string">
                     <span class="input-group-btn">
                         <button class="btn btn-default" type="submit">
                             <i class="fa fa-search" aria-hidden="true"></i>

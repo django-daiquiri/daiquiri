@@ -76,7 +76,7 @@ angular.module('core')
             page: 1,
             page_size: 10,
             ordering: null,
-            filter: null
+            search: null
         },
         i18n: {
             'first': gettext('First'),
@@ -87,8 +87,8 @@ angular.module('core')
             'filter': gettext('Filter'),
             'count': function() {
                 var page_count = Math.ceil(service.count / service.params.page_size);
-                if (service.params.filter) {
-                    return interpolate(gettext('Page %s of %s (%s rows total, filtering for "%s")'), [service.params.page,page_count, service.count, service.params.filter]);
+                if (service.params.search) {
+                    return interpolate(gettext('Page %s of %s (%s rows total, filtering for "%s")'), [service.params.page,page_count, service.count, service.params.search]);
                 } else {
                     return interpolate(gettext('Page %s of %s (%s rows total)'), [service.params.page,page_count, service.count]);
                 }
@@ -110,7 +110,7 @@ angular.module('core')
             'next_row': gettext('Next row'),
         },
         page_sizes: [10, 20, 100],
-        filter_string: null,
+        search_string: null,
         files: false,
         active: {},
         modal: {},
@@ -255,13 +255,13 @@ angular.module('core')
     service.reset = function() {
         service.params.page = 1;
         service.params.ordering = null;
-        service.params.filter = null;
-        service.filter_string = null;
+        service.params.search = null;
+        service.search_string = null;
         service.fetch();
     };
 
-    service.filter = function() {
-        service.params.filter = service.filter_string;
+    service.search = function() {
+        service.params.search = service.search_string;
         service.fetch();
     };
 

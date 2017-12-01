@@ -7,6 +7,27 @@ ASYNC = False
 IPV4_PRIVACY_MASK = 16
 IPV6_PRIVACY_MASK = 32
 
+ARCHIVE_ANONYMOUS = False
+
+ARCHIVE_DATABASE = 'daiquiri_archive'
+
+ARCHIVE_TABLE = 'files'
+
+ARCHIVE_COLUMNS = [
+    {
+        'name': 'timestamp'
+    },
+    {
+        'name': 'file'
+    },
+    {
+        'name': 'collection'
+    },
+    {
+        'name': 'path'
+    }
+]
+
 AUTH_SIGNUP = False
 
 AUTH_WORKFLOW = None

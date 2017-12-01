@@ -1,0 +1,41 @@
+{% extends 'core/wide.html' %}
+{% load staticfiles %}
+{% load i18n %}
+{% load compress %}
+{% load core_tags %}
+
+{% block bodyargs %}ng-app="archive" ng-controller="ArchiveController"{% endblock %}
+
+{% block headextra %}
+    {% vendor 'angular' %}
+
+    {% compress css %}
+    <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/browser.scss' %}" />
+    <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/table.scss' %}" />
+    <link rel="stylesheet" type="text/x-scss" href="{% static 'archive/css/archive.scss' %}" />
+    {% endcompress css %}
+
+    {% compress js %}
+    <script type="text/javascript" src="{% static 'core/js/core.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'core/js/byNumber.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'core/js/table.js' %}" ></script>
+
+    <script type="text/javascript" src="{% static 'archive/js/archive.js' %}" ></script>
+    {% endcompress js %}
+
+    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
+{% endblock %}
+
+{% block wide %}
+
+    <h1>Archive</h1>
+
+    <div daiquiri-table
+        data-rows-url="archive/api/rows/"
+        data-columns-url="archive/api/columns/"
+        data-files-url="archive/api/files/"
+        data-references-url="archive/api/references/"
+        data-params="{}">
+    </div>
+
+{% endblock %}

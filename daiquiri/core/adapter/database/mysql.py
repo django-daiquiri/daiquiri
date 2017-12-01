@@ -104,7 +104,7 @@ class MySQLAdapter(DatabaseAdapter):
         sql = 'SELECT table_rows as nrows, data_length + index_length AS size FROM `information_schema`.`tables` WHERE `table_schema` = %s AND table_name = %s;'
         return self.fetchone(sql, (database_name, table_name))
 
-    def count_rows(self, database_name, table_name, column_names=None, filter_string=None, filters=None):
+    def count_rows(self, database_name, table_name, column_names=None, search=None, filters=None):
         # if no column names are provided get all column_names from the table
         if not column_names:
             column_names= self.fetch_column_names(database_name, table_name)
@@ -120,11 +120,11 @@ class MySQLAdapter(DatabaseAdapter):
         sql_args = []
 
         # process filtering
-        sql, sql_args = self._process_filtering(sql, sql_args, filter_string, filters, escaped_column_names)
+        sql, sql_args = self._process_filtering(sql, sql_args, search, filters, escaped_column_names)
 
         return self.fetchone(sql, args=sql_args)[0]
 
-    def fetch_row(self, database_name, table_name, column_names=None, filter_string=None, filters=None):
+    def fetch_row(self, database_name, table_name, column_names=None, search=None, filters=None):
 
         # if no column names are provided get all column_names from the table
         if not column_names:
@@ -142,17 +142,17 @@ class MySQLAdapter(DatabaseAdapter):
         sql_args = []
 
         # process filtering
-        sql, sql_args = self._process_filtering(sql, sql_args, filter_string, filters, escaped_column_names)
+        sql, sql_args = self._process_filtering(sql, sql_args, search, filters, escaped_column_names)
 
         return self.fetchone(sql, args=sql_args)
 
-    def fetch_dict(self, database_name, table_name, column_names=None, filter_string=None, filters=None):
+    def fetch_dict(self, database_name, table_name, column_names=None, search=None, filters=None):
 
         # if no column names are provided get all column_names from the table
         if not column_names:
             column_names = self.fetch_column_names(database_name, table_name)
 
-        row = self.fetch_row(database_name, table_name, column_names, filter_string, filters)
+        row = self.fetch_row(database_name, table_name, column_names, search, filters)
 
         if row:
             return {
@@ -161,7 +161,7 @@ class MySQLAdapter(DatabaseAdapter):
         else:
             return {}
 
-    def fetch_rows(self, database_name, table_name, column_names=None, ordering=None, page=1, page_size=10, filter_string=None, filters=None):
+    def fetch_rows(self, database_name, table_name, column_names=None, ordering=None, page=1, page_size=10, search=None, filters=None):
 
         # if no column names are provided get all column_names from the table
         if not column_names:
@@ -179,7 +179,7 @@ class MySQLAdapter(DatabaseAdapter):
         sql_args = []
 
         # process filtering
-        sql, sql_args = self._process_filtering(sql, sql_args, filter_string, filters, escaped_column_names)
+        sql, sql_args = self._process_filtering(sql, sql_args, search, filters, escaped_column_names)
 
         # process ordering
         sql = self._process_ordering(sql, ordering, escaped_column_names)
@@ -193,15 +193,15 @@ class MySQLAdapter(DatabaseAdapter):
 
         return self.fetchall(sql, args=sql_args)
 
-    def _process_filtering(self, sql, sql_args, filter_string, filters, escaped_column_names):
-        if filter_string and filters:
-            raise Exception('filter_string and filters are mutually exclusive.')
+    def _process_filtering(self, sql, sql_args, search, filters, escaped_column_names):
+        if search and filters:
+            raise Exception('search and filters are mutually exclusive.')
 
-        elif filter_string:
+        elif search:
             # append a WHERE/OR condition fo every column
             where_stmts = []
             for escaped_column_name in escaped_column_names:
-                sql_args.append('%' + filter_string + '%')
+                sql_args.append('%' + search + '%')
                 where_stmts.append(escaped_column_name + ' LIKE %s')
 
             if where_stmts:
