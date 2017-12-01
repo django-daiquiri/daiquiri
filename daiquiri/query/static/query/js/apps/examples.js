@@ -1,4 +1,4 @@
-var app = angular.module('examples', ['list', 'infinite-scroll']);
+var app = angular.module('examples', ['core', 'infinite-scroll']);
 
 app.factory('ExamplesService', ['$resource', '$timeout', 'ListService', function($resource, $timeout, ListService) {
 

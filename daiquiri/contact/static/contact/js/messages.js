@@ -1,4 +1,4 @@
-var app = angular.module('messages', ['list', 'infinite-scroll']);
+var app = angular.module('messages', ['core', 'infinite-scroll']);
 
 app.factory('MessagesService', ['$resource', '$timeout', 'ListService', function($resource, $timeout, ListService) {
 
