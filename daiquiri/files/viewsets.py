@@ -35,7 +35,7 @@ class FileViewSet(viewsets.GenericViewSet):
                     )
 
                     # send the file to the client
-                    return sendfile(request, file_name, attachment=False)
+                    return sendfile(request, file_name, attachment=True)
                 else:
                     # send an empty response
                     return Response()

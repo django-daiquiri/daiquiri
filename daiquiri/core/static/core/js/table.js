@@ -265,6 +265,7 @@ angular.module('core')
         } else if (column.ucd.indexOf('meta.preview') > -1) {
             service.modal.pre = null;
             service.modal.src = url;
+
             return $q.when();
         } else {
             return $q.when();

@@ -12,9 +12,9 @@
                         </div>
                         <div class="order" ng-click="service.table.order(column.name)">
                             <i ng-class="{
-                                'fa fa-chevron-down': !service.table.config.ordering.endsWith(column.name),
-                                'ordered fa fa-chevron-down': service.table.config.ordering == column.name,
-                                'ordered fa fa-chevron-up': service.table.config.ordering == '-' + column.name
+                                'fa fa-chevron-down': !service.table.params.ordering.endsWith(column.name),
+                                'ordered fa fa-chevron-down': service.table.params.ordering == column.name,
+                                'ordered fa fa-chevron-up': service.table.params.ordering == '-' + column.name
                             }" aria-hidden="true"></i>
                         </div>
                         <div ng-if="!$last" class="handle" ng-mousedown="service.table.resize($index)"></div>
