@@ -4,7 +4,17 @@
 {% load compress %}
 {% load core_tags %}
 
-{% block bodyargs %}ng-app="archive" ng-controller="ArchiveController"{% endblock %}
+{% block bodyargs %}
+    ng-app="archive"
+    ng-controller="ArchiveController"
+    ng-init="service.table.init({
+        rows_url: 'archive/api/rows/',
+        columns_url: 'archive/api/columns/',
+        files_url: 'archive/api/files/',
+        references_url: 'archive/api/references/',
+        params: {}
+    })"
+{% endblock %}
 
 {% block headextra %}
     {% vendor 'angular' %}
@@ -19,23 +29,14 @@
     <script type="text/javascript" src="{% static 'core/js/core.js' %}" ></script>
     <script type="text/javascript" src="{% static 'core/js/byNumber.js' %}" ></script>
     <script type="text/javascript" src="{% static 'core/js/table.js' %}" ></script>
-
     <script type="text/javascript" src="{% static 'archive/js/archive.js' %}" ></script>
     {% endcompress js %}
-
-    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
 {% endblock %}
 
 {% block wide %}
 
     <h1>Archive</h1>
 
-    <div daiquiri-table
-        data-rows-url="archive/api/rows/"
-        data-columns-url="archive/api/columns/"
-        data-files-url="archive/api/files/"
-        data-references-url="archive/api/references/"
-        data-params="{}">
-    </div>
+    {% include 'core/partials/table.html' %}
 
 {% endblock %}

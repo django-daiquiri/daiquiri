@@ -1,0 +1,67 @@
+<div class="daiquiri-table-pane">
+    <table class="table">
+        <thead>
+            <tr>
+                <th ng-repeat="column in service.table.columns" data-column-index="{$ $index $}">
+                    <div class="cell">
+                        <div class="name">
+                            <span>{$ column.name $}</span>
+                        </div>
+                        <div class="info">
+                            <i class="fa fa-question-circle" aria-hidden="true"></i>
+                        </div>
+                        <div class="order" ng-click="service.table.order(column.name)">
+                            <i ng-class="{
+                                'fa fa-chevron-down': !service.table.config.ordering.endsWith(column.name),
+                                'ordered fa fa-chevron-down': service.table.config.ordering == column.name,
+                                'ordered fa fa-chevron-up': service.table.config.ordering == '-' + column.name
+                            }" aria-hidden="true"></i>
+                        </div>
+                        <div ng-if="!$last" class="handle" ng-mousedown="service.table.resize($index)"></div>
+                    </div>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="row in service.table.rows" ng-init="row_index = $index"
+                ng-class="{'active': row_index == service.table.active.row_index}">
+
+                <td ng-repeat="column in service.table.columns" ng-init="column_index = $index"
+                    ng-class="{'active': column_index == service.table.active.column_index}">
+
+                    <div class="cell" ng-click="service.table.activate(column_index, row_index)">
+                        <div ng-if="column.display == 'modal'">
+                            <a href="{$ service.table.files_url $}?search={$ row[column_index] | encodeURIComponent $}"
+                                ng-click="service.table.modal_open($event, column_index, row_index)">
+                                {$ row[column_index] $}
+                            </a>
+                        </div>
+                        <div ng-if="column.display == 'file'">
+                            <a href="{$ service.table.files_url $}?search={$ row[column_index] | encodeURIComponent $}">
+                                {$ row[column_index] $}
+                            </a>
+                        </div>
+                        <div ng-if="column.display == 'reference'">
+                            <a href="{$ service.table.references_url $}?key={$ column.name | encodeURIComponent $}&value={$ row[column_index] | encodeURIComponent $}" target="blank">
+                                {$ row[column_index] $}
+                            </a>
+                        </div>
+                        <div ng-if="column.display == 'link'">
+                            <a href="{$ row[column_index] $}" target="blank">
+                                {$ row[column_index] $}
+                            </a>
+                        </div>
+                        <div ng-if="column.display == 'text'">
+                            <div ng-if="service.table.column_round[column_index]">
+                                {$ row[column_index] | number : service.table.column_round[column_index] $}
+                            </div>
+                            <div ng-if="!service.table.column_round[column_index]">
+                                {$ row[column_index] $}
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

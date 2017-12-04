@@ -1,0 +1,26 @@
+{% load i18n %}
+
+<div class="row daiquiri-table-footer">
+    <div class="col-sm-8 daiquiri-table-count">
+        <span ng-show="service.table.params.search">
+            {% blocktrans with page='{$ service.table.params.page $}' page_count='{$ service.table.page_count $}' count='{$ service.table.count $}' search='{$ service.table.params.search $}' %}
+            Page {{ page }} of {{ page_count }} ({{ count }} rows total, filtering for "{{ search }}")
+            {% endblocktrans %}
+        </span>
+        <span ng-hide="service.table.params.search">
+            {% blocktrans with page='{$ service.table.params.page $}' page_count='{$ service.table.page_count $}' count='{$ service.table.count $}' %}
+            Page {{ page }} of {{ page_count }} ({{ count }} rows total)
+            {% endblocktrans %}
+        </span>
+    </div>
+
+    <div class="col-sm-4 daiquiri-table-page-size" ng-show="service.table.page_sizes.length > 1">
+        <select class="form-control" ng-model="service.table.params.page_size" ng-change="service.table.fetch()" by-number>
+            <option value="{$ value $}" ng-repeat="value in service.table.page_sizes">
+                {% blocktrans with value='{$ value $}' count='{$ service.count $}' trimmed %}
+                Show {{ value }} of {{ count }} rows
+                {% endblocktrans %}
+            </option>
+        </select>
+    </div>
+</div>

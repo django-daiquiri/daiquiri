@@ -1,65 +1,6 @@
 angular.module('core')
 
-.directive('daiquiriTable', ['$timeout', '$compile', '$templateCache', 'TableService', function($timeout, $compile, $templateCache, TableService) {
-    return {
-        templateUrl: function(element, attrs) {
-            var staticurl = angular.element('meta[name="staticurl"]').attr('content');
-            return staticurl + 'core/html/table.html';
-        },
-        scope: {
-            'rowsUrl': '@',
-            'columnsUrl': '@',
-            'filesUrl': '@',
-            'referencesUrl': '@',
-            'params': '=',
-            'pageSizes': '=',
-            'columnWidths': '=',
-            'columnRound': '='
-        },
-        link: function(scope, element, attrs) {
-            scope.table = TableService;
-            scope.table.init({
-                rows_url: scope.rowsUrl,
-                columns_url: scope.columnsUrl,
-                files_url: scope.filesUrl,
-                references_url: scope.referencesUrl,
-                params: scope.params,
-                page_sizes: scope.pageSizes,
-                column_widths: scope.columnWidths,
-                column_round: scope.columnRound
-            });
-
-            // refresh the tooltips everytime a new set of columns is fetched
-            scope.$watch(function() {
-                return angular.isDefined(scope.table.columns) && scope.table.columns.$resolved;
-            }, function(new_value) {
-                if (new_value) {
-                    var template = $templateCache.get('tooltip.html');
-
-                    $timeout(function() {
-                        angular.forEach(scope.table.columns, function(column, index) {
-                            var isolated_scope = scope.$new(true);
-                            isolated_scope.column = column;
-                            isolated_scope.table = scope.table;
-
-                            $('[data-column-index="' + index + '"] .info').popover({
-                                title: '<strong>' + column.name + '</strong>',
-                                content: $compile(template)(isolated_scope),
-                                html: true,
-                                trigger: 'hover',
-                                placement: 'bottom',
-                                container: '.daiquiri-table'
-                            });
-                        });
-                    });
-                }
-            });
-
-        }
-    };
-}])
-
-.factory('TableService', ['$http', '$resource', '$q', '$document', '$timeout', function($http, $resource, $q, $document, $timeout) {
+.factory('TableService', ['$http', '$resource', '$q', '$document', '$timeout', '$rootScope', '$compile', '$templateCache',  function($http, $resource, $q, $document, $timeout, $rootScope, $compile, $templateCache) {
 
     /* get the base url */
 
@@ -77,37 +18,6 @@ angular.module('core')
             page_size: 10,
             ordering: null,
             search: null
-        },
-        i18n: {
-            'first': gettext('First'),
-            'previous': gettext('Previous'),
-            'next': gettext('Next'),
-            'last': gettext('Last'),
-            'reset': gettext('Reset'),
-            'filter': gettext('Filter'),
-            'count': function() {
-                var page_count = Math.ceil(service.count / service.params.page_size);
-                if (service.params.search) {
-                    return interpolate(gettext('Page %s of %s (%s rows total, filtering for "%s")'), [service.params.page,page_count, service.count, service.params.search]);
-                } else {
-                    return interpolate(gettext('Page %s of %s (%s rows total)'), [service.params.page,page_count, service.count]);
-                }
-            },
-            'page_size': function(value) {
-                return interpolate(gettext('Show %s of %s rows'), [value, service.count]);
-            },
-            'description': gettext('Description'),
-            'unit': gettext('Unit'),
-            'ucd': gettext('UCD'),
-            'datatype': gettext('Data type'),
-            'arraysize': gettext('Size'),
-            'principal': gettext('Principal'),
-            'indexed': gettext('Indexed'),
-            'std': gettext('STD'),
-            'previous_column': gettext('Previous column'),
-            'next_column': gettext('Next column'),
-            'previous_row': gettext('Previous row'),
-            'next_row': gettext('Next row'),
         },
         page_sizes: [10, 20, 100],
         search_string: null,
@@ -196,6 +106,23 @@ angular.module('core')
                 });
 
                 $timeout(function() {
+                    var template = $templateCache.get('tooltip.html');
+
+                    angular.forEach(service.columns, function(column, index) {
+                        var isolated_scope = $rootScope.$new(true);
+                        isolated_scope.column = column;
+                        isolated_scope.table = service;
+
+                        $('[data-column-index="' + index + '"] .info').popover({
+                            title: '<strong>' + column.name + '</strong>',
+                            content: $compile(template)(isolated_scope),
+                            html: true,
+                            trigger: 'hover',
+                            placement: 'bottom',
+                            container: '.daiquiri-table'
+                        });
+                    });
+
                     angular.forEach(service.column_widths, function(column_width, column_index) {
                         angular.element('[data-column-index="' + column_index + '"]').width(column_width);
                     });
@@ -217,8 +144,10 @@ angular.module('core')
             service.count = response.count;
             service.rows = response.results;
 
+            service.page_count = Math.ceil(service.count / service.params.page_size);
+
             service.first_page = (service.params.page == 1);
-            service.last_page = (service.params.page * service.params.page_size > service.count);
+            service.last_page = (service.params.page * service.params.page_size >= service.count);
 
             service.ready = true;
         }).$promise;

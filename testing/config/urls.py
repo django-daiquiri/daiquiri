@@ -19,6 +19,4 @@ urlpatterns = [
     url(r'^uws/', include('daiquiri.uws.urls', namespace='uws')),
 
     url(r'^admin/', include(admin.site.urls)),
-
-    url(r'^jsi18n/$', javascript_catalog, name='javascript-catalog'),
 ]
