@@ -24,7 +24,8 @@ angular.module('core')
         files: false,
         active: {},
         modal: {},
-        round: false
+        round: false,
+        tooltips: true
     };
 
     service.init = function(opt) {
@@ -105,28 +106,34 @@ angular.module('core')
                     }
                 });
 
-                $timeout(function() {
-                    var template = $templateCache.get('tooltip.html');
+                if (service.tooltips) {
+                    $timeout(function() {
+                        var template = $templateCache.get('tooltip.html');
 
-                    angular.forEach(service.columns, function(column, index) {
-                        var isolated_scope = $rootScope.$new(true);
-                        isolated_scope.column = column;
-                        isolated_scope.table = service;
+                        angular.forEach(service.columns, function(column, index) {
+                            var isolated_scope = $rootScope.$new(true);
+                            isolated_scope.column = column;
+                            isolated_scope.table = service;
 
-                        $('[data-column-index="' + index + '"] .info').popover({
-                            title: '<strong>' + column.name + '</strong>',
-                            content: $compile(template)(isolated_scope),
-                            html: true,
-                            trigger: 'hover',
-                            placement: 'bottom',
-                            container: '.daiquiri-table'
+                            $('[data-column-index="' + index + '"] .info').popover({
+                                title: '<strong>' + column.name + '</strong>',
+                                content: $compile(template)(isolated_scope),
+                                html: true,
+                                trigger: 'hover',
+                                placement: 'bottom',
+                                container: '.daiquiri-table'
+                            });
                         });
                     });
+                }
 
-                    angular.forEach(service.column_widths, function(column_width, column_index) {
-                        angular.element('[data-column-index="' + column_index + '"]').width(column_width);
+                if (service.tooltips) {
+                    $timeout(function() {
+                        angular.forEach(service.column_widths, function(column_width, column_index) {
+                            angular.element('[data-column-index="' + column_index + '"]').width(column_width);
+                        });
                     });
-                });
+                }
 
                 service.reset();
             });

@@ -12,7 +12,8 @@
         columns_url: 'archive/api/columns/',
         files_url: 'archive/api/files/',
         references_url: 'archive/api/references/',
-        params: {}
+        params: {},
+        tooltips: false
     })"
 {% endblock %}
 
@@ -37,6 +38,55 @@
 
     <h1>Archive</h1>
 
-    {% include 'core/partials/table.html' %}
+    <div class="daiquiri-table" ng-show="service.table.ready">
+
+        <div class="daiquiri-table-header">
+            <div class="row">
+                <div class="col-sm-12">
+                    {% include 'core/partials/table_search.html' %}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <ul class="pagination">
+                        <li>
+                            <a href="" ng-click="service.download()">
+                                {% trans 'Download marked files' %}
+                            </a>
+                        </li>
+                    </ul>
+                    <ul class="pagination">
+                        <li>
+                            <a href="" ng-click="service.mark()">
+                                {% trans 'Mark this page' %}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="" ng-click="service.mark_all()">
+                                {% trans 'Mark all' %}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="" ng-click="service.unmark()">
+                                {% trans 'Unmark all' %}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-sm-6">
+                    <div class="pull-right">
+                        {% include 'core/partials/table_pagination.html' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% include 'core/partials/table_pane.html' %}
+
+        {% include 'core/partials/table_footer.html' %}
+
+    </div>
+
+    {% include 'core/partials/table_modal.html' %}
 
 {% endblock %}

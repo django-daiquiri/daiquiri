@@ -13,14 +13,22 @@
         .daiquiri-table-search {
             margin: 0 0 10px 0;
         }
-        .daiquiri-table-pagination {
-            margin-bottom: 10px;
+        // .daiquiri-table-pagination {
+        //     margin-bottom: 10px;
 
-            @media(min-width: $screen-xs-max) {
-                text-align: right;
-            }
-            .pagination {
-                margin: 0;
+        //     @media(min-width: $screen-xs-max) {
+        //         text-align: right;
+        //     }
+        //     .pagination {
+        //         margin: 0;
+        //     }
+        // }
+        .pagination {
+            margin: 0 0 10px 0;
+        }
+        @media(max-width: $screen-xs-max) {
+            .pull-right {
+                float: none!important;
             }
         }
     }

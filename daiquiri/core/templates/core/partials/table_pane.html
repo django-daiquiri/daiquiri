@@ -7,7 +7,7 @@
                         <div class="name">
                             <span>{$ column.name $}</span>
                         </div>
-                        <div class="info">
+                        <div class="info" ng-show="service.table.tooltips">
                             <i class="fa fa-question-circle" aria-hidden="true"></i>
                         </div>
                         <div class="order" ng-click="service.table.order(column.name)">
