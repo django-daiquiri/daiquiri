@@ -24,8 +24,11 @@ angular.module('core')
         files: false,
         active: {},
         modal: {},
+        checked: {},
+        checked_all: false,
         round: false,
-        tooltips: true
+        tooltips: true,
+        checkboxes: false
     };
 
     service.init = function(opt) {
@@ -60,6 +63,12 @@ angular.module('core')
         if (angular.isDefined(opt.column_round)) {
             service.column_round = opt.column_round;
         }
+
+        angular.forEach(['tooltips', 'checkboxes'], function(key) {
+            if (angular.isDefined(opt[key])) {
+                service[key] = opt[key];
+            }
+        });
 
         // add params from the dom to service.params and fetch the data
         if (angular.isDefined(opt.params)) {
@@ -127,7 +136,7 @@ angular.module('core')
                     });
                 }
 
-                if (service.tooltips) {
+                if (service.column_widths) {
                     $timeout(function() {
                         angular.forEach(service.column_widths, function(column_width, column_index) {
                             angular.element('[data-column-index="' + column_index + '"]').width(column_width);
@@ -155,6 +164,10 @@ angular.module('core')
 
             service.first_page = (service.params.page == 1);
             service.last_page = (service.params.page * service.params.page_size >= service.count);
+
+            if (service.checkboxes) {
+                service.update_checked_all();
+            }
 
             service.ready = true;
         }).$promise;
@@ -233,10 +246,28 @@ angular.module('core')
     };
 
     service.activate = function(column_index, row_index) {
-        service.active = {
-            column_index: column_index,
-            row_index: row_index
-        }
+        // service.active = {
+        //     column_index: column_index,
+        //     row_index: row_index
+        // }
+    };
+
+    service.check_all = function() {
+        angular.forEach(service.rows, function(row) {
+            service.checked[service.get_hash(row)] = service.checked_all;
+        })
+    };
+
+    service.update_checked_all = function() {
+        service.checked_all = service.rows.map(function(row) {
+            return service.checked[service.get_hash(row)];
+        }).every(function(element) {
+            return element === true;
+        });
+    }
+
+    service.get_hash = function(row) {
+        return JSON.stringify(row);
     }
 
     service.modal_open = function(event, column_index, row_index) {

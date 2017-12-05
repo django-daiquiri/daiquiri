@@ -13,7 +13,8 @@
         files_url: 'archive/api/files/',
         references_url: 'archive/api/references/',
         params: {},
-        tooltips: false
+        tooltips: false,
+        checkboxes: true
     })"
 {% endblock %}
 
@@ -28,6 +29,7 @@
 
     {% compress js %}
     <script type="text/javascript" src="{% static 'core/js/core.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'core/js/filter.js' %}" ></script>
     <script type="text/javascript" src="{% static 'core/js/byNumber.js' %}" ></script>
     <script type="text/javascript" src="{% static 'core/js/table.js' %}" ></script>
     <script type="text/javascript" src="{% static 'archive/js/archive.js' %}" ></script>
@@ -51,24 +53,14 @@
                     <ul class="pagination">
                         <li>
                             <a href="" ng-click="service.download()">
-                                {% trans 'Download marked files' %}
+                                {% trans 'Download checked' %}
                             </a>
                         </li>
                     </ul>
                     <ul class="pagination">
                         <li>
-                            <a href="" ng-click="service.mark()">
-                                {% trans 'Mark this page' %}
-                            </a>
-                        </li>
-                        <li>
-                            <a href="" ng-click="service.mark_all()">
-                                {% trans 'Mark all' %}
-                            </a>
-                        </li>
-                        <li>
-                            <a href="" ng-click="service.unmark()">
-                                {% trans 'Unmark all' %}
+                            <a href="" ng-click="service.download_all()">
+                                {% trans 'Download all' %}
                             </a>
                         </li>
                     </ul>

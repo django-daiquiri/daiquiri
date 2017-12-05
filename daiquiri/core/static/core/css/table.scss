@@ -13,16 +13,6 @@
         .daiquiri-table-search {
             margin: 0 0 10px 0;
         }
-        // .daiquiri-table-pagination {
-        //     margin-bottom: 10px;
-
-        //     @media(min-width: $screen-xs-max) {
-        //         text-align: right;
-        //     }
-        //     .pagination {
-        //         margin: 0;
-        //     }
-        // }
         .pagination {
             margin: 0 0 10px 0;
         }
@@ -53,12 +43,19 @@
             td:last-child {
                 border-right: none;
             }
-            .cell {
+
+            .daiquiri-table-cell,
+            .daiquiri-table-check {
                 white-space: nowrap;
                 padding: 8px;
                 position: relative;
 
                 overflow: hidden;
+            }
+            .daiquiri-table-check {
+                white-space: nowrap;
+                padding: 9px 7px 7px 9px;
+                width: 13px;
             }
             tr.active {
                 td.active {

@@ -2,10 +2,16 @@
     <table class="table">
         <thead>
             <tr>
-                <th ng-repeat="column in service.table.columns" data-column-index="{$ $index $}">
-                    <div class="cell">
+                <th class="daiquiri-table-check" ng-if="service.table.checkboxes">
+                    <input type="checkbox" ng-model="service.table.checked_all" ng-click="service.table.check_all()" />
+                </th>
+
+                <th ng-repeat="column in service.table.columns"
+                    ng-if="!column.hidden" data-column-index="{$ $index $}">
+                    <div class="daiquiri-table-cell">
                         <div class="name">
-                            <span>{$ column.name $}</span>
+                            <span ng-show="column.label">{$ column.label $}</span>
+                            <span ng-hide="column.label">{$ column.name $}</span>
                         </div>
                         <div class="info" ng-show="service.table.tooltips">
                             <i class="fa fa-question-circle" aria-hidden="true"></i>
@@ -26,10 +32,18 @@
             <tr ng-repeat="row in service.table.rows" ng-init="row_index = $index"
                 ng-class="{'active': row_index == service.table.active.row_index}">
 
-                <td ng-repeat="column in service.table.columns" ng-init="column_index = $index"
+                <td class="daiquiri-table-check" ng-if="service.table.checkboxes">
+                    <input type="checkbox"
+                        ng-click="service.table.update_checked_all()"
+                        ng-model="service.table.checked[service.table.get_hash(row)]" />
+                </td>
+
+                <td ng-repeat="column in service.table.columns"
+                    ng-if="!column.hidden"
+                    ng-init="column_index = $index"
                     ng-class="{'active': column_index == service.table.active.column_index}">
 
-                    <div class="cell" ng-click="service.table.activate(column_index, row_index)">
+                    <div class="daiquiri-table-cell" ng-click="service.table.activate(column_index, row_index)">
                         <div ng-if="column.display == 'modal'">
                             <a href="{$ service.table.files_url $}?search={$ row[column_index] | encodeURIComponent $}"
                                 ng-click="service.table.modal_open($event, column_index, row_index)">

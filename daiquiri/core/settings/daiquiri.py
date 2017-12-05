@@ -15,16 +15,25 @@ ARCHIVE_TABLE = 'files'
 
 ARCHIVE_COLUMNS = [
     {
-        'name': 'timestamp'
+        'name': 'id',
+        'hidden': True
     },
     {
-        'name': 'file'
+        'name': 'timestamp',
+        'label': 'Timestamp'
     },
     {
-        'name': 'collection'
+        'name': 'file',
+        'label': 'Filename',
+        'ucd': 'meta.file'
     },
     {
-        'name': 'path'
+        'name': 'collection',
+        'label': 'Collection'
+    },
+    {
+        'name': 'path',
+        'hidden': True
     }
 ]
 
