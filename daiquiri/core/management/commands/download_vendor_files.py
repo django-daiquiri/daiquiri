@@ -13,7 +13,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         for key, vendor_conf in settings.VENDOR.items():
-            for file_type in ['js', 'css', 'img', 'font']:
+            for file_type in ['js', 'css', 'img', 'font', 'map']:
                 if file_type in vendor_conf:
                     for file in vendor_conf[file_type]:
                         # get the directory and the file_name
@@ -28,7 +28,7 @@ class Command(BaseCommand):
                             pass
 
                         # get the full url of the file
-                        url = requests.compat.urljoin(vendor_conf['url'], file['path']) 
+                        url = requests.compat.urljoin(vendor_conf['url'], file['path'])
 
                         print('%s -> %s' % (url, file_name))
 

@@ -57,16 +57,18 @@ VENDOR = {
                 'path': 'angular.min.js'
             },
             {
-                'path': 'angular.min.js.map'
-            },
-            {
                 'path': 'angular-resource.min.js'
             },
             {
-                'path': 'angular-resource.min.js.map'
+                'path': 'angular-sanitize.min.js'
+            }
+        ],
+        'map': [
+            {
+                'path': 'angular.min.js.map'
             },
             {
-                'path': 'angular-sanitize.min.js'
+                'path': 'angular-resource.min.js.map'
             },
             {
                 'path': 'angular-sanitize.min.js.map'
