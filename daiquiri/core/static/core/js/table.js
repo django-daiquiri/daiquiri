@@ -153,7 +153,7 @@ angular.module('core')
         service.columns = [];
         service.rows = [];
         service.ready = true;
-    }
+    };
 
     service.fetch = function() {
         return resources.rows.paginate(service.params, function(response) {
@@ -206,6 +206,7 @@ angular.module('core')
         service.params.ordering = null;
         service.params.search = null;
         service.search_string = null;
+        service.checked = {};
         service.fetch();
     };
 
