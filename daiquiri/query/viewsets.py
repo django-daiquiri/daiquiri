@@ -1,3 +1,5 @@
+import os
+
 from sendfile import sendfile
 
 from django.conf import settings
@@ -158,12 +160,23 @@ class QueryJobViewSet(viewsets.ModelViewSet):
 
         try:
             download_job = DownloadJob.objects.get(job=job, format_key=format_key)
+
+            # check if the file was lost
+            if download_job.phase == download_job.PHASE_COMPLETED and \
+                not os.path.isfile(download_job.file_path):
+
+                # set the phase back to pending so that the file is recreated
+                download_job.phase == download_job.PHASE_PENDING
+
         except DownloadJob.DoesNotExist:
             download_job = DownloadJob(
                 client_ip=get_client_ip(self.request),
                 job=job,
                 format_key=request.data.get('format_key')
             )
+            download_job.save()
+
+        if download_job.phase == download_job.PHASE_PENDING:
             download_job.process()
             download_job.save()
             download_job.run()

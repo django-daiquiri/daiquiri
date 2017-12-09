@@ -396,16 +396,30 @@ class DownloadJob(Job):
 
         self.file_path = get_download_file_name(self.job.owner, self.job.table_name, format_config)
 
-    def run(self):
-        download_job_id = str(self.id)
+        # set clean flag
+        self.is_clean = True
 
-        if not settings.ASYNC:
-            logger.info('create_download_file %s submitted (sync)' % download_job_id)
-            create_download_file.apply((download_job_id, ), task_id=download_job_id, throw=True)
+    def run(self):
+        if not self.is_clean:
+            raise Exception('download_job.process() was not called.')
+
+        if self.phase == self.PHASE_PENDING:
+            self.phase = self.PHASE_QUEUED
+            self.save()
+
+            download_job_id = str(self.id)
+            if not settings.ASYNC:
+                logger.info('create_download_file %s submitted (sync)' % download_job_id)
+                create_download_file.apply((download_job_id, ), task_id=download_job_id, throw=True)
+
+            else:
+                logger.info('create_download_file %s submitted (async, queue=download)' % download_job_id)
+                create_download_file.apply_async((download_job_id, ), task_id=download_job_id, queue='download')
 
         else:
-            logger.info('create_download_file %s submitted (async, queue=download)' % download_job_id)
-            create_download_file.apply_async((download_job_id, ), task_id=download_job_id, queue='download')
+            raise ValidationError({
+                'phase': ['Job is not PENDING.']
+            })
 
     def abort(self):
         pass
