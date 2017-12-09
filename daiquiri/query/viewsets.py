@@ -1,7 +1,7 @@
 from sendfile import sendfile
 
 from django.conf import settings
-from django.http import Http404, StreamingHttpResponse
+from django.http import Http404, FileResponse
 
 from rest_framework import viewsets, mixins, filters
 from rest_framework.response import Response
@@ -184,8 +184,14 @@ class QueryJobViewSet(viewsets.ModelViewSet):
         except IndexError:
             raise ValidationError({'format': "Not supported."})
 
-        return StreamingHttpResponse(job.stream(format_key), content_type=format_config['content_type'])
-
+        try:
+            download_job = DownloadJob.objects.get(job=job, format_key=format_key)
+            return sendfile(request, download_job.file_path, attachment=True)
+        except DownloadJob.DoesNotExist:
+            file_name = '%s.%s' % (job.table_name, format_config['extension'])
+            response = FileResponse(job.stream(format_key), content_type=format_config['content_type'])
+            response['Content-Disposition'] = "attachment; filename=%s" % file_name
+            return response
 
 class ExampleViewSet(viewsets.ModelViewSet):
     permission_classes = (HasModelPermission, )
