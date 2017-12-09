@@ -101,9 +101,9 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
         // start the polling service
         service.polling = PollingService
         service.polling.init();
-        service.polling.register('status', service.fetchStatus);
-        service.polling.register('jobs', service.fetchJobs);
-        service.polling.register('database', service.fetchUserDatabase);
+        service.polling.register('status', service.fetchStatus, true, false);
+        service.polling.register('jobs', service.fetchJobs, true, false);
+        service.polling.register('database', service.fetchUserDatabase, true, false);
 
         // load the other services
         service.table = TableService;

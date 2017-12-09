@@ -1,4 +1,6 @@
-app.factory('PollingService', ['$timeout', function($timeout) {
+angular.module('core')
+
+.factory('PollingService', ['$timeout', function($timeout) {
 
     var service = {
         actions: {}
@@ -19,12 +21,15 @@ app.factory('PollingService', ['$timeout', function($timeout) {
         $timeout(service.poll, 4000);
     };
 
-    service.register = function(polling_id, callback, callback_options, enabled) {
+    service.register = function(polling_id, callback, callback_options, enabled, initial) {
         if (angular.isUndefined(callback_options)) {
             callback_options = {};
         }
         if (angular.isUndefined(enabled)) {
             enabled = true;
+        }
+        if (angular.isUndefined(initial)) {
+            initial = true;
         }
 
         service.actions[polling_id] = {
@@ -32,6 +37,11 @@ app.factory('PollingService', ['$timeout', function($timeout) {
             'callback_options': callback_options,
             'enabled': enabled
         };
+
+        if (enabled && initial) {
+            console.log('!');
+            callback(callback_options);
+        }
     };
 
     service.unregister = function(polling_id) {
