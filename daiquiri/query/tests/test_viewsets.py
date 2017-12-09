@@ -93,10 +93,10 @@ class JobTests(TestViewsetMixin, QueryViewsetTestCase):
         'abort_viewset': {
             'admin': 404, 'user': 200, 'evil': 404, 'anonymous': 403
         },
-        'download_completed_viewset': {
+        'create_download_completed_viewset': {
             'admin': 404, 'user': 200, 'evil': 404, 'anonymous': 403
         },
-        'download_executing_viewset': {
+        'create_download_executing_viewset': {
             'admin': 404, 'user': 400, 'evil': 404, 'anonymous': 403
         },
         'stream_completed_viewset': {
@@ -145,38 +145,39 @@ class JobTests(TestViewsetMixin, QueryViewsetTestCase):
                 'pk': instance.pk
             })
 
-    def _test_download_completed_viewset(self, username):
+    def _test_create_download_completed_viewset(self, username):
 
         instance = self.instances.filter(phase='COMPLETED').first()
-        self.assert_download_viewset('download_completed_viewset', instance, username)
+        self.assert_create_download_viewset('create_download_completed_viewset', instance, username)
 
-    def _test_download_executing_viewset(self, username):
+    def _test_create_download_executing_viewset(self, username):
 
         instance = self.instances.filter(phase='EXECUTING').first()
-        self.assert_download_viewset('download_executing_viewset', instance, username)
+        self.assert_create_download_viewset('create_download_executing_viewset', instance, username)
 
-    def assert_download_viewset(self, key, instance, username):
+    def assert_create_download_viewset(self, key, instance, username):
 
         for format_key in ('csv', 'votable', 'votable-binary', 'votable-binary2'):
             file_name = self.get_download_file_name(instance, format_key)
 
-            for method in ['get', 'put']:
-                try:
-                    os.remove(os.path.join(settings.QUERY_DOWNLOAD_DIR, file_name))
-                except OSError:
-                    pass
+            try:
+                os.remove(os.path.join(settings.QUERY_DOWNLOAD_DIR, file_name))
+            except OSError:
+                pass
 
-                # file is not existing yet
-                self.assert_viewset(key, method, 'download', username, kwargs={
-                    'pk': instance.pk,
-                    'format_key': format_key
-                })
+            # file is not existing yet
+            self.assert_viewset(key, 'post', 'create-download', username, data={
+                'format_key': format_key
+            }, kwargs={
+                'pk': instance.pk
+            })
 
-                # file exists
-                self.assert_viewset(key, method, 'download', username, kwargs={
-                    'pk': instance.pk,
-                    'format_key': format_key
-                })
+            # file exists
+            self.assert_viewset(key, 'post', 'create-download', username, data={
+                'format_key': format_key
+            }, kwargs={
+                'pk': instance.pk
+            })
 
     def _test_stream_completed_viewset(self, username):
 

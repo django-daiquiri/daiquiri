@@ -16,7 +16,7 @@ setup(
     description=u'Daiquiri is a framework for the publication of scientific databases.',
     long_description=open('README.rst').read(),
     install_requires=[
-        'Django>=1.11',
+        'Django>=1.11,<2.0',
         'djangorestframework==3.7.0',
         'drf-extensions>=0.3.1',
         'django-extensions>=1.8.1',
