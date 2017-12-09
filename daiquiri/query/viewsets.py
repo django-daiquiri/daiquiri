@@ -142,7 +142,7 @@ class QueryJobViewSet(viewsets.ModelViewSet):
         except DownloadJob.DoesNotExist:
             raise NotFound
 
-        if download_job.phase == download_job.PHASE_COMPLETED:
+        if download_job.phase == download_job.PHASE_COMPLETED and request.GET.get('download', True):
             return sendfile(request, download_job.file_path, attachment=True)
         else:
             return Response(download_job.phase)
