@@ -166,13 +166,13 @@ class QueryJobViewSet(viewsets.ModelViewSet):
                 not os.path.isfile(download_job.file_path):
 
                 # set the phase back to pending so that the file is recreated
-                download_job.phase == download_job.PHASE_PENDING
+                download_job.phase = download_job.PHASE_PENDING
 
         except DownloadJob.DoesNotExist:
             download_job = DownloadJob(
                 client_ip=get_client_ip(self.request),
                 job=job,
-                format_key=request.data.get('format_key')
+                format_key=format_key
             )
             download_job.save()
 
