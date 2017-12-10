@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import six
 
 from collections import OrderedDict
@@ -365,6 +366,14 @@ class DownloadJob(Job):
         help_text=_('Path to the file.')
     )
 
+    class Meta:
+        ordering = ('start_time', )
+
+        verbose_name = _('DownloadJob')
+        verbose_name_plural = _('DownloadJobs')
+
+        permissions = (('view_downloadjob', 'Can view DownloadJob'),)
+
     @property
     def parameters(self):
         raise NotImplementedError
@@ -427,13 +436,8 @@ class DownloadJob(Job):
     def archive(self):
         pass
 
-    class Meta:
-        ordering = ('start_time', )
-
-        verbose_name = _('DownloadJob')
-        verbose_name_plural = _('DownloadJobs')
-
-        permissions = (('view_downloadjob', 'Can view DownloadJob'),)
+    def delete_file(self):
+        os.remove(self.file_path)
 
 
 @python_2_unicode_compatible

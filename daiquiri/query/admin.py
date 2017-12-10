@@ -9,8 +9,8 @@ class QueryJobAdmin(admin.ModelAdmin):
 
 
 class DownloadJobAdmin(admin.ModelAdmin):
-    search_fields = ('id', 'job__table_name', 'owner__username', 'phase', 'format_key')
-    list_display = ('id', 'job', 'owner', 'phase', 'creation_time', 'format_key')
+    search_fields = ('id', 'job__table_name', 'owner__username', 'phase', 'format_key', 'file_path')
+    list_display = ('id', 'job', 'phase', 'creation_time', 'file_path')
 
 
 class ExampleAdmin(admin.ModelAdmin):
