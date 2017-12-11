@@ -1,11 +1,16 @@
 from django.contrib import admin
 
-from .models import QueryJob, Example
+from .models import QueryJob, DownloadJob, Example
 
 
 class QueryJobAdmin(admin.ModelAdmin):
     search_fields = ('id', 'job_type', 'owner__username', 'phase', 'database_name', 'table_name')
     list_display = ('id', 'job_type', 'owner', 'phase', 'creation_time', 'database_name', 'table_name', 'nrows')
+
+
+class DownloadJobAdmin(admin.ModelAdmin):
+    search_fields = ('id', 'job__table_name', 'owner__username', 'phase', 'format_key', 'file_path')
+    list_display = ('id', 'job', 'phase', 'creation_time', 'file_path')
 
 
 class ExampleAdmin(admin.ModelAdmin):
@@ -15,4 +20,5 @@ class ExampleAdmin(admin.ModelAdmin):
 
 
 admin.site.register(QueryJob, QueryJobAdmin)
+admin.site.register(DownloadJob, DownloadJobAdmin)
 admin.site.register(Example, ExampleAdmin)

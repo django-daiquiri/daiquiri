@@ -5,6 +5,7 @@ import uuid
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -81,10 +82,14 @@ class Job(models.Model):
         permissions = (('view_job', 'Can view Job'),)
 
     def __str__(self):
-        return self.get_str()
+        return str(self.id)
 
-    def get_str(self):
-        return "id=%s; phase=%s; job_type=%s" % (str(self.id), self.phase, self.job_type)
+    def save(self, *args, **kwargs):
+        if self.pk is None:
+            self.phase = self.PHASE_PENDING
+            self.creation_time = now()
+
+        return super(Job, self).save(*args, **kwargs)
 
     @property
     def owner_username(self):
@@ -104,6 +109,9 @@ class Job(models.Model):
 
     @property
     def quote(self):
+        raise NotImplementedError
+
+    def process(self):
         raise NotImplementedError
 
     def run(self):

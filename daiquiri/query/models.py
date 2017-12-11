@@ -1,11 +1,10 @@
-import os
 import json
 import logging
+import os
 import six
 
 from collections import OrderedDict
 
-from celery.result import AsyncResult, EagerResult
 from celery.task.control import revoke
 
 from django.conf import settings
@@ -14,7 +13,6 @@ from django.db import models
 from django.db.utils import OperationalError, ProgrammingError
 from django.urls import reverse
 from django.utils.encoding import python_2_unicode_compatible
-from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 
 from rest_framework.exceptions import ValidationError
@@ -34,6 +32,7 @@ from .utils import (
     get_quota,
     get_default_table_name,
     get_default_queue,
+    get_format_config,
     get_tap_schema_name,
     get_user_database_name,
     get_download_file_name,
@@ -45,7 +44,6 @@ from .tasks import run_query, create_download_file
 logger = logging.getLogger(__name__)
 
 
-@python_2_unicode_compatible
 class QueryJob(Job):
 
     objects = QueryJobManager()
@@ -75,15 +73,71 @@ class QueryJob(Job):
 
         permissions = (('view_queryjob', 'Can view QueryJob'),)
 
-    def __str__(self):
-        return self.get_str()
+    @property
+    def parameters(self):
+        return {
+            'database_name': self.database_name,
+            'table_name': self.table_name,
+            'query_language': self.query_language,
+            'query': self.query,
+            'native_query': self.native_query,
+            'actual_query': self.actual_query,
+            'queue': self.queue,
+            'nrows': self.nrows,
+            'size': self.size
+        }
 
-    def save(self, *args, **kwargs):
-        if self.pk is None:
-            self.phase = self.PHASE_PENDING
-            self.creation_time = now()
+    @property
+    def results(self):
+        if self.phase == self.PHASE_COMPLETED:
+            # create dictionary of the form
+            # 'votable': '/query/api/jobs/{job.id}/stream/votable'
+            return {download_format['key']: reverse('query:job-stream', kwargs={
+                'pk': str(self.id),
+                'format_key': download_format['key']
+            }) for download_format in settings.QUERY_DOWNLOAD_FORMATS}
+        else:
+            return {}
 
-        return super(QueryJob, self).save(*args, **kwargs)
+    @property
+    def result(self):
+        return reverse('query:job-stream', kwargs={
+            'pk': str(self.id),
+            'format_key': self.response_format
+        })
+
+    @property
+    def quote(self):
+        return None
+
+    @property
+    def result_status(self):
+        return 'OK' if self.max_records is None else 'OVERFLOW'
+
+    @property
+    def time_queue(self):
+        if self.start_time and self.creation_time:
+            return (self.start_time - self.creation_time).total_seconds()
+        else:
+            return None
+
+    @property
+    def time_query(self):
+        if self.end_time and self.start_time:
+            return (self.end_time - self.start_time).total_seconds()
+        else:
+            return None
+
+    @property
+    def timeout(self):
+        if self.queue:
+            return six.next((queue['timeout'] for queue in settings.QUERY_QUEUES if queue['key'] == self.queue))
+        else:
+            return 10
+
+    @property
+    def priority(self):
+        return six.next((queue['priority'] for queue in settings.QUERY_QUEUES if queue['key'] == self.queue))
 
     def process(self):
         if not self.response_format:
@@ -205,73 +259,6 @@ class QueryJob(Job):
         # set clean flag
         self.is_clean = True
 
-
-    @property
-    def parameters(self):
-        return {
-            'database_name': self.database_name,
-            'table_name': self.table_name,
-            'query_language': self.query_language,
-            'query': self.query,
-            'native_query': self.native_query,
-            'actual_query': self.actual_query,
-            'queue': self.queue,
-            'nrows': self.nrows,
-            'size': self.size
-        }
-
-    @property
-    def timeout(self):
-        if self.queue:
-            return six.next((queue['timeout'] for queue in settings.QUERY_QUEUES if queue['key'] == self.queue))
-        else:
-            return 10
-
-    @property
-    def priority(self):
-        return six.next((queue['priority'] for queue in settings.QUERY_QUEUES if queue['key'] == self.queue))
-
-    @property
-    def result_status(self):
-        return 'OK' if self.max_records is None else 'OVERFLOW'
-
-    @property
-    def results(self):
-        if self.phase == self.PHASE_COMPLETED:
-            # create dictionary of the form
-            # 'votable': '/query/api/jobs/{job.id}/stream/votable'
-            return {download_format['key']: reverse('query:job-stream', kwargs={
-                'pk': str(self.id),
-                'format_key': download_format['key']
-            }) for download_format in settings.QUERY_DOWNLOAD_FORMATS}
-        else:
-            return {}
-
-    @property
-    def result(self):
-        return reverse('query:job-stream', kwargs={
-            'pk': str(self.id),
-            'format_key': self.response_format
-        })
-
-    @property
-    def quote(self):
-        return None
-
-    @property
-    def time_queue(self):
-        if self.start_time and self.creation_time:
-            return (self.start_time - self.creation_time).total_seconds()
-        else:
-            return None
-
-    @property
-    def time_query(self):
-        if self.end_time and self.start_time:
-            return (self.end_time - self.start_time).total_seconds()
-        else:
-            return None
-
     def run(self, sync=False):
         if not self.is_clean:
             raise Exception('job.process() was not called.')
@@ -345,54 +332,113 @@ class QueryJob(Job):
             # the query was probably killed before
             pass
 
-    def download(self, format):
+    def stream(self, format_key):
         if self.phase == self.PHASE_COMPLETED:
-            file_name = get_download_file_name(self.owner, self.table_name, format)
+            return get_adapter().download.generate(
+                format_key,
+                self.database_name,
+                self.table_name,
+                self.metadata,
+                self.result_status,
+                (self.nrows == 0)
+            )
+        else:
+            raise ValidationError({
+                'phase': ['Job is not COMPLETED.']
+            })
 
-            task_id = file_name
-            task_args = (file_name, format['key'], self.database_name, self.table_name, self.metadata, self.result_status, (self.nrows == 0))
 
-            # create directory if necessary
-            try:
-                os.mkdir(os.path.dirname(file_name))
-            except OSError:
-                pass
+class DownloadJob(Job):
 
+    job = models.ForeignKey(
+        QueryJob, related_name='downloads',
+        verbose_name=_('QueryJob'),
+        help_text=_('QueryJob this DownloadJob belongs to.')
+    )
+    format_key = models.CharField(
+        max_length=32,
+        verbose_name=_('Format key'),
+        help_text=_('Format key for this download.')
+    )
+    file_path = models.CharField(
+        max_length=256,
+        verbose_name=_('Path'),
+        help_text=_('Path to the file.')
+    )
+
+    class Meta:
+        ordering = ('start_time', )
+
+        verbose_name = _('DownloadJob')
+        verbose_name_plural = _('DownloadJobs')
+
+        permissions = (('view_downloadjob', 'Can view DownloadJob'),)
+
+    @property
+    def parameters(self):
+        raise NotImplementedError
+
+    @property
+    def results(self):
+        raise NotImplementedError
+
+    @property
+    def result(self):
+        raise NotImplementedError
+
+    @property
+    def quote(self):
+        raise NotImplementedError
+
+    def process(self):
+        try:
+            format_config = get_format_config(self.format_key)
+        except IndexError:
+            raise ValidationError({'format_key': "Not supported."})
+
+        if self.job.phase == self.PHASE_COMPLETED:
+            self.owner = self.job.owner
+        else:
+            raise ValidationError({
+                'phase': ['Job is not COMPLETED.']
+            })
+
+        self.file_path = get_download_file_name(self.job.owner, self.job.table_name, format_config)
+
+        # set clean flag
+        self.is_clean = True
+
+    def run(self):
+        if not self.is_clean:
+            raise Exception('download_job.process() was not called.')
+
+        if self.phase == self.PHASE_PENDING:
+            self.phase = self.PHASE_QUEUED
+            self.save()
+
+            download_job_id = str(self.id)
             if not settings.ASYNC:
-                if os.path.isfile(file_name):
-                    task_result = EagerResult(task_id, None, 'SUCCESS')
-                else:
-                    logger.info('create_download_file %s submitted (sync)' % self.id)
-                    task_result = create_download_file.apply(task_args, task_id=task_id, throw=True)
+                logger.info('create_download_file %s submitted (sync)' % download_job_id)
+                create_download_file.apply((download_job_id, ), task_id=download_job_id, throw=True)
+
             else:
-                task_result = AsyncResult(task_id)
-
-                if not os.path.isfile(file_name):
-                    # create an empty file to prevent multiple pending tasks
-                    open(file_name, 'a').close()
-
-                    if task_result.successful():
-                        # somebody or something removed the file. start all over again
-                        task_result.forget()
-
-                    logger.info('create_download_file %s submitted (async, queue=download)' % self.id)
-                    task_result = create_download_file.apply_async(task_args, task_id=task_id, queue='download')
-
-            return task_result, file_name
+                logger.info('create_download_file %s submitted (async, queue=download)' % download_job_id)
+                create_download_file.apply_async((download_job_id, ), task_id=download_job_id, queue='download')
 
         else:
             raise ValidationError({
-                'phase': ['Job is not COMPLETED.']
+                'phase': ['Job is not PENDING.']
             })
 
-    def stream(self, format):
-        if self.phase == self.PHASE_COMPLETED:
-            return get_adapter().download.generate(format['key'], self.database_name, self.table_name, self.metadata, self.result_status, (self.nrows == 0))
+    def abort(self):
+        pass
 
-        else:
-            raise ValidationError({
-                'phase': ['Job is not COMPLETED.']
-            })
+    def archive(self):
+        pass
+
+    def delete_file(self):
+        os.remove(self.file_path)
+
 
 @python_2_unicode_compatible
 class Example(models.Model):

@@ -1,13 +1,15 @@
+import os
+
 from sendfile import sendfile
 
 from django.conf import settings
-from django.http import Http404, StreamingHttpResponse
+from django.http import Http404, FileResponse
 
 from rest_framework import viewsets, mixins, filters
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError, NotFound
 from rest_framework.decorators import list_route, detail_route
-from rest_framework.authentication import SessionAuthentication, TokenAuthentication
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
 
 from daiquiri.core.viewsets import ChoicesViewSet
 from daiquiri.core.permissions import HasModelPermission
@@ -16,7 +18,7 @@ from daiquiri.core.utils import get_client_ip
 
 from daiquiri.jobs.viewsets import SyncJobViewSet, AsyncJobViewSet
 
-from .models import QueryJob, Example
+from .models import QueryJob, DownloadJob, Example
 from .serializers import (
     FormSerializer,
     DropdownSerializer,
@@ -69,7 +71,7 @@ class DropdownViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
 class QueryJobViewSet(viewsets.ModelViewSet):
     permission_classes = (HasPermission, )
-    authentication_classes = (SessionAuthentication, TokenAuthentication)
+    authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
 
     def get_queryset(self):
         queryset = QueryJob.objects.filter_by_owner(self.request.user).exclude(phase=QueryJob.PHASE_ARCHIVED)
@@ -130,31 +132,58 @@ class QueryJobViewSet(viewsets.ModelViewSet):
         except QueryJob.DoesNotExist:
             raise Http404
 
-    @detail_route(methods=['get', 'put'], url_path='download/(?P<format_key>[A-Za-z0-9\-]+)', url_name='download')
-    def download(self, request, pk=None, format_key=None):
+    @detail_route(methods=['get'], url_path='download/(?P<download_id>[A-Za-z0-9\-]+)', url_name='download')
+    def download(self, request, pk=None, download_id=None):
         try:
             job = self.get_queryset().get(pk=pk)
         except QueryJob.DoesNotExist:
             raise NotFound
 
         try:
-            format_config = get_format_config(format_key)
-        except IndexError:
-            raise ValidationError({'format': "Not supported."})
+            download_job = job.downloads.get(pk=download_id)
+        except DownloadJob.DoesNotExist:
+            raise NotFound
 
-        result, file_name = job.download(format_config)
-
-        if result.successful():
-            if self.request.method == 'GET':
-                return sendfile(request, file_name, attachment=True)
-            else:
-                return Response(result.status)
-
+        if download_job.phase == download_job.PHASE_COMPLETED and request.GET.get('download', True):
+            return sendfile(request, download_job.file_path, attachment=True)
         else:
-            if result.status == 'FAILURE':
-                return Response(result.status, status=500)
-            else:
-                return Response(result.status)
+            return Response(download_job.phase)
+
+    @detail_route(methods=['post'], url_path='download', url_name='create-download')
+    def create_download(self, request, pk=None):
+        try:
+            job = self.get_queryset().get(pk=pk)
+        except QueryJob.DoesNotExist:
+            raise NotFound
+
+        format_key = request.data.get('format_key')
+
+        try:
+            download_job = DownloadJob.objects.get(job=job, format_key=format_key)
+
+            # check if the file was lost
+            if download_job.phase == download_job.PHASE_COMPLETED and \
+                not os.path.isfile(download_job.file_path):
+
+                # set the phase back to pending so that the file is recreated
+                download_job.phase = download_job.PHASE_PENDING
+
+        except DownloadJob.DoesNotExist:
+            download_job = DownloadJob(
+                client_ip=get_client_ip(self.request),
+                job=job,
+                format_key=format_key
+            )
+            download_job.save()
+
+        if download_job.phase == download_job.PHASE_PENDING:
+            download_job.process()
+            download_job.save()
+            download_job.run()
+
+        return Response({
+            'id': download_job.id
+        })
 
     @detail_route(methods=['get'], url_path='stream/(?P<format_key>[A-Za-z0-9\-]+)', url_name='stream')
     def stream(self, request, pk=None, format_key=None):
@@ -168,8 +197,14 @@ class QueryJobViewSet(viewsets.ModelViewSet):
         except IndexError:
             raise ValidationError({'format': "Not supported."})
 
-        return StreamingHttpResponse(job.stream(format_config), content_type=format_config['content_type'])
-
+        try:
+            download_job = DownloadJob.objects.get(job=job, format_key=format_key)
+            return sendfile(request, download_job.file_path, attachment=True)
+        except DownloadJob.DoesNotExist:
+            file_name = '%s.%s' % (job.table_name, format_config['extension'])
+            response = FileResponse(job.stream(format_key), content_type=format_config['content_type'])
+            response['Content-Disposition'] = "attachment; filename=%s" % file_name
+            return response
 
 class ExampleViewSet(viewsets.ModelViewSet):
     permission_classes = (HasModelPermission, )

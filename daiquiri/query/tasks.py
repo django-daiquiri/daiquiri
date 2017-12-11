@@ -165,21 +165,46 @@ def run_query(job_id):
     return job.phase
 
 
-@shared_task(track_started=True, base=Task)
-def create_download_file(file_name, format_key, database_name, table_name, metadata, status, empty):
+@shared_task(base=Task)
+def create_download_file(download_job_id):
     # always import daiquiri packages inside the task
     from daiquiri.core.adapter import get_adapter
+    from daiquiri.query.models import DownloadJob
 
     # get logger
     logger = logging.getLogger(__name__)
 
+    # get the job object from the database
+    download_job = DownloadJob.objects.get(pk=download_job_id)
+
     # log start
-    logger.info('create_download_file %s started' % file_name)
+    logger.info('create_download_file %s started' % download_job.file_path)
+
+    # create directory if necessary
+    try:
+        os.mkdir(os.path.dirname(download_job.file_path))
+    except OSError:
+        pass
+
+    download_job.phase = download_job.PHASE_EXECUTING
+    download_job.start_time = now()
+    download_job.save()
 
     # write file using the generator in the adapter
-    with open(file_name, 'w') as f:
-        for line in get_adapter().download.generate(format_key, database_name, table_name, metadata, status, empty):
+    with open(download_job.file_path, 'w') as f:
+        for line in get_adapter().download.generate(
+                download_job.format_key,
+                download_job.job.database_name,
+                download_job.job.table_name,
+                download_job.job.metadata,
+                download_job.job.result_status,
+                (download_job.job.nrows == 0)):
             f.write(line)
 
+    download_job.end_time = now()
+    download_job.execution_duration = (download_job.end_time - download_job.start_time).seconds
+    download_job.phase = download_job.PHASE_COMPLETED
+    download_job.save()
+
     # log completion
-    logger.info('create_download_file %s completed' % file_name)
+    logger.info('create_download_file %s completed' % download_job.file_path)

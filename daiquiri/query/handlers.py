@@ -2,7 +2,7 @@
 from django.dispatch import receiver
 from django.db.models.signals import pre_save, post_delete
 
-from .models import QueryJob
+from .models import QueryJob, DownloadJob
 
 
 @receiver(pre_save, sender=QueryJob)
@@ -18,3 +18,8 @@ def query_job_updated_handler(sender, **kwargs):
 @receiver(post_delete, sender=QueryJob)
 def query_job_deleted_handler(sender, **kwargs):
     kwargs['instance'].drop_table()
+
+
+@receiver(post_delete, sender=DownloadJob)
+def download_job_deleted_handler(sender, **kwargs):
+    kwargs['instance'].delete_file()
