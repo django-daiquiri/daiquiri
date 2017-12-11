@@ -10,6 +10,7 @@ from django.utils.timezone import now
 
 from rest_framework import viewsets, serializers
 from rest_framework.response import Response
+from rest_framework.decorators import list_route
 from rest_framework.exceptions import NotFound
 
 from daiquiri.core.viewsets import RowViewSet as BaseRowViewSet
@@ -18,7 +19,6 @@ from daiquiri.core.utils import get_client_ip
 from daiquiri.stats.models import Record
 
 from .models import ArchiveJob
-from .serializers import ArchiveSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -129,11 +129,11 @@ class ArchiveViewSet(viewsets.GenericViewSet):
 
     def create(self, request):
         try:
-            archive_job = ArchiveJob.objects.get(owner=request.user, file_ids=request.data)
+            archive_job = ArchiveJob.objects.get(owner=request.user, data=request.data)
 
             # check if the file was lost
             if archive_job.phase == archive_job.PHASE_COMPLETED and \
-                not os.path.isfile(archive_job.file_path):
+                    not os.path.isfile(archive_job.file_path):
 
                 # set the phase back to pending so that the file is recreated
                 archive_job.phase = archive_job.PHASE_PENDING
@@ -145,7 +145,7 @@ class ArchiveViewSet(viewsets.GenericViewSet):
             archive_job = ArchiveJob(
                 owner=request.user,
                 client_ip=get_client_ip(self.request),
-                file_ids=request.data
+                data=request.data
             )
             archive_job.process()
             archive_job.save()

@@ -20,9 +20,9 @@ logger = logging.getLogger(__name__)
 
 class ArchiveJob(Job):
 
-    file_ids = JSONField(
-        verbose_name=_('Files'),
-        help_text=_('IDs of files the files to download.')
+    data = JSONField(
+        verbose_name=_('Data'),
+        help_text=_('Input data for archive creation.')
     )
     files = JSONField(
         verbose_name=_('Files'),
@@ -65,25 +65,44 @@ class ArchiveJob(Job):
         table_name = settings.ARCHIVE_TABLE
         column_names = [column['name'] for column in settings.ARCHIVE_COLUMNS]
 
+        adapter = get_adapter()
+
         files = []
-        for file_id in self.file_ids:
-            try:
-                uuid.UUID(file_id, version=4)
-            except ValueError:
-                raise ValidationError({
-                    'files': [_('One or more of the identifiers are not valid UUIDs.')]
-                })
+        if 'file_ids' in self.data:
+            for file_id in self.data['file_ids']:
+                try:
+                    uuid.UUID(file_id, version=4)
+                except ValueError:
+                    raise ValidationError({
+                        'files': [_('One or more of the identifiers are not valid UUIDs.')]
+                    })
 
-            file = get_adapter().database.fetch_dict(database_name, table_name, column_names, filters={
-                'id': file_id
+                file = adapter.database.fetch_dict(database_name, table_name, column_names, filters={
+                    'id': file_id
+                }, page_size=0)
+
+                if file and os.path.isfile(os.path.join(settings.ARCHIVE_BASE_PATH, file['path'])):
+                    files.append(file['path'])
+                else:
+                    raise ValidationError({
+                        'files': [_('One or more of the file cannot be found.')]
+                    })
+
+        elif 'search' in self.data:
+            rows = adapter.database.fetch_rows(database_name, table_name, ['path'], search=self.data['search'], page_size=0)
+
+            for row in rows:
+                if os.path.isfile(os.path.join(settings.ARCHIVE_BASE_PATH, row[0])):
+                    files.append(row[0])
+                else:
+                    raise ValidationError({
+                        'files': [_('One or more of the file cannot be found.')]
+                    })
+
+        else:
+            raise ValidationError({
+                [_('No data received.')]
             })
-
-            if file and os.path.isfile(os.path.join(settings.ARCHIVE_BASE_PATH, file['path'])):
-                files.append(file['path'])
-            else:
-                raise ValidationError({
-                    'files': [_('One or more of the file cannot be found.')]
-                })
 
         self.files = files
         self.file_path = get_archive_file_path(self.owner, self.id)

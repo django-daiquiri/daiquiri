@@ -29,33 +29,32 @@ app.factory('ArchiveService', ['$http', 'TableService', 'PollingService', functi
     }
 
     service.download_checked = function() {
-        var files = [];
+        var file_ids = [];
         angular.forEach(service.table.checked, function(value, key) {
             if (value) {
-                files.push(key);
+                file_ids.push(key);
             }
         })
 
-        if (files.length) {
-            service.start_download(files)
+        if (file_ids.length) {
+            service.start_download({
+                file_ids: file_ids
+            });
         }
     }
 
     service.download_all = function() {
-        // var url = zip_url + '?all=';
-
-        // var search = service.table.params.search;
-        // if (search) {
-        //     url += '&search=' + search;
-        // }
-
-        // console.log(url);
-    }
-
-    service.start_download = function(files) {
         service.download_failed = false;
 
-        $http.post(archive_url, files).then(function(result) {
+        service.start_download({
+            search: service.table.params.search
+        });
+    }
+
+    service.start_download = function(data) {
+        service.download_failed = false;
+
+        $http.post(archive_url, data).then(function(result) {
             var download_id = result.data.id;
 
             service.pending_downloads++;
@@ -66,10 +65,9 @@ app.factory('ArchiveService', ['$http', 'TableService', 'PollingService', functi
             // display error message
             service.download_failed = true;
         });
-    };
+    }
 
     service.poll_download = function(options) {
-        console.log(options);
         var url = archive_url + options.download_id + '/';
         $http.get(url + '?download=').then(function(result) {
             if (result.data == 'COMPLETED') {

@@ -3,6 +3,7 @@ from django.views.generic import TemplateView
 
 from .permissions import HasPermission
 
+
 class ArchiveView(AccessMixin, TemplateView):
     template_name = 'archive/archive.html'
 
