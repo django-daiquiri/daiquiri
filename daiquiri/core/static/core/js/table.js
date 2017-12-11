@@ -20,29 +20,37 @@ angular.module('core')
             search: null
         },
         page_sizes: [10, 20, 100],
-        search_string: null,
-        files: false,
         active: {},
         modal: {},
-        checked: {},
-        checked_all: false,
-        round: false,
-        tooltips: true,
-        checkboxes: false
+        getter: {
+            row_id: function(row) {
+                return JSON.stringify(row);
+            },
+            file_url: function(row, column_index) {
+                return service.files_url + '?search=' + window.encodeURIComponent(row[column_index]);
+            },
+            reference_url: function(row, column_index) {
+                var key = window.encodeURIComponent(service.columns[column_index]),
+                    value = window.encodeURIComponent(row[column_index]);
+
+                return service.references_url + '?key=' + key + '&value=' + value;
+            },
+            link_url: function(row, column_index) {
+                return row[column_index];
+            }
+        }
     };
 
     service.init = function(opt) {
         service.ready = false;
 
-        // set up resources
+        // set up resources and urls
         if (angular.isDefined(opt.rows_url)) {
             resources.rows = $resource(baseurl + opt.rows_url);
         }
         if (angular.isDefined(opt.columns_url)) {
             resources.columns = $resource(baseurl + opt.columns_url);
         }
-
-        // setup files url and reference
         if (angular.isDefined(opt.files_url)) {
             service.files_url = baseurl + opt.files_url;
         }
@@ -50,29 +58,35 @@ angular.module('core')
             service.references_url = baseurl + opt.references_url;
         }
 
-        // update pages_sizes
+        // update params
+        if (angular.isDefined(opt.params)) {
+            angular.extend(service.params, opt.params);
+        }
+
+        // set pages_sizes
         if (angular.isDefined(opt.page_sizes)) {
             service.page_sizes = opt.page_sizes;
             service.params.page_size = opt.page_sizes[0];
         }
 
-        // setup initial column width and rounding of cells
-        if (angular.isDefined(opt.column_widths)) {
-            service.column_widths = opt.column_widths;
-        }
-        if (angular.isDefined(opt.column_round)) {
-            service.column_round = opt.column_round;
+        // set custom getter functions
+        if (angular.isDefined(opt.getter)) {
+            angular.forEach(opt.getter, function(func, key) {
+                service.getter[key] = func;
+            })
         }
 
-        angular.forEach(['tooltips', 'checkboxes'], function(key) {
-            if (angular.isDefined(opt[key])) {
+        // set additional options
+        angular.forEach(opt, function(value, key) {
+            if ([
+                'rows_url', 'columns_url', 'files_url', 'references_url', 'params', 'page_sizes', 'getter'
+            ].indexOf(key) == -1) {
                 service[key] = opt[key];
             }
         });
 
         // add params from the dom to service.params and fetch the data
-        if (angular.isDefined(opt.params)) {
-            angular.extend(service.params, opt.params);
+        if (angular.isUndefined(opt.fetch) || opt.fetch) {
 
             resources.columns.query(service.params, function(response) {
                 service.columns = response;
@@ -255,21 +269,18 @@ angular.module('core')
 
     service.check_all = function() {
         angular.forEach(service.rows, function(row) {
-            service.checked[service.get_hash(row)] = service.checked_all;
+            service.checked[service.getter.id(row)] = service.checked_all;
         })
     };
 
     service.update_checked_all = function() {
         service.checked_all = service.rows.map(function(row) {
-            return service.checked[service.get_hash(row)];
+            return service.checked[service.getter.id(row)];
         }).every(function(element) {
             return element === true;
         });
-    }
+    };
 
-    service.get_hash = function(row) {
-        return JSON.stringify(row);
-    }
 
     service.modal_open = function(event, column_index, row_index) {
         event.preventDefault();
@@ -287,7 +298,7 @@ angular.module('core')
                 $('#daiquiri-table-modal').modal('show');
             }, 100);
         })
-    }
+    };
 
     service.modal_update = function() {
         var file_path = service.rows[service.active.row_index][service.active.column_index];
@@ -324,7 +335,7 @@ angular.module('core')
                 service.modal_update();
             });
         }
-    }
+    };
 
     service.modal_down = function() {
         if (service.active.row_index < service.rows.length - 1) {
@@ -339,7 +350,7 @@ angular.module('core')
                 service.modal_update();
             });
         }
-    }
+    };
 
     service.modal_left = function() {
         var next_column_index = null,
@@ -360,7 +371,7 @@ angular.module('core')
 
         service.active.column_index = current_column_index;
         service.modal_update();
-    }
+    };
 
     service.modal_right = function() {
         var next_column_index = null,
@@ -381,7 +392,7 @@ angular.module('core')
 
         service.active.column_index = current_column_index;
         service.modal_update();
-    }
+    };
 
     return service;
 }]);

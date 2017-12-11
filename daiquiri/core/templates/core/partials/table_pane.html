@@ -35,7 +35,7 @@
                 <td class="daiquiri-table-check" ng-if="service.table.checkboxes">
                     <input type="checkbox"
                         ng-click="service.table.update_checked_all()"
-                        ng-model="service.table.checked[service.table.get_hash(row)]" />
+                        ng-model="service.table.checked[service.table.getter.id(row)]" />
                 </td>
 
                 <td ng-repeat="column in service.table.columns"
@@ -45,23 +45,23 @@
 
                     <div class="daiquiri-table-cell" ng-click="service.table.activate(column_index, row_index)">
                         <div ng-if="column.display == 'modal'">
-                            <a href="{$ service.table.files_url $}?search={$ row[column_index] | encodeURIComponent $}"
+                            <a href="{$ service.table.getter.file_url(row, column_index) $}"
                                 ng-click="service.table.modal_open($event, column_index, row_index)">
                                 {$ row[column_index] $}
                             </a>
                         </div>
                         <div ng-if="column.display == 'file'">
-                            <a href="{$ service.table.files_url $}?search={$ row[column_index] | encodeURIComponent $}">
+                            <a href="{$ service.table.getter.file_url(row, column_index) $}">
                                 {$ row[column_index] $}
                             </a>
                         </div>
                         <div ng-if="column.display == 'reference'">
-                            <a href="{$ service.table.references_url $}?key={$ column.name | encodeURIComponent $}&value={$ row[column_index] | encodeURIComponent $}" target="blank">
+                            <a href="{$ service.table.getter.reference_url(row, column_index) $}" target="blank">
                                 {$ row[column_index] $}
                             </a>
                         </div>
                         <div ng-if="column.display == 'link'">
-                            <a href="{$ row[column_index] $}" target="blank">
+                            <a href="{$ service.table.getter.link_url(row, column_index) $}" target="blank">
                                 {$ row[column_index] $}
                             </a>
                         </div>

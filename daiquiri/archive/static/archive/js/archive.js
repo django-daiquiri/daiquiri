@@ -1,6 +1,6 @@
 var app = angular.module('archive', ['core']);
 
-app.factory('ArchiveService', ['$resource', '$timeout', 'TableService', function($resource, $timeout, TableService) {
+app.factory('ArchiveService', ['$http', 'TableService', 'PollingService', function($http, TableService, PollingService) {
 
     /* get the base url */
 
@@ -8,9 +8,7 @@ app.factory('ArchiveService', ['$resource', '$timeout', 'TableService', function
 
     /* configure resources */
 
-    var resources = {
-
-    }
+    var zip_url = baseurl + 'archive/api/files/zip/'
 
     /* create the messages service */
 
@@ -21,6 +19,38 @@ app.factory('ArchiveService', ['$resource', '$timeout', 'TableService', function
     service.init = function() {
 
     };
+
+    service.get_id = function(row, column_index) {
+        return row[0];
+    }
+
+    service.get_file_url = function(row, column_index) {
+        return service.table.files_url + row[0];
+    }
+
+    service.download_checked = function() {
+        var files = [];
+        angular.forEach(service.table.checked, function(value, key) {
+            if (value) {
+                files.push(key);
+            }
+        })
+
+        if (files.length) {
+            console.log(files);
+        }
+    }
+
+    service.download_all = function() {
+        var url = zip_url + '?all=';
+
+        var search = service.table.params.search;
+        if (search) {
+            url += '&search=' + search;
+        }
+
+        console.log(url);
+    }
 
     return service;
 }]);

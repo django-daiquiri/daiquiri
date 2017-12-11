@@ -29,13 +29,17 @@ ARCHIVE_COLUMNS = [
     },
     {
         'name': 'collection',
-        'label': 'Collection'
+        'hidden': True
     },
     {
         'name': 'path',
         'hidden': True
     }
 ]
+
+ARCHIVE_BASE_PATH = '/'
+
+ARCHIVE_DOWNLOAD_DIR = os.path.join(BASE_DIR, 'download')
 
 AUTH_SIGNUP = False
 

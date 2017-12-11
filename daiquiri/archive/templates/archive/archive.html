@@ -12,9 +12,12 @@
         columns_url: 'archive/api/columns/',
         files_url: 'archive/api/files/',
         references_url: 'archive/api/references/',
-        params: {},
         tooltips: false,
-        checkboxes: true
+        checkboxes: true,
+        getter: {
+            id: service.get_id,
+            file_url: service.get_file_url
+        }
     })"
 {% endblock %}
 
@@ -32,6 +35,7 @@
     <script type="text/javascript" src="{% static 'core/js/filter.js' %}" ></script>
     <script type="text/javascript" src="{% static 'core/js/byNumber.js' %}" ></script>
     <script type="text/javascript" src="{% static 'core/js/table.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'core/js/polling.js' %}" ></script>
     <script type="text/javascript" src="{% static 'archive/js/archive.js' %}" ></script>
     {% endcompress js %}
 {% endblock %}
@@ -52,7 +56,7 @@
                 <div class="col-sm-6">
                     <ul class="pagination">
                         <li>
-                            <a href="" ng-click="service.download()">
+                            <a href="" ng-click="service.download_checked()">
                                 {% trans 'Download checked' %}
                             </a>
                         </li>
