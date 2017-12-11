@@ -5,7 +5,7 @@ USE `daiquiri_archive`;
 
 
 CREATE TABLE IF NOT EXISTS `files` (
-    `id`          CHAR(32) PRIMARY KEY NOT NULL,
+    `id`          CHAR(36) PRIMARY KEY NOT NULL,
     `timestamp`   DATETIME NOT NULL,
     `file`        VARCHAR(256) NOT NULL,
     `collection`  CHAR(32) NOT NULL,

@@ -1,30 +1,24 @@
 import os
-import uuid
 import logging
 
 from collections import OrderedDict
 
 from sendfile import sendfile
 
-from celery.result import AsyncResult, EagerResult
-from celery.task.control import revoke
-
 from django.conf import settings
-from django.http import Http404
 from django.utils.timezone import now
 
 from rest_framework import viewsets, serializers
 from rest_framework.response import Response
-from rest_framework.exceptions import NotFound, ValidationError
-from rest_framework.decorators import list_route
+from rest_framework.exceptions import NotFound
 
 from daiquiri.core.viewsets import RowViewSet as BaseRowViewSet
 from daiquiri.core.adapter import get_adapter
 from daiquiri.core.utils import get_client_ip
 from daiquiri.stats.models import Record
 
-from .utils import get_download_file_name
-from .tasks import create_archive_zip
+from .models import ArchiveJob
+from .serializers import ArchiveSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -117,35 +111,46 @@ class FileViewSet(viewsets.GenericViewSet):
         # if the file was not found, return 404
         raise NotFound()
 
-    @list_route(methods=['get', 'post'])
-    def zip(self, request):
 
-        adapter = get_adapter()
+class ArchiveViewSet(viewsets.GenericViewSet):
 
-        database_name = settings.ARCHIVE_DATABASE
-        table_name = settings.ARCHIVE_TABLE
-        column_names = [column['name'] for column in settings.ARCHIVE_COLUMNS]
+    serializer_class = serializers.Serializer
 
-        task_id = str(uuid.uuid4())
-        file_name = get_download_file_name(self.request.user, task_id)
+    def retrieve(self, request, pk=None):
+        try:
+            archive_job = ArchiveJob.objects.get(pk=pk)
+        except ArchiveJob.DoesNotExist:
+            raise NotFound
 
-        files = []
-        for file_id in request.data:
-            resource = adapter.database.fetch_dict(database_name, table_name, column_names, filters={
-                'id': file_id
-            })
-
-            files.append((settings.ARCHIVE_BASE_PATH, resource['path']))
-
-        task_args = (file_name, files)
-
-        if not settings.ASYNC:
-            task_result = create_archive_zip.apply(task_args, task_id=task_id, throw=True)
-
+        if archive_job.phase == archive_job.PHASE_COMPLETED and request.GET.get('download', True):
+            return sendfile(request, archive_job.file_path, attachment=True)
         else:
-            task_result = create_archive_zip.apply_async(task_args, task_id=task_id, queue='download')
+            return Response(archive_job.phase)
+
+    def create(self, request):
+        try:
+            archive_job = ArchiveJob.objects.get(owner=request.user, file_ids=request.data)
+
+            # check if the file was lost
+            if archive_job.phase == archive_job.PHASE_COMPLETED and \
+                not os.path.isfile(archive_job.file_path):
+
+                # set the phase back to pending so that the file is recreated
+                archive_job.phase = archive_job.PHASE_PENDING
+                archive_job.process()
+                archive_job.save()
+                archive_job.run()
+
+        except ArchiveJob.DoesNotExist:
+            archive_job = ArchiveJob(
+                owner=request.user,
+                client_ip=get_client_ip(self.request),
+                file_ids=request.data
+            )
+            archive_job.process()
+            archive_job.save()
+            archive_job.run()
 
         return Response({
-            'id': task_id,
-            'status': task_result.status
+            'id': archive_job.id
         })

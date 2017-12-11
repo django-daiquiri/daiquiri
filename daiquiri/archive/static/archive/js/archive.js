@@ -8,7 +8,7 @@ app.factory('ArchiveService', ['$http', 'TableService', 'PollingService', functi
 
     /* configure resources */
 
-    var zip_url = baseurl + 'archive/api/files/zip/'
+    var archive_url = baseurl + 'archive/api/archives/'
 
     /* create the messages service */
 
@@ -37,20 +37,56 @@ app.factory('ArchiveService', ['$http', 'TableService', 'PollingService', functi
         })
 
         if (files.length) {
-            console.log(files);
+            service.start_download(files)
         }
     }
 
     service.download_all = function() {
-        var url = zip_url + '?all=';
+        // var url = zip_url + '?all=';
 
-        var search = service.table.params.search;
-        if (search) {
-            url += '&search=' + search;
-        }
+        // var search = service.table.params.search;
+        // if (search) {
+        //     url += '&search=' + search;
+        // }
 
-        console.log(url);
+        // console.log(url);
     }
+
+    service.start_download = function(files) {
+        service.download_failed = false;
+
+        $http.post(archive_url, files).then(function(result) {
+            var download_id = result.data.id;
+
+            service.pending_downloads++;
+            PollingService.register(download_id, service.poll_download, {
+                download_id: download_id
+            });
+        }, function() {
+            // display error message
+            service.download_failed = true;
+        });
+    };
+
+    service.poll_download = function(options) {
+        console.log(options);
+        var url = archive_url + options.download_id + '/';
+        $http.get(url + '?download=').then(function(result) {
+            if (result.data == 'COMPLETED') {
+                service.pending_downloads--;
+                PollingService.unregister(options.download_id);
+
+                // download the file, headers will prevent the browser reloading the page
+                window.location.href = url;
+            }
+        }, function() {
+            service.pending_downloads--;
+            PollingService.unregister(options.download_id);
+
+            // display error message
+            service.download_failed = true;
+        });
+    };
 
     return service;
 }]);
