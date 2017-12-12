@@ -16,7 +16,7 @@ from daiquiri.core.constants import ACCESS_LEVEL_CHOICES
 from daiquiri.core.managers import AccessLevelManager
 from daiquiri.jobs.models import Job
 
-from .utils import get_archive_file_path
+from .utils import fetch_rows, fetch_row, get_archive_file_path
 from .tasks import create_archive_zip_file
 
 logger = logging.getLogger(__name__)
@@ -95,12 +95,8 @@ class ArchiveJob(Job):
         return None
 
     def process(self):
-        from daiquiri.core.adapter import get_adapter
-
-        database_name = settings.ARCHIVE_DATABASE
-        table_name = settings.ARCHIVE_TABLE
-
-        adapter = get_adapter()
+        # get collections for the owner of this download job
+        collections = [collection.name for collection in Collection.objects.filter_by_access_level(self.owner)]
 
         # prepare list of files for this archive job
         files = []
@@ -117,13 +113,11 @@ class ArchiveJob(Job):
                     })
 
                 # get the path to the file from the database
-                file = adapter.database.fetch_dict(database_name, table_name, ['path'], filters={
-                    'id': file_id
-                })
+                row = fetch_row(collections, ['path'], file_id)
 
                 # append the file to the list of files only if it exists in the database and on the filesystem
-                if file and os.path.isfile(os.path.join(settings.ARCHIVE_BASE_PATH, file['path'])):
-                    files.append(file['path'])
+                if row and os.path.isfile(os.path.join(settings.ARCHIVE_BASE_PATH, row[0])):
+                    files.append(row[0])
                 else:
                     raise ValidationError({
                         'files': [_('One or more of the file cannot be found.')]
@@ -132,7 +126,7 @@ class ArchiveJob(Job):
         elif 'search' in self.data:
 
             # retrieve the pathes of all file matching the search criteria
-            rows = adapter.database.fetch_rows(database_name, table_name, ['path'], search=self.data['search'], page_size=0)
+            rows = fetch_rows(collections, ['path'], None, 1, 0, self.data['search'], {})
 
             for row in rows:
                 # append the file to the list of files only if it exists on the filesystem

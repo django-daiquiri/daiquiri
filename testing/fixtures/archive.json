@@ -1,0 +1,182 @@
+[
+  {
+    "model": "daiquiri_archive.collection",
+    "pk": 1,
+    "fields": {
+      "name": "c01",
+      "access_level": "PRIVATE",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_archive.collection",
+    "pk": 2,
+    "fields": {
+      "name": "c02",
+      "access_level": "PRIVATE",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_archive.collection",
+    "pk": 3,
+    "fields": {
+      "name": "c03",
+      "access_level": "PRIVATE",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_archive.collection",
+    "pk": 4,
+    "fields": {
+      "name": "c04",
+      "access_level": "PRIVATE",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_archive.collection",
+    "pk": 5,
+    "fields": {
+      "name": "c05",
+      "access_level": "PRIVATE",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_archive.collection",
+    "pk": 6,
+    "fields": {
+      "name": "c06",
+      "access_level": "PRIVATE",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_archive.collection",
+    "pk": 7,
+    "fields": {
+      "name": "c07",
+      "access_level": "PRIVATE",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_archive.collection",
+    "pk": 8,
+    "fields": {
+      "name": "c08",
+      "access_level": "PRIVATE",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_archive.collection",
+    "pk": 9,
+    "fields": {
+      "name": "c09",
+      "access_level": "PRIVATE",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_archive.collection",
+    "pk": 10,
+    "fields": {
+      "name": "c10",
+      "access_level": "PRIVATE",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_archive.collection",
+    "pk": 11,
+    "fields": {
+      "name": "c11",
+      "access_level": "PRIVATE",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_archive.collection",
+    "pk": 12,
+    "fields": {
+      "name": "c12",
+      "access_level": "PRIVATE",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_archive.collection",
+    "pk": 13,
+    "fields": {
+      "name": "c13",
+      "access_level": "PRIVATE",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_archive.collection",
+    "pk": 14,
+    "fields": {
+      "name": "c14",
+      "access_level": "PRIVATE",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_archive.collection",
+    "pk": 15,
+    "fields": {
+      "name": "c15",
+      "access_level": "PRIVATE",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_archive.collection",
+    "pk": 16,
+    "fields": {
+      "name": "c16",
+      "access_level": "PRIVATE",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_archive.collection",
+    "pk": 17,
+    "fields": {
+      "name": "c17",
+      "access_level": "PRIVATE",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_archive.collection",
+    "pk": 18,
+    "fields": {
+      "name": "c18",
+      "access_level": "PRIVATE",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_archive.collection",
+    "pk": 19,
+    "fields": {
+      "name": "c19",
+      "access_level": "PRIVATE",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_archive.collection",
+    "pk": 20,
+    "fields": {
+      "name": "c20",
+      "access_level": "PRIVATE",
+      "groups": []
+    }
+  }
+]

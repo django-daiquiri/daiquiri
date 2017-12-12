@@ -1,5 +1,4 @@
 import os
-import logging
 
 from collections import OrderedDict
 
@@ -10,29 +9,19 @@ from django.utils.timezone import now
 
 from rest_framework import viewsets, serializers
 from rest_framework.response import Response
-from rest_framework.decorators import list_route
 from rest_framework.exceptions import NotFound
 
 from daiquiri.core.viewsets import RowViewSet as BaseRowViewSet
-from daiquiri.core.adapter import get_adapter
 from daiquiri.core.utils import get_client_ip
 from daiquiri.stats.models import Record
 
 from .models import Collection, ArchiveJob
-
-logger = logging.getLogger(__name__)
+from .utils import count_rows, fetch_rows, fetch_row
 
 
 class RowViewSet(BaseRowViewSet):
 
     def list(self, request, *args, **kwargs):
-
-        adapter = get_adapter()
-
-        database_name = settings.ARCHIVE_DATABASE
-        table_name = settings.ARCHIVE_TABLE
-        column_names = [column['name'] for column in settings.ARCHIVE_COLUMNS]
-
         # get the ordering
         ordering = self.request.GET.get('ordering')
 
@@ -50,13 +39,11 @@ class RowViewSet(BaseRowViewSet):
 
         # get collecions for this user
         collections = [collection.name for collection in Collection.objects.filter_by_access_level(request.user)]
-        filters['collection'] = collections
 
-        # query the database for the total number of rows
-        count = adapter.database.count_rows(database_name, table_name, column_names, search, filters)
-
-        # query the paginated rowset
-        results = adapter.database.fetch_rows(database_name, table_name, column_names, ordering, page, page_size, search, filters)
+        # fetch rows from the database
+        column_names = [column['name'] for column in settings.ARCHIVE_COLUMNS]
+        count = count_rows(collections, column_names, search, filters)
+        results = fetch_rows(collections, column_names, ordering, page, page_size, search, filters)
 
         # get the previous and next url
         next = self._get_next_url(page, page_size, count)
@@ -82,31 +69,23 @@ class FileViewSet(viewsets.GenericViewSet):
     serializer_class = serializers.Serializer
 
     def retrieve(self, request, pk=None):
+        # get collecions for this user
+        collections = [collection.name for collection in Collection.objects.filter_by_access_level(request.user)]
 
-        adapter = get_adapter()
-
-        database_name = settings.ARCHIVE_DATABASE
-        table_name = settings.ARCHIVE_TABLE
-        column_names = [column['name'] for column in settings.ARCHIVE_COLUMNS]
-
-        resource = adapter.database.fetch_dict(database_name, table_name, column_names, filters={
-            'id': pk
-        })
-
-        if resource:
+        row = fetch_row(collections, ['path'], pk)
+        if row:
             if request.GET.get('download', True):
                 # create a stats record for this download
                 Record.objects.create(
                     time=now(),
                     resource_type='ARCHIVE_DOWNLOAD',
-                    resource=resource,
+                    resource=row[0],
                     client_ip=get_client_ip(request),
                     user=request.user
                 )
 
                 # send the file to the client
-                file_path = os.path.join(settings.ARCHIVE_BASE_PATH, resource['path'])
-
+                file_path = os.path.join(settings.ARCHIVE_BASE_PATH, row[0])
                 return sendfile(request, file_path, attachment=True)
             else:
                 # send an empty response

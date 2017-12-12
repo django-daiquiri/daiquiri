@@ -219,10 +219,10 @@ class MySQLAdapter(DatabaseAdapter):
                 # check if the filter is a list or a string
                 if isinstance(column_filter, six.string_types):
                     filter_list = [column_filter]
-                if isinstance(column_filter, list):
+                elif isinstance(column_filter, list):
                     filter_list = column_filter
                 else:
-                    raise RuntimeError('Unsupported filter')
+                    raise RuntimeError('Unsupported filter for column "%s"' % column_name)
 
                 # append a OR condition fo every entry in the list
                 filter_stmts = []
