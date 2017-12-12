@@ -63,13 +63,16 @@ class ArchiveJob(Job):
 
         database_name = settings.ARCHIVE_DATABASE
         table_name = settings.ARCHIVE_TABLE
-        column_names = [column['name'] for column in settings.ARCHIVE_COLUMNS]
 
         adapter = get_adapter()
 
+        # prepare list of files for this archive job
         files = []
+
         if 'file_ids' in self.data:
+
             for file_id in self.data['file_ids']:
+                # validate that the file_id is a valid UUID4
                 try:
                     uuid.UUID(file_id, version=4)
                 except ValueError:
@@ -77,10 +80,12 @@ class ArchiveJob(Job):
                         'files': [_('One or more of the identifiers are not valid UUIDs.')]
                     })
 
-                file = adapter.database.fetch_dict(database_name, table_name, column_names, filters={
+                # get the path to the file from the database
+                file = adapter.database.fetch_dict(database_name, table_name, ['path'], filters={
                     'id': file_id
-                }, page_size=0)
+                })
 
+                # append the file to the list of files only if it exists in the database and on the filesystem
                 if file and os.path.isfile(os.path.join(settings.ARCHIVE_BASE_PATH, file['path'])):
                     files.append(file['path'])
                 else:
@@ -89,9 +94,12 @@ class ArchiveJob(Job):
                     })
 
         elif 'search' in self.data:
+
+            # retrieve the pathes of all file matching the search criteria
             rows = adapter.database.fetch_rows(database_name, table_name, ['path'], search=self.data['search'], page_size=0)
 
             for row in rows:
+                # append the file to the list of files only if it exists on the filesystem
                 if os.path.isfile(os.path.join(settings.ARCHIVE_BASE_PATH, row[0])):
                     files.append(row[0])
                 else:
@@ -104,6 +112,7 @@ class ArchiveJob(Job):
                 [_('No data received.')]
             })
 
+        # set files and file_path for this archive job
         self.files = files
         self.file_path = get_archive_file_path(self.owner, self.id)
 
