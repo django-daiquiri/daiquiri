@@ -3,19 +3,55 @@ import os
 import uuid
 
 from django.conf import settings
+from django.contrib.auth.models import Group
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 from rest_framework.exceptions import ValidationError
 
 from jsonfield import JSONField
 
+from daiquiri.core.constants import ACCESS_LEVEL_CHOICES
+from daiquiri.core.managers import AccessLevelManager
 from daiquiri.jobs.models import Job
 
 from .utils import get_archive_file_path
 from .tasks import create_archive_zip_file
 
 logger = logging.getLogger(__name__)
+
+
+@python_2_unicode_compatible
+class Collection(models.Model):
+
+    objects = AccessLevelManager()
+
+    name = models.CharField(
+        max_length=32,
+        verbose_name=_('Name'),
+        help_text=_('Name of the collection.')
+    )
+    access_level = models.CharField(
+        max_length=8, choices=ACCESS_LEVEL_CHOICES,
+        verbose_name=_('Access level')
+    )
+    groups = models.ManyToManyField(
+        Group, blank=True,
+        verbose_name=_('Groups'),
+        help_text=_('The groups which have access to this function.')
+    )
+
+    class Meta:
+        ordering = ('name', )
+
+        verbose_name = _('Collection')
+        verbose_name_plural = _('Collections')
+
+        permissions = (('view_collection', 'Can view Collection'),)
+
+    def __str__(self):
+        return self.name
 
 
 class ArchiveJob(Job):

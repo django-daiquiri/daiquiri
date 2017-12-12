@@ -28,6 +28,8 @@
         border-radius: 4px;
         width: auto;
         overflow-x: auto;
+        table-layout: fixed;
+        width: 100%;
 
         .table {
             margin: 0;
@@ -38,24 +40,29 @@
                 width: 200px;
                 padding: 0;
                 border-right: 1px solid $border-color;
-            }
-            th:last-child,
-            td:last-child {
-                border-right: none;
-            }
 
+                &:last-child,
+                &:last-child {
+                    border-right: none;
+                }
+            }
+            th.daiquiri-table-check {
+                width: 16px;
+
+                @media(max-width: $screen-xs-max) {
+                    width: 32px;
+                }
+            }
             .daiquiri-table-cell,
             .daiquiri-table-check {
                 white-space: nowrap;
                 padding: 8px;
                 position: relative;
-
                 overflow: hidden;
             }
             .daiquiri-table-check {
                 white-space: nowrap;
-                padding: 9px 7px 7px 9px;
-                width: 3%;
+                padding: 9px 4px 7px 6px;
                 text-align: center;
             }
             tr.active {

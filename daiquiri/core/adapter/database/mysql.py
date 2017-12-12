@@ -1,5 +1,6 @@
 import logging
 import re
+import six
 import warnings
 
 from django.db import OperationalError, ProgrammingError
@@ -194,30 +195,50 @@ class MySQLAdapter(DatabaseAdapter):
         return self.fetchall(sql, args=sql_args)
 
     def _process_filtering(self, sql, sql_args, search, filters, escaped_column_names):
-        if search and filters:
-            raise Exception('search and filters are mutually exclusive.')
+        # prepare lists for the WHERE statements
+        where_stmts = []
+        where_args = []
 
-        elif search:
-            # append a WHERE/OR condition fo every column
-            where_stmts = []
+        if search:
+            # append a OR condition fo every column
+            search_stmts = []
+            search_args = []
             for escaped_column_name in escaped_column_names:
-                sql_args.append('%' + search + '%')
-                where_stmts.append(escaped_column_name + ' LIKE %s')
+                search_stmts.append(escaped_column_name + ' LIKE %s')
+                search_args.append('%' + search + '%')
 
-            if where_stmts:
-                sql += ' WHERE ' + ' OR '.join(where_stmts)
+            if search_stmts:
+                where_stmts.append('(' + ' OR '.join(search_stmts) + ')')
+                where_args += search_args
 
-        elif filters:
-            # append a WHERE/AND condition for entry in filters
-            where_stmts = []
-            for column_name, string in filters.items():
+        if filters:
+            for column_name, column_filter in filters.items():
+                # escpae the column_name for this column
                 escaped_column_name = self.escape_identifier(column_name)
 
-                sql_args.append(string)
-                where_stmts.append(escaped_column_name + ' = %s')
+                # check if the filter is a list or a string
+                if isinstance(column_filter, six.string_types):
+                    filter_list = [column_filter]
+                if isinstance(column_filter, list):
+                    filter_list = column_filter
+                else:
+                    raise RuntimeError('Unsupported filter')
 
-            if where_stmts:
-                sql += ' WHERE ' + ' AND '.join(where_stmts)
+                # append a OR condition fo every entry in the list
+                filter_stmts = []
+                filter_args = []
+                for filter_string in filter_list:
+                    filter_stmts.append(escaped_column_name + ' = %s')
+                    filter_args.append(filter_string)
+
+                if filter_stmts:
+                    where_stmts.append('(' + ' OR '.join(filter_stmts) + ')')
+                    where_args += filter_args
+
+        # connect the where statements with AND and append to the sql string
+        if where_stmts:
+            sql += ' WHERE ' + ' AND '.join(where_stmts)
+            sql_args += where_args
 
         return sql, sql_args
 

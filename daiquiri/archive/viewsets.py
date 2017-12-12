@@ -18,7 +18,7 @@ from daiquiri.core.adapter import get_adapter
 from daiquiri.core.utils import get_client_ip
 from daiquiri.stats.models import Record
 
-from .models import ArchiveJob
+from .models import Collection, ArchiveJob
 
 logger = logging.getLogger(__name__)
 
@@ -48,10 +48,14 @@ class RowViewSet(BaseRowViewSet):
         # get the page_size from the querystring and make sure it is an int
         page_size = self._get_page_size()
 
+        # get collecions for this user
+        collections = [collection.name for collection in Collection.objects.filter_by_access_level(request.user)]
+        filters['collection'] = collections
+
         # query the database for the total number of rows
         count = adapter.database.count_rows(database_name, table_name, column_names, search, filters)
 
-        # # query the paginated rowset
+        # query the paginated rowset
         results = adapter.database.fetch_rows(database_name, table_name, column_names, ordering, page, page_size, search, filters)
 
         # get the previous and next url

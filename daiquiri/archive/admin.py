@@ -1,6 +1,11 @@
 from django.contrib import admin
 
-from .models import ArchiveJob
+from .models import Collection, ArchiveJob
+
+
+class CollectionAdmin(admin.ModelAdmin):
+    search_fields = ('name', )
+    list_display = ('name', 'access_level')
 
 
 class ArchiveJobAdmin(admin.ModelAdmin):
@@ -8,4 +13,5 @@ class ArchiveJobAdmin(admin.ModelAdmin):
     list_display = ('id', 'owner', 'phase', 'creation_time', 'file_path')
 
 
+admin.site.register(Collection, CollectionAdmin)
 admin.site.register(ArchiveJob, ArchiveJobAdmin)
