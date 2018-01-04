@@ -47,10 +47,10 @@
                 }
             }
             th.daiquiri-table-check {
-                width: 16px;
+                width: 32px;
 
-                @media(max-width: $screen-xs-max) {
-                    width: 32px;
+                @media(max-width: $screen-md-max) {
+                    width: 40px;
                 }
             }
             .daiquiri-table-cell,
