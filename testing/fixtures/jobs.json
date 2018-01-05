@@ -74,5 +74,62 @@
       "error_summary": "There has been an error.",
       "job_type": "INTERFACE"
     }
+  },
+  {
+    "model": "daiquiri_jobs.job",
+    "pk": "64aab8ae-50e8-4fa9-8579-8c3345473f6d",
+    "fields": {
+      "owner": 3,
+      "client_ip": null,
+      "response_format": null,
+      "max_records": null,
+      "run_id": null,
+      "phase": "COMPLETED",
+      "creation_time": "2018-01-01T00:00:00.000Z",
+      "start_time": "2018-01-01T00:00:01.000Z",
+      "end_time": "2018-01-01T00:00:02.000Z",
+      "execution_duration": 0,
+      "destruction_time": null,
+      "error_summary": null,
+      "job_type": "INTERFACE"
+    }
+  },
+  {
+    "model": "daiquiri_jobs.job",
+    "pk": "79bef6fa-15b0-408d-8af3-2011c4d2487f",
+    "fields": {
+      "owner": 3,
+      "client_ip": null,
+      "response_format": null,
+      "max_records": null,
+      "run_id": null,
+      "phase": "EXECUTING",
+      "creation_time": "2018-01-01T01:00:00.000Z",
+      "start_time": "2018-01-01T01:00:01.000Z",
+      "end_time": "2018-01-01T01:00:02.000Z",
+      "execution_duration": 0,
+      "destruction_time": null,
+      "error_summary": null,
+      "job_type": "INTERFACE"
+    }
+  },
+  {
+    "model": "daiquiri_jobs.job",
+    "pk": "25515f20-1ee9-4a12-bda3-f4ef7289c998",
+    "fields": {
+      "owner": 3,
+      "client_ip": null,
+      "response_format": null,
+      "max_records": null,
+      "run_id": null,
+      "phase": "COMPLETED",
+      "creation_time": "2018-01-01T02:00:00.000Z",
+      "start_time": "2018-01-01T02:00:01.000Z",
+      "end_time": "2018-01-01T02:00:02.000Z",
+      "execution_duration": 0,
+      "destruction_time": null,
+      "error_summary": null,
+      "job_type": "INTERFACE"
+    }
   }
 ]

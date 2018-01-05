@@ -18,8 +18,11 @@ from daiquiri.stats.models import Record
 from .models import Collection, ArchiveJob
 from .utils import count_rows, fetch_rows, fetch_row
 
+from .permissions import HasPermission
+
 
 class RowViewSet(BaseRowViewSet):
+    permission_classes = (HasPermission, )
 
     def list(self, request, *args, **kwargs):
         # get the ordering
@@ -58,6 +61,7 @@ class RowViewSet(BaseRowViewSet):
 
 
 class ColumnViewSet(viewsets.ViewSet):
+    permission_classes = (HasPermission, )
 
     def list(self, request, *args, **kwargs):
 
@@ -65,7 +69,7 @@ class ColumnViewSet(viewsets.ViewSet):
 
 
 class FileViewSet(viewsets.GenericViewSet):
-
+    permission_classes = (HasPermission, )
     serializer_class = serializers.Serializer
 
     def retrieve(self, request, pk=None):
@@ -96,12 +100,12 @@ class FileViewSet(viewsets.GenericViewSet):
 
 
 class ArchiveViewSet(viewsets.GenericViewSet):
-
+    permission_classes = (HasPermission, )
     serializer_class = serializers.Serializer
 
     def retrieve(self, request, pk=None):
         try:
-            archive_job = ArchiveJob.objects.get(pk=pk)
+            archive_job = ArchiveJob.objects.filter_by_owner(request.user).get(pk=pk)
         except ArchiveJob.DoesNotExist:
             raise NotFound
 
@@ -112,7 +116,7 @@ class ArchiveViewSet(viewsets.GenericViewSet):
 
     def create(self, request):
         try:
-            archive_job = ArchiveJob.objects.get(owner=request.user, data=request.data)
+            archive_job = ArchiveJob.objects.filter_by_owner(request.user).get(data=request.data)
 
             # check if the file was lost
             if archive_job.phase == archive_job.PHASE_COMPLETED and \
@@ -126,7 +130,7 @@ class ArchiveViewSet(viewsets.GenericViewSet):
 
         except ArchiveJob.DoesNotExist:
             archive_job = ArchiveJob(
-                owner=request.user,
+                owner=(None if self.request.user.is_anonymous() else self.request.user),
                 client_ip=get_client_ip(self.request),
                 data=request.data
             )

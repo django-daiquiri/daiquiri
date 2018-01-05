@@ -8,7 +8,7 @@ from .viewsets import RowViewSet, ColumnViewSet, FileViewSet, ArchiveViewSet
 
 router = routers.DefaultRouter()
 router.register(r'rows', RowViewSet, base_name='row')
-router.register(r'columns', ColumnViewSet, base_name='row')
+router.register(r'columns', ColumnViewSet, base_name='column')
 router.register(r'files', FileViewSet, base_name='file')
 router.register(r'archives', ArchiveViewSet, base_name='archive')
 

@@ -1,15 +1,10 @@
 from django.db import models
 
 from daiquiri.core.managers import AccessLevelManager
+from daiquiri.jobs.managers import JobManager
 
 
-class QueryJobManager(models.Manager):
-
-    def filter_by_owner(self, user):
-        if not user or user.is_anonymous():
-            return self.get_queryset().filter(owner=None)
-        else:
-            return self.get_queryset().filter(owner=user)
+class QueryJobManager(JobManager):
 
     def get_size(self, user):
         # get the size of all the tables of this user

@@ -5,6 +5,7 @@ import uuid
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.db import models
+from django.http.request import QueryDict
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
@@ -15,8 +16,9 @@ from jsonfield import JSONField
 from daiquiri.core.constants import ACCESS_LEVEL_CHOICES
 from daiquiri.core.managers import AccessLevelManager
 from daiquiri.jobs.models import Job
+from daiquiri.jobs.managers import JobManager
 
-from .utils import fetch_rows, fetch_row, get_archive_file_path
+from .utils import fetch_rows, fetch_row
 from .tasks import create_archive_zip_file
 
 logger = logging.getLogger(__name__)
@@ -56,6 +58,8 @@ class Collection(models.Model):
 
 class ArchiveJob(Job):
 
+    objects = JobManager()
+
     data = JSONField(
         verbose_name=_('Data'),
         help_text=_('Input data for archive creation.')
@@ -63,11 +67,6 @@ class ArchiveJob(Job):
     files = JSONField(
         verbose_name=_('Files'),
         help_text=_('List of files in the archive.')
-    )
-    file_path = models.CharField(
-        max_length=256,
-        verbose_name=_('Path'),
-        help_text=_('Path to the archive file.')
     )
 
     class Meta:
@@ -94,6 +93,16 @@ class ArchiveJob(Job):
     def quote(self):
         return None
 
+    @property
+    def file_path(self):
+        if not self.owner:
+            username = 'anonymous'
+        else:
+            username = self.owner.username
+
+        directory_name = os.path.join(settings.ARCHIVE_DOWNLOAD_DIR, username)
+        return os.path.join(directory_name, str(self.id) + '.zip')
+
     def process(self):
         # get collections for the owner of this download job
         collections = [collection.name for collection in Collection.objects.filter_by_access_level(self.owner)]
@@ -102,8 +111,12 @@ class ArchiveJob(Job):
         files = []
 
         if 'file_ids' in self.data:
+            if isinstance(self.data, QueryDict):
+                file_ids = self.data.getlist('file_ids')
+            else:
+                file_ids = self.data.get('file_ids')
 
-            for file_id in self.data['file_ids']:
+            for file_id in file_ids:
                 # validate that the file_id is a valid UUID4
                 try:
                     uuid.UUID(file_id, version=4)
@@ -120,11 +133,10 @@ class ArchiveJob(Job):
                     files.append(row[0])
                 else:
                     raise ValidationError({
-                        'files': [_('One or more of the file cannot be found.')]
+                        'files': [_('One or more of the files cannot be found.')]
                     })
 
         elif 'search' in self.data:
-
             # retrieve the pathes of all file matching the search criteria
             rows = fetch_rows(collections, ['path'], None, 1, 0, self.data['search'], {})
 
@@ -134,7 +146,7 @@ class ArchiveJob(Job):
                     files.append(row[0])
                 else:
                     raise ValidationError({
-                        'files': [_('One or more of the file cannot be found.')]
+                        'files': [_('One or more of the files cannot be found.')]
                     })
 
         else:
@@ -144,7 +156,6 @@ class ArchiveJob(Job):
 
         # set files and file_path for this archive job
         self.files = files
-        self.file_path = get_archive_file_path(self.owner, self.id)
 
         # set clean flag
         self.is_clean = True
@@ -178,4 +189,7 @@ class ArchiveJob(Job):
         pass
 
     def delete_file(self):
-        os.remove(self.file_path)
+        try:
+            os.remove(self.file_path)
+        except OSError:
+            pass

@@ -28,7 +28,7 @@ def create_archive_zip_file(archive_job_id):
 
     # create directory if necessary
     try:
-        os.mkdir(os.path.dirname(archive_job.file_path))
+        os.makedirs(os.path.dirname(archive_job.file_path))
     except OSError:
         pass
 
