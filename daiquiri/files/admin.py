@@ -4,9 +4,9 @@ from .models import Directory
 
 
 class DirectoryAdmin(admin.ModelAdmin):
-    search_fields = ('path', )
-    list_display = ('path', )
-    list_display_links = ('path', )
-
+    search_fields = ('path', 'access_level')
+    list_display = ('absolute_path', 'path' , 'depth', 'access_level')
+    list_display_links = ('absolute_path', )
+    readonly_fields = ('depth', )
 
 admin.site.register(Directory, DirectoryAdmin)

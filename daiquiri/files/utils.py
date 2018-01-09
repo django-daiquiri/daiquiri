@@ -1,58 +1,33 @@
 import os
 
+from django.conf import settings
+
 from .models import Directory
 
 
-def get_file(user, file_path):
-    # append 'index.html' when the file_path is a directory
-    if file_path.endswith('/'):
-        file_path += 'index.html'
+def check_file(user, absolute_file_path):
+    if not os.path.isfile(absolute_file_path):
+        return False
 
-    # get directories this user has access to
-    directories = Directory.objects.filter_by_access_level(user)
+    # loop over all directories beginning with the hights depth and return as soon as a directory matches
+    for directory in Directory.objects.order_by('-depth'):
+        if os.path.normpath(absolute_file_path).startswith(directory.absolute_path):
+            return Directory.objects.filter_by_access_level(user).filter(pk=directory.pk).exists()
 
+
+def search_file(user, search_path):
+    base_path = os.path.normpath(settings.FILES_BASE_PATH)
+
+    # look for the file in all directory below the base path
     results = set()
-    for directory in directories:
-        # normalize the file path so that /a/b/c and b/c/d/e become /a/b/c and d/e
-        normalized_file_path = normalize_file_path(directory.path, file_path)
+    for directory_path, _, _ in os.walk(base_path):
+        normalized_file_path = normalize_file_path(directory_path, search_path)
+        absolute_file_path = os.path.join(directory_path, normalized_file_path)
 
-        # join directory_path and file_path so that it becomes /a/b/c/d/e
-        absolute_file_path = os.path.join(directory.path, normalized_file_path)
-
-        # check if absolute_file_path is actually a file
         if os.path.isfile(absolute_file_path):
             results.add(absolute_file_path)
 
-    # check if we found the file more than once
-    if len(results) > 1:
-        raise Exception('More than one file found in %s.get_file().' % __name__)
-    elif len(results) == 1:
-        return results.pop()
-    else:
-        return None
-
-
-def search_file(user, file_path):
-    # get directories this user has access to
-    directories = Directory.objects.filter_by_access_level(user)
-
-    results = set()
-    for directory in directories:
-        for directory_path, dirs, files in os.walk(directory.path):
-            # normalize the file path so that /a/b/c and b/c/d/e become /a/b/c and d/e
-            normalized_file_path = normalize_file_path(directory_path, file_path)
-
-            # join directory_path and file_path so that it becomes /a/b/c/d/e
-            absolute_file_path = os.path.join(directory_path, normalized_file_path)
-
-            # check if absolute_file_path is actually a file
-            if os.path.isfile(absolute_file_path):
-                results.add(absolute_file_path)
-
-    # check if we found the file more than once
-    if len(results) > 1:
-        raise Exception('More than one file found in %s.get_file().' % __name__)
-    elif len(results) == 1:
+    if len(results) == 1:
         return results.pop()
     else:
         return None

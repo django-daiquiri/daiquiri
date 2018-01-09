@@ -1,0 +1,36 @@
+[
+  {
+    "model": "daiquiri_files.directory",
+    "pk": 1,
+    "fields": {
+      "path": "html",
+      "access_level": "INTERNAL",
+      "groups": [],
+      "depth": 1
+    }
+  },
+    {
+    "model": "daiquiri_files.directory",
+    "pk": 2,
+    "fields": {
+      "path": "html/a/a",
+      "access_level": "PRIVATE",
+      "groups": [
+        1
+      ],
+      "depth": 3
+    }
+  },
+  {
+    "model": "daiquiri_files.directory",
+    "pk": 3,
+    "fields": {
+      "path": "images",
+      "access_level": "PRIVATE",
+      "groups": [
+        1
+      ],
+      "depth": 1
+    }
+  }
+]

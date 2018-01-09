@@ -8,11 +8,8 @@ IPV4_PRIVACY_MASK = 16
 IPV6_PRIVACY_MASK = 32
 
 ARCHIVE_ANONYMOUS = False
-
 ARCHIVE_DATABASE = 'daiquiri_archive'
-
 ARCHIVE_TABLE = 'files'
-
 ARCHIVE_COLUMNS = [
     {
         'name': 'id',
@@ -36,34 +33,28 @@ ARCHIVE_COLUMNS = [
         'hidden': True
     }
 ]
-
-ARCHIVE_BASE_PATH = '/'
-
+ARCHIVE_BASE_PATH = os.path.join(BASE_DIR, 'files')
 ARCHIVE_DOWNLOAD_DIR = os.path.join(BASE_DIR, 'download')
 
 AUTH_SIGNUP = False
-
 AUTH_WORKFLOW = None
-
 AUTH_DETAIL_KEYS = []
 
 CUTOUT_ADAPTER = 'daiquiri.cutout.utils.CutoutAdapter'
-
 CUTOUT_ANONYMOUS = False
+
+FILES_BASE_PATH = os.path.join(BASE_DIR, 'files')
 
 METADATA_COLUMN_PERMISSIONS = False
 
 QUERY_ANONYMOUS = False
-
 QUERY_USER_DATABASE_PREFIX = 'daiquiri_user_'
-
 QUERY_QUOTA = {
     'anonymous': '100Mb',
     'user': '100Mb',
     'users': {},
     'groups': {}
 }
-
 QUERY_QUEUES = [
     {
         'key': 'default',
@@ -72,7 +63,6 @@ QUERY_QUEUES = [
         'priority': 1
     }
 ]
-
 QUERY_LANGUAGES = [
     {
         'key': 'adql',
@@ -82,7 +72,6 @@ QUERY_LANGUAGES = [
         'quote_char': '"'
     }
 ]
-
 QUERY_FORMS = [
     {
         'key': 'sql',
@@ -103,7 +92,6 @@ QUERY_FORMS = [
         'template': 'query/query_form_cone.html'
     }
 ]
-
 QUERY_DROPDOWNS = [
     {
         'key': 'simbad',
@@ -123,7 +111,6 @@ QUERY_DROPDOWNS = [
         }
     }
 ]
-
 QUERY_DOWNLOAD_DIR = os.path.join(BASE_DIR, 'download')
 QUERY_DEFAULT_DOWNLOAD_FORMAT = 'votable'
 QUERY_DOWNLOAD_FORMATS = [

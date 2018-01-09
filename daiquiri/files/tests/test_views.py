@@ -2,13 +2,12 @@ from django.test import TestCase
 
 from test_generator.views import TestViewMixin
 
-from .utils import setUp_directories
-
 
 class FilesViewTestCase(TestCase):
 
     fixtures = (
         'auth.json',
+        'files.json'
     )
 
     users = (
@@ -18,41 +17,44 @@ class FilesViewTestCase(TestCase):
         ('anonymous', None),
     )
 
-    def setUp(self):
-        setUp_directories()
 
-
-class InternalFileTests(TestViewMixin, FilesViewTestCase):
+class FileTests(TestViewMixin, FilesViewTestCase):
 
     url_names = {
         'list_view': 'files:file'
     }
 
     status_map = {
-        'list_view': {
+        'html': {
             'admin': 200, 'manager': 200, 'user': 200, 'anonymous': 404
+        },
+        'html_a': {
+            'admin': 200, 'manager': 200, 'user': 200, 'anonymous': 404
+        },
+        'html_a_a': {
+            'admin': 404, 'manager': 200, 'user': 404, 'anonymous': 404
+        },
+        'html_a_b': {
+            'admin': 404, 'manager': 404, 'user': 404, 'anonymous': 404
         }
     }
 
-    def _test_get(self, username):
-        self.assert_list_view(username, kwargs={
+    def _test_html(self, username):
+        self.assert_view('html', 'get', 'list_view', username, kwargs={
             'file_path': 'html/'
         })
 
+    def _test_html_a(self, username):
+        self.assert_view('html_a', 'get', 'list_view', username, kwargs={
+            'file_path': 'html/a/'
+        })
 
-class PrivateFileTests(TestViewMixin, FilesViewTestCase):
+    def _test_html_a_a(self, username):
+        self.assert_view('html_a_a', 'get', 'list_view', username, kwargs={
+            'file_path': 'html/a/a/'
+        })
 
-    url_names = {
-        'list_view': 'files:file'
-    }
-
-    status_map = {
-        'list_view': {
-            'admin': 404, 'manager': 200, 'user': 404, 'anonymous': 404
-        }
-    }
-
-    def _test_get(self, username):
-        self.assert_list_view(username, kwargs={
-            'file_path': 'image_00.jpg'
+    def _test_html_a_b(self, username):
+        self.assert_view('html_a_b', 'get', 'list_view', username, kwargs={
+            'file_path': 'html/a/b/'
         })
