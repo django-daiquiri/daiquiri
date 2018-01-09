@@ -1,65 +1,6 @@
 angular.module('core')
 
-.directive('daiquiriTable', ['$timeout', '$compile', '$templateCache', 'TableService', function($timeout, $compile, $templateCache, TableService) {
-    return {
-        templateUrl: function(element, attrs) {
-            var staticurl = angular.element('meta[name="staticurl"]').attr('content');
-            return staticurl + 'core/html/table.html';
-        },
-        scope: {
-            'rowsUrl': '@',
-            'columnsUrl': '@',
-            'filesUrl': '@',
-            'referencesUrl': '@',
-            'params': '=',
-            'pageSizes': '=',
-            'columnWidths': '=',
-            'columnRound': '='
-        },
-        link: function(scope, element, attrs) {
-            scope.table = TableService;
-            scope.table.init({
-                rows_url: scope.rowsUrl,
-                columns_url: scope.columnsUrl,
-                files_url: scope.filesUrl,
-                references_url: scope.referencesUrl,
-                params: scope.params,
-                page_sizes: scope.pageSizes,
-                column_widths: scope.columnWidths,
-                column_round: scope.columnRound
-            });
-
-            // refresh the tooltips everytime a new set of columns is fetched
-            scope.$watch(function() {
-                return angular.isDefined(scope.table.columns) && scope.table.columns.$resolved;
-            }, function(new_value) {
-                if (new_value) {
-                    var template = $templateCache.get('tooltip.html');
-
-                    $timeout(function() {
-                        angular.forEach(scope.table.columns, function(column, index) {
-                            var isolated_scope = scope.$new(true);
-                            isolated_scope.column = column;
-                            isolated_scope.table = scope.table;
-
-                            $('[data-column-index="' + index + '"] .info').popover({
-                                title: '<strong>' + column.name + '</strong>',
-                                content: $compile(template)(isolated_scope),
-                                html: true,
-                                trigger: 'hover',
-                                placement: 'bottom',
-                                container: '.daiquiri-table'
-                            });
-                        });
-                    });
-                }
-            });
-
-        }
-    };
-}])
-
-.factory('TableService', ['$http', '$resource', '$q', '$document', '$timeout', function($http, $resource, $q, $document, $timeout) {
+.factory('TableService', ['$http', '$resource', '$q', '$document', '$timeout', '$rootScope', '$compile', '$templateCache',  function($http, $resource, $q, $document, $timeout, $rootScope, $compile, $templateCache) {
 
     /* get the base url */
 
@@ -76,59 +17,40 @@ angular.module('core')
             page: 1,
             page_size: 10,
             ordering: null,
-            filter: null
-        },
-        i18n: {
-            'first': gettext('First'),
-            'previous': gettext('Previous'),
-            'next': gettext('Next'),
-            'last': gettext('Last'),
-            'reset': gettext('Reset'),
-            'filter': gettext('Filter'),
-            'count': function() {
-                var page_count = Math.ceil(service.count / service.params.page_size);
-                if (service.params.filter) {
-                    return interpolate(gettext('Page %s of %s (%s rows total, filtering for "%s")'), [service.params.page,page_count, service.count, service.params.filter]);
-                } else {
-                    return interpolate(gettext('Page %s of %s (%s rows total)'), [service.params.page,page_count, service.count]);
-                }
-            },
-            'page_size': function(value) {
-                return interpolate(gettext('Show %s of %s rows'), [value, service.count]);
-            },
-            'description': gettext('Description'),
-            'unit': gettext('Unit'),
-            'ucd': gettext('UCD'),
-            'datatype': gettext('Data type'),
-            'arraysize': gettext('Size'),
-            'principal': gettext('Principal'),
-            'indexed': gettext('Indexed'),
-            'std': gettext('STD'),
-            'previous_column': gettext('Previous column'),
-            'next_column': gettext('Next column'),
-            'previous_row': gettext('Previous row'),
-            'next_row': gettext('Next row'),
+            search: null
         },
         page_sizes: [10, 20, 100],
-        filter_string: null,
-        files: false,
         active: {},
         modal: {},
-        round: false
+        getter: {
+            row_id: function(row) {
+                return JSON.stringify(row);
+            },
+            file_url: function(row, column_index) {
+                return service.files_url + '?search=' + window.encodeURIComponent(row[column_index]);
+            },
+            reference_url: function(row, column_index) {
+                var key = window.encodeURIComponent(service.columns[column_index]),
+                    value = window.encodeURIComponent(row[column_index]);
+
+                return service.references_url + '?key=' + key + '&value=' + value;
+            },
+            link_url: function(row, column_index) {
+                return row[column_index];
+            }
+        }
     };
 
     service.init = function(opt) {
         service.ready = false;
 
-        // set up resources
+        // set up resources and urls
         if (angular.isDefined(opt.rows_url)) {
             resources.rows = $resource(baseurl + opt.rows_url);
         }
         if (angular.isDefined(opt.columns_url)) {
             resources.columns = $resource(baseurl + opt.columns_url);
         }
-
-        // setup files url and reference
         if (angular.isDefined(opt.files_url)) {
             service.files_url = baseurl + opt.files_url;
         }
@@ -136,23 +58,35 @@ angular.module('core')
             service.references_url = baseurl + opt.references_url;
         }
 
-        // update pages_sizes
+        // update params
+        if (angular.isDefined(opt.params)) {
+            angular.extend(service.params, opt.params);
+        }
+
+        // set pages_sizes
         if (angular.isDefined(opt.page_sizes)) {
             service.page_sizes = opt.page_sizes;
             service.params.page_size = opt.page_sizes[0];
         }
 
-        // setup initial column width and rounding of cells
-        if (angular.isDefined(opt.column_widths)) {
-            service.column_widths = opt.column_widths;
-        }
-        if (angular.isDefined(opt.column_round)) {
-            service.column_round = opt.column_round;
+        // set custom getter functions
+        if (angular.isDefined(opt.getter)) {
+            angular.forEach(opt.getter, function(func, key) {
+                service.getter[key] = func;
+            })
         }
 
+        // set additional options
+        angular.forEach(opt, function(value, key) {
+            if ([
+                'rows_url', 'columns_url', 'files_url', 'references_url', 'params', 'page_sizes', 'getter'
+            ].indexOf(key) == -1) {
+                service[key] = opt[key];
+            }
+        });
+
         // add params from the dom to service.params and fetch the data
-        if (angular.isDefined(opt.params)) {
-            angular.extend(service.params, opt.params);
+        if (angular.isUndefined(opt.fetch) || opt.fetch) {
 
             resources.columns.query(service.params, function(response) {
                 service.columns = response;
@@ -195,11 +129,34 @@ angular.module('core')
                     }
                 });
 
-                $timeout(function() {
-                    angular.forEach(service.column_widths, function(column_width, column_index) {
-                        angular.element('[data-column-index="' + column_index + '"]').width(column_width);
+                if (service.tooltips) {
+                    $timeout(function() {
+                        var template = $templateCache.get('tooltip.html');
+
+                        angular.forEach(service.columns, function(column, index) {
+                            var isolated_scope = $rootScope.$new(true);
+                            isolated_scope.column = column;
+                            isolated_scope.table = service;
+
+                            $('[data-column-index="' + index + '"] .info').popover({
+                                title: '<strong>' + column.name + '</strong>',
+                                content: $compile(template)(isolated_scope),
+                                html: true,
+                                trigger: 'hover',
+                                placement: 'bottom',
+                                container: '.daiquiri-table'
+                            });
+                        });
                     });
-                });
+                }
+
+                if (service.column_widths) {
+                    $timeout(function() {
+                        angular.forEach(service.column_widths, function(column_width, column_index) {
+                            angular.element('[data-column-index="' + column_index + '"]').width(column_width);
+                        });
+                    });
+                }
 
                 service.reset();
             });
@@ -210,15 +167,21 @@ angular.module('core')
         service.columns = [];
         service.rows = [];
         service.ready = true;
-    }
+    };
 
     service.fetch = function() {
         return resources.rows.paginate(service.params, function(response) {
             service.count = response.count;
             service.rows = response.results;
 
+            service.page_count = Math.ceil(service.count / service.params.page_size);
+
             service.first_page = (service.params.page == 1);
-            service.last_page = (service.params.page * service.params.page_size > service.count);
+            service.last_page = (service.params.page * service.params.page_size >= service.count);
+
+            if (service.checkboxes) {
+                service.update_checked_all();
+            }
 
             service.ready = true;
         }).$promise;
@@ -255,13 +218,14 @@ angular.module('core')
     service.reset = function() {
         service.params.page = 1;
         service.params.ordering = null;
-        service.params.filter = null;
-        service.filter_string = null;
+        service.params.search = null;
+        service.search_string = null;
+        service.checked = {};
         service.fetch();
     };
 
-    service.filter = function() {
-        service.params.filter = service.filter_string;
+    service.search = function() {
+        service.params.search = service.search_string;
         service.fetch();
     };
 
@@ -297,11 +261,26 @@ angular.module('core')
     };
 
     service.activate = function(column_index, row_index) {
-        service.active = {
-            column_index: column_index,
-            row_index: row_index
-        }
-    }
+        // service.active = {
+        //     column_index: column_index,
+        //     row_index: row_index
+        // }
+    };
+
+    service.check_all = function() {
+        angular.forEach(service.rows, function(row) {
+            service.checked[service.getter.id(row)] = service.checked_all;
+        })
+    };
+
+    service.update_checked_all = function() {
+        service.checked_all = service.rows.map(function(row) {
+            return service.checked[service.getter.id(row)];
+        }).every(function(element) {
+            return element === true;
+        });
+    };
+
 
     service.modal_open = function(event, column_index, row_index) {
         event.preventDefault();
@@ -319,7 +298,7 @@ angular.module('core')
                 $('#daiquiri-table-modal').modal('show');
             }, 100);
         })
-    }
+    };
 
     service.modal_update = function() {
         var file_path = service.rows[service.active.row_index][service.active.column_index];
@@ -336,6 +315,7 @@ angular.module('core')
         } else if (column.ucd.indexOf('meta.preview') > -1) {
             service.modal.pre = null;
             service.modal.src = url;
+
             return $q.when();
         } else {
             return $q.when();
@@ -355,7 +335,7 @@ angular.module('core')
                 service.modal_update();
             });
         }
-    }
+    };
 
     service.modal_down = function() {
         if (service.active.row_index < service.rows.length - 1) {
@@ -370,7 +350,7 @@ angular.module('core')
                 service.modal_update();
             });
         }
-    }
+    };
 
     service.modal_left = function() {
         var next_column_index = null,
@@ -391,7 +371,7 @@ angular.module('core')
 
         service.active.column_index = current_column_index;
         service.modal_update();
-    }
+    };
 
     service.modal_right = function() {
         var next_column_index = null,
@@ -412,7 +392,7 @@ angular.module('core')
 
         service.active.column_index = current_column_index;
         service.modal_update();
-    }
+    };
 
     return service;
 }]);

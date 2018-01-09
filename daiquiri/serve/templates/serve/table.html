@@ -4,7 +4,19 @@
 {% load i18n %}
 {% load core_tags %}
 
-{% block bodyargs %}ng-app="table" ng-controller="TableController"{% endblock %}
+{% block bodyargs %}
+    ng-app="table"
+    ng-controller="TableController"
+    ng-init="service.table.init({
+        rows_url: 'serve/api/rows/',
+        columns_url: 'serve/api/columns/',
+        files_url: 'files/api/files/',
+        params: {
+            database: '{{ database }}',
+            table: '{{ table }}'
+        }
+    })"
+{% endblock %}
 
 {% block headextra %}
     {% vendor 'angular' %}
@@ -17,24 +29,18 @@
 
     {% compress js %}
     <script type="text/javascript" src="{% static 'core/js/core.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'core/js/filter.js' %}" ></script>
     <script type="text/javascript" src="{% static 'core/js/byNumber.js' %}" ></script>
     <script type="text/javascript" src="{% static 'core/js/table.js' %}" ></script>
 
     <script type="text/javascript" src="{% static 'serve/js/table.js' %}" ></script>
     {% endcompress js %}
-
-    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
 {% endblock %}
 
 {% block wide %}
 
     <h1>{{ database }}.{{ table }}</h1>
 
-    <div daiquiri-table
-        data-rows-url="serve/api/rows/"
-        data-columns-url="serve/api/columns/"
-        data-files-url="files/api/files/"
-        data-params="{database: '{{ database }}', table: '{{ table }}'}">
-    </div>
+    {% include 'core/partials/table.html' %}
 
 {% endblock %}

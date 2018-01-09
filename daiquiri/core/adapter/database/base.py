@@ -48,10 +48,10 @@ class DatabaseAdapter(object):
     def abort_query(self, pid):
         raise NotImplementedError()
 
-    def count_rows(self, database_name, table_name, column_names=None, filter_string=None):
+    def count_rows(self, database_name, table_name, column_names=None, search=None, filters=None):
         raise NotImplementedError()
 
-    def fetch_rows(self, database_name, table_name, column_names=None, ordering=None, page=1, page_size=10, filter_string=None):
+    def fetch_rows(self, database_name, table_name, column_names=None, ordering=None, page=1, page_size=10, search=None, filters=None):
         raise NotImplementedError()
 
     def fetch_row(self, database_name, table_name, column_name, value):

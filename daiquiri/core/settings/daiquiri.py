@@ -7,6 +7,40 @@ ASYNC = False
 IPV4_PRIVACY_MASK = 16
 IPV6_PRIVACY_MASK = 32
 
+ARCHIVE_ANONYMOUS = False
+
+ARCHIVE_DATABASE = 'daiquiri_archive'
+
+ARCHIVE_TABLE = 'files'
+
+ARCHIVE_COLUMNS = [
+    {
+        'name': 'id',
+        'hidden': True
+    },
+    {
+        'name': 'timestamp',
+        'label': 'Timestamp'
+    },
+    {
+        'name': 'file',
+        'label': 'Filename',
+        'ucd': 'meta.file'
+    },
+    {
+        'name': 'collection',
+        'hidden': True
+    },
+    {
+        'name': 'path',
+        'hidden': True
+    }
+]
+
+ARCHIVE_BASE_PATH = '/'
+
+ARCHIVE_DOWNLOAD_DIR = os.path.join(BASE_DIR, 'download')
+
 AUTH_SIGNUP = False
 
 AUTH_WORKFLOW = None

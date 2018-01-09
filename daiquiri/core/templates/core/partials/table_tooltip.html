@@ -1,0 +1,28 @@
+{% load i18n %}
+
+<script type="text/ng-template" id="tooltip.html">
+    <div ng-show="column.description">
+        <strong>{% trans 'Description' %}</strong> {$ column.description $}
+    </div>
+    <div ng-show="column.unit">
+        <strong>{% trans 'Unit' %}</strong> {$ column.unit $}
+    </div>
+    <div ng-show="column.ucd">
+        <strong>{% trans 'UCD' %}</strong> {$ column.ucd $}
+    </div>
+    <div ng-show="column.datatype">
+        <strong>{% trans 'Data type' %}</strong> {$ column.datatype $}
+    </div>
+    <div ng-show="column.arraysize">
+        <strong>{% trans 'Array size' %}</strong> {$ column.arraysize $}
+    </div>
+    <div>
+        <strong ng-show="column.principal">{% trans 'Principal' %}</strong>
+    </div>
+    <div>
+        <strong ng-show="column.indexed">{% trans 'Indexed' %}</strong>
+    </div>
+    <div>
+        <strong ng-show="column.std">{% trans 'Std' %}</strong>
+    </div>
+</script>

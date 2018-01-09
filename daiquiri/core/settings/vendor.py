@@ -62,6 +62,17 @@ VENDOR = {
             {
                 'path': 'angular-sanitize.min.js'
             }
+        ],
+        'map': [
+            {
+                'path': 'angular.min.js.map'
+            },
+            {
+                'path': 'angular-resource.min.js.map'
+            },
+            {
+                'path': 'angular-sanitize.min.js.map'
+            }
         ]
     },
     'ng-infinite-scroll': {

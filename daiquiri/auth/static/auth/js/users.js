@@ -1,4 +1,4 @@
-var app = angular.module('users', ['list', 'infinite-scroll']);
+var app = angular.module('users', ['core', 'infinite-scroll']);
 
 app.factory('UsersService', ['$resource', '$timeout', 'ListService', function($resource, $timeout, ListService) {
 

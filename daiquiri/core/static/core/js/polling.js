@@ -39,7 +39,6 @@ angular.module('core')
         };
 
         if (enabled && initial) {
-            console.log('!');
             callback(callback_options);
         }
     };

@@ -13,14 +13,12 @@
         .daiquiri-table-search {
             margin: 0 0 10px 0;
         }
-        .daiquiri-table-pagination {
-            margin-bottom: 10px;
-
-            @media(min-width: $screen-xs-max) {
-                text-align: right;
-            }
-            .pagination {
-                margin: 0;
+        .pagination {
+            margin: 0 0 10px 0;
+        }
+        @media(max-width: $screen-xs-max) {
+            .pull-right {
+                float: none!important;
             }
         }
     }
@@ -30,6 +28,8 @@
         border-radius: 4px;
         width: auto;
         overflow-x: auto;
+        table-layout: fixed;
+        width: 100%;
 
         .table {
             margin: 0;
@@ -40,17 +40,30 @@
                 width: 200px;
                 padding: 0;
                 border-right: 1px solid $border-color;
+
+                &:last-child,
+                &:last-child {
+                    border-right: none;
+                }
             }
-            th:last-child,
-            td:last-child {
-                border-right: none;
+            th.daiquiri-table-check {
+                width: 32px;
+
+                @media(max-width: $screen-md-max) {
+                    width: 40px;
+                }
             }
-            .cell {
+            .daiquiri-table-cell,
+            .daiquiri-table-check {
                 white-space: nowrap;
                 padding: 8px;
                 position: relative;
-
                 overflow: hidden;
+            }
+            .daiquiri-table-check {
+                white-space: nowrap;
+                padding: 9px 4px 7px 6px;
+                text-align: center;
             }
             tr.active {
                 td.active {

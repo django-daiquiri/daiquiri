@@ -1,0 +1,88 @@
+{% extends 'core/wide.html' %}
+{% load staticfiles %}
+{% load i18n %}
+{% load compress %}
+{% load core_tags %}
+
+{% block bodyargs %}
+    ng-app="archive"
+    ng-controller="ArchiveController"
+    ng-init="service.table.init({
+        rows_url: 'archive/api/rows/',
+        columns_url: 'archive/api/columns/',
+        files_url: 'archive/api/files/',
+        references_url: 'archive/api/references/',
+        tooltips: false,
+        checkboxes: true,
+        getter: {
+            id: service.get_id,
+            file_url: service.get_file_url
+        }
+    })"
+{% endblock %}
+
+{% block headextra %}
+    {% vendor 'angular' %}
+
+    {% compress css %}
+    <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/browser.scss' %}" />
+    <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/table.scss' %}" />
+    <link rel="stylesheet" type="text/x-scss" href="{% static 'archive/css/archive.scss' %}" />
+    {% endcompress css %}
+
+    {% compress js %}
+    <script type="text/javascript" src="{% static 'core/js/core.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'core/js/filter.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'core/js/byNumber.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'core/js/table.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'core/js/polling.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'archive/js/archive.js' %}" ></script>
+    {% endcompress js %}
+{% endblock %}
+
+{% block wide %}
+
+    <h1>Archive</h1>
+
+    <div class="daiquiri-table" ng-show="service.table.ready" ng-cloak>
+
+        <div class="daiquiri-table-header">
+            <div class="row">
+                <div class="col-sm-12">
+                    {% include 'core/partials/table_search.html' %}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <ul class="pagination">
+                        <li>
+                            <a href="" ng-click="service.download_checked()">
+                                {% trans 'Download checked' %}
+                            </a>
+                        </li>
+                    </ul>
+                    <ul class="pagination">
+                        <li>
+                            <a href="" ng-click="service.download_all()">
+                                {% trans 'Download all' %}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-sm-6">
+                    <div class="pull-right">
+                        {% include 'core/partials/table_pagination.html' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% include 'core/partials/table_pane.html' %}
+
+        {% include 'core/partials/table_footer.html' %}
+
+    </div>
+
+    {% include 'core/partials/table_modal.html' %}
+
+{% endblock %}

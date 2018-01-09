@@ -1,7 +1,7 @@
 // throttle/debounce the frequency of infinite-scroll events
 angular.module('infinite-scroll').value('THROTTLE_MILLISECONDS', 100);
 
-angular.module('list', ['core'])
+angular.module('core')
 
 .directive('orderList', ['ListService', function(ListService) {
     return {

@@ -18,6 +18,18 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
         functions: $resource(baseurl + 'metadata/api/functions/user/'),
     };
 
+    /* configure urls for table and plot */
+
+    var urls = {
+        table: {
+            rows: 'serve/api/rows/',
+            columns: 'serve/api/columns/',
+            files: 'files/api/files/',
+            references: 'serve/api/references/'
+        },
+        plot: 'serve/api/rows/'
+    }
+
     /* initialise the browser service */
 
     BrowserService.init('databases', ['databases', 'tables', 'columns'])
@@ -259,6 +271,10 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
             if (!service.table.ready) {
                 if (service.job && service.job.phase == 'COMPLETED') {
                     service.table.init({
+                        rows_url: urls.table.rows,
+                        columns_url: urls.table.columns,
+                        files_url: urls.table.files,
+                        references_url: urls.table.references,
                         params: {
                             database: service.job.database_name,
                             table: service.job.table_name
@@ -271,7 +287,7 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
         } else if (tab == 'plot') {
             if (!service.plot.ready) {
                 if (service.job && service.job.phase == 'COMPLETED') {
-                    service.plot.init('serve/api/rows/', {
+                    service.plot.init(urls.plot, {
                         database: service.job.database_name,
                         table: service.job.table_name
                     }, service.job.columns);

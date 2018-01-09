@@ -1,0 +1,32 @@
+{% load i18n %}
+
+<ul class="pagination">
+    <li>
+        <a href="" ng-click="service.table.first()">
+            {% trans 'First' %}
+        </a>
+    </li>
+    <li>
+        <a href="" ng-click="service.table.previous()">
+            {% trans 'Previous' %}
+        </a>
+    </li>
+    <li>
+        <a href="" ng-click="service.table.next()">
+            {% trans 'Next' %}
+        </a>
+    </li>
+    <li>
+        <a href="" ng-click="service.table.last()">
+            {% trans 'Last' %}
+        </a>
+    </li>
+</ul>
+
+<ul class="pagination">
+    <li>
+        <a href="" ng-click="service.table.reset()">
+            {% trans 'Reset' %}
+        </a>
+    </li>
+</ul>

@@ -437,7 +437,10 @@ class DownloadJob(Job):
         pass
 
     def delete_file(self):
-        os.remove(self.file_path)
+        try:
+            os.remove(self.file_path)
+        except OSError:
+            pass
 
 
 @python_2_unicode_compatible

@@ -26,6 +26,7 @@ before_script:
 - mysql < testing/sql/daiquiri_data_obs.sql
 - mysql < testing/sql/daiquiri_data_sim.sql
 - mysql < testing/sql/daiquiri_user_user.sql
+- mysql < testing/sql/daiquiri_archive.sql
 
 script:
 - coverage run testing/runtests.py

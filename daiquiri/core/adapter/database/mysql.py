@@ -1,5 +1,6 @@
 import logging
 import re
+import six
 import warnings
 
 from django.db import OperationalError, ProgrammingError
@@ -104,7 +105,7 @@ class MySQLAdapter(DatabaseAdapter):
         sql = 'SELECT table_rows as nrows, data_length + index_length AS size FROM `information_schema`.`tables` WHERE `table_schema` = %s AND table_name = %s;'
         return self.fetchone(sql, (database_name, table_name))
 
-    def count_rows(self, database_name, table_name, column_names=None, filter_string=None, filters=None):
+    def count_rows(self, database_name, table_name, column_names=None, search=None, filters=None):
         # if no column names are provided get all column_names from the table
         if not column_names:
             column_names= self.fetch_column_names(database_name, table_name)
@@ -120,11 +121,11 @@ class MySQLAdapter(DatabaseAdapter):
         sql_args = []
 
         # process filtering
-        sql, sql_args = self._process_filtering(sql, sql_args, filter_string, filters, escaped_column_names)
+        sql, sql_args = self._process_filtering(sql, sql_args, search, filters, escaped_column_names)
 
         return self.fetchone(sql, args=sql_args)[0]
 
-    def fetch_row(self, database_name, table_name, column_names=None, filter_string=None, filters=None):
+    def fetch_row(self, database_name, table_name, column_names=None, search=None, filters=None):
 
         # if no column names are provided get all column_names from the table
         if not column_names:
@@ -142,17 +143,17 @@ class MySQLAdapter(DatabaseAdapter):
         sql_args = []
 
         # process filtering
-        sql, sql_args = self._process_filtering(sql, sql_args, filter_string, filters, escaped_column_names)
+        sql, sql_args = self._process_filtering(sql, sql_args, search, filters, escaped_column_names)
 
         return self.fetchone(sql, args=sql_args)
 
-    def fetch_dict(self, database_name, table_name, column_names=None, filter_string=None, filters=None):
+    def fetch_dict(self, database_name, table_name, column_names=None, search=None, filters=None):
 
         # if no column names are provided get all column_names from the table
         if not column_names:
             column_names = self.fetch_column_names(database_name, table_name)
 
-        row = self.fetch_row(database_name, table_name, column_names, filter_string, filters)
+        row = self.fetch_row(database_name, table_name, column_names, search, filters)
 
         if row:
             return {
@@ -161,7 +162,7 @@ class MySQLAdapter(DatabaseAdapter):
         else:
             return {}
 
-    def fetch_rows(self, database_name, table_name, column_names=None, ordering=None, page=1, page_size=10, filter_string=None, filters=None):
+    def fetch_rows(self, database_name, table_name, column_names=None, ordering=None, page=1, page_size=10, search=None, filters=None):
 
         # if no column names are provided get all column_names from the table
         if not column_names:
@@ -179,7 +180,7 @@ class MySQLAdapter(DatabaseAdapter):
         sql_args = []
 
         # process filtering
-        sql, sql_args = self._process_filtering(sql, sql_args, filter_string, filters, escaped_column_names)
+        sql, sql_args = self._process_filtering(sql, sql_args, search, filters, escaped_column_names)
 
         # process ordering
         sql = self._process_ordering(sql, ordering, escaped_column_names)
@@ -193,31 +194,51 @@ class MySQLAdapter(DatabaseAdapter):
 
         return self.fetchall(sql, args=sql_args)
 
-    def _process_filtering(self, sql, sql_args, filter_string, filters, escaped_column_names):
-        if filter_string and filters:
-            raise Exception('filter_string and filters are mutually exclusive.')
+    def _process_filtering(self, sql, sql_args, search, filters, escaped_column_names):
+        # prepare lists for the WHERE statements
+        where_stmts = []
+        where_args = []
 
-        elif filter_string:
-            # append a WHERE/OR condition fo every column
-            where_stmts = []
+        if search:
+            # append a OR condition fo every column
+            search_stmts = []
+            search_args = []
             for escaped_column_name in escaped_column_names:
-                sql_args.append('%' + filter_string + '%')
-                where_stmts.append(escaped_column_name + ' LIKE %s')
+                search_stmts.append(escaped_column_name + ' LIKE %s')
+                search_args.append('%' + search + '%')
 
-            if where_stmts:
-                sql += ' WHERE ' + ' OR '.join(where_stmts)
+            if search_stmts:
+                where_stmts.append('(' + ' OR '.join(search_stmts) + ')')
+                where_args += search_args
 
-        elif filters:
-            # append a WHERE/AND condition for entry in filters
-            where_stmts = []
-            for column_name, string in filters.items():
+        if filters:
+            for column_name, column_filter in filters.items():
+                # escpae the column_name for this column
                 escaped_column_name = self.escape_identifier(column_name)
 
-                sql_args.append(string)
-                where_stmts.append(escaped_column_name + ' = %s')
+                # check if the filter is a list or a string
+                if isinstance(column_filter, six.string_types):
+                    filter_list = [column_filter]
+                elif isinstance(column_filter, list):
+                    filter_list = column_filter
+                else:
+                    raise RuntimeError('Unsupported filter for column "%s"' % column_name)
 
-            if where_stmts:
-                sql += ' WHERE ' + ' AND '.join(where_stmts)
+                # append a OR condition fo every entry in the list
+                filter_stmts = []
+                filter_args = []
+                for filter_string in filter_list:
+                    filter_stmts.append(escaped_column_name + ' = %s')
+                    filter_args.append(filter_string)
+
+                if filter_stmts:
+                    where_stmts.append('(' + ' OR '.join(filter_stmts) + ')')
+                    where_args += filter_args
+
+        # connect the where statements with AND and append to the sql string
+        if where_stmts:
+            sql += ' WHERE ' + ' AND '.join(where_stmts)
+            sql_args += where_args
 
         return sql, sql_args
 

@@ -1,0 +1,214 @@
+[
+  {
+    "model": "daiquiri_archive.collection",
+    "pk": 1,
+    "fields": {
+      "name": "c01",
+      "access_level": "PUBLIC",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_archive.collection",
+    "pk": 2,
+    "fields": {
+      "name": "c02",
+      "access_level": "PUBLIC",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_archive.collection",
+    "pk": 3,
+    "fields": {
+      "name": "c03",
+      "access_level": "PUBLIC",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_archive.collection",
+    "pk": 4,
+    "fields": {
+      "name": "c04",
+      "access_level": "PUBLIC",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_archive.collection",
+    "pk": 5,
+    "fields": {
+      "name": "c05",
+      "access_level": "PUBLIC",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_archive.collection",
+    "pk": 6,
+    "fields": {
+      "name": "c06",
+      "access_level": "PUBLIC",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_archive.collection",
+    "pk": 7,
+    "fields": {
+      "name": "c07",
+      "access_level": "PUBLIC",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_archive.collection",
+    "pk": 8,
+    "fields": {
+      "name": "c08",
+      "access_level": "PUBLIC",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_archive.collection",
+    "pk": 9,
+    "fields": {
+      "name": "c09",
+      "access_level": "PUBLIC",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_archive.collection",
+    "pk": 10,
+    "fields": {
+      "name": "c10",
+      "access_level": "PUBLIC",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_archive.collection",
+    "pk": 11,
+    "fields": {
+      "name": "c11",
+      "access_level": "INTERNAL",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_archive.collection",
+    "pk": 12,
+    "fields": {
+      "name": "c12",
+      "access_level": "INTERNAL",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_archive.collection",
+    "pk": 13,
+    "fields": {
+      "name": "c13",
+      "access_level": "INTERNAL",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_archive.collection",
+    "pk": 14,
+    "fields": {
+      "name": "c14",
+      "access_level": "INTERNAL",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_archive.collection",
+    "pk": 15,
+    "fields": {
+      "name": "c15",
+      "access_level": "INTERNAL",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_archive.collection",
+    "pk": 16,
+    "fields": {
+      "name": "c16",
+      "access_level": "PRIVATE",
+      "groups": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "daiquiri_archive.collection",
+    "pk": 17,
+    "fields": {
+      "name": "c17",
+      "access_level": "PRIVATE",
+      "groups": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "daiquiri_archive.collection",
+    "pk": 18,
+    "fields": {
+      "name": "c18",
+      "access_level": "PRIVATE",
+      "groups": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "daiquiri_archive.collection",
+    "pk": 19,
+    "fields": {
+      "name": "c19",
+      "access_level": "PRIVATE",
+      "groups": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "daiquiri_archive.collection",
+    "pk": 20,
+    "fields": {
+      "name": "c20",
+      "access_level": "PRIVATE",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_archive.archivejob",
+    "pk": "64aab8ae-50e8-4fa9-8579-8c3345473f6d",
+    "fields": {
+      "data": "{\"search\":\"image_01\"}",
+      "files": "[\"images/image_01.jpg\",\"images/image_01.fits\"]"
+    }
+  },
+  {
+    "model": "daiquiri_archive.archivejob",
+    "pk": "79bef6fa-15b0-408d-8af3-2011c4d2487f",
+    "fields": {
+      "data": "{\"search\":\"image_02\"}",
+      "files": "[\"images/image_02.fits\",\"images/image_02.jpg\"]"
+    }
+  },
+  {
+    "model": "daiquiri_archive.archivejob",
+    "pk": "25515f20-1ee9-4a12-bda3-f4ef7289c998",
+    "fields": {
+      "data": "{\"file_ids\":[\"1b1812c3-2911-4a28-bff1-41ad45086d28\",\"074fec76-6143-4d58-a1f6-a7e8c23af15e\",\"95362abc-ad62-4403-b04c-8ea64e642d1d\",\"c5e61e94-767d-4a44-9fea-1f1f36318fbe\"]}",
+      "files": "[\"images/image_01.fits\",\"images/image_01.jpg\",\"images/image_02.fits\",\"images/image_02.jpg\"]"
+    }
+  }
+]
