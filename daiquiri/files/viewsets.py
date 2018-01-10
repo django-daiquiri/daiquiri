@@ -1,5 +1,8 @@
+import os
+
 from sendfile import sendfile
 
+from django.conf import settings
 from django.utils.timezone import now
 
 from rest_framework import viewsets
@@ -19,9 +22,9 @@ class FileViewSet(viewsets.GenericViewSet):
         search = request.GET.get('search', None)
 
         if search:
-            absolute_file_path = search_file(request.user, search)
+            file_path = search_file(search)
 
-            if absolute_file_path and check_file(request.user, absolute_file_path):
+            if file_path and check_file(request.user, file_path):
 
                 if request.GET.get('download', True):
                     # create a stats record for this download
@@ -30,13 +33,14 @@ class FileViewSet(viewsets.GenericViewSet):
                         resource_type='FILE',
                         resource={
                             'search': search,
-                            'absolute_file_path': absolute_file_path
+                            'file_path': file_path
                         },
                         client_ip=get_client_ip(request),
                         user=request.user
                     )
 
                     # send the file to the client
+                    absolute_file_path = os.path.join(settings.FILES_BASE_PATH, file_path)
                     return sendfile(request, absolute_file_path, attachment=True)
                 else:
                     # send an empty response

@@ -13,6 +13,7 @@ from django.db import models
 from django.db.utils import OperationalError, ProgrammingError
 from django.urls import reverse
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 
 from rest_framework.exceptions import ValidationError
@@ -26,6 +27,8 @@ from queryparser.exceptions import QueryError, QuerySyntaxError
 from daiquiri.core.adapter import get_adapter
 from daiquiri.core.constants import ACCESS_LEVEL_CHOICES
 from daiquiri.jobs.models import Job
+from daiquiri.jobs.managers import JobManager
+from daiquiri.files.utils import check_file, search_file
 
 from .managers import QueryJobManager, ExampleManager
 from .utils import (
@@ -35,11 +38,10 @@ from .utils import (
     get_format_config,
     get_tap_schema_name,
     get_user_database_name,
-    get_download_file_name,
     get_asterisk_columns,
     check_permissions
 )
-from .tasks import run_query, create_download_file
+from .tasks import run_query, create_download_file, create_archive_file
 
 logger = logging.getLogger(__name__)
 
@@ -138,6 +140,10 @@ class QueryJob(Job):
     @property
     def priority(self):
         return six.next((queue['priority'] for queue in settings.QUERY_QUEUES if queue['key'] == self.queue))
+
+    @cached_property
+    def column_names(self):
+        return [column['name'] for column in self.metadata['columns']]
 
     def process(self):
         if not self.response_format:
@@ -347,8 +353,40 @@ class QueryJob(Job):
                 'phase': ['Job is not COMPLETED.']
             })
 
+    def rows(self, column_names, ordering, page, page_size, search, filters):
+        if self.phase == self.PHASE_COMPLETED:
+            # check if the columns are actually in the jobs table
+            errors = {}
+
+            for column_name in column_names:
+                if column_name not in self.column_names:
+                    errors[column_name] = _('Column not found.')
+
+            if errors:
+                raise ValidationError(errors)
+
+            # get database adapter
+            adapter = get_adapter()
+
+            # query the database for the total number of rows
+            count = adapter.database.count_rows(self.database_name, self.table_name, column_names, search, filters)
+
+            # query the paginated rowset
+            rows = adapter.database.fetch_rows(self.database_name, self.table_name, column_names, ordering, page, page_size, search, filters)
+
+            # flatten the list if only one column is retrieved
+            if len(column_names) == 1:
+                return count, [element for row in rows for element in row]
+            else:
+                return count, rows
+        else:
+            raise ValidationError({
+                'phase': ['Job is not COMPLETED.']
+            })
 
 class DownloadJob(Job):
+
+    objects = JobManager()
 
     job = models.ForeignKey(
         QueryJob, related_name='downloads',
@@ -360,11 +398,6 @@ class DownloadJob(Job):
         verbose_name=_('Format key'),
         help_text=_('Format key for this download.')
     )
-    file_path = models.CharField(
-        max_length=256,
-        verbose_name=_('Path'),
-        help_text=_('Path to the file.')
-    )
 
     class Meta:
         ordering = ('start_time', )
@@ -375,35 +408,24 @@ class DownloadJob(Job):
         permissions = (('view_downloadjob', 'Can view DownloadJob'),)
 
     @property
-    def parameters(self):
-        raise NotImplementedError
+    def file_path(self):
+        if not self.owner:
+            username = 'anonymous'
+        else:
+            username = self.owner.username
 
-    @property
-    def results(self):
-        raise NotImplementedError
+        format_config = get_format_config(self.format_key)
 
-    @property
-    def result(self):
-        raise NotImplementedError
-
-    @property
-    def quote(self):
-        raise NotImplementedError
+        directory_name = os.path.join(settings.QUERY_DOWNLOAD_DIR, username)
+        return os.path.join(directory_name, '%s.%s' % (self.job.table_name, format_config['extension']))
 
     def process(self):
-        try:
-            format_config = get_format_config(self.format_key)
-        except IndexError:
-            raise ValidationError({'format_key': "Not supported."})
-
         if self.job.phase == self.PHASE_COMPLETED:
             self.owner = self.job.owner
         else:
             raise ValidationError({
                 'phase': ['Job is not COMPLETED.']
             })
-
-        self.file_path = get_download_file_name(self.job.owner, self.job.table_name, format_config)
 
         # set clean flag
         self.is_clean = True
@@ -416,25 +438,129 @@ class DownloadJob(Job):
             self.phase = self.PHASE_QUEUED
             self.save()
 
-            download_job_id = str(self.id)
+            download_id = str(self.id)
             if not settings.ASYNC:
-                logger.info('create_download_file %s submitted (sync)' % download_job_id)
-                create_download_file.apply((download_job_id, ), task_id=download_job_id, throw=True)
+                logger.info('create_download_file %s submitted (sync)' % download_id)
+                create_download_file.apply((download_id, ), task_id=download_id, throw=True)
 
             else:
-                logger.info('create_download_file %s submitted (async, queue=download)' % download_job_id)
-                create_download_file.apply_async((download_job_id, ), task_id=download_job_id, queue='download')
+                logger.info('create_download_file %s submitted (async, queue=download)' % download_id)
+                create_download_file.apply_async((download_id, ), task_id=download_id, queue='download')
 
         else:
             raise ValidationError({
                 'phase': ['Job is not PENDING.']
             })
 
-    def abort(self):
-        pass
+    def delete_file(self):
+        try:
+            os.remove(self.file_path)
+        except OSError:
+            pass
 
-    def archive(self):
-        pass
+
+class QueryArchiveJob(Job):
+
+    objects = JobManager()
+
+    job = models.ForeignKey(
+        QueryJob, related_name='archives',
+        verbose_name=_('QueryJob'),
+        help_text=_('QueryJob this ArchiveJob belongs to.')
+    )
+    column_name = models.CharField(
+        max_length=32,
+        verbose_name=_('Column name'),
+        help_text=_('Column name for this download.')
+    )
+    files = JSONField(
+        verbose_name=_('Files'),
+        help_text=_('List of files in the archive.')
+    )
+
+    class Meta:
+        ordering = ('start_time', )
+
+        verbose_name = _('QueryArchiveJob')
+        verbose_name_plural = _('QueryArchiveJob')
+
+        permissions = (('view_queryarchivejob', 'Can view QueryArchiveJob'),)
+
+    @property
+    def file_path(self):
+        if not self.owner:
+            username = 'anonymous'
+        else:
+            username = self.owner.username
+
+        directory_name = os.path.join(settings.QUERY_DOWNLOAD_DIR, username)
+        return os.path.join(directory_name, '%s.%s.zip' % (self.job.table_name, self.column_name))
+
+    def process(self):
+        if self.job.phase == self.PHASE_COMPLETED:
+            self.owner = self.job.owner
+        else:
+            raise ValidationError({
+                'phase': ['Job is not COMPLETED.']
+            })
+
+        if not self.column_name:
+            raise ValidationError({
+                'column_name': [_('This field may not be blank.')]
+            })
+
+        if self.column_name not in self.job.column_names:
+            raise ValidationError({
+                'column_name': [_('Unknown column "%s".') % self.column_name]
+            })
+
+        # get database adapter
+        adapter = get_adapter()
+
+        # query the paginated rowset
+        rows = adapter.database.fetch_rows(self.job.database_name, self.job.table_name, [self.column_name], page_size=0)
+
+        # prepare list of files for this job
+        files = []
+
+        for row in rows:
+            file_path = search_file(row[0])
+
+            # append the file to the list of files  if it exists
+            if file_path and check_file(self.owner, file_path):
+                files.append(file_path)
+            else:
+                raise ValidationError({
+                    'files': [_('One or more of the files cannot be found.')]
+                })
+
+        # set files for this job
+        self.files = files
+
+        # set clean flag
+        self.is_clean = True
+
+    def run(self):
+        if not self.is_clean:
+            raise Exception('download_job.process() was not called.')
+
+        if self.phase == self.PHASE_PENDING:
+            self.phase = self.PHASE_QUEUED
+            self.save()
+
+            archive_id = str(self.id)
+            if not settings.ASYNC:
+                logger.info('create_download_file %s submitted (sync)' % archive_id)
+                create_archive_file.apply((archive_id, ), task_id=archive_id, throw=True)
+
+            else:
+                logger.info('create_download_file %s submitted (async, queue=download)' % archive_id)
+                create_archive_file.apply_async((archive_id, ), task_id=archive_id, queue='download')
+
+        else:
+            raise ValidationError({
+                'phase': ['Job is not PENDING.']
+            })
 
     def delete_file(self):
         try:

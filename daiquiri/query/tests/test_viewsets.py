@@ -226,6 +226,45 @@ class JobTests(TestViewsetMixin, QueryViewsetTestCase):
         elif format_key == 'votable-binary2':
             return file_name + '.votable.binary2.xml'
 
+
+# class UserRowTests(TestViewsetMixin, ServeTestCase):
+
+#     url_names = {
+#         'viewset': 'serve:row'
+#     }
+
+#     status_map = {
+#         'list_viewset': {
+#             'admin': 404, 'user': 200, 'anonymous': 404
+#         }
+#     }
+
+#     def _test_list_viewset(self, username):
+#         self.assert_list_viewset(username, query_params={
+#             'database': 'daiquiri_user_user',
+#             'table': 'test'
+#         })
+
+
+# class UserColumnTests(TestViewsetMixin, ServeTestCase):
+
+#     url_names = {
+#         'viewset': 'serve:column'
+#     }
+
+#     status_map = {
+#         'list_viewset': {
+#             'admin': 404, 'user': 200, 'anonymous': 404
+#         }
+#     }
+
+#     def _test_list_viewset(self, username):
+#         self.assert_list_viewset(username, query_params={
+#             'database': 'daiquiri_user_user',
+#             'table': 'test'
+#         })
+
+
 class ExampleViewsetTestCase(TestCase):
 
     fixtures = (

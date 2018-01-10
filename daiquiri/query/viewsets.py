@@ -1,5 +1,7 @@
 import os
 
+from collections import OrderedDict
+
 from sendfile import sendfile
 
 from django.conf import settings
@@ -11,14 +13,13 @@ from rest_framework.exceptions import ValidationError, NotFound
 from rest_framework.decorators import list_route, detail_route
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
 
-from daiquiri.core.viewsets import ChoicesViewSet
+from daiquiri.core.viewsets import ChoicesViewSet, RowViewSetMixin
 from daiquiri.core.permissions import HasModelPermission
 from daiquiri.core.paginations import ListPagination
 from daiquiri.core.utils import get_client_ip
-
 from daiquiri.jobs.viewsets import SyncJobViewSet, AsyncJobViewSet
 
-from .models import QueryJob, DownloadJob, Example
+from .models import QueryJob, DownloadJob, QueryArchiveJob, Example
 from .serializers import (
     FormSerializer,
     DropdownSerializer,
@@ -69,7 +70,7 @@ class DropdownViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         return settings.QUERY_DROPDOWNS
 
 
-class QueryJobViewSet(viewsets.ModelViewSet):
+class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
     permission_classes = (HasPermission, )
     authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
 
@@ -132,6 +133,39 @@ class QueryJobViewSet(viewsets.ModelViewSet):
         except QueryJob.DoesNotExist:
             raise Http404
 
+    @detail_route(methods=['get'])
+    def rows(self, request, pk=None):
+        try:
+            job = self.get_queryset().get(pk=pk)
+        except QueryJob.DoesNotExist:
+            raise NotFound
+
+        # get column names from the request
+        column_names = self.request.GET.getlist('column')
+
+        # get the row query params from the request
+        ordering, page, page_size, search, filters = self._get_query_params(column_names)
+
+        # get the count and the rows from the job
+        count, results = job.rows(column_names, ordering, page, page_size, search, filters)
+
+        # return ordered dict to be send as json
+        return Response(OrderedDict((
+            ('count', count),
+            ('results', results),
+            ('next', self._get_next_url(page, page_size, count)),
+            ('previous', self._get_previous_url(page))
+        )))
+
+    @detail_route(methods=['get'])
+    def columns(self, request, pk=None, format_key=None):
+        try:
+            job = self.get_queryset().get(pk=pk)
+        except QueryJob.DoesNotExist:
+            raise NotFound
+
+        return Response(job.metadata['columns'])
+
     @detail_route(methods=['get'], url_path='download/(?P<download_id>[A-Za-z0-9\-]+)', url_name='download')
     def download(self, request, pk=None, download_id=None):
         try:
@@ -167,6 +201,9 @@ class QueryJobViewSet(viewsets.ModelViewSet):
 
                 # set the phase back to pending so that the file is recreated
                 download_job.phase = download_job.PHASE_PENDING
+                download_job.process()
+                download_job.save()
+                download_job.run()
 
         except DownloadJob.DoesNotExist:
             download_job = DownloadJob(
@@ -174,15 +211,65 @@ class QueryJobViewSet(viewsets.ModelViewSet):
                 job=job,
                 format_key=format_key
             )
-            download_job.save()
-
-        if download_job.phase == download_job.PHASE_PENDING:
             download_job.process()
             download_job.save()
             download_job.run()
 
         return Response({
             'id': download_job.id
+        })
+
+    @detail_route(methods=['get'], url_path='archive/(?P<archive_id>[A-Za-z0-9\-]+)', url_name='archive')
+    def archive(self, request, pk=None, archive_id=None):
+        try:
+            job = self.get_queryset().get(pk=pk)
+        except QueryJob.DoesNotExist:
+            raise NotFound
+
+        try:
+            archive_job = job.archives.get(pk=archive_id)
+        except QueryArchiveJob.DoesNotExist:
+            raise NotFound
+
+        if archive_job.phase == archive_job.PHASE_COMPLETED and request.GET.get('download', True):
+            return sendfile(request, archive_job.file_path, attachment=True)
+        else:
+            return Response(archive_job.phase)
+
+    @detail_route(methods=['post'], url_path='archive', url_name='create-archive')
+    def create_archive(self, request, pk=None):
+        try:
+            job = self.get_queryset().get(pk=pk)
+        except QueryJob.DoesNotExist:
+            raise NotFound
+
+        column_name = request.data.get('column_name')
+
+        try:
+            archive_job = QueryArchiveJob.objects.get(job=job, column_name=column_name)
+
+            # check if the file was lost
+            if archive_job.phase == archive_job.PHASE_COMPLETED and \
+                not os.path.isfile(archive_job.file_path):
+
+                # set the phase back to pending so that the file is recreated
+                archive_job.phase = archive_job.PHASE_PENDING
+                archive_job.process()
+                archive_job.save()
+                archive_job.run()
+
+        except QueryArchiveJob.DoesNotExist:
+            archive_job = QueryArchiveJob(
+                client_ip=get_client_ip(self.request),
+                job=job,
+                column_name=column_name
+            )
+            archive_job.process()
+            archive_job.save()
+            archive_job.run()
+
+        return Response({
+            'id': archive_job.id
         })
 
     @detail_route(methods=['get'], url_path='stream/(?P<format_key>[A-Za-z0-9\-]+)', url_name='stream')
@@ -205,6 +292,7 @@ class QueryJobViewSet(viewsets.ModelViewSet):
             response = FileResponse(job.stream(format_key), content_type=format_config['content_type'])
             response['Content-Disposition'] = "attachment; filename=%s" % file_name
             return response
+
 
 class ExampleViewSet(viewsets.ModelViewSet):
     permission_classes = (HasModelPermission, )

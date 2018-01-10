@@ -7,16 +7,29 @@ app.factory('DownloadService', ['$http', 'PollingService', function($http, Polli
     /* configure urls */
 
     var base_download_url = baseurl + 'query/api/jobs/';
-    var base_archive_url = baseurl + 'serve/archives/';
 
     var service = {
         pending_downloads: 0
     };
 
-    service.start_download = function(job, format_key) {
-        job.download_failed = false;
+    service.init = function(opt) {
+        service.job = opt.job;
 
-        var url = base_download_url + job.id + '/download/';
+        service.archive_columns = [];
+
+        angular.forEach(service.job.columns, function(column) {
+            angular.forEach(['meta.note', 'meta.preview', 'meta.file'], function(key) {
+                if (column.ucd.indexOf(key) > -1) {
+                    service.archive_columns.push(column.name);
+                }
+            });
+        });
+    }
+
+    service.start_download = function(format_key) {
+        service.job.download_failed = false;
+
+        var url = base_download_url + service.job.id + '/download/';
         $http.post(url, {
             format_key: format_key
         }).then(function(result) {
@@ -24,12 +37,12 @@ app.factory('DownloadService', ['$http', 'PollingService', function($http, Polli
 
             service.pending_downloads++;
             PollingService.register(download_id, service.poll_download, {
-                job: job,
+                job: service.job,
                 download_id: download_id
             });
         }, function() {
             // display error message
-            job.download_failed = true;
+            service.job.download_failed = true;
         });
     };
 
@@ -52,12 +65,43 @@ app.factory('DownloadService', ['$http', 'PollingService', function($http, Polli
         });
     };
 
-    service.start_zip = function(job, column_name) {
+    service.start_archive = function(column_name) {
+        service.job.download_failed = false;
 
+        var url = base_download_url + service.job.id + '/archive/';
+        $http.post(url, {
+            column_name: column_name
+        }).then(function(result) {
+            var archive_id = result.data.id;
+
+            service.pending_downloads++;
+            PollingService.register(archive_id, service.poll_archive, {
+                job: service.job,
+                archive_id: archive_id
+            });
+        }, function() {
+            // display error message
+            service.job.download_failed = true;
+        });
     };
 
-    service.poll_zip = function(options) {
+    service.poll_archive = function(options) {
+        var url = base_download_url + options.job.id + '/archive/' + options.archive_id + '/';
+        $http.get(url + '?download=').then(function(result) {
+            if (result.data == 'COMPLETED') {
+                service.pending_downloads--;
+                PollingService.unregister(options.archive_id);
 
+                // download the file, headers will prevent the browser reloading the page
+                window.location.href = url;
+            }
+        }, function() {
+            service.pending_downloads--;
+            PollingService.unregister(options.archive_id);
+
+            // display error message
+            options.job.download_failed = true;
+        });
     };
 
     return service;

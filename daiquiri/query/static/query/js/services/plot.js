@@ -21,12 +21,17 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
         ready: false
     };
 
-    service.init = function(rows_url, params, columns) {
+    service.init = function(opt) {
         service.ready = false;
 
-        angular.extend(service.params, params);
-        service.columns = columns;
+        // set up resources and urls
+        resources.rows = $resource(baseurl + opt.rows_url);
 
+        // update params
+        angular.extend(service.params, opt.params);
+
+        // set columns
+        service.columns = opt.columns
         if (angular.isDefined(service.columns[0])) {
             service.values.x = service.columns[0].name;
         } else {
@@ -94,7 +99,6 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
     }
 
     service.fetch = function() {
-
         var x_params = angular.extend({}, service.params, {
             column: service.values.x
         });

@@ -88,16 +88,16 @@
                     </li>
                 </ul>
 
-                <div ng-show="service.tab == 'overview'">
+                <div class="daiquiri-query-overview" ng-show="service.tab == 'overview'">
                     {% include 'query/query_overview.html' %}
                 </div>
-                <div ng-show="service.tab == 'results'">
+                <div class="daiquiri-query-results" ng-show="service.tab == 'results'">
                     {% include 'query/query_results.html' %}
                 </div>
-                <div ng-show="service.tab == 'plot'">
+                <div class="daiquiri-query-plot" ng-show="service.tab == 'plot'">
                     {% include 'query/query_plot.html' %}
                 </div>
-                <div ng-show="service.tab == 'download'">
+                <div class="daiquiri-query-download" ng-show="service.tab == 'download'">
                     {% include 'query/query_download.html' %}
                 </div>
 

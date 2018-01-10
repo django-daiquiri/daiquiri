@@ -20,23 +20,20 @@ def file(request, file_path):
     if file_path.endswith('/'):
         file_path += 'index.html'
 
-    # get the absolute path to the file
-    absolute_file_path = os.path.join(settings.FILES_BASE_PATH, file_path)
-
-    if check_file(request.user, absolute_file_path):
+    if check_file(request.user, file_path):
         # create a stats record for this job
         Record.objects.create(
             time=now(),
             resource_type='FILE',
             resource={
-                'file_path': file_path,
-                'absolute_file_path': absolute_file_path
+                'file_path': file_path
             },
             client_ip=get_client_ip(request),
             user=request.user
         )
 
         # send the file to the client
+        absolute_file_path = os.path.join(settings.FILES_BASE_PATH, file_path)
         return sendfile(request, absolute_file_path, attachment=False)
 
     # if nothing worked, return 404

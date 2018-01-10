@@ -1,3 +1,5 @@
+from django.utils.translation import ugettext_lazy as _
+
 from rest_framework import mixins, viewsets
 
 from .serializers import ChoicesSerializer
@@ -9,26 +11,34 @@ class ChoicesViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     serializer_class = ChoicesSerializer
 
 
-class RowViewSet(viewsets.ViewSet):
+class RowViewSetMixin(object):
 
-    def _get_page(self):
+    def _get_query_params(self, column_names):
+        # get the ordering
+        ordering = self.request.GET.get('ordering')
+
+        # get the search string
+        search = self.request.GET.get('search')
+
+        # get the page from the querystring and make sure it is an int
         try:
-            return int(self.request.GET.get('page', '1'))
+            page = int(self.request.GET.get('page', '1'))
         except ValueError:
-            raise ParseError('page must be an integer')
+            raise ParseError(_('page must be an integer'))
 
-    def _get_page_size(self):
+        # get the page_size from the querystring and make sure it is an int
         try:
-            return int(self.request.GET.get('page_size', '30'))
+            page_size = int(self.request.GET.get('page_size', '30'))
         except ValueError:
-            raise ParseError('page_size must be an integer')
+            raise ParseError(_('page_size must be an integer'))
 
-    def _get_filters(self):
+        # get additional filters from the querystring
         filters = {}
         for key, value in self.request.GET.items():
-            if key not in ['database', 'table', 'column', 'ordering', 'search', 'page', 'page_size']:
+            if key in column_names:
                 filters[key] = value
-        return filters
+
+        return ordering, page, page_size, search, filters
 
     def _get_next_url(self, page, page_size, count):
         if page * page_size < count:

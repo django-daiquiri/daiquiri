@@ -23,13 +23,20 @@ p.daiquiri-query-form-help {
     margin-bottom: 20px;
 }
 
-.daiquiri-query-plot-button {
-    margin-top: 25px;
+.daiquiri-query-plot {
+    .daiquiri-query-plot-button {
+        margin-top: 25px;
+    }
+    .daiquiri-query-plot-canvas {
+        margin-bottom: 10px;
+        height: 500px;
+    }
 }
 
-.daiquiri-query-plot-canvas {
-    margin-bottom: 10px;
-    height: 500px;
+.daiquiri-query-download {
+    h4:first-child {
+        margin-top: 20px;
+    }
 }
 
 .daiquiri-query-joblist {

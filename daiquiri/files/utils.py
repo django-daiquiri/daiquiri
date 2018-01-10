@@ -5,17 +5,14 @@ from django.conf import settings
 from .models import Directory
 
 
-def check_file(user, absolute_file_path):
-    if not os.path.isfile(absolute_file_path):
-        return False
-
+def check_file(user, file_path):
     # loop over all directories beginning with the hights depth and return as soon as a directory matches
     for directory in Directory.objects.order_by('-depth'):
-        if os.path.normpath(absolute_file_path).startswith(directory.absolute_path):
+        if os.path.normpath(file_path).startswith(directory.path):
             return Directory.objects.filter_by_access_level(user).filter(pk=directory.pk).exists()
 
 
-def search_file(user, search_path):
+def search_file(search_path):
     base_path = os.path.normpath(settings.FILES_BASE_PATH)
 
     # look for the file in all directory below the base path
@@ -28,7 +25,8 @@ def search_file(user, search_path):
             results.add(absolute_file_path)
 
     if len(results) == 1:
-        return results.pop()
+        # subtract the base path and return
+        return results.pop().split(base_path, 1)[1].lstrip('/')
     else:
         return None
 

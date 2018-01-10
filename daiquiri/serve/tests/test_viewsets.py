@@ -2,8 +2,6 @@ from django.test import TestCase
 
 from test_generator.viewsets import TestViewsetMixin
 
-from daiquiri.files.tests.utils import setUp_directories
-
 
 class ServeTestCase(TestCase):
 
@@ -47,9 +45,6 @@ class ServeTestCase(TestCase):
         }
     }
 
-    def setUp(self):
-        setUp_directories()
-
 
 class PublicRowTests(TestViewsetMixin, ServeTestCase):
 
@@ -86,25 +81,6 @@ class InternalRowTests(TestViewsetMixin, ServeTestCase):
         self.assert_list_viewset(username, query_params={
             'database': 'daiquiri_data_sim',
             'table': 'particles'
-        })
-
-
-class UserRowTests(TestViewsetMixin, ServeTestCase):
-
-    url_names = {
-        'viewset': 'serve:row'
-    }
-
-    status_map = {
-        'list_viewset': {
-            'admin': 404, 'user': 200, 'anonymous': 404
-        }
-    }
-
-    def _test_list_viewset(self, username):
-        self.assert_list_viewset(username, query_params={
-            'database': 'daiquiri_user_user',
-            'table': 'test'
         })
 
 
@@ -174,25 +150,6 @@ class InternalColumnTests(TestViewsetMixin, ServeTestCase):
         self.assert_list_viewset(username, query_params={
             'database': 'daiquiri_data_sim',
             'table': 'particles'
-        })
-
-
-class UserColumnTests(TestViewsetMixin, ServeTestCase):
-
-    url_names = {
-        'viewset': 'serve:column'
-    }
-
-    status_map = {
-        'list_viewset': {
-            'admin': 404, 'user': 200, 'anonymous': 404
-        }
-    }
-
-    def _test_list_viewset(self, username):
-        self.assert_list_viewset(username, query_params={
-            'database': 'daiquiri_user_user',
-            'table': 'test'
         })
 
 

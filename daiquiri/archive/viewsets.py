@@ -11,52 +11,49 @@ from rest_framework import viewsets, serializers
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
 
-from daiquiri.core.viewsets import RowViewSet as BaseRowViewSet
+from daiquiri.core.viewsets import RowViewSetMixin
+from daiquiri.core.adapter import get_adapter
 from daiquiri.core.utils import get_client_ip
 from daiquiri.stats.models import Record
 
 from .models import Collection, ArchiveJob
-from .utils import count_rows, fetch_rows, fetch_row
 
 from .permissions import HasPermission
 
 
-class RowViewSet(BaseRowViewSet):
+class RowViewSet(RowViewSetMixin, viewsets.GenericViewSet):
     permission_classes = (HasPermission, )
 
     def list(self, request, *args, **kwargs):
-        # get the ordering
-        ordering = self.request.GET.get('ordering')
-
-        # get the search string
-        search = self.request.GET.get('search')
-
-        # get additional filters from the querystring
-        filters = self._get_filters()
-
-        # get the page from the querystring and make sure it is an int
-        page = self._get_page()
-
-        # get the page_size from the querystring and make sure it is an int
-        page_size = self._get_page_size()
-
-        # get collecions for this user
-        collections = [collection.name for collection in Collection.objects.filter_by_access_level(request.user)]
-
         # fetch rows from the database
         column_names = [column['name'] for column in settings.ARCHIVE_COLUMNS]
-        count = count_rows(collections, column_names, search, filters)
-        results = fetch_rows(collections, column_names, ordering, page, page_size, search, filters)
 
-        # get the previous and next url
-        next = self._get_next_url(page, page_size, count)
-        previous = self._get_previous_url(page)
+        # get the row query params from the request
+        ordering, page, page_size, search, filters = self._get_query_params(column_names)
 
+        # get database adapter
+        adapter = get_adapter()
+
+        # get the database_name and the table_name from the settings
+        database_name = settings.ARCHIVE_DATABASE
+        table_name = settings.ARCHIVE_TABLE
+
+        # get collecions for this user and add them to the filters
+        collections = [collection.name for collection in Collection.objects.filter_by_access_level(request.user)]
+        filters['collection'] = collections
+
+        # query the database for the total number of rows
+        count = adapter.database.count_rows(database_name, table_name, column_names, search, filters)
+
+        # query the paginated rowset
+        results = adapter.database.fetch_rows(database_name, table_name, column_names, ordering, page, page_size, search, filters)
+
+        # return ordered dict to be send as json
         return Response(OrderedDict((
             ('count', count),
-            ('next', next),
-            ('previous', previous),
-            ('results', results)
+            ('results', results),
+            ('next', self._get_next_url(page, page_size, count)),
+            ('previous', self._get_previous_url(page))
         )))
 
 
@@ -73,10 +70,22 @@ class FileViewSet(viewsets.GenericViewSet):
     serializer_class = serializers.Serializer
 
     def retrieve(self, request, pk=None):
+        # get database adapter
+        adapter = get_adapter()
+
+        # get the database_name and the table_name from the settings
+        database_name = settings.ARCHIVE_DATABASE
+        table_name = settings.ARCHIVE_TABLE
+
         # get collecions for this user
         collections = [collection.name for collection in Collection.objects.filter_by_access_level(request.user)]
 
-        row = fetch_row(collections, ['path'], pk)
+        # fetch the path for this file from the database
+        row = adapter.database.fetch_row(database_name, table_name, ['path'], filters={
+            'id': pk,
+            'collection': collections
+        })
+
         if row:
             if request.GET.get('download', True):
                 # create a stats record for this download

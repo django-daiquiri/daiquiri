@@ -1,5 +1,6 @@
 import logging
 import os
+import six
 import uuid
 
 from django.conf import settings
@@ -15,10 +16,10 @@ from jsonfield import JSONField
 
 from daiquiri.core.constants import ACCESS_LEVEL_CHOICES
 from daiquiri.core.managers import AccessLevelManager
+from daiquiri.core.adapter import get_adapter
 from daiquiri.jobs.models import Job
 from daiquiri.jobs.managers import JobManager
 
-from .utils import fetch_rows, fetch_row
 from .tasks import create_archive_zip_file
 
 logger = logging.getLogger(__name__)
@@ -77,21 +78,6 @@ class ArchiveJob(Job):
 
         permissions = (('view_archivejob', 'Can view ArchiveJob'),)
 
-    @property
-    def parameters(self):
-        return None
-
-    @property
-    def results(self):
-        return None
-
-    @property
-    def result(self):
-        return None
-
-    @property
-    def quote(self):
-        return None
 
     @property
     def file_path(self):
@@ -106,6 +92,13 @@ class ArchiveJob(Job):
     def process(self):
         # get collections for the owner of this download job
         collections = [collection.name for collection in Collection.objects.filter_by_access_level(self.owner)]
+
+        # get database adapter
+        adapter = get_adapter()
+
+        # get the database_name and the table_name from the settings
+        database_name = settings.ARCHIVE_DATABASE
+        table_name = settings.ARCHIVE_TABLE
 
         # prepare list of files for this archive job
         files = []
@@ -125,8 +118,11 @@ class ArchiveJob(Job):
                         'files': [_('One or more of the identifiers are not valid UUIDs.')]
                     })
 
-                # get the path to the file from the database
-                row = fetch_row(collections, ['path'], file_id)
+                # fetch the path for this file from the database
+                row = adapter.database.fetch_row(database_name, table_name, ['path'], filters={
+                    'id': file_id,
+                    'collection': collections
+                })
 
                 # append the file to the list of files only if it exists in the database and on the filesystem
                 if row and os.path.isfile(os.path.join(settings.ARCHIVE_BASE_PATH, row[0])):
@@ -138,12 +134,17 @@ class ArchiveJob(Job):
 
         elif 'search' in self.data:
             # retrieve the pathes of all file matching the search criteria
-            rows = fetch_rows(collections, ['path'], None, 1, 0, self.data['search'], {})
+            rows = adapter.database.fetch_rows(database_name, table_name, page_size=0, search=self.data['search'], filters={
+                'collection': collections
+            })
+
+            # get the index of the path column in the row
+            path_index = six.next((i for i, column in enumerate(settings.ARCHIVE_COLUMNS) if column['name'] == 'path'))
 
             for row in rows:
                 # append the file to the list of files only if it exists on the filesystem
-                if os.path.isfile(os.path.join(settings.ARCHIVE_BASE_PATH, row[0])):
-                    files.append(row[0])
+                if os.path.isfile(os.path.join(settings.ARCHIVE_BASE_PATH, row[path_index])):
+                    files.append(row[path_index])
                 else:
                     raise ValidationError({
                         'files': [_('One or more of the files cannot be found.')]

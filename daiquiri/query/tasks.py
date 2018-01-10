@@ -1,10 +1,12 @@
 from __future__ import absolute_import, unicode_literals
 
-import os
 import logging
+import os
+import zipfile
 
 from celery import shared_task
 
+from django.conf import settings
 from django.db.utils import OperationalError, ProgrammingError, InternalError
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
@@ -166,7 +168,7 @@ def run_query(job_id):
 
 
 @shared_task(base=Task)
-def create_download_file(download_job_id):
+def create_download_file(download_id):
     # always import daiquiri packages inside the task
     from daiquiri.core.adapter import get_adapter
     from daiquiri.query.models import DownloadJob
@@ -175,7 +177,7 @@ def create_download_file(download_job_id):
     logger = logging.getLogger(__name__)
 
     # get the job object from the database
-    download_job = DownloadJob.objects.get(pk=download_job_id)
+    download_job = DownloadJob.objects.get(pk=download_id)
 
     # log start
     logger.info('create_download_file %s started' % download_job.file_path)
@@ -208,3 +210,42 @@ def create_download_file(download_job_id):
 
     # log completion
     logger.info('create_download_file %s completed' % download_job.file_path)
+
+
+@shared_task(track_started=True, base=Task)
+def create_archive_file(archive_id):
+    # always import daiquiri packages inside the task
+    from daiquiri.query.models import QueryArchiveJob
+
+    # get logger
+    logger = logging.getLogger(__name__)
+
+    # get the job object from the database
+    archive_job = QueryArchiveJob.objects.get(pk=archive_id)
+
+    # log start
+    logger.info('create_archive_zip_file %s started' % archive_job.file_path)
+
+    # create directory if necessary
+    try:
+        os.makedirs(os.path.dirname(archive_job.file_path))
+    except OSError:
+        pass
+
+    archive_job.phase = archive_job.PHASE_EXECUTING
+    archive_job.start_time = now()
+    archive_job.save()
+
+    # create a zipfile with all files
+    with zipfile.ZipFile(archive_job.file_path, 'w') as z:
+        for file_path in archive_job.files:
+            os.chdir(settings.ARCHIVE_BASE_PATH)
+            z.write(file_path)
+
+    archive_job.end_time = now()
+    archive_job.execution_duration = (archive_job.end_time - archive_job.start_time).seconds
+    archive_job.phase = archive_job.PHASE_COMPLETED
+    archive_job.save()
+
+    # log completion
+    logger.info('create_archive_zip_file %s completed' % archive_job.file_path)

@@ -1,11 +1,6 @@
-import os
-
-from django.conf import settings
 from django.test import TestCase
 
 from test_generator.views import TestViewMixin
-
-from daiquiri.files.tests.utils import setUp_directories
 
 
 class ServeViewTestCase(TestCase):
@@ -24,8 +19,6 @@ class ServeViewTestCase(TestCase):
         ('anonymous', None),
     )
 
-    def setUp(self):
-        setUp_directories()
 
 class PublicTableTests(TestViewMixin, ServeViewTestCase):
 
@@ -65,25 +58,6 @@ class InternalTableTests(TestViewMixin, ServeViewTestCase):
         })
 
 
-class UserTableTests(TestViewMixin, ServeViewTestCase):
-
-    url_names = {
-        'list_view': 'serve:table'
-    }
-
-    status_map = {
-        'list_view': {
-            'admin': 404, 'manager': 404, 'user': 200, 'anonymous': 404
-        }
-    }
-
-    def _test_list_view(self, username):
-        self.assert_list_view(username, {
-            'database_name': 'daiquiri_user_user',
-            'table_name': 'test'
-        })
-
-
 class NotFoundTableTests(TestViewMixin, ServeViewTestCase):
 
     url_names = {
@@ -112,54 +86,4 @@ class NotFoundTableTests(TestViewMixin, ServeViewTestCase):
         self.assert_list_view(username, {
             'database_name': 'daiquiri_user_user',
             'table_name': 'non_existing'
-        })
-
-
-class ArchiveTests(TestViewMixin, ServeViewTestCase):
-
-    url_names = {
-        'list_view': 'serve:archive'
-    }
-
-    status_map = {
-        'list_view': {
-            'admin': 404, 'manager': 200, 'user': 404, 'anonymous': 404
-        }
-    }
-
-    def setUp(self):
-        setUp_directories()
-
-        for username, password in self.users:
-            try:
-                os.remove(os.path.join(settings.SERVE_DOWNLOAD_DIR, username, 'images_preview.zip'))
-            except OSError:
-                pass
-
-    def _test_archive_get(self, username):
-
-        self.assert_view('list_view', 'get', 'list_view', username, kwargs={
-            'database_name': 'daiquiri_data_obs',
-            'table_name': 'images',
-            'column_name': 'preview'
-        })
-
-        self.assert_view('list_view', 'get', 'list_view', username, kwargs={
-            'database_name': 'daiquiri_data_obs',
-            'table_name': 'images',
-            'column_name': 'preview'
-        })
-
-    def _test_archive_put(self, username):
-
-        self.assert_view('list_view', 'put', 'list_view', username, kwargs={
-            'database_name': 'daiquiri_data_obs',
-            'table_name': 'images',
-            'column_name': 'preview'
-        })
-
-        self.assert_view('list_view', 'put', 'list_view', username, kwargs={
-            'database_name': 'daiquiri_data_obs',
-            'table_name': 'images',
-            'column_name': 'preview'
         })
