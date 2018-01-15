@@ -56,8 +56,8 @@ class PostgresAdapter(DatabaseAdapter):
         return self.connection().connection.thread_id()
 
     def escape_identifier(self, identifier):
-        # escape backticks whithin the identifier and backtick the string
-        return '`%s`' % identifier.replace('`', '``')
+        # escape quates whithin the identifier and quote the string
+        return '`%s`' % identifier.replace('"', '"')
 
     def escape_string(self, string):
         return "'%s'" % string
