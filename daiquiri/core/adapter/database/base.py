@@ -74,23 +74,26 @@ class DatabaseAdapter(object):
     def escape_string(self, string):
         raise NotImplementedError()
 
-    def build_query(self, database_name, table_name, query, timeout):
+    def build_query(self, schema_name, table_name, query, timeout):
         raise NotImplementedError()
 
     def abort_query(self, pid):
         raise NotImplementedError()
 
-    def count_rows(self, database_name, table_name, column_names=None, search=None, filters=None):
+    def count_rows(self, schema_name, table_name, column_names=None, search=None, filters=None):
         raise NotImplementedError()
 
-    def fetch_rows(self, database_name, table_name, column_names=None, ordering=None, page=1, page_size=10, search=None, filters=None):
+    def fetch_rows(self, schema_name, table_name, column_names=None, ordering=None, page=1, page_size=10, search=None, filters=None):
         raise NotImplementedError()
 
-    def fetch_row(self, database_name, table_name, column_name, value):
+    def fetch_row(self, schema_name, table_name, column_name, value):
         raise NotImplementedError()
 
-    def create_user_database_if_not_exists(self, database_name):
+    def create_user_schema_if_not_exists(self, schema_name):
         raise NotImplementedError()
+
+    # def create_user_database_if_not_exists(self, database_name):
+    #    raise NotImplementedError()
 
     def fetch_tables(self, database_name):
         raise NotImplementedError()

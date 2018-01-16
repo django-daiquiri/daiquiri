@@ -62,6 +62,7 @@ Setup Daiquiri
     mkdir log download
 
     ./manage.py sqlcreate               # shows the commands to be executed on MariaDB
+    ./manage.py sqlcreate_postgres      # shows the commands to be executed on Postgres
     ./manage.py migrate                 # creates database and tables
     ./manage.py migrate --database=tap  # creates TAP_SCHEMA
     ./manage.py createsuperuser         # creates admin user

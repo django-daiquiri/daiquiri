@@ -78,11 +78,18 @@ Create the front end library vendor bundles:
 ./manage.py download_vendor_files
 ```
 
-Next, the differenet users and permissions need to be created on `mysql`. For this purpose, the `sqlcreate` can be used to see what needs to be executed on the database:
+Next, the differenet users and permissions need to be created on `mysql`. For this purpose, the `sqlcreate` can be used to see what needs to be executed on the MySQL/MariaDB database:
 
 ```
 ./manage.py sqlcreate
 ```
+
+Alternatively, for postgres:
+
+```
+./manage.py sqlcreate_postgres
+```
+
 
 Either copy the output line by line to a mysql shell, or use a pipe:
 
