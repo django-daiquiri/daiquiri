@@ -77,11 +77,13 @@ class PostgresAdapter(DatabaseAdapter):
             return 'CREATE TABLE %(schema)s.%(table)s  %(query)s );' % params
 
     def abort_query(self, pid):
-        sql = 'KILL %(pid)i' % {'pid': pid}
+        sql = 'select pg_terminate_backend(%(pid)i)' % {'pid': pid}
         self.execute(sql)
 
     def fetch_stats(self, schema_name, table_name):
-        sql = 'SELECT table_rows as nrows, data_length + index_length AS size FROM `information_schema`.`tables` WHERE `table_schema` = %s AND table_name = %s;'
+        # TODO
+        # will be in pg_stat_all_tables, might need a function
+        sql = 'SELECT table_rows as nrows, data_length + index_length AS size FROM "pg_stat_all_tables" WHERE "table_schema" = %s AND table_name = %s;'
         return self.fetchone(sql, (schema_name, table_name))
 
     def count_rows(self, schema_name, table_name, column_names=None, search=None, filters=None):
@@ -269,7 +271,8 @@ class PostgresAdapter(DatabaseAdapter):
         escaped_schema_name = self.escape_identifier(schema_name)
 
         # prepare sql string
-        sql = 'SHOW FULL TABLES FROM %(schema)s' % {
+        # TODO: test 
+         sql = 'SELECT table_name, table_type FROM information_schema.tables where table_schema = %(schema)s'{
             'schema': escaped_schema_name
         }
 
@@ -287,7 +290,8 @@ class PostgresAdapter(DatabaseAdapter):
 
     def fetch_table(self, schema_name, table_name):
         # prepare sql string
-        sql = 'SHOW FULL TABLES FROM %(schema)s LIKE %(table)s' % {
+        # TODO: to test
+        sql = 'SELECT table_name, table_type FROM information_schema.tables where table_schema = %(schema)s LIKE %(table)s' % {
             'schema': self.escape_identifier(schema_name),
             'table': self.escape_string(table_name)
         }
@@ -305,7 +309,8 @@ class PostgresAdapter(DatabaseAdapter):
             }
 
     def rename_table(self, schema_name, table_name, new_table_name):
-        sql = 'RENAME TABLE %(schema)s.%(table)s to %(schema)s.%(new_table)s;' % {
+        # TODO: test
+        sql = 'ALTER TABLE %(schema)s.%(table)s RENAME TO %(schema)s.%(new_table)s;' % {
             'schema': self.escape_identifier(schema_name),
             'table': self.escape_identifier(table_name),
             'new_table': self.escape_identifier(new_table_name)
@@ -314,6 +319,7 @@ class PostgresAdapter(DatabaseAdapter):
         self.execute(sql)
 
     def drop_table(self, schema_name, table_name):
+        # TODO: test
         sql = 'DROP TABLE IF EXISTS %(schema)s.%(table)s;' % {
             'schema': self.escape_identifier(schema_name),
             'table': self.escape_identifier(table_name)
@@ -323,6 +329,12 @@ class PostgresAdapter(DatabaseAdapter):
 
     def fetch_columns(self, schema_name, table_name):
         # prepare sql string
+        # TODO: get index
+        # this will get you column names and types
+        # sql = 'SELECT column_name, data_type  FROM information_schema.tables where table_schema = %(schema)s LIKE %(table)s' % 
+        # and this will get you the indicies
+        # SELECT * FROM pg_indexes WHERE tablename = 'images';
+        # 2 queries needed, view?
         sql = 'SHOW FULL COLUMNS FROM %(schema)s.%(table)s;' % {
             'schema': self.escape_identifier(schema_name),
             'table': self.escape_identifier(table_name)
@@ -350,6 +362,9 @@ class PostgresAdapter(DatabaseAdapter):
 
     def fetch_column(self, schema_name, table_name, column_name):
         # prepare sql string
+        # TODO: 
+        # this will get you column names and types
+        # sql = 'SELECT column_name, data_type  FROM information_schema.tables where table_schema = %(schema)s LIKE %(table)s' % 
         sql = 'SHOW FULL COLUMNS FROM %(schema)s.%(table)s WHERE `Field` = %(column)s' % {
             'schema': self.escape_identifier(schema_name),
             'table': self.escape_identifier(table_name),
@@ -371,6 +386,10 @@ class PostgresAdapter(DatabaseAdapter):
 
     def fetch_column_names(self, schema_name, table_name):
         # prepare sql string
+        # TODO: 
+        # this will get you column names and types
+        # sql = 'SELECT column_name, data_type  FROM information_schema.tables where table_schema = %(schema)s LIKE %(table)s' % 
+
         sql = 'SHOW COLUMNS FROM %(schema)s.%(table)s' % {
             'schema': self.escape_identifier(schema_name),
             'table': self.escape_identifier(table_name),
