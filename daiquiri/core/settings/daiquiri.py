@@ -45,6 +45,16 @@ CUTOUT_ANONYMOUS = False
 
 FILES_BASE_PATH = os.path.join(BASE_DIR, 'files')
 
+MEETINGS_CONTRIBUTION_TYPES = ['talk', 'poster']
+MEETINGS_PARTICIPANT_DETAIL_KEYS = [
+    {
+        'key': 'affiliation',
+        'label': 'Affiliation',
+        'data_type': 'text',
+        'required': True
+    }
+]
+
 METADATA_COLUMN_PERMISSIONS = False
 
 QUERY_ANONYMOUS = False
