@@ -81,10 +81,13 @@ class PostgresAdapter(DatabaseAdapter):
         self.execute(sql)
 
     def fetch_stats(self, schema_name, table_name):
-        # TODO
-        # will be in pg_stat_all_tables, might need a function
-        sql = 'SELECT table_rows as nrows, data_length + index_length AS size FROM "pg_stat_all_tables" WHERE "table_schema" = %s AND table_name = %s;'
-        return self.fetchone(sql, (schema_name, table_name))
+        # TODO: test
+        # 'SELECT pg_size_pretty( pg_total_relation_size('tablename') );'
+        sql = 'SELECT pg_total_relation_size(%(schema)s.%(table)s);' % {
+            'schema': self.escape_identifier(schema_name),
+            'table': self.escape_identifier(table_name)
+        }
+        return self.fetchone(sql)
 
     def count_rows(self, schema_name, table_name, column_names=None, search=None, filters=None):
         # if no column names are provided get all column_names from the table
@@ -331,7 +334,7 @@ class PostgresAdapter(DatabaseAdapter):
         # prepare sql string
         # TODO: get index
         # this will get you column names and types
-        # sql = 'SELECT column_name, data_type  FROM information_schema.tables where table_schema = %(schema)s LIKE %(table)s' % 
+        # sql = 'SELECT column_name, data_type  FROM information_schema.columns where table_name = %(schema)s LIKE %(table)s' % 
         # and this will get you the indicies
         # SELECT * FROM pg_indexes WHERE tablename = 'images';
         # 2 queries needed, view?
