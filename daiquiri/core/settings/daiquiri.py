@@ -45,7 +45,16 @@ CUTOUT_ANONYMOUS = False
 
 FILES_BASE_PATH = os.path.join(BASE_DIR, 'files')
 
-MEETINGS_CONTRIBUTION_TYPES = ['talk', 'poster']
+MEETINGS_CONTRIBUTION_TYPES = [
+    {
+        'key': 'talk',
+        'label': 'Talk',
+    },
+    {
+        'key': 'poster',
+        'label': 'Poster',
+    }
+]
 MEETINGS_PARTICIPANT_DETAIL_KEYS = [
     {
         'key': 'affiliation',
