@@ -59,7 +59,7 @@ class Migration(migrations.Migration):
                 ('last_name', models.CharField(max_length=256, verbose_name='Last name')),
                 ('email', models.EmailField(max_length=256, verbose_name='Email')),
                 ('details', jsonfield.fields.JSONField(blank=True, help_text='Choices are given by settings.MEETINGS_PARTICIPANT_DETAIL_KEYS', null=True, verbose_name='Details')),
-                ('registered_on', models.DateTimeField(help_text='Datetime this participant has submitted his/her registration', verbose_name='Registered on')),
+                ('registered', models.DateTimeField(help_text='Datetime this participant has submitted his/her registration', verbose_name='Registered on')),
                 ('accepted', models.BooleanField(default=False, help_text='Designates whether the participant is accepted.', verbose_name='Accepted')),
                 ('meeting', models.ForeignKey(help_text='Meeting this participant has registered for', on_delete=django.db.models.deletion.CASCADE, related_name='participants', to='daiquiri_meetings.Meeting', verbose_name='Meeting')),
             ],

@@ -4,6 +4,7 @@ import ipaddress
 import importlib
 import re
 
+from django import forms
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMultiAlternatives, EmailMessage
@@ -71,6 +72,45 @@ def get_model_field_meta(model):
             meta[field.name]['help_text'] = field.help_text
 
     return meta
+
+def get_detail_fields(detail_keys):
+    fields = []
+
+    # add a field for each detail key
+    for detail_key in detail_keys:
+
+        if 'options' in detail_key:
+            choices = [(option['id'], option['label']) for option in detail_key['options']]
+        else:
+            choices = []
+
+        if detail_key['data_type'] == 'text':
+            field = forms.CharField(widget=forms.TextInput(attrs={'placeholder': detail_key['label']}))
+        elif detail_key['data_type'] == 'textarea':
+            field = forms.CharField(widget=forms.Textarea(attrs={'placeholder': detail_key['label']}))
+        elif detail_key['data_type'] == 'select':
+            field = forms.ChoiceField(choices=choices)
+        elif detail_key['data_type'] == 'radio':
+            field = forms.ChoiceField(choices=choices, widget=forms.RadioSelect)
+        elif detail_key['data_type'] == 'multiselect':
+            field = forms.MultipleChoiceField(choices=choices)
+        elif detail_key['data_type'] == 'checkbox':
+            field = forms.MultipleChoiceField(choices=choices, widget=forms.CheckboxSelectMultiple)
+        else:
+            raise Exception('Unknown detail key data type.')
+
+        if 'label' in detail_key:
+            field.label = detail_key['label']
+
+        if 'required' in detail_key:
+            field.required = detail_key['required']
+
+        if 'help_text' in detail_key:
+            field.help_text = detail_key['help_text']
+
+        fields.append((detail_key['key'], field))
+
+    return fields
 
 
 def human2bytes(string):

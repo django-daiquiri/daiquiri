@@ -1,0 +1,29 @@
+{% extends 'core/page.html' %}
+{% load i18n %}
+{% load core_tags %}
+
+{% block page %}
+
+    <h1>{% trans 'Registration' %}</h1>
+
+    {{ meeting.registration_message|markdown }}
+
+    <form method="post" action="{% url 'meetings:registration' meeting.slug %}" novalidate>
+        {% csrf_token %}
+
+        <h2>Your data</h2>
+
+        <fieldset>
+            {% include 'core/bootstrap_form_fields.html' with form=participant_form %}
+        </fieldset>
+
+        <h2>Your contribution</h2>
+
+        <fieldset>
+            {% include 'core/bootstrap_form_fields.html' with form=contribution_form %}
+        </fieldset>
+
+        <input type="submit" value="{% trans 'Register' %}" class="btn btn-primary" />
+    </form>
+
+{% endblock %}

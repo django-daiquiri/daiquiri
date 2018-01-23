@@ -21,17 +21,22 @@ class Meeting(models.Model):
     registration_message = models.TextField(
         blank=True, null=True,
         verbose_name=_('Registration message'),
-        help_text=_('Message on registration page')
+        help_text=_('Message on registration page, you can use Markdown here.')
+    )
+    registration_done_message = models.TextField(
+        blank=True, null=True,
+        verbose_name=_('Registration done message'),
+        help_text=_('Message on the page displayed after registration, you can use Markdown here.')
     )
     participants_message = models.TextField(
         blank=True, null=True,
         verbose_name=_('Participants message'),
-        help_text=_('Message on participants page')
+        help_text=_('Message on participants page, you can use Markdown here.')
     )
     contributions_message = models.TextField(
         blank=True, null=True,
         verbose_name=_('Contributions message'),
-        help_text=_('Message on contributions page')
+        help_text=_('Message on contributions page, you can use Markdown here.')
     )
     registration_open = models.BooleanField(
         default=False,
@@ -86,7 +91,7 @@ class Participant(models.Model):
         verbose_name=_('Details'),
         help_text=_('Choices are given by settings.MEETINGS_PARTICIPANT_DETAIL_KEYS')
     )
-    registered_on = models.DateTimeField(
+    registered = models.DateTimeField(
         verbose_name=_('Registered on'),
         help_text=_('Datetime this participant has submitted his/her registration')
     )
@@ -125,7 +130,6 @@ class Contribution(models.Model):
         verbose_name=_('Title')
     )
     abstract = models.TextField(
-        blank=True, null=True,
         verbose_name=_('Abstract')
     )
     contribution_type = models.CharField(

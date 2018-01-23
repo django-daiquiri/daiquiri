@@ -1,0 +1,19 @@
+{% extends 'core/wide.html' %}
+{% load i18n %}
+{% load core_tags %}
+
+{% block wide %}
+
+    <h1>{% trans 'Participants' %}</h1>
+
+    {{ meeting.participants_message|markdown }}
+
+    <ol>
+        {% for participant in participants %}
+        <li>
+            {{ participant.full_name }} ({{ participant.details.affiliation }})
+        </li>
+        {% endfor %}
+    </ol>
+
+{% endblock %}
