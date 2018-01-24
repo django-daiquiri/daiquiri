@@ -21,6 +21,10 @@ class PostgresAdapter(DatabaseAdapter):
             'datatype': 'char',
             'arraysize': True
         },
+        'text': {
+            'datatype': 'char',
+            'arraysize': True
+        }
         'smallint': {
             'datatype': 'unsignedByte',
             'arraysize': False
@@ -48,6 +52,10 @@ class PostgresAdapter(DatabaseAdapter):
         'timestamp': {
             'datatype': 'timestamp',
             'arraysize': False
+        },
+        'array': {
+            'datatype': 'array',
+            'arraysize': True
         }
     }
 
@@ -80,7 +88,7 @@ class PostgresAdapter(DatabaseAdapter):
         sql = 'select pg_terminate_backend(%(pid)i)' % {'pid': pid}
         self.execute(sql)
 
-    def fetch_stats(self, schema_name, table_name):
+    def fetch_stats(self, schema_name, table_name):    
         # TODO: test
         # 'SELECT pg_size_pretty( pg_total_relation_size('tablename') );'
         sql = 'SELECT pg_total_relation_size(%(schema)s.%(table)s);' % {
@@ -147,7 +155,7 @@ class PostgresAdapter(DatabaseAdapter):
             return {}
 
     def fetch_rows(self, schema_name, table_name, column_names=None, ordering=None, page=1, page_size=10, search=None, filters=None):
-
+        # TODO: test
         # if no column names are provided get all column_names from the table
         if not column_names:
             column_names = self.fetch_column_names(schema_name, table_name)
@@ -184,7 +192,7 @@ class PostgresAdapter(DatabaseAdapter):
         where_args = []
 
         if search:
-            # append a OR condition fo every column
+            # append an OR condition fo every column
             search_stmts = []
             search_args = []
             for escaped_column_name in escaped_column_names:
@@ -254,21 +262,6 @@ class PostgresAdapter(DatabaseAdapter):
             warnings.simplefilter('ignore')
             self.execute(sql)
 
-    def create_user_schema_if_not_exists(self, schema_name):
-        # escape input
-        escaped_schema_name = self.escape_identifier(schema_name)
-
-        # prepare sql string
-        sql = 'CREATE schema IF NOT EXISTS %(schema)s' % {
-            'schema': escaped_schema_name
-        }
-
-        with warnings.catch_warnings():
-            warnings.simplefilter('ignore')
-            self.execute(sql)
-
-
-
     def fetch_tables(self, schema_name):
         # escape input
         escaped_schema_name = self.escape_identifier(schema_name)
@@ -311,6 +304,7 @@ class PostgresAdapter(DatabaseAdapter):
                 'type': 'view' if row[1] == 'VIEW' else 'table'
             }
 
+
     def rename_table(self, schema_name, table_name, new_table_name):
         # TODO: test
         sql = 'ALTER TABLE %(schema)s.%(table)s RENAME TO %(schema)s.%(new_table)s;' % {
@@ -321,6 +315,7 @@ class PostgresAdapter(DatabaseAdapter):
 
         self.execute(sql)
 
+
     def drop_table(self, schema_name, table_name):
         # TODO: test
         sql = 'DROP TABLE IF EXISTS %(schema)s.%(table)s;' % {
@@ -330,19 +325,16 @@ class PostgresAdapter(DatabaseAdapter):
 
         self.execute(sql)
 
+
     def fetch_columns(self, schema_name, table_name):
+        # TODO: test
+        # get columnnames and datatype
         # prepare sql string
-        # TODO: get index
-        # this will get you column names and types
-        # sql = 'SELECT column_name, data_type  FROM information_schema.columns where table_name = %(schema)s LIKE %(table)s' % 
-        # and this will get you the indicies
-        # SELECT * FROM pg_indexes WHERE tablename = 'images';
-        # 2 queries needed, view?
-        sql = 'SHOW FULL COLUMNS FROM %(schema)s.%(table)s;' % {
+        sql = 'SELECT column_name, data_type  FROM information_schema.columns where table_schema = %s AND table_name = %s;' % {
             'schema': self.escape_identifier(schema_name),
             'table': self.escape_identifier(table_name)
         }
-
+        
         # execute query
         try:
             rows = self.fetchall(sql)
@@ -350,54 +342,92 @@ class PostgresAdapter(DatabaseAdapter):
             logger.error('Could not fetch from %s.%s (%s)' % (schema_name, table_name, e))
             return []
         else:
-            column_metadata = []
             for row in rows:
                 datatype, arraysize = self.convert_datatype(row[1])
-
                 column_metadata.append({
                     'name': row[0],
                     'datatype': datatype,
                     'arraysize': arraysize,
-                    'indexed': bool(row[4])
+                    'indexed': None)
                 })
 
+            # check if indexed
+            sql = 'SELECT indexdef FROM pg_indexes WHERE schemaname = %s AND tablename = %s;' % {
+                'schema': self.escape_identifier(schema_name),
+                'table': self.escape_identifier(table_name)
+            }
+            #TODO: test
+            try:
+                rows = self.fetchall(sql)
+            except ProgrammingError as e:
+                logger.error('Could not fetch indexes of %s.%s (%s)' % (schema_name, table_name, e))
+            else:
+                if rows is None:
+                    for column in column_metadata:
+                        column['indexed'] = False
+                else: 
+                    for column in column_metadata:
+                        columnname = '(\'' + row('name') + '\'));
+                        if row.find(row, columnname) = -1:
+                            column['indexed'] = False
+                        else:
+                            column['indexed'] = True
+            
             return column_metadata
 
+
     def fetch_column(self, schema_name, table_name, column_name):
+        # TODO: test
         # prepare sql string
-        # TODO: 
-        # this will get you column names and types
-        # sql = 'SELECT column_name, data_type  FROM information_schema.tables where table_schema = %(schema)s LIKE %(table)s' % 
-        sql = 'SHOW FULL COLUMNS FROM %(schema)s.%(table)s WHERE `Field` = %(column)s' % {
+        sql = 'SELECT column_name, data_type  FROM information_schema.columns where table_schema = %s AND table_name = %s AND column_name = %s;' % {
             'schema': self.escape_identifier(schema_name),
             'table': self.escape_identifier(table_name),
             'column': self.escape_string(column_name)
         }
-
+        
         # execute query
         try:
-            row = self.fetchone(sql)
+            rows = self.fetchone(sql)
         except ProgrammingError as e:
             logger.error('Could not fetch %s.%s.%s (%s)' % (schema_name, table_name, column_name, e))
-            return {}
+            return []
         else:
-            return {
+            column {
                 'name': row[0],
                 'datatype': row[1],
-                'indexed': bool(row[4])
+                'indexed': None
             }
+
+            # check if indexed
+            sql = 'SELECT indexdef FROM pg_indexes WHERE schemaname = %s AND tablename = %s;' % {
+                'schema': self.escape_identifier(schema_name),
+                'table': self.escape_identifier(table_name)
+            }
+            try:
+                rows = self.fetchone(sql)
+            except ProgrammingError as e:
+                logger.error('Could not fetch indexes of %s.%s.%s (%s)' % (schema_name, table_name, column_name, e))
+            else:
+                if rows is None:
+                    column['indexed'] = False
+                else: 
+                    columnname = '(\'' + row('name') + '\'));
+                    if row.find(row, columnname) = -1:
+                        column['indexed'] = False
+                    else:
+                        column['indexed'] = True
+            return column
+
 
     def fetch_column_names(self, schema_name, table_name):
         # prepare sql string
-        # TODO: 
-        # this will get you column names and types
-        # sql = 'SELECT column_name, data_type  FROM information_schema.tables where table_schema = %(schema)s LIKE %(table)s' % 
-
-        sql = 'SHOW COLUMNS FROM %(schema)s.%(table)s' % {
+        # TODO: test
+        sql = 'SELECT column_name FROM information_schema.columns where table_schema = %s AND table_name = %s;' % {
             'schema': self.escape_identifier(schema_name),
-            'table': self.escape_identifier(table_name),
+            'table': self.escape_identifier(table_name)
         }
         return [column[0] for column in self.fetchall(sql)]
+
 
     def convert_datatype(self, datatype_string):
         result = re.match('([a-z]+)\(*(\d*)\)*', datatype_string)
