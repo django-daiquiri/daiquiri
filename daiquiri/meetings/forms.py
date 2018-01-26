@@ -87,3 +87,6 @@ class ContributionForm(forms.ModelForm):
 
             if not cleaned_data['abstract']:
                 self.add_error('abstract', _('This field is required.'))
+        else:
+            if cleaned_data['title'] or cleaned_data['abstract']:
+                self.add_error('contribution_type', _('This field is required.'))

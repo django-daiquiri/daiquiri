@@ -1,0 +1,12 @@
+{% load i18n %}
+{% blocktrans %}
+Dear {{ full_name }},
+
+Thank you for registering for the {{ title }}.
+
+We collected the following information from you:
+{% endblocktrans %}
+{% for label, value in values %}{{ label }}: {{ value }}
+{% endfor %}
+{% trans "Sincerely" %},
+    {{ current_site.name }} Admins

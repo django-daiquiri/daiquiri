@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
@@ -116,6 +117,18 @@ class Participant(models.Model):
     def full_name(self):
         return '%s %s' % (self.first_name, self.last_name)
 
+    @property
+    def values(self):
+        details = [
+            (_('Name'), self.full_name),
+            (_('Email'), self.email)
+        ]
+        for detail_key in settings.MEETINGS_PARTICIPANT_DETAIL_KEYS:
+            if self.details[detail_key['key']]:
+                details.append((detail_key['label'], self.details[detail_key['key']]))
+
+        return details
+
 
 @python_2_unicode_compatible
 class Contribution(models.Model):
@@ -152,4 +165,4 @@ class Contribution(models.Model):
         permissions = (('view_contribution', 'Can view Contribution'),)
 
     def __str__(self):
-        return '%s: %s' % (self.participant.full_name, self.title)
+        return self.title

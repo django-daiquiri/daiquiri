@@ -1,0 +1,10 @@
+{% load i18n %}
+{% blocktrans with site_name=current_site.name %}
+Dear {{ site_name }} Team,
+
+{{ full_name }} has just registered for the {{ title }}.
+{% endblocktrans %}
+{% for label, value in values %}{{ label }}: {{ value }}
+{% endfor %}
+{% trans "Sincerely" %},
+    {{ current_site.name }} Admins
