@@ -7,18 +7,17 @@ def get_manager_emails():
     return [user.email for user in User.objects.filter(groups__name='meetings_manager')]
 
 
-def send_registration_mails(request, meeting, participant):
-
+def send_registration_mails(request, meeting, participant, contribution=None):
     # sends an email to the admins once a user was activated.
     send_mail(request, 'meetings/email/notify_registration', {
-        'title': meeting.title,
-        'full_name': participant.full_name,
-        'values': participant.values
+        'meeting': meeting,
+        'participant': participant,
+        'contribution': contribution
     }, get_manager_emails())
 
     # sends an email to the once he/she was activated.
     send_mail(request, 'meetings/email/registration', {
-        'title': meeting.title,
-        'full_name': participant.full_name,
-        'values': participant.values
+        'meeting': meeting,
+        'participant': participant,
+        'contribution': contribution
     }, [participant.email])

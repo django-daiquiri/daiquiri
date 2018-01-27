@@ -25,16 +25,20 @@ def registration(request, slug):
             if participant_form.is_valid() and contribution_form.is_valid():
                 participant = participant_form.save()
 
+                logger.info('participant \'%s\' registered.' % (participant.full_name, ))
+
                 if contribution_form.cleaned_data['contribution_type']:
                     contribution = contribution_form.save(commit=False)
                     contribution.participant = participant
                     contribution.save()
 
-                logger.info('participant \'%s\' registered.' % (participant.full_name, ))
+                    send_registration_mails(request, meeting, participant, contribution)
+                else:
+                    send_registration_mails(request, meeting, participant)
 
-                send_registration_mails(request, meeting, participant)
-
-                return HttpResponseRedirect(reverse('meetings:registration_done', kwargs={'slug': slug}))
+                return HttpResponseRedirect(reverse('meetings:registration_done', kwargs={
+                    'slug': slug
+                }))
 
         return render(request, 'meetings/registration.html', {
             'meeting': meeting,

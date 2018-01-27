@@ -118,16 +118,16 @@ class Participant(models.Model):
         return '%s %s' % (self.first_name, self.last_name)
 
     @property
-    def values(self):
-        details = [
+    def as_text(self):
+        values = [
             (_('Name'), self.full_name),
             (_('Email'), self.email)
         ]
         for detail_key in settings.MEETINGS_PARTICIPANT_DETAIL_KEYS:
             if self.details[detail_key['key']]:
-                details.append((detail_key['label'], self.details[detail_key['key']]))
+                values.append((detail_key['label'], self.details[detail_key['key']]))
 
-        return details
+        return '\n' + ''.join(['%s: %s\n' % value for value in values])
 
 
 @python_2_unicode_compatible
@@ -166,3 +166,12 @@ class Contribution(models.Model):
 
     def __str__(self):
         return self.title
+
+    @property
+    def as_text(self):
+        values = [
+            (_('Type'), dict(settings.MEETINGS_CONTRIBUTION_TYPES)[self.contribution_type]),
+            (_('Title'), self.title),
+            (_('Abstract'), self.abstract)
+        ]
+        return '\n' + ''.join(['%s: %s\n' % value for value in values])
