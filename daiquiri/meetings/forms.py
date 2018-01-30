@@ -69,8 +69,9 @@ class ContributionForm(forms.ModelForm):
     )
     abstract = forms.CharField(
         widget=forms.Textarea(attrs={'placeholder': _('Abstract')}),
-        # validators=validate_abstract,
-        required=None
+        required=None,
+        max_length=settings.MEETINGS_ABSTRACT_MAX_LENGTH,
+        help_text=_('The abstract needs to be shorter than %s characters.') % settings.MEETINGS_ABSTRACT_MAX_LENGTH
     )
 
     class Meta:
