@@ -287,7 +287,7 @@ class PostgresAdapter(DatabaseAdapter):
     def fetch_table(self, schema_name, table_name):
         # prepare sql string
         # TODO: to test
-        sql = 'SELECT table_name, table_type FROM information_schema.tables where table_schema = %(schema)s LIKE %(table)s' % {
+        sql = 'SELECT table_name, table_type FROM information_schema.tables where table_schema = %(schema)s AND table_name = %(table)s' % {
             'schema': self.escape_identifier(schema_name),
             'table': self.escape_string(table_name)
         }

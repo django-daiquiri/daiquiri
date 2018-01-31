@@ -13,6 +13,10 @@ class CoreAdapterTestCase(TestCase):
         rows = self.adapter.database.fetch_rows('daiquiri_data_obs', 'stars', column_names=None, search=None, filters=None)
         self.assertEqual(len(rows), 10)
 
+    def test_fetch_table(self):
+        rows = self.adapter.database.fetch_rows('daiquiri_data_obs', 'stars', column_names=None, search=None, filters=None)
+        self.assertEqual(row[1], 'table')
+
 
     def test_fetch_row(self):
         row = self.adapter.database.fetch_row('daiquiri_data_obs', 'stars', column_names=None, search=None, filters={
@@ -21,7 +25,7 @@ class CoreAdapterTestCase(TestCase):
         self.assertEqual(row[0], 100)
 
 
-    def test_fetch_stat(self):
+    def test_fetch_stats(self):
         row = self.adapter.database.fetch_stats('daiquiri_data_obs', 'stars')
         self.assertEqual(row[0], 548864)
 
@@ -48,6 +52,17 @@ class CoreAdapterTestCase(TestCase):
     def test_fetch_column(self):
         columns = self.adapter.database.fetch_stats('daiquiri_archive', 'files', 'id')
         self.assertEqual(row[0]['indexed'], True)
+
+    def test_fetch_column_names(self):
+        columns = self.adapter.database.fetch_stats('daiquiri_data_obs', 'stars')
+        self.assertEqual(row[0], 'id')
+
+    def test_count_rows(self):
+        row = self.adapter.database.count_rows('daiquiri_data_obs', 'stars')
+        self.assertEqual(rows[0], 10000)
+
+
+
 
 
     
