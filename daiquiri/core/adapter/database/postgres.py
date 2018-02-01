@@ -24,7 +24,7 @@ class PostgresAdapter(DatabaseAdapter):
         'text': {
             'datatype': 'char',
             'arraysize': True
-        }
+        },
         'smallint': {
             'datatype': 'unsignedByte',
             'arraysize': False
@@ -268,7 +268,7 @@ class PostgresAdapter(DatabaseAdapter):
 
         # prepare sql string
         # TODO: test 
-         sql = 'SELECT table_name, table_type FROM information_schema.tables where table_schema = %(schema)s'{
+        sql = 'SELECT table_name, table_type FROM information_schema.tables where table_schema = %(schema)s' % {
             'schema': escaped_schema_name
         }
 
@@ -348,7 +348,7 @@ class PostgresAdapter(DatabaseAdapter):
                     'name': row[0],
                     'datatype': datatype,
                     'arraysize': arraysize,
-                    'indexed': None)
+                    'indexed': None
                 })
 
             # check if indexed
@@ -367,8 +367,9 @@ class PostgresAdapter(DatabaseAdapter):
                         column['indexed'] = False
                 else: 
                     for column in column_metadata:
-                        columnname = '(\'' + row('name') + '\'));
-                        if row.find(row, columnname) = -1:
+                        columnname = '(\'' + row('name') + '\')'
+
+                        if row.find(row, columnname) == -1:
                             column['indexed'] = False
                         else:
                             column['indexed'] = True
@@ -392,7 +393,7 @@ class PostgresAdapter(DatabaseAdapter):
             logger.error('Could not fetch %s.%s.%s (%s)' % (schema_name, table_name, column_name, e))
             return []
         else:
-            column {
+            column = {
                 'name': row[0],
                 'datatype': row[1],
                 'indexed': None
@@ -411,8 +412,8 @@ class PostgresAdapter(DatabaseAdapter):
                 if rows is None:
                     column['indexed'] = False
                 else: 
-                    columnname = '(\'' + row('name') + '\'));
-                    if row.find(row, columnname) = -1:
+                    columnname = '(\'' + row('name') + '\')'
+                    if row.find(row, columnname) == -1:
                         column['indexed'] = False
                     else:
                         column['indexed'] = True

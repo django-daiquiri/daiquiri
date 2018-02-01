@@ -3,7 +3,7 @@ import socket
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-
+# TODO: test!
 class Command(BaseCommand):
 
     requires_system_checks = False
@@ -65,20 +65,20 @@ GRANT ALL PRIVILEGES ON "test_".* to \'%(USER)s\'@\'%(CLIENT)s\';
             if default:
                 print('''-- Run the following commands on \'%(HOST)s\':
 CREATE SCHEMA "%(NAME)s";
-CREATE USER \'%(USER)s\'@\'%(CLIENT)s\' identified by \'%(PASSWORD)s\';
+CREATE USER \'%(USER)s\'@\'%(CLIENT)s\' WITH PASSWORD \'%(PASSWORD)s\';
 GRANT ALL PRIVILEGES ON "%(NAME)s".* to \'%(USER)s\'@\'%(CLIENT)s\';
 ''' % default)
 
             if tap:
                 print('''-- Run the following commands on \'%(HOST)s\':
 CREATE SCHEMA "%(NAME)s";
-CREATE USER \'%(USER)s\'@\'%(CLIENT)s\' identified by \'%(PASSWORD)s\';
+CREATE USER \'%(USER)s\'@\'%(CLIENT)s\' WITH PASSWORD \'%(PASSWORD)s\';
 GRANT ALL PRIVILEGES ON "%(NAME)s".* to \'%(USER)s\'@\'%(CLIENT)s\';
 ''' % tap)
 
             if data:
                 print('''-- Run the following commands on \'%(HOST)s\':
-CREATE USER \'%(USER)s\'@\'%(CLIENT)s\' identified by \'%(PASSWORD)s\';
+CREATE USER \'%(USER)s\'@\'%(CLIENT)s\' WITH PASSWORD \'%(PASSWORD)s\';
 GRANT ALL PRIVILEGES ON "%(PREFIX)s%%".* to \'%(USER)s\'@\'%(CLIENT)s\';''' % data)
                 if tap:
                     data.update({'SCHEMA_NAME': tap['NAME']})
