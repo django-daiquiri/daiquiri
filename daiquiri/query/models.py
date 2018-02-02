@@ -21,6 +21,7 @@ from rest_framework.exceptions import ValidationError
 from jsonfield import JSONField
 
 from queryparser.mysql import MySQLQueryProcessor
+from queryparser.postgresql import PostgreSQLQueryProcessor
 from queryparser.adql import ADQLQueryTranslator
 from queryparser.exceptions import QueryError, QuerySyntaxError
 
@@ -53,7 +54,7 @@ class QueryJob(Job):
     database_name = models.CharField(max_length=256)
     table_name = models.CharField(max_length=256)
     queue = models.CharField(max_length=16)
-
+    
     query_language = models.CharField(max_length=16)
     query = models.TextField()
     native_query = models.TextField(null=True, blank=True)
@@ -173,11 +174,24 @@ class QueryJob(Job):
                     'query': [_('Quota is exceeded. Please remove some of your jobs.')]
                 })
 
+        # get the adapter
+        adapter = get_adapter()
+
         # translate adql -> mysql string
         if self.query_language == 'adql-2.0':
+            translator = ADQLQueryTranslator(self.query)
             try:
-                translator = ADQLQueryTranslator(self.query)
-                translated_query = translator.to_mysql()
+                if adapter.database_config['ENGINE'] == 'django.db.backends.mysql':
+                    translated_query = translator.to_mysql()
+                # TODO: adql to postgres translator
+                # elif adapter.database_config['ENGINE'] == 'django.db.backends.postgresql':
+                #    translated_query = translator.to_postgres()
+                else:
+                    # TODO: check error type
+                    raise ValidationError({
+                        'query': [_('The query could not be translated. The engine of the database must be postgres or mysql.')]
+                    })
+                    
             except QuerySyntaxError as e:
                 raise ValidationError({
                     'query': {
@@ -197,7 +211,15 @@ class QueryJob(Job):
 
         # parse the query
         try:
-            processor = MySQLQueryProcessor(translated_query)
+            if adapter.database_config['ENGINE'] == 'django.db.backends.mysql':
+                processor = MySQLQueryProcessor(translated_query)
+            elif adapter.database_config['ENGINE'] == 'django.db.backends.postgresql':
+                processor = PostgresQLQueryProcessor(translated_query)
+            else:
+                    # TODO: check error type
+                    raise ValidationError({
+                        'query': [_('The query could not be translated. The engine of the database must be postgres or mysql.')]
+                    })
 
             tap_schema_name = get_tap_schema_name()
             if tap_schema_name:

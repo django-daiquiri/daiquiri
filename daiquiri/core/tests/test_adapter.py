@@ -47,7 +47,9 @@ class CoreAdapterTestCase(TestCase):
         #  ra          | real
         #  de          | real
         # id is indexed
-        self.assertEqual((len(rows), 7) && (row[0]['indexed'], True))
+        if len(rows) == 7 and row[0]['indexed'] == True:
+            test = True
+        self.assertEqual(test, True)
 
     def test_fetch_column(self):
         columns = self.adapter.database.fetch_stats('daiquiri_archive', 'files', 'id')

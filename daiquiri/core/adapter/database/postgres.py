@@ -10,7 +10,7 @@ from .base import DatabaseAdapter
 logger = logging.getLogger(__name__)
 
 
-class PostgresAdapter(DatabaseAdapter):
+class PostgresQLAdapter(DatabaseAdapter):
 
     DATATYPES = {
         'char': {
@@ -63,8 +63,8 @@ class PostgresAdapter(DatabaseAdapter):
         return self.connection().connection.thread_id()
 
     def escape_identifier(self, identifier):
-        # escape quates whithin the identifier and quote the string
-        return '`%s`' % identifier.replace('"', '"')
+        # escape quotes whithin the identifier and quote the string
+        return '"%s"' % identifier.replace('"', '""')
 
     def escape_string(self, string):
         return "'%s'" % string
@@ -90,11 +90,13 @@ class PostgresAdapter(DatabaseAdapter):
 
     def fetch_stats(self, schema_name, table_name):    
         # TODO: test
-        # 'SELECT pg_size_pretty( pg_total_relation_size('tablename') );'
-        sql = 'SELECT pg_total_relation_size(%(schema)s.%(table)s);' % {
-            'schema': self.escape_identifier(schema_name),
-            'table': self.escape_identifier(table_name)
+        schema = self.escape_identifier(schema_name)
+        table = self.escape_identifier(table_name)
+        schema_dot_table = schema + '.' + table
+        sql = 'SELECT pg_total_relation_size(%(schema_table)s)' % {
+            'schema_table': self.escape_string(schema_dot_table) 
         }
+        logger.debug('fetch_stats: schema_dot_table - %s ' % (self.escape_string(schema_dot_table)))
         return self.fetchone(sql)
 
     def count_rows(self, schema_name, table_name, column_names=None, search=None, filters=None):
@@ -264,7 +266,7 @@ class PostgresAdapter(DatabaseAdapter):
 
     def fetch_tables(self, schema_name):
         # escape input
-        escaped_schema_name = self.escape_identifier(schema_name)
+        escaped_schema_name = self.escape_string(schema_name)
 
         # prepare sql string
         # TODO: test 
@@ -288,10 +290,10 @@ class PostgresAdapter(DatabaseAdapter):
         # prepare sql string
         # TODO: to test
         sql = 'SELECT table_name, table_type FROM information_schema.tables where table_schema = %(schema)s AND table_name = %(table)s' % {
-            'schema': self.escape_identifier(schema_name),
+            'schema': self.escape_string(schema_name),
             'table': self.escape_string(table_name)
         }
-
+        logger.debug('fetch_table: query %s ' % (sql))
         # execute query
         try:
             row = self.fetchone(sql)
@@ -308,7 +310,7 @@ class PostgresAdapter(DatabaseAdapter):
     def rename_table(self, schema_name, table_name, new_table_name):
         # TODO: test
         sql = 'ALTER TABLE %(schema)s.%(table)s RENAME TO %(schema)s.%(new_table)s;' % {
-            'schema': self.escape_identifier(schema_name),
+            'schema': self.escape_string(schema_name),
             'table': self.escape_identifier(table_name),
             'new_table': self.escape_identifier(new_table_name)
         }
@@ -328,13 +330,14 @@ class PostgresAdapter(DatabaseAdapter):
 
     def fetch_columns(self, schema_name, table_name):
         # TODO: test
-        # get columnnames and datatype
+        # get column names and datatype
         # prepare sql string
-        sql = 'SELECT column_name, data_type  FROM information_schema.columns where table_schema = %s AND table_name = %s;' % {
-            'schema': self.escape_identifier(schema_name),
-            'table': self.escape_identifier(table_name)
+        logger.debug('fetch_comlumns attributes: %s %s' % (schema_name, table_name))
+        sql = 'SELECT column_name, data_type  FROM information_schema.columns where table_schema = %(schema)s AND table_name = %(tables)s' % {
+            'schema': self.escape_string(schema_name),
+            'table': self.escape_string(table_name)
         }
-        
+        logger.debug('Query: %s' % (sql))
         # execute query
         try:
             rows = self.fetchall(sql)
@@ -352,7 +355,7 @@ class PostgresAdapter(DatabaseAdapter):
                 })
 
             # check if indexed
-            sql = 'SELECT indexdef FROM pg_indexes WHERE schemaname = %s AND tablename = %s;' % {
+            sql = 'SELECT indexdef FROM pg_indexes WHERE schemaname = %s AND tablename = %s' % {
                 'schema': self.escape_identifier(schema_name),
                 'table': self.escape_identifier(table_name)
             }
@@ -380,12 +383,12 @@ class PostgresAdapter(DatabaseAdapter):
     def fetch_column(self, schema_name, table_name, column_name):
         # TODO: test
         # prepare sql string
-        sql = 'SELECT column_name, data_type  FROM information_schema.columns where table_schema = %s AND table_name = %s AND column_name = %s;' % {
+        sql = 'SELECT column_name, data_type  FROM information_schema.columns where table_schema = %(schema)s AND table_name = %(table)s AND column_name = %(column)s' % {
             'schema': self.escape_identifier(schema_name),
             'table': self.escape_identifier(table_name),
             'column': self.escape_string(column_name)
         }
-        
+
         # execute query
         try:
             rows = self.fetchone(sql)
@@ -400,7 +403,7 @@ class PostgresAdapter(DatabaseAdapter):
             }
 
             # check if indexed
-            sql = 'SELECT indexdef FROM pg_indexes WHERE schemaname = %s AND tablename = %s;' % {
+            sql = 'SELECT indexdef FROM pg_indexes WHERE schemaname = %s AND tablename = %s' % {
                 'schema': self.escape_identifier(schema_name),
                 'table': self.escape_identifier(table_name)
             }
@@ -423,10 +426,12 @@ class PostgresAdapter(DatabaseAdapter):
     def fetch_column_names(self, schema_name, table_name):
         # prepare sql string
         # TODO: test
-        sql = 'SELECT column_name FROM information_schema.columns where table_schema = %s AND table_name = %s;' % {
-            'schema': self.escape_identifier(schema_name),
-            'table': self.escape_identifier(table_name)
+        logger.debug('fetch_comlumn names: %s %s' % (schema_name, table_name))
+        sql = 'SELECT column_name FROM information_schema.columns where table_schema = %(schema)s AND table_name = %(table)s' % {
+            'schema': self.escape_string(schema_name),
+            'table': self.escape_string(table_name)
         }
+        logger.debug('fetch_column_names: query: %s ' % (sql))
         return [column[0] for column in self.fetchall(sql)]
 
 
