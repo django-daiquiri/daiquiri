@@ -345,37 +345,33 @@ class PostgresQLAdapter(DatabaseAdapter):
             logger.error('Could not fetch from %s.%s (%s)' % (schema_name, table_name, e))
             return []
         else:
+            column_metadata = []
             for row in rows:
                 datatype, arraysize = self.convert_datatype(row[1])
                 column_metadata.append({
                     'name': row[0],
                     'datatype': datatype,
                     'arraysize': arraysize,
-                    'indexed': None
+                    'indexed': False
                 })
 
             # check if indexed
-            sql = 'SELECT indexdef FROM pg_indexes WHERE schemaname = %s AND tablename = %s' % {
-                'schema': self.escape_identifier(schema_name),
-                'table': self.escape_identifier(table_name)
+            sql = 'SELECT indexdef FROM pg_indexes WHERE schemaname = %(schema)s AND tablename = %(table)s' % {
+                'schema': self.escape_string(schema_name),
+                'table': self.escape_string(table_name)
             }
             #TODO: test
             try:
                 rows = self.fetchall(sql)
-            except ProgrammingError as e:
+            except OperationalError as e:
                 logger.error('Could not fetch indexes of %s.%s (%s)' % (schema_name, table_name, e))
-            else:
-                if rows is None:
-                    for column in column_metadata:
-                        column['indexed'] = False
-                else: 
-                    for column in column_metadata:
-                        columnname = '(\'' + row('name') + '\')'
-
-                        if row.find(row, columnname) == -1:
-                            column['indexed'] = False
-                        else:
-                            column['indexed'] = True
+                return column_metadata
+            else: 
+                for column in column_metadata:              
+                    columnname = '(\'' + column['name'] + '\')'
+                    # for row in rows:
+                    if ''.join(rows).find(columnname) > -1:
+                        column['indexed'] = True
             
             return column_metadata
 
@@ -384,14 +380,14 @@ class PostgresQLAdapter(DatabaseAdapter):
         # TODO: test
         # prepare sql string
         sql = 'SELECT column_name, data_type  FROM information_schema.columns where table_schema = %(schema)s AND table_name = %(table)s AND column_name = %(column)s' % {
-            'schema': self.escape_identifier(schema_name),
-            'table': self.escape_identifier(table_name),
+            'schema': self.escape_string(schema_name),
+            'table': self.escape_string(table_name),
             'column': self.escape_string(column_name)
         }
-
+        logger.debug('fetch_column: %s:' % (sql))
         # execute query
         try:
-            rows = self.fetchone(sql)
+            row = self.fetchone(sql)
         except ProgrammingError as e:
             logger.error('Could not fetch %s.%s.%s (%s)' % (schema_name, table_name, column_name, e))
             return []
@@ -399,26 +395,23 @@ class PostgresQLAdapter(DatabaseAdapter):
             column = {
                 'name': row[0],
                 'datatype': row[1],
-                'indexed': None
+                'indexed': False
             }
 
             # check if indexed
-            sql = 'SELECT indexdef FROM pg_indexes WHERE schemaname = %s AND tablename = %s' % {
-                'schema': self.escape_identifier(schema_name),
-                'table': self.escape_identifier(table_name)
+            sql = 'SELECT indexdef FROM pg_indexes WHERE schemaname = %(schema)s AND tablename = %(table)s' % {
+                'schema': self.escape_string(schema_name),
+                'table': self.escape_string(table_name)
             }
             try:
-                rows = self.fetchone(sql)
-            except ProgrammingError as e:
+                rows = self.fetchall(sql)
+            except OperationalError as e:
                 logger.error('Could not fetch indexes of %s.%s.%s (%s)' % (schema_name, table_name, column_name, e))
-            else:
-                if rows is None:
-                    column['indexed'] = False
-                else: 
-                    columnname = '(\'' + row('name') + '\')'
-                    if row.find(row, columnname) == -1:
-                        column['indexed'] = False
-                    else:
+                return column
+            else: 
+                columnname = '(\'' + column['name'] + '\')'
+                for row in rows:
+                    if row.find(columnname) > -1:
                         column['indexed'] = True
             return column
 
