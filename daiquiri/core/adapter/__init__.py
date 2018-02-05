@@ -21,11 +21,9 @@ class Adapter(object):
             database_adapter_class = import_class(settings.ADAPTER_DATABASE)
             self.database = database_adapter_class(self.database_key, self.database_config)
         except AttributeError:
-
             if self.database_config['ENGINE'] == 'django.db.backends.mysql':
                 self.database = MySQLAdapter(self.database_key, self.database_config)
-            elif self.database_config['ENGINE'] == 'django.db.backends.postgresql':
-                print('postgresql')
+            elif self.database_config['ENGINE'] == 'django.db.backends.postgresql_psycopg2':
                 self.database = PostgresQLAdapter(self.database_key, self.database_config)
             else:
                 raise Exception('No suitable database adapter found.')

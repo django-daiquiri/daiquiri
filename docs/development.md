@@ -68,6 +68,10 @@ pip install -I -e ../daiquiri
 pip install -I -e ../queryparser
 pip install mysqlclient
 ```
+or for postgres:
+```
+pip install psycopg2
+```
 
 Setup the app
 -------------

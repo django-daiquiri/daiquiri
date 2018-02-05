@@ -333,7 +333,7 @@ class PostgresQLAdapter(DatabaseAdapter):
         # get column names and datatype
         # prepare sql string
         logger.debug('fetch_comlumns attributes: %s %s' % (schema_name, table_name))
-        sql = 'SELECT column_name, data_type  FROM information_schema.columns where table_schema = %(schema)s AND table_name = %(tables)s' % {
+        sql = 'SELECT column_name, data_type  FROM information_schema.columns where table_schema = %(schema)s AND table_name = %(table)s' % {
             'schema': self.escape_string(schema_name),
             'table': self.escape_string(table_name)
         }

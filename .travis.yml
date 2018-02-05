@@ -9,14 +9,17 @@ python:
 
 addons:
   mariadb: '10.1'
+  postgres: '9.6'
 
 before_install:
   - sudo apt-get -qq update
   - sudo apt-get install -y libmariadbd-dev libmariadbclient-dev
+  - sudo apt-get install -y postgresql
 
 install:
 - pip install -e .
 - pip install mysqlclient
+- pip install psycopg2
 - pip install coveralls
 
 before_script:
@@ -27,6 +30,11 @@ before_script:
 - mysql < testing/sql/daiquiri_data_sim.sql
 - mysql < testing/sql/daiquiri_user_user.sql
 - mysql < testing/sql/daiquiri_archive.sql
+- psql < testing/sql/postgres_daiquiri_data_obs.sql
+- psql < testing/sql/postgres_daiquiri_data_sim.sql
+- psql < testing/sql/postgres_daiquiri_user_user.sql
+- psql < testing/sql/postgres_daiquiri_archive.sql
+
 
 script:
 - coverage run testing/runtests.py
