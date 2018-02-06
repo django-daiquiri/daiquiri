@@ -89,7 +89,6 @@ class PostgresQLAdapter(DatabaseAdapter):
         self.execute(sql)
 
     def fetch_stats(self, schema_name, table_name):    
-        # TODO: test
         schema = self.escape_identifier(schema_name)
         table = self.escape_identifier(table_name)
         schema_dot_table = schema + '.' + table
@@ -157,7 +156,6 @@ class PostgresQLAdapter(DatabaseAdapter):
             return {}
 
     def fetch_rows(self, schema_name, table_name, column_names=None, ordering=None, page=1, page_size=10, search=None, filters=None):
-        # TODO: test
         # if no column names are provided get all column_names from the table
         if not column_names:
             column_names = self.fetch_column_names(schema_name, table_name)
@@ -269,7 +267,6 @@ class PostgresQLAdapter(DatabaseAdapter):
         escaped_schema_name = self.escape_string(schema_name)
 
         # prepare sql string
-        # TODO: test 
         sql = 'SELECT table_name, table_type FROM information_schema.tables where table_schema = %(schema)s' % {
             'schema': escaped_schema_name
         }
@@ -288,7 +285,6 @@ class PostgresQLAdapter(DatabaseAdapter):
 
     def fetch_table(self, schema_name, table_name):
         # prepare sql string
-        # TODO: to test
         sql = 'SELECT table_name, table_type FROM information_schema.tables where table_schema = %(schema)s AND table_name = %(table)s' % {
             'schema': self.escape_string(schema_name),
             'table': self.escape_string(table_name)
@@ -308,7 +304,6 @@ class PostgresQLAdapter(DatabaseAdapter):
 
 
     def rename_table(self, schema_name, table_name, new_table_name):
-        # TODO: test
         sql = 'ALTER TABLE %(schema)s.%(table)s RENAME TO %(schema)s.%(new_table)s;' % {
             'schema': self.escape_string(schema_name),
             'table': self.escape_identifier(table_name),
@@ -319,7 +314,6 @@ class PostgresQLAdapter(DatabaseAdapter):
 
 
     def drop_table(self, schema_name, table_name):
-        # TODO: test
         sql = 'DROP TABLE IF EXISTS %(schema)s.%(table)s;' % {
             'schema': self.escape_identifier(schema_name),
             'table': self.escape_identifier(table_name)
@@ -329,7 +323,6 @@ class PostgresQLAdapter(DatabaseAdapter):
 
 
     def fetch_columns(self, schema_name, table_name):
-        # TODO: test
         # get column names and datatype
         # prepare sql string
         logger.debug('fetch_comlumns attributes: %s %s' % (schema_name, table_name))
@@ -360,7 +353,6 @@ class PostgresQLAdapter(DatabaseAdapter):
                 'schema': self.escape_string(schema_name),
                 'table': self.escape_string(table_name)
             }
-            #TODO: test
             try:
                 rows = self.fetchall(sql)
             except OperationalError as e:
@@ -369,15 +361,13 @@ class PostgresQLAdapter(DatabaseAdapter):
             else: 
                 for column in column_metadata:              
                     columnname = '(\'' + column['name'] + '\')'
-                    # for row in rows:
-                    if ''.join(rows).find(columnname) > -1:
+                    if str(rows).find(columnname) > -1:
                         column['indexed'] = True
             
             return column_metadata
 
 
     def fetch_column(self, schema_name, table_name, column_name):
-        # TODO: test
         # prepare sql string
         sql = 'SELECT column_name, data_type  FROM information_schema.columns where table_schema = %(schema)s AND table_name = %(table)s AND column_name = %(column)s' % {
             'schema': self.escape_string(schema_name),
@@ -410,15 +400,13 @@ class PostgresQLAdapter(DatabaseAdapter):
                 return column
             else: 
                 columnname = '(\'' + column['name'] + '\')'
-                for row in rows:
-                    if row.find(columnname) > -1:
-                        column['indexed'] = True
+                if str(rows).find(columnname) > -1:
+                    column['indexed'] = True
             return column
 
 
     def fetch_column_names(self, schema_name, table_name):
         # prepare sql string
-        # TODO: test
         logger.debug('fetch_comlumn names: %s %s' % (schema_name, table_name))
         sql = 'SELECT column_name FROM information_schema.columns where table_schema = %(schema)s AND table_name = %(table)s' % {
             'schema': self.escape_string(schema_name),
