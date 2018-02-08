@@ -58,7 +58,7 @@ def run_query(job_id):
 
     # create the database of the user if it not already exists
     try:
-        adapter.database.create_user_database_if_not_exists(job.database_name)
+        adapter.database.create_user_schema_if_not_exists(job.database_name)
     except OperationalError as e:
         job.phase = job.PHASE_ERROR
         job.error_summary = str(e)

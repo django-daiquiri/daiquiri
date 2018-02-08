@@ -10,7 +10,7 @@ from .base import DatabaseAdapter
 logger = logging.getLogger(__name__)
 
 
-class PostgresQLAdapter(DatabaseAdapter):
+class PostgreSQLAdapter(DatabaseAdapter):
 
     DATATYPES = {
         'char': {
@@ -25,10 +25,10 @@ class PostgresQLAdapter(DatabaseAdapter):
             'datatype': 'char',
             'arraysize': True
         },
-        'smallint': {
-            'datatype': 'unsignedByte',
-            'arraysize': False
-        },
+        # 'smallint': {
+        #     'datatype': 'unsignedByte',
+        #     'arraysize': False
+        # },
         'smallint': {
             'datatype': 'short',
             'arraysize': False
@@ -60,7 +60,7 @@ class PostgresQLAdapter(DatabaseAdapter):
     }
 
     def fetch_pid(self):
-        return self.connection().connection.thread_id()
+        return self.connection().connection.get_backend_pid()
 
     def escape_identifier(self, identifier):
         # escape quotes whithin the identifier and quote the string
@@ -80,23 +80,32 @@ class PostgresQLAdapter(DatabaseAdapter):
         }
 
         if max_records is not None:
-            return 'CREATE TABLE %(schema)s.%(table)s  %(query)s ) LIMIT %(max_records)s;' % params
+            return 'CREATE TABLE %(schema)s.%(table)s AS %(query)s LIMIT %(max_records)s;' % params
         else:
-            return 'CREATE TABLE %(schema)s.%(table)s  %(query)s );' % params
+            return 'CREATE TABLE %(schema)s.%(table)s AS %(query)s;' % params
 
     def abort_query(self, pid):
         sql = 'select pg_terminate_backend(%(pid)i)' % {'pid': pid}
         self.execute(sql)
 
-    def fetch_stats(self, schema_name, table_name):    
-        schema = self.escape_identifier(schema_name)
-        table = self.escape_identifier(table_name)
-        schema_dot_table = schema + '.' + table
-        sql = 'SELECT pg_total_relation_size(%(schema_table)s)' % {
-            'schema_table': self.escape_string(schema_dot_table) 
+    def fetch_stats(self, schema_name, table_name):
+        # fetch the number of rows
+        sql = 'SELECT count(*) FROM %(schema)s.%(table)s' % {
+            'schema': self.escape_identifier(schema_name),
+            'table': self.escape_identifier(table_name)
         }
-        logger.debug('fetch_stats: schema_dot_table - %s ' % (self.escape_string(schema_dot_table)))
-        return self.fetchone(sql)
+        nrows = self.fetchone(sql)[0]
+
+        # fetch the size of the table using pg_total_relation_size
+        sql = 'SELECT pg_total_relation_size(\'%(schema)s.%(table)s\')' % {
+            'schema': self.escape_identifier(schema_name),
+            'table': self.escape_identifier(table_name)
+        }
+        size = self.fetchone(sql)[0]
+
+        logger.debug('fetch_stats: %d, %d' % (nrows, size))
+
+        return nrows, size
 
     def count_rows(self, schema_name, table_name, column_names=None, search=None, filters=None):
         # if no column names are provided get all column_names from the table
@@ -289,7 +298,9 @@ class PostgresQLAdapter(DatabaseAdapter):
             'schema': self.escape_string(schema_name),
             'table': self.escape_string(table_name)
         }
-        logger.debug('fetch_table: query %s ' % (sql))
+
+        logger.debug('fetch_table: sql %s ' % (sql))
+
         # execute query
         try:
             row = self.fetchone(sql)
@@ -302,16 +313,14 @@ class PostgresQLAdapter(DatabaseAdapter):
                 'type': 'view' if row[1] == 'VIEW' else 'table'
             }
 
-
     def rename_table(self, schema_name, table_name, new_table_name):
-        sql = 'ALTER TABLE %(schema)s.%(table)s RENAME TO %(schema)s.%(new_table)s;' % {
-            'schema': self.escape_string(schema_name),
+        sql = 'ALTER TABLE %(schema)s.%(table)s RENAME TO %(new_table)s;' % {
+            'schema': self.escape_identifier(schema_name),
             'table': self.escape_identifier(table_name),
             'new_table': self.escape_identifier(new_table_name)
         }
 
         self.execute(sql)
-
 
     def drop_table(self, schema_name, table_name):
         sql = 'DROP TABLE IF EXISTS %(schema)s.%(table)s;' % {
@@ -321,16 +330,17 @@ class PostgresQLAdapter(DatabaseAdapter):
 
         self.execute(sql)
 
-
     def fetch_columns(self, schema_name, table_name):
-        # get column names and datatype
+        logger.debug('fetch_columns: attributes %s %s' % (schema_name, table_name))
+
         # prepare sql string
-        logger.debug('fetch_comlumns attributes: %s %s' % (schema_name, table_name))
-        sql = 'SELECT column_name, data_type  FROM information_schema.columns where table_schema = %(schema)s AND table_name = %(table)s' % {
+        sql = 'SELECT column_name, data_type FROM information_schema.columns where table_schema = %(schema)s AND table_name = %(table)s' % {
             'schema': self.escape_string(schema_name),
             'table': self.escape_string(table_name)
         }
-        logger.debug('Query: %s' % (sql))
+
+        logger.debug('fetch_columns: sql %s' % (sql))
+
         # execute query
         try:
             rows = self.fetchall(sql)
@@ -358,12 +368,12 @@ class PostgresQLAdapter(DatabaseAdapter):
             except OperationalError as e:
                 logger.error('Could not fetch indexes of %s.%s (%s)' % (schema_name, table_name, e))
                 return column_metadata
-            else: 
-                for column in column_metadata:              
+            else:
+                for column in column_metadata:
                     columnname = '(\'' + column['name'] + '\')'
                     if str(rows).find(columnname) > -1:
                         column['indexed'] = True
-            
+
             return column_metadata
 
 
@@ -374,7 +384,9 @@ class PostgresQLAdapter(DatabaseAdapter):
             'table': self.escape_string(table_name),
             'column': self.escape_string(column_name)
         }
+
         logger.debug('fetch_column: %s:' % (sql))
+
         # execute query
         try:
             row = self.fetchone(sql)
@@ -398,7 +410,7 @@ class PostgresQLAdapter(DatabaseAdapter):
             except OperationalError as e:
                 logger.error('Could not fetch indexes of %s.%s.%s (%s)' % (schema_name, table_name, column_name, e))
                 return column
-            else: 
+            else:
                 columnname = '(\'' + column['name'] + '\')'
                 if str(rows).find(columnname) > -1:
                     column['indexed'] = True
@@ -406,13 +418,16 @@ class PostgresQLAdapter(DatabaseAdapter):
 
 
     def fetch_column_names(self, schema_name, table_name):
+        logger.debug('fetch_column_names: %s %s' % (schema_name, table_name))
+
         # prepare sql string
-        logger.debug('fetch_comlumn names: %s %s' % (schema_name, table_name))
         sql = 'SELECT column_name FROM information_schema.columns where table_schema = %(schema)s AND table_name = %(table)s' % {
             'schema': self.escape_string(schema_name),
             'table': self.escape_string(table_name)
         }
-        logger.debug('fetch_column_names: query: %s ' % (sql))
+
+        logger.debug('fetch_column_names: sql: %s ' % (sql))
+
         return [column[0] for column in self.fetchall(sql)]
 
 

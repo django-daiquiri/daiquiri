@@ -54,7 +54,7 @@ class QueryJob(Job):
     database_name = models.CharField(max_length=256)
     table_name = models.CharField(max_length=256)
     queue = models.CharField(max_length=16)
-    
+
     query_language = models.CharField(max_length=16)
     query = models.TextField()
     native_query = models.TextField(null=True, blank=True)
@@ -191,7 +191,7 @@ class QueryJob(Job):
                     raise ValidationError({
                         'query': [_('The query could not be translated. The engine of the database must be postgres or mysql.')]
                     })
-                    
+
             except QuerySyntaxError as e:
                 raise ValidationError({
                     'query': {
@@ -214,7 +214,7 @@ class QueryJob(Job):
             if adapter.database_config['ENGINE'] == 'django.db.backends.mysql':
                 processor = MySQLQueryProcessor(translated_query)
             elif adapter.database_config['ENGINE'] == 'django.db.backends.postgresql':
-                processor = PostgresQLQueryProcessor(translated_query)
+                processor = PostgreSQLQueryProcessor(translated_query)
             else:
                     # TODO: check error type
                     raise ValidationError({

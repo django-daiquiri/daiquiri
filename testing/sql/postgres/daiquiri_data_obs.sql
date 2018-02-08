@@ -1,13 +1,10 @@
-﻿-- Create schemas with the data
+﻿DROP SCHEMA IF EXISTS daiquiri_data_obs CASCADE;
+
 CREATE SCHEMA daiquiri_data_obs;
-
--- Table: daiquiri_data_obs.images
-
-DROP TABLE daiquiri_data_obs.images;
 
 CREATE TABLE daiquiri_data_obs.images
 (
-"id" int, 
+  "id" int,
   "RA" double precision,
   "DE" double precision,
   "preview" char(64),
@@ -20,8 +17,6 @@ WITH (
 
 INSERT INTO daiquiri_data_obs.images VALUES (1,55.66325,7.923143,'image_00.jpg','image_00.fits','http://localhost/0'),(2,3.928691,28.09714,'image_01.jpg','image_01.fits','http://localhost/1'),(3,-22.71346,-25.23272,'image_02.jpg','image_02.fits','http://localhost/2'),(4,-46.90122,37.90701,'image_03.jpg','image_03.fits','http://localhost/3'),(5,-0.09892338,-39.78411,'image_04.jpg','image_04.fits','http://localhost/4'),(6,51.93239,-4.325558,'image_05.jpg','image_05.fits','http://localhost/5'),(7,41.2415,-21.21454,'image_06.jpg','image_06.fits','http://localhost/6'),(8,-75.28017,-42.37635,'image_07.jpg','image_07.fits','http://localhost/7'),(9,57.56662,4.841062,'image_08.jpg','image_08.fits','http://localhost/8'),(10,-27.66142,0.4055515,'image_09.jpg','image_09.fits','http://localhost/9'),(11,-43.66956,-40.62242,'image_10.jpg','image_10.fits','http://localhost/10'),(12,61.869,-42.2658,'image_11.jpg','image_11.fits','http://localhost/11'),(13,66.64327,-15.33197,'image_12.jpg','image_12.fits','http://localhost/12'),(14,42.24354,-27.37847,'image_13.jpg','image_13.fits','http://localhost/13'),(15,-86.82651,8.618157,'image_14.jpg','image_14.fits','http://localhost/14'),(16,-25.91859,19.07619,'image_15.jpg','image_15.fits','http://localhost/15'),(17,-30.46411,-1.52731,'image_16.jpg','image_16.fits','http://localhost/16'),(18,-52.52222,18.10293,'image_17.jpg','image_17.fits','http://localhost/17'),(19,51.79935,-28.74261,'image_18.jpg','image_18.fits','http://localhost/18'),(20,36.61555,31.55929,'image_19.jpg','image_19.fits','http://localhost/19');
 
--- Table: daiquiri_data_obs.stars
-DROP TABLE IF EXISTS daiquiri_data_obs.stars;
 CREATE TABLE daiquiri_data_obs.stars (
   "id" int,
   "RA" int,

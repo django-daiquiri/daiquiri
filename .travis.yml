@@ -26,15 +26,14 @@ before_script:
 - mkdir testing/log testing/download
 - cp -r testing/files /tmp/daiquiri
 - cp testing/config/settings/travis.local.py testing/config/settings/local.py
-- mysql < testing/sql/daiquiri_data_obs.sql
-- mysql < testing/sql/daiquiri_data_sim.sql
-- mysql < testing/sql/daiquiri_user_user.sql
-- mysql < testing/sql/daiquiri_archive.sql
-- psql < testing/sql/postgres_daiquiri_data_obs.sql
-- psql < testing/sql/postgres_daiquiri_data_sim.sql
-- psql < testing/sql/postgres_daiquiri_user_user.sql
-- psql < testing/sql/postgres_daiquiri_archive.sql
-
+- mysql < testing/sql/mysql/daiquiri_data_obs.sql
+- mysql < testing/sql/mysql/daiquiri_data_sim.sql
+- mysql < testing/sql/mysql/daiquiri_user_user.sql
+- mysql < testing/sql/mysql/daiquiri_archive.sql
+- psql < testing/sql/postgres/daiquiri_data_obs.sql
+- psql < testing/sql/postgres/daiquiri_data_sim.sql
+- psql < testing/sql/postgres/daiquiri_user_user.sql
+- psql < testing/sql/postgres/daiquiri_archive.sql
 
 script:
 - coverage run testing/runtests.py

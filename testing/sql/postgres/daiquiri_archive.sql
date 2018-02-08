@@ -1,7 +1,8 @@
-DROP SCHEMA IF EXISTS daiquiri_archive;
+DROP SCHEMA IF EXISTS daiquiri_archive CASCADE;
+
 CREATE SCHEMA daiquiri_archive;
 
-CREATE TABLE IF NOT EXISTS daiquiri_archive.files (
+CREATE TABLE daiquiri_archive.files (
     "id"          CHAR(36) PRIMARY KEY NOT NULL,
     "timestamp"   timestamp NOT NULL,
     "file"        VARCHAR(256) NOT NULL,
