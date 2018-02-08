@@ -75,14 +75,14 @@ class PostgreSQLAdapter(DatabaseAdapter):
             'schema': self.escape_identifier(schema_name),
             'table': self.escape_identifier(table_name),
             'query': query,
-            'timeout': timeout,
+            'timeout': timeout * 1000,
             'max_records': max_records
         }
 
         if max_records is not None:
-            return 'CREATE TABLE %(schema)s.%(table)s AS %(query)s LIMIT %(max_records)s;' % params
+            return 'SET SESSION statement_timeout TO %(timeout)s; CREATE TABLE %(schema)s.%(table)s AS %(query)s LIMIT %(max_records)s;' % params
         else:
-            return 'CREATE TABLE %(schema)s.%(table)s AS %(query)s;' % params
+            return 'SET SESSION statement_timeout TO %(timeout)s; CREATE TABLE %(schema)s.%(table)s AS %(query)s;' % params
 
     def abort_query(self, pid):
         sql = 'select pg_terminate_backend(%(pid)i)' % {'pid': pid}

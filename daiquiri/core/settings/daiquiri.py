@@ -67,7 +67,7 @@ QUERY_QUEUES = [
     {
         'key': 'default',
         'label': 'Default',
-        'timeout': 300,
+        'timeout': 10,
         'priority': 1
     }
 ]
