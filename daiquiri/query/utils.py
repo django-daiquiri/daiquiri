@@ -30,14 +30,6 @@ def get_queue_choices():
     return [(item['key'], item['label']) for item in settings.QUERY_QUEUES]
 
 
-def get_tap_schema_name():
-    tap_config = settings.DATABASES.get('tap')
-    if tap_config:
-        return tap_config['NAME']
-    else:
-        return None
-
-
 def get_user_database_name(user):
     if not user or user.is_anonymous():
         username = 'anonymous'
@@ -118,9 +110,9 @@ def check_permissions(user, keywords, tables, columns, functions):
     if not settings.METADATA_COLUMN_PERMISSIONS:
         # check permissions on databases/tables
         for database_name, table_name in tables:
-
+            print(database_name in [None, settings.TAP_SCHEMA, get_user_database_name(user)])
             # check permission on database
-            if database_name in [None, get_tap_schema_name(), get_user_database_name(user)]:
+            if database_name in [None, settings.TAP_SCHEMA, get_user_database_name(user)]:
                 continue
             else:
                 try:
@@ -145,7 +137,7 @@ def check_permissions(user, keywords, tables, columns, functions):
             database_name, table_name, column_name = column
 
             # check permission on database
-            if database_name in [None, get_tap_schema_name(), get_user_database_name(user)]:
+            if database_name in [None, settings.TAP_SCHEMA, get_user_database_name(user)]:
                 continue
             else:
                 try:

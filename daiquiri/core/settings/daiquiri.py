@@ -157,6 +157,8 @@ SERVE_RESOLVER = None
 
 UWS_RESOURCES = []
 
+TAP_SCHEMA = 'TAP_SCHEMA'
+
 WORDPRESS_URL = '/cms/'
 WORDPRESS_CLI = '/opt/wp-cli/wp'
 WORDPRESS_PATH = '/opt/wordpress'

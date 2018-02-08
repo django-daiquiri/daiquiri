@@ -37,7 +37,6 @@ from .utils import (
     get_default_table_name,
     get_default_queue,
     get_format_config,
-    get_tap_schema_name,
     get_user_database_name,
     get_asterisk_columns,
     check_permissions
@@ -221,13 +220,9 @@ class QueryJob(Job):
                         'query': [_('The query could not be translated. The engine of the database must be postgres or mysql.')]
                     })
 
-            tap_schema_name = get_tap_schema_name()
-            if tap_schema_name:
-                processor.process_query(replace_schema_name={
-                    'TAP_SCHEMA': tap_schema_name
-                })
-            else:
-                processor.process_query()
+            processor.process_query(replace_schema_name={
+                'TAP_SCHEMA': settings.TAP_SCHEMA
+            })
 
         except QuerySyntaxError as e:
             raise ValidationError({
