@@ -1,3 +1,4 @@
+import logging
 import base64
 import csv
 import io
@@ -11,8 +12,9 @@ from bitstring import BitArray
 
 from .base import DownloadAdapter
 
+logger = logging.getLogger(__name__)
 
-class MysqldumpAdapter(DownloadAdapter):
+class PostgreSQLdumpAdapter(DownloadAdapter):
 
     insert_pattern = re.compile('^INSERT INTO .*? VALUES \((.*?)\);')
 
@@ -37,42 +39,57 @@ class MysqldumpAdapter(DownloadAdapter):
     }
 
     def __init__(self, database_key, database_config):
-        self.args = ['mysqldump', '--compact', '--skip-extended-insert']
+        self.args = ['pgdump']
+
+        # TODO: argument string to pass
+        # pg_dump --table=schema.table --dbname=postgresql://user:password@host:port/database
+
+        dbname_arg = 'postgresql://'
+        logger.debug('dbname_arg: %s' % (dbname_arg))
 
         if 'USER' in database_config and database_config['USER']:
-            self.args.append('--user=%(USER)s' % database_config)
+            dbname_arg.join('%(USER)s' % database_config)
 
         if 'PASSWORD' in database_config and database_config['PASSWORD']:
-            self.args.append('--password=%(PASSWORD)s' % database_config)
+            dbname_arg.join(':%(PASSWORD)s' % database_config)
 
         if 'HOST' in database_config and database_config['HOST']:
-            self.args.append('--host=%(HOST)s' % database_config)
+            dbname_arg.join('@%(HOST)s' % database_config)
 
         if 'PORT' in database_config and database_config['PORT']:
-            self.args.append('--port=%(PORT)s' % database_config)
+            dbname_arg.join(':%(PORT)s' % database_config)
+        
+        if 'tab' in database_config and database_config['NAME']:
+            dbname_arg.join('/%(PORT)s' % database_config)
 
-    def generate(self, format_key, database_name, table_name, metadata, status=None, empty=False):
+        self.args.append(dbname_arg)
+        logger.debug('dbname_arg: %s' % (dbname_arg))
+        
+    def _set_args(self, database_name, table_name):
+        self.args.append('--table=%(schema)s.%(table)s' % (schema_name, table_name))
+        return self.args
+
+    def generate(self, format_key, schema_name, table_name, metadata, status=None, empty=False):
 
         if format_key == 'csv':
-            return self.generate_csv(database_name, table_name)
+            return self.generate_csv(schema_name, table_name)
 
         elif format_key == 'votable':
-            return self.generate_votable('TABLEDATA', database_name, table_name, metadata, status, empty)
+            return self.generate_votable('TABLEDATA', schema_name, table_name, metadata, status, empty)
 
         elif format_key == 'votable-binary':
-            return self.generate_votable('BINARY', database_name, table_name, metadata, status, empty)
+            return self.generate_votable('BINARY', schema_name, table_name, metadata, status, empty)
 
         elif format_key == 'votable-binary2':
-            return self.generate_votable('BINARY2', database_name, table_name, metadata, status, empty)
+            return self.generate_votable('BINARY2', schema_name, table_name, metadata, status, empty)
 
         else:
             raise Exception('Not supported.')
 
-    def _set_args(self, database_name, table_name):
-        return (self.args + [database_name, table_name])
+    def generate_csv(self, schema_name, table_name):
+        
+        args = self._set_args(self, schema_name, table_name)
 
-    def generate_csv(self, database_name, table_name):
-        args = self._set_args(self, database_name, table_name)
         process = subprocess.Popen(args, stdout=subprocess.PIPE)
 
         if sys.version_info.major >= 3:
@@ -87,8 +104,10 @@ class MysqldumpAdapter(DownloadAdapter):
                 csv.writer(f, quotechar='"').writerow(row)
                 yield f.getvalue()
 
-    def generate_votable(self, serialization, database_name, table_name, metadata, status, empty):
-        args = self._set_args(self, database_name, table_name)
+    def generate_votable(self, serialization, schema_name, table_name, metadata, status, empty):
+        
+        self.args.append('--table=%(schema)s.%(table)s' % (schema_name, table_name))
+
         process = subprocess.Popen(args, stdout=subprocess.PIPE)
 
         fmt_list, null_value_list = self._get_fmt_list(metadata['columns'])
@@ -99,7 +118,7 @@ class MysqldumpAdapter(DownloadAdapter):
     xmlns="http://www.ivoa.net/xml/VOTable/v1.3"
     xmlns:stc="http://www.ivoa.net/xml/STC/v1.30">
     <RESOURCE name="%(database)s" type="results">''' % {
-            'database': database_name
+            'database': schema_name
         }
         if status == 'OK':
             yield '''
@@ -188,4 +207,3 @@ class MysqldumpAdapter(DownloadAdapter):
     </RESOURCE>
 </VOTABLE>
 '''
-

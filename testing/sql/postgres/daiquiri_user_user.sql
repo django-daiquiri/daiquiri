@@ -8,9 +8,6 @@ CREATE TABLE daiquiri_user_user.test (
   "ra" int,
   "de" double precision,
   "parallax" double precision
-)
-WITH (
-  OIDS=FALSE
 );
 ALTER TABLE daiquiri_user_user.test OWNER TO daiquiri_data;
 

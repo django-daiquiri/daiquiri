@@ -5,7 +5,7 @@ from daiquiri.core.utils import import_class
 from .database.mysql import MySQLAdapter
 from .download.mysqldump import MysqldumpAdapter
 from .database.postgres import PostgreSQLAdapter
-
+from .download.postgresdump import PostgreSQLdumpAdapter
 
 _adapter = None
 
@@ -35,6 +35,8 @@ class Adapter(object):
 
             if self.database_config['ENGINE'] == 'django.db.backends.mysql':
                 self.download = MysqldumpAdapter(self.database_key, self.database_config)
+            elif self.database_config['ENGINE'] == 'django.db.backends.postgresql':
+                self.download = PostgreSQLdumpAdapter(self.database_key, self.database_config)
             else:
                 raise Exception('No suitable download adapter found.')
 
