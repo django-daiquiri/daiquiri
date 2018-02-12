@@ -1,3 +1,4 @@
+import logging
 import base64
 import csv
 import io
@@ -11,6 +12,7 @@ from bitstring import BitArray
 
 from .base import DownloadAdapter
 
+logger = logging.getLogger(__name__)
 
 class MysqldumpAdapter(DownloadAdapter):
 
@@ -69,123 +71,8 @@ class MysqldumpAdapter(DownloadAdapter):
             raise Exception('Not supported.')
 
     def _set_args(self, database_name, table_name):
-        return (self.args + [database_name, table_name])
-
-    def generate_csv(self, database_name, table_name):
-        args = self._set_args(self, database_name, table_name)
-        process = subprocess.Popen(args, stdout=subprocess.PIPE)
-
-        if sys.version_info.major >= 3:
-            io_class = io.StringIO
-        else:
-            io_class = io.BytesIO
-
-        for line in process.stdout:
-            row = self._parse_line(line)
-            if row:
-                f = io_class()
-                csv.writer(f, quotechar='"').writerow(row)
-                yield f.getvalue()
-
-    def generate_votable(self, serialization, database_name, table_name, metadata, status, empty):
-        args = self._set_args(self, database_name, table_name)
-        process = subprocess.Popen(args, stdout=subprocess.PIPE)
-
-        fmt_list, null_value_list = self._get_fmt_list(metadata['columns'])
-
-        yield '''<?xml version="1.0"?>
-<VOTABLE version="1.3"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns="http://www.ivoa.net/xml/VOTable/v1.3"
-    xmlns:stc="http://www.ivoa.net/xml/STC/v1.30">
-    <RESOURCE name="%(database)s" type="results">''' % {
-            'database': database_name
-        }
-        if status == 'OK':
-            yield '''
-        <INFO name="QUERY_STATUS" value="OK" />'''
-        elif status == 'OVERFLOW':
-            yield '''
-        <INFO name="QUERY_STATUS" value="OVERFLOW" />'''
-
-        yield '''
-        <TABLE name="%(table)s">''' % {
-            'table': table_name
-        }
-
-        if 'columns' in metadata:
-            for i, column in enumerate(metadata['columns']):
-                attrs = []
-                for key in ['name', 'datatype', 'arraysize', 'unit', 'ucd', 'utype']:
-                    if key in column and column[key]:
-                        attrs.append('%s="%s"' % (key, column[key]))
-
-                if serialization == 'BINARY':
-                    # for binary specify excplicit null value
-                    yield '''
-            <FIELD %s>
-                <VALUES null="%s" />
-            </FIELD>''' % (' '.join(attrs), null_value_list[i])
-
-                else:
-                    # just yield the field metadata
-                    yield '''
-            <FIELD %s />''' % ' '.join(attrs)
-
-        if not empty:
-            yield '''
-            <DATA>'''
-
-            # write serialization specific opening tag
-            if serialization == 'TABLEDATA':
-                yield '''
-                <TABLEDATA>'''
-            elif serialization == 'BINARY':
-                yield '''
-                <BINARY>
-                    <STREAM encoding="base64">'''
-            elif serialization == 'BINARY2':
-                yield '''
-                <BINARY2>
-                    <STREAM encoding="base64">'''
-
-            # write rows of the table from stdout of the mysqldump process
-            for line in process.stdout:
-                parsed_line = self._parse_line(line)
-                if parsed_line:
-                    if serialization == 'TABLEDATA':
-                        yield '''
-                    <TR>
-                        <TD>%s</TD>
-                    </TR>''' % '''</TD>
-                        <TD>'''.join([('' if cell == 'NULL' else cell) for cell in parsed_line])
-
-                    elif serialization == 'BINARY':
-                        values, null_mask = self._get_binary_values(parsed_line, fmt_list, null_value_list)
-                        binary_string = struct.pack('>' + ''.join(fmt_list), *values)
-                        yield base64.b64encode(binary_string).decode()
-
-                    elif serialization == 'BINARY2':
-                        values, null_mask = self._get_binary_values(parsed_line, fmt_list, null_value_list)
-                        binary_string = BitArray(bin=null_mask).tobytes() + struct.pack('>' + ''.join(fmt_list), *values)
-                        yield base64.b64encode(binary_string).decode()
-
-            # write serialization specific closing tag
-            if serialization == 'TABLEDATA':
-                yield '''
-                </TABLEDATA>'''
-            elif serialization == 'BINARY':
-                yield '''</STREAM>
-                </BINARY>'''
-            elif serialization == 'BINARY2':
-                yield '''</STREAM>
-                </BINARY2>'''
-
-            yield '''
-            </DATA>'''
-        yield '''
-        </TABLE>
-    </RESOURCE>
-</VOTABLE>
-'''
+        # append 'database_name table_name'
+        self.args.append(database_name)
+        self.args.append(table_name)
+        return self.args
 

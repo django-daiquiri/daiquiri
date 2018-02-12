@@ -9,7 +9,6 @@ from .download.postgresdump import PostgreSQLdumpAdapter
 
 _adapter = None
 
-
 class Adapter(object):
 
     def __init__(self):
@@ -32,11 +31,10 @@ class Adapter(object):
             download_adapter_class = import_class(settings.ADAPTER_DOWNLOAD)
             self.download = download_adapter_class(self.database_key, self.database_config)
         except AttributeError:
-
             if self.database_config['ENGINE'] == 'django.db.backends.mysql':
                 self.download = MysqldumpAdapter(self.database_key, self.database_config)
-            elif self.database_config['ENGINE'] == 'django.db.backends.postgresql':
-                self.download = PostgreSQLdumpAdapter(self.database_key, self.database_config)
+            if self.database_config['ENGINE'] == 'django.db.backends.postgresql':
+                self.download = PostgresQLdumpAdapter(self.database_key, self.database_config)
             else:
                 raise Exception('No suitable download adapter found.')
 

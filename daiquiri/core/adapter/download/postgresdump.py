@@ -39,37 +39,46 @@ class PostgreSQLdumpAdapter(DownloadAdapter):
     }
 
     def __init__(self, database_key, database_config):
-        self.args = ['pgdump']
-
         # TODO: argument string to pass
-        # pg_dump --table=schema.table --dbname=postgresql://user:password@host:port/database
+        # command line for pg_dump:
+        # pg_dump --dbname=postgresql://user:password@host:port/database --table=schema.table 
 
-        dbname_arg = 'postgresql://'
-        logger.debug('dbname_arg: %s' % (dbname_arg))
+        self.args = ['pg_dump']
+
+        dbname_arg = '--dbname=postgresql://'
 
         if 'USER' in database_config and database_config['USER']:
-            dbname_arg.join('%(USER)s' % database_config)
+            dbname_arg += '%(USER)s' % database_config
+
+        dbname_arg +=':' 
 
         if 'PASSWORD' in database_config and database_config['PASSWORD']:
-            dbname_arg.join(':%(PASSWORD)s' % database_config)
+            dbname_arg +='%(PASSWORD)s' % database_config
+        
+        dbname_arg +='@' 
 
         if 'HOST' in database_config and database_config['HOST']:
-            dbname_arg.join('@%(HOST)s' % database_config)
+            dbname_arg +='%(HOST)s' % database_config
 
         if 'PORT' in database_config and database_config['PORT']:
-            dbname_arg.join(':%(PORT)s' % database_config)
+            dbname_arg +=':%(PORT)s' % database_config
         
-        if 'tab' in database_config and database_config['NAME']:
-            dbname_arg.join('/%(PORT)s' % database_config)
+        dbname_arg +='/' 
+
+        if 'NAME' in database_config and database_config['NAME']:
+            dbname_arg +='%(NAME)s' % database_config
 
         self.args.append(dbname_arg)
-        logger.debug('dbname_arg: %s' % (dbname_arg))
+
         
-    def _set_args(self, database_name, table_name):
-        self.args.append('--table=%(schema)s.%(table)s' % (schema_name, table_name))
+    def _set_args(self, schema_name, table_name):
+        # append --table=schema.table
+        self.args.append('--table=%s.%s' % (schema_name, table_name))
         return self.args
 
     def generate(self, format_key, schema_name, table_name, metadata, status=None, empty=False):
+
+        logger.debug('postgres generate %s' % format_key)
 
         if format_key == 'csv':
             return self.generate_csv(schema_name, table_name)
@@ -87,10 +96,11 @@ class PostgreSQLdumpAdapter(DownloadAdapter):
             raise Exception('Not supported.')
 
     def generate_csv(self, schema_name, table_name):
-        
         args = self._set_args(self, schema_name, table_name)
-
-        process = subprocess.Popen(args, stdout=subprocess.PIPE)
+        try: 
+            process = subprocess.Popen(args, stdout=subprocess.PIPE)
+        except CalledProcessError as e:
+            logger.error('Command PIPE returned non-zero exit status: %s' % e)
 
         if sys.version_info.major >= 3:
             io_class = io.StringIO
@@ -105,8 +115,7 @@ class PostgreSQLdumpAdapter(DownloadAdapter):
                 yield f.getvalue()
 
     def generate_votable(self, serialization, schema_name, table_name, metadata, status, empty):
-        
-        self.args.append('--table=%(schema)s.%(table)s' % (schema_name, table_name))
+        args = self._set_args(self, schema_name, table_name)
 
         process = subprocess.Popen(args, stdout=subprocess.PIPE)
 

@@ -370,10 +370,9 @@ class PostgreSQLAdapter(DatabaseAdapter):
                 return column_metadata
             else:
                 for column in column_metadata:
-                    columnname = '(\'' + column['name'] + '\')'
+                    columnname = '(' + column['name'] + ')'
                     if str(rows).find(columnname) > -1:
                         column['indexed'] = True
-
             return column_metadata
 
 
