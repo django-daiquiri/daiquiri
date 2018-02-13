@@ -182,8 +182,9 @@ def check_permissions(user, keywords, tables, columns, functions):
             continue
         else:
             # check permission on function
-            function = Function.objects.filter_by_access_level(user).get(name=function_name)
-            if not function:
+            try:
+                Function.objects.filter_by_access_level(user).get(name=function_name)
+            except Function.DoesNotExist:
                 messages.append(_('Function %s not found.') % function_name)
                 continue
 
