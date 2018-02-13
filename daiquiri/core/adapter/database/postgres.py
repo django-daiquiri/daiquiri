@@ -80,9 +80,9 @@ class PostgreSQLAdapter(DatabaseAdapter):
         }
 
         if max_records is not None:
-            return 'SET SESSION statement_timeout TO %(timeout)s; CREATE TABLE %(schema)s.%(table)s AS %(query)s LIMIT %(max_records)s;' % params
+            return 'SET SESSION statement_timeout TO %(timeout)s; COMMIT; CREATE TABLE %(schema)s.%(table)s AS %(query)s LIMIT %(max_records)s;' % params
         else:
-            return 'SET SESSION statement_timeout TO %(timeout)s; CREATE TABLE %(schema)s.%(table)s AS %(query)s;' % params
+            return 'SET SESSION statement_timeout TO %(timeout)s; COMMIT; CREATE TABLE %(schema)s.%(table)s AS %(query)s;' % params
 
     def abort_query(self, pid):
         sql = 'select pg_terminate_backend(%(pid)i)' % {'pid': pid}
