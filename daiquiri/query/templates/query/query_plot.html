@@ -2,28 +2,56 @@
 
     <div class="row fieldset">
         <div class="col-md-5">
-            <formgroup
-                data-id="plot_x"
-                data-type="select"
-                data-label="{% trans 'X axis'%}"
-                data-model="service.plot.values.x"
-                data-errors="service.plot.errors.x"
-                data-options="service.job.columns"
-                data-options-id="name"
-                data-options-label="name">
-            </formgroup>
+            <div class="form-group" ng-class="{'has-error': service.plot.errors.x }">
+                <label class="control-label" for="plot_x">{% trans 'X axis'%}</label>
+
+                <select class="form-control" id="plot_x" ng-model="service.plot.values.x" ng-change="service.plot.errors.x = null">
+                    <option value="">---</option>
+                    <option value="{$ option.name $}"
+                        ng-repeat="option in service.job.columns">
+                        {$ option.name $}
+                    </option>
+                </select>
+
+                <ul class="help-block list-unstyled">
+                    <li ng-show="service.plot.errors.x">
+                        <span ng-show="service.plot.errors.x == 'empty'">
+                            {% trans 'No column selected' %}
+                        </span>
+                        <span ng-show="service.plot.errors.x != 'empty'">
+                            {% blocktrans with datatype='{$ service.plot.errors.x $}' %}
+                            Columns of the type {{ datatype }} can not be plotted
+                            {% endblocktrans%}
+                        </span>
+                    </li>
+                </ul>
+            </div>
         </div>
         <div class="col-md-5">
-            <formgroup
-                data-id="plot_y"
-                data-type="select"
-                data-label="{% trans 'Y axis'%}"
-                data-model="service.plot.values.y"
-                data-errors="service.plot.errors.y"
-                data-options="service.job.columns"
-                data-options-id="name"
-                data-options-label="name">
-            </formgroup>
+            <div class="form-group" ng-class="{'has-error': service.plot.errors.y }">
+                <label class="control-label" for="plot_y">{% trans 'Y axis'%}</label>
+
+                <select class="form-control" id="plot_y" ng-model="service.plot.values.y" ng-change="service.plot.errors.y = null">
+                    <option value="">---</option>
+                    <option value="{$ option.name $}"
+                        ng-repeat="option in service.job.columns">
+                        {$ option.name $}
+                    </option>
+                </select>
+
+                <ul class="help-block list-unstyled">
+                    <li ng-show="service.plot.errors.y">
+                        <span ng-show="service.plot.errors.y == 'empty'">
+                            {% trans 'No column selected' %}
+                        </span>
+                        <span ng-show="service.plot.errors.y != 'empty'">
+                            {% blocktrans with datatype='{$ service.plot.errors.y $}' %}
+                            Columns of the type {{ datatype }} can not be plotted
+                            {% endblocktrans%}
+                        </span>
+                    </li>
+                </ul>
+            </div>
         </div>
         <div class="col-md-2">
             <button class="btn btn-default daiquiri-query-plot-button" ng-click="service.plot.update()">
