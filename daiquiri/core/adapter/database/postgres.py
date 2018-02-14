@@ -85,7 +85,7 @@ class PostgreSQLAdapter(DatabaseAdapter):
             return 'SET SESSION statement_timeout TO %(timeout)s; COMMIT; CREATE TABLE %(schema)s.%(table)s AS %(query)s;' % params
 
     def abort_query(self, pid):
-        sql = 'select pg_terminate_backend(%(pid)i)' % {'pid': pid}
+        sql = 'select pg_cancel_backend(%(pid)i)' % {'pid': pid}
         self.execute(sql)
 
     def fetch_stats(self, schema_name, table_name):
@@ -308,10 +308,14 @@ class PostgreSQLAdapter(DatabaseAdapter):
             logger.error('Could not fetch %s.%s (%s)' % (schema_name, table_name, e))
             return {}
         else:
-            return {
-                'name': row[0],
-                'type': 'view' if row[1] == 'VIEW' else 'table'
-            }
+            if row is None:
+                logger.info('Could not fetch %s.%s (%s). Check if table and schema exist.' % (schema_name, table_name, e))
+                return []
+            else:
+                return {
+                    'name': row[0],
+                    'type': 'view' if row[1] == 'VIEW' else 'table'
+                }
 
     def rename_table(self, schema_name, table_name, new_table_name):
         sql = 'ALTER TABLE %(schema)s.%(table)s RENAME TO %(new_table)s;' % {
@@ -393,11 +397,15 @@ class PostgreSQLAdapter(DatabaseAdapter):
             logger.error('Could not fetch %s.%s.%s (%s)' % (schema_name, table_name, column_name, e))
             return []
         else:
-            column = {
-                'name': row[0],
-                'datatype': row[1],
-                'indexed': False
-            }
+            if row is None:
+                logger.info('Could not fetch %s.%s.%s (%s). Check if the schema exists.' % (schema_name, table_name, column_name, e))
+                return []
+            else:
+                column = {
+                    'name': row[0],
+                    'datatype': row[1],
+                    'indexed': False
+                }
 
             # check if indexed
             sql = 'SELECT indexdef FROM pg_indexes WHERE schemaname = %(schema)s AND tablename = %(table)s' % {

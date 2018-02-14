@@ -60,9 +60,9 @@ class CoreAdapterTestCase(TestCase):
             args_preset = ['mysqldump', '--compact', '--skip-extended-insert', '--user=daiquiri_data', '--password=daiquiri_data', 'daiquiri_archive', 'files']
         elif self.adapter.database_config['ENGINE'] == 'django.db.backends.postgresql':
             dbname = self.adapter.database_config['NAME']
-            args_preset = ['pg_dump', '--dbname=postgresql://daiquiri_data:daiquiri_data@localhost:5432/'+dbname, '--table=daiquiri_archive.files']
+            args_preset = ['pg_dump', '-a', '--inserts', '--dbname=postgresql://daiquiri_data:daiquiri_data@localhost:5432/'+dbname, '--table=daiquiri_archive.files']
         self.assertEqual(args, args_preset)
-
+            
 
         
     

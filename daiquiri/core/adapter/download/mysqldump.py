@@ -53,25 +53,9 @@ class MysqldumpAdapter(DownloadAdapter):
         if 'PORT' in database_config and database_config['PORT']:
             self.args.append('--port=%(PORT)s' % database_config)
 
-    def generate(self, format_key, database_name, table_name, metadata, status=None, empty=False):
-
-        if format_key == 'csv':
-            return self.generate_csv(database_name, table_name)
-
-        elif format_key == 'votable':
-            return self.generate_votable('TABLEDATA', database_name, table_name, metadata, status, empty)
-
-        elif format_key == 'votable-binary':
-            return self.generate_votable('BINARY', database_name, table_name, metadata, status, empty)
-
-        elif format_key == 'votable-binary2':
-            return self.generate_votable('BINARY2', database_name, table_name, metadata, status, empty)
-
-        else:
-            raise Exception('Not supported.')
 
     def _set_args(self, database_name, table_name):
-        # append 'database_name table_name'
+        # append ' database_name table_name'
         self.args.append(database_name)
         self.args.append(table_name)
         return self.args
