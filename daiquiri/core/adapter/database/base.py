@@ -1,3 +1,5 @@
+import six
+
 from django.db import connections
 
 

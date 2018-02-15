@@ -104,12 +104,13 @@ class FileTests(TestViewsetMixin, ArchiveTestCase):
             msg = OrderedDict((
                 ('username', username),
                 ('url', url),
+                ('row', row),
                 ('status_code', response.status_code)
             ))
 
             self.assertEqual(response.status_code, status_code, msg=msg)
 
-    def _test_detail_viewset_whithout_download(self, username):
+    def _test_detail_viewset_without_download(self, username):
 
         database_name = settings.ARCHIVE_DATABASE
         table_name = settings.ARCHIVE_TABLE
@@ -126,6 +127,7 @@ class FileTests(TestViewsetMixin, ArchiveTestCase):
             msg = OrderedDict((
                 ('username', username),
                 ('url', url),
+                ('row', row),
                 ('status_code', response.status_code)
             ))
 

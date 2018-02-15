@@ -27,3 +27,8 @@ FIXTURE_DIRS = (
 AUTH_SIGNUP = True
 
 AUTH_WORKFLOW = 'confirmation'
+
+ARCHIVE_ANONYMOUS = False
+ARCHIVE_BASE_PATH = os.path.join(BASE_DIR, 'files')
+
+SERVE_DOWNLOAD_DIR = os.path.join(BASE_DIR, 'files')

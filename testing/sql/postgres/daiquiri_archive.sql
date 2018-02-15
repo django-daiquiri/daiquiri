@@ -6,7 +6,7 @@ CREATE TABLE daiquiri_archive.files (
     "id"          CHAR(36) PRIMARY KEY NOT NULL,
     "timestamp"   timestamp NOT NULL,
     "file"        VARCHAR(256) NOT NULL,
-    "collection"  CHAR(32) NOT NULL,
+    "collection"  VARCHAR(32) NOT NULL,
     "path"        TEXT NOT NULL,
     "ra"          REAL NOT NULL,
     "de"          REAL NOT NULL

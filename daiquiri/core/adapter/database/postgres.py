@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 class PostgreSQLAdapter(DatabaseAdapter):
 
     DATATYPES = {
-        'char': {
+        'character': {
             'datatype': 'char',
             'arraysize': True
         },

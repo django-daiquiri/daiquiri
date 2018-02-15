@@ -36,14 +36,13 @@ class CoreAdapterTestCase(TestCase):
 
     def test_fetch_columns(self):
         columns = self.adapter.database.fetch_columns('daiquiri_archive', 'files')
-        test = False
-        if len(columns) == 7 and columns[0]['indexed'] == True:
-            test = True
-        self.assertEqual(test, True)
+
+        self.assertEqual(len(columns), 7)
+        self.assertTrue(columns[0]['indexed'])
 
     def test_fetch_column(self):
         column = self.adapter.database.fetch_column('daiquiri_archive', 'files', 'id')
-        self.assertEqual(column['datatype'], 'character')
+        self.assertEqual(column['datatype'], 'char', msg=column)
 
     def test_fetch_column_names(self):
         columns = self.adapter.database.fetch_column_names('daiquiri_data_obs', 'stars')
@@ -54,21 +53,27 @@ class CoreAdapterTestCase(TestCase):
         self.assertEqual(row, 10000)
 
     def test_download_set_args(self):
-        args = self.adapter.download._set_args('daiquiri_archive', 'files')
+        self.adapter.download.set_table('daiquiri_archive', 'files')
+
         if self.adapter.database_config['ENGINE'] == 'django.db.backends.mysql':
             # TODO: test
-            args_preset = ['mysqldump', '--compact', '--skip-extended-insert', '--user=daiquiri_data', '--password=daiquiri_data', 'daiquiri_archive', 'files']
+            args_preset = [
+                'mysqldump',
+                '--compact',
+                '--skip-extended-insert',
+                '--user=daiquiri_data',
+                '--password=daiquiri_data',
+                'daiquiri_archive',
+                'files'
+            ]
         elif self.adapter.database_config['ENGINE'] == 'django.db.backends.postgresql':
             dbname = self.adapter.database_config['NAME']
-            args_preset = ['pg_dump', '-a', '--inserts', '--dbname=postgresql://daiquiri_data:daiquiri_data@localhost:5432/'+dbname, '--table=daiquiri_archive.files']
-        self.assertEqual(args, args_preset)
-            
+            args_preset = [
+                'pg_dump',
+                '-a',
+                '--inserts',
+                '--dbname=postgresql://daiquiri_data:daiquiri_data@127.0.0.1:5432/' + dbname,
+                '--table=daiquiri_archive.files'
+            ]
 
-        
-    
-        
-
-
-
-
-
+        self.assertEqual(self.adapter.download.args, args_preset)
