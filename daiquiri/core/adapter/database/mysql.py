@@ -12,27 +12,6 @@ logger = logging.getLogger(__name__)
 
 class MySQLAdapter(DatabaseAdapter):
 
-    FUNCTIONS = (
-        # group_functions
-        'AVG', 'COUNT', 'MAX_SYM', 'MIN_SYM', 'SUM', 'BIT_AND', 'BIT_OR', 'BIT_XOR',
-        'BIT_COUNT', 'GROUP_CONCAT', 'STD', 'STDDEV', 'STDDEV_POP', 'STDDEV_SAMP',
-        'VAR_POP', 'VAR_SAMP', 'VARIANCE',
-        # number_functions
-        'ABS', 'ACOS', 'ASIN', 'ATAN2', 'ATAN', 'CEIL', 'CEILING', 'CONV', 'COS', 'COT',
-        'CRC32', 'DEGREES', 'EXP', 'FLOOR', 'LN', 'LOG10', 'LOG2', 'LOG', 'MOD', 'PI', 'POW',
-        'POWER', 'RADIANS', 'RAND', 'ROUND', 'SIGN', 'SIN', 'SQRT', 'TAN', 'TRUNCATE',
-        # time_functions
-        'ADDDATE', 'ADDTIME', 'CONVERT_TZ', 'CURDATE', 'CURTIME', 'DATE_ADD',
-        'DATE_FORMAT', 'DATE_SUB', 'DATE_SYM', 'DATEDIFF', 'DAYNAME', 'DAYOFMONTH',
-        'DAYOFWEEK', 'DAYOFYEAR', 'EXTRACT', 'FROM_DAYS', 'FROM_UNIXTIME', 'GET_FORMAT',
-        'HOUR', 'LAST_DAY', 'MAKEDATE', 'MAKETIME', 'MICROSECOND', 'MINUTE', 'MONTH',
-        'MONTHNAME', 'NOW', 'PERIOD_ADD', 'PERIOD_DIFF', 'QUARTER', 'SEC_TO_TIME',
-        'SECOND', 'STR_TO_DATE', 'SUBTIME', 'SYSDATE', 'TIME_FORMAT', 'TIME_TO_SEC',
-        'TIME_SYM', 'TIMEDIFF', 'TIMESTAMP', 'TIMESTAMPADD', 'TIMESTAMPDIFF', 'TO_DAYS',
-        'TO_SECONDS', 'UNIX_TIMESTAMP', 'UTC_DATE', 'UTC_TIME', 'UTC_TIMESTAMP', 'WEEK',
-        'WEEKDAY', 'WEEKOFYEAR', 'YEAR', 'YEARWEEK',
-    )
-
     DATATYPES = {
         'char': {
             'datatype': 'char',
@@ -339,21 +318,21 @@ class MySQLAdapter(DatabaseAdapter):
         try:
             rows = self.fetchall(sql)
         except ProgrammingError as e:
-            logger.error('Could not fetch from %s.%s (%s)' % (database_name, table_name, e))
+            logger.error('Could not fetch columns from %s.%s (%s)' % (database_name, table_name, e))
             return []
         else:
-            column_metadata = []
+            columns = []
             for row in rows:
                 datatype, arraysize = self.convert_datatype(row[1])
 
-                column_metadata.append({
+                columns.append({
                     'name': row[0],
                     'datatype': datatype,
                     'arraysize': arraysize,
                     'indexed': bool(row[4])
                 })
 
-            return column_metadata
+            return columns
 
     def fetch_column(self, database_name, table_name, column_name):
         # prepare sql string

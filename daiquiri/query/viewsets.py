@@ -286,12 +286,20 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
 
         try:
             download_job = DownloadJob.objects.get(job=job, format_key=format_key)
-            return sendfile(request, download_job.file_path, attachment=True)
+
+            # check if the file was lost
+            if download_job.phase == download_job.PHASE_COMPLETED and os.path.isfile(download_job.file_path):
+                # stream the previously created file
+                return sendfile(request, download_job.file_path, attachment=True)
         except DownloadJob.DoesNotExist:
-            file_name = '%s.%s' % (job.table_name, format_config['extension'])
-            response = FileResponse(job.stream(format_key), content_type=format_config['content_type'])
-            response['Content-Disposition'] = "attachment; filename=%s" % file_name
-            return response
+            pass
+
+        # stream the table directly from the database
+        file_name = '%s.%s' % (job.table_name, format_config['extension'])
+        response = FileResponse(job.stream(format_key), content_type=format_config['content_type'])
+        response['Content-Disposition'] = "attachment; filename=%s" % file_name
+        return response
+
 
 
 class ExampleViewSet(viewsets.ModelViewSet):

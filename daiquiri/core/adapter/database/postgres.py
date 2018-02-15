@@ -1,5 +1,4 @@
 import logging
-import re
 import six
 import warnings
 
@@ -25,15 +24,11 @@ class PostgreSQLAdapter(DatabaseAdapter):
             'datatype': 'char',
             'arraysize': True
         },
-        # 'smallint': {
-        #     'datatype': 'unsignedByte',
-        #     'arraysize': False
-        # },
         'smallint': {
             'datatype': 'short',
             'arraysize': False
         },
-        'int': {
+        'integer': {
             'datatype': 'int',
             'arraysize': False
         },
@@ -56,6 +51,10 @@ class PostgreSQLAdapter(DatabaseAdapter):
         'array': {
             'datatype': 'array',
             'arraysize': True
+        },
+        'spoint': {
+            'datatype': 'spoint',
+            'arraysize': False
         }
     }
 
@@ -335,32 +334,26 @@ class PostgreSQLAdapter(DatabaseAdapter):
         self.execute(sql)
 
     def fetch_columns(self, schema_name, table_name):
-        logger.debug('fetch_columns: attributes %s %s' % (schema_name, table_name))
+        logger.debug('fetch_columns %s %s' % (schema_name, table_name))
 
         # prepare sql string
-        sql = 'SELECT column_name, data_type FROM information_schema.columns where table_schema = %(schema)s AND table_name = %(table)s' % {
+        sql = 'SELECT column_name, data_type, udt_name, character_maximum_length FROM information_schema.columns WHERE table_schema = %(schema)s AND table_name = %(table)s' % {
             'schema': self.escape_string(schema_name),
             'table': self.escape_string(table_name)
         }
 
-        logger.debug('fetch_columns: sql %s' % (sql))
+        logger.debug('fetch_columns ' + sql)
 
         # execute query
         try:
             rows = self.fetchall(sql)
         except ProgrammingError as e:
-            logger.error('Could not fetch from %s.%s (%s)' % (schema_name, table_name, e))
+            logger.error('Could not fetch columns from %s.%s (%s)' % (schema_name, table_name, e))
             return []
         else:
-            column_metadata = []
+            columns = []
             for row in rows:
-                datatype, arraysize = self.convert_datatype(row[1])
-                column_metadata.append({
-                    'name': row[0],
-                    'datatype': datatype,
-                    'arraysize': arraysize,
-                    'indexed': False
-                })
+                columns.append(self.parse_column(row))
 
             # check if indexed
             sql = 'SELECT indexdef FROM pg_indexes WHERE schemaname = %(schema)s AND tablename = %(table)s' % {
@@ -371,24 +364,24 @@ class PostgreSQLAdapter(DatabaseAdapter):
                 rows = self.fetchall(sql)
             except OperationalError as e:
                 logger.error('Could not fetch indexes of %s.%s (%s)' % (schema_name, table_name, e))
-                return column_metadata
+                return columns
             else:
-                for column in column_metadata:
+                for column in columns:
                     columnname = '(' + column['name'] + ')'
                     if str(rows).find(columnname) > -1:
                         column['indexed'] = True
-            return column_metadata
+            return columns
 
 
     def fetch_column(self, schema_name, table_name, column_name):
         # prepare sql string
-        sql = 'SELECT column_name, data_type  FROM information_schema.columns where table_schema = %(schema)s AND table_name = %(table)s AND column_name = %(column)s' % {
+        sql = 'SELECT column_name, data_type, udt_name, character_maximum_length FROM information_schema.columns WHERE table_schema = %(schema)s AND table_name = %(table)s AND column_name = %(column)s' % {
             'schema': self.escape_string(schema_name),
             'table': self.escape_string(table_name),
             'column': self.escape_string(column_name)
         }
 
-        logger.debug('fetch_column: %s:' % (sql))
+        logger.debug('fetch_column ' + sql)
 
         # execute query
         try:
@@ -398,14 +391,10 @@ class PostgreSQLAdapter(DatabaseAdapter):
             return []
         else:
             if row is None:
-                logger.info('Could not fetch %s.%s.%s (%s). Check if the schema exists.' % (schema_name, table_name, column_name, e))
+                logger.info('Could not fetch %s.%s.%s. Check if the schema exists.' % (schema_name, table_name, column_name))
                 return []
             else:
-                column = {
-                    'name': row[0],
-                    'datatype': row[1],
-                    'indexed': False
-                }
+                column = self.parse_column(row)
 
             # check if indexed
             sql = 'SELECT indexdef FROM pg_indexes WHERE schemaname = %(schema)s AND tablename = %(table)s' % {
@@ -433,32 +422,32 @@ class PostgreSQLAdapter(DatabaseAdapter):
             'table': self.escape_string(table_name)
         }
 
-        logger.debug('fetch_column_names: sql: %s ' % (sql))
-
+        logger.debug('fetch_column_names ' + sql)
         return [column[0] for column in self.fetchall(sql)]
 
 
-    def convert_datatype(self, datatype_string):
-        result = re.match('([a-z]+)\(*(\d*)\)*', datatype_string)
+    def parse_column(self, row):
+        column = {
+            'name': row[0]
+        }
 
-        if result:
-            native_datatype = result.group(1)
-
-            try:
-                native_arraysize = int(result.group(2))
-            except ValueError:
-                native_arraysize = None
-
-            if native_datatype in self.DATATYPES:
-                datatype = self.DATATYPES[native_datatype]['datatype']
-
-                if self.DATATYPES[native_datatype]['arraysize']:
-                    arraysize = native_arraysize
-                else:
-                    arraysize = None
-
-                return datatype, arraysize
-            else:
-                return native_datatype, native_arraysize
+        if row[1] in self.DATATYPES:
+            datatype = self.DATATYPES[row[1]]
+        elif row[2] in self.DATATYPES:
+            datatype = self.DATATYPES[row[2]]
         else:
-            return datatype_string, None
+            datatype = None
+
+        if datatype:
+            column['datatype'] = datatype['datatype']
+
+            if datatype['arraysize']:
+                column['arraysize'] = row[3]
+            else:
+                column['arraysize'] = None
+        else:
+            column['datatype'] = None
+            column['arraysize'] = None
+
+        logger.debug('parse_column %s -> %s' % (str(row), str(column)))
+        return column

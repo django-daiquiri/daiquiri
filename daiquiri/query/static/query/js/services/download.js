@@ -55,6 +55,12 @@ app.factory('DownloadService', ['$http', 'PollingService', function($http, Polli
 
                 // download the file, headers will prevent the browser reloading the page
                 window.location.href = url;
+            } else {
+                service.pending_downloads--;
+                PollingService.unregister(options.download_id);
+
+                // display error message
+                options.job.download_failed = true;
             }
         }, function() {
             service.pending_downloads--;

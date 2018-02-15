@@ -3,7 +3,6 @@ from django.db import connections
 
 class DatabaseAdapter(object):
 
-
     FUNCTIONS = (
         # char_functions
        'ASCII_SYM', 'BIN', 'BIT_LENGTH', 'CHAR_LENGTH', 'CHAR', 'CONCAT_WS', 'CONCAT',
@@ -91,9 +90,6 @@ class DatabaseAdapter(object):
 
     def create_user_schema_if_not_exists(self, schema_name):
         raise NotImplementedError()
-
-    # def create_user_database_if_not_exists(self, database_name):
-    #    raise NotImplementedError()
 
     def fetch_tables(self, database_name):
         raise NotImplementedError()

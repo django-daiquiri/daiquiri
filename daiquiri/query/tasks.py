@@ -193,23 +193,28 @@ def create_download_file(download_id):
     download_job.save()
 
     # write file using the generator in the adapter
-    with open(download_job.file_path, 'w') as f:
-        for line in get_adapter().download.generate(
-                download_job.format_key,
-                download_job.job.database_name,
-                download_job.job.table_name,
-                download_job.job.metadata,
-                download_job.job.result_status,
-                (download_job.job.nrows == 0)):
-            f.write(line)
-
-    download_job.end_time = now()
-    download_job.execution_duration = (download_job.end_time - download_job.start_time).seconds
-    download_job.phase = download_job.PHASE_COMPLETED
-    download_job.save()
-
-    # log completion
-    logger.info('create_download_file %s completed' % download_job.file_path)
+    try:
+        with open(download_job.file_path, 'w') as f:
+            for line in get_adapter().download.generate(
+                    download_job.format_key,
+                    download_job.job.database_name,
+                    download_job.job.table_name,
+                    download_job.job.metadata,
+                    download_job.job.result_status,
+                    (download_job.job.nrows == 0)):
+                f.write(line)
+    except Exception as e:
+        download_job.phase = download_job.PHASE_ERROR
+        download_job.error_summary = str(e)
+        download_job.save()
+        logger.info('run_query %s failed (%s)' % (download_job.id, download_job.error_summary))
+    else:
+        download_job.phase = download_job.PHASE_COMPLETED
+        logger.info('create_download_file %s completed' % download_job.file_path)
+    finally:
+        download_job.end_time = now()
+        download_job.execution_duration = (download_job.end_time - download_job.start_time).seconds
+        download_job.save()
 
 
 @shared_task(track_started=True, base=Task)

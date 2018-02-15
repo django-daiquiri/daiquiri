@@ -1,22 +1,11 @@
 import logging
-import base64
-import csv
-import io
-import re
-import six
-import struct
-import subprocess
-import sys
-
-from bitstring import BitArray
 
 from .base import DownloadAdapter
 
 logger = logging.getLogger(__name__)
 
-class MysqldumpAdapter(DownloadAdapter):
 
-    insert_pattern = re.compile('^INSERT INTO .*? VALUES \((.*?)\);')
+class MysqldumpAdapter(DownloadAdapter):
 
     FORMATS = {
         'char': 'c',
@@ -54,9 +43,7 @@ class MysqldumpAdapter(DownloadAdapter):
             self.args.append('--port=%(PORT)s' % database_config)
 
 
-    def _set_args(self, database_name, table_name):
+    def set_table(self, database_name, table_name):
         # append ' database_name table_name'
         self.args.append(database_name)
         self.args.append(table_name)
-        return self.args
-
