@@ -182,14 +182,10 @@ class QueryJob(Job):
             try:
                 if adapter.database_config['ENGINE'] == 'django.db.backends.mysql':
                     translated_query = translator.to_mysql()
-                # TODO: adql to postgres translator
-                # elif adapter.database_config['ENGINE'] == 'django.db.backends.postgresql':
-                #    translated_query = translator.to_postgres()
+                elif adapter.database_config['ENGINE'] == 'django.db.backends.postgresql':
+                    translated_query = translator.to_postgresql()
                 else:
-                    # TODO: check error type
-                    raise ValidationError({
-                        'query': [_('The query could not be translated. The engine of the database must be postgres or mysql.')]
-                    })
+                    raise Exception('Unknown database engine')
 
             except QuerySyntaxError as e:
                 raise ValidationError({
@@ -215,10 +211,7 @@ class QueryJob(Job):
             elif adapter.database_config['ENGINE'] == 'django.db.backends.postgresql':
                 processor = PostgreSQLQueryProcessor(translated_query)
             else:
-                    # TODO: check error type
-                    raise ValidationError({
-                        'query': [_('The query could not be translated. The engine of the database must be postgres or mysql.')]
-                    })
+                raise Exception('Unknown database engine')
 
             processor.process_query(replace_schema_name={
                 'TAP_SCHEMA': settings.TAP_SCHEMA
