@@ -110,7 +110,6 @@ def check_permissions(user, keywords, tables, columns, functions):
     if not settings.METADATA_COLUMN_PERMISSIONS:
         # check permissions on databases/tables
         for database_name, table_name in tables:
-            print(database_name in [None, settings.TAP_SCHEMA, get_user_database_name(user)])
             # check permission on database
             if database_name in [None, settings.TAP_SCHEMA, get_user_database_name(user)]:
                 continue
