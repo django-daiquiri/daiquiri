@@ -1,5 +1,4 @@
 import logging
-import six
 import warnings
 
 from django.db import OperationalError, ProgrammingError
@@ -102,8 +101,9 @@ class PostgreSQLAdapter(DatabaseAdapter):
         }
         size = self.fetchone(sql)[0]
 
-        logger.debug('fetch_stats: %d, %d' % (nrows, size))
-
+        # log values and return
+        logger.debug('nrows = %d', nrows)
+        logger.debug('size = %d', size)
         return nrows, size
 
     def count_rows(self, schema_name, table_name, column_names=None, search=None, filters=None):
@@ -194,69 +194,6 @@ class PostgreSQLAdapter(DatabaseAdapter):
 
         return self.fetchall(sql, args=sql_args)
 
-    def _process_filtering(self, sql, sql_args, search, filters, escaped_column_names):
-        # prepare lists for the WHERE statements
-        where_stmts = []
-        where_args = []
-
-        if search:
-            # append an OR condition fo every column
-            search_stmts = []
-            search_args = []
-            for escaped_column_name in escaped_column_names:
-                search_stmts.append(escaped_column_name + ' LIKE %s')
-                search_args.append('%' + search + '%')
-
-            if search_stmts:
-                where_stmts.append('(' + ' OR '.join(search_stmts) + ')')
-                where_args += search_args
-
-        if filters:
-            for column_name, column_filter in filters.items():
-                # escpae the column_name for this column
-                escaped_column_name = self.escape_identifier(column_name)
-
-                # check if the filter is a list or a string
-                if isinstance(column_filter, six.string_types):
-                    filter_list = [column_filter]
-                elif isinstance(column_filter, list):
-                    filter_list = column_filter
-                else:
-                    raise RuntimeError('Unsupported filter for column "%s"' % column_name)
-
-                # append a OR condition fo every entry in the list
-                filter_stmts = []
-                filter_args = []
-                for filter_string in filter_list:
-                    filter_stmts.append(escaped_column_name + ' = %s')
-                    filter_args.append(filter_string)
-
-                if filter_stmts:
-                    where_stmts.append('(' + ' OR '.join(filter_stmts) + ')')
-                    where_args += filter_args
-
-        # connect the where statements with AND and append to the sql string
-        if where_stmts:
-            sql += ' WHERE ' + ' AND '.join(where_stmts)
-            sql_args += where_args
-
-        return sql, sql_args
-
-    def _process_ordering(self, sql, ordering, escaped_column_names):
-        if ordering:
-            if ordering.startswith('-'):
-                escaped_ordering_column, ordering_direction = self.escape_identifier(ordering[1:]), 'DESC'
-            else:
-                escaped_ordering_column, ordering_direction = self.escape_identifier(ordering), 'ASC'
-
-            if escaped_ordering_column in escaped_column_names:
-                sql += ' ORDER BY %(column)s %(direction)s' % {
-                    'column': escaped_ordering_column,
-                    'direction': ordering_direction
-                }
-
-        return sql
-
     def create_user_schema_if_not_exists(self, schema_name):
         # escape input
         escaped_schema_name = self.escape_identifier(schema_name)
@@ -265,6 +202,9 @@ class PostgreSQLAdapter(DatabaseAdapter):
         sql = 'CREATE SCHEMA IF NOT EXISTS %(schema)s' % {
             'schema': escaped_schema_name
         }
+
+        # log sql string
+        logger.debug('sql = "%s"', sql)
 
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
@@ -278,6 +218,9 @@ class PostgreSQLAdapter(DatabaseAdapter):
         sql = 'SELECT table_name, table_type FROM information_schema.tables where table_schema = %(schema)s' % {
             'schema': escaped_schema_name
         }
+
+        # log sql string
+        logger.debug('sql = "%s"', sql)
 
         # execute query
         try:
@@ -298,17 +241,18 @@ class PostgreSQLAdapter(DatabaseAdapter):
             'table': self.escape_string(table_name)
         }
 
-        logger.debug('fetch_table: sql %s ' % (sql))
+        # log sql string
+        logger.debug('sql = "%s"', sql)
 
         # execute query
         try:
             row = self.fetchone(sql)
         except OperationalError as e:
-            logger.error('Could not fetch %s.%s (%s)' % (schema_name, table_name, e))
+            logger.error('Could not fetch %s.%s (%s)', schema_name, table_name, e)
             return {}
         else:
             if row is None:
-                logger.info('Could not fetch %s.%s (%s). Check if table and schema exist.' % (schema_name, table_name, e))
+                logger.info('Could not fetch %s.%s. Check if table and schema exist.', schema_name, table_name)
                 return []
             else:
                 return {
@@ -323,6 +267,8 @@ class PostgreSQLAdapter(DatabaseAdapter):
             'new_table': self.escape_identifier(new_table_name)
         }
 
+        # log sql string and execute
+        logger.debug('sql = "%s"', sql)
         self.execute(sql)
 
     def drop_table(self, schema_name, table_name):
@@ -331,6 +277,8 @@ class PostgreSQLAdapter(DatabaseAdapter):
             'table': self.escape_identifier(table_name)
         }
 
+        # log sql string and execute
+        logger.debug('sql = "%s"', sql)
         self.execute(sql)
 
     def fetch_columns(self, schema_name, table_name):
@@ -342,13 +290,14 @@ class PostgreSQLAdapter(DatabaseAdapter):
             'table': self.escape_string(table_name)
         }
 
-        logger.debug('fetch_columns ' + sql)
+        # log sql string
+        logger.debug('sql = "%s"', sql)
 
         # execute query
         try:
             rows = self.fetchall(sql)
         except ProgrammingError as e:
-            logger.error('Could not fetch columns from %s.%s (%s)' % (schema_name, table_name, e))
+            logger.error('Could not fetch columns from %s.%s (%s)', schema_name, table_name, e)
             return []
         else:
             columns = []
@@ -360,10 +309,14 @@ class PostgreSQLAdapter(DatabaseAdapter):
                 'schema': self.escape_string(schema_name),
                 'table': self.escape_string(table_name)
             }
+
+            # log sql string
+            logger.debug('sql = "%s"', sql)
+
             try:
                 rows = self.fetchall(sql)
             except OperationalError as e:
-                logger.error('Could not fetch indexes of %s.%s (%s)' % (schema_name, table_name, e))
+                logger.error('Could not fetch indexes of %s.%s (%s)', schema_name, table_name, e)
                 return columns
             else:
                 for column in columns:
@@ -381,17 +334,18 @@ class PostgreSQLAdapter(DatabaseAdapter):
             'column': self.escape_string(column_name)
         }
 
-        logger.debug('fetch_column ' + sql)
+        # log sql string
+        logger.debug('sql = "%s"', sql)
 
         # execute query
         try:
             row = self.fetchone(sql)
         except ProgrammingError as e:
-            logger.error('Could not fetch %s.%s.%s (%s)' % (schema_name, table_name, column_name, e))
+            logger.error('Could not fetch %s.%s.%s (%s)', schema_name, table_name, column_name, e)
             return []
         else:
             if row is None:
-                logger.info('Could not fetch %s.%s.%s. Check if the schema exists.' % (schema_name, table_name, column_name))
+                logger.info('Could not fetch %s.%s.%s. Check if the schema exists.', schema_name, table_name, column_name)
                 return []
             else:
                 column = self.parse_column(row)
@@ -401,10 +355,14 @@ class PostgreSQLAdapter(DatabaseAdapter):
                 'schema': self.escape_string(schema_name),
                 'table': self.escape_string(table_name)
             }
+
+            # log sql string
+            logger.debug('sql = "%s"', sql)
+
             try:
                 rows = self.fetchall(sql)
             except OperationalError as e:
-                logger.error('Could not fetch indexes of %s.%s.%s (%s)' % (schema_name, table_name, column_name, e))
+                logger.error('Could not fetch indexes of %s.%s.%s (%s)', schema_name, table_name, column_name, e)
                 return column
             else:
                 columnname = '(\'' + column['name'] + '\')'
@@ -414,7 +372,8 @@ class PostgreSQLAdapter(DatabaseAdapter):
 
 
     def fetch_column_names(self, schema_name, table_name):
-        logger.debug('fetch_column_names: %s %s' % (schema_name, table_name))
+        logger.debug('schema_name = "%s"', schema_name)
+        logger.debug('table_name = "%s"', table_name)
 
         # prepare sql string
         sql = 'SELECT column_name FROM information_schema.columns where table_schema = %(schema)s AND table_name = %(table)s' % {
@@ -422,7 +381,8 @@ class PostgreSQLAdapter(DatabaseAdapter):
             'table': self.escape_string(table_name)
         }
 
-        logger.debug('fetch_column_names ' + sql)
+        # log values and return
+        logger.debug('sql = "%s"', sql)
         return [column[0] for column in self.fetchall(sql)]
 
 
@@ -449,5 +409,7 @@ class PostgreSQLAdapter(DatabaseAdapter):
             column['datatype'] = None
             column['arraysize'] = None
 
-        logger.debug('parse_column %s -> %s' % (str(row), str(column)))
+        # log values and return
+        logger.debug('row = %s', row)
+        logger.debug('column = %s', column)
         return column

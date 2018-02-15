@@ -83,7 +83,7 @@ def run_query(job_id):
     job.start_time = now()
     job.save()
 
-    logger.info('run_query %s started' % job.id)
+    logger.info('job %s started' % job.id)
 
     # get the actual query and submit the job to the database
     try:
@@ -93,7 +93,7 @@ def run_query(job_id):
     except (ProgrammingError, InternalError) as e:
         job.phase = job.PHASE_ERROR
         job.error_summary = str(e)
-        logger.info('run_query %s failed (%s)' % (job.id, job.error_summary))
+        logger.info('job %s failed (%s)' % (job.id, job.error_summary))
 
     except OperationalError as e:
         # load the job again and check if the job was killed
@@ -102,12 +102,12 @@ def run_query(job_id):
         if job.phase != job.PHASE_ABORTED:
             job.phase = job.PHASE_ERROR
             job.error_summary = str(e)
-            logger.info('run_query %s failed (%s)' % (job.id, job.error_summary))
+            logger.info('job %s failed (%s)' % (job.id, job.error_summary))
 
     else:
         # get additional information about the completed job
         job.phase = job.PHASE_COMPLETED
-        logger.info('run_query %s completed' % job.id)
+        logger.info('job %s completed' % job.id)
 
     finally:
         # get timing and save the job object
@@ -180,7 +180,7 @@ def create_download_file(download_id):
     download_job = DownloadJob.objects.get(pk=download_id)
 
     # log start
-    logger.info('create_download_file %s started' % download_job.file_path)
+    logger.info('download_job %s started' % download_job.file_path)
 
     # create directory if necessary
     try:
@@ -207,10 +207,10 @@ def create_download_file(download_id):
         download_job.phase = download_job.PHASE_ERROR
         download_job.error_summary = str(e)
         download_job.save()
-        logger.info('run_query %s failed (%s)' % (download_job.id, download_job.error_summary))
+        logger.info('download_job %s failed (%s)' % (download_job.id, download_job.error_summary))
     else:
         download_job.phase = download_job.PHASE_COMPLETED
-        logger.info('create_download_file %s completed' % download_job.file_path)
+        logger.info('download_job %s completed' % download_job.file_path)
     finally:
         download_job.end_time = now()
         download_job.execution_duration = (download_job.end_time - download_job.start_time).seconds

@@ -24,7 +24,7 @@ def create_archive_zip_file(archive_job_id):
     archive_job = ArchiveJob.objects.get(pk=archive_job_id)
 
     # log start
-    logger.info('create_archive_zip_file %s started' % archive_job.file_path)
+    logger.info('archive_job %s started' % archive_job.file_path)
 
     # create directory if necessary
     try:
@@ -48,4 +48,4 @@ def create_archive_zip_file(archive_job_id):
     archive_job.save()
 
     # log completion
-    logger.info('create_archive_zip_file %s completed' % archive_job.file_path)
+    logger.info('archive_job %s completed' % archive_job.file_path)

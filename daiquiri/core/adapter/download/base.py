@@ -184,8 +184,8 @@ class DownloadAdapter(object):
                 null_value_list.append(self.NULL_VALUES[column['datatype']])
 
         # log and return
-        logger.debug('get_lists fmt_list = %s' % fmt_list)
-        logger.debug('get_lists null_value_list = %s' % null_value_list)
+        logger.debug('fmt_list = %s' % fmt_list)
+        logger.debug('null_value_list = %s' % null_value_list)
         return fmt_list, null_value_list
 
     def get_binary_string(self, columns, parsed_line, serialization):
@@ -218,9 +218,9 @@ class DownloadAdapter(object):
                         values.append(cell)
 
         # log values
-        logger.debug('get_binary_string null_mask = %s' % null_mask)
-        logger.debug('get_binary_string fmt_string = %s' % fmt_string)
-        logger.debug('get_binary_string values = %s' % values)
+        logger.debug('null_mask = "%s"' % null_mask)
+        logger.debug('fmt_string = "%s"' % fmt_string)
+        logger.debug('values = %s' % values)
 
         # create binary string
         binary_string = struct.pack(fmt_string, *values)

@@ -111,3 +111,66 @@ class DatabaseAdapter(object):
 
     def fetch_column_names(self, database_name, table_name):
         raise NotImplementedError()
+
+    def _process_filtering(self, sql, sql_args, search, filters, escaped_column_names):
+        # prepare lists for the WHERE statements
+        where_stmts = []
+        where_args = []
+
+        if search:
+            # append a OR condition fo every column
+            search_stmts = []
+            search_args = []
+            for escaped_column_name in escaped_column_names:
+                search_stmts.append(escaped_column_name + ' LIKE %s')
+                search_args.append('%' + search + '%')
+
+            if search_stmts:
+                where_stmts.append('(' + ' OR '.join(search_stmts) + ')')
+                where_args += search_args
+
+        if filters:
+            for column_name, column_filter in filters.items():
+                # escpae the column_name for this column
+                escaped_column_name = self.escape_identifier(column_name)
+
+                # check if the filter is a list or a string
+                if isinstance(column_filter, six.string_types):
+                    filter_list = [column_filter]
+                elif isinstance(column_filter, list):
+                    filter_list = column_filter
+                else:
+                    raise RuntimeError('Unsupported filter for column "%s"' % column_name)
+
+                # append a OR condition fo every entry in the list
+                filter_stmts = []
+                filter_args = []
+                for filter_string in filter_list:
+                    filter_stmts.append(escaped_column_name + ' = %s')
+                    filter_args.append(filter_string)
+
+                if filter_stmts:
+                    where_stmts.append('(' + ' OR '.join(filter_stmts) + ')')
+                    where_args += filter_args
+
+        # connect the where statements with AND and append to the sql string
+        if where_stmts:
+            sql += ' WHERE ' + ' AND '.join(where_stmts)
+            sql_args += where_args
+
+        return sql, sql_args
+
+    def _process_ordering(self, sql, ordering, escaped_column_names):
+        if ordering:
+            if ordering.startswith('-'):
+                escaped_ordering_column, ordering_direction = self.escape_identifier(ordering[1:]), 'DESC'
+            else:
+                escaped_ordering_column, ordering_direction = self.escape_identifier(ordering), 'ASC'
+
+            if escaped_ordering_column in escaped_column_names:
+                sql += ' ORDER BY %(column)s %(direction)s' % {
+                    'column': escaped_ordering_column,
+                    'direction': ordering_direction
+                }
+
+        return sql

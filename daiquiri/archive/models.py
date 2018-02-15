@@ -171,11 +171,11 @@ class ArchiveJob(Job):
 
             archive_job_id = str(self.id)
             if not settings.ASYNC:
-                logger.info('create_archive_zip_file %s submitted (sync)' % archive_job_id)
+                logger.info('archive_job %s submitted (sync)' % archive_job_id)
                 create_archive_zip_file.apply((archive_job_id, ), task_id=archive_job_id, throw=True)
 
             else:
-                logger.info('create_archive_zip_file %s submitted (async, queue=download)' % archive_job_id)
+                logger.info('archive_job %s submitted (async, queue=download)' % archive_job_id)
                 create_archive_zip_file.apply_async((archive_job_id, ), task_id=archive_job_id, queue='download')
 
         else:

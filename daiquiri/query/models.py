@@ -176,6 +176,9 @@ class QueryJob(Job):
         # get the adapter
         adapter = get_adapter()
 
+        # log the input query
+        logger.debug('query = "%s"', self.query)
+
         # translate adql -> mysql string
         if self.query_language == 'adql-2.0':
             translator = ADQLQueryTranslator(self.query)
@@ -204,6 +207,9 @@ class QueryJob(Job):
         else:
             translated_query = self.query
 
+        # log the translated query
+        logger.debug('translated_query = "%s"', translated_query)
+
         # parse the query
         try:
             if adapter.database_config['ENGINE'] == 'django.db.backends.mysql':
@@ -230,6 +236,12 @@ class QueryJob(Job):
                     'messages': e.messages,
                 }
             })
+
+        # log the processor output
+        logger.debug('processor.keywords = %s', processor.keywords)
+        logger.debug('processor.tables = %s', processor.tables)
+        logger.debug('processor.columns = %s', processor.columns)
+        logger.debug('processor.functions = %s', processor.functions)
 
         # check permissions
         permission_messages = check_permissions(self.owner, processor.keywords, processor.tables, processor.columns, processor.functions)
@@ -272,6 +284,9 @@ class QueryJob(Job):
         # get the native query from the processor (without trailing semicolon)
         self.native_query = processor.query.rstrip(';')
 
+        # log the native query
+        logger.debug('native_query = "%s"', self.native_query)
+
         # set clean flag
         self.is_clean = True
 
@@ -286,7 +301,7 @@ class QueryJob(Job):
             # start the submit_query task in a syncronous or asuncronous way
             job_id = str(self.id)
             if not settings.ASYNC or sync:
-                logger.info('run_query %s submitted (sync)' % self.id)
+                logger.info('job %s submitted (sync)' % self.id)
                 run_query.apply((job_id, ), task_id=job_id, throw=True)
 
             else:
@@ -294,7 +309,7 @@ class QueryJob(Job):
                     self.queue = get_default_queue()
                     self.save()
 
-                logger.info('run_query %s submitted (async, queue=query, priority=%s)' % (self.id, self.priority))
+                logger.info('job %s submitted (async, queue=query, priority=%s)' % (self.id, self.priority))
                 run_query.apply_async((job_id, ), task_id=job_id, queue='query', priority=self.priority)
 
         else:
@@ -507,6 +522,11 @@ class QueryArchiveJob(Job):
         return os.path.join(directory_name, '%s.%s.zip' % (self.job.table_name, self.column_name))
 
     def process(self):
+        try:
+            format_config = get_format_config(self.format_key)
+        except IndexError:
+            raise ValidationError({'format_key': "Not supported."})
+
         if self.job.phase == self.PHASE_COMPLETED:
             self.owner = self.job.owner
         else:
@@ -560,12 +580,12 @@ class QueryArchiveJob(Job):
 
             archive_id = str(self.id)
             if not settings.ASYNC:
-                logger.info('create_download_file %s submitted (sync)' % archive_id)
-                create_archive_file.apply((archive_id, ), task_id=archive_id, throw=True)
+                logger.info('download_job %s submitted (sync)' % download_job_id)
+                create_download_file.apply((download_job_id, ), task_id=download_job_id, throw=True)
 
             else:
-                logger.info('create_download_file %s submitted (async, queue=download)' % archive_id)
-                create_archive_file.apply_async((archive_id, ), task_id=archive_id, queue='download')
+                logger.info('download_job %s submitted (async, queue=download)' % download_job_id)
+                create_download_file.apply_async((download_job_id, ), task_id=download_job_id, queue='download')
 
         else:
             raise ValidationError({
