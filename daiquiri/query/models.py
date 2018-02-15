@@ -181,8 +181,9 @@ class QueryJob(Job):
 
         # translate adql -> mysql string
         if self.query_language == 'adql-2.0':
-            translator = ADQLQueryTranslator(self.query)
             try:
+                translator = ADQLQueryTranslator(self.query)
+
                 if adapter.database_config['ENGINE'] == 'django.db.backends.mysql':
                     translated_query = translator.to_mysql()
                 elif adapter.database_config['ENGINE'] == 'django.db.backends.postgresql':
