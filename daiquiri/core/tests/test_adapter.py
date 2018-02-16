@@ -1,5 +1,6 @@
 import logging
-import os
+
+from django.conf import settings
 from django.test import TestCase
 
 from daiquiri.core.adapter import get_adapter
@@ -52,10 +53,12 @@ class CoreAdapterTestCase(TestCase):
         row = self.adapter.database.count_rows('daiquiri_data_obs', 'stars')
         self.assertEqual(row, 10000)
 
-    def test_download_set_args(self):
+    def test_download_set_table(self):
+        database_config = settings.DATABASES['data']
+
         self.adapter.download.set_table('daiquiri_archive', 'files')
 
-        if self.adapter.database_config['ENGINE'] == 'django.db.backends.mysql':
+        if database_config['ENGINE'] == 'django.db.backends.mysql':
             # TODO: test
             args_preset = [
                 'mysqldump',
@@ -66,13 +69,12 @@ class CoreAdapterTestCase(TestCase):
                 'daiquiri_archive',
                 'files'
             ]
-        elif self.adapter.database_config['ENGINE'] == 'django.db.backends.postgresql':
-            dbname = self.adapter.database_config['NAME']
+        elif database_config['ENGINE'] == 'django.db.backends.postgresql':
             args_preset = [
                 'pg_dump',
                 '-a',
                 '--inserts',
-                '--dbname=postgresql://daiquiri_data:daiquiri_data@127.0.0.1:5432/' + dbname,
+                '--dbname=postgresql://%(USER)s:%(PASSWORD)s@%(HOST)s:%(PORT)s/%(NAME)s' % database_config,
                 '--table=daiquiri_archive.files'
             ]
 
