@@ -16,7 +16,7 @@ from jsonfield import JSONField
 
 from daiquiri.core.constants import ACCESS_LEVEL_CHOICES
 from daiquiri.core.managers import AccessLevelManager
-from daiquiri.core.adapter import Adapter
+from daiquiri.core.adapter import DatabaseAdapter
 from daiquiri.jobs.models import Job
 from daiquiri.jobs.managers import JobManager
 
@@ -94,7 +94,7 @@ class ArchiveJob(Job):
         collections = [collection.name for collection in Collection.objects.filter_by_access_level(self.owner)]
 
         # get database adapter
-        adapter = Adapter()
+        adapter = DatabaseAdapter()
 
         # get the database_name and the table_name from the settings
         database_name = settings.ARCHIVE_DATABASE
@@ -119,7 +119,7 @@ class ArchiveJob(Job):
                     })
 
                 # fetch the path for this file from the database
-                row = adapter.database.fetch_row(database_name, table_name, ['path'], filters={
+                row = adapter.fetch_row(database_name, table_name, ['path'], filters={
                     'id': file_id,
                     'collection': collections
                 })
@@ -134,7 +134,7 @@ class ArchiveJob(Job):
 
         elif 'search' in self.data:
             # retrieve the pathes of all file matching the search criteria
-            rows = adapter.database.fetch_rows(database_name, table_name, page_size=0, search=self.data['search'], filters={
+            rows = adapter.fetch_rows(database_name, table_name, page_size=0, search=self.data['search'], filters={
                 'collection': collections
             })
 

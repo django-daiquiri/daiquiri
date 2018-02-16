@@ -25,7 +25,7 @@ from queryparser.postgresql import PostgreSQLQueryProcessor
 from queryparser.adql import ADQLQueryTranslator
 from queryparser.exceptions import QueryError, QuerySyntaxError
 
-from daiquiri.core.adapter import Adapter
+from daiquiri.core.adapter import DatabaseAdapter, DownloadAdapter
 from daiquiri.core.constants import ACCESS_LEVEL_CHOICES
 from daiquiri.jobs.models import Job
 from daiquiri.jobs.managers import JobManager
@@ -174,7 +174,7 @@ class QueryJob(Job):
                 })
 
         # get the adapter
-        adapter = Adapter()
+        adapter = DatabaseAdapter()
 
         # log the input query
         logger.debug('query = "%s"', self.query)
@@ -344,7 +344,7 @@ class QueryJob(Job):
 
     def rename_table(self, new_table_name):
         if self.table_name != new_table_name:
-            Adapter().database.rename_table(self.database_name, self.table_name, new_table_name)
+            DatabaseAdapter().rename_table(self.database_name, self.table_name, new_table_name)
 
             self.metadata['name'] = new_table_name
             self.save()
@@ -352,21 +352,21 @@ class QueryJob(Job):
     def drop_table(self):
         # drop the corresponding database table, but fail silently
         try:
-            Adapter().database.drop_table(self.database_name, self.table_name)
+            DatabaseAdapter().drop_table(self.database_name, self.table_name)
         except ProgrammingError:
             pass
 
     def abort_query(self):
         # abort the job on the database
         try:
-            Adapter().database.abort_query(self.pid)
+            DatabaseAdapter().abort_query(self.pid)
         except OperationalError:
             # the query was probably killed before
             pass
 
     def stream(self, format_key):
         if self.phase == self.PHASE_COMPLETED:
-            return Adapter().download.generate(
+            return DownloadAdapter().generate(
                 format_key,
                 self.database_name,
                 self.table_name,
@@ -392,13 +392,13 @@ class QueryJob(Job):
                 raise ValidationError(errors)
 
             # get database adapter
-            adapter = Adapter()
+            adapter = DatabaseAdapter()
 
             # query the database for the total number of rows
-            count = adapter.database.count_rows(self.database_name, self.table_name, column_names, search, filters)
+            count = adapter.count_rows(self.database_name, self.table_name, column_names, search, filters)
 
             # query the paginated rowset
-            rows = adapter.database.fetch_rows(self.database_name, self.table_name, column_names, ordering, page, page_size, search, filters)
+            rows = adapter.fetch_rows(self.database_name, self.table_name, column_names, ordering, page, page_size, search, filters)
 
             # flatten the list if only one column is retrieved
             if len(column_names) == 1:
@@ -466,11 +466,11 @@ class DownloadJob(Job):
 
             download_id = str(self.id)
             if not settings.ASYNC:
-                logger.info('create_download_file %s submitted (sync)' % download_id)
+                logger.info('download_job %s submitted (sync)' % download_id)
                 create_download_file.apply((download_id, ), task_id=download_id, throw=True)
 
             else:
-                logger.info('create_download_file %s submitted (async, queue=download)' % download_id)
+                logger.info('download_job %s submitted (async, queue=download)' % download_id)
                 create_download_file.apply_async((download_id, ), task_id=download_id, queue='download')
 
         else:
@@ -524,7 +524,7 @@ class QueryArchiveJob(Job):
 
     def process(self):
         try:
-            format_config = get_format_config(self.format_key)
+            get_format_config(self.format_key)
         except IndexError:
             raise ValidationError({'format_key': "Not supported."})
 
@@ -545,11 +545,8 @@ class QueryArchiveJob(Job):
                 'column_name': [_('Unknown column "%s".') % self.column_name]
             })
 
-        # get database adapter
-        adapter = Adapter()
-
-        # query the paginated rowset
-        rows = adapter.database.fetch_rows(self.job.database_name, self.job.table_name, [self.column_name], page_size=0)
+        # get database adapter and query the paginated rowset
+        rows = DatabaseAdapter().fetch_rows(self.job.database_name, self.job.table_name, [self.column_name], page_size=0)
 
         # prepare list of files for this job
         files = []
@@ -581,12 +578,12 @@ class QueryArchiveJob(Job):
 
             archive_id = str(self.id)
             if not settings.ASYNC:
-                logger.info('download_job %s submitted (sync)' % download_job_id)
-                create_download_file.apply((download_job_id, ), task_id=download_job_id, throw=True)
+                logger.info('archive_job %s submitted (sync)' % archive_id)
+                create_archive_file.apply((archive_id, ), task_id=archive_id, throw=True)
 
             else:
-                logger.info('download_job %s submitted (async, queue=download)' % download_job_id)
-                create_download_file.apply_async((download_job_id, ), task_id=download_job_id, queue='download')
+                logger.info('archive_job %s submitted (async, queue=download)' % archive_id)
+                create_archive_file.apply_async((archive_id, ), task_id=archive_id, queue='download')
 
         else:
             raise ValidationError({

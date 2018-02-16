@@ -6,7 +6,7 @@ from rest_framework.authentication import SessionAuthentication, TokenAuthentica
 
 from django_filters.rest_framework import DjangoFilterBackend
 
-from daiquiri.core.adapter import Adapter
+from daiquiri.core.adapter import DatabaseAdapter
 from daiquiri.core.viewsets import ChoicesViewSet
 from daiquiri.core.permissions import HasModelPermission
 from daiquiri.core.constants import LICENSE_CHOICES, ACCESS_LEVEL_CHOICES
@@ -52,9 +52,9 @@ class DatabaseViewSet(viewsets.ModelViewSet):
         database = serializer.save()
 
         if request.data.get('discover'):
-            adapter = Adapter()
+            adapter = DatabaseAdapter()
 
-            for table_metadata in adapter.database.fetch_tables(database.name):
+            for table_metadata in adapter.fetch_tables(database.name):
                 table_metadata['database'] = database.id
                 table_metadata['groups'] = [group.id for group in database.groups.all()]
                 for key in ['license', 'access_level', 'metadata_access_level']:
@@ -64,7 +64,7 @@ class DatabaseViewSet(viewsets.ModelViewSet):
                 if table_serializer.is_valid():
                     table = table_serializer.save()
 
-                    for column_metadata in adapter.database.fetch_columns(database.name, table.name):
+                    for column_metadata in adapter.fetch_columns(database.name, table.name):
                         column_metadata['table'] = table.id
                         column_metadata['groups'] = [group.id for group in table.groups.all()]
                         for key in ['access_level', 'metadata_access_level']:
@@ -123,9 +123,9 @@ class TableViewSet(viewsets.ModelViewSet):
         table = serializer.save()
 
         if request.data.get('discover'):
-            adapter = Adapter()
+            adapter = DatabaseAdapter()
 
-            for column_metadata in adapter.database.fetch_columns(table.database.name, table.name):
+            for column_metadata in adapter.fetch_columns(table.database.name, table.name):
                 column_metadata['table'] = table.id
                 column_metadata['groups'] = [group.id for group in table.groups.all()]
                 for key in ['access_level', 'metadata_access_level']:
@@ -144,7 +144,7 @@ class TableViewSet(viewsets.ModelViewSet):
         table_name = request.GET.get('table')
 
         if database_name and table_name:
-            return Response([Adapter().database.fetch_table(database_name, table_name)])
+            return Response([DatabaseAdapter().fetch_table(database_name, table_name)])
         else:
             return Response([])
 
@@ -168,7 +168,7 @@ class ColumnViewSet(viewsets.ModelViewSet):
         column_name = request.GET.get('column')
 
         if database_name and table_name:
-            return Response([Adapter().database.fetch_column(database_name, table_name, column_name)])
+            return Response([DatabaseAdapter().fetch_column(database_name, table_name, column_name)])
         else:
             return Response([])
 

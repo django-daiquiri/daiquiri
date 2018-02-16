@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
 
 from daiquiri.core.viewsets import RowViewSetMixin
-from daiquiri.core.adapter import Adapter
+from daiquiri.core.adapter import DatabaseAdapter
 from daiquiri.core.utils import get_client_ip
 from daiquiri.stats.models import Record
 
@@ -32,7 +32,7 @@ class RowViewSet(RowViewSetMixin, viewsets.GenericViewSet):
         ordering, page, page_size, search, filters = self._get_query_params(column_names)
 
         # get database adapter
-        adapter = Adapter()
+        adapter = DatabaseAdapter()
 
         # get the database_name and the table_name from the settings
         database_name = settings.ARCHIVE_DATABASE
@@ -43,10 +43,10 @@ class RowViewSet(RowViewSetMixin, viewsets.GenericViewSet):
         filters['collection'] = collections
 
         # query the database for the total number of rows
-        count = adapter.database.count_rows(database_name, table_name, column_names, search, filters)
+        count = adapter.count_rows(database_name, table_name, column_names, search, filters)
 
         # query the paginated rowset
-        results = adapter.database.fetch_rows(database_name, table_name, column_names, ordering, page, page_size, search, filters)
+        results = adapter.fetch_rows(database_name, table_name, column_names, ordering, page, page_size, search, filters)
 
         # return ordered dict to be send as json
         return Response(OrderedDict((
@@ -71,7 +71,7 @@ class FileViewSet(viewsets.GenericViewSet):
 
     def retrieve(self, request, pk=None):
         # get database adapter
-        adapter = Adapter()
+        adapter = DatabaseAdapter()
 
         # get the database_name and the table_name from the settings
         database_name = settings.ARCHIVE_DATABASE
@@ -81,7 +81,7 @@ class FileViewSet(viewsets.GenericViewSet):
         collections = [collection.name for collection in Collection.objects.filter_by_access_level(request.user)]
 
         # fetch the path for this file from the database
-        row = adapter.database.fetch_row(database_name, table_name, ['path'], filters={
+        row = adapter.fetch_row(database_name, table_name, ['path'], filters={
             'id': pk,
             'collection': collections
         })

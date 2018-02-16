@@ -41,7 +41,7 @@ class RunQueryTask(Task):
 @shared_task(base=RunQueryTask)
 def run_query(job_id):
     # always import daiquiri packages inside the task
-    from daiquiri.core.adapter import Adapter
+    from daiquiri.core.adapter import DatabaseAdapter
     from daiquiri.metadata.models import Column
     from daiquiri.query.models import QueryJob
     from daiquiri.query.utils import get_quota
@@ -54,11 +54,11 @@ def run_query(job_id):
     job = QueryJob.objects.get(pk=job_id)
 
     # get the adapter with the database specific functions
-    adapter = Adapter()
+    adapter = DatabaseAdapter()
 
     # create the database of the user if it not already exists
     try:
-        adapter.database.create_user_schema_if_not_exists(job.database_name)
+        adapter.create_user_schema_if_not_exists(job.database_name)
     except OperationalError as e:
         job.phase = job.PHASE_ERROR
         job.error_summary = str(e)
@@ -77,8 +77,8 @@ def run_query(job_id):
     # set database and start time
     job.start_time = now()
 
-    job.pid = adapter.database.fetch_pid()
-    job.actual_query = adapter.database.build_query(job.database_name, job.table_name, job.native_query, job.timeout, job.max_records)
+    job.pid = adapter.fetch_pid()
+    job.actual_query = adapter.build_query(job.database_name, job.table_name, job.native_query, job.timeout, job.max_records)
     job.phase = job.PHASE_EXECUTING
     job.start_time = now()
     job.save()
@@ -88,7 +88,7 @@ def run_query(job_id):
     # get the actual query and submit the job to the database
     try:
         # this is where the work ist done (and the time is spend)
-        adapter.database.submit_query(job.actual_query)
+        adapter.submit_query(job.actual_query)
 
     except (ProgrammingError, InternalError) as e:
         job.phase = job.PHASE_ERROR
@@ -116,10 +116,10 @@ def run_query(job_id):
 
         # get additional information about the completed job
         if job.phase == job.PHASE_COMPLETED:
-            job.nrows, job.size = adapter.database.fetch_stats(job.database_name, job.table_name)
+            job.nrows, job.size = adapter.fetch_stats(job.database_name, job.table_name)
 
             # fetch the metadata for the columns
-            job.metadata['columns'] = adapter.database.fetch_columns(job.database_name, job.table_name)
+            job.metadata['columns'] = adapter.fetch_columns(job.database_name, job.table_name)
 
             # fetch additional metadata from the metadata store
             for column in job.metadata['columns']:
@@ -170,7 +170,7 @@ def run_query(job_id):
 @shared_task(base=Task)
 def create_download_file(download_id):
     # always import daiquiri packages inside the task
-    from daiquiri.core.adapter import Adapter
+    from daiquiri.core.adapter import DownloadAdapter
     from daiquiri.query.models import DownloadJob
 
     # get logger
@@ -195,7 +195,7 @@ def create_download_file(download_id):
     # write file using the generator in the adapter
     try:
         with open(download_job.file_path, 'w') as f:
-            for line in Adapter().download.generate(
+            for line in DownloadAdapter().generate(
                     download_job.format_key,
                     download_job.job.database_name,
                     download_job.job.table_name,
