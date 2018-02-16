@@ -93,7 +93,7 @@ class MySQLAdapter(DatabaseAdapter):
     def count_rows(self, schema_name, table_name, column_names=None, search=None, filters=None):
         # if no column names are provided get all column_names from the table
         if not column_names:
-            column_names= self.fetch_column_names(schema_name, table_name)
+            column_names = self.fetch_column_names(schema_name, table_name)
 
         # create a list of escaped columns
         escaped_column_names = [self.escape_identifier(column_name) for column_name in column_names]
@@ -191,7 +191,6 @@ class MySQLAdapter(DatabaseAdapter):
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
             self.execute(sql)
-
 
     def fetch_tables(self, schema_name):
         # escape input

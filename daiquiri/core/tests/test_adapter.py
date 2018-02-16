@@ -31,7 +31,7 @@ class CoreAdapterTestCase(TestCase):
     def test_fetch_stats(self):
         rows = DatabaseAdapter().fetch_stats('daiquiri_data_obs', 'stars')
         self.assertEqual(rows[0], 10000)
-        self.assertGreater(rows[1], 400000)
+        self.assertGreater(rows[1], 250000)
 
     def test_fetch_columns(self):
         columns = DatabaseAdapter().fetch_columns('daiquiri_archive', 'files')
@@ -49,31 +49,3 @@ class CoreAdapterTestCase(TestCase):
     def test_count_rows(self):
         row = DatabaseAdapter().count_rows('daiquiri_data_obs', 'stars')
         self.assertEqual(row, 10000)
-
-    def test_download_set_args(self):
-        database_config = settings.DATABASES['data']
-
-        adapter = DownloadAdapter()
-        adapter.set_args('daiquiri_archive', 'files')
-
-        if database_config['ENGINE'] == 'django.db.backends.mysql':
-            # TODO: test
-            args_preset = [
-                'mysqldump',
-                '--compact',
-                '--skip-extended-insert',
-                '--user=daiquiri_data',
-                '--password=daiquiri_data',
-                'daiquiri_archive',
-                'files'
-            ]
-        elif database_config['ENGINE'] == 'django.db.backends.postgresql':
-            args_preset = [
-                'pg_dump',
-                '-a',
-                '--inserts',
-                '--dbname=postgresql://%(USER)s:%(PASSWORD)s@%(HOST)s:%(PORT)s/%(NAME)s' % database_config,
-                '--table=daiquiri_archive.files'
-            ]
-
-        self.assertEqual(adapter.args, args_preset)
