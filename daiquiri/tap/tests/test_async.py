@@ -1,30 +1,16 @@
 import mock
 
+from django.conf import settings
 from django.test import TestCase, override_settings
 
-from daiquiri.core.adapter import get_adapter
 from daiquiri.jobs.tests.mixins import AsyncTestMixin
 from daiquiri.query.models import QueryJob, Example
 
-adapter = get_adapter()
-
-mock_execute = mock.Mock()
-
-mock_fetch_stats = mock.Mock()
-mock_fetch_stats.return_value = [0, 0]
-
-mock_fetch_pid = mock.Mock()
-mock_fetch_pid.return_value = 1
-
-mock_fetch_table = mock.Mock()
-mock_fetch_table.return_value = []
-
-
 @override_settings(QUERY_ANONYMOUS=True)
-@mock.patch.object(adapter.database, 'execute', mock_execute)
-@mock.patch.object(adapter.database, 'fetch_stats', mock_fetch_stats)
-@mock.patch.object(adapter.database, 'fetch_pid', mock_fetch_pid)
-@mock.patch.object(adapter.database, 'fetch_table', mock_fetch_table)
+@mock.patch(settings.ADAPTER_DATABASE + '.submit_query', mock.Mock())
+@mock.patch(settings.ADAPTER_DATABASE + '.fetch_stats', mock.Mock(return_value=[100, 100]))
+@mock.patch(settings.ADAPTER_DATABASE + '.rename_table', mock.Mock())
+@mock.patch(settings.ADAPTER_DATABASE + '.drop_table', mock.Mock())
 class AsyncTestCase(AsyncTestMixin, TestCase):
 
     fixtures = (

@@ -85,6 +85,9 @@ class PostgreSQLAdapter(DatabaseAdapter):
         else:
             return 'SET SESSION statement_timeout TO %(timeout)s; COMMIT; CREATE TABLE %(schema)s.%(table)s AS %(query)s;' % params
 
+    def submit_query(self, sql):
+        self.execute(sql)
+
     def abort_query(self, pid):
         sql = 'select pg_cancel_backend(%(pid)i)' % {'pid': pid}
         self.execute(sql)

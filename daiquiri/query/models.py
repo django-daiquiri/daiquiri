@@ -25,7 +25,7 @@ from queryparser.postgresql import PostgreSQLQueryProcessor
 from queryparser.adql import ADQLQueryTranslator
 from queryparser.exceptions import QueryError, QuerySyntaxError
 
-from daiquiri.core.adapter import get_adapter
+from daiquiri.core.adapter import Adapter
 from daiquiri.core.constants import ACCESS_LEVEL_CHOICES
 from daiquiri.jobs.models import Job
 from daiquiri.jobs.managers import JobManager
@@ -174,7 +174,7 @@ class QueryJob(Job):
                 })
 
         # get the adapter
-        adapter = get_adapter()
+        adapter = Adapter()
 
         # log the input query
         logger.debug('query = "%s"', self.query)
@@ -344,7 +344,7 @@ class QueryJob(Job):
 
     def rename_table(self, new_table_name):
         if self.table_name != new_table_name:
-            get_adapter().database.rename_table(self.database_name, self.table_name, new_table_name)
+            Adapter().database.rename_table(self.database_name, self.table_name, new_table_name)
 
             self.metadata['name'] = new_table_name
             self.save()
@@ -352,21 +352,21 @@ class QueryJob(Job):
     def drop_table(self):
         # drop the corresponding database table, but fail silently
         try:
-            get_adapter().database.drop_table(self.database_name, self.table_name)
+            Adapter().database.drop_table(self.database_name, self.table_name)
         except ProgrammingError:
             pass
 
     def abort_query(self):
         # abort the job on the database
         try:
-            get_adapter().database.abort_query(self.pid)
+            Adapter().database.abort_query(self.pid)
         except OperationalError:
             # the query was probably killed before
             pass
 
     def stream(self, format_key):
         if self.phase == self.PHASE_COMPLETED:
-            return get_adapter().download.generate(
+            return Adapter().download.generate(
                 format_key,
                 self.database_name,
                 self.table_name,
@@ -392,7 +392,7 @@ class QueryJob(Job):
                 raise ValidationError(errors)
 
             # get database adapter
-            adapter = get_adapter()
+            adapter = Adapter()
 
             # query the database for the total number of rows
             count = adapter.database.count_rows(self.database_name, self.table_name, column_names, search, filters)
@@ -546,7 +546,7 @@ class QueryArchiveJob(Job):
             })
 
         # get database adapter
-        adapter = get_adapter()
+        adapter = Adapter()
 
         # query the paginated rowset
         rows = adapter.database.fetch_rows(self.job.database_name, self.job.table_name, [self.column_name], page_size=0)

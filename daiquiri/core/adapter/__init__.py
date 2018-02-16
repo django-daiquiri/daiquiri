@@ -7,7 +7,6 @@ from .download.mysqldump import MysqldumpAdapter
 from .database.postgres import PostgreSQLAdapter
 from .download.pgdump import PgDumpAdapter
 
-_adapter = None
 
 class Adapter(object):
 
@@ -37,11 +36,3 @@ class Adapter(object):
                 self.download = PgDumpAdapter(self.database_key, self.database_config)
             else:
                 raise Exception('No suitable download adapter found.')
-
-
-def get_adapter():
-    global _adapter
-    if not _adapter:
-        _adapter = Adapter()
-
-    return _adapter

@@ -3,14 +3,14 @@ import logging
 from django.conf import settings
 from django.test import TestCase
 
-from daiquiri.core.adapter import get_adapter
+from daiquiri.core.adapter import Adapter
 
 logger = logging.getLogger(__name__)
 
 class CoreAdapterTestCase(TestCase):
 
     def setUp(self):
-        self.adapter = get_adapter()
+        self.adapter = Adapter()
 
     def test_fetch_rows_1(self):
         rows = self.adapter.database.fetch_rows('daiquiri_data_obs', 'stars', column_names=None, search=None, filters=None)
@@ -33,17 +33,16 @@ class CoreAdapterTestCase(TestCase):
     def test_fetch_stats(self):
         rows = self.adapter.database.fetch_stats('daiquiri_data_obs', 'stars')
         self.assertEqual(rows[0], 10000)
-        self.assertEqual(rows[1], 548864)
+        self.assertGreater(rows[1], 400000)
 
     def test_fetch_columns(self):
         columns = self.adapter.database.fetch_columns('daiquiri_archive', 'files')
-
         self.assertEqual(len(columns), 7)
         self.assertTrue(columns[0]['indexed'])
 
     def test_fetch_column(self):
         column = self.adapter.database.fetch_column('daiquiri_archive', 'files', 'id')
-        self.assertEqual(column['datatype'], 'char', msg=column)
+        self.assertTrue(column['datatype'].startswith('char'))
 
     def test_fetch_column_names(self):
         columns = self.adapter.database.fetch_column_names('daiquiri_data_obs', 'stars')
@@ -53,10 +52,10 @@ class CoreAdapterTestCase(TestCase):
         row = self.adapter.database.count_rows('daiquiri_data_obs', 'stars')
         self.assertEqual(row, 10000)
 
-    def test_download_set_table(self):
+    def test_download_set_args(self):
         database_config = settings.DATABASES['data']
 
-        self.adapter.download.set_table('daiquiri_archive', 'files')
+        self.adapter.download.set_args('daiquiri_archive', 'files')
 
         if database_config['ENGINE'] == 'django.db.backends.mysql':
             # TODO: test

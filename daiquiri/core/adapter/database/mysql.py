@@ -79,6 +79,9 @@ class MySQLAdapter(DatabaseAdapter):
         else:
             return 'CREATE TABLE %(database)s.%(table)s ENGINE=MyISAM ( %(query)s );' % params
 
+    def submit_query(self, sql):
+        self.execute(sql)
+
     def abort_query(self, pid):
         sql = 'KILL %(pid)i' % {'pid': pid}
         self.execute(sql)
@@ -176,7 +179,7 @@ class MySQLAdapter(DatabaseAdapter):
 
         return self.fetchall(sql, args=sql_args)
 
-    def create_user_database_if_not_exists(self, database_name):
+    def create_user_schema_if_not_exists(self, database_name):
         # escape input
         escaped_database_name = self.escape_identifier(database_name)
 

@@ -15,7 +15,14 @@ logger = logging.getLogger(__name__)
 
 class DownloadAdapter(object):
 
+    def __init__(self, database_key, database_config):
+        self.database_key = database_key
+        self.database_config = database_config
+
     def generate(self, format_key, schema_name, table_name, metadata, status=None, empty=False):
+        # create the final list of arguments subprocess.Popen
+        self.set_args(schema_name, table_name)
+
         if format_key == 'csv':
             return self.generate_csv(schema_name, table_name)
 
@@ -32,9 +39,6 @@ class DownloadAdapter(object):
             raise Exception('Not supported.')
 
     def generate_csv(self, schema_name, table_name):
-        # create the final list of arguments subprocess.Popen
-        self.set_table(schema_name, table_name)
-
         # excecute the subprocess
         process = self.execute()
 
@@ -51,9 +55,6 @@ class DownloadAdapter(object):
                 yield f.getvalue()
 
     def generate_votable(self, serialization, schema_name, table_name, metadata, status, empty):
-        # create the final list of arguments subprocess.Popen
-        self.set_table(schema_name, table_name)
-
         # excecute the subprocess
         process = self.execute()
 
@@ -217,10 +218,10 @@ class DownloadAdapter(object):
                     else:  # char
                         values.append(cell)
 
-        # log values
-        logger.debug('null_mask = "%s"' % null_mask)
-        logger.debug('fmt_string = "%s"' % fmt_string)
-        logger.debug('values = %s' % values)
+        # # log values
+        # logger.debug('null_mask = "%s"' % null_mask)
+        # logger.debug('fmt_string = "%s"' % fmt_string)
+        # logger.debug('values = %s' % values)
 
         # create binary string
         binary_string = struct.pack(fmt_string, *values)

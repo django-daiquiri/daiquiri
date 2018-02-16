@@ -16,7 +16,7 @@ from jsonfield import JSONField
 
 from daiquiri.core.constants import ACCESS_LEVEL_CHOICES
 from daiquiri.core.managers import AccessLevelManager
-from daiquiri.core.adapter import get_adapter
+from daiquiri.core.adapter import Adapter
 from daiquiri.jobs.models import Job
 from daiquiri.jobs.managers import JobManager
 
@@ -94,7 +94,7 @@ class ArchiveJob(Job):
         collections = [collection.name for collection in Collection.objects.filter_by_access_level(self.owner)]
 
         # get database adapter
-        adapter = get_adapter()
+        adapter = Adapter()
 
         # get the database_name and the table_name from the settings
         database_name = settings.ARCHIVE_DATABASE

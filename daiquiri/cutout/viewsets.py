@@ -16,7 +16,7 @@ class DatacubeViewSet(viewsets.GenericViewSet):
     authentication_classes = (SessionAuthentication, TokenAuthentication)
 
     def list(self, request):
-        adapter = get_adapter()
+        adapter = Adapter()
         adapter.clean(request)
 
         if request.GET.get('download', True):

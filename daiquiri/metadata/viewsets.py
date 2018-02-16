@@ -6,7 +6,7 @@ from rest_framework.authentication import SessionAuthentication, TokenAuthentica
 
 from django_filters.rest_framework import DjangoFilterBackend
 
-from daiquiri.core.adapter import get_adapter
+from daiquiri.core.adapter import Adapter
 from daiquiri.core.viewsets import ChoicesViewSet
 from daiquiri.core.permissions import HasModelPermission
 from daiquiri.core.constants import LICENSE_CHOICES, ACCESS_LEVEL_CHOICES
@@ -52,7 +52,7 @@ class DatabaseViewSet(viewsets.ModelViewSet):
         database = serializer.save()
 
         if request.data.get('discover'):
-            adapter = get_adapter()
+            adapter = Adapter()
 
             for table_metadata in adapter.database.fetch_tables(database.name):
                 table_metadata['database'] = database.id
@@ -123,7 +123,7 @@ class TableViewSet(viewsets.ModelViewSet):
         table = serializer.save()
 
         if request.data.get('discover'):
-            adapter = get_adapter()
+            adapter = Adapter()
 
             for column_metadata in adapter.database.fetch_columns(table.database.name, table.name):
                 column_metadata['table'] = table.id
@@ -144,7 +144,7 @@ class TableViewSet(viewsets.ModelViewSet):
         table_name = request.GET.get('table')
 
         if database_name and table_name:
-            return Response([get_adapter().database.fetch_table(database_name, table_name)])
+            return Response([Adapter().database.fetch_table(database_name, table_name)])
         else:
             return Response([])
 
@@ -168,7 +168,7 @@ class ColumnViewSet(viewsets.ModelViewSet):
         column_name = request.GET.get('column')
 
         if database_name and table_name:
-            return Response([get_adapter().database.fetch_column(database_name, table_name, column_name)])
+            return Response([Adapter().database.fetch_column(database_name, table_name, column_name)])
         else:
             return Response([])
 

@@ -2,7 +2,7 @@ from django.conf import settings
 from django.contrib.auth.mixins import AccessMixin
 from django.views.generic import TemplateView
 
-from .utils import get_adapter
+from .utils import Adapter
 
 
 class DatacubeView(AccessMixin, TemplateView):
@@ -15,6 +15,6 @@ class DatacubeView(AccessMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(DatacubeView, self).get_context_data(**kwargs)
-        context['defaults'] = get_adapter().defaults
+        context['defaults'] = Adapter().defaults
 
         return context

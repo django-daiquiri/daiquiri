@@ -28,28 +28,25 @@ class PgDumpAdapter(DownloadAdapter):
         'double': float('nan')
     }
 
-    def __init__(self, database_key, database_config):
+    def set_args(self, schema_name, table_name):
         # command line for pg_dump:
         # pg_dump -a --inserts --dbname=postgresql://user:password@host:port/database --table=schema.table
 
         dbname_string = '--dbname=postgresql://'
 
-        if 'USER' in database_config and database_config['USER']:
-            dbname_string += '%(USER)s' % database_config
+        if 'USER' in self.database_config and self.database_config['USER']:
+            dbname_string += '%(USER)s' % self.database_config
 
-        if 'PASSWORD' in database_config and database_config['PASSWORD']:
-            dbname_string +=':%(PASSWORD)s' % database_config
+        if 'PASSWORD' in self.database_config and self.database_config['PASSWORD']:
+            dbname_string +=':%(PASSWORD)s' % self.database_config
 
-        if 'HOST' in database_config and database_config['HOST']:
-            dbname_string +='@%(HOST)s' % database_config
+        if 'HOST' in self.database_config and self.database_config['HOST']:
+            dbname_string +='@%(HOST)s' % self.database_config
 
-        if 'PORT' in database_config and database_config['PORT']:
-            dbname_string +=':%(PORT)s' % database_config
+        if 'PORT' in self.database_config and self.database_config['PORT']:
+            dbname_string +=':%(PORT)s' % self.database_config
 
-        if 'NAME' in database_config and database_config['NAME']:
-            dbname_string +='/%(NAME)s' % database_config
+        if 'NAME' in self.database_config and self.database_config['NAME']:
+            dbname_string +='/%(NAME)s' % self.database_config
 
-        self.args = ['pg_dump', '-a', '--inserts', dbname_string]
-
-    def set_table(self, schema_name, table_name):
-        self.args.append('--table=%s.%s' % (schema_name, table_name))
+        self.args = ['pg_dump', '-a', '--inserts', dbname_string, '--table=%s.%s' % (schema_name, table_name)]

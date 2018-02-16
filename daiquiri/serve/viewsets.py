@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
 
 from daiquiri.core.viewsets import RowViewSetMixin
-from daiquiri.core.adapter import get_adapter
+from daiquiri.core.adapter import Adapter
 
 from .serializers import ColumnSerializer
 from .utils import get_columns, get_resolver
@@ -33,7 +33,7 @@ class RowViewSet(RowViewSetMixin, viewsets.GenericViewSet):
             ordering, page, page_size, search, filters = self._get_query_params(column_names)
 
             # get database adapter
-            adapter = get_adapter()
+            adapter = Adapter()
 
             # query the database for the total number of rows
             count = adapter.database.count_rows(database_name, table_name, column_names, search, filters)

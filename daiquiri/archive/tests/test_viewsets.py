@@ -7,7 +7,7 @@ from django.test import TestCase
 
 from test_generator.viewsets import TestViewsetMixin, TestListViewsetMixin
 
-from daiquiri.core.adapter import get_adapter
+from daiquiri.core.adapter import Adapter
 from daiquiri.archive.models import Collection, ArchiveJob
 
 
@@ -92,7 +92,7 @@ class FileTests(TestViewsetMixin, ArchiveTestCase):
         database_name = settings.ARCHIVE_DATABASE
         table_name = settings.ARCHIVE_TABLE
 
-        rows = get_adapter().database.fetch_rows(database_name, table_name, ['id', 'collection'], None, None, 0, None, None)
+        rows = Adapter().database.fetch_rows(database_name, table_name, ['id', 'collection'], None, None, 0, None, None)
 
         for row in rows:
 
@@ -115,7 +115,7 @@ class FileTests(TestViewsetMixin, ArchiveTestCase):
         database_name = settings.ARCHIVE_DATABASE
         table_name = settings.ARCHIVE_TABLE
 
-        rows = get_adapter().database.fetch_rows(database_name, table_name, ['id', 'collection'], None, None, 0, None, None)
+        rows = Adapter().database.fetch_rows(database_name, table_name, ['id', 'collection'], None, None, 0, None, None)
 
         for row in rows:
 

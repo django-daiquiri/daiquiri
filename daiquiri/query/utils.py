@@ -5,7 +5,7 @@ from django.conf import settings
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 
-from daiquiri.core.adapter import get_adapter
+from daiquiri.core.adapter import Adapter
 from daiquiri.core.utils import human2bytes
 from daiquiri.metadata.models import Database, Table, Column, Function
 
@@ -96,7 +96,7 @@ def fetch_user_database_metadata(user, jobs):
 
 def get_asterisk_columns(display_column):
     database_name, table_name, _ = display_column[1]
-    column_names = get_adapter().database.fetch_column_names(database_name, table_name)
+    column_names = Adapter().database.fetch_column_names(database_name, table_name)
     return [(column_name, (database_name, table_name, column_name)) for column_name in column_names]
 
 
@@ -160,7 +160,7 @@ def check_permissions(user, keywords, tables, columns, functions):
                 continue
             elif column_name == '*':
                 columns = Column.objects.filter_by_access_level(user).filter(table=table)
-                actual_columns = get_adapter().database.fetch_columns(database_name, table_name)
+                actual_columns = Adapter().database.fetch_columns(database_name, table_name)
 
                 column_names_set = set([column.name for column in columns])
                 actual_column_names_set = set([column['name'] for column in actual_columns])
@@ -177,7 +177,7 @@ def check_permissions(user, keywords, tables, columns, functions):
 
     # check permissions on functions
     for function_name in functions:
-        if function_name.upper() in get_adapter().database.FUNCTIONS:
+        if function_name.upper() in Adapter().database.FUNCTIONS:
             continue
         else:
             # check permission on function

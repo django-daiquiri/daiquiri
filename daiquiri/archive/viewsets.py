@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
 
 from daiquiri.core.viewsets import RowViewSetMixin
-from daiquiri.core.adapter import get_adapter
+from daiquiri.core.adapter import Adapter
 from daiquiri.core.utils import get_client_ip
 from daiquiri.stats.models import Record
 
@@ -32,7 +32,7 @@ class RowViewSet(RowViewSetMixin, viewsets.GenericViewSet):
         ordering, page, page_size, search, filters = self._get_query_params(column_names)
 
         # get database adapter
-        adapter = get_adapter()
+        adapter = Adapter()
 
         # get the database_name and the table_name from the settings
         database_name = settings.ARCHIVE_DATABASE
@@ -71,7 +71,7 @@ class FileViewSet(viewsets.GenericViewSet):
 
     def retrieve(self, request, pk=None):
         # get database adapter
-        adapter = get_adapter()
+        adapter = Adapter()
 
         # get the database_name and the table_name from the settings
         database_name = settings.ARCHIVE_DATABASE
