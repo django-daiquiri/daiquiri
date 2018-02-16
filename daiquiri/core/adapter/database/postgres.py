@@ -57,6 +57,9 @@ class PostgreSQLAdapter(DatabaseAdapter):
         }
     }
 
+    search_stmt_template = '%s::text LIKE %%s'
+    search_arg_template = '%%%s%%'
+
     def fetch_pid(self):
         return self.connection().connection.get_backend_pid()
 

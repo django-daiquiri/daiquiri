@@ -51,6 +51,9 @@ class MySQLAdapter(DatabaseAdapter):
         }
     }
 
+    search_stmt_template = '%s LIKE %%s'
+    search_arg_template = '%%%s%%'
+
     def fetch_pid(self):
         return self.connection().connection.thread_id()
 

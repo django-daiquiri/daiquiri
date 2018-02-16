@@ -124,8 +124,9 @@ class DatabaseAdapter(object):
             search_stmts = []
             search_args = []
             for escaped_column_name in escaped_column_names:
-                search_stmts.append(escaped_column_name + ' LIKE %s')
-                search_args.append('%' + search + '%')
+                # search_stmt_template and search_arg_template are set differently for mysql and postgres
+                search_stmts.append(self.search_stmt_template % escaped_column_name)
+                search_args.append(self.search_arg_template % search)
 
             if search_stmts:
                 where_stmts.append('(' + ' OR '.join(search_stmts) + ')')
