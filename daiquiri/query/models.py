@@ -37,7 +37,7 @@ from .utils import (
     get_default_table_name,
     get_default_queue,
     get_format_config,
-    get_user_database_name,
+    get_user_schema_name,
     get_asterisk_columns,
     check_permissions
 )
@@ -50,7 +50,7 @@ class QueryJob(Job):
 
     objects = QueryJobManager()
 
-    database_name = models.CharField(max_length=256)
+    schema_name = models.CharField(max_length=256)
     table_name = models.CharField(max_length=256)
     queue = models.CharField(max_length=16)
 
@@ -78,7 +78,7 @@ class QueryJob(Job):
     @property
     def parameters(self):
         return {
-            'database_name': self.database_name,
+            'schema_name': self.schema_name,
             'table_name': self.table_name,
             'query_language': self.query_language,
             'query': self.query,
@@ -149,9 +149,9 @@ class QueryJob(Job):
         if not self.response_format:
             self.response_format = settings.QUERY_DEFAULT_DOWNLOAD_FORMAT
 
-        # set the database name
-        if not self.database_name:
-            self.database_name = get_user_database_name(self.owner)
+        # set the schema name
+        if not self.schema_name:
+            self.schema_name = get_user_schema_name(self.owner)
 
         # set a default table name
         if not self.table_name:
@@ -344,7 +344,7 @@ class QueryJob(Job):
 
     def rename_table(self, new_table_name):
         if self.table_name != new_table_name:
-            DatabaseAdapter().rename_table(self.database_name, self.table_name, new_table_name)
+            DatabaseAdapter().rename_table(self.schema_name, self.table_name, new_table_name)
 
             self.metadata['name'] = new_table_name
             self.save()
@@ -352,7 +352,7 @@ class QueryJob(Job):
     def drop_table(self):
         # drop the corresponding database table, but fail silently
         try:
-            DatabaseAdapter().drop_table(self.database_name, self.table_name)
+            DatabaseAdapter().drop_table(self.schema_name, self.table_name)
         except ProgrammingError:
             pass
 
@@ -368,7 +368,7 @@ class QueryJob(Job):
         if self.phase == self.PHASE_COMPLETED:
             return DownloadAdapter().generate(
                 format_key,
-                self.database_name,
+                self.schema_name,
                 self.table_name,
                 self.metadata,
                 self.result_status,
@@ -395,10 +395,10 @@ class QueryJob(Job):
             adapter = DatabaseAdapter()
 
             # query the database for the total number of rows
-            count = adapter.count_rows(self.database_name, self.table_name, column_names, search, filters)
+            count = adapter.count_rows(self.schema_name, self.table_name, column_names, search, filters)
 
             # query the paginated rowset
-            rows = adapter.fetch_rows(self.database_name, self.table_name, column_names, ordering, page, page_size, search, filters)
+            rows = adapter.fetch_rows(self.schema_name, self.table_name, column_names, ordering, page, page_size, search, filters)
 
             # flatten the list if only one column is retrieved
             if len(column_names) == 1:
@@ -546,7 +546,7 @@ class QueryArchiveJob(Job):
             })
 
         # get database adapter and query the paginated rowset
-        rows = DatabaseAdapter().fetch_rows(self.job.database_name, self.job.table_name, [self.column_name], page_size=0)
+        rows = DatabaseAdapter().fetch_rows(self.job.schema_name, self.job.table_name, [self.column_name], page_size=0)
 
         # prepare list of files for this job
         files = []

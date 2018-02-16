@@ -3,7 +3,7 @@ from django.contrib.auth.models import Group
 
 from rest_framework import serializers
 
-from ..models import Database, Table, Column, Function
+from ..models import Schema, Table, Column, Function
 
 
 class GroupSerializer(serializers.ModelSerializer):
@@ -61,10 +61,10 @@ class TableSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class DatabaseSerializer(serializers.ModelSerializer):
+class SchemaSerializer(serializers.ModelSerializer):
 
     label = serializers.CharField(source='__str__', read_only=True)
 
     class Meta:
-        model = Database
+        model = Schema
         fields = '__all__'

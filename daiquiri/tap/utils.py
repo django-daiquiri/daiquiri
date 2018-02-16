@@ -9,44 +9,44 @@ from .models import (
 )
 
 
-def update_database(database):
+def update_schema(schema):
     '''
-    Update or create the database in the TAP_SCHEMA.
+    Update or create the schema in the TAP_SCHEMA.
     '''
     # check if the metadata_access_level is (a) PUBLIC or (b) INTRENAL and QUERY_ANONYMOUS is False
-    tap = (database.metadata_access_level == ACCESS_LEVEL_PUBLIC) or \
-        (database.metadata_access_level == ACCESS_LEVEL_INTERNAL and not settings.QUERY_ANONYMOUS)
+    tap = (schema.metadata_access_level == ACCESS_LEVEL_PUBLIC) or \
+        (schema.metadata_access_level == ACCESS_LEVEL_INTERNAL and not settings.QUERY_ANONYMOUS)
 
     if tap:
         try:
-            tap_schema = TapSchema.objects.get(pk=database.id)
+            tap_schema = TapSchema.objects.get(pk=schema.id)
         except TapSchema.DoesNotExist:
-            tap_schema = TapSchema.objects.create(pk=database.id)
+            tap_schema = TapSchema.objects.create(pk=schema.id)
 
-        tap_schema.schema_name = database.name
+        tap_schema.schema_name = schema.name
         tap_schema.utype = None
-        if database.description:
-            tap_schema.description = database.description[:255]
+        if schema.description:
+            tap_schema.description = schema.description[:255]
         tap_schema.save()
 
     else:
-        # remove the database from the TAP_SCHEMA (if it exists)
+        # remove the schema from the TAP_SCHEMA (if it exists)
         try:
-            TapSchema.objects.get(pk=database.id).delete()
+            TapSchema.objects.get(pk=schema.id).delete()
         except TapSchema.DoesNotExist:
             pass
 
-    # call the handler for each table of the database
-    for table in database.tables.all():
+    # call the handler for each table of the schema
+    for table in schema.tables.all():
         update_table(table)
 
 
-def delete_database(database):
+def delete_schema(schema):
     '''
-    Remove the database from the TAP_SCHEMA (if it exists).
+    Remove the schema from the TAP_SCHEMA (if it exists).
     '''
     try:
-        TapSchema.objects.get(pk=database.id).delete()
+        TapSchema.objects.get(pk=schema.id).delete()
     except TapSchema.DoesNotExist:
         pass
 
@@ -61,7 +61,7 @@ def update_table(table):
 
     # get the schema from the TAP_SCHEMA
     try:
-        tap_schema = TapSchema.objects.get(pk=table.database.id)
+        tap_schema = TapSchema.objects.get(pk=table.schema.id)
     except TapSchema.DoesNotExist:
         tap_schema = None
 
@@ -72,7 +72,7 @@ def update_table(table):
         except TapTable.DoesNotExist:
             tap_table = TapTable.objects.create(pk=table.id, schema=tap_schema)
 
-        tap_table.schema_name = str(table.database)
+        tap_table.schema_name = str(table.schema)
         tap_table.table_name = table.name
         tap_table.table_type = table.type
         tap_table.utype = table.utype

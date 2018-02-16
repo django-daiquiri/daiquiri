@@ -233,7 +233,7 @@ class JobTests(TestViewsetMixin, QueryViewsetTestCase):
 
 #     def _test_list_viewset(self, username):
 #         self.assert_list_viewset(username, query_params={
-#             'database': 'daiquiri_user_user',
+#             'schema': 'daiquiri_user_user',
 #             'table': 'test'
 #         })
 
@@ -252,7 +252,7 @@ class JobTests(TestViewsetMixin, QueryViewsetTestCase):
 
 #     def _test_list_viewset(self, username):
 #         self.assert_list_viewset(username, query_params={
-#             'database': 'daiquiri_user_user',
+#             'schema': 'daiquiri_user_user',
 #             'table': 'test'
 #         })
 

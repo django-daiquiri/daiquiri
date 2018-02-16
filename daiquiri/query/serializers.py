@@ -68,7 +68,7 @@ class QueryJobRetrieveSerializer(serializers.ModelSerializer):
             'destruction_time',
             'error_summary',
             'job_type',
-            'database_name',
+            'schema_name',
             'table_name',
             'query_language',
             'query',

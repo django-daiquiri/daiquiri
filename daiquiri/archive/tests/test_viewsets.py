@@ -89,10 +89,10 @@ class FileTests(TestViewsetMixin, ArchiveTestCase):
 
     def _test_detail_viewset(self, username):
 
-        database_name = settings.ARCHIVE_DATABASE
+        schema_name = settings.ARCHIVE_SCHEMA
         table_name = settings.ARCHIVE_TABLE
 
-        rows = DatabaseAdapter().fetch_rows(database_name, table_name, ['id', 'collection'], None, None, 0, None, None)
+        rows = DatabaseAdapter().fetch_rows(schema_name, table_name, ['id', 'collection'], None, None, 0, None, None)
 
         for row in rows:
 
@@ -112,10 +112,10 @@ class FileTests(TestViewsetMixin, ArchiveTestCase):
 
     def _test_detail_viewset_without_download(self, username):
 
-        database_name = settings.ARCHIVE_DATABASE
+        schema_name = settings.ARCHIVE_SCHEMA
         table_name = settings.ARCHIVE_TABLE
 
-        rows = DatabaseAdapter().fetch_rows(database_name, table_name, ['id', 'collection'], None, None, 0, None, None)
+        rows = DatabaseAdapter().fetch_rows(schema_name, table_name, ['id', 'collection'], None, None, 0, None, None)
 
         for row in rows:
 

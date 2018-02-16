@@ -1,12 +1,12 @@
 [
   {
-    "model": "daiquiri_metadata.database",
+    "model": "daiquiri_metadata.schema",
     "pk": 110,
     "fields": {
       "order": 1,
       "name": "daiquiri_data_obs",
       "title": null,
-      "description": "A database of generated observational data.",
+      "description": "A schema of generated observational data.",
       "long_description": null,
       "attribution": null,
       "license": "CC0",
@@ -18,13 +18,13 @@
     }
   },
   {
-    "model": "daiquiri_metadata.database",
+    "model": "daiquiri_metadata.schema",
     "pk": 111,
     "fields": {
       "order": 2,
       "name": "daiquiri_data_sim",
       "title": null,
-      "description": "A database of generated simulation data.",
+      "description": "A schema of generated simulation data.",
       "long_description": null,
       "attribution": null,
       "license": "PD",
@@ -39,7 +39,7 @@
     "model": "daiquiri_metadata.table",
     "pk": 203,
     "fields": {
-      "database": 110,
+      "schema": 110,
       "order": 1,
       "name": "images",
       "title": null,
@@ -61,7 +61,7 @@
     "model": "daiquiri_metadata.table",
     "pk": 204,
     "fields": {
-      "database": 110,
+      "schema": 110,
       "order": 0,
       "name": "stars",
       "title": null,
@@ -81,7 +81,7 @@
     "model": "daiquiri_metadata.table",
     "pk": 205,
     "fields": {
-      "database": 111,
+      "schema": 111,
       "order": null,
       "name": "particles",
       "title": null,

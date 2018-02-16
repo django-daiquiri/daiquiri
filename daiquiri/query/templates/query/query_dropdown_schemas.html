@@ -1,0 +1,15 @@
+{% load i18n %}
+
+<button type="button" class="btn btn-default"
+    ng-click="service.forms.sql.toggleDropdown('schemas')"
+    ng-class="{'active': service.forms.sql.dropdown == 'schemas'}">
+
+    {% trans 'Schemas' %} <span class="caret"></span>
+</button>
+
+<div class="daiquiri-query-dropdown" ng-show="service.forms.sql.dropdown == 'schemas'">
+    <div daiquiri-browser data-browser-id="schemas" class="daiquiri-metadata-browser"></div>
+    <p class="help-block small">
+        {% trans 'A double click will paste the schema/table/column into the query field.' %}
+    </p>
+</div>

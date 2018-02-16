@@ -14,13 +14,13 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
         examples: $resource(baseurl + 'query/api/examples/user/'),
         queues: $resource(baseurl + 'query/api/queues/'),
         querylanguages: $resource(baseurl + 'query/api/querylanguages/'),
-        databases: $resource(baseurl + 'metadata/api/databases/user/'),
+        schemas: $resource(baseurl + 'metadata/api/schemas/user/'),
         functions: $resource(baseurl + 'metadata/api/functions/user/'),
     };
 
     /* initialise the browser service */
 
-    BrowserService.init('databases', ['databases', 'tables', 'columns'])
+    BrowserService.init('schemas', ['schemas', 'tables', 'columns'])
     BrowserService.init('columns', ['columns'], true)
     BrowserService.init('functions', ['functions'])
     BrowserService.init('examples', ['examples'])
@@ -73,23 +73,23 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
             BrowserService.render('examples', response);
         });
 
-        // fetch databases
-        resources.databases.query(function(response) {
-            service.databases = response;
+        // fetch schemas
+        resources.schemas.query(function(response) {
+            service.schemas = response;
 
             service.columns = []
-            angular.forEach(service.databases, function(database) {
-                angular.forEach(database.tables, function(table) {
+            angular.forEach(service.schemas, function(schema) {
+                angular.forEach(schema.tables, function(table) {
                     angular.forEach(table.columns, function(column) {
                         var column_copy = angular.copy(column);
-                        column_copy.name = database.name + '.' + table.name + '.' + column.name;
+                        column_copy.name = schema.name + '.' + table.name + '.' + column.name;
                         service.columns.push(column_copy);
                     });
                 });
             });
 
-            // load user database when databases have been fetched
-            service.fetchUserDatabase();
+            // load user schema when schemas have been fetched
+            service.fetchUserSchema();
         });
 
         // fetch joblist
@@ -103,7 +103,7 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
         service.polling.init();
         service.polling.register('status', service.fetchStatus, {}, true, false);
         service.polling.register('jobs', service.fetchJobs, {}, true, false);
-        service.polling.register('database', service.fetchUserDatabase, {}, true, false);
+        service.polling.register('schema', service.fetchUserDatabase, {}, true, false);
 
         // load the other services
         service.table = TableService;
@@ -117,22 +117,22 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
         }).$promise;
     };
 
-    service.fetchUserDatabase = function() {
+    service.fetchUserSchema = function() {
         return resources.jobs.query({
             'detail_route': 'tables'
         }, function(response) {
-            var user_database = response[0];
+            var user_schema = response[0];
 
             var user_columns = [];
-            angular.forEach(user_database.tables, function(table) {
+            angular.forEach(user_schema.tables, function(table) {
                 angular.forEach(table.columns, function(column) {
                     var column_copy = angular.copy(column);
-                    column_copy.name = user_database.name + '.' + table.name + '.' + column.name;
+                    column_copy.name = user_schema.name + '.' + table.name + '.' + column.name;
                     user_columns.push(column_copy);
                 });
             });
 
-            BrowserService.render('databases', service.databases.concat(user_database));
+            BrowserService.render('schemas', service.schemas.concat(user_schema));
             BrowserService.render('columns', service.columns.concat(user_columns));
         }).$promise;
     }

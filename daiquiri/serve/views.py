@@ -4,13 +4,13 @@ from django.http import Http404
 from .utils import get_columns
 
 
-def table(request, database_name, table_name):
+def table(request, schema_name, table_name):
 
-    columns = get_columns(request.user, database_name, table_name)
+    columns = get_columns(request.user, schema_name, table_name)
 
     if columns:
         return render(request, 'serve/table.html', {
-            'database': database_name,
+            'schema': schema_name,
             'table': table_name
         })
 

@@ -1,6 +1,6 @@
 {% load i18n %}
 
-    <div class="modal" id="databases-description-form-modal" tabindex="-1">
+    <div class="modal" id="schemas-description-form-modal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -8,16 +8,16 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                     <h4 class="modal-title">
-                        {% trans 'Database' %}
+                        {% trans 'Schema' %}
                     </h4>
                 </div>
 
                 <div class="modal-body">
                     <formgroup
-                        data-id="database-long_description"
+                        data-id="schema-long_description"
                         data-type="codemirror"
-                        data-label="{{ meta.Database.long_description.verbose_name }}"
-                        data-help="{{ meta.Database.long_description.help_text }}"
+                        data-label="{{ meta.Schema.long_description.verbose_name }}"
+                        data-help="{{ meta.Schema.long_description.help_text }}"
                         data-model="service.values.long_description"
                         data-errors="service.errors.long_description"
                         data-mode="markdown">
@@ -29,11 +29,11 @@
                         {% trans 'Close' %}
                     </button>
                     <button type="button" class="btn btn-default"
-                            ng-click="service.submitFormModal('databases', false)">
+                            ng-click="service.submitFormModal('schemas', false)">
                         {% trans 'Save' %}
                     </button>
                     <button type="button" class="btn btn-primary"
-                            ng-click="service.submitFormModal('databases')">
+                            ng-click="service.submitFormModal('schemas')">
                         {% trans 'Save and close' %}
                     </button>
                 </div>

@@ -60,7 +60,7 @@ class PublicRowTests(TestViewsetMixin, ServeTestCase):
 
     def _test_list_viewset(self, username):
         self.assert_list_viewset(username, query_params={
-            'database': 'daiquiri_data_obs',
+            'schema': 'daiquiri_data_obs',
             'table': 'stars'
         })
 
@@ -79,7 +79,7 @@ class InternalRowTests(TestViewsetMixin, ServeTestCase):
 
     def _test_list_viewset(self, username):
         self.assert_list_viewset(username, query_params={
-            'database': 'daiquiri_data_sim',
+            'schema': 'daiquiri_data_sim',
             'table': 'particles'
         })
 
@@ -96,21 +96,21 @@ class NotFoundRowTests(TestViewsetMixin, ServeTestCase):
         }
     }
 
-    def _test_non_existing_database_viewset(self, username):
+    def _test_non_existing_schema_viewset(self, username):
         self.assert_list_viewset(username, query_params={
-            'database': 'non_existing',
+            'schema': 'non_existing',
             'table': 'stars'
         })
 
     def _test_non_existing_table_viewset(self, username):
         self.assert_list_viewset(username, query_params={
-            'database': 'daiquiri_data_obs',
+            'schema': 'daiquiri_data_obs',
             'table': 'non_existing'
         })
 
     def _test_non_existing_user_table_viewset(self, username):
         self.assert_list_viewset(username, query_params={
-            'database': 'daiquiri_user_user',
+            'schema': 'daiquiri_user_user',
             'table': 'non_existing'
         })
 
@@ -129,7 +129,7 @@ class PublicColumnTests(TestViewsetMixin, ServeTestCase):
 
     def _test_list_viewset(self, username):
         self.assert_list_viewset(username, query_params={
-            'database': 'daiquiri_data_obs',
+            'schema': 'daiquiri_data_obs',
             'table': 'stars'
         })
 
@@ -148,7 +148,7 @@ class InternalColumnTests(TestViewsetMixin, ServeTestCase):
 
     def _test_list_viewset(self, username):
         self.assert_list_viewset(username, query_params={
-            'database': 'daiquiri_data_sim',
+            'schema': 'daiquiri_data_sim',
             'table': 'particles'
         })
 
@@ -165,20 +165,20 @@ class NotFoundColumnTests(TestViewsetMixin, ServeTestCase):
         }
     }
 
-    def _test_non_existing_database_viewset(self, username):
+    def _test_non_existing_schema_viewset(self, username):
         self.assert_list_viewset(username, query_params={
-            'database': 'non_existing',
+            'schema': 'non_existing',
             'table': 'stars'
         })
 
     def _test_non_existing_table_viewset(self, username):
         self.assert_list_viewset(username, query_params={
-            'database': 'daiquiri_data_obs',
+            'schema': 'daiquiri_data_obs',
             'table': 'non_existing'
         })
 
     def _test_non_existing_user_table_viewset(self, username):
         self.assert_list_viewset(username, query_params={
-            'database': 'daiquiri_user_user',
+            'schema': 'daiquiri_user_user',
             'table': 'non_existing'
         })

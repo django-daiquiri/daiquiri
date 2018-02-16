@@ -1,6 +1,6 @@
 {% load i18n %}
 
-    <div class="modal" id="databases-form-modal" tabindex="-1">
+    <div class="modal" id="schemas-form-modal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -8,7 +8,7 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                     <h4 class="modal-title">
-                        {% trans 'Database' %}
+                        {% trans 'Schema' %}
                     </h4>
                 </div>
 
@@ -18,8 +18,8 @@
                             class="col-md-8"
                             data-id="name"
                             data-type="text"
-                            data-label="{{ meta.Database.name.verbose_name }}"
-                            data-help="{{ meta.Database.name.help_text }}"
+                            data-label="{{ meta.Schema.name.verbose_name }}"
+                            data-help="{{ meta.Schema.name.help_text }}"
                             data-model="service.values.name"
                             data-errors="service.errors.name">
                         </formgroup>
@@ -27,8 +27,8 @@
                             class="col-md-4"
                             data-id="order"
                             data-type="number"
-                            data-label="{{ meta.Database.order.verbose_name }}"
-                            data-help="{{ meta.Database.order.help_text }}"
+                            data-label="{{ meta.Schema.order.verbose_name }}"
+                            data-help="{{ meta.Schema.order.help_text }}"
                             data-model="service.values.order"
                             data-errors="service.errors.order">
                         </formgroup>
@@ -36,16 +36,16 @@
                     <formgroup
                         data-id="title"
                         data-type="text"
-                        data-label="{{ meta.Database.title.verbose_name }}"
-                        data-help="{{ meta.Database.title.help_text }}"
+                        data-label="{{ meta.Schema.title.verbose_name }}"
+                        data-help="{{ meta.Schema.title.help_text }}"
                         data-model="service.values.title"
                         data-errors="service.errors.title">
                     </formgroup>
                     <formgroup
                         data-id="description"
                         data-type="textarea"
-                        data-label="{{ meta.Database.description.verbose_name }}"
-                        data-help="{{ meta.Database.description.help_text }}"
+                        data-label="{{ meta.Schema.description.verbose_name }}"
+                        data-help="{{ meta.Schema.description.help_text }}"
                         data-model="service.values.description"
                         data-errors="service.errors.description">
                     </formgroup>
@@ -54,8 +54,8 @@
                             class="col-md-4"
                             data-id="license"
                             data-type="select"
-                            data-label="{{ meta.Database.license.verbose_name }}"
-                            data-help="{{ meta.Database.license.help_text }}"
+                            data-label="{{ meta.Schema.license.verbose_name }}"
+                            data-help="{{ meta.Schema.license.help_text }}"
                             data-model="service.values.license"
                             data-errors="service.errors.license"
                             data-options="service.licenses"
@@ -66,8 +66,8 @@
                             class="col-md-4"
                             data-id="doi"
                             data-type="text"
-                            data-label="{{ meta.Database.doi.verbose_name }}"
-                            data-help="{{ meta.Database.doi.help_text }}"
+                            data-label="{{ meta.Schema.doi.verbose_name }}"
+                            data-help="{{ meta.Schema.doi.help_text }}"
                             data-model="service.values.doi"
                             data-errors="service.errors.doi">
                         </formgroup>
@@ -75,8 +75,8 @@
                             class="col-md-4"
                             data-id="utype"
                             data-type="text"
-                            data-label="{{ meta.Database.utype.verbose_name }}"
-                            data-help="{{ meta.Database.utype.help_text }}"
+                            data-label="{{ meta.Schema.utype.verbose_name }}"
+                            data-help="{{ meta.Schema.utype.help_text }}"
                             data-model="service.values.utype"
                             data-errors="service.errors.utype">
                         </formgroup>
@@ -86,8 +86,8 @@
                             class="col-md-6"
                             data-id="access_level"
                             data-type="select"
-                            data-label="{{ meta.Database.access_level.verbose_name }}"
-                            data-help="{{ meta.Database.access_level.help_text }}"
+                            data-label="{{ meta.Schema.access_level.verbose_name }}"
+                            data-help="{{ meta.Schema.access_level.help_text }}"
                             data-model="service.values.access_level"
                             data-errors="service.errors.access_level"
                             data-options="service.accesslevels"
@@ -97,8 +97,8 @@
                             class="col-md-6"
                             data-id="metadata_access_level"
                             data-type="select"
-                            data-label="{{ meta.Database.metadata_access_level.verbose_name }}"
-                            data-help="{{ meta.Database.metadata_access_level.help_text }}"
+                            data-label="{{ meta.Schema.metadata_access_level.verbose_name }}"
+                            data-help="{{ meta.Schema.metadata_access_level.help_text }}"
                             data-model="service.values.metadata_access_level"
                             data-errors="service.errors.metadata_access_level"
                             data-options="service.accesslevels"
@@ -131,7 +131,7 @@
                         {% trans 'Close' %}
                     </button>
                     <button type="button" class="btn btn-primary"
-                            ng-click="service.submitFormModal('databases')">
+                            ng-click="service.submitFormModal('schemas')">
                         {% trans 'Save' %}
                     </button>
                 </div>

@@ -14,9 +14,9 @@ class MetadataTagsTestCase(TestCase):
         self.request = RequestFactory().get('/')
         self.request.user = AnonymousUser()
 
-    def test_database_menu(self):
+    def test_schema_menu(self):
 
-        template = "{% load metadata_tags %}{% databases_menu %}"
+        template = "{% load metadata_tags %}{% schemas_menu %}"
 
         context = RequestContext(self.request, {})
         rendered_template = Template(template).render(context)

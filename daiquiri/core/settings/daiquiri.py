@@ -8,7 +8,7 @@ IPV4_PRIVACY_MASK = 16
 IPV6_PRIVACY_MASK = 32
 
 ARCHIVE_ANONYMOUS = False
-ARCHIVE_DATABASE = 'daiquiri_archive'
+ARCHIVE_SCHEMA = 'daiquiri_archive'
 ARCHIVE_TABLE = 'files'
 ARCHIVE_COLUMNS = [
     {
@@ -56,7 +56,7 @@ MEETINGS_ABSTRACT_MAX_LENGTH = 2000
 METADATA_COLUMN_PERMISSIONS = False
 
 QUERY_ANONYMOUS = False
-QUERY_USER_DATABASE_PREFIX = 'daiquiri_user_'
+QUERY_USER_SCHEMA_PREFIX = 'daiquiri_user_'
 QUERY_QUOTA = {
     'anonymous': '100Mb',
     'user': '100Mb',

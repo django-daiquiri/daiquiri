@@ -23,7 +23,7 @@ class Command(BaseCommand):
             else:
                 config['CLIENT'] = socket.gethostname()
 
-            config['PREFIX'] = settings.QUERY_USER_DATABASE_PREFIX
+            config['PREFIX'] = settings.QUERY_USER_SCHEMA_PREFIX
 
         return config
 

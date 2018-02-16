@@ -36,7 +36,7 @@ from .serializers import (
 )
 
 from .permissions import HasPermission
-from .utils import get_format_config, get_quota, fetch_user_database_metadata
+from .utils import get_format_config, get_quota, fetch_user_schema_metadata
 
 
 class StatusViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -120,7 +120,7 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
 
     @list_route(methods=['get'])
     def tables(self, request):
-        return Response(fetch_user_database_metadata(request.user, self.get_queryset()))
+        return Response(fetch_user_schema_metadata(request.user, self.get_queryset()))
 
     @detail_route(methods=['put'])
     def abort(self, request, pk=None):

@@ -58,7 +58,7 @@ def run_query(job_id):
 
     # create the database of the user if it not already exists
     try:
-        adapter.create_user_schema_if_not_exists(job.database_name)
+        adapter.create_user_schema_if_not_exists(job.schema_name)
     except OperationalError as e:
         job.phase = job.PHASE_ERROR
         job.error_summary = str(e)
@@ -78,7 +78,7 @@ def run_query(job_id):
     job.start_time = now()
 
     job.pid = adapter.fetch_pid()
-    job.actual_query = adapter.build_query(job.database_name, job.table_name, job.native_query, job.timeout, job.max_records)
+    job.actual_query = adapter.build_query(job.schema_name, job.table_name, job.native_query, job.timeout, job.max_records)
     job.phase = job.PHASE_EXECUTING
     job.start_time = now()
     job.save()
@@ -116,17 +116,17 @@ def run_query(job_id):
 
         # get additional information about the completed job
         if job.phase == job.PHASE_COMPLETED:
-            job.nrows, job.size = adapter.fetch_stats(job.database_name, job.table_name)
+            job.nrows, job.size = adapter.fetch_stats(job.schema_name, job.table_name)
 
             # fetch the metadata for the columns
-            job.metadata['columns'] = adapter.fetch_columns(job.database_name, job.table_name)
+            job.metadata['columns'] = adapter.fetch_columns(job.schema_name, job.table_name)
 
             # fetch additional metadata from the metadata store
             for column in job.metadata['columns']:
                 if column['name'] in job.metadata['display_columns']:
 
                     try:
-                        database_name, table_name, column_name = job.metadata['display_columns'][column['name']]
+                        schema_name, table_name, column_name = job.metadata['display_columns'][column['name']]
                     except ValueError:
                         continue
 
@@ -134,7 +134,7 @@ def run_query(job_id):
                         original_column = Column.objects.get(
                             name=column_name,
                             table__name=table_name,
-                            table__database__name=database_name
+                            table__schema__name=schema_name
                         )
                     except Column.DoesNotExist:
                         continue
@@ -197,7 +197,7 @@ def create_download_file(download_id):
         with open(download_job.file_path, 'w') as f:
             for line in DownloadAdapter().generate(
                     download_job.format_key,
-                    download_job.job.database_name,
+                    download_job.job.schema_name,
                     download_job.job.table_name,
                     download_job.job.metadata,
                     download_job.job.result_status,

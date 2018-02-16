@@ -34,8 +34,8 @@ class RowViewSet(RowViewSetMixin, viewsets.GenericViewSet):
         # get database adapter
         adapter = DatabaseAdapter()
 
-        # get the database_name and the table_name from the settings
-        database_name = settings.ARCHIVE_DATABASE
+        # get the schema_name and the table_name from the settings
+        schema_name = settings.ARCHIVE_SCHEMA
         table_name = settings.ARCHIVE_TABLE
 
         # get collecions for this user and add them to the filters
@@ -43,10 +43,10 @@ class RowViewSet(RowViewSetMixin, viewsets.GenericViewSet):
         filters['collection'] = collections
 
         # query the database for the total number of rows
-        count = adapter.count_rows(database_name, table_name, column_names, search, filters)
+        count = adapter.count_rows(schema_name, table_name, column_names, search, filters)
 
         # query the paginated rowset
-        results = adapter.fetch_rows(database_name, table_name, column_names, ordering, page, page_size, search, filters)
+        results = adapter.fetch_rows(schema_name, table_name, column_names, ordering, page, page_size, search, filters)
 
         # return ordered dict to be send as json
         return Response(OrderedDict((
@@ -73,15 +73,15 @@ class FileViewSet(viewsets.GenericViewSet):
         # get database adapter
         adapter = DatabaseAdapter()
 
-        # get the database_name and the table_name from the settings
-        database_name = settings.ARCHIVE_DATABASE
+        # get the schema_name and the table_name from the settings
+        schema_name = settings.ARCHIVE_SCHEMA
         table_name = settings.ARCHIVE_TABLE
 
         # get collecions for this user
         collections = [collection.name for collection in Collection.objects.filter_by_access_level(request.user)]
 
         # fetch the path for this file from the database
-        row = adapter.fetch_row(database_name, table_name, ['path'], filters={
+        row = adapter.fetch_row(schema_name, table_name, ['path'], filters={
             'id': pk,
             'collection': collections
         })

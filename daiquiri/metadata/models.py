@@ -8,7 +8,7 @@ from daiquiri.core.managers import AccessLevelManager
 
 
 @python_2_unicode_compatible
-class Database(models.Model):
+class Schema(models.Model):
 
     objects = AccessLevelManager()
 
@@ -20,27 +20,27 @@ class Database(models.Model):
     name = models.CharField(
         max_length=256,
         verbose_name=_('Name'),
-        help_text=_('Name of the database on the database server.')
+        help_text=_('Name of the schema on the database server.')
     )
     title = models.CharField(
         max_length=256, null=True, blank=True,
         verbose_name=_('Title'),
-        help_text=_('Human readable title of the database.')
+        help_text=_('Human readable title of the schema.')
     )
     description = models.TextField(
         null=True, blank=True,
         verbose_name=_('Description'),
-        help_text=_('A brief description of the database to be displayed in the user interface.')
+        help_text=_('A brief description of the schema to be displayed in the user interface.')
     )
     long_description = models.TextField(
         null=True, blank=True,
         verbose_name=_('Long description'),
-        help_text=_('A more extensive description of the database to be displayed on the public database page.')
+        help_text=_('A more extensive description of the schema to be displayed on the public schema page.')
     )
     attribution = models.TextField(
         null=True, blank=True,
         verbose_name=_('Attribution'),
-        help_text=_('The desired attribution for the database.')
+        help_text=_('The desired attribution for the schema.')
     )
     license = models.CharField(
         max_length=8, choices=LICENSE_CHOICES, null=True, blank=True,
@@ -65,16 +65,16 @@ class Database(models.Model):
     groups = models.ManyToManyField(
         Group, blank=True,
         verbose_name=_('Groups'),
-        help_text=_('The groups which have access to the database.')
+        help_text=_('The groups which have access to the schema.')
     )
 
     class Meta:
         ordering = ('order', )
 
-        verbose_name = _('Database')
-        verbose_name_plural = _('Databases')
+        verbose_name = _('Schema')
+        verbose_name_plural = _('Schemas')
 
-        permissions = (('view_database', 'Can view Database'),)
+        permissions = (('view_schema', 'Can view Schema'),)
 
     def __str__(self):
         return self.name
@@ -104,8 +104,8 @@ class Table(models.Model):
 
     objects = AccessLevelManager()
 
-    database = models.ForeignKey(
-        Database, related_name='tables',
+    schema = models.ForeignKey(
+        Schema, related_name='tables',
         verbose_name=_('Database'),
         help_text=_('Database the table belongs to.')
     )
@@ -170,7 +170,7 @@ class Table(models.Model):
     )
 
     class Meta:
-        ordering = ('database__order', 'order', )
+        ordering = ('schema__order', 'order', )
 
         verbose_name = _('Table')
         verbose_name_plural = _('Tables')
@@ -178,11 +178,11 @@ class Table(models.Model):
         permissions = (('view_table', 'Can view Table'),)
 
     def __str__(self):
-        return self.database.name + '.' + self.name
+        return self.schema.name + '.' + self.name
 
     @property
     def query_strings(self):
-        return [self.database.name, self.name]
+        return [self.schema.name, self.name]
 
     @property
     def license_label(self):
@@ -269,7 +269,7 @@ class Column(models.Model):
     )
 
     class Meta:
-        ordering = ('table__database__order', 'table__order', 'order', )
+        ordering = ('table__schema__order', 'table__order', 'order', )
 
         verbose_name = _('Column')
         verbose_name_plural = _('Columns')
@@ -277,7 +277,7 @@ class Column(models.Model):
         permissions = (('view_column', 'Can view Column'),)
 
     def __str__(self):
-        return self.table.database.name + '.' + self.table.name + '.' + self.name
+        return self.table.schema.name + '.' + self.table.name + '.' + self.name
 
     @property
     def query_strings(self):

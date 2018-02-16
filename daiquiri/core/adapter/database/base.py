@@ -93,25 +93,25 @@ class DatabaseAdapter(object):
     def create_user_schema_if_not_exists(self, schema_name):
         raise NotImplementedError()
 
-    def fetch_tables(self, database_name):
+    def fetch_tables(self, schema_name):
         raise NotImplementedError()
 
-    def fetch_table(self, database_name, table_name):
+    def fetch_table(self, schema_name, table_name):
         raise NotImplementedError()
 
-    def rename_table(self, database_name, table_name, new_table_name):
+    def rename_table(self, schema_name, table_name, new_table_name):
         raise NotImplementedError()
 
-    def drop_table(self, database_name, table_name):
+    def drop_table(self, schema_name, table_name):
         raise NotImplementedError()
 
-    def fetch_columns(self, database_name, table_name):
+    def fetch_columns(self, schema_name, table_name):
         raise NotImplementedError()
 
-    def fetch_column(self, database_name, table_name, column_name):
+    def fetch_column(self, schema_name, table_name, column_name):
         raise NotImplementedError()
 
-    def fetch_column_names(self, database_name, table_name):
+    def fetch_column_names(self, schema_name, table_name):
         raise NotImplementedError()
 
     def _process_filtering(self, sql, sql_args, search, filters, escaped_column_names):

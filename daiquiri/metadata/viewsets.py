@@ -11,33 +11,33 @@ from daiquiri.core.viewsets import ChoicesViewSet
 from daiquiri.core.permissions import HasModelPermission
 from daiquiri.core.constants import LICENSE_CHOICES, ACCESS_LEVEL_CHOICES
 
-from .models import Database, Table, Column, Function
+from .models import Schema, Table, Column, Function
 from .serializers import (
-    DatabaseSerializer,
+    SchemaSerializer,
     TableSerializer,
     ColumnSerializer,
     FunctionSerializer
 )
 from .serializers.export import (
-    DatabaseSerializer as ExportDatabaseSerializer,
+    SchemaSerializer as ExportSchemaSerializer,
     FunctionSerializer as ExportFunctionSerializer
 )
 from .serializers.management import (
-    DatabaseSerializer as ManagementDatabaseSerializer,
+    SchemaSerializer as ManagementSchemaSerializer,
     FunctionSerializer as ManagementFunctionSerializer
 )
 from .serializers.user import (
-    DatabaseSerializer as UserDatabaseSerializer,
+    SchemaSerializer as UserSchemaSerializer,
     FunctionSerializer as UserFunctionSerializer
 )
 
 
-class DatabaseViewSet(viewsets.ModelViewSet):
+class SchemaViewSet(viewsets.ModelViewSet):
     permission_classes = (HasModelPermission, )
     authentication_classes = (SessionAuthentication, TokenAuthentication)
 
-    queryset = Database.objects.all()
-    serializer_class = DatabaseSerializer
+    queryset = Schema.objects.all()
+    serializer_class = SchemaSerializer
 
     filter_backends = (DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
     filter_fields = ('name', 'access_level', 'metadata_access_level')
@@ -49,22 +49,22 @@ class DatabaseViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        database = serializer.save()
+        schema = serializer.save()
 
         if request.data.get('discover'):
             adapter = DatabaseAdapter()
 
-            for table_metadata in adapter.fetch_tables(database.name):
-                table_metadata['database'] = database.id
-                table_metadata['groups'] = [group.id for group in database.groups.all()]
+            for table_metadata in adapter.fetch_tables(schema.name):
+                table_metadata['schema'] = schema.id
+                table_metadata['groups'] = [group.id for group in schema.groups.all()]
                 for key in ['license', 'access_level', 'metadata_access_level']:
-                    table_metadata[key] = getattr(database, key)
+                    table_metadata[key] = getattr(schema, key)
 
                 table_serializer = TableSerializer(data=table_metadata)
                 if table_serializer.is_valid():
                     table = table_serializer.save()
 
-                    for column_metadata in adapter.fetch_columns(database.name, table.name):
+                    for column_metadata in adapter.fetch_columns(schema.name, table.name):
                         column_metadata['table'] = table.id
                         column_metadata['groups'] = [group.id for group in table.groups.all()]
                         for key in ['access_level', 'metadata_access_level']:
@@ -79,27 +79,27 @@ class DatabaseViewSet(viewsets.ModelViewSet):
 
     @list_route()
     def management(self, request):
-        queryset = Database.objects.all()
-        serializer = ManagementDatabaseSerializer(queryset, many=True)
+        queryset = Schema.objects.all()
+        serializer = ManagementSchemaSerializer(queryset, many=True)
         return Response(serializer.data)
 
     @list_route(methods=['get'], permission_classes=[])
     def user(self, request):
-        # filter the databases which are published for the groups of the user
-        queryset = Database.objects.filter_by_access_level(self.request.user)
-        serializer = UserDatabaseSerializer(queryset, context={'request': request}, many=True)
+        # filter the schemas which are published for the groups of the user
+        queryset = Schema.objects.filter_by_access_level(self.request.user)
+        serializer = UserSchemaSerializer(queryset, context={'request': request}, many=True)
         return Response(serializer.data)
 
     @list_route(methods=['get'], url_path='export', url_name='export-detail')
     def export_list(self, request):
-        queryset = Database.objects.all()
-        serializer = ExportDatabaseSerializer(queryset, many=True)
+        queryset = Schema.objects.all()
+        serializer = ExportSchemaSerializer(queryset, many=True)
         return Response(serializer.data)
 
     @detail_route(methods=['get'], url_path='export', url_name='export-detail')
     def export_detail(self, request, pk=None):
-        queryset = Database.objects.get(pk=pk)
-        serializer = ExportDatabaseSerializer(queryset)
+        queryset = Schema.objects.get(pk=pk)
+        serializer = ExportSchemaSerializer(queryset)
         return Response(serializer.data)
 
 
@@ -125,7 +125,7 @@ class TableViewSet(viewsets.ModelViewSet):
         if request.data.get('discover'):
             adapter = DatabaseAdapter()
 
-            for column_metadata in adapter.fetch_columns(table.database.name, table.name):
+            for column_metadata in adapter.fetch_columns(table.schema.name, table.name):
                 column_metadata['table'] = table.id
                 column_metadata['groups'] = [group.id for group in table.groups.all()]
                 for key in ['access_level', 'metadata_access_level']:
@@ -140,11 +140,11 @@ class TableViewSet(viewsets.ModelViewSet):
 
     @list_route(methods=['get'])
     def discover(self, request):
-        database_name = request.GET.get('database')
+        schema_name = request.GET.get('schema')
         table_name = request.GET.get('table')
 
-        if database_name and table_name:
-            return Response([DatabaseAdapter().fetch_table(database_name, table_name)])
+        if schema_name and table_name:
+            return Response([DatabaseAdapter().fetch_table(schema_name, table_name)])
         else:
             return Response([])
 
@@ -163,12 +163,12 @@ class ColumnViewSet(viewsets.ModelViewSet):
 
     @list_route(methods=['get'])
     def discover(self, request):
-        database_name = request.GET.get('database')
+        schema_name = request.GET.get('schema')
         table_name = request.GET.get('table')
         column_name = request.GET.get('column')
 
-        if database_name and table_name:
-            return Response([DatabaseAdapter().fetch_column(database_name, table_name, column_name)])
+        if schema_name and table_name:
+            return Response([DatabaseAdapter().fetch_column(schema_name, table_name, column_name)])
         else:
             return Response([])
 

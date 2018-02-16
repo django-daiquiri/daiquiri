@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from ..models import Database, Table, Column, Function
+from ..models import Schema, Table, Column, Function
 
 
 class ColumnSerializer(serializers.ModelSerializer):
@@ -47,12 +47,12 @@ class TableSerializer(serializers.ModelSerializer):
         return ColumnSerializer(queryset, context=self.context, many=True).data
 
 
-class DatabaseSerializer(serializers.ModelSerializer):
+class SchemaSerializer(serializers.ModelSerializer):
 
     tables = serializers.SerializerMethodField()
 
     class Meta:
-        model = Database
+        model = Schema
         fields = (
             'id',
             'order',

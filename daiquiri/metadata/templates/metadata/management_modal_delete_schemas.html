@@ -1,6 +1,6 @@
 {% load i18n %}
 
-    <div class="modal" id="databases-delete-modal" tabindex="-1">
+    <div class="modal" id="schemas-delete-modal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -8,14 +8,14 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                     <h4 class="modal-title">
-                        {% trans 'Delete database' %}
+                        {% trans 'Delete schema' %}
                     </h4>
                 </div>
 
                 <div class="modal-body">
                     <p>
                         {% blocktrans trimmed %}
-                        You are about to permanently delete the metadata for the database <strong>{$ service.values.name $}</strong>.
+                        You are about to permanently delete the metadata for the schema <strong>{$ service.values.name $}</strong>.
                         {% endblocktrans %}
                     </p>
                     <p>
@@ -33,7 +33,7 @@
                         {% trans 'Close' %}
                     </button>
                     <button type="button" class="btn btn-danger"
-                            ng-click="service.submitDeleteModal('databases')">
+                            ng-click="service.submitDeleteModal('schemas')">
                         {% trans 'Delete' %}
                     </button>
                 </div>

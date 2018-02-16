@@ -12,7 +12,7 @@ router.register(r'references', ReferenceViewSet, base_name='reference')
 
 
 urlpatterns = [
-    url(r'^table/(?P<database_name>[A-Za-z0-9_]+)/(?P<table_name>[A-Za-z0-9_]+)/$', table, name='table'),
+    url(r'^table/(?P<schema_name>[A-Za-z0-9_]+)/(?P<table_name>[A-Za-z0-9_]+)/$', table, name='table'),
 
     # rest api
     url(r'^api/', include(router.urls)),

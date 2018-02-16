@@ -96,8 +96,8 @@ class ArchiveJob(Job):
         # get database adapter
         adapter = DatabaseAdapter()
 
-        # get the database_name and the table_name from the settings
-        database_name = settings.ARCHIVE_DATABASE
+        # get the schema_name and the table_name from the settings
+        schema_name = settings.ARCHIVE_SCHEMA
         table_name = settings.ARCHIVE_TABLE
 
         # prepare list of files for this archive job
@@ -119,7 +119,7 @@ class ArchiveJob(Job):
                     })
 
                 # fetch the path for this file from the database
-                row = adapter.fetch_row(database_name, table_name, ['path'], filters={
+                row = adapter.fetch_row(schema_name, table_name, ['path'], filters={
                     'id': file_id,
                     'collection': collections
                 })
@@ -134,7 +134,7 @@ class ArchiveJob(Job):
 
         elif 'search' in self.data:
             # retrieve the pathes of all file matching the search criteria
-            rows = adapter.fetch_rows(database_name, table_name, page_size=0, search=self.data['search'], filters={
+            rows = adapter.fetch_rows(schema_name, table_name, page_size=0, search=self.data['search'], filters={
                 'collection': collections
             })
 

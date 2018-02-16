@@ -63,8 +63,8 @@ class DownloadAdapter(object):
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="http://www.ivoa.net/xml/VOTable/v1.3"
     xmlns:stc="http://www.ivoa.net/xml/STC/v1.30">
-    <RESOURCE name="%(database)s" type="results">''' % {
-            'database': schema_name
+    <RESOURCE name="%(schema)s" type="results">''' % {
+            'schema': schema_name
         }
         if status == 'OK':
             yield '''

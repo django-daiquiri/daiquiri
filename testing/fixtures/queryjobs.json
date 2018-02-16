@@ -3,7 +3,7 @@
     "model": "daiquiri_query.queryjob",
     "pk": "1b6c93ef-4161-4402-b1a7-d1237657e807",
     "fields": {
-      "database_name": "daiquiri_user_user",
+      "schema_name": "daiquiri_user_user",
       "table_name": "test",
       "query_language": "adql-2.0",
       "query": "SELECT id, ra, de, parallax FROM daiquiri_data_obs.stars",
@@ -20,7 +20,7 @@
     "model": "daiquiri_query.queryjob",
     "pk": "679b5ce8-bbcf-41c2-ba45-2340910bcfae",
     "fields": {
-      "database_name": "daiquiri_user_user",
+      "schema_name": "daiquiri_user_user",
       "table_name": "test_executing",
       "query_language": "adql-2.0",
       "query": "SELECT id, ra, de, parallax FROM daiquiri_data_obs.stars",
@@ -37,7 +37,7 @@
     "model": "daiquiri_query.queryjob",
     "pk": "5527f2b0-7130-466d-b8d2-dbf6c5f700bf",
     "fields": {
-      "database_name": "daiquiri_user_user",
+      "schema_name": "daiquiri_user_user",
       "table_name": "test_pending",
       "query_language": "adql-2.0",
       "query": "SELECT id, ra, de, parallax FROM daiquiri_data_obs.stars",
@@ -54,7 +54,7 @@
     "model": "daiquiri_query.queryjob",
     "pk": "c87926e4-8e5f-4032-a764-826b6a39c171",
     "fields": {
-      "database_name": "daiquiri_user_user",
+      "schema_name": "daiquiri_user_user",
       "table_name": "test_error",
       "query_language": "adql-2.0",
       "query": "SELECT id, ra, de, parallax FROM daiquiri_data_obs.stars",

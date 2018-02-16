@@ -27,7 +27,7 @@ class MysqldumpAdapter(DownloadAdapter):
         'double': float('nan')
     }
 
-    def set_args(self, database_name, table_name):
+    def set_args(self, schema_name, table_name):
         self.args = ['mysqldump', '--compact', '--skip-extended-insert']
 
         if 'USER' in self.database_config and self.database_config['USER']:
@@ -42,5 +42,5 @@ class MysqldumpAdapter(DownloadAdapter):
         if 'PORT' in self.database_config and self.database_config['PORT']:
             self.args.append('--port=%(PORT)s' % self.database_config)
 
-        self.args.append(database_name)
+        self.args.append(schema_name)
         self.args.append(table_name)
