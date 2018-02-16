@@ -1,0 +1,9 @@
+{% load i18n %}{% autoescape off %}
+{% blocktrans with site_name=current_site.name full_name=participant.full_name title=meeting.title %}
+Dear {{ site_name }} Team,
+
+{{ full_name }} has just registered for the {{ title }}:{% endblocktrans %}
+{{ participant.as_text }}{{ contribution.as_text }}
+{% trans "Sincerely" %},
+    {{ current_site.name }} Admins
+{% endautoescape %}

@@ -1,0 +1,11 @@
+{% load i18n %}{% autoescape off %}
+{% blocktrans with site_name=current_site.name full_name=participant.full_name title=meeting.title %}
+Dear {{ full_name }},
+
+Thank you for registering for the {{ title }}.
+
+We collected the following information from you:{% endblocktrans %}
+{{ participant.as_text|safe }}{{ contribution.as_text|safe }}
+{% trans "Sincerely" %},
+    {{ current_site.name }} Admins
+{% endautoescape %}

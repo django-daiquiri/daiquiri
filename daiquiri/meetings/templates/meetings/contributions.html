@@ -1,0 +1,20 @@
+{% extends 'core/page.html' %}
+{% load i18n %}
+{% load core_tags %}
+
+{% block page %}
+
+    <h1>{% trans 'Contributions' %}</h1>
+
+    {{ meeting.contributions_message|markdown }}
+
+    <ul class="list-unstyled">
+        {% for contribution in contributions %}
+        <li>
+            <h4>{{ contribution.title }} ({{ contribution.participant.full_name }})</h4>
+            {{ contribution.abstract }}
+        </li>
+        {% endfor %}
+    </ol>
+
+{% endblock %}
