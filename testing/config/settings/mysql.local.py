@@ -19,6 +19,3 @@ DATABASES = {
 
 ADAPTER_DATABASE = 'daiquiri.core.adapter.database.mysql.MySQLAdapter'
 ADAPTER_DOWNLOAD = 'daiquiri.core.adapter.download.mysqldump.MysqldumpAdapter'
-
-LOGGING_DIR = '/tmp'
-QUERY_DOWNLOAD_DIR = '/tmp'

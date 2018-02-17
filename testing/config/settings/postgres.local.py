@@ -20,6 +20,3 @@ DATABASES = {
 
 ADAPTER_DATABASE = 'daiquiri.core.adapter.database.postgres.PostgreSQLAdapter'
 ADAPTER_DOWNLOAD = 'daiquiri.core.adapter.download.pgdump.PgDumpAdapter'
-
-LOGGING_DIR = '/tmp'
-QUERY_DOWNLOAD_DIR = '/tmp'

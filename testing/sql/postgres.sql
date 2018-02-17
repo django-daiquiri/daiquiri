@@ -1,5 +1,8 @@
 -- drop and create schemas
 
+DROP SCHEMA IF EXISTS TAP_SCHEMA CASCADE;
+CREATE SCHEMA TAP_SCHEMA;
+
 DROP SCHEMA IF EXISTS daiquiri_archive CASCADE;
 CREATE SCHEMA daiquiri_archive;
 
