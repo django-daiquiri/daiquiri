@@ -37,9 +37,9 @@ class PgDumpAdapter(DownloadAdapter):
 
         if 'PASSWORD' in self.database_config and self.database_config['PASSWORD']:
             if 'PORT' in self.database_config and self.database_config['PORT']:
-                dbname = '--dbname=postgresql://%(USER)s:%(PASSWORD)s@%(HOST)s:%(PORT)s/'
+                dbname = '--dbname=postgresql://%(USER)s:%(PASSWORD)s@%(HOST)s:%(PORT)s/%(NAME)s'
             else:
-                dbname = '--dbname=postgresql://%(USER)s:%(PASSWORD)s@%(HOST)s/'
+                dbname = '--dbname=postgresql://%(USER)s:%(PASSWORD)s@%(HOST)s/%(NAME)s'
 
             self.args.append(dbname % self.database_config)
         else:

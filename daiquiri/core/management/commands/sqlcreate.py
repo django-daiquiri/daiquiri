@@ -10,7 +10,7 @@ class Command(BaseCommand):
     can_import_settings = True
 
     def add_arguments(self, parser):
-        parser.add_argument('--database', help='Show commands for a science database.')
+        parser.add_argument('--schema', help='Show commands for a science schema.')
         parser.add_argument('--test', action='store_true', help='Show commands for the test databases.')
 
     def get_config(self, key):
@@ -24,64 +24,89 @@ class Command(BaseCommand):
                 config['CLIENT'] = socket.gethostname()
 
             config['PREFIX'] = settings.QUERY_USER_SCHEMA_PREFIX
+            config['TAP_SCHEMA'] = settings.TAP_SCHEMA
+            config['TEST_NAME'] = 'test_%(NAME)s' % config
 
         return config
 
     def handle(self, *args, **options):
 
-        default = self.get_config('default')
-        tap = self.get_config('tap')
-        data = self.get_config('data')
+        config = {key: self.get_config(key) for key in ['default', 'tap', 'data']}
 
         print('')
 
-        if options['database']:
-            if data:
-                data.update({'DATABASE_NAME': options['database']})
-                print('''-- Run the following commands on \'%(HOST)s\':
-GRANT SELECT ON `%(DATABASE_NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\';''' % data)
+        if options['schema']:
+            if 'data' in config:
+                if config['data']['ENGINE'] == 'django.db.backends.mysql':
+                    config['data'].update({'SCHEMA_NAME': options['schema']})
+                    print('''-- Run the following commands on \'%(HOST)s\':
+GRANT SELECT ON `%(SCHEMA_NAME)s`.* TO \'%(USER)s\'@\'%(CLIENT)s\';
+''' % config['data'])
+                elif config['data']['ENGINE'] == 'django.db.backends.postgresql':
+                    config['data'].update({'SCHEMA_NAME': options['schema']})
+                    print('''-- Run the following commands on %(HOST)s:
+\c %(NAME)s
+GRANT USAGE ON SCHEMA %(SCHEMA_NAME)s TO %(USER)s;
+GRANT SELECT ON ALL TABLES IN SCHEMA %(SCHEMA_NAME)s TO %(USER)s;
+''' % config['data'])
+
             else:
                 raise RuntimeError('No \'data\' database connection configured.')
 
         elif options['test']:
+            if 'default' in config:
+                if config['default']['ENGINE'] == 'django.db.backends.mysql':
+                    print('''-- For testing, run the following commands on \'%(HOST)s\':
+CREATE DATABASE `%(TEST_NAME)s`;
+GRANT ALL PRIVILEGES ON `%(TEST_NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\';
+''' % config['default'])
 
-            if default:
-                print('''-- For testing, run the following commands on \'%(HOST)s\':
-GRANT ALL PRIVILEGES ON `test_%(NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\';
-''' % default)
+                elif config['default']['ENGINE'] == 'django.db.backends.postgresql':
+                    print('''-- Run the following commands on \'%(HOST)s\':
+CREATE DATABASE %(TEST_NAME)s WITH OWNER %(USER)s;
+''' % config['default'])
 
-            if tap:
-                print('''-- For testing, run the following commands on \'%(HOST)s\':
-GRANT ALL PRIVILEGES ON `test_%(NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\';
-''' % tap)
+            if 'data' in config:
+                if config['data']['ENGINE'] == 'django.db.backends.mysql':
+                    print('''-- For testing, run the following commands on \'%(HOST)s\':
+CREATE DATABASE `%(TEST_NAME)s`;
+GRANT ALL PRIVILEGES ON `%(TEST_NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\';
+''' % config['data'])
 
-            if data:
-                print('''-- For testing, run the following commands on \'%(HOST)s\':
-GRANT ALL PRIVILEGES ON `test_`.* to \'%(USER)s\'@\'%(CLIENT)s\';
-''' % data)
+                elif config['data']['ENGINE'] == 'django.db.backends.postgresql':
+                    print('''-- Run the following commands on \'%(HOST)s\':
+CREATE DATABASE %(TEST_NAME)s WITH OWNER %(USER)s;
+\c %(TEST_NAME)s
+CREATE SCHEMA %(TAP_SCHEMA)s AUTHORIZATION %(USER)s;
+''' % config['data'])
 
         else:
-
-            if default:
-                print('''-- Run the following commands on \'%(HOST)s\':
+            if 'default' in config:
+                if config['default']['ENGINE'] == 'django.db.backends.mysql':
+                    print('''-- Run the following commands on \'%(HOST)s\':
+CREATE USER \'%(USER)s\'@\'%(CLIENT)s\' identified by \'%(PASSWORD)s\';
 CREATE DATABASE `%(NAME)s`;
-CREATE USER \'%(USER)s\'@\'%(CLIENT)s\' identified by \'%(PASSWORD)s\';
 GRANT ALL PRIVILEGES ON `%(NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\';
-''' % default)
+''' % config['default'])
 
-            if tap:
-                print('''-- Run the following commands on \'%(HOST)s\':
-CREATE DATABASE `%(NAME)s`;
+                elif config['default']['ENGINE'] == 'django.db.backends.postgresql':
+                    print('''-- Run the following commands on \'%(HOST)s\':
+CREATE USER %(USER)s WITH PASSWORD \'%(PASSWORD)s\';
+CREATE DATABASE %(NAME)s WITH OWNER %(USER)s;
+''' % config['default'])
+
+            if 'data' in config:
+                if config['data']['ENGINE'] == 'django.db.backends.mysql':
+                    print('''-- Run the following commands on \'%(HOST)s\':
 CREATE USER \'%(USER)s\'@\'%(CLIENT)s\' identified by \'%(PASSWORD)s\';
-GRANT ALL PRIVILEGES ON `%(NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\';
-''' % tap)
+GRANT ALL PRIVILEGES ON `%(TAP_SCHEMA)s`.* to \'%(USER)s\'@\'%(CLIENT)s\';
+GRANT ALL PRIVILEGES ON `%(PREFIX)s%%`.* to \'%(USER)s\'@\'%(CLIENT)s\';
+''' % config['data'])
 
-            if data:
-                print('''-- Run the following commands on \'%(HOST)s\':
-CREATE USER \'%(USER)s\'@\'%(CLIENT)s\' identified by \'%(PASSWORD)s\';
-GRANT ALL PRIVILEGES ON `%(PREFIX)s%%`.* to \'%(USER)s\'@\'%(CLIENT)s\';''' % data)
-                if tap:
-                    data.update({'DATABASE_NAME': tap['NAME']})
-                    print('GRANT SELECT ON `%(DATABASE_NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\';' % data)
-
-        print('')
+                elif config['data']['ENGINE'] == 'django.db.backends.postgresql':
+                    print('''-- Run the following commands on \'%(HOST)s\':
+CREATE USER %(USER)s WITH PASSWORD \'%(PASSWORD)s\';
+CREATE DATABASE %(NAME)s WITH OWNER %(USER)s;
+\c %(NAME)s
+CREATE SCHEMA TAP_SCHEMA AUTHORIZATION %(USER)s;
+''' % config['data'])
