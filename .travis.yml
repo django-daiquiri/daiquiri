@@ -24,7 +24,7 @@ install:
 - pip install mysqlclient psycopg2-binary coveralls
 
 before_script:
-- sh -c "cp testing/config/settings/travis.$DB.local.py testing/config/settings/local.py; fi"
+- sh -c "cp testing/config/settings/$DB.local.py testing/config/settings/local.py; fi"
 - mkdir testing/log testing/download
 - mysql < testing/sql/mysql.sql
 #- psql < testing/sql/postgres.sql
