@@ -31,22 +31,27 @@ class PgDumpAdapter(DownloadAdapter):
     def set_args(self, schema_name, table_name):
         # command line for pg_dump:
         # pg_dump -a --inserts --dbname=postgresql://user:password@host:port/database --table=schema.table
+        # pg_dump -a --inserts --user=user --host=host --port=port --dbname=database --table=schema.table
 
-        dbname_string = '--dbname=postgresql://'
-
-        if 'USER' in self.database_config and self.database_config['USER']:
-            dbname_string += '%(USER)s' % self.database_config
+        self.args = ['pg_dump', '-a', '--inserts']
 
         if 'PASSWORD' in self.database_config and self.database_config['PASSWORD']:
-            dbname_string +=':%(PASSWORD)s' % self.database_config
+            if 'PORT' in self.database_config and self.database_config['PORT']:
+                dbname = '--dbname=postgresql://%(USER)s:%(PASSWORD)s@%(HOST)s:%(PORT)s/'
+            else:
+                dbname = '--dbname=postgresql://%(USER)s:%(PASSWORD)s@%(HOST)s/'
 
-        if 'HOST' in self.database_config and self.database_config['HOST']:
-            dbname_string +='@%(HOST)s' % self.database_config
+            self.args.append(dbname % self.database_config)
+        else:
+            if 'USER' in self.database_config and self.database_config['USER']:
+                self.args.append('--user=%(USER)s' % self.database_config)
 
-        if 'PORT' in self.database_config and self.database_config['PORT']:
-            dbname_string +=':%(PORT)s' % self.database_config
+            if 'HOST' in self.database_config and self.database_config['HOST']:
+                self.args.append('--host=%(HOST)s' % self.database_config)
 
-        if 'NAME' in self.database_config and self.database_config['NAME']:
-            dbname_string +='/%(NAME)s' % self.database_config
+            if 'PORT' in self.database_config and self.database_config['PORT']:
+                self.args.append('--port=%(PORT)d' % self.database_config)
 
-        self.args = ['pg_dump', '-a', '--inserts', dbname_string, '--table=%s.%s' % (schema_name, table_name)]
+            self.args.append('--dbname=%(NAME)s' % self.database_config)
+
+        self.args.append('--table=%s.%s' % (schema_name, table_name))

@@ -4,7 +4,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'daiquiri_app',
-        'USER': 'postgres'
+        'USER': 'postgres',
     },
     'tap': {
         'ENGINE': 'django.db.backends.postgresql',
