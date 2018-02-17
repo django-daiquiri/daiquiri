@@ -9,11 +9,11 @@ python:
 
 addons:
   mariadb: '10.1'
-  postgres: '9.6'
+  postgresql: '9.6'
 
 env:
 - DB=mysql
-#- DB=postgres
+- DB=postgres
 
 before_install:
   - sudo apt-get -qq update
@@ -27,10 +27,11 @@ before_script:
 - sh -c "cp testing/config/settings/$DB.local.py testing/config/settings/local.py; fi"
 - mkdir testing/log testing/download
 - mysql < testing/sql/mysql.sql
-#- psql < testing/sql/postgres.sql
+- psql -U postgres -c 'CREATE DATABASE test_daiquiri_data;'
+- psql -U postgres -f testing/sql/postgres.sql test_daiquiri_data
 
 script:
-- coverage run testing/runtests.py
+- coverage run testing/runtests.py -k
 
 after_success:
 - coveralls
