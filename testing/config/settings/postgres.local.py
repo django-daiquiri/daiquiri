@@ -6,16 +6,11 @@ DATABASES = {
         'NAME': 'daiquiri_app',
         'USER': 'postgres',
     },
-    'tap': {
+    'data': {
         'ENGINE': 'django.db.backends.postgresql',
         'OPTIONS': {
             'options': '-c search_path=TAP_SCHEMA'
         },
-        'NAME': 'daiquiri_data',
-        'USER': 'postgres'
-    },
-    'data': {
-        'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'daiquiri_data',
         'USER': 'postgres'
     }

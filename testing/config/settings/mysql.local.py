@@ -6,13 +6,9 @@ DATABASES = {
         'NAME': 'daiquiri_app',
         'USER': 'root'
     },
-    'tap': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'TAP_SCHEMA',
-        'USER': 'root'
-    },
     'data': {
         'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'TAP_SCHEMA',
         'USER': 'root'
     }
 }
