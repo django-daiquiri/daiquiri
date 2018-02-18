@@ -103,7 +103,7 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
         service.polling.init();
         service.polling.register('status', service.fetchStatus, {}, true, false);
         service.polling.register('jobs', service.fetchJobs, {}, true, false);
-        service.polling.register('schema', service.fetchUserDatabase, {}, true, false);
+        service.polling.register('schema', service.fetchUserSchema, {}, true, false);
 
         // load the other services
         service.table = TableService;
