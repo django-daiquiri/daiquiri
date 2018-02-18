@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from rest_framework import serializers
 
 from ..models import Schema, Table, Column, Function
@@ -43,7 +45,10 @@ class TableSerializer(serializers.ModelSerializer):
 
     def get_columns(self, obj):
         # filter the columns which are published for the groups of the user
-        queryset = obj.columns.filter_by_access_level(self.context['request'].user)
+        if not settings.METADATA_COLUMN_PERMISSIONS:
+            queryset = obj.columns.all()
+        else:
+            queryset = obj.columns.filter_by_access_level(self.context['request'].user)
         return ColumnSerializer(queryset, context=self.context, many=True).data
 
 
