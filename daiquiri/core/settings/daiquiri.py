@@ -86,18 +86,6 @@ QUERY_FORMS = [
         'label': 'SQL query',
         'service': 'query/js/forms/sql.js',
         'template': 'query/query_form_sql.html'
-    },
-    {
-        'key': 'box',
-        'label': 'Box search',
-        'service': 'query/js/forms/box.js',
-        'template': 'query/query_form_box.html'
-    },
-    {
-        'key': 'cone',
-        'label': 'Cone search',
-        'service': 'query/js/forms/cone.js',
-        'template': 'query/query_form_cone.html'
     }
 ]
 QUERY_DROPDOWNS = [

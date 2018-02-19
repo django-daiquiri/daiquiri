@@ -67,6 +67,10 @@
     </div>
 </div>
 
+<ul class="help-block list-unstyled">
+    <li class="text-danger" ng-repeat="error in service.forms.box.errors.query">{$ error $}</li>
+</ul>
+
 <div class="row">
     <formgroup
         class="col-md-9"
