@@ -15,7 +15,8 @@ class JobListSerializer(serializers.ModelSerializer):
 class JobRetrieveSerializer(serializers.ModelSerializer):
 
     job_id = serializers.UUIDField(source='id')
-    owner_id = serializers.UUIDField(source='owner.username')
+    #owner_id = serializers.UUIDField(source='owner.username')
+    owner_id = serializers.SerializerMethodField()
     destruction = serializers.DateTimeField(source='destruction_time')
 
     class Meta:
@@ -32,6 +33,12 @@ class JobRetrieveSerializer(serializers.ModelSerializer):
             'results',
             'parameters'
         )
+
+    def get_owner_id(self, obj):
+        if obj.owner:
+            return obj.owner.username
+        else:
+            return None
 
 
 class CaseInsensitiveSerializer(serializers.Serializer):
