@@ -17,6 +17,22 @@ def home(request):
     return render(request, 'core/home.html', {'form': login_form})
 
 
+def bad_request(request):
+    return render(request, 'core/400.html')
+
+
+def forbidden(request):
+    return render(request, 'core/403.html')
+
+
+def not_found(request):
+    return render(request, 'core/404.html')
+
+
+def internal_server_error(request):
+    return render(request, 'core/500.html')
+
+
 class PermissionRedirectMixin(object):
 
     def handle_no_permission(self):
