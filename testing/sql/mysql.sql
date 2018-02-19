@@ -23,20 +23,23 @@ CREATE TABLE `daiquiri_archive`.`files` (
     `ra`          FLOAT NOT NULL,
     `de`          FLOAT NOT NULL
 ) ENGINE=MyISAM;
+
 CREATE TABLE `daiquiri_data_obs`.`images` (
   `id` int(11),
-  `RA` double,
-  `DE` double,
+  `ra` double,
+  `de` double,
   `preview` char(64),
   `fits` char(64),
   `links` char(64)
 ) ENGINE=MyISAM;
+
 CREATE TABLE `daiquiri_data_obs`.`stars` (
   `id` int(11),
-  `RA` int(11),
-  `DE` double,
+  `ra` int(11),
+  `de` double,
   `parallax` double
 ) ENGINE=MyISAM;
+
 CREATE TABLE `daiquiri_data_sim`.`particles` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `x` double NOT NULL,
@@ -47,6 +50,7 @@ CREATE TABLE `daiquiri_data_sim`.`particles` (
   `vz` double NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM;
+
 CREATE TABLE `daiquiri_user_user`.`test` (
   `id` int(11),
   `ra` int(11),

@@ -129,6 +129,15 @@ def check_permissions(user, keywords, tables, columns, functions):
                     messages.append(_('Table %s not found.') % table_name)
                     continue
 
+        for schema_name, table_name, column_name in columns:
+            if column_name in [None, '*']:
+                continue
+            else:
+                try:
+                    Column.objects.filter(table__schema__name=schema_name).filter(table__name=table_name).get(name=column_name)
+                except Column.DoesNotExist:
+                    messages.append(_('Column %s not found.') % column_name)
+                    continue
     else:
         # check permissions on schemas/tables/columns
         for column in columns:

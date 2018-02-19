@@ -25,21 +25,24 @@ CREATE TABLE daiquiri_archive.files (
     "ra"          REAL NOT NULL,
     "de"          REAL NOT NULL
 );
+
 CREATE TABLE daiquiri_data_obs.images
 (
   "id" int,
-  "RA" double precision,
-  "DE" double precision,
+  "ra" double precision,
+  "de" double precision,
   "preview" char(64),
   "fits" char(64),
   "links" char(64)
 );
+
 CREATE TABLE daiquiri_data_obs.stars (
   "id" int,
-  "RA" int,
-  "DE" double precision,
+  "ra" int,
+  "de" double precision,
   "parallax" double precision
 );
+
 CREATE TABLE daiquiri_data_sim.particles (
   "id" int PRIMARY KEY,
   "x" double precision NOT NULL,
@@ -49,6 +52,7 @@ CREATE TABLE daiquiri_data_sim.particles (
   "vy" double precision NOT NULL,
   "vz" double precision NOT NULL
 );
+
 CREATE TABLE daiquiri_user_user.test (
   "id" int,
   "ra" int,

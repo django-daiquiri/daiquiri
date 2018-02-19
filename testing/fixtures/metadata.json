@@ -126,7 +126,7 @@
     "fields": {
       "table": 203,
       "order": 1,
-      "name": "RA",
+      "name": "ra",
       "description": "Right ascension",
       "unit": "Angle[deg]",
       "ucd": "pos.eq.ra; meta.main",
@@ -149,7 +149,7 @@
     "fields": {
       "table": 203,
       "order": 2,
-      "name": "DE",
+      "name": "de",
       "description": "Declination",
       "unit": "Angle[deg]",
       "ucd": "pos.eq.de; meta.main",
@@ -262,7 +262,7 @@
     "fields": {
       "table": 204,
       "order": 1,
-      "name": "RA",
+      "name": "ra",
       "description": "Right ascension",
       "unit": "Angle[deg]",
       "ucd": "pos.eq.ra; meta.main",
@@ -283,7 +283,7 @@
     "fields": {
       "table": 204,
       "order": 2,
-      "name": "DE",
+      "name": "de",
       "description": "Declination",
       "unit": "Angle[deg]",
       "ucd": "pos.eq.de; meta.main",
