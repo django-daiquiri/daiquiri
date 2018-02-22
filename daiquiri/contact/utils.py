@@ -1,12 +1,11 @@
 from django.urls import reverse
 
-from daiquiri.core.utils import send_mail
-from daiquiri.auth.utils import get_admin_emails
+from daiquiri.core.utils import send_mail, get_admin_emails
 
 
 def send_contact_message(request, message):
 
-    emails = get_admin_emails()
+    admin_emails = get_admin_emails()
     context = {
         'user': message.user,
         'author': message.author,
@@ -15,5 +14,5 @@ def send_contact_message(request, message):
         'message': message.message,
         'url': request.build_absolute_uri(reverse('contact:messages'))
     }
-    send_mail(request, 'contact/email/new_message_admin', context, emails)
+    send_mail(request, 'contact/email/new_message_admin', context, admin_emails)
     send_mail(request, 'contact/email/new_message_user', context, [message.email])

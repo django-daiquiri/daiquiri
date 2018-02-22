@@ -1,7 +1,6 @@
-from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
-from daiquiri.core.utils import send_mail
+from daiquiri.core.utils import send_mail, get_admin_emails
 
 
 def get_full_name(user):
@@ -9,10 +8,6 @@ def get_full_name(user):
         return user.first_name + ' ' + user.last_name
     else:
         return user.username
-
-
-def get_admin_emails():
-    return [user.email for user in User.objects.filter(is_superuser=True)]
 
 
 def send_request_confirmation(request, user):
