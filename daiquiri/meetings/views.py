@@ -51,7 +51,7 @@ def registration(request, slug):
 
 def registration_done(request, slug):
     try:
-        meeting = Meeting.objects.filter(registration_open=True).get(slug=slug)
+        meeting = Meeting.objects.get(slug=slug)
     except Meeting.DoesNotExist:
         raise Http404
 
