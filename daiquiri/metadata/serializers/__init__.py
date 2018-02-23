@@ -45,6 +45,7 @@ class ColumnSerializer(serializers.ModelSerializer):
                 'utype',
                 'datatype',
                 'arraysize',
+                'index_for',
                 'principal',
                 'indexed',
                 'std',

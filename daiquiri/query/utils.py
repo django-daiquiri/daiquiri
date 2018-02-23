@@ -99,6 +99,18 @@ def get_asterisk_columns(display_column):
     return [(column_name, (schema_name, table_name, column_name)) for column_name in column_names]
 
 
+def get_indexed_objects():
+    indexed_objects = {}
+
+    for column in Column.objects.exclude(index_for=None):
+        if column.datatype not in indexed_objects:
+            indexed_objects[column.datatype] = [column.indexed_columns]
+        else:
+            indexed_objects[column.datatype].append(column.indexed_columns)
+
+    return indexed_objects
+
+
 def check_permissions(user, keywords, tables, columns, functions):
     messages = []
 

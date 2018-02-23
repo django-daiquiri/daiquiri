@@ -99,6 +99,14 @@
                         </formgroup>
                     </div>
                     <formgroup
+                        data-id="index_for"
+                        data-type="text"
+                        data-label="{{ meta.Column.index_for.verbose_name }}"
+                        data-help="{{ meta.Column.index_for.help_text }}"
+                        data-model="service.values.index_for"
+                        data-errors="service.errors.index_for">
+                    </formgroup>
+                    <formgroup
                         data-id="principal"
                         data-type="checkbox"
                         data-label="{{ meta.Column.principal.verbose_name }}"

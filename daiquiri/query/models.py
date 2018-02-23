@@ -39,6 +39,7 @@ from .utils import (
     get_format_config,
     get_user_schema_name,
     get_asterisk_columns,
+    get_indexed_objects,
     check_permissions
 )
 from .tasks import run_query, create_download_file, create_archive_file
@@ -216,7 +217,8 @@ class QueryJob(Job):
             if adapter.database_config['ENGINE'] == 'django.db.backends.mysql':
                 processor = MySQLQueryProcessor(translated_query)
             elif adapter.database_config['ENGINE'] == 'django.db.backends.postgresql':
-                processor = PostgreSQLQueryProcessor(translated_query)
+                processor = PostgreSQLQueryProcessor(translated_query, indexed_objects=get_indexed_objects())
+                processor.process_query()
             else:
                 raise Exception('Unknown database engine')
 
