@@ -31,7 +31,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        config = {key: self.get_config(key) for key in ['default', 'tap', 'data']}
+        config = {key: self.get_config(key) for key in ['default', 'data']}
 
         print('')
 
@@ -108,5 +108,5 @@ GRANT ALL PRIVILEGES ON `%(PREFIX)s%%`.* to \'%(USER)s\'@\'%(CLIENT)s\';
 CREATE USER %(USER)s WITH PASSWORD \'%(PASSWORD)s\';
 CREATE DATABASE %(NAME)s WITH OWNER %(USER)s;
 \c %(NAME)s
-CREATE SCHEMA TAP_SCHEMA AUTHORIZATION %(USER)s;
+CREATE SCHEMA %(TAP_SCHEMA)s AUTHORIZATION %(USER)s;
 ''' % config['data'])
