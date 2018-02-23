@@ -46,12 +46,12 @@ class RegistrationTests(TestViewMixin, MeetingsViewTestCase):
             'slug': instance.slug
         })
 
-        self.assertIn('<input type="submit" value="Register"', msg['content'])
-        self.assertIn('<input type="text" name="affiliation"', msg['content'])
-        self.assertIn('<input type="radio" name="dinner" value="yes"', msg['content'])
-        self.assertIn('<input type="radio" name="dinner" value="no"', msg['content'])
-        self.assertIn('<input type="radio" name="contribution_type" value="talk"', msg['content'])
-        self.assertIn('<input type="radio" name="contribution_type" value="poster"', msg['content'])
+        self.assertIn(b'<input type="submit" value="Register"', msg['content'])
+        self.assertIn(b'<input type="text" name="affiliation"', msg['content'])
+        self.assertIn(b'<input type="radio" name="dinner" value="yes"', msg['content'])
+        self.assertIn(b'<input type="radio" name="dinner" value="no"', msg['content'])
+        self.assertIn(b'<input type="radio" name="contribution_type" value="talk"', msg['content'])
+        self.assertIn(b'<input type="radio" name="contribution_type" value="poster"', msg['content'])
 
     def _test_open_post(self, username):
         instance = Meeting.objects.filter(registration_open=True).first()
@@ -89,8 +89,8 @@ class RegistrationTests(TestViewMixin, MeetingsViewTestCase):
             'slug': instance.slug
         })
 
-        self.assertNotIn('<input type="submit" value="Register"', msg['content'])
-        self.assertIn('The registration is currently closed.', msg['content'])
+        self.assertNotIn(b'<input type="submit" value="Register"', msg['content'])
+        self.assertIn(b'The registration is currently closed.', msg['content'])
 
     def _test_not_found_get(self, username):
         self.assert_view('detail_view_not_found', 'get', 'update_view', username, {
@@ -111,7 +111,7 @@ class RegistrationDoneTests(TestViewMixin, MeetingsViewTestCase):
             'slug': instance.slug
         })
 
-        self.assertNotIn('The registration is currently closed.', msg['content'])
+        self.assertNotIn(b'The registration is currently closed.', msg['content'])
 
     def _test_closed(self, username):
         instance = Meeting.objects.filter(registration_open=False).first()
@@ -120,7 +120,7 @@ class RegistrationDoneTests(TestViewMixin, MeetingsViewTestCase):
             'slug': instance.slug
         })
 
-        self.assertIn('The registration is currently closed.', msg['content'])
+        self.assertIn(b'The registration is currently closed.', msg['content'])
 
     def _test_not_found(self, username):
         self.assert_view('detail_view_not_found', 'get', 'detail_view', username, {
@@ -140,7 +140,7 @@ class ParticipantsTests(TestViewMixin, MeetingsViewTestCase):
             'slug': instance.slug
         })
 
-        self.assertIn('Tanja Testuser (Test)', msg['content'])
+        self.assertIn(b'Tanja Testuser (Test)', msg['content'])
 
     def _test_closed(self, username):
         instance = Meeting.objects.filter(participants_open=False).first()
@@ -149,7 +149,7 @@ class ParticipantsTests(TestViewMixin, MeetingsViewTestCase):
             'slug': instance.slug
         })
 
-        self.assertIn('The list of participants is currently not available.', msg['content'])
+        self.assertIn(b'The list of participants is currently not available.', msg['content'])
 
     def _test_not_found(self, username):
         self.assert_view('detail_view_not_found', 'get', 'detail_view', username, {
@@ -169,7 +169,7 @@ class ContributionsTests(TestViewMixin, MeetingsViewTestCase):
             'slug': instance.slug
         })
 
-        self.assertIn('Lorem ipsum dolor sit amet (Tanja Testuser)', msg['content'])
+        self.assertIn(b'Lorem ipsum dolor sit amet (Tanja Testuser)', msg['content'])
 
     def _test_closed(self, username):
         instance = Meeting.objects.filter(contributions_open=False).first()
@@ -178,7 +178,7 @@ class ContributionsTests(TestViewMixin, MeetingsViewTestCase):
             'slug': instance.slug
         })
 
-        self.assertIn('The list of contributions is currently not available.', msg['content'])
+        self.assertIn(b'The list of contributions is currently not available.', msg['content'])
 
     def _test_not_found(self, username):
         self.assert_view('detail_view_not_found', 'get', 'detail_view', username, {
