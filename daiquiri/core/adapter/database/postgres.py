@@ -291,7 +291,7 @@ class PostgreSQLAdapter(DatabaseAdapter):
         logger.debug('fetch_columns %s %s' % (schema_name, table_name))
 
         # prepare sql string
-        sql = 'SELECT column_name, data_type, udt_name, character_maximum_length FROM information_schema.columns WHERE table_schema = %(schema)s AND table_name = %(table)s' % {
+        sql = 'SELECT column_name, data_type, udt_name, character_maximum_length, ordinal_position FROM information_schema.columns WHERE table_schema = %(schema)s AND table_name = %(table)s' % {
             'schema': self.escape_string(schema_name),
             'table': self.escape_string(table_name)
         }
@@ -334,7 +334,7 @@ class PostgreSQLAdapter(DatabaseAdapter):
 
     def fetch_column(self, schema_name, table_name, column_name):
         # prepare sql string
-        sql = 'SELECT column_name, data_type, udt_name, character_maximum_length FROM information_schema.columns WHERE table_schema = %(schema)s AND table_name = %(table)s AND column_name = %(column)s' % {
+        sql = 'SELECT column_name, data_type, udt_name, character_maximum_length, ordinal_position FROM information_schema.columns WHERE table_schema = %(schema)s AND table_name = %(table)s AND column_name = %(column)s' % {
             'schema': self.escape_string(schema_name),
             'table': self.escape_string(table_name),
             'column': self.escape_string(column_name)
@@ -414,6 +414,8 @@ class PostgreSQLAdapter(DatabaseAdapter):
         else:
             column['datatype'] = None
             column['arraysize'] = None
+
+        column['order'] = row[4]
 
         # log values and return
         logger.debug('row = %s', row)
