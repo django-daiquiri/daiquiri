@@ -86,6 +86,10 @@ p.daiquiri-query-form-help {
             border-left: 1px solid $border-color;
 
             padding: 5px 15px;
+
+            .daiquiri-query-dropdown-form {
+                margin: 0;
+            }
         }
         .daiquiri-query-dropdown-body {
             border: 1px solid $border-color;
