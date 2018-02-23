@@ -40,7 +40,7 @@ setup(
         'django-test-generator>=0.3.3',
         'mock',
         'coverage',
-        'queryparser_python%d>=0.2.5' % sys.version_info.major
+        'queryparser_python%d>=0.2.6' % sys.version_info.major
     ],
     classifiers=[
         'Development Status :: 1 - Planning',
