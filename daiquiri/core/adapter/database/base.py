@@ -5,37 +5,6 @@ from django.db import connections
 
 class DatabaseAdapter(object):
 
-    FUNCTIONS = (
-        # char_functions
-       'ASCII_SYM', 'BIN', 'BIT_LENGTH', 'CHAR_LENGTH', 'CHAR', 'CONCAT_WS', 'CONCAT',
-       'ELT', 'EXPORT_SET', 'FIELD', 'FIND_IN_SET', 'FORMAT', 'FROM_BASE64', 'HEX',
-       'INSERT', 'INSTR', 'LEFT', 'LENGTH', 'LOAD_FILE', 'LOCATE', 'LOWER', 'LPAD', 
-       'LTRIM', 'MAKE_SET', 'MID', 'OCT', 'ORD', 'QUOTE', 'REPEAT', 'REPLACE', 'REVERSE',
-       'RIGHT', 'RPAD', 'RTRIM', 'SOUNDEX', 'SPACE', 'STRCMP', 'SUBSTRING_INDEX',
-       'SUBSTRING', 'TO_BASE64', 'TRIM', 'UNHEX', 'UPPER', 'WEIGHT_STRING',
-
-        # group_functions
-        'AVG', 'COUNT', 'MAX_SYM', 'MIN_SYM', 'SUM', 'BIT_AND', 'BIT_OR', 'BIT_XOR',
-        'BIT_COUNT', 'GROUP_CONCAT', 'STD', 'STDDEV', 'STDDEV_POP', 'STDDEV_SAMP',
-        'VAR_POP', 'VAR_SAMP', 'VARIANCE',
-
-        # number_functions
-        'ABS', 'ACOS', 'ASIN', 'ATAN2', 'ATAN', 'CEIL', 'CEILING', 'CONV', 'COS', 'COT',
-        'CRC32', 'DEGREES', 'EXP', 'FLOOR', 'LN', 'LOG10', 'LOG2', 'LOG', 'MOD', 'PI', 'POW',
-        'POWER', 'RADIANS', 'RAND', 'ROUND', 'SIGN', 'SIN', 'SQRT', 'TAN', 'TRUNCATE',
-
-        # time_functions
-        'ADDDATE', 'ADDTIME', 'CONVERT_TZ', 'CURDATE', 'CURTIME', 'DATE_ADD',
-        'DATE_FORMAT', 'DATE_SUB', 'DATE_SYM', 'DATEDIFF', 'DAYNAME', 'DAYOFMONTH',
-        'DAYOFWEEK', 'DAYOFYEAR', 'EXTRACT', 'FROM_DAYS', 'FROM_UNIXTIME', 'GET_FORMAT',
-        'HOUR', 'LAST_DAY', 'MAKEDATE', 'MAKETIME', 'MICROSECOND', 'MINUTE', 'MONTH',
-        'MONTHNAME', 'NOW', 'PERIOD_ADD', 'PERIOD_DIFF', 'QUARTER', 'SEC_TO_TIME',
-        'SECOND', 'STR_TO_DATE', 'SUBTIME', 'SYSDATE', 'TIME_FORMAT', 'TIME_TO_SEC',
-        'TIME_SYM', 'TIMEDIFF', 'TIMESTAMP', 'TIMESTAMPADD', 'TIMESTAMPDIFF', 'TO_DAYS',
-        'TO_SECONDS', 'UNIX_TIMESTAMP', 'UTC_DATE', 'UTC_TIME', 'UTC_TIMESTAMP', 'WEEK',
-        'WEEKDAY', 'WEEKOFYEAR', 'YEAR', 'YEARWEEK',
-    )
-
     def __init__(self, database_key, database_config):
         self.database_key = database_key
         self.database_config = database_config

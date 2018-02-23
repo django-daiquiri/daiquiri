@@ -185,15 +185,15 @@ def check_permissions(user, keywords, tables, columns, functions):
 
     # check permissions on functions
     for function_name in functions:
-        if function_name.upper() in DatabaseAdapter().FUNCTIONS:
-            continue
+
+        # check permission on function
+        queryset = Function.objects.filter(name=function_name)
+
+        # forbit the function if it is in metadata.functions, and the user doesn't have access.
+        if queryset and not queryset.filter_by_access_level(user):
+            messages.append(_('Function %s is not allowed.') % function_name)
         else:
-            # check permission on function
-            try:
-                Function.objects.filter_by_access_level(user).get(name=function_name)
-            except Function.DoesNotExist:
-                messages.append(_('Function %s not found.') % function_name)
-                continue
+            continue
 
     # return the error stack
     return list(set(messages))

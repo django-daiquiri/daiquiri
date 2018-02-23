@@ -1,6 +1,5 @@
 import logging
 import re
-import six
 import warnings
 
 from django.db import OperationalError, ProgrammingError
