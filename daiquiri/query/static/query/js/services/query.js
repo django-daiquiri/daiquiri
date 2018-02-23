@@ -187,9 +187,14 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
                 service.activateTab('overview');
             }
 
-            CodeMirror.runMode(service.job.query, "text/x-mariadb", angular.element('#query')[0]);
-            CodeMirror.runMode(service.job.native_query, "text/x-mariadb", angular.element('#native-query')[0]);
-            CodeMirror.runMode(service.job.actual_query, "text/x-mariadb", angular.element('#actual-query')[0]);
+            CodeMirror.runMode(service.job.query, "text/x-sql", angular.element('#query')[0]);
+
+            if (service.job.native_query) {
+                CodeMirror.runMode(service.job.native_query, "text/x-sql", angular.element('#native-query')[0]);
+            }
+            if (service.job.actual_query) {
+                CodeMirror.runMode(service.job.actual_query, "text/x-sql", angular.element('#actual-query')[0]);
+            }
         });
     };
 
