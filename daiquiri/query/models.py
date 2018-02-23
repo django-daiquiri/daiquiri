@@ -9,6 +9,7 @@ from celery.task.control import revoke
 
 from django.conf import settings
 from django.contrib.auth.models import Group
+from django.core.cache import cache
 from django.db import models
 from django.db.utils import OperationalError, ProgrammingError
 from django.urls import reverse
@@ -183,7 +184,8 @@ class QueryJob(Job):
         # translate adql -> mysql string
         if self.query_language == 'adql-2.0':
             try:
-                translator = ADQLQueryTranslator(self.query)
+                translator = cache.get_or_set('translator', ADQLQueryTranslator(), 3600)
+                translator.set_query(self.query)
 
                 if adapter.database_config['ENGINE'] == 'django.db.backends.mysql':
                     translated_query = translator.to_mysql()
@@ -217,7 +219,9 @@ class QueryJob(Job):
             if adapter.database_config['ENGINE'] == 'django.db.backends.mysql':
                 processor = MySQLQueryProcessor(translated_query)
             elif adapter.database_config['ENGINE'] == 'django.db.backends.postgresql':
-                processor = PostgreSQLQueryProcessor(translated_query, indexed_objects=get_indexed_objects())
+
+                processor = cache.get_or_set('processor', PostgreSQLQueryProcessor(indexed_objects=get_indexed_objects()), 3600)
+                processor.set_query(translated_query)
                 processor.process_query()
             else:
                 raise Exception('Unknown database engine')
@@ -239,6 +243,9 @@ class QueryJob(Job):
                     'messages': e.messages,
                 }
             })
+
+        # log the native query
+        logger.debug('native_query = "%s"', processor.query)
 
         # log the processor output
         logger.debug('processor.keywords = %s', processor.keywords)
@@ -286,9 +293,6 @@ class QueryJob(Job):
 
         # get the native query from the processor (without trailing semicolon)
         self.native_query = processor.query.rstrip(';')
-
-        # log the native query
-        logger.debug('native_query = "%s"', self.native_query)
 
         # set clean flag
         self.is_clean = True
