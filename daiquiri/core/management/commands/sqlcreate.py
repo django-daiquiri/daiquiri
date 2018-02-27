@@ -36,7 +36,7 @@ class Command(BaseCommand):
         print('')
 
         if options['schema']:
-            if 'data' in config:
+            if config['data']:
                 if config['data']['ENGINE'] == 'django.db.backends.mysql':
                     config['data'].update({'SCHEMA_NAME': options['schema']})
                     print('''-- Run the following commands on \'%(HOST)s\':
@@ -54,7 +54,7 @@ GRANT SELECT ON ALL TABLES IN SCHEMA %(SCHEMA_NAME)s TO %(USER)s;
                 raise RuntimeError('No \'data\' database connection configured.')
 
         elif options['test']:
-            if 'default' in config:
+            if config['default']:
                 if config['default']['ENGINE'] == 'django.db.backends.mysql':
                     print('''-- For testing, run the following commands on \'%(HOST)s\':
 CREATE DATABASE `%(TEST_NAME)s`;
@@ -66,7 +66,7 @@ GRANT ALL PRIVILEGES ON `%(TEST_NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\';
 CREATE DATABASE %(TEST_NAME)s WITH OWNER %(USER)s;
 ''' % config['default'])
 
-            if 'data' in config:
+            if config['data']:
                 if config['data']['ENGINE'] == 'django.db.backends.mysql':
                     print('''-- For testing, run the following commands on \'%(HOST)s\':
 CREATE DATABASE `%(TEST_NAME)s`;
@@ -81,7 +81,7 @@ CREATE SCHEMA %(TAP_SCHEMA)s AUTHORIZATION %(USER)s;
 ''' % config['data'])
 
         else:
-            if 'default' in config:
+            if config['default']:
                 if config['default']['ENGINE'] == 'django.db.backends.mysql':
                     print('''-- Run the following commands on \'%(HOST)s\':
 CREATE USER \'%(USER)s\'@\'%(CLIENT)s\' identified by \'%(PASSWORD)s\';
@@ -95,7 +95,7 @@ CREATE USER %(USER)s WITH PASSWORD \'%(PASSWORD)s\';
 CREATE DATABASE %(NAME)s WITH OWNER %(USER)s;
 ''' % config['default'])
 
-            if 'data' in config:
+            if config['data']:
                 if config['data']['ENGINE'] == 'django.db.backends.mysql':
                     print('''-- Run the following commands on \'%(HOST)s\':
 CREATE USER \'%(USER)s\'@\'%(CLIENT)s\' identified by \'%(PASSWORD)s\';
