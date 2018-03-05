@@ -24,6 +24,15 @@ FIXTURE_DIRS = (
     os.path.join(BASE_DIR, 'fixtures'),
 )
 
+REST_FRAMEWORK = {
+    'DEFAULT_THROTTLE_CLASSES': (
+        'rest_framework.throttling.ScopedRateThrottle',
+    ),
+    'DEFAULT_THROTTLE_RATES': {
+        'query.create': '1000/second'
+    }
+}
+
 AUTH_SIGNUP = True
 AUTH_WORKFLOW = 'confirmation'
 
