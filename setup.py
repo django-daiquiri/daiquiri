@@ -1,17 +1,19 @@
+import re
 import sys
 
 from setuptools import setup, find_packages
 
-from daiquiri import __title__, __email__, __version__, __author__, __license__
+with open('daiquiri/__init__.py') as f:
+    metadata = dict(re.findall(r'__(.*)__ = [\']([^\']*)[\']', f.read()))
 
 setup(
-    name=__title__,
-    version=__version__,
-    author=__author__,
-    author_email=__email__,
-    maintainer=__author__,
-    maintainer_email=__email__,
-    license=__license__,
+    name=metadata['title'],
+    version=metadata['version'],
+    author=metadata['author'],
+    author_email=metadata['email'],
+    maintainer=metadata['author'],
+    maintainer_email=metadata['email'],
+    license=metadata['license'],
     url='https://github.com/aipescience/django-daiquiri',
     description=u'Daiquiri is a framework for the publication of scientific databases.',
     long_description=open('README.rst').read(),
