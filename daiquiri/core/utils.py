@@ -164,6 +164,9 @@ def send_mail(request, template_prefix, context, to_emails, cc_emails=[], bcc_em
     # get from email
     from_email = settings.DEFAULT_FROM_EMAIL
 
+    # get reply_to
+    reply_to = settings.EMAIL_REPLY_TO
+
     # render bodie(s)
     bodies = {}
     for ext in ['html', 'txt']:
@@ -176,11 +179,11 @@ def send_mail(request, template_prefix, context, to_emails, cc_emails=[], bcc_em
                 # We need at least one body
                 raise
     if 'txt' in bodies:
-        msg = EmailMultiAlternatives(subject, bodies['txt'], from_email, to_emails, cc=cc_emails, bcc=bcc_emails)
+        msg = EmailMultiAlternatives(subject, bodies['txt'], from_email, to_emails, cc=cc_emails, bcc=bcc_emails, reply_to=reply_to)
         if 'html' in bodies:
             msg.attach_alternative(bodies['html'], 'text/html')
     else:
-        msg = EmailMessage(subject, bodies['html'], from_email, to_emails, cc=cc_emails, bcc=bcc_emails)
+        msg = EmailMessage(subject, bodies['html'], from_email, to_emails, cc=cc_emails, bcc=bcc_emails, reply_to=reply_to)
         msg.content_subtype = 'html'  # Main content is now text/html
 
     msg.send()
