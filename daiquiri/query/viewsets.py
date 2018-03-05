@@ -12,6 +12,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError, NotFound
 from rest_framework.decorators import list_route, detail_route
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
+from rest_framework.throttling import UserRateThrottle
 
 from daiquiri.core.viewsets import ChoicesViewSet, RowViewSetMixin
 from daiquiri.core.permissions import HasModelPermission
@@ -94,6 +95,12 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
             return QueryJobUpdateSerializer
         else:
             return QueryJobSerializer
+
+    def get_throttles(self):
+        if self.action == 'create':
+            self.throttle_scope = 'query.create'
+
+        return super(QueryJobViewSet, self).get_throttles()
 
     def perform_create(self, serializer):
         job = QueryJob(

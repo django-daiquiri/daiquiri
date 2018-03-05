@@ -42,7 +42,7 @@ app.factory('SqlFormService', ['$timeout', '$filter', 'QueryService', 'BrowserSe
 
                 var editor = $('.CodeMirror')[0].CodeMirror;
 
-                if (angular.isDefined(service.errors.query.positions)) {
+                if (angular.isDefined(service.errors.query) && angular.isDefined(service.errors.query.positions)) {
 
                     var editor = $('.CodeMirror')[0].CodeMirror;
 
