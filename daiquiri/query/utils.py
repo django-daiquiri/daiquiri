@@ -40,29 +40,48 @@ def get_user_schema_name(user):
 
 def get_quota(user):
     if not user or user.is_anonymous():
-        anonymous_quota = human2bytes(settings.QUERY_QUOTA.get('anonymous'))
-        return anonymous_quota if anonymous_quota else 0
+        quota = human2bytes(settings.QUERY_QUOTA.get('anonymous')) else 0
 
     else:
-        user_quota = human2bytes(settings.QUERY_QUOTA.get('user'))
-        quota = user_quota if user_quota else 0
+        quota = human2bytes(settings.QUERY_QUOTA.get('user')) or 0
 
         # apply quota for user
-        user_quotas = settings.QUERY_QUOTA.get('users')
-        if user_quotas:
-            user_quota = human2bytes(user_quotas.get(user.username))
-            if user_quota:
-                quota = user_quota if user_quota > quota else quota
+        users = settings.QUERY_QUOTA.get('users')
+        if users:
+            user_quota = human2bytes(users.get(user.username)) or 0
+            quota = user_quota if user_quota > quota else quota
 
         # apply quota for group
-        group_quotas = settings.QUERY_QUOTA.get('groups')
-        if group_quotas:
+        groups = settings.QUERY_QUOTA.get('groups')
+        if groups:
             for group in user.groups.all():
-                group_quota = human2bytes(group_quotas.get(group.name))
-                if group_quota:
-                    quota = group_quota if group_quota > quota else quota
+                group_quota = human2bytes(groups.get(group.name)) or 0
+                quota = group_quota if group_quota > quota else quota
 
     return quota
+
+
+def get_max_active_jobs(user):
+    if not user or user.is_anonymous():
+        count = settings.QUERY_MAX_ACTIVE_JOBS.get('anonymous')
+
+    else:
+        count = settings.QUERY_MAX_ACTIVE_JOBS.get('user')
+
+        # apply quota for user
+        users = settings.QUERY_MAX_ACTIVE_JOBS.get('users')
+        if users:
+            user_count = users.get(user.username)
+            count = user_count if user_count and user_count > count else count
+
+        # apply quota for group
+        groups = settings.QUERY_MAX_ACTIVE_JOBS.get('groups')
+        if groups:
+            for group in user.groups.all():
+                group_count = groups.get(group.name)
+                count = group_count if group_count and group_count > count else count
+
+    return count
 
 
 def fetch_user_schema_metadata(user, jobs):
