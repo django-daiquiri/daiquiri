@@ -40,22 +40,22 @@ def get_user_schema_name(user):
 
 def get_quota(user):
     if not user or user.is_anonymous():
-        quota = human2bytes(settings.QUERY_QUOTA.get('anonymous')) else 0
+        quota = human2bytes(settings.QUERY_QUOTA.get('anonymous'))
 
     else:
-        quota = human2bytes(settings.QUERY_QUOTA.get('user')) or 0
+        quota = human2bytes(settings.QUERY_QUOTA.get('user'))
 
         # apply quota for user
         users = settings.QUERY_QUOTA.get('users')
         if users:
-            user_quota = human2bytes(users.get(user.username)) or 0
+            user_quota = human2bytes(users.get(user.username))
             quota = user_quota if user_quota > quota else quota
 
         # apply quota for group
         groups = settings.QUERY_QUOTA.get('groups')
         if groups:
             for group in user.groups.all():
-                group_quota = human2bytes(groups.get(group.name)) or 0
+                group_quota = human2bytes(groups.get(group.name))
                 quota = group_quota if group_quota > quota else quota
 
     return quota
