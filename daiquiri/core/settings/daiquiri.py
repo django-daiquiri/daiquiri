@@ -63,6 +63,9 @@ QUERY_QUOTA = {
     'users': {},
     'groups': {}
 }
+QUERY_MAX_ACTIVE_JOBS = {
+    'anonymous': '1'
+}
 QUERY_QUEUES = [
     {
         'key': 'default',

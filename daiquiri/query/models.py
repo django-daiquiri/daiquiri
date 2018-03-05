@@ -35,6 +35,7 @@ from daiquiri.files.utils import check_file, search_file
 from .managers import QueryJobManager, ExampleManager
 from .utils import (
     get_quota,
+    get_max_active_jobs,
     get_default_table_name,
     get_default_queue,
     get_format_config,
@@ -172,8 +173,14 @@ class QueryJob(Job):
         # check quota
         if QueryJob.objects.get_size(self.owner) > get_quota(self.owner):
             raise ValidationError({
-                    'query': [_('Quota is exceeded. Please remove some of your jobs.')]
-                })
+                'query': [_('Quota is exceeded. Please remove some of your jobs.')]
+            })
+
+        # check number of active jobs
+        if QueryJob.objects.get_active(self.owner).count() >= get_max_active_jobs(self.owner):
+            raise ValidationError({
+                'query': [_('Too many active jobs. Please abort some of your active jobs or wait until they are completed.')]
+            })
 
         # get the adapter
         adapter = DatabaseAdapter()

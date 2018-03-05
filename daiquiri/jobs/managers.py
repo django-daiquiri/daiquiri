@@ -8,3 +8,7 @@ class JobManager(models.Manager):
             return self.get_queryset().filter(owner=None)
         else:
             return self.get_queryset().filter(owner=user)
+
+    def get_active(self, user):
+        # get the number of PENDING, QUEUED or EXECUTING jobs
+        return self.filter_by_owner(user).filter(phase__in=self.model.PHASE_ACTIVE)

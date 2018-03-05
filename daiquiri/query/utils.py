@@ -63,22 +63,22 @@ def get_quota(user):
 
 def get_max_active_jobs(user):
     if not user or user.is_anonymous():
-        count = settings.QUERY_MAX_ACTIVE_JOBS.get('anonymous')
+        count = int(settings.QUERY_MAX_ACTIVE_JOBS.get('anonymous'))
 
     else:
-        count = settings.QUERY_MAX_ACTIVE_JOBS.get('user')
+        count = int(settings.QUERY_MAX_ACTIVE_JOBS.get('user'))
 
         # apply quota for user
-        users = settings.QUERY_MAX_ACTIVE_JOBS.get('users')
+        users = int(settings.QUERY_MAX_ACTIVE_JOBS.get('users'))
         if users:
-            user_count = users.get(user.username)
+            user_count = int(users.get(user.username))
             count = user_count if user_count and user_count > count else count
 
         # apply quota for group
         groups = settings.QUERY_MAX_ACTIVE_JOBS.get('groups')
         if groups:
             for group in user.groups.all():
-                group_count = groups.get(group.name)
+                group_count = int(groups.get(group.name))
                 count = group_count if group_count and group_count > count else count
 
     return count
