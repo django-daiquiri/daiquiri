@@ -177,7 +177,8 @@ class QueryJob(Job):
             })
 
         # check number of active jobs
-        if QueryJob.objects.get_active(self.owner).count() >= get_max_active_jobs(self.owner):
+        max_active_jobs = get_max_active_jobs(self.owner)
+        if max_active_jobs and max_active_jobs <= QueryJob.objects.get_active(self.owner).count():
             raise ValidationError({
                 'query': [_('Too many active jobs. Please abort some of your active jobs or wait until they are completed.')]
             })
