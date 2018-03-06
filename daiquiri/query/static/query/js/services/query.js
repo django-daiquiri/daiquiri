@@ -28,6 +28,7 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
     /* create the query service */
 
     var service = {
+        show: {null: true},
         forms: {},
         dropdowns: {},
         values: {},
@@ -100,10 +101,10 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
 
         // start the polling service
         service.polling = PollingService
-        service.polling.init();
-        service.polling.register('status', service.fetchStatus, {}, true, false);
-        service.polling.register('jobs', service.fetchJobs, {}, true, false);
-        service.polling.register('schema', service.fetchUserSchema, {}, true, false);
+        // service.polling.init();
+        // service.polling.register('status', service.fetchStatus, {}, true, false);
+        // service.polling.register('jobs', service.fetchJobs, {}, true, false);
+        // service.polling.register('schema', service.fetchUserSchema, {}, true, false);
 
         // load the other services
         service.table = TableService;
@@ -140,6 +141,12 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
     service.fetchJobs = function() {
         return resources.jobs.query(function(response) {
             service.jobs = response;
+
+            service.run_ids = service.jobs.map(function(job) {
+                return job.run_id;
+            }).filter(function(job, index, jobs) {
+                return jobs.indexOf(job) == index;
+            }).sort();
 
             if (service.job) {
                 // get the phase of the current job in the jobs list

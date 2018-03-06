@@ -45,6 +45,7 @@ class QueryJobListSerializer(serializers.ModelSerializer):
             'id',
             'table_name',
             'creation_time',
+            'run_id',
             'phase'
         )
 
