@@ -40,6 +40,7 @@ setup(
         'bitstring>=3.1.5',
         'ipaddress>=1.0.18',
         'django-test-generator>=0.3.3',
+        'typing',
         'mock',
         'coverage',
         'queryparser_python%d>=0.2.6' % sys.version_info.major
