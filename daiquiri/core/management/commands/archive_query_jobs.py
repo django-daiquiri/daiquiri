@@ -1,6 +1,3 @@
-import sys
-
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 
@@ -14,10 +11,11 @@ class Command(BaseCommand):
         parser.add_argument('-y', action='store_true', help='Answer yes for all questions.')
 
     def handle(self, *args, **options):
+
         if options['username'] == 'anonymous':
             jobs = QueryJob.objects.filter_by_owner(None).exclude(phase=QueryJob.PHASE_ARCHIVED)
         else:
-            user = User.objects.get(options['username'])
+            user = User.objects.get(username=options['username'])
             jobs = QueryJob.objects.filter_by_owner(user).exclude(phase=QueryJob.PHASE_ARCHIVED)
 
         count = jobs.count()
