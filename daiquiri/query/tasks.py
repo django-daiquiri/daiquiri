@@ -112,7 +112,6 @@ def run_query(job_id):
     finally:
         # get timing and save the job object
         job.end_time = now()
-        job.execution_duration = (job.end_time - job.start_time).seconds
 
         # get additional information about the completed job
         if job.phase == job.PHASE_COMPLETED:
@@ -213,7 +212,6 @@ def create_download_file(download_id):
         logger.info('download_job %s completed' % download_job.file_path)
     finally:
         download_job.end_time = now()
-        download_job.execution_duration = (download_job.end_time - download_job.start_time).seconds
         download_job.save()
 
 
@@ -248,7 +246,6 @@ def create_archive_file(archive_id):
             z.write(file_path)
 
     archive_job.end_time = now()
-    archive_job.execution_duration = (archive_job.end_time - archive_job.start_time).seconds
     archive_job.phase = archive_job.PHASE_COMPLETED
     archive_job.save()
 

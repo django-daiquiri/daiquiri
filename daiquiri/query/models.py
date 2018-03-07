@@ -160,11 +160,18 @@ class QueryJob(Job):
         if not self.table_name:
             self.table_name = get_default_table_name()
 
+        # set a default queue
+        if not self.queue:
+            self.queue = get_default_queue()
+
+        # set the execution_duration to the queues timeout
+        self.execution_duration = self.timeout
+
+        # validate query_language and query
         if not self.query_language:
             raise ValidationError({
                  'query_language': [_('This field may not be blank.')]
             })
-
         if not self.query:
             raise ValidationError({
                  'query': [_('This field may not be blank.')]
@@ -320,10 +327,6 @@ class QueryJob(Job):
                 run_query.apply((job_id, ), task_id=job_id, throw=True)
 
             else:
-                if not self.queue:
-                    self.queue = get_default_queue()
-                    self.save()
-
                 logger.info('job %s submitted (async, queue=query, priority=%s)' % (self.id, self.priority))
                 run_query.apply_async((job_id, ), task_id=job_id, queue='query', priority=self.priority)
 

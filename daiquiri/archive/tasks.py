@@ -43,7 +43,6 @@ def create_archive_zip_file(archive_job_id):
             z.write(file_path)
 
     archive_job.end_time = now()
-    archive_job.execution_duration = (archive_job.end_time - archive_job.start_time).seconds
     archive_job.phase = archive_job.PHASE_COMPLETED
     archive_job.save()
 
