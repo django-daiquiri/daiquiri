@@ -144,9 +144,10 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
 
             service.run_ids = service.jobs.map(function(job) {
                 return job.run_id;
-            }).filter(function(job, index, jobs) {
-                return jobs.indexOf(job) == index;
+            }).filter(function(run_id, index, run_ids) {
+                return run_id && run_ids.indexOf(run_id) == index;
             }).sort();
+            service.run_ids.push(null);
 
             if (service.job) {
                 // get the phase of the current job in the jobs list
@@ -226,7 +227,7 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
         $('#' + modal + '-modal').modal('show');
     };
 
-    service.renameJob = function() {
+    service.updateJob = function() {
         resources.jobs.update({id: service.values.id}, service.values).$promise.then(function() {
             service.fetchJobs();
             $('.modal').modal('hide');

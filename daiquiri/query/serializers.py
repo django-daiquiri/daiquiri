@@ -114,7 +114,8 @@ class QueryJobUpdateSerializer(serializers.ModelSerializer):
         model = QueryJob
         fields = (
             'id',
-            'table_name'
+            'table_name',
+            'run_id'
         )
 
 

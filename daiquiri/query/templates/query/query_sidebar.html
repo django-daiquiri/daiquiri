@@ -74,7 +74,7 @@
         <ul class="list-group daiquiri-query-joblist">
             <div class="daiquiri-query-joblist-group" ng-repeat="run_id in service.run_ids">
 
-                <li class="list-group-item list-group-link" ng-if="service.run_ids.length > 1">
+                <li class="list-group-item list-group-link" ng-if="service.run_ids[0] !== null">
                     <a href="" ng-click="service.show[run_id] = !service.show[run_id]">
                         <div class="pull-right">
                             <i class="fa fa-folder-o" title="{% trans 'Open group' %}"

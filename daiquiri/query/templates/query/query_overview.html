@@ -76,7 +76,7 @@
     <div class="panel-footer">
         <div ng-show="service.job.phase == 'COMPLETED'">
             <a href="" ng-click="service.showModal('rename-job', service.job)">
-                {% trans 'Rename the job\'s result table' %}
+                {% trans 'Rename the job\'s result table or run id' %}
             </button>
         </div>
         <div ng-show="service.job.phase == 'EXECUTING' || service.job.phase == 'PENDING' || service.job.phase == 'QUEUED'">
