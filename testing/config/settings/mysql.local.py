@@ -6,16 +6,12 @@ DATABASES = {
         'NAME': 'daiquiri_app',
         'USER': 'root'
     },
-    'tap': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'TAP_SCHEMA',
-        'USER': 'root'
-    },
     'data': {
         'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'TAP_SCHEMA',
         'USER': 'root'
     }
 }
 
-LOGGING_DIR = '/tmp'
-QUERY_DOWNLOAD_DIR = '/tmp'
+ADAPTER_DATABASE = 'daiquiri.core.adapter.database.mysql.MySQLAdapter'
+ADAPTER_DOWNLOAD = 'daiquiri.core.adapter.download.mysqldump.MysqldumpAdapter'

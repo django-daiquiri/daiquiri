@@ -8,7 +8,7 @@ IPV4_PRIVACY_MASK = 16
 IPV6_PRIVACY_MASK = 32
 
 ARCHIVE_ANONYMOUS = False
-ARCHIVE_DATABASE = 'daiquiri_archive'
+ARCHIVE_SCHEMA = 'daiquiri_archive'
 ARCHIVE_TABLE = 'files'
 ARCHIVE_COLUMNS = [
     {
@@ -56,18 +56,21 @@ MEETINGS_ABSTRACT_MAX_LENGTH = 2000
 METADATA_COLUMN_PERMISSIONS = False
 
 QUERY_ANONYMOUS = False
-QUERY_USER_DATABASE_PREFIX = 'daiquiri_user_'
+QUERY_USER_SCHEMA_PREFIX = 'daiquiri_user_'
 QUERY_QUOTA = {
     'anonymous': '100Mb',
     'user': '100Mb',
     'users': {},
     'groups': {}
 }
+QUERY_MAX_ACTIVE_JOBS = {
+    'anonymous': '1'
+}
 QUERY_QUEUES = [
     {
         'key': 'default',
         'label': 'Default',
-        'timeout': 300,
+        'timeout': 10,
         'priority': 1
     }
 ]
@@ -86,18 +89,6 @@ QUERY_FORMS = [
         'label': 'SQL query',
         'service': 'query/js/forms/sql.js',
         'template': 'query/query_form_sql.html'
-    },
-    {
-        'key': 'box',
-        'label': 'Box search',
-        'service': 'query/js/forms/box.js',
-        'template': 'query/query_form_box.html'
-    },
-    {
-        'key': 'cone',
-        'label': 'Cone search',
-        'service': 'query/js/forms/cone.js',
-        'template': 'query/query_form_cone.html'
     }
 ]
 QUERY_DROPDOWNS = [
@@ -156,6 +147,8 @@ SERVE_DOWNLOAD_DIR = os.path.join(BASE_DIR, 'download')
 SERVE_RESOLVER = None
 
 UWS_RESOURCES = []
+
+TAP_SCHEMA = 'TAP_SCHEMA'
 
 WORDPRESS_URL = '/cms/'
 WORDPRESS_CLI = '/opt/wp-cli/wp'

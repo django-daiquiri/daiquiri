@@ -14,7 +14,7 @@ LOGGING = {
             'format': '[%(asctime)s] %(levelname)s: %(message)s'
         },
         'name': {
-            'format': '[%(asctime)s] %(levelname)s %(name)s: %(message)s'
+            'format': '[%(asctime)s] %(levelname)s %(name)s %(funcName)s: %(message)s'
         },
         'console': {
             'format': '[%(asctime)s] %(message)s'

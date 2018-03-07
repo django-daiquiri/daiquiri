@@ -8,7 +8,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
                 <h4 class="modal-title">
-                    {% trans 'Rename job\'s table name' %}
+                    {% trans 'Update job' %}
                 </h4>
             </div>
 
@@ -20,6 +20,13 @@
                     data-model="service.values.table_name"
                     data-errors="service.errors.table_name">
                 </formgroup>
+                <formgroup
+                    data-id="run_id"
+                    data-type="text"
+                    data-label="{% trans 'Run id' %}"
+                    data-model="service.values.run_id"
+                    data-errors="service.errors.run_id">
+                </formgroup>
             </div>
 
             <div class="modal-footer">
@@ -27,7 +34,7 @@
                     {% trans 'Close' %}
                 </button>
                 <button type="button" class="btn btn-primary"
-                        ng-click="service.renameJob()">
+                        ng-click="service.updateJob()">
                     {% trans 'Save' %}
                 </button>
             </div>

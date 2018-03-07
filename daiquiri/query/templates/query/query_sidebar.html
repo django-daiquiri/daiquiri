@@ -64,28 +64,52 @@
         <div class="panel-heading">
             {% trans 'Job list' %}
         </div>
-        <ul class="list-group daiquiri-query-joblist">
-            <li class="list-group-item" ng-if="!service.jobs.length">
+
+        <ul class="list-group" ng-if="!service.jobs.length">
+            <li class="list-group-item">
                 {% trans 'No jobs found.' %}
             </li>
-            <li class="list-group-item list-group-link" ng-repeat="job in service.jobs | orderBy: '-creation_time'">
-                <a href="" ng-click="service.activateJob(job)" ng-class="{active: service.job.id == job.id}">
-                    <div class="pull-right">
-                        <i class="fa fa-pause" title="PENDING" ng-show="job.phase == 'PENDING'"></i>
-                        <i class="fa fa-spinner fa-spin" title="QUEUED" ng-show="job.phase == 'QUEUED'"></i>
-                        <i class="fa fa-play" title="EXECUTING" ng-show="job.phase == 'EXECUTING'"></i>
-                        <i class="fa fa-check" title="COMPLETED" ng-show="job.phase == 'COMPLETED'"></i>
-                        <i class="fa fa-warning" title="ERROR" ng-show="job.phase == 'ERROR'"></i>
-                        <i class="fa fa-remove" title="ABORTED" ng-show="job.phase == 'ABORTED'"></i>
-                        <i class="fa fa-question" title="UNKNOWN" ng-show="job.phase == 'UNKNOWN'"></i>
-                        <i class="fa fa-stop" title="HELD" ng-show="job.phase == 'HELD'"></i>
-                        <i class="fa fa-pause" title="SUSPENDED" ng-show="job.phase == 'SUSPENDED'"></i>
-                        <i class="fa fa-ban" title="ARCHIVED" ng-show="job.phase == 'ARCHIVED'"></i>
-                    </div>
-                    <div>{$ job.table_name $}</div>
-                </a>
-            </li>
+        </ul>
+
+        <ul class="list-group daiquiri-query-joblist">
+            <div class="daiquiri-query-joblist-group" ng-repeat="run_id in service.run_ids">
+
+                <li class="list-group-item list-group-link" ng-if="service.run_ids[0] !== null">
+                    <a href="" ng-click="service.show[run_id] = !service.show[run_id]">
+                        <div class="pull-right">
+                            <i class="fa fa-folder-o" title="{% trans 'Open group' %}"
+                                ng-hide="service.show[run_id]"></i>
+                            <i class="fa fa-folder-open-o" title="{% trans 'Close group' %}"
+                                ng-show="service.show[run_id]"></i>
+                        </div>
+                        <div>
+                            <span ng-show="run_id">{$ run_id $}</span>
+                            <span ng-hide="run_id">{% trans 'unasigned' %}</span>
+                        </div>
+                    </a>
+                </li>
+
+                <li class="list-group-item list-group-link"
+                    ng-repeat="job in service.jobs | orderBy: '-creation_time'"
+                    ng-if="job.run_id == run_id && service.show[run_id]">
+                    <a href="" ng-click="service.activateJob(job)" ng-class="{active: service.job.id == job.id}">
+                        <div class="pull-right">
+                            <i class="fa fa-pause" title="PENDING" ng-show="job.phase == 'PENDING'"></i>
+                            <i class="fa fa-spinner fa-spin" title="QUEUED" ng-show="job.phase == 'QUEUED'"></i>
+                            <i class="fa fa-play" title="EXECUTING" ng-show="job.phase == 'EXECUTING'"></i>
+                            <i class="fa fa-check" title="COMPLETED" ng-show="job.phase == 'COMPLETED'"></i>
+                            <i class="fa fa-warning" title="ERROR" ng-show="job.phase == 'ERROR'"></i>
+                            <i class="fa fa-remove" title="ABORTED" ng-show="job.phase == 'ABORTED'"></i>
+                            <i class="fa fa-question" title="UNKNOWN" ng-show="job.phase == 'UNKNOWN'"></i>
+                            <i class="fa fa-stop" title="HELD" ng-show="job.phase == 'HELD'"></i>
+                            <i class="fa fa-pause" title="SUSPENDED" ng-show="job.phase == 'SUSPENDED'"></i>
+                            <i class="fa fa-ban" title="ARCHIVED" ng-show="job.phase == 'ARCHIVED'"></i>
+                        </div>
+                        <div>{$ job.table_name $}</div>
+                    </a>
+                </li>
+
+            </div>
         </ul>
     </div>
 </div>
-

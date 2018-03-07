@@ -19,7 +19,7 @@ app.factory('DownloadService', ['$http', 'PollingService', function($http, Polli
 
         angular.forEach(service.job.columns, function(column) {
             angular.forEach(['meta.note', 'meta.preview', 'meta.file'], function(key) {
-                if (column.ucd.indexOf(key) > -1) {
+                if (column.ucd && column.ucd.indexOf(key) > -1) {
                     service.archive_columns.push(column.name);
                 }
             });
@@ -55,6 +55,12 @@ app.factory('DownloadService', ['$http', 'PollingService', function($http, Polli
 
                 // download the file, headers will prevent the browser reloading the page
                 window.location.href = url;
+            } else if (result.data == 'ERROR') {
+                service.pending_downloads--;
+                PollingService.unregister(options.download_id);
+
+                // display error message
+                options.job.download_failed = true;
             }
         }, function() {
             service.pending_downloads--;
@@ -94,6 +100,12 @@ app.factory('DownloadService', ['$http', 'PollingService', function($http, Polli
 
                 // download the file, headers will prevent the browser reloading the page
                 window.location.href = url;
+            } else if (result.data == 'ERROR') {
+                service.pending_downloads--;
+                PollingService.unregister(options.download_id);
+
+                // display error message
+                options.job.download_failed = true;
             }
         }, function() {
             service.pending_downloads--;

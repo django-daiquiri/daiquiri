@@ -69,7 +69,7 @@ class Job(models.Model):
     execution_duration = models.PositiveIntegerField(blank=True, default=0)
     destruction_time = models.DateTimeField(blank=True, null=True)
 
-    error_summary = models.CharField(max_length=256, blank=True, null=True)
+    error_summary = models.TextField(blank=True, null=True)
 
     job_type = models.CharField(max_length=10, choices=JOB_TYPE_CHOICES)
 

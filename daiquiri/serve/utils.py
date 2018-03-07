@@ -1,20 +1,20 @@
 from django.conf import settings
 
 from daiquiri.core.utils import import_class
-from daiquiri.metadata.models import Database, Table, Column
+from daiquiri.metadata.models import Schema, Table, Column
 
 
-def get_columns(user, database_name, table_name, column_names=None):
+def get_columns(user, schema_name, table_name, column_names=None):
 
-    # check permissions on the database
+    # check permissions on the schema
     try:
-        database = Database.objects.filter_by_access_level(user).get(name=database_name)
-    except Database.DoesNotExist:
+        schema = Schema.objects.filter_by_access_level(user).get(name=schema_name)
+    except Schema.DoesNotExist:
         return []
 
     # check permissions on the table
     try:
-        table = Table.objects.filter_by_access_level(user).filter(database=database).get(name=table_name)
+        table = Table.objects.filter_by_access_level(user).filter(schema=schema).get(name=table_name)
     except Table.DoesNotExist:
         return []
 
@@ -31,9 +31,9 @@ def get_columns(user, database_name, table_name, column_names=None):
         return [column for column in columns]
 
 
-def get_column(user, database_name, table_name, column_name):
+def get_column(user, schema_name, table_name, column_name):
 
-    columns = get_columns(user, database_name, table_name)
+    columns = get_columns(user, schema_name, table_name)
 
     try:
         return [column for column in columns if column.name == column_name][0]

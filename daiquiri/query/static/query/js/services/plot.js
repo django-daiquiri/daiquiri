@@ -61,10 +61,10 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
                     service.labels.x += ' [' + x_column.unit + ']';
                 }
             } else {
-                service.errors.x = [interpolate(gettext('Columns of the type %s can not be plotted'), [x_column.datatype])];
+                service.errors.x = x_column.datatype;
             }
         } else {
-            service.errors.x = [gettext('No column selected')];
+            service.errors.x = 'empty';
         }
 
         if (service.values.y) {
@@ -78,10 +78,10 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
                     service.labels.y += ' [' + y_column.unit + ']';
                 }
             } else {
-                service.errors.y = [interpolate(gettext('Columns of the type %s can not be plotted'), [y_column.datatype])];
+                service.errors.y = y_column.datatype;
             }
         } else {
-            service.errors.y = [gettext('No column selected')];
+            service.errors.y = 'empty';
         }
 
         if (service.errors.x === null && service.errors.y === null) {

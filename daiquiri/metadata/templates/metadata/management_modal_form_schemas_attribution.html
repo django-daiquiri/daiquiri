@@ -1,6 +1,6 @@
 {% load i18n %}
 
-    <div class="modal" id="databases-attribution-form-modal" tabindex="-1">
+    <div class="modal" id="schemas-attribution-form-modal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -8,16 +8,16 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                     <h4 class="modal-title">
-                        {% trans 'Database' %}
+                        {% trans 'Schema' %}
                     </h4>
                 </div>
 
                 <div class="modal-body">
                     <formgroup
-                        data-id="database-attribution"
+                        data-id="schema-attribution"
                         data-type="codemirror"
-                        data-label="{{ meta.Database.attribution.verbose_name }}"
-                        data-help="{{ meta.Database.attribution.help_text }}"
+                        data-label="{{ meta.Schema.attribution.verbose_name }}"
+                        data-help="{{ meta.Schema.attribution.help_text }}"
                         data-model="service.values.attribution"
                         data-errors="service.errors.attribution"
                         data-mode="markdown">
@@ -29,11 +29,11 @@
                         {% trans 'Close' %}
                     </button>
                     <button type="button" class="btn btn-default"
-                            ng-click="service.submitFormModal('databases', false)">
+                            ng-click="service.submitFormModal('schemas', false)">
                         {% trans 'Save' %}
                     </button>
                     <button type="button" class="btn btn-primary"
-                            ng-click="service.submitFormModal('databases')">
+                            ng-click="service.submitFormModal('schemas')">
                         {% trans 'Save and close' %}
                     </button>
                 </div>

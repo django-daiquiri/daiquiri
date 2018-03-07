@@ -1,6 +1,5 @@
 import logging
 import re
-import six
 import warnings
 
 from django.db import OperationalError, ProgrammingError
@@ -11,27 +10,6 @@ logger = logging.getLogger(__name__)
 
 
 class MySQLAdapter(DatabaseAdapter):
-
-    FUNCTIONS = (
-        # group_functions
-        'AVG', 'COUNT', 'MAX_SYM', 'MIN_SYM', 'SUM', 'BIT_AND', 'BIT_OR', 'BIT_XOR',
-        'BIT_COUNT', 'GROUP_CONCAT', 'STD', 'STDDEV', 'STDDEV_POP', 'STDDEV_SAMP',
-        'VAR_POP', 'VAR_SAMP', 'VARIANCE',
-        # number_functions
-        'ABS', 'ACOS', 'ASIN', 'ATAN2', 'ATAN', 'CEIL', 'CEILING', 'CONV', 'COS', 'COT',
-        'CRC32', 'DEGREES', 'EXP', 'FLOOR', 'LN', 'LOG10', 'LOG2', 'LOG', 'MOD', 'PI', 'POW',
-        'POWER', 'RADIANS', 'RAND', 'ROUND', 'SIGN', 'SIN', 'SQRT', 'TAN', 'TRUNCATE',
-        # time_functions
-        'ADDDATE', 'ADDTIME', 'CONVERT_TZ', 'CURDATE', 'CURTIME', 'DATE_ADD',
-        'DATE_FORMAT', 'DATE_SUB', 'DATE_SYM', 'DATEDIFF', 'DAYNAME', 'DAYOFMONTH',
-        'DAYOFWEEK', 'DAYOFYEAR', 'EXTRACT', 'FROM_DAYS', 'FROM_UNIXTIME', 'GET_FORMAT',
-        'HOUR', 'LAST_DAY', 'MAKEDATE', 'MAKETIME', 'MICROSECOND', 'MINUTE', 'MONTH',
-        'MONTHNAME', 'NOW', 'PERIOD_ADD', 'PERIOD_DIFF', 'QUARTER', 'SEC_TO_TIME',
-        'SECOND', 'STR_TO_DATE', 'SUBTIME', 'SYSDATE', 'TIME_FORMAT', 'TIME_TO_SEC',
-        'TIME_SYM', 'TIMEDIFF', 'TIMESTAMP', 'TIMESTAMPADD', 'TIMESTAMPDIFF', 'TO_DAYS',
-        'TO_SECONDS', 'UNIX_TIMESTAMP', 'UTC_DATE', 'UTC_TIME', 'UTC_TIMESTAMP', 'WEEK',
-        'WEEKDAY', 'WEEKOFYEAR', 'YEAR', 'YEARWEEK',
-    )
 
     DATATYPES = {
         'char': {
@@ -72,6 +50,9 @@ class MySQLAdapter(DatabaseAdapter):
         }
     }
 
+    search_stmt_template = '%s LIKE %%s'
+    search_arg_template = '%%%s%%'
+
     def fetch_pid(self):
         return self.connection().connection.thread_id()
 
@@ -82,10 +63,10 @@ class MySQLAdapter(DatabaseAdapter):
     def escape_string(self, string):
         return "'%s'" % string
 
-    def build_query(self, database_name, table_name, query, timeout, max_records):
+    def build_query(self, schema_name, table_name, query, timeout, max_records):
         # construct the actual query
         params = {
-            'database': self.escape_identifier(database_name),
+            'schema': self.escape_identifier(schema_name),
             'table': self.escape_identifier(table_name),
             'query': query,
             'timeout': timeout,
@@ -93,29 +74,32 @@ class MySQLAdapter(DatabaseAdapter):
         }
 
         if max_records is not None:
-            return 'CREATE TABLE %(database)s.%(table)s ENGINE=MyISAM ( %(query)s ) LIMIT %(max_records)s;' % params
+            return 'CREATE TABLE %(schema)s.%(table)s ENGINE=MyISAM ( %(query)s ) LIMIT %(max_records)s;' % params
         else:
-            return 'CREATE TABLE %(database)s.%(table)s ENGINE=MyISAM ( %(query)s );' % params
+            return 'CREATE TABLE %(schema)s.%(table)s ENGINE=MyISAM ( %(query)s );' % params
+
+    def submit_query(self, sql):
+        self.execute(sql)
 
     def abort_query(self, pid):
         sql = 'KILL %(pid)i' % {'pid': pid}
         self.execute(sql)
 
-    def fetch_stats(self, database_name, table_name):
+    def fetch_stats(self, schema_name, table_name):
         sql = 'SELECT table_rows as nrows, data_length + index_length AS size FROM `information_schema`.`tables` WHERE `table_schema` = %s AND table_name = %s;'
-        return self.fetchone(sql, (database_name, table_name))
+        return self.fetchone(sql, (schema_name, table_name))
 
-    def count_rows(self, database_name, table_name, column_names=None, search=None, filters=None):
+    def count_rows(self, schema_name, table_name, column_names=None, search=None, filters=None):
         # if no column names are provided get all column_names from the table
         if not column_names:
-            column_names= self.fetch_column_names(database_name, table_name)
+            column_names = self.fetch_column_names(schema_name, table_name)
 
         # create a list of escaped columns
         escaped_column_names = [self.escape_identifier(column_name) for column_name in column_names]
 
         # prepare sql string
-        sql = 'SELECT COUNT(*) FROM %(database)s.%(table)s' % {
-            'database': self.escape_identifier(database_name),
+        sql = 'SELECT COUNT(*) FROM %(schema)s.%(table)s' % {
+            'schema': self.escape_identifier(schema_name),
             'table': self.escape_identifier(table_name)
         }
         sql_args = []
@@ -125,18 +109,18 @@ class MySQLAdapter(DatabaseAdapter):
 
         return self.fetchone(sql, args=sql_args)[0]
 
-    def fetch_row(self, database_name, table_name, column_names=None, search=None, filters=None):
+    def fetch_row(self, schema_name, table_name, column_names=None, search=None, filters=None):
 
         # if no column names are provided get all column_names from the table
         if not column_names:
-            column_names = self.fetch_column_names(database_name, table_name)
+            column_names = self.fetch_column_names(schema_name, table_name)
 
         # create a list of escaped columns
         escaped_column_names = [self.escape_identifier(column_name) for column_name in column_names]
 
         # prepare sql string
-        sql = 'SELECT %(columns)s FROM %(database)s.%(table)s' % {
-            'database': self.escape_identifier(database_name),
+        sql = 'SELECT %(columns)s FROM %(schema)s.%(table)s' % {
+            'schema': self.escape_identifier(schema_name),
             'table': self.escape_identifier(table_name),
             'columns': ', '.join(escaped_column_names)
         }
@@ -147,13 +131,13 @@ class MySQLAdapter(DatabaseAdapter):
 
         return self.fetchone(sql, args=sql_args)
 
-    def fetch_dict(self, database_name, table_name, column_names=None, search=None, filters=None):
+    def fetch_dict(self, schema_name, table_name, column_names=None, search=None, filters=None):
 
         # if no column names are provided get all column_names from the table
         if not column_names:
-            column_names = self.fetch_column_names(database_name, table_name)
+            column_names = self.fetch_column_names(schema_name, table_name)
 
-        row = self.fetch_row(database_name, table_name, column_names, search, filters)
+        row = self.fetch_row(schema_name, table_name, column_names, search, filters)
 
         if row:
             return {
@@ -162,18 +146,18 @@ class MySQLAdapter(DatabaseAdapter):
         else:
             return {}
 
-    def fetch_rows(self, database_name, table_name, column_names=None, ordering=None, page=1, page_size=10, search=None, filters=None):
+    def fetch_rows(self, schema_name, table_name, column_names=None, ordering=None, page=1, page_size=10, search=None, filters=None):
 
         # if no column names are provided get all column_names from the table
         if not column_names:
-            column_names = self.fetch_column_names(database_name, table_name)
+            column_names = self.fetch_column_names(schema_name, table_name)
 
         # create a list of escaped columns
         escaped_column_names = [self.escape_identifier(column_name) for column_name in column_names]
 
         # init sql string and sql_args list
-        sql = 'SELECT %(columns)s FROM %(database)s.%(table)s' % {
-            'database': self.escape_identifier(database_name),
+        sql = 'SELECT %(columns)s FROM %(schema)s.%(table)s' % {
+            'schema': self.escape_identifier(schema_name),
             'table': self.escape_identifier(table_name),
             'columns': ', '.join(escaped_column_names)
         }
@@ -194,97 +178,33 @@ class MySQLAdapter(DatabaseAdapter):
 
         return self.fetchall(sql, args=sql_args)
 
-    def _process_filtering(self, sql, sql_args, search, filters, escaped_column_names):
-        # prepare lists for the WHERE statements
-        where_stmts = []
-        where_args = []
-
-        if search:
-            # append a OR condition fo every column
-            search_stmts = []
-            search_args = []
-            for escaped_column_name in escaped_column_names:
-                search_stmts.append(escaped_column_name + ' LIKE %s')
-                search_args.append('%' + search + '%')
-
-            if search_stmts:
-                where_stmts.append('(' + ' OR '.join(search_stmts) + ')')
-                where_args += search_args
-
-        if filters:
-            for column_name, column_filter in filters.items():
-                # escpae the column_name for this column
-                escaped_column_name = self.escape_identifier(column_name)
-
-                # check if the filter is a list or a string
-                if isinstance(column_filter, six.string_types):
-                    filter_list = [column_filter]
-                elif isinstance(column_filter, list):
-                    filter_list = column_filter
-                else:
-                    raise RuntimeError('Unsupported filter for column "%s"' % column_name)
-
-                # append a OR condition fo every entry in the list
-                filter_stmts = []
-                filter_args = []
-                for filter_string in filter_list:
-                    filter_stmts.append(escaped_column_name + ' = %s')
-                    filter_args.append(filter_string)
-
-                if filter_stmts:
-                    where_stmts.append('(' + ' OR '.join(filter_stmts) + ')')
-                    where_args += filter_args
-
-        # connect the where statements with AND and append to the sql string
-        if where_stmts:
-            sql += ' WHERE ' + ' AND '.join(where_stmts)
-            sql_args += where_args
-
-        return sql, sql_args
-
-    def _process_ordering(self, sql, ordering, escaped_column_names):
-        if ordering:
-            if ordering.startswith('-'):
-                escaped_ordering_column, ordering_direction = self.escape_identifier(ordering[1:]), 'DESC'
-            else:
-                escaped_ordering_column, ordering_direction = self.escape_identifier(ordering), 'ASC'
-
-            if escaped_ordering_column in escaped_column_names:
-                sql += ' ORDER BY %(column)s %(direction)s' % {
-                    'column': escaped_ordering_column,
-                    'direction': ordering_direction
-                }
-
-        return sql
-
-    def create_user_database_if_not_exists(self, database_name):
+    def create_user_schema_if_not_exists(self, schema_name):
         # escape input
-        escaped_database_name = self.escape_identifier(database_name)
+        escaped_schema_name = self.escape_identifier(schema_name)
 
         # prepare sql string
-        sql = 'CREATE DATABASE IF NOT EXISTS %(database)s' % {
-            'database': escaped_database_name
+        sql = 'CREATE DATABASE IF NOT EXISTS %(schema)s' % {
+            'schema': escaped_schema_name
         }
 
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
             self.execute(sql)
 
-
-    def fetch_tables(self, database_name):
+    def fetch_tables(self, schema_name):
         # escape input
-        escaped_database_name = self.escape_identifier(database_name)
+        escaped_schema_name = self.escape_identifier(schema_name)
 
         # prepare sql string
-        sql = 'SHOW FULL TABLES FROM %(database)s' % {
-            'database': escaped_database_name
+        sql = 'SHOW FULL TABLES FROM %(schema)s' % {
+            'schema': escaped_schema_name
         }
 
         # execute query
         try:
             rows = self.fetchall(sql)
         except OperationalError as e:
-            logger.error('Could not fetch from %s (%s)' % (database_name, e))
+            logger.error('Could not fetch from %s (%s)' % (schema_name, e))
             return []
         else:
             return [{
@@ -292,10 +212,10 @@ class MySQLAdapter(DatabaseAdapter):
                 'type': 'view' if row[1] == 'VIEW' else 'table'
             } for row in rows]
 
-    def fetch_table(self, database_name, table_name):
+    def fetch_table(self, schema_name, table_name):
         # prepare sql string
-        sql = 'SHOW FULL TABLES FROM %(database)s LIKE %(table)s' % {
-            'database': self.escape_identifier(database_name),
+        sql = 'SHOW FULL TABLES FROM %(schema)s LIKE %(table)s' % {
+            'schema': self.escape_identifier(schema_name),
             'table': self.escape_string(table_name)
         }
 
@@ -303,7 +223,7 @@ class MySQLAdapter(DatabaseAdapter):
         try:
             row = self.fetchone(sql)
         except OperationalError as e:
-            logger.error('Could not fetch %s.%s (%s)' % (database_name, table_name, e))
+            logger.error('Could not fetch %s.%s (%s)' % (schema_name, table_name, e))
             return {}
         else:
             return {
@@ -311,27 +231,27 @@ class MySQLAdapter(DatabaseAdapter):
                 'type': 'view' if row[1] == 'VIEW' else 'table'
             }
 
-    def rename_table(self, database_name, table_name, new_table_name):
-        sql = 'RENAME TABLE %(database)s.%(table)s to %(database)s.%(new_table)s;' % {
-            'database': self.escape_identifier(database_name),
+    def rename_table(self, schema_name, table_name, new_table_name):
+        sql = 'RENAME TABLE %(schema)s.%(table)s to %(schema)s.%(new_table)s;' % {
+            'schema': self.escape_identifier(schema_name),
             'table': self.escape_identifier(table_name),
             'new_table': self.escape_identifier(new_table_name)
         }
 
         self.execute(sql)
 
-    def drop_table(self, database_name, table_name):
-        sql = 'DROP TABLE IF EXISTS %(database)s.%(table)s;' % {
-            'database': self.escape_identifier(database_name),
+    def drop_table(self, schema_name, table_name):
+        sql = 'DROP TABLE IF EXISTS %(schema)s.%(table)s;' % {
+            'schema': self.escape_identifier(schema_name),
             'table': self.escape_identifier(table_name)
         }
 
         self.execute(sql)
 
-    def fetch_columns(self, database_name, table_name):
+    def fetch_columns(self, schema_name, table_name):
         # prepare sql string
-        sql = 'SHOW FULL COLUMNS FROM %(database)s.%(table)s;' % {
-            'database': self.escape_identifier(database_name),
+        sql = 'SHOW FULL COLUMNS FROM %(schema)s.%(table)s;' % {
+            'schema': self.escape_identifier(schema_name),
             'table': self.escape_identifier(table_name)
         }
 
@@ -339,26 +259,26 @@ class MySQLAdapter(DatabaseAdapter):
         try:
             rows = self.fetchall(sql)
         except ProgrammingError as e:
-            logger.error('Could not fetch from %s.%s (%s)' % (database_name, table_name, e))
+            logger.error('Could not fetch columns from %s.%s (%s)' % (schema_name, table_name, e))
             return []
         else:
-            column_metadata = []
+            columns = []
             for row in rows:
                 datatype, arraysize = self.convert_datatype(row[1])
 
-                column_metadata.append({
+                columns.append({
                     'name': row[0],
                     'datatype': datatype,
                     'arraysize': arraysize,
                     'indexed': bool(row[4])
                 })
 
-            return column_metadata
+            return columns
 
-    def fetch_column(self, database_name, table_name, column_name):
+    def fetch_column(self, schema_name, table_name, column_name):
         # prepare sql string
-        sql = 'SHOW FULL COLUMNS FROM %(database)s.%(table)s WHERE `Field` = %(column)s' % {
-            'database': self.escape_identifier(database_name),
+        sql = 'SHOW FULL COLUMNS FROM %(schema)s.%(table)s WHERE `Field` = %(column)s' % {
+            'schema': self.escape_identifier(schema_name),
             'table': self.escape_identifier(table_name),
             'column': self.escape_string(column_name)
         }
@@ -367,7 +287,7 @@ class MySQLAdapter(DatabaseAdapter):
         try:
             row = self.fetchone(sql)
         except ProgrammingError as e:
-            logger.error('Could not fetch %s.%s.%s (%s)' % (database_name, table_name, column_name, e))
+            logger.error('Could not fetch %s.%s.%s (%s)' % (schema_name, table_name, column_name, e))
             return {}
         else:
             return {
@@ -376,10 +296,10 @@ class MySQLAdapter(DatabaseAdapter):
                 'indexed': bool(row[4])
             }
 
-    def fetch_column_names(self, database_name, table_name):
+    def fetch_column_names(self, schema_name, table_name):
         # prepare sql string
-        sql = 'SHOW COLUMNS FROM %(database)s.%(table)s' % {
-            'database': self.escape_identifier(database_name),
+        sql = 'SHOW COLUMNS FROM %(schema)s.%(table)s' % {
+            'schema': self.escape_identifier(schema_name),
             'table': self.escape_identifier(table_name),
         }
         return [column[0] for column in self.fetchall(sql)]

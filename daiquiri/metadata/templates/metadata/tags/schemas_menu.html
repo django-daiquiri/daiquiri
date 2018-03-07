@@ -1,0 +1,13 @@
+{% for schema in schemas %}
+<li>
+    <a href="{% url 'metadata:schema' schema.name %}">{{ schema.name }}</a>
+
+    <ul class="sub-menu">
+        {% for table_name in schema.tables %}
+        <li>
+            <a href="{% url 'metadata:table' schema.name table_name %}">{{ table_name }}</a>
+        </li>
+        {% endfor %}
+    </ul>
+</li>
+{% endfor %}

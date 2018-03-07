@@ -41,7 +41,7 @@ class RunQueryTask(Task):
 @shared_task(base=RunQueryTask)
 def run_query(job_id):
     # always import daiquiri packages inside the task
-    from daiquiri.core.adapter import get_adapter
+    from daiquiri.core.adapter import DatabaseAdapter
     from daiquiri.metadata.models import Column
     from daiquiri.query.models import QueryJob
     from daiquiri.query.utils import get_quota
@@ -54,11 +54,11 @@ def run_query(job_id):
     job = QueryJob.objects.get(pk=job_id)
 
     # get the adapter with the database specific functions
-    adapter = get_adapter()
+    adapter = DatabaseAdapter()
 
     # create the database of the user if it not already exists
     try:
-        adapter.database.create_user_database_if_not_exists(job.database_name)
+        adapter.create_user_schema_if_not_exists(job.schema_name)
     except OperationalError as e:
         job.phase = job.PHASE_ERROR
         job.error_summary = str(e)
@@ -77,23 +77,23 @@ def run_query(job_id):
     # set database and start time
     job.start_time = now()
 
-    job.pid = adapter.database.fetch_pid()
-    job.actual_query = adapter.database.build_query(job.database_name, job.table_name, job.native_query, job.timeout, job.max_records)
+    job.pid = adapter.fetch_pid()
+    job.actual_query = adapter.build_query(job.schema_name, job.table_name, job.native_query, job.timeout, job.max_records)
     job.phase = job.PHASE_EXECUTING
     job.start_time = now()
     job.save()
 
-    logger.info('run_query %s started' % job.id)
+    logger.info('job %s started' % job.id)
 
     # get the actual query and submit the job to the database
     try:
         # this is where the work ist done (and the time is spend)
-        adapter.database.execute(job.actual_query)
+        adapter.submit_query(job.actual_query)
 
     except (ProgrammingError, InternalError) as e:
         job.phase = job.PHASE_ERROR
         job.error_summary = str(e)
-        logger.info('run_query %s failed (%s)' % (job.id, job.error_summary))
+        logger.info('job %s failed (%s)' % (job.id, job.error_summary))
 
     except OperationalError as e:
         # load the job again and check if the job was killed
@@ -102,31 +102,30 @@ def run_query(job_id):
         if job.phase != job.PHASE_ABORTED:
             job.phase = job.PHASE_ERROR
             job.error_summary = str(e)
-            logger.info('run_query %s failed (%s)' % (job.id, job.error_summary))
+            logger.info('job %s failed (%s)' % (job.id, job.error_summary))
 
     else:
         # get additional information about the completed job
         job.phase = job.PHASE_COMPLETED
-        logger.info('run_query %s completed' % job.id)
+        logger.info('job %s completed' % job.id)
 
     finally:
         # get timing and save the job object
         job.end_time = now()
-        job.execution_duration = (job.end_time - job.start_time).seconds
 
         # get additional information about the completed job
         if job.phase == job.PHASE_COMPLETED:
-            job.nrows, job.size = adapter.database.fetch_stats(job.database_name, job.table_name)
+            job.nrows, job.size = adapter.fetch_stats(job.schema_name, job.table_name)
 
             # fetch the metadata for the columns
-            job.metadata['columns'] = adapter.database.fetch_columns(job.database_name, job.table_name)
+            job.metadata['columns'] = adapter.fetch_columns(job.schema_name, job.table_name)
 
             # fetch additional metadata from the metadata store
             for column in job.metadata['columns']:
                 if column['name'] in job.metadata['display_columns']:
 
                     try:
-                        database_name, table_name, column_name = job.metadata['display_columns'][column['name']]
+                        schema_name, table_name, column_name = job.metadata['display_columns'][column['name']]
                     except ValueError:
                         continue
 
@@ -134,7 +133,7 @@ def run_query(job_id):
                         original_column = Column.objects.get(
                             name=column_name,
                             table__name=table_name,
-                            table__database__name=database_name
+                            table__schema__name=schema_name
                         )
                     except Column.DoesNotExist:
                         continue
@@ -170,7 +169,7 @@ def run_query(job_id):
 @shared_task(base=Task)
 def create_download_file(download_id):
     # always import daiquiri packages inside the task
-    from daiquiri.core.adapter import get_adapter
+    from daiquiri.core.adapter import DownloadAdapter
     from daiquiri.query.models import DownloadJob
 
     # get logger
@@ -180,7 +179,7 @@ def create_download_file(download_id):
     download_job = DownloadJob.objects.get(pk=download_id)
 
     # log start
-    logger.info('create_download_file %s started' % download_job.file_path)
+    logger.info('download_job %s started' % download_job.file_path)
 
     # create directory if necessary
     try:
@@ -193,23 +192,27 @@ def create_download_file(download_id):
     download_job.save()
 
     # write file using the generator in the adapter
-    with open(download_job.file_path, 'w') as f:
-        for line in get_adapter().download.generate(
-                download_job.format_key,
-                download_job.job.database_name,
-                download_job.job.table_name,
-                download_job.job.metadata,
-                download_job.job.result_status,
-                (download_job.job.nrows == 0)):
-            f.write(line)
-
-    download_job.end_time = now()
-    download_job.execution_duration = (download_job.end_time - download_job.start_time).seconds
-    download_job.phase = download_job.PHASE_COMPLETED
-    download_job.save()
-
-    # log completion
-    logger.info('create_download_file %s completed' % download_job.file_path)
+    try:
+        with open(download_job.file_path, 'w') as f:
+            for line in DownloadAdapter().generate(
+                    download_job.format_key,
+                    download_job.job.schema_name,
+                    download_job.job.table_name,
+                    download_job.job.metadata,
+                    download_job.job.result_status,
+                    (download_job.job.nrows == 0)):
+                f.write(line)
+    except Exception as e:
+        download_job.phase = download_job.PHASE_ERROR
+        download_job.error_summary = str(e)
+        download_job.save()
+        logger.info('download_job %s failed (%s)' % (download_job.id, download_job.error_summary))
+    else:
+        download_job.phase = download_job.PHASE_COMPLETED
+        logger.info('download_job %s completed' % download_job.file_path)
+    finally:
+        download_job.end_time = now()
+        download_job.save()
 
 
 @shared_task(track_started=True, base=Task)
@@ -243,7 +246,6 @@ def create_archive_file(archive_id):
             z.write(file_path)
 
     archive_job.end_time = now()
-    archive_job.execution_duration = (archive_job.end_time - archive_job.start_time).seconds
     archive_job.phase = archive_job.PHASE_COMPLETED
     archive_job.save()
 

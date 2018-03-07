@@ -7,7 +7,7 @@ from django.test import TestCase
 
 from test_generator.viewsets import TestViewsetMixin, TestListViewsetMixin
 
-from daiquiri.core.adapter import get_adapter
+from daiquiri.core.adapter import DatabaseAdapter
 from daiquiri.archive.models import Collection, ArchiveJob
 
 
@@ -89,10 +89,10 @@ class FileTests(TestViewsetMixin, ArchiveTestCase):
 
     def _test_detail_viewset(self, username):
 
-        database_name = settings.ARCHIVE_DATABASE
+        schema_name = settings.ARCHIVE_SCHEMA
         table_name = settings.ARCHIVE_TABLE
 
-        rows = get_adapter().database.fetch_rows(database_name, table_name, ['id', 'collection'], None, None, 0, None, None)
+        rows = DatabaseAdapter().fetch_rows(schema_name, table_name, ['id', 'collection'], None, None, 0, None, None)
 
         for row in rows:
 
@@ -104,17 +104,18 @@ class FileTests(TestViewsetMixin, ArchiveTestCase):
             msg = OrderedDict((
                 ('username', username),
                 ('url', url),
+                ('row', row),
                 ('status_code', response.status_code)
             ))
 
             self.assertEqual(response.status_code, status_code, msg=msg)
 
-    def _test_detail_viewset_whithout_download(self, username):
+    def _test_detail_viewset_without_download(self, username):
 
-        database_name = settings.ARCHIVE_DATABASE
+        schema_name = settings.ARCHIVE_SCHEMA
         table_name = settings.ARCHIVE_TABLE
 
-        rows = get_adapter().database.fetch_rows(database_name, table_name, ['id', 'collection'], None, None, 0, None, None)
+        rows = DatabaseAdapter().fetch_rows(schema_name, table_name, ['id', 'collection'], None, None, 0, None, None)
 
         for row in rows:
 
@@ -126,6 +127,7 @@ class FileTests(TestViewsetMixin, ArchiveTestCase):
             msg = OrderedDict((
                 ('username', username),
                 ('url', url),
+                ('row', row),
                 ('status_code', response.status_code)
             ))
 

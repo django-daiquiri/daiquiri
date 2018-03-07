@@ -1,10 +1,10 @@
 from django.conf import settings
 from django.contrib import admin
 
-from .models import Database, Table, Column, Function
+from .models import Schema, Table, Column, Function
 
 
-class DatabaseAdmin(admin.ModelAdmin):
+class SchemaAdmin(admin.ModelAdmin):
     search_fields = ('__str__', )
     list_display = ('order' ,'__str__', 'access_level', 'metadata_access_level')
     list_display_links = ('__str__', )
@@ -46,7 +46,7 @@ class FunctionAdmin(admin.ModelAdmin):
     list_display_links = ('name', )
 
 
-admin.site.register(Database, DatabaseAdmin)
+admin.site.register(Schema, SchemaAdmin)
 admin.site.register(Table, TableAdmin)
 admin.site.register(Column, ColumnAdmin)
 admin.site.register(Function, FunctionAdmin)

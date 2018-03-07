@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
 
 from daiquiri.core.viewsets import RowViewSetMixin
-from daiquiri.core.adapter import get_adapter
+from daiquiri.core.adapter import DatabaseAdapter
 
 from .serializers import ColumnSerializer
 from .utils import get_columns, get_resolver
@@ -17,13 +17,13 @@ class RowViewSet(RowViewSetMixin, viewsets.GenericViewSet):
 
     def list(self, request, *args, **kwargs):
 
-        # get database, table and column_names from the querystring
-        database_name = self.request.GET.get('database')
+        # get schema, table and column_names from the querystring
+        schema_name = self.request.GET.get('schema')
         table_name = self.request.GET.get('table')
         column_names = self.request.GET.getlist('column')
 
         # get the columns using the utils function
-        columns = get_columns(self.request.user, database_name, table_name, column_names)
+        columns = get_columns(self.request.user, schema_name, table_name, column_names)
 
         if columns:
             # get column names from the checked columns (again)
@@ -33,13 +33,13 @@ class RowViewSet(RowViewSetMixin, viewsets.GenericViewSet):
             ordering, page, page_size, search, filters = self._get_query_params(column_names)
 
             # get database adapter
-            adapter = get_adapter()
+            adapter = DatabaseAdapter()
 
             # query the database for the total number of rows
-            count = adapter.database.count_rows(database_name, table_name, column_names, search, filters)
+            count = adapter.count_rows(schema_name, table_name, column_names, search, filters)
 
             # query the paginated rowset
-            results = adapter.database.fetch_rows(database_name, table_name, column_names, ordering, page, page_size, search, filters)
+            results = adapter.fetch_rows(schema_name, table_name, column_names, ordering, page, page_size, search, filters)
 
             # return ordered dict to be send as json
             return Response(OrderedDict((
@@ -58,12 +58,12 @@ class ColumnViewSet(viewsets.ViewSet):
     def list(self, request, *args, **kwargs):
 
         # get database, table and column_names from the querystring
-        database_name = self.request.GET.get('database')
+        schema_name = self.request.GET.get('schema')
         table_name = self.request.GET.get('table')
         column_names = self.request.GET.getlist('column')
 
         # get the columns using the utils function
-        columns = get_columns(self.request.user, database_name, table_name, column_names)
+        columns = get_columns(self.request.user, schema_name, table_name, column_names)
 
         if columns:
             # get column names from the checked columns (again)

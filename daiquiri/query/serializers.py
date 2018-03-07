@@ -45,6 +45,7 @@ class QueryJobListSerializer(serializers.ModelSerializer):
             'id',
             'table_name',
             'creation_time',
+            'run_id',
             'phase'
         )
 
@@ -68,7 +69,7 @@ class QueryJobRetrieveSerializer(serializers.ModelSerializer):
             'destruction_time',
             'error_summary',
             'job_type',
-            'database_name',
+            'schema_name',
             'table_name',
             'query_language',
             'query',
@@ -101,7 +102,8 @@ class QueryJobCreateSerializer(serializers.ModelSerializer):
             'table_name',
             'queue',
             'query_language',
-            'query'
+            'query',
+            'run_id'
         )
 
 
@@ -113,7 +115,8 @@ class QueryJobUpdateSerializer(serializers.ModelSerializer):
         model = QueryJob
         fields = (
             'id',
-            'table_name'
+            'table_name',
+            'run_id'
         )
 
 

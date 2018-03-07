@@ -3,6 +3,8 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 
+from daiquiri.core.utils import get_detail_fields
+
 from .models import Profile
 
 
@@ -25,39 +27,11 @@ class ProfileForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ProfileForm, self).__init__(*args, **kwargs)
 
-        # add a field for each detail key
-        for detail_key in settings.AUTH_DETAIL_KEYS:
+        for key, field in get_detail_fields(settings.AUTH_DETAIL_KEYS):
+            if self.instance.details and key in self.instance.details:
+                field.initial = self.instance.details[key]
 
-            choices = [(option['id'], option['label']) for option in detail_key['options']]
-
-            if detail_key['data_type'] == 'text':
-                field = forms.CharField(widget=forms.TextInput(attrs={'placeholder': detail_key['label']}))
-            elif detail_key['data_type'] == 'textarea':
-                field = forms.CharField(widget=forms.Textarea(attrs={'placeholder': detail_key['label']}))
-            elif detail_key['data_type'] == 'select':
-                field = forms.ChoiceField(choices=choices)
-            elif detail_key['data_type'] == 'radio':
-                field = forms.ChoiceField(choices=choices, widget=forms.RadioSelect)
-            elif detail_key['data_type'] == 'multiselect':
-                field = forms.MultipleChoiceField(choices=choices)
-            elif detail_key['data_type'] == 'checkbox':
-                field = forms.MultipleChoiceField(choices=choices, widget=forms.CheckboxSelectMultiple)
-            else:
-                raise Exception('Unknown detail key data type.')
-
-            if 'label' in detail_key:
-                field.label = detail_key['label']
-
-            if 'required' in detail_key:
-                field.required = detail_key['required']
-
-            if 'help_text' in detail_key:
-                field.help_text = detail_key['help_text']
-
-            if self.instance.details and detail_key['key'] in self.instance.details:
-                field.initial = self.instance.details[detail_key['key']]
-
-            self.fields[detail_key['key']] = field
+            self.fields[key] = field
 
     def save(self, *args, **kwargs):
         # create an empty details dict if it does not exist

@@ -1,13 +1,12 @@
-import os
 import sys
 
 from django.conf import settings
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 
-from daiquiri.core.adapter import get_adapter
+from daiquiri.core.adapter import DatabaseAdapter
 from daiquiri.core.utils import human2bytes
-from daiquiri.metadata.models import Database, Table, Column, Function
+from daiquiri.metadata.models import Schema, Table, Column, Function
 
 
 def get_format_config(format_key):
@@ -30,59 +29,70 @@ def get_queue_choices():
     return [(item['key'], item['label']) for item in settings.QUERY_QUEUES]
 
 
-def get_tap_schema_name():
-    tap_config = settings.DATABASES.get('tap')
-    if tap_config:
-        return tap_config['NAME']
-    else:
-        return None
-
-
-def get_user_database_name(user):
+def get_user_schema_name(user):
     if not user or user.is_anonymous():
         username = 'anonymous'
     else:
         username = user.username
 
-    return settings.QUERY_USER_DATABASE_PREFIX + username
+    return settings.QUERY_USER_SCHEMA_PREFIX + username
 
 
 def get_quota(user):
     if not user or user.is_anonymous():
-        anonymous_quota = human2bytes(settings.QUERY_QUOTA.get('anonymous'))
-        return anonymous_quota if anonymous_quota else 0
+        quota = human2bytes(settings.QUERY_QUOTA.get('anonymous'))
 
     else:
-        user_quota = human2bytes(settings.QUERY_QUOTA.get('user'))
-        quota = user_quota if user_quota else 0
+        quota = human2bytes(settings.QUERY_QUOTA.get('user'))
 
         # apply quota for user
-        user_quotas = settings.QUERY_QUOTA.get('users')
-        if user_quotas:
-            user_quota = human2bytes(user_quotas.get(user.username))
-            if user_quota:
-                quota = user_quota if user_quota > quota else quota
+        users = settings.QUERY_QUOTA.get('users')
+        if users:
+            user_quota = human2bytes(users.get(user.username))
+            quota = user_quota if user_quota > quota else quota
 
         # apply quota for group
-        group_quotas = settings.QUERY_QUOTA.get('groups')
-        if group_quotas:
+        groups = settings.QUERY_QUOTA.get('groups')
+        if groups:
             for group in user.groups.all():
-                group_quota = human2bytes(group_quotas.get(group.name))
-                if group_quota:
-                    quota = group_quota if group_quota > quota else quota
+                group_quota = human2bytes(groups.get(group.name))
+                quota = group_quota if group_quota > quota else quota
 
     return quota
 
 
-def fetch_user_database_metadata(user, jobs):
+def get_max_active_jobs(user):
+    if not user or user.is_anonymous():
+        count = int(settings.QUERY_MAX_ACTIVE_JOBS.get('anonymous') or 0)
 
-    database_name = get_user_database_name(user)
+    else:
+        count = int(settings.QUERY_MAX_ACTIVE_JOBS.get('user') or 0)
 
-    database = {
+        # apply quota for user
+        users = int(settings.QUERY_MAX_ACTIVE_JOBS.get('users') or 0)
+        if users:
+            user_count = int(users.get(user.username))
+            count = user_count if user_count and user_count > count else count
+
+        # apply quota for group
+        groups = int(settings.QUERY_MAX_ACTIVE_JOBS.get('groups') or 0)
+        if groups:
+            for group in user.groups.all():
+                group_count = int(groups.get(group.name))
+                count = group_count if group_count and group_count > count else count
+
+    return count
+
+
+def fetch_user_schema_metadata(user, jobs):
+
+    schema_name = get_user_schema_name(user)
+
+    schema = {
         'order': sys.maxsize,
-        'name': database_name,
-        'query_strings': [database_name],
-        'description': _('Your personal database'),
+        'name': schema_name,
+        'query_strings': [schema_name],
+        'description': _('Your personal schema'),
         'tables': []
     }
 
@@ -90,22 +100,34 @@ def fetch_user_database_metadata(user, jobs):
         if job.phase == job.PHASE_COMPLETED:
             table = {
                 'name': job.table_name,
-                'query_strings': [database_name, job.table_name],
+                'query_strings': [schema_name, job.table_name],
                 'columns': job.metadata['columns']
             }
 
             for column in table['columns']:
                 column['query_strings'] = [column['name']]
 
-            database['tables'].append(table)
+            schema['tables'].append(table)
 
-    return [database]
+    return [schema]
 
 
 def get_asterisk_columns(display_column):
-    database_name, table_name, _ = display_column[1]
-    column_names = get_adapter().database.fetch_column_names(database_name, table_name)
-    return [(column_name, (database_name, table_name, column_name)) for column_name in column_names]
+    schema_name, table_name, _ = display_column[1]
+    column_names = DatabaseAdapter().fetch_column_names(schema_name, table_name)
+    return [(column_name, (schema_name, table_name, column_name)) for column_name in column_names]
+
+
+def get_indexed_objects():
+    indexed_objects = {}
+
+    for column in Column.objects.exclude(index_for=None):
+        if column.datatype not in indexed_objects:
+            indexed_objects[column.datatype] = [column.indexed_columns]
+        else:
+            indexed_objects[column.datatype].append(column.indexed_columns)
+
+    return indexed_objects
 
 
 def check_permissions(user, keywords, tables, columns, functions):
@@ -116,17 +138,16 @@ def check_permissions(user, keywords, tables, columns, functions):
         pass
 
     if not settings.METADATA_COLUMN_PERMISSIONS:
-        # check permissions on databases/tables
-        for database_name, table_name in tables:
-
-            # check permission on database
-            if database_name in [None, get_tap_schema_name(), get_user_database_name(user)]:
+        # check permissions on schemas/tables
+        for schema_name, table_name in tables:
+            # check permission on schema
+            if schema_name in [None, settings.TAP_SCHEMA, get_user_schema_name(user)]:
                 continue
             else:
                 try:
-                    database = Database.objects.filter_by_access_level(user).get(name=database_name)
-                except Database.DoesNotExist:
-                    messages.append(_('Database %s not found.') % database_name)
+                    schema = Schema.objects.filter_by_access_level(user).get(name=schema_name)
+                except Schema.DoesNotExist:
+                    messages.append(_('Schema %s not found.') % schema_name)
                     continue
 
             # check permission on table
@@ -134,24 +155,33 @@ def check_permissions(user, keywords, tables, columns, functions):
                 continue
             else:
                 try:
-                    Table.objects.filter_by_access_level(user).filter(database=database).get(name=table_name)
+                    Table.objects.filter_by_access_level(user).filter(schema=schema).get(name=table_name)
                 except Table.DoesNotExist:
                     messages.append(_('Table %s not found.') % table_name)
                     continue
 
-    else:
-        # check permissions on databases/tables/columns
-        for column in columns:
-            database_name, table_name, column_name = column
-
-            # check permission on database
-            if database_name in [None, get_tap_schema_name(), get_user_database_name(user)]:
+        for schema_name, table_name, column_name in columns:
+            if column_name in [None, '*']:
                 continue
             else:
                 try:
-                    database = Database.objects.filter_by_access_level(user).get(name=database_name)
-                except Database.DoesNotExist:
-                    messages.append(_('Database %s not found.') % database_name)
+                    Column.objects.filter(table__schema__name=schema_name).filter(table__name=table_name).get(name=column_name)
+                except Column.DoesNotExist:
+                    messages.append(_('Column %s not found.') % column_name)
+                    continue
+    else:
+        # check permissions on schemas/tables/columns
+        for column in columns:
+            schema_name, table_name, column_name = column
+
+            # check permission on schema
+            if schema_name in [None, settings.TAP_SCHEMA, get_user_schema_name(user)]:
+                continue
+            else:
+                try:
+                    schema = Schema.objects.filter_by_access_level(user).get(name=schema_name)
+                except Schema.DoesNotExist:
+                    messages.append(_('Schema %s not found.') % schema_name)
                     continue
 
             # check permission on table
@@ -159,7 +189,7 @@ def check_permissions(user, keywords, tables, columns, functions):
                 continue
             else:
                 try:
-                    table = Table.objects.filter_by_access_level(user).filter(database=database).get(name=table_name)
+                    table = Table.objects.filter_by_access_level(user).filter(schema=schema).get(name=table_name)
                 except Table.DoesNotExist:
                     messages.append(_('Table %s not found.') % table_name)
                     continue
@@ -169,7 +199,7 @@ def check_permissions(user, keywords, tables, columns, functions):
                 continue
             elif column_name == '*':
                 columns = Column.objects.filter_by_access_level(user).filter(table=table)
-                actual_columns = get_adapter().database.fetch_columns(database_name, table_name)
+                actual_columns = DatabaseAdapter().fetch_columns(schema_name, table_name)
 
                 column_names_set = set([column.name for column in columns])
                 actual_column_names_set = set([column['name'] for column in actual_columns])
@@ -186,14 +216,15 @@ def check_permissions(user, keywords, tables, columns, functions):
 
     # check permissions on functions
     for function_name in functions:
-        if function_name.upper() in get_adapter().database.FUNCTIONS:
-            continue
+
+        # check permission on function
+        queryset = Function.objects.filter(name=function_name)
+
+        # forbit the function if it is in metadata.functions, and the user doesn't have access.
+        if queryset and not queryset.filter_by_access_level(user):
+            messages.append(_('Function %s is not allowed.') % function_name)
         else:
-            # check permission on function
-            function = Function.objects.filter_by_access_level(user).get(name=function_name)
-            if not function:
-                messages.append(_('Function %s not found.') % function_name)
-                continue
+            continue
 
     # return the error stack
     return list(set(messages))

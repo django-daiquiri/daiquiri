@@ -24,8 +24,6 @@ class ParticipantForm(forms.ModelForm):
         super(ParticipantForm, self).__init__(*args, **kwargs)
 
         for key, field in get_detail_fields(settings.MEETINGS_PARTICIPANT_DETAIL_KEYS):
-            if self.instance.details and key in self.instance.details:
-                field.initial = self.instance.details[key]
             self.fields[key] = field
 
     def save(self, *args, **kwargs):

@@ -16,7 +16,7 @@ angular.module('metadata', ['core'])
     /* configure the resources */
 
     var resources = {
-        'databases': $resource(baseurl + 'metadata/api/databases/:list_route/:id/'),
+        'schemas': $resource(baseurl + 'metadata/api/schemas/:list_route/:id/'),
         'tables': $resource(baseurl + 'metadata/api/tables/:list_route/:id/'),
         'columns': $resource(baseurl + 'metadata/api/columns/:list_route/:id/'),
         'functions': $resource(baseurl + 'metadata/api/functions/:list_route/:id/'),
@@ -29,7 +29,7 @@ angular.module('metadata', ['core'])
     /* configure the factory for new items */
 
     service.factory = {
-        databases: function() {
+        schemas: function() {
             return {
                 access_level: 'PRIVATE',
                 metadata_access_level: 'PRIVATE',
@@ -39,7 +39,7 @@ angular.module('metadata', ['core'])
          },
         tables: function() {
             return {
-                database: service.browser.getSelectedItem('databases', 0).id,
+                schema: service.browser.getSelectedItem('schemas', 0).id,
                 access_level: 'PRIVATE',
                 metadata_access_level: 'PRIVATE',
                 discover: true,
@@ -48,7 +48,7 @@ angular.module('metadata', ['core'])
         },
         columns: function() {
             return {
-                table: service.browser.getSelectedItem('databases', 1).id,
+                table: service.browser.getSelectedItem('schemas', 1).id,
                 access_level: 'PRIVATE',
                 metadata_access_level: 'PRIVATE',
                 groups: []
@@ -71,31 +71,31 @@ angular.module('metadata', ['core'])
         service.licenses = resources.licenses.query();
         service.accesslevels = resources.accesslevels.query();
 
-        BrowserService.init('databases', ['databases','tables','columns']);
+        BrowserService.init('schemas', ['schemas','tables','columns']);
         BrowserService.init('functions', ['functions']);
 
-        databases_promise = service.initDatabasesBrowser();
+        schemas_promise = service.initSchemasBrowser();
         functions_promise = service.initFunctionsBrowser();
 
-        $q.all([databases_promise, functions_promise]).then(function() {
+        $q.all([schemas_promise, functions_promise]).then(function() {
             service.ready = true;
         })
     };
 
-    service.initDatabasesBrowser = function() {
-        return resources.databases.query({'list_route': 'management'}, function(response) {
-            service.databases = response;
+    service.initSchemasBrowser = function() {
+        return resources.schemas.query({'list_route': 'management'}, function(response) {
+            service.schemas = response;
 
             service.tables = [];
-            angular.forEach(service.databases, function(database) {
-                database.label = database.name;
-                angular.forEach(database.tables, function(table) {
-                    table.label = database.name + '.' + table.name;
+            angular.forEach(service.schemas, function(schema) {
+                schema.label = schema.name;
+                angular.forEach(schema.tables, function(table) {
+                    table.label = schema.name + '.' + table.name;
                     service.tables.push(table);
                 });
             });
 
-            BrowserService.render('databases', service.databases, service.active);
+            BrowserService.render('schemas', service.schemas, service.active);
         }).$promise;
     };
 
@@ -169,7 +169,7 @@ angular.module('metadata', ['core'])
                     if (resource === 'functions') {
                         service.initFunctionsBrowser();
                     } else {
-                        service.initDatabasesBrowser();
+                        service.initSchemasBrowser();
                     }
                 });
             }
@@ -192,7 +192,7 @@ angular.module('metadata', ['core'])
             if (resource === 'functions') {
                 service.initFunctionsBrowser();
             } else {
-                service.initDatabasesBrowser();
+                service.initSchemasBrowser();
             }
         });
     };
@@ -203,12 +203,12 @@ angular.module('metadata', ['core'])
         };
 
         if (resource === 'tables') {
-            parameters['database'] = $filter('filter')(service.databases, {'id': service.values.database})[0].name;
+            parameters['schema'] = $filter('filter')(service.schemas, {'id': service.values.schema})[0].name;
             parameters['table'] = service.values.name;
         } else if (resource === 'columns') {
             var split = $filter('filter')(service.tables, {'id': service.values.table})[0].__str__.split('.');
 
-            parameters['database'] = split[0];
+            parameters['schema'] = split[0];
             parameters['table'] = split[1];
             parameters['column'] = service.values.name;
         }

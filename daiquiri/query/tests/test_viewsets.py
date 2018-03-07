@@ -10,16 +10,7 @@ from test_generator.viewsets import (
     TestViewsetMixin
 )
 
-from daiquiri.core.adapter import get_adapter
-
 from ..models import QueryJob, Example
-
-adapter = get_adapter()
-
-mock_execute = mock.Mock()
-
-mock_fetch_stats = mock.Mock()
-mock_fetch_stats.return_value = [0, 0]
 
 
 class QueryViewsetTestCase(TestCase):
@@ -28,7 +19,8 @@ class QueryViewsetTestCase(TestCase):
         'auth.json',
         'metadata.json',
         'jobs.json',
-        'queryjobs.json'
+        'queryjobs.json',
+        'examples.json'
     )
 
     users = (
@@ -66,6 +58,10 @@ class DropdownTests(TestListViewsetMixin, QueryViewsetTestCase):
     }
 
 
+@mock.patch(settings.ADAPTER_DATABASE + '.submit_query', mock.Mock())
+@mock.patch(settings.ADAPTER_DATABASE + '.fetch_stats', mock.Mock(return_value=[100, 100]))
+@mock.patch(settings.ADAPTER_DATABASE + '.rename_table', mock.Mock())
+@mock.patch(settings.ADAPTER_DATABASE + '.drop_table', mock.Mock())
 class JobTests(TestViewsetMixin, QueryViewsetTestCase):
 
     instances = QueryJob.objects.filter(owner__username='user')
@@ -114,16 +110,13 @@ class JobTests(TestViewsetMixin, QueryViewsetTestCase):
         for instance in self.instances:
             self.assert_detail_viewset(username, kwargs={'pk': instance.pk})
 
-    @mock.patch.object(adapter.database, 'execute', mock_execute)
-    @mock.patch.object(adapter.database, 'fetch_stats', mock_fetch_stats)
     def _test_create_viewset(self, username):
         for example in Example.objects.all():
             self.assert_create_viewset(username, data={
                 'query_language': example.query_language,
-                'query': example.query
+                'query': example.query_string
             })
 
-    @mock.patch.object(adapter.database, 'execute', mock_execute)
     def _test_update_viewset(self, username):
         for instance in self.instances:
             self.assert_update_viewset(username, kwargs={
@@ -132,7 +125,6 @@ class JobTests(TestViewsetMixin, QueryViewsetTestCase):
                 'table_name': instance.table_name + '_renamed'
             })
 
-    @mock.patch.object(adapter.database, 'execute', mock_execute)
     def _test_delete_viewset(self, username):
         for instance in self.instances:
             self.assert_delete_viewset(username, kwargs={
@@ -241,7 +233,7 @@ class JobTests(TestViewsetMixin, QueryViewsetTestCase):
 
 #     def _test_list_viewset(self, username):
 #         self.assert_list_viewset(username, query_params={
-#             'database': 'daiquiri_user_user',
+#             'schema': 'daiquiri_user_user',
 #             'table': 'test'
 #         })
 
@@ -260,7 +252,7 @@ class JobTests(TestViewsetMixin, QueryViewsetTestCase):
 
 #     def _test_list_viewset(self, username):
 #         self.assert_list_viewset(username, query_params={
-#             'database': 'daiquiri_user_user',
+#             'schema': 'daiquiri_user_user',
 #             'table': 'test'
 #         })
 

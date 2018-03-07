@@ -41,7 +41,7 @@
             </div>
 
             <dt>{% trans 'Full database table name' %}</dt>
-            <dd>{$ service.job.database_name $}.{$ service.job.table_name $}</dd>
+            <dd>{$ service.job.schema_name $}.{$ service.job.table_name $}</dd>
 
             <dt>{% trans 'Internal job id' %}</dt>
             <dd>{$ service.job.id $}</dd>
@@ -76,7 +76,7 @@
     <div class="panel-footer">
         <div ng-show="service.job.phase == 'COMPLETED'">
             <a href="" ng-click="service.showModal('rename-job', service.job)">
-                {% trans 'Rename the job\'s result table' %}
+                {% trans 'Rename the job\'s result table or run id' %}
             </button>
         </div>
         <div ng-show="service.job.phase == 'EXECUTING' || service.job.phase == 'PENDING' || service.job.phase == 'QUEUED'">

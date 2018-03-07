@@ -34,7 +34,7 @@ class PublicTableTests(TestViewMixin, ServeViewTestCase):
 
     def _test_list_view(self, username):
         self.assert_list_view(username, {
-            'database_name': 'daiquiri_data_obs',
+            'schema_name': 'daiquiri_data_obs',
             'table_name': 'stars'
         })
 
@@ -53,7 +53,7 @@ class InternalTableTests(TestViewMixin, ServeViewTestCase):
 
     def _test_list_view(self, username):
         self.assert_list_view(username, {
-            'database_name': 'daiquiri_data_sim',
+            'schema_name': 'daiquiri_data_sim',
             'table_name': 'particles'
         })
 
@@ -70,20 +70,20 @@ class NotFoundTableTests(TestViewMixin, ServeViewTestCase):
         }
     }
 
-    def _test_non_existing_database_view(self, username):
+    def _test_non_existing_schema_view(self, username):
         self.assert_list_view(username, {
-            'database_name': 'non_existing',
+            'schema_name': 'non_existing',
             'table_name': 'stars'
         })
 
     def _test_non_existing_table_view(self, username):
         self.assert_list_view(username, {
-            'database_name': 'daiquiri_data_obs',
+            'schema_name': 'daiquiri_data_obs',
             'table_name': 'non_existing'
         })
 
     def _test_non_existing_user_table_view(self, username):
         self.assert_list_view(username, {
-            'database_name': 'daiquiri_user_user',
+            'schema_name': 'daiquiri_user_user',
             'table_name': 'non_existing'
         })

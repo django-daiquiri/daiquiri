@@ -12,6 +12,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError, NotFound
 from rest_framework.decorators import list_route, detail_route
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
+from rest_framework.throttling import UserRateThrottle
 
 from daiquiri.core.viewsets import ChoicesViewSet, RowViewSetMixin
 from daiquiri.core.permissions import HasModelPermission
@@ -36,7 +37,7 @@ from .serializers import (
 )
 
 from .permissions import HasPermission
-from .utils import get_format_config, get_quota, fetch_user_database_metadata
+from .utils import get_format_config, get_quota, fetch_user_schema_metadata
 
 
 class StatusViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -95,10 +96,17 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
         else:
             return QueryJobSerializer
 
+    def get_throttles(self):
+        if self.action == 'create':
+            self.throttle_scope = 'query.create'
+
+        return super(QueryJobViewSet, self).get_throttles()
+
     def perform_create(self, serializer):
         job = QueryJob(
             job_type=QueryJob.JOB_TYPE_INTERFACE,
             owner=(None if self.request.user.is_anonymous() else self.request.user),
+            run_id=serializer.data.get('run_id'),
             table_name=serializer.data.get('table_name'),
             query_language=serializer.data.get('query_language'),
             query=serializer.data.get('query'),
@@ -120,7 +128,7 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
 
     @list_route(methods=['get'])
     def tables(self, request):
-        return Response(fetch_user_database_metadata(request.user, self.get_queryset()))
+        return Response(fetch_user_schema_metadata(request.user, self.get_queryset()))
 
     @detail_route(methods=['put'])
     def abort(self, request, pk=None):
@@ -286,12 +294,20 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
 
         try:
             download_job = DownloadJob.objects.get(job=job, format_key=format_key)
-            return sendfile(request, download_job.file_path, attachment=True)
+
+            # check if the file was lost
+            if download_job.phase == download_job.PHASE_COMPLETED and os.path.isfile(download_job.file_path):
+                # stream the previously created file
+                return sendfile(request, download_job.file_path, attachment=True)
         except DownloadJob.DoesNotExist:
-            file_name = '%s.%s' % (job.table_name, format_config['extension'])
-            response = FileResponse(job.stream(format_key), content_type=format_config['content_type'])
-            response['Content-Disposition'] = "attachment; filename=%s" % file_name
-            return response
+            pass
+
+        # stream the table directly from the database
+        file_name = '%s.%s' % (job.table_name, format_config['extension'])
+        response = FileResponse(job.stream(format_key), content_type=format_config['content_type'])
+        response['Content-Disposition'] = "attachment; filename=%s" % file_name
+        return response
+
 
 
 class ExampleViewSet(viewsets.ModelViewSet):

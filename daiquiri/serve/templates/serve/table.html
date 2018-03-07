@@ -12,7 +12,7 @@
         columns_url: 'serve/api/columns/',
         files_url: 'files/api/files/',
         params: {
-            database: '{{ database }}',
+            schema: '{{ schema }}',
             table: '{{ table }}'
         }
     })"
@@ -39,7 +39,7 @@
 
 {% block wide %}
 
-    <h1>{{ database }}.{{ table }}</h1>
+    <h1>{{ schema }}.{{ table }}</h1>
 
     {% include 'core/partials/table.html' %}
 

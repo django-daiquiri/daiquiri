@@ -56,7 +56,7 @@ source env/bin/activate
 or for `python3`:
 
 ```
-cd app
+cd ../app
 python3 -m venv env3
 source env3/bin/activate
 ```
@@ -64,9 +64,14 @@ source env3/bin/activate
 Install the requirements in editable mode:
 
 ```
-pip install -I -e ../daiquiri
-pip install -I -e ../queryparser
+pip install -e ../daiquiri
+pip install -e ../queryparser
 pip install mysqlclient
+pip install psycopg2-binary
+```
+or for postgres:
+```
+pip install psycopg2
 ```
 
 Setup the app
@@ -78,48 +83,61 @@ Create a `log` and a `download` directory:
 mkdir log download
 ```
 
-Create the test databases from `../daiquiri/testing/data`:
-
-```
-mysql < ../daiquiri/testing/sql/daiquiri_data_obs.sql
-mysql < ../daiquiri/testing/sql/daiquiri_data_sim.sql
-mysql < ../daiquiri/testing/sql/daiquiri_user_user.sql
-```
-
 Copy the `local.py` settings file:
 
 ```
 cp config/settings/sample.local.py config/settings/local.py
 ```
 
-Edit config/settings/local.py for database settings, `ASYNC = True` and `DEBUG = True` and add
+Edit config/settings/local.py for database settings, and `DEBUG = True` and add
 
 ```
-import os
-from . import BASE_DIR
+TESTING_DIR = os.path.join(BASE_DIR, '../daiquiri/testing')
+
 FIXTURE_DIRS = (
-    os.path.join(BASE_DIR, '../daiquiri/testing/fixtures'),
+    os.path.join(TESTING_DIR, 'fixtures'),
 )
+
+AUTH_SIGNUP = True
+AUTH_WORKFLOW = 'confirmation'
+
+ARCHIVE_ANONYMOUS = False
+ARCHIVE_BASE_PATH = os.path.join(TESTING_DIR, 'files')
+
+FILES_BASE_PATH = os.path.join(TESTING_DIR, 'files')
+
+SERVE_DOWNLOAD_DIR = os.path.join(TESTING_DIR, 'files')
 ```
 
 at the end of the file.
+
+Next, the differenet users and permissions need to be created on the database. For this purpose, the `sqlcreate` can be used to see what needs to be executed on the database:
+
+```
+./manage.py sqlcreate                             # databases, users and permissions to run daiquiri
+./manage.py sqlcreate --test                      # databases, users and permissions to run tests
+./manage.py sqlcreate --schema=daiquiri_data_obs  # databases, users and permissions to use a particular schema with scientific data
+```
+
+Copy the output line by line to a database shell, and create the test databases using the files in `../daiquiri/testing/sql`, for MySQL:
+
+```
+mysql < ../daiquiri/testing/sql/mysql.sql
+```
+
+and for PostgreSQL:
+
+```
+psql daiquiri_data < ../daiquiri/testing/sql/postgres.sql
+psql daiquiri_data < ../daiquiri/testing/sql/postgres_permissions.sql
+psql test_daiquiri_data < ../daiquiri/testing/sql/postgres.sql
+psql test_daiquiri_data < ../daiquiri/testing/sql/postgres_permissions.sql
+```
 
 Create the front end library vendor bundles:
 
 ```
 ./manage.py download_vendor_files
-```
-
-Next, the differenet users and permissions need to be created on `mysql`. For this purpose, the `sqlcreate` can be used to see what needs to be executed on the database:
-
-```
-./manage.py sqlcreate daiquiri_data_obs daiquiri_data_sim
-```
-
-Either copy the output line by line to a mysql shell, or use a pipe:
-
-```
-./manage.py sqlcreate daiquiri_data_obs daiquiri_data_sim | mysql
 ```
 
 Run the tests:
@@ -132,7 +150,7 @@ Run the database migrations:
 
 ```
 ./manage.py migrate
-./manage.py migrate --database=tap
+./manage.py migrate --database=data
 ```
 
 Import the fixtures:
@@ -150,10 +168,16 @@ Run the development server:
 Go to `http://localhost:8000` in your web browser.
 
 
-Open three other terminals, got to the `app` directory, activate the virtual environment, and run:
+Setup the queues
+----------------
+
+Edit config/settings/local.py again, and set `ASYNC = True`.
+
+
+Open three other terminals, go to the `app` directory, activate the virtual environment, and run:
 
 ```
-./manage.py runworker default
+./manage.py runworker
 ```
 
 ```

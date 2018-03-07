@@ -1,6 +1,6 @@
 import iso8601
 
-from lxml import objectify
+import xml.etree.ElementTree as et
 
 from django.core.urlresolvers import reverse
 from django.db.models import Q
@@ -68,10 +68,14 @@ class AsyncTestMixin(TestMixin):
         self.assertEqual(response.status_code, 200)
 
         if username == 'user':
-            root = objectify.fromstring(response.content)
+            root = et.fromstring(response.content)
+            children = root.getchildren()
+
             self.assertEqual(root.tag, self.uws_ns + 'jobs')
-            self.assertEqual(root.jobref.tag, self.uws_ns + 'jobref')
-            self.assertEqual(len(root.jobref), len(self.jobs))
+            self.assertEqual(len(children), len(self.jobs))
+
+            for node in children:
+                self.assertEqual(node.tag, self.uws_ns + 'jobref')
 
     def _test_get_job_list_xml_phase(self, username):
         '''
@@ -83,8 +87,8 @@ class AsyncTestMixin(TestMixin):
         self.assertEqual(response.status_code, 200)
 
         if username == 'user':
-            root = objectify.fromstring(response.content)
-            self.assertEqual(len(root.jobref), len(self.jobs.filter(Q(phase='PENDING')|Q(phase='ARCHIVED'))))
+            root = et.fromstring(response.content)
+            self.assertEqual(len(root.getchildren()), len(self.jobs.filter(Q(phase='PENDING')|Q(phase='ARCHIVED'))))
 
     def _test_get_job_list_xml_after(self, username):
         '''
@@ -97,8 +101,8 @@ class AsyncTestMixin(TestMixin):
         self.assertEqual(response.status_code, 200)
 
         if username == 'user':
-            root = objectify.fromstring(response.content)
-            self.assertEqual(len(root.jobref), len(self.jobs.filter(creation_time__gte='2017-01-01T01:00:00Z')))
+            root = et.fromstring(response.content)
+            self.assertEqual(len(root.getchildren()), len(self.jobs.filter(creation_time__gte='2017-01-01T01:00:00Z')))
 
     def _test_get_job_list_xml_last(self, username):
         '''
@@ -110,8 +114,8 @@ class AsyncTestMixin(TestMixin):
         self.assertEqual(response.status_code, 200)
 
         if username == 'user':
-            root = objectify.fromstring(response.content)
-            self.assertEqual(len(root.jobref), 3)
+            root = et.fromstring(response.content)
+            self.assertEqual(len(root.getchildren()), 3)
 
     def _test_post_job_list_create(self, username):
         '''
@@ -179,7 +183,7 @@ class AsyncTestMixin(TestMixin):
             if username == 'user':
                 self.assertEqual(response.status_code, 200)
 
-                root = objectify.fromstring(response.content)
+                root = et.fromstring(response.content)
                 self.assertEqual(root.tag, self.uws_ns + 'job')
             else:
                 self.assertEqual(response.status_code, 404)
@@ -196,7 +200,7 @@ class AsyncTestMixin(TestMixin):
             if username == 'user':
                 self.assertEqual(response.status_code, 200)
 
-                root = objectify.fromstring(response.content)
+                root = et.fromstring(response.content)
                 self.assertEqual(root.tag, self.uws_ns + 'results')
             else:
                 self.assertEqual(response.status_code, 404)
@@ -231,7 +235,7 @@ class AsyncTestMixin(TestMixin):
             if username == 'user':
                 self.assertEqual(response.status_code, 200)
 
-                root = objectify.fromstring(response.content)
+                root = et.fromstring(response.content)
                 self.assertEqual(root.tag, self.uws_ns + 'parameters')
             else:
                 self.assertEqual(response.status_code, 404)

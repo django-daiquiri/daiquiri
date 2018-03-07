@@ -9,16 +9,18 @@
 
 <div class="daiquiri-query-dropdown" ng-show="service.forms.sql.dropdown == 'simbad'">
     <div class="daiquiri-query-dropdown-head">
-        <div class="input-group">
-            <input type="text" class="form-control"
-                placeholder="{% trans 'Object name' %}"
-                ng-model="service.dropdowns.simbad.values.query"/>
-            <span class="input-group-btn">
-                <button class="btn btn-default" type="button" ng-click="service.dropdowns.simbad.query()">
-                    {% trans 'Search on SIMBAD' %}
-                </button>
-            </span>
-        </div>
+        <form class="daiquiri-query-dropdown-form" ng-submit="service.dropdowns.simbad.query()">
+            <div class="input-group">
+                <input type="text" class="form-control"
+                    placeholder="{% trans 'Object name' %}"
+                    ng-model="service.dropdowns.simbad.values.query"/>
+                <span class="input-group-btn">
+                    <input type="submit" class="btn btn-default">
+                        {% trans 'Search on SIMBAD' %}
+                    </input>
+                </span>
+            </div>
+        </form>
     </div>
 
     <div class="daiquiri-query-dropdown-body">

@@ -9,6 +9,7 @@ from celery.task.control import revoke
 
 from django.conf import settings
 from django.contrib.auth.models import Group
+from django.core.cache import cache
 from django.db import models
 from django.db.utils import OperationalError, ProgrammingError
 from django.urls import reverse
@@ -21,10 +22,11 @@ from rest_framework.exceptions import ValidationError
 from jsonfield import JSONField
 
 from queryparser.mysql import MySQLQueryProcessor
+from queryparser.postgresql import PostgreSQLQueryProcessor
 from queryparser.adql import ADQLQueryTranslator
 from queryparser.exceptions import QueryError, QuerySyntaxError
 
-from daiquiri.core.adapter import get_adapter
+from daiquiri.core.adapter import DatabaseAdapter, DownloadAdapter
 from daiquiri.core.constants import ACCESS_LEVEL_CHOICES
 from daiquiri.jobs.models import Job
 from daiquiri.jobs.managers import JobManager
@@ -33,12 +35,13 @@ from daiquiri.files.utils import check_file, search_file
 from .managers import QueryJobManager, ExampleManager
 from .utils import (
     get_quota,
+    get_max_active_jobs,
     get_default_table_name,
     get_default_queue,
     get_format_config,
-    get_tap_schema_name,
-    get_user_database_name,
+    get_user_schema_name,
     get_asterisk_columns,
+    get_indexed_objects,
     check_permissions
 )
 from .tasks import run_query, create_download_file, create_archive_file
@@ -50,7 +53,7 @@ class QueryJob(Job):
 
     objects = QueryJobManager()
 
-    database_name = models.CharField(max_length=256)
+    schema_name = models.CharField(max_length=256)
     table_name = models.CharField(max_length=256)
     queue = models.CharField(max_length=16)
 
@@ -78,7 +81,7 @@ class QueryJob(Job):
     @property
     def parameters(self):
         return {
-            'database_name': self.database_name,
+            'schema_name': self.schema_name,
             'table_name': self.table_name,
             'query_language': self.query_language,
             'query': self.query,
@@ -149,19 +152,26 @@ class QueryJob(Job):
         if not self.response_format:
             self.response_format = settings.QUERY_DEFAULT_DOWNLOAD_FORMAT
 
-        # set the database name
-        if not self.database_name:
-            self.database_name = get_user_database_name(self.owner)
+        # set the schema name
+        if not self.schema_name:
+            self.schema_name = get_user_schema_name(self.owner)
 
         # set a default table name
         if not self.table_name:
             self.table_name = get_default_table_name()
 
+        # set a default queue
+        if not self.queue:
+            self.queue = get_default_queue()
+
+        # set the execution_duration to the queues timeout
+        self.execution_duration = self.timeout
+
+        # validate query_language and query
         if not self.query_language:
             raise ValidationError({
                  'query_language': [_('This field may not be blank.')]
             })
-
         if not self.query:
             raise ValidationError({
                  'query': [_('This field may not be blank.')]
@@ -170,14 +180,35 @@ class QueryJob(Job):
         # check quota
         if QueryJob.objects.get_size(self.owner) > get_quota(self.owner):
             raise ValidationError({
-                    'query': [_('Quota is exceeded. Please remove some of your jobs.')]
-                })
+                'query': [_('Quota is exceeded. Please remove some of your jobs.')]
+            })
+
+        # check number of active jobs
+        max_active_jobs = get_max_active_jobs(self.owner)
+        if max_active_jobs and max_active_jobs <= QueryJob.objects.get_active(self.owner).count():
+            raise ValidationError({
+                'query': [_('Too many active jobs. Please abort some of your active jobs or wait until they are completed.')]
+            })
+
+        # get the adapter
+        adapter = DatabaseAdapter()
+
+        # log the input query
+        logger.debug('query = "%s"', self.query)
 
         # translate adql -> mysql string
         if self.query_language == 'adql-2.0':
             try:
-                translator = ADQLQueryTranslator(self.query)
-                translated_query = translator.to_mysql()
+                translator = cache.get_or_set('translator', ADQLQueryTranslator(), 3600)
+                translator.set_query(self.query)
+
+                if adapter.database_config['ENGINE'] == 'django.db.backends.mysql':
+                    translated_query = translator.to_mysql()
+                elif adapter.database_config['ENGINE'] == 'django.db.backends.postgresql':
+                    translated_query = translator.to_postgresql()
+                else:
+                    raise Exception('Unknown database engine')
+
             except QuerySyntaxError as e:
                 raise ValidationError({
                     'query': {
@@ -195,17 +226,24 @@ class QueryJob(Job):
         else:
             translated_query = self.query
 
+        # log the translated query
+        logger.debug('translated_query = "%s"', translated_query)
+
         # parse the query
         try:
-            processor = MySQLQueryProcessor(translated_query)
+            if adapter.database_config['ENGINE'] == 'django.db.backends.mysql':
+                processor = MySQLQueryProcessor(translated_query)
+            elif adapter.database_config['ENGINE'] == 'django.db.backends.postgresql':
 
-            tap_schema_name = get_tap_schema_name()
-            if tap_schema_name:
-                processor.process_query(replace_schema_name={
-                    'TAP_SCHEMA': tap_schema_name
-                })
-            else:
+                processor = cache.get_or_set('processor', PostgreSQLQueryProcessor(indexed_objects=get_indexed_objects()), 3600)
+                processor.set_query(translated_query)
                 processor.process_query()
+            else:
+                raise Exception('Unknown database engine')
+
+            processor.process_query(replace_schema_name={
+                'TAP_SCHEMA': settings.TAP_SCHEMA
+            })
 
         except QuerySyntaxError as e:
             raise ValidationError({
@@ -220,6 +258,15 @@ class QueryJob(Job):
                     'messages': e.messages,
                 }
             })
+
+        # log the native query
+        logger.debug('native_query = "%s"', processor.query)
+
+        # log the processor output
+        logger.debug('processor.keywords = %s', processor.keywords)
+        logger.debug('processor.tables = %s', processor.tables)
+        logger.debug('processor.columns = %s', processor.columns)
+        logger.debug('processor.functions = %s', processor.functions)
 
         # check permissions
         permission_messages = check_permissions(self.owner, processor.keywords, processor.tables, processor.columns, processor.functions)
@@ -276,15 +323,11 @@ class QueryJob(Job):
             # start the submit_query task in a syncronous or asuncronous way
             job_id = str(self.id)
             if not settings.ASYNC or sync:
-                logger.info('run_query %s submitted (sync)' % self.id)
+                logger.info('job %s submitted (sync)' % self.id)
                 run_query.apply((job_id, ), task_id=job_id, throw=True)
 
             else:
-                if not self.queue:
-                    self.queue = get_default_queue()
-                    self.save()
-
-                logger.info('run_query %s submitted (async, queue=query, priority=%s)' % (self.id, self.priority))
+                logger.info('job %s submitted (async, queue=query, priority=%s)' % (self.id, self.priority))
                 run_query.apply_async((job_id, ), task_id=job_id, queue='query', priority=self.priority)
 
         else:
@@ -318,7 +361,7 @@ class QueryJob(Job):
 
     def rename_table(self, new_table_name):
         if self.table_name != new_table_name:
-            get_adapter().database.rename_table(self.database_name, self.table_name, new_table_name)
+            DatabaseAdapter().rename_table(self.schema_name, self.table_name, new_table_name)
 
             self.metadata['name'] = new_table_name
             self.save()
@@ -326,23 +369,23 @@ class QueryJob(Job):
     def drop_table(self):
         # drop the corresponding database table, but fail silently
         try:
-            get_adapter().database.drop_table(self.database_name, self.table_name)
+            DatabaseAdapter().drop_table(self.schema_name, self.table_name)
         except ProgrammingError:
             pass
 
     def abort_query(self):
         # abort the job on the database
         try:
-            get_adapter().database.abort_query(self.pid)
+            DatabaseAdapter().abort_query(self.pid)
         except OperationalError:
             # the query was probably killed before
             pass
 
     def stream(self, format_key):
         if self.phase == self.PHASE_COMPLETED:
-            return get_adapter().download.generate(
+            return DownloadAdapter().generate(
                 format_key,
-                self.database_name,
+                self.schema_name,
                 self.table_name,
                 self.metadata,
                 self.result_status,
@@ -366,13 +409,13 @@ class QueryJob(Job):
                 raise ValidationError(errors)
 
             # get database adapter
-            adapter = get_adapter()
+            adapter = DatabaseAdapter()
 
             # query the database for the total number of rows
-            count = adapter.database.count_rows(self.database_name, self.table_name, column_names, search, filters)
+            count = adapter.count_rows(self.schema_name, self.table_name, column_names, search, filters)
 
             # query the paginated rowset
-            rows = adapter.database.fetch_rows(self.database_name, self.table_name, column_names, ordering, page, page_size, search, filters)
+            rows = adapter.fetch_rows(self.schema_name, self.table_name, column_names, ordering, page, page_size, search, filters)
 
             # flatten the list if only one column is retrieved
             if len(column_names) == 1:
@@ -440,11 +483,11 @@ class DownloadJob(Job):
 
             download_id = str(self.id)
             if not settings.ASYNC:
-                logger.info('create_download_file %s submitted (sync)' % download_id)
+                logger.info('download_job %s submitted (sync)' % download_id)
                 create_download_file.apply((download_id, ), task_id=download_id, throw=True)
 
             else:
-                logger.info('create_download_file %s submitted (async, queue=download)' % download_id)
+                logger.info('download_job %s submitted (async, queue=download)' % download_id)
                 create_download_file.apply_async((download_id, ), task_id=download_id, queue='download')
 
         else:
@@ -497,6 +540,11 @@ class QueryArchiveJob(Job):
         return os.path.join(directory_name, '%s.%s.zip' % (self.job.table_name, self.column_name))
 
     def process(self):
+        try:
+            get_format_config(self.format_key)
+        except IndexError:
+            raise ValidationError({'format_key': "Not supported."})
+
         if self.job.phase == self.PHASE_COMPLETED:
             self.owner = self.job.owner
         else:
@@ -514,11 +562,8 @@ class QueryArchiveJob(Job):
                 'column_name': [_('Unknown column "%s".') % self.column_name]
             })
 
-        # get database adapter
-        adapter = get_adapter()
-
-        # query the paginated rowset
-        rows = adapter.database.fetch_rows(self.job.database_name, self.job.table_name, [self.column_name], page_size=0)
+        # get database adapter and query the paginated rowset
+        rows = DatabaseAdapter().fetch_rows(self.job.schema_name, self.job.table_name, [self.column_name], page_size=0)
 
         # prepare list of files for this job
         files = []
@@ -550,11 +595,11 @@ class QueryArchiveJob(Job):
 
             archive_id = str(self.id)
             if not settings.ASYNC:
-                logger.info('create_download_file %s submitted (sync)' % archive_id)
+                logger.info('archive_job %s submitted (sync)' % archive_id)
                 create_archive_file.apply((archive_id, ), task_id=archive_id, throw=True)
 
             else:
-                logger.info('create_download_file %s submitted (async, queue=download)' % archive_id)
+                logger.info('archive_job %s submitted (async, queue=download)' % archive_id)
                 create_archive_file.apply_async((archive_id, ), task_id=archive_id, queue='download')
 
         else:

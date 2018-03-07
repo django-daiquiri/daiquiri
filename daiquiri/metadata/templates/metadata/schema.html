@@ -7,29 +7,29 @@
 {% block page %}
 
     <h1>
-        {% if database.title %}
-        {{ database.title }} ({{ database }})
+        {% if schema.title %}
+        {{ schema.title }} ({{ schema }})
         {% else %}
-        {{ database }}
+        {{ schema }}
         {% endif %}
     </h1>
 
-    {% if database.long_description %}
+    {% if schema.long_description %}
 
     <h2>Description</h2>
-    <p>{{ database.long_description | markdown }}</p>
+    <p>{{ schema.long_description | markdown }}</p>
 
-    {% elif database.description %}
+    {% elif schema.description %}
 
     <h2>Description</h2>
-    <p>{{ database.description | markdown }}</p>
+    <p>{{ schema.description | markdown }}</p>
 
     {% endif %}
 
-    {% if database.attribution %}
+    {% if schema.attribution %}
     <h2>Attribution</h2>
 
-    {{ database.attribution | markdown }}
+    {{ schema.attribution | markdown }}
     {% endif %}
 
     <h2>{% trans 'Tables' %}</h2>
@@ -38,7 +38,7 @@
         {% for table in tables %}
         <li>
             <h6>
-                <a href="{% url 'metadata:table' database.name table.name %}">
+                <a href="{% url 'metadata:table' schema.name table.name %}">
                     {% if table.title %}
                     {{ table.title }} ({{ table }})
                     {% else %}
@@ -58,12 +58,12 @@
 
 {% block sidebar %}
 
-    {% if database.doi %}
-    {% doi_panel database.doi _('database') %}
+    {% if schema.doi %}
+    {% doi_panel schema.doi _('schema') %}
     {% endif %}
 
-    {% if database.license %}
-    {% license_panel database.license %}
+    {% if schema.license %}
+    {% license_panel schema.license %}
     {% endif %}
 
 {% endblock %}

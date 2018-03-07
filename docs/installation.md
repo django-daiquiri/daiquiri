@@ -48,11 +48,12 @@ python3 -m venv env3
 source env3/bin/activate
 ```
 
-Install the requirements in editable mode:
+Install the requirements:
 
 ```
-pip install -r requirements.txt
-pip install mysqlclient
+pip install django-daiquiri
+pip install mysqlclient      # for MySQL
+pip install psycopg2-binary  # for PostgreSQL
 ```
 
 Setup the app
@@ -70,7 +71,7 @@ Copy the `local.py` settings file:
 cp config/settings/sample.local.py config/settings/local.py
 ```
 
-Edit config/settings/local.py for database settings, `ASYNC = True`, `DEBUG = True`, and `VENDOR_CDN`.
+Edit config/settings/local.py for database settings, `ASYNC = True` and `DEBUG = True`.
 
 Create the front end library vendor bundles:
 
@@ -78,29 +79,21 @@ Create the front end library vendor bundles:
 ./manage.py download_vendor_files
 ```
 
-Next, the differenet users and permissions need to be created on `mysql`. For this purpose, the `sqlcreate` can be used to see what needs to be executed on the database:
+Next, the differenet users and permissions need to be created on the database. For this purpose, the `sqlcreate` can be used to see what needs to be executed on the database:
 
 ```
-./manage.py sqlcreate
+./manage.py sqlcreate                             # databases, users and permissions to run daiquiri
+./manage.py sqlcreate --test                      # databases, users and permissions to run tests
+./manage.py sqlcreate --schema=daiquiri_data_obs  # databases, users and permissions to use a particular schema with scientific data
 ```
 
-Either copy the output line by line to a mysql shell, or use a pipe:
-
-```
-./manage.py sqlcreate | mysql
-```
-
-Run the tests:
-
-```
-./manage.py test daiquiri --keepdb
-```
+Copy the output line by line to a database shell, or use a pipe.
 
 Run the database migrations:
 
 ```
 ./manage.py migrate
-./manage.py migrate --database=tap
+./manage.py migrate --database=data
 ```
 
 Create a superuser

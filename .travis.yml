@@ -9,6 +9,11 @@ python:
 
 addons:
   mariadb: '10.1'
+  postgresql: '9.6'
+
+env:
+- DB=mysql
+- DB=postgres
 
 before_install:
   - sudo apt-get -qq update
@@ -16,20 +21,17 @@ before_install:
 
 install:
 - pip install -e .
-- pip install mysqlclient
-- pip install coveralls
+- pip install mysqlclient psycopg2-binary coveralls
 
 before_script:
+- sh -c "cp testing/config/settings/$DB.local.py testing/config/settings/local.py; fi"
 - mkdir testing/log testing/download
-- cp -r testing/files /tmp/daiquiri
-- cp testing/config/settings/travis.local.py testing/config/settings/local.py
-- mysql < testing/sql/daiquiri_data_obs.sql
-- mysql < testing/sql/daiquiri_data_sim.sql
-- mysql < testing/sql/daiquiri_user_user.sql
-- mysql < testing/sql/daiquiri_archive.sql
+- mysql < testing/sql/mysql.sql
+- psql -U postgres -c 'CREATE DATABASE test_daiquiri_data;'
+- psql -U postgres -f testing/sql/postgres.sql test_daiquiri_data
 
 script:
-- coverage run testing/runtests.py
+- coverage run testing/runtests.py -k
 
 after_success:
 - coveralls

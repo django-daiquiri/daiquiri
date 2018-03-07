@@ -30,6 +30,7 @@ class TableNameValidator(object):
                 except QueryJob.DoesNotExist:
                     pass
 
+
 class QueryLanguageValidator(object):
 
     message = _('This query language is not supported.')

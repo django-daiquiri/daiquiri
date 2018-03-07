@@ -1,17 +1,19 @@
+import re
 import sys
 
 from setuptools import setup, find_packages
 
-from daiquiri import __title__, __email__, __version__, __author__, __license__
+with open('daiquiri/__init__.py') as f:
+    metadata = dict(re.findall(r'__(.*)__ = [\']([^\']*)[\']', f.read()))
 
 setup(
-    name=__title__,
-    version=__version__,
-    author=__author__,
-    author_email=__email__,
-    maintainer=__author__,
-    maintainer_email=__email__,
-    license=__license__,
+    name=metadata['title'],
+    version=metadata['version'],
+    author=metadata['author'],
+    author_email=metadata['email'],
+    maintainer=metadata['author'],
+    maintainer_email=metadata['email'],
+    license=metadata['license'],
     url='https://github.com/aipescience/django-daiquiri',
     description=u'Daiquiri is a framework for the publication of scientific databases.',
     long_description=open('README.rst').read(),
@@ -20,6 +22,7 @@ setup(
         'djangorestframework==3.7.0',
         'drf-extensions>=0.3.1',
         'django-extensions>=1.8.1',
+        'wheel>=0.30.0',
         'django-allauth>=0.32.0',
         'django-filter>=1.0.4',
         'django-widget-tweaks>=1.4.1',
@@ -34,13 +37,13 @@ setup(
         'jsonfield==1.0.0',
         'Markdown>=2.6.8',
         'iso8601>=0.1.11',
-        'lxml>=3.7.3',
         'bitstring>=3.1.5',
         'ipaddress>=1.0.18',
         'django-test-generator>=0.3.3',
+        'typing',
         'mock',
         'coverage',
-        'queryparser_python%d>=0.2.3' % sys.version_info.major
+        'queryparser_python%d>=0.2.6' % sys.version_info.major
     ],
     classifiers=[
         'Development Status :: 1 - Planning',

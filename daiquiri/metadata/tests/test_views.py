@@ -30,10 +30,10 @@ class ManagementTests(TestListViewMixin, MetadataViewTestCase):
     }
 
 
-class PublicDatabaseTests(MetadataViewTestCase):
+class PublicSchemaTests(MetadataViewTestCase):
 
     url_names = {
-        'list_view': 'metadata:database'
+        'list_view': 'metadata:schema'
     }
 
     status_map = {
@@ -44,14 +44,14 @@ class PublicDatabaseTests(MetadataViewTestCase):
 
     def _test_list_viewset(self, username):
         self.assert_list_view(username, {
-            'database_name': 'daiquiri_data_obs'
+            'schema_name': 'daiquiri_data_obs'
         })
 
 
-class InternalDatabaseTests(MetadataViewTestCase):
+class InternalSchemaTests(MetadataViewTestCase):
 
     url_names = {
-        'list_view': 'metadata:database'
+        'list_view': 'metadata:schema'
     }
 
     status_map = {
@@ -62,7 +62,7 @@ class InternalDatabaseTests(MetadataViewTestCase):
 
     def _test_list_viewset(self, username):
         self.assert_list_view(username, {
-            'database_name': 'daiquiri_data_sim'
+            'schema_name': 'daiquiri_data_sim'
         })
 
 
@@ -81,7 +81,7 @@ class PublicTableTests(MetadataViewTestCase):
 
     def _test_list_viewset(self, username):
         self.assert_list_view(username, {
-            'database_name': 'daiquiri_data_obs',
+            'schema_name': 'daiquiri_data_obs',
             'table_name': 'stars'
         })
 
@@ -100,6 +100,6 @@ class InternalTableTests(MetadataViewTestCase):
 
     def _test_list_viewset(self, username):
         self.assert_list_view(username, {
-            'database_name': 'daiquiri_data_sim',
+            'schema_name': 'daiquiri_data_sim',
             'table_name': 'particles'
         })

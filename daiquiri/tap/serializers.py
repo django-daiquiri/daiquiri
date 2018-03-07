@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from daiquiri.query.models import Example
-from daiquiri.metadata.models import Database, Table, Column
+from daiquiri.metadata.models import Schema, Table, Column
 
 
 class ExampleSerializer(serializers.ModelSerializer):
@@ -56,7 +56,7 @@ class SchemaSerializer(serializers.ModelSerializer):
     tables = serializers.SerializerMethodField()
 
     class Meta:
-        model = Database
+        model = Schema
         fields = (
             'name',
             'description',

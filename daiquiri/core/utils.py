@@ -6,6 +6,7 @@ import re
 
 from django import forms
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMultiAlternatives, EmailMessage
 from django.template.loader import render_to_string
@@ -111,6 +112,10 @@ def get_detail_fields(detail_keys):
         fields.append((detail_key['key'], field))
 
     return fields
+
+
+def get_admin_emails():
+    return [user.email for user in User.objects.filter(is_superuser=True)]
 
 
 def human2bytes(string):

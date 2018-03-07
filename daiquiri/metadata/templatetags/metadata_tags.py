@@ -3,21 +3,21 @@ from django.utils.translation import ugettext_lazy as _
 
 from daiquiri.core.constants import LICENSE_CHOICES, LICENSE_URLS
 
-from ..models import Database
+from ..models import Schema
 
 register = template.Library()
 
 
-@register.inclusion_tag('metadata/tags/databases_menu.html', takes_context=True)
-def databases_menu(context):
+@register.inclusion_tag('metadata/tags/schemas_menu.html', takes_context=True)
+def schemas_menu(context):
 
-    databases = Database.objects.filter_by_metadata_access_level(context.request.user)
+    schemas = Schema.objects.filter_by_metadata_access_level(context.request.user)
 
-    context['databases'] = []
-    for database in databases:
-        context['databases'].append({
-            'name': database.name,
-            'tables': [table.name for table in database.tables.filter_by_metadata_access_level(context.request.user)]
+    context['schemas'] = []
+    for schema in schemas:
+        context['schemas'].append({
+            'name': schema.name,
+            'tables': [table.name for table in schema.tables.filter_by_metadata_access_level(context.request.user)]
         })
 
     return context

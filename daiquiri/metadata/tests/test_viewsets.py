@@ -2,7 +2,7 @@ from django.test import TestCase
 
 from test_generator.viewsets import TestModelViewsetMixin
 
-from ..models import Database, Table, Column, Function
+from ..models import Schema, Table, Column, Function
 
 
 class MetadataViewsetTestCase(TestCase):
@@ -46,11 +46,11 @@ class MetadataViewsetTestCase(TestCase):
     }
 
 
-class DatabaseTests(TestModelViewsetMixin, MetadataViewsetTestCase):
+class SchemaTests(TestModelViewsetMixin, MetadataViewsetTestCase):
 
-    instances = Database.objects.all()
+    instances = Schema.objects.all()
     url_names = {
-        'viewset': 'metadata:database'
+        'viewset': 'metadata:schema'
     }
 
     def _test_create_viewset(self, username):
@@ -82,7 +82,7 @@ class TableTests(TestModelViewsetMixin, MetadataViewsetTestCase):
     def _test_discover_viewset(self, username):
         for instance in self.instances:
             self.assert_viewset('discover_viewset', 'get', 'discover', username, query_params={
-                'database': instance.database.name,
+                'schema': instance.schema.name,
                 'table': instance.name
             })
 
@@ -97,7 +97,7 @@ class ColumnTests(TestModelViewsetMixin, MetadataViewsetTestCase):
     def _test_discover_viewset(self, username):
         for instance in self.instances:
             self.assert_viewset('discover_viewset', 'get', 'discover', username, query_params={
-                'database': instance.table.database.name,
+                'schema': instance.table.schema.name,
                 'table': instance.table.name,
                 'column': instance.name
             })

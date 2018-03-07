@@ -5,9 +5,8 @@
 </p>
 
 <div class="daiquiri-query-dropdowns">
-    {% include 'query/query_dropdown_databases.html' %}
+    {% include 'query/query_dropdown_schemas.html' %}
     {% include 'query/query_dropdown_columns.html' %}
-    {% include 'query/query_dropdown_functions.html' %}
 
     {% for dropdown in settings.QUERY_DROPDOWNS %}
     {% include dropdown.template %}
@@ -30,11 +29,18 @@
 
 <div class="row">
     <formgroup
-        class="col-md-6"
+        class="col-md-4"
         data-type="text"
         data-label="{% trans 'Table name' %}"
         data-model="service.forms.sql.values.table_name"
         data-errors="service.forms.sql.errors.table_name">
+    </formgroup>
+    <formgroup
+        class="col-md-2"
+        data-type="text"
+        data-label="{% trans 'Run id' %}"
+        data-model="service.forms.sql.values.run_id"
+        data-errors="service.forms.sql.errors.run_id">
     </formgroup>
     <formgroup
         class="col-md-3"
@@ -55,10 +61,16 @@
     </formgroup>
 </div>
 
-<button class="btn btn-primary" ng-click="service.forms.sql.submit()">
-    {% trans 'Submit new SQL Query' %}
-</button>
+<div class="form-group">
+    <button class="btn btn-primary" ng-click="service.forms.sql.submit()">
+        {% trans 'Submit new SQL Query' %}
+    </button>
 
-<button class="btn" ng-click="service.forms.sql.clearQuery()">
-    {% trans 'Clear input window' %}
-</button>
+    <button class="btn" ng-click="service.forms.sql.clearQuery()">
+        {% trans 'Clear input window' %}
+    </button>
+</div>
+
+<p class="text-danger" ng-show="service.forms.sql.errors.detail">
+    {$ service.forms.sql.errors.detail $}
+</p>

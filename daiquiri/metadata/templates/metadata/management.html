@@ -36,12 +36,12 @@
             <h1>{% trans 'Metadata management' %}</h1>
 
             <p>
-                {% trans 'Please click on a database, a table, a column or a function to show or edit its metadata.' %}
+                {% trans 'Please click on a schema, a table, a column or a function to show or edit its metadata.' %}
             </p>
 
             <div class="row">
                 <div class="col-md-9">
-                    <div daiquiri-browser data-browser-id="databases" class="daiquiri-metadata-browser"></div>
+                    <div daiquiri-browser data-browser-id="schemas" class="daiquiri-metadata-browser"></div>
                 </div>
                 <div class="col-md-3">
                     <div daiquiri-browser data-browser-id="functions" class="daiquiri-metadata-browser"></div>
@@ -59,16 +59,16 @@
         </div>
     </div>
 
-    {% include 'metadata/management_modal_form_databases.html' %}
-    {% include 'metadata/management_modal_form_databases_description.html' %}
-    {% include 'metadata/management_modal_form_databases_attribution.html' %}
+    {% include 'metadata/management_modal_form_schemas.html' %}
+    {% include 'metadata/management_modal_form_schemas_description.html' %}
+    {% include 'metadata/management_modal_form_schemas_attribution.html' %}
     {% include 'metadata/management_modal_form_tables.html' %}
     {% include 'metadata/management_modal_form_tables_description.html' %}
     {% include 'metadata/management_modal_form_tables_attribution.html' %}
     {% include 'metadata/management_modal_form_columns.html' %}
     {% include 'metadata/management_modal_form_functions.html' %}
 
-    {% include 'metadata/management_modal_delete_databases.html' %}
+    {% include 'metadata/management_modal_delete_schemas.html' %}
     {% include 'metadata/management_modal_delete_tables.html' %}
     {% include 'metadata/management_modal_delete_columns.html' %}
     {% include 'metadata/management_modal_delete_functions.html' %}
