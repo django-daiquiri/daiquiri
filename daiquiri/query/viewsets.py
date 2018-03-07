@@ -106,6 +106,7 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
         job = QueryJob(
             job_type=QueryJob.JOB_TYPE_INTERFACE,
             owner=(None if self.request.user.is_anonymous() else self.request.user),
+            run_id=serializer.data.get('run_id'),
             table_name=serializer.data.get('table_name'),
             query_language=serializer.data.get('query_language'),
             query=serializer.data.get('query'),

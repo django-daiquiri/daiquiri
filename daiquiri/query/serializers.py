@@ -102,7 +102,8 @@ class QueryJobCreateSerializer(serializers.ModelSerializer):
             'table_name',
             'queue',
             'query_language',
-            'query'
+            'query',
+            'run_id'
         )
 
 
