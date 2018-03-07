@@ -9,13 +9,12 @@ class JobListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Job
-        fields = ('id', 'phase')
+        fields = ('id', 'phase', 'run_id', 'creation_time')
 
 
 class JobRetrieveSerializer(serializers.ModelSerializer):
 
     job_id = serializers.UUIDField(source='id')
-    #owner_id = serializers.UUIDField(source='owner.username')
     owner_id = serializers.SerializerMethodField()
     destruction = serializers.DateTimeField(source='destruction_time')
 
@@ -23,9 +22,11 @@ class JobRetrieveSerializer(serializers.ModelSerializer):
         model = Job
         fields = (
             'job_id',
+            'run_id',
             'owner_id',
             'phase',
             'quote',
+            'creation_time',
             'start_time',
             'end_time',
             'execution_duration',

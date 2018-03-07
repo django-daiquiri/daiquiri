@@ -78,6 +78,8 @@ class UWSRenderer(XMLRenderer):
                 'xlink:type': 'simple'
             })
             self.node('uws:phase', {}, item['phase'])
+            self.node('uws:runId', {}, item['run_id'])
+            self.node('uws:creationTime', {}, item['creation_time'])
             self.end('uws:jobref')
 
         self.end('uws:jobs')
