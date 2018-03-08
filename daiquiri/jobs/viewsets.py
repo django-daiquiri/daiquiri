@@ -8,6 +8,7 @@ from rest_framework.authentication import SessionAuthentication, BasicAuthentica
 
 from daiquiri.core.responses import HttpResponseSeeOther
 from daiquiri.core.utils import get_client_ip
+from daiquiri.core.renderers import ErrorRenderer
 
 from .models import Job
 from .serializers import (
@@ -17,7 +18,7 @@ from .serializers import (
     SyncJobSerializer,
     AsyncJobSerializer
 )
-from .renderers import UWSRenderer, ErrorRenderer
+from .renderers import UWSRenderer
 from .filters import UWSFilterBackend
 from .utils import get_job_url
 

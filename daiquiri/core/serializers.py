@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from .utils import make_query_dict_upper_case
+
 
 class JSONField(serializers.JSONField):
 
@@ -19,3 +21,13 @@ class ChoicesSerializer(serializers.Serializer):
 
     def get_text(self, obj):
         return obj[1]
+
+
+class CaseInsensitiveSerializer(serializers.Serializer):
+
+    def __init__(self, *args, **kwargs):
+        # make all the keys in kwargs['data'] upper case
+        if 'data' in kwargs:
+            kwargs['data'] = make_query_dict_upper_case(kwargs['data'])
+
+        super(CaseInsensitiveSerializer, self).__init__(*args, **kwargs)
