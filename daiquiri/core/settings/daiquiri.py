@@ -146,6 +146,25 @@ QUERY_DOWNLOAD_FORMATS = [
 SERVE_DOWNLOAD_DIR = os.path.join(BASE_DIR, 'download')
 SERVE_RESOLVER = None
 
+STATS_RESOURCE_TYPES = [
+    {
+        'key': 'ARCHIVE_DOWNLOAD',
+        'label': 'Archive downloads'
+    },
+    {
+        'key': 'CUTOUT',
+        'label': 'Performed cutouts'
+    },
+    {
+        'key': 'FILE',
+        'label': 'File downloads'
+    },
+    {
+        'key': 'QUERY_JOB',
+        'label': 'Query jobs'
+    }
+]
+
 UWS_RESOURCES = []
 
 TAP_SCHEMA = 'TAP_SCHEMA'

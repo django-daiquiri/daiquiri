@@ -1,0 +1,30 @@
+{% extends 'core/wide.html' %}
+{% load i18n %}
+{% load core_tags %}
+
+{% block wide %}
+
+<h1>Stats</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>{% trans 'Resource type' %}</th>
+            <th>{% trans '# records' %}</th>
+            <th>{% trans '# users' %}</th>
+            <th>{% trans '# client IP' %}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for resource_type in resource_types %}
+        <tr>
+            <td>{{ resource_type.label }}</td>
+            <td>{{ resource_type.count }}</td>
+            <td>{{ resource_type.users }}</td>
+            <td>{{ resource_type.client_ips }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock wide %}
