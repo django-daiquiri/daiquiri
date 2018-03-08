@@ -34,22 +34,23 @@ class DefaultAdapter(object):
         data = make_query_dict_upper_case(request.GET)
 
         self.sql = settings.CONESEARCH_STMT
-        self.sql_args = {}
+        self.args = {}
 
         errors = {}
         for key in self.keys:
             try:
                 value = float(data[key])
+
+                if self.ranges[key]['min'] <= value <= self.ranges[key]['max']:
+                    self.args[key] = value
+                else:
+                    errors[key] = [_('This value must be between %(min)g and %(max)g.' % self.ranges[key])]
+
             except KeyError:
                 errors[key] = [_('This field may not be blank.')]
-
-            if self.ranges[key]['min'] <= value <= self.ranges[key]['max']:
-                self.sql_args[key] = value
-            else:
-                errors[key] = [_('This value must be between %(min)g and %(max)g.' % self.ranges[key])]
 
         if errors:
             raise ValidationError(errors)
 
     def fetch_rows(self):
-        return DatabaseAdapter().fetchall(self.sql, self.sql_args)
+        return DatabaseAdapter().fetchall(self.sql, self.args)

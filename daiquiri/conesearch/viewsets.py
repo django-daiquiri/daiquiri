@@ -28,14 +28,16 @@ class SearchViewSet(viewsets.ViewSet):
             Record.objects.create(
                 time=now(),
                 resource_type='CONESEARCH',
-                resource=adapter.sql_args,
+                resource=adapter.args,
                 client_ip=get_client_ip(request),
                 user=request.user if request.user.is_authenticated else None
             )
 
             # perform the cutout and send the file
-            rows = adapter.fetch_rows()
-            renderered_data = SearchRenderer().render(rows, renderer_context=self.get_renderer_context())
+            renderered_data = SearchRenderer().render({
+                'args': adapter.args,
+                'rows': adapter.fetch_rows()
+            }, renderer_context=self.get_renderer_context())
             return HttpResponse(renderered_data, content_type=SearchRenderer.media_type)
         else:
             # send an empty response
