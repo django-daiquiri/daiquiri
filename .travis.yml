@@ -26,8 +26,14 @@ install:
 before_script:
 - sh -c "cp testing/config/settings/$DB.local.py testing/config/settings/local.py; fi"
 - mkdir testing/log testing/download
+- mysql -e "CREATE USER daiquiri_app@localhost IDENTIFIED BY 'daiquiri_app';"
+- mysql -e "CREATE USER daiquiri_data@localhost IDENTIFIED BY 'daiquiri_data';"
+- mysql -e "GRANT ALL PRIVILEGES ON test_daiquiri_app.* TO daiquiri_app@localhost;"
 - mysql < testing/sql/mysql.sql
-- psql -U postgres -c 'CREATE DATABASE test_daiquiri_data;'
+- psql -U postgres -c "CREATE USER daiquiri_app WITH PASSWORD 'daiquiri_app';"
+- psql -U postgres -c "CREATE USER daiquiri_data WITH PASSWORD 'daiquiri_data';"
+- psql -U postgres -c "CREATE DATABASE test_daiquiri_app OWNER daiquiri_app;"
+- psql -U postgres -c "CREATE DATABASE test_daiquiri_data OWNER daiquiri_data;"
 - psql -U postgres -f testing/sql/postgres.sql test_daiquiri_data
 
 script:

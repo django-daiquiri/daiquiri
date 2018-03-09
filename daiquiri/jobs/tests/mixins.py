@@ -205,7 +205,6 @@ class AsyncTestMixin(TestMixin):
             else:
                 self.assertEqual(response.status_code, 404)
 
-
     def _test_get_job_result(self, username):
         '''
         GET /{jobs}/{job-id}/results/result returns a 303 to the stream url for this job.
@@ -221,7 +220,6 @@ class AsyncTestMixin(TestMixin):
                     self.assertRedirects(response, job.result, status_code=303, target_status_code=400)
             else:
                 self.assertEqual(response.status_code, 404)
-
 
     def _test_get_job_parameters(self, username):
         '''
@@ -270,7 +268,6 @@ class AsyncTestMixin(TestMixin):
             else:
                 self.assertEqual(response.status_code, 404)
 
-
     def _test_post_job_delete(self, username):
         '''
         POST /{jobs}/{job-id} with ACTION=DELETE sets the job phase to ARCHIVED
@@ -287,7 +284,6 @@ class AsyncTestMixin(TestMixin):
             else:
                 self.assertEqual(response.status_code, 404)
 
-
     def _test_post_job_invalid(self, username):
         '''
         POST /{jobs}/{job-id} with invalid ACTION returns 400.
@@ -301,7 +297,6 @@ class AsyncTestMixin(TestMixin):
             else:
                 self.assertEqual(response.status_code, 404)
 
-
     def _test_post_job_missing(self, username):
         '''
         POST /{jobs}/{job-id} without ACTION returns 400.
@@ -314,7 +309,6 @@ class AsyncTestMixin(TestMixin):
                 self.assertEqual(response.status_code, 400)
             else:
                 self.assertEqual(response.status_code, 404)
-
 
     def _test_get_job_destruction(self, username):
         '''
@@ -358,7 +352,6 @@ class AsyncTestMixin(TestMixin):
             else:
                 self.assertEqual(response.status_code, 404)
 
-
     def _test_post_job_destruction_invalid(self, username):
         '''
         POST /{jobs}/{job-id}/destruction with invalid DESTRUCTION returns 400.
@@ -372,7 +365,6 @@ class AsyncTestMixin(TestMixin):
             else:
                 self.assertEqual(response.status_code, 404)
 
-
     def _test_post_job_destruction_missing(self, username):
         '''
         POST /{jobs}/{job-id}/destruction without DESTRUCTION returns 400.
@@ -385,7 +377,6 @@ class AsyncTestMixin(TestMixin):
                 self.assertEqual(response.status_code, 400)
             else:
                 self.assertEqual(response.status_code, 404)
-
 
     def _test_get_job_executionduration(self, username):
         '''
@@ -401,7 +392,6 @@ class AsyncTestMixin(TestMixin):
                 self.assertEqual(int(response.content), job.execution_duration)
             else:
                 self.assertEqual(response.status_code, 404)
-
 
     def _test_post_job_executionduration(self, username):
         '''
@@ -422,7 +412,6 @@ class AsyncTestMixin(TestMixin):
             else:
                 self.assertEqual(response.status_code, 404)
 
-
     def _test_post_job_executionduration_invalid(self, username):
         '''
         POST /{jobs}/{job-id}/executionduration with invalid EXECUTIONDURATION returns 400.
@@ -436,7 +425,6 @@ class AsyncTestMixin(TestMixin):
             else:
                 self.assertEqual(response.status_code, 404)
 
-
     def _test_post_job_executionduration_missing(self, username):
         '''
         POST /{jobs}/{job-id}/executionduration without EXECUTIONDURATION returns 400.
@@ -449,7 +437,6 @@ class AsyncTestMixin(TestMixin):
                 self.assertEqual(response.status_code, 400)
             else:
                 self.assertEqual(response.status_code, 404)
-
 
     def _test_get_job_phase(self, username):
         '''
@@ -506,7 +493,6 @@ class AsyncTestMixin(TestMixin):
             else:
                 self.assertEqual(response.status_code, 404)
 
-
     def _test_post_job_phase_invalid(self, username):
         '''
         POST /{jobs}/{job-id}/phase with invalid PHASE returns 400.
@@ -519,7 +505,6 @@ class AsyncTestMixin(TestMixin):
                 self.assertEqual(response.status_code, 400)
             else:
                 self.assertEqual(response.status_code, 404)
-
 
     def _test_post_job_phase_missing(self, username):
         '''
@@ -534,7 +519,6 @@ class AsyncTestMixin(TestMixin):
             else:
                 self.assertEqual(response.status_code, 404)
 
-
     def _test_post_job_phase_unsupported(self, username):
         '''
         POST /{jobs}/{job-id}/phase with PHASE=unsupported returns 400.
@@ -547,7 +531,6 @@ class AsyncTestMixin(TestMixin):
                 self.assertEqual(response.status_code, 400)
             else:
                 self.assertEqual(response.status_code, 404)
-
 
     def _test_get_job_quote(self, username):
         '''
