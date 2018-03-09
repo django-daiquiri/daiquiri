@@ -1,3 +1,5 @@
+import os
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,
@@ -28,13 +30,13 @@ LOGGING = {
         },
         'error_log': {
             'level': 'ERROR',
-            'class':'logging.FileHandler',
+            'class': 'logging.FileHandler',
             'filename': 'error.log',
             'formatter': 'default'
         },
         'daiquiri_log': {
             'level': 'DEBUG',
-            'class':'logging.FileHandler',
+            'class': 'logging.FileHandler',
             'filename': 'daiquiri.log',
             'formatter': 'name'
         },
@@ -63,6 +65,7 @@ LOGGING = {
         'django': {
             'handlers': ['console'],
             'level': 'INFO',
+            'propagate': False
         },
         'django.request': {
             'handlers': ['mail_admins', 'error_log'],
@@ -71,17 +74,17 @@ LOGGING = {
         },
         'django.db.backends': {
             'handlers': ['sql_log'],
-            'level': 'DEBUG',
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
             'propagate': False
         },
         'daiquiri': {
             'handlers': ['daiquiri_log'],
-            'level': 'DEBUG',
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
             'propagate': False
         },
         'rules': {
             'handlers': ['rules_log'],
-            'level': 'DEBUG',
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
             'propagate': False
         }
     }
