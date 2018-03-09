@@ -155,6 +155,10 @@ STATS_RESOURCE_TYPES = [
         'label': 'Archive downloads'
     },
     {
+        'key': 'CONESEARCH',
+        'label': 'Performed cone searches'
+    },
+    {
         'key': 'CUTOUT',
         'label': 'Performed cutouts'
     },
