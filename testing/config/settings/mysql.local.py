@@ -4,12 +4,14 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'daiquiri_app',
-        'USER': 'root'
+        'USER': 'daiquiri_app',
+        'PASSWORD': 'daiquiri_app'
     },
     'data': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'TAP_SCHEMA',
-        'USER': 'root'
+        'USER': 'daiquiri_data',
+        'PASSWORD': 'daiquiri_data'
     }
 }
 

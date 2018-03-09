@@ -40,7 +40,10 @@ AUTH_SIGNUP = False
 AUTH_WORKFLOW = None
 AUTH_DETAIL_KEYS = []
 
-CUTOUT_ADAPTER = 'daiquiri.cutout.utils.CutoutAdapter'
+CONESEARCH_ADAPTER = 'daiquiri.conesearch.adapter.DefaultAdapter'
+CONESEARCH_ANONYMOUS = False
+
+CUTOUT_ADAPTER = 'daiquiri.cutout.adapter.DefaultAdapter'
 CUTOUT_ANONYMOUS = False
 
 FILES_BASE_PATH = os.path.join(BASE_DIR, 'files')

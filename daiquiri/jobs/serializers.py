@@ -1,8 +1,7 @@
 from rest_framework import serializers
 
+from daiquiri.core.serializers import CaseInsensitiveSerializer
 from daiquiri.jobs.models import Job
-
-from .utils import make_query_dict_upper_case
 
 
 class JobListSerializer(serializers.ModelSerializer):
@@ -40,16 +39,6 @@ class JobRetrieveSerializer(serializers.ModelSerializer):
             return obj.owner.username
         else:
             return None
-
-
-class CaseInsensitiveSerializer(serializers.Serializer):
-
-    def __init__(self, *args, **kwargs):
-        # make all the keys in kwargs['data'] upper case
-        if 'data' in kwargs:
-            kwargs['data'] = make_query_dict_upper_case(kwargs['data'])
-
-        super(CaseInsensitiveSerializer, self).__init__(*args, **kwargs)
 
 
 class JobUpdateSerializer(CaseInsensitiveSerializer):

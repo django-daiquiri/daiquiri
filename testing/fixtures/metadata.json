@@ -1,7 +1,7 @@
 [
   {
     "model": "daiquiri_metadata.schema",
-    "pk": 110,
+    "pk": 1,
     "fields": {
       "order": 1,
       "name": "daiquiri_data_obs",
@@ -19,7 +19,7 @@
   },
   {
     "model": "daiquiri_metadata.schema",
-    "pk": 111,
+    "pk": 2,
     "fields": {
       "order": 2,
       "name": "daiquiri_data_sim",
@@ -36,19 +36,17 @@
     }
   },
   {
-    "model": "daiquiri_metadata.table",
-    "pk": 203,
+    "model": "daiquiri_metadata.schema",
+    "pk": 3,
     "fields": {
-      "schema": 110,
-      "order": 1,
-      "name": "images",
+      "order": 3,
+      "name": "daiquiri_archive",
       "title": null,
-      "description": "",
+      "description": "A generated archive of files",
       "long_description": null,
       "attribution": null,
       "license": null,
       "doi": null,
-      "type": "table",
       "utype": null,
       "access_level": "PRIVATE",
       "metadata_access_level": "PRIVATE",
@@ -59,9 +57,9 @@
   },
   {
     "model": "daiquiri_metadata.table",
-    "pk": 204,
+    "pk": 1,
     "fields": {
-      "schema": 110,
+      "schema": 1,
       "order": 0,
       "name": "stars",
       "title": null,
@@ -79,11 +77,11 @@
   },
   {
     "model": "daiquiri_metadata.table",
-    "pk": 205,
+    "pk": 2,
     "fields": {
-      "schema": 111,
-      "order": null,
-      "name": "particles",
+      "schema": 2,
+      "order": 0,
+      "name": "halos",
       "title": null,
       "description": null,
       "long_description": null,
@@ -98,90 +96,20 @@
     }
   },
   {
-    "model": "daiquiri_metadata.column",
-    "pk": 1654,
+    "model": "daiquiri_metadata.table",
+    "pk": 3,
     "fields": {
-      "table": 203,
+      "schema": 3,
       "order": 0,
-      "name": "id",
-      "description": "unique identifier",
-      "unit": null,
-      "ucd": "meta.id; meta.main",
-      "utype": null,
-      "datatype": "int(11)",
-      "arraysize": null,
-      "principal": false,
-      "indexed": true,
-      "std": false,
-      "access_level": "PRIVATE",
-      "metadata_access_level": "PRIVATE",
-      "groups": [
-        1
-      ]
-    }
-  },
-  {
-    "model": "daiquiri_metadata.column",
-    "pk": 1655,
-    "fields": {
-      "table": 203,
-      "order": 1,
-      "name": "ra",
-      "description": "Right ascension",
-      "unit": "Angle[deg]",
-      "ucd": "pos.eq.ra; meta.main",
-      "utype": null,
-      "datatype": "double",
-      "arraysize": null,
-      "principal": false,
-      "indexed": false,
-      "std": false,
-      "access_level": "PRIVATE",
-      "metadata_access_level": "PRIVATE",
-      "groups": [
-        1
-      ]
-    }
-  },
-  {
-    "model": "daiquiri_metadata.column",
-    "pk": 1656,
-    "fields": {
-      "table": 203,
-      "order": 2,
-      "name": "de",
-      "description": "Declination",
-      "unit": "Angle[deg]",
-      "ucd": "pos.eq.de; meta.main",
-      "utype": null,
-      "datatype": "double",
-      "arraysize": null,
-      "principal": false,
-      "indexed": false,
-      "std": false,
-      "access_level": "PRIVATE",
-      "metadata_access_level": "PRIVATE",
-      "groups": [
-        1
-      ]
-    }
-  },
-  {
-    "model": "daiquiri_metadata.column",
-    "pk": 1657,
-    "fields": {
-      "table": 203,
-      "order": 3,
-      "name": "preview",
+      "name": "files",
+      "title": null,
       "description": null,
-      "unit": null,
-      "ucd": "meta.preview",
+      "long_description": null,
+      "attribution": null,
+      "license": null,
+      "doi": null,
+      "type": "table",
       "utype": null,
-      "datatype": "varchar(64)",
-      "arraysize": null,
-      "principal": false,
-      "indexed": false,
-      "std": false,
       "access_level": "PRIVATE",
       "metadata_access_level": "PRIVATE",
       "groups": [
@@ -191,55 +119,9 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 1658,
+    "pk": 10,
     "fields": {
-      "table": 203,
-      "order": 4,
-      "name": "fits",
-      "description": null,
-      "unit": null,
-      "ucd": "meta.file",
-      "utype": null,
-      "datatype": "varchar(64)",
-      "arraysize": null,
-      "principal": false,
-      "indexed": false,
-      "std": false,
-      "access_level": "PRIVATE",
-      "metadata_access_level": "PRIVATE",
-      "groups": [
-        1
-      ]
-    }
-  },
-  {
-    "model": "daiquiri_metadata.column",
-    "pk": 1659,
-    "fields": {
-      "table": 203,
-      "order": 5,
-      "name": "links",
-      "description": null,
-      "unit": null,
-      "ucd": "meta.ref",
-      "utype": null,
-      "datatype": "varchar(64)",
-      "arraysize": null,
-      "principal": false,
-      "indexed": false,
-      "std": false,
-      "access_level": "PRIVATE",
-      "metadata_access_level": "PRIVATE",
-      "groups": [
-        1
-      ]
-    }
-  },
-  {
-    "model": "daiquiri_metadata.column",
-    "pk": 1660,
-    "fields": {
-      "table": 204,
+      "table": 1,
       "order": 0,
       "name": "id",
       "description": "unique identifier",
@@ -258,9 +140,9 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 1661,
+    "pk": 11,
     "fields": {
-      "table": 204,
+      "table": 1,
       "order": 1,
       "name": "ra",
       "description": "Right ascension",
@@ -279,11 +161,11 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 1662,
+    "pk": 12,
     "fields": {
-      "table": 204,
+      "table": 1,
       "order": 2,
-      "name": "de",
+      "name": "dec",
       "description": "Declination",
       "unit": "Angle[deg]",
       "ucd": "pos.eq.de; meta.main",
@@ -300,9 +182,9 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 1663,
+    "pk": 13,
     "fields": {
-      "table": 204,
+      "table": 1,
       "order": 3,
       "name": "parallax",
       "description": "Parallax",
@@ -321,9 +203,9 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 1664,
+    "pk": 20,
     "fields": {
-      "table": 205,
+      "table": 2,
       "order": 0,
       "name": "id",
       "description": "unique id for particle",
@@ -342,13 +224,13 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 1665,
+    "pk": 21,
     "fields": {
-      "table": 205,
+      "table": 2,
       "order": 1,
       "name": "x",
       "description": "comoving position, x-component",
-      "unit": "1/h Mpc",
+      "unit": "h-1.Mpc",
       "ucd": "pos.cartesian.x",
       "utype": null,
       "datatype": "double",
@@ -363,13 +245,13 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 1666,
+    "pk": 22,
     "fields": {
-      "table": 205,
+      "table": 2,
       "order": 2,
       "name": "y",
       "description": "comoving position, y-component",
-      "unit": "1/h Mpc",
+      "unit": "h-1.Mpc",
       "ucd": "pos.cartesian.y",
       "utype": null,
       "datatype": "double",
@@ -384,13 +266,13 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 1667,
+    "pk": 23,
     "fields": {
-      "table": 205,
+      "table": 2,
       "order": 3,
       "name": "z",
       "description": "comoving position, z-component",
-      "unit": "1/h Mpc",
+      "unit": "h-1.Mpc",
       "ucd": "pos.cartesian.z",
       "utype": null,
       "datatype": "double",
@@ -405,9 +287,9 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 1668,
+    "pk": 24,
     "fields": {
-      "table": 205,
+      "table": 2,
       "order": 4,
       "name": "vx",
       "description": "peculiar velocity, x-component",
@@ -426,9 +308,9 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 1669,
+    "pk": 25,
     "fields": {
-      "table": 205,
+      "table": 2,
       "order": 5,
       "name": "vy",
       "description": "peculiar velocity, y-component",
@@ -447,9 +329,9 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 1670,
+    "pk": 26,
     "fields": {
-      "table": 205,
+      "table": 2,
       "order": 6,
       "name": "vz",
       "description": "peculiar velocity, z-component",
@@ -467,15 +349,182 @@
     }
   },
   {
-    "model": "daiquiri_metadata.function",
-    "pk": 1,
+    "model": "daiquiri_metadata.column",
+    "pk": 27,
     "fields": {
+      "table": 2,
+      "order": 7,
+      "name": "mass",
+      "description": "total mass of the FOF group",
+      "unit": "h-1.solMass",
+      "ucd": "phys.mass",
+      "utype": null,
+      "datatype": "double",
+      "arraysize": null,
+      "principal": false,
+      "indexed": false,
+      "std": false,
+      "access_level": "INTERNAL",
+      "metadata_access_level": "INTERNAL",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_metadata.column",
+    "pk": 30,
+    "fields": {
+      "table": 3,
+      "order": 0,
+      "name": "id",
+      "description": "unique identifier",
+      "unit": null,
+      "ucd": "meta.id; meta.main",
+      "utype": null,
+      "datatype": "int(11)",
+      "arraysize": null,
+      "principal": false,
+      "indexed": true,
+      "std": false,
+      "access_level": "PRIVATE",
+      "metadata_access_level": "PRIVATE",
+      "groups": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "daiquiri_metadata.column",
+    "pk": 31,
+    "fields": {
+      "table": 3,
       "order": 1,
-      "name": "angdist",
-      "description": "The angular distance between two objects.",
-      "query_string": "angdist(ra, de, radius)",
-      "access_level": "PUBLIC",
-      "metadata_access_level": "PUBLIC",
+      "name": "timestamp",
+      "description": null,
+      "unit": null,
+      "ucd": "time",
+      "utype": null,
+      "datatype": "timestamp",
+      "arraysize": null,
+      "principal": false,
+      "indexed": false,
+      "std": false,
+      "access_level": "PRIVATE",
+      "metadata_access_level": "PRIVATE",
+      "groups": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "daiquiri_metadata.column",
+    "pk": 32,
+    "fields": {
+      "table": 3,
+      "order": 2,
+      "name": "file",
+      "description": null,
+      "unit": null,
+      "ucd": "meta.file",
+      "utype": null,
+      "datatype": "char",
+      "arraysize": "32",
+      "principal": false,
+      "indexed": false,
+      "std": false,
+      "access_level": "PRIVATE",
+      "metadata_access_level": "PRIVATE",
+      "groups": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "daiquiri_metadata.column",
+    "pk": 33,
+    "fields": {
+      "table": 3,
+      "order": 3,
+      "name": "collection",
+      "description": null,
+      "unit": null,
+      "ucd": "",
+      "utype": null,
+      "datatype": "char",
+      "arraysize": "32",
+      "principal": false,
+      "indexed": false,
+      "std": false,
+      "access_level": "PRIVATE",
+      "metadata_access_level": "PRIVATE",
+      "groups": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "daiquiri_metadata.column",
+    "pk": 34,
+    "fields": {
+      "table": 3,
+      "order": 4,
+      "name": "path",
+      "description": null,
+      "unit": null,
+      "ucd": "",
+      "utype": null,
+      "datatype": "char",
+      "arraysize": null,
+      "principal": false,
+      "indexed": false,
+      "std": false,
+      "access_level": "PRIVATE",
+      "metadata_access_level": "PRIVATE",
+      "groups": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "daiquiri_metadata.column",
+    "pk": 35,
+    "fields": {
+      "table": 3,
+      "order": 5,
+      "name": "ra",
+      "description": "Right ascension",
+      "unit": "Angle[deg]",
+      "ucd": "pos.eq.ra; meta.main",
+      "utype": null,
+      "datatype": "double",
+      "arraysize": null,
+      "principal": false,
+      "indexed": false,
+      "std": false,
+      "access_level": "PRIVATE",
+      "metadata_access_level": "PRIVATE",
+      "groups": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "daiquiri_metadata.column",
+    "pk": 36,
+    "fields": {
+      "table": 3,
+      "order": 6,
+      "name": "dec",
+      "description": "Declination",
+      "unit": "Angle[deg]",
+      "ucd": "pos.eq.de; meta.main",
+      "utype": null,
+      "datatype": "double",
+      "arraysize": null,
+      "principal": false,
+      "indexed": false,
+      "std": false,
+      "access_level": "PRIVATE",
+      "metadata_access_level": "PRIVATE",
       "groups": [
         1
       ]
@@ -483,14 +532,14 @@
   },
   {
     "model": "daiquiri_metadata.function",
-    "pk": 2,
+    "pk": 1,
     "fields": {
-      "order": 2,
-      "name": "idle",
+      "order": 0,
+      "name": "sleep",
       "description": "Wait for n seconds.",
-      "query_string": "idle()",
-      "access_level": "PUBLIC",
-      "metadata_access_level": "PUBLIC",
+      "query_string": "sleep()",
+      "access_level": "PRIVATE",
+      "metadata_access_level": "PRIVATE",
       "groups": [
         1
       ]

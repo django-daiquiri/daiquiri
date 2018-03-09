@@ -2,9 +2,9 @@ import iso8601
 
 from rest_framework.filters import BaseFilterBackend
 
+from daiquiri.core.utils import make_query_dict_upper_case
 from daiquiri.jobs.models import Job
 
-from .utils import make_query_dict_upper_case
 
 class UWSFilterBackend(BaseFilterBackend):
 

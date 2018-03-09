@@ -2,6 +2,7 @@ import os
 import mock
 
 from django.conf import settings
+from django.contrib.auth.models import User, AnonymousUser
 from django.test import TestCase
 
 from test_generator.viewsets import (
@@ -111,7 +112,12 @@ class JobTests(TestViewsetMixin, QueryViewsetTestCase):
             self.assert_detail_viewset(username, kwargs={'pk': instance.pk})
 
     def _test_create_viewset(self, username):
-        for example in Example.objects.all():
+        if username == 'anonymous':
+            user = AnonymousUser()
+        else:
+            user = User.objects.get(username=username)
+
+        for example in Example.objects.filter_by_access_level(user):
             self.assert_create_viewset(username, data={
                 'query_language': example.query_language,
                 'query': example.query_string

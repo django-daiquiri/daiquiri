@@ -54,7 +54,26 @@ class InternalTableTests(TestViewMixin, ServeViewTestCase):
     def _test_list_view(self, username):
         self.assert_list_view(username, {
             'schema_name': 'daiquiri_data_sim',
-            'table_name': 'particles'
+            'table_name': 'halos'
+        })
+
+
+class PrivateTableTests(TestViewMixin, ServeViewTestCase):
+
+    url_names = {
+        'list_view': 'serve:table'
+    }
+
+    status_map = {
+        'list_view': {
+            'admin': 404, 'manager': 200, 'user': 404, 'anonymous': 404
+        }
+    }
+
+    def _test_list_view(self, username):
+        self.assert_list_view(username, {
+            'schema_name': 'daiquiri_archive',
+            'table_name': 'files'
         })
 
 

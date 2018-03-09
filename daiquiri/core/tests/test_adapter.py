@@ -1,18 +1,13 @@
 import logging
 
-from django.conf import settings
 from django.test import TestCase
 
-from daiquiri.core.adapter import DatabaseAdapter, DownloadAdapter
+from daiquiri.core.adapter import DatabaseAdapter
 
 logger = logging.getLogger(__name__)
 
 
 class CoreAdapterTestCase(TestCase):
-
-    def test_fetch_rows_1(self):
-        rows = DatabaseAdapter().fetch_rows('daiquiri_data_obs', 'stars', column_names=None, search=None, filters=None)
-        self.assertEqual(len(rows), 10)
 
     def test_fetch_table(self):
         rows = DatabaseAdapter().fetch_table('daiquiri_data_obs', 'stars')
@@ -20,13 +15,23 @@ class CoreAdapterTestCase(TestCase):
 
     def test_fetch_row(self):
         row = DatabaseAdapter().fetch_row('daiquiri_data_obs', 'stars', column_names=None, search=None, filters={
-            'id': '100'
+            'id': '4551299946478123136'
         })
-        self.assertEqual(row[1], -12)
+        self.assertEqual(row[0], 4551299946478123136)
 
-    def test_fetch_rows_2(self):
-        row = DatabaseAdapter().fetch_rows('daiquiri_data_obs', 'stars')
-        self.assertEqual(row[0], (1, 26, -10.54756, 386.3631))
+    def test_fetch_rows(self):
+        rows = DatabaseAdapter().fetch_rows('daiquiri_data_obs', 'stars')
+        self.assertEqual(len(rows), 10)
+        self.assertEqual(len(rows[0]), 4)
+        self.assertEqual(rows[0][0], 1714709274237701248)
+
+    def test_fetch_rows_filter(self):
+        rows = DatabaseAdapter().fetch_rows('daiquiri_data_sim', 'halos', filters={
+            'id': '85000000000'
+        })
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(len(rows[0]), 8)
+        self.assertEqual(rows[0][0], 85000000000)
 
     def test_fetch_stats(self):
         rows = DatabaseAdapter().fetch_stats('daiquiri_data_obs', 'stars')

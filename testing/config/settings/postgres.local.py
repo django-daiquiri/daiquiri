@@ -4,7 +4,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'daiquiri_app',
-        'USER': 'postgres',
+        'USER': 'daiquiri_app',
+        'PASSWORD': 'daiquiri_app',
+        'HOST': 'localhost'
     },
     'data': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -12,7 +14,9 @@ DATABASES = {
             'options': '-c search_path=TAP_SCHEMA'
         },
         'NAME': 'daiquiri_data',
-        'USER': 'postgres'
+        'USER': 'daiquiri_data',
+        'PASSWORD': 'daiquiri_data',
+        'HOST': 'localhost'
     }
 }
 
