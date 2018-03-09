@@ -11,7 +11,19 @@ def ConeSearchAdapter():
     return import_class(settings.CONESEARCH_ADAPTER)()
 
 
-class DefaultAdapter(object):
+class BaseAdapter(object):
+
+    def clean():
+        raise NotImplementedError()
+
+    def fetch_columns():
+        raise NotImplementedError()
+
+    def fetch_rows():
+        raise NotImplementedError()
+
+
+class DefaultAdapter(BaseAdapter):
 
     keys = ['RA', 'DEC', 'SR']
 
@@ -29,6 +41,25 @@ class DefaultAdapter(object):
             'max': 10
         }
     }
+
+    columns = [
+        {
+            'name': 'id',
+            'ucd': 'meta.id; meta.main',
+            'datatype': 'char',
+            'arraysize': '*'
+        },
+        {
+            'name': 'RA',
+            'ucd': 'pos.eq.ra; meta.main',
+            'datatype': 'double'
+        },
+        {
+            'name': 'DEC',
+            'ucd': 'pos.eq.dec; meta.main',
+            'datatype': 'double'
+        }
+    ]
 
     def clean(self, request):
         data = make_query_dict_upper_case(request.GET)
@@ -51,6 +82,9 @@ class DefaultAdapter(object):
 
         if errors:
             raise ValidationError(errors)
+
+    def fetch_columns(self):
+        return self.columns
 
     def fetch_rows(self):
         return DatabaseAdapter().fetchall(self.sql, self.args)

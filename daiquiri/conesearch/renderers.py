@@ -1,5 +1,3 @@
-from django.conf import settings
-
 from daiquiri.core.renderers import VOTableRenderer
 
 
@@ -12,7 +10,7 @@ class SearchRenderer(VOTableRenderer):
 
         self.start('TABLE')
 
-        for column in settings.CONESEARCH_COLUMNS:
+        for column in data['columns']:
             self.start('FIELD', column)
             self.end('FIELD')
 

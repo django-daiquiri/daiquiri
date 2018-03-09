@@ -36,6 +36,7 @@ class SearchViewSet(viewsets.ViewSet):
             # perform the cutout and send the file
             renderered_data = SearchRenderer().render({
                 'args': adapter.args,
+                'columns': adapter.fetch_columns(),
                 'rows': adapter.fetch_rows()
             }, renderer_context=self.get_renderer_context())
             return HttpResponse(renderered_data, content_type=SearchRenderer.media_type)
