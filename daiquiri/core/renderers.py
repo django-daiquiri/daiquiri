@@ -71,7 +71,7 @@ class ErrorRenderer(VOTableRenderer):
             errors = []
             for parameter, parameter_errors in data.items():
                 if isinstance(parameter_errors, (list, tuple)):
-                    errors.append('%s: %s' % (parameter, ', '.join(parameter_errors)))
+                    errors.append('%s: %s' % (parameter, ', '.join([str(e) for e in parameter_errors])))
                 else:
                     errors.append('%s: %s' % (parameter, parameter_errors))
             return '\n'.join(errors)
@@ -79,7 +79,6 @@ class ErrorRenderer(VOTableRenderer):
             return '\n'.join(data)
         else:
             return data
-
 
     def render_votable(self, data, accepted_media_type=None, renderer_context=None):
         self.start('RESOURCE', {

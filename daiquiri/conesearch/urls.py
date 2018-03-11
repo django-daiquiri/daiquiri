@@ -1,13 +1,8 @@
-from django.conf.urls import url, include
+from django.conf.urls import url
 
-from rest_framework import routers
+from .views import ConeSearchView
 
-from .viewsets import SearchViewSet
-
-router = routers.DefaultRouter()
-router.register(r'search', SearchViewSet, base_name='search')
 
 urlpatterns = [
-    # rest api
-    url(r'^', include(router.urls)),
+    url(r'^(?P<resource>.+)/$', ConeSearchView.as_view(), name='search'),
 ]

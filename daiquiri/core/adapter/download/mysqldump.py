@@ -7,26 +7,6 @@ logger = logging.getLogger(__name__)
 
 class MysqldumpAdapter(DownloadAdapter):
 
-    FORMATS = {
-        'char': 'c',
-        'unsignedByte': 'B',
-        'short': 'h',
-        'int': 'i',
-        'long': 'q',
-        'float': 'f',
-        'double': 'd'
-    }
-
-    NULL_VALUES = {
-        'char': '',
-        'unsignedByte': 255,
-        'short': 32767,
-        'int': 2147483647,
-        'long': 9223372036854775807,
-        'float': float('nan'),
-        'double': float('nan')
-    }
-
     def set_args(self, schema_name, table_name):
         self.args = ['mysqldump', '--compact', '--skip-extended-insert']
 

@@ -74,6 +74,7 @@ def get_model_field_meta(model):
 
     return meta
 
+
 def get_detail_fields(detail_keys):
     fields = []
 

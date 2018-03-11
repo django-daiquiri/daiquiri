@@ -155,7 +155,7 @@ class JobTests(TestViewsetMixin, QueryViewsetTestCase):
 
     def assert_create_download_viewset(self, key, instance, username):
 
-        for format_key in ('csv', 'votable', 'votable-binary', 'votable-binary2'):
+        for format_key in ('csv', 'votable'):
             file_name = self.get_download_file_name(instance, format_key)
 
             try:
@@ -189,7 +189,7 @@ class JobTests(TestViewsetMixin, QueryViewsetTestCase):
 
     def assert_stream_viewset(self, key, instance, username):
 
-        for format_key in ('csv', 'votable', 'votable-binary', 'votable-binary2'):
+        for format_key in ('csv', 'votable'):
             file_name = self.get_download_file_name(instance, format_key)
 
             try:
@@ -210,7 +210,7 @@ class JobTests(TestViewsetMixin, QueryViewsetTestCase):
             })
 
     def get_download_file_name(self, instance, format_key):
-        file_name =  '%(username)s/%(table_name)s' % {
+        file_name = '%(username)s/%(table_name)s' % {
             'username': instance.owner.username,
             'table_name': instance.table_name
         }
@@ -218,12 +218,7 @@ class JobTests(TestViewsetMixin, QueryViewsetTestCase):
         if format_key == 'csv':
             return file_name + '.csv'
         elif format_key == 'votable':
-            return file_name + '.votable.xml'
-        elif format_key == 'votable-binary':
-            return file_name + '.votable.binary.xml'
-        elif format_key == 'votable-binary2':
-            return file_name + '.votable.binary2.xml'
-
+            return file_name + '.xml'
 
 # class UserRowTests(TestViewsetMixin, ServeTestCase):
 

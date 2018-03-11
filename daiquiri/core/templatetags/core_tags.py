@@ -19,8 +19,8 @@ def base_url(context):
 
 
 @register.simple_tag(takes_context=True)
-def absolute_url(context, *args, **kwargs):
-    return context.request.build_absolute_uri(reverse(*args, **kwargs))
+def absolute_url(context, name, *args):
+    return context.request.build_absolute_uri(reverse(name, args=args))
 
 
 @register.simple_tag()
@@ -46,7 +46,6 @@ def vendor(vendor_key):
                 }
 
             tags.append(tag)
-
 
     if 'css' in vendor_config:
         for file in vendor_config['css']:
@@ -126,7 +125,7 @@ def markdown(value):
 @register.filter(is_safe=True)
 @stringfilter
 def semicolonbr(value):
-    return mark_safe(value.replace(';','<br />'))
+    return mark_safe(value.replace(';', '<br />'))
 
 
 @register.filter(is_safe=True)

@@ -125,24 +125,10 @@ QUERY_DOWNLOAD_FORMATS = [
     },
     {
         'key': 'votable',
-        'extension': 'votable.xml',
+        'extension': 'xml',
         'content_type': 'application/xml',
         'label': 'IVOA VOTable XML file - TABLEDATA serialization',
         'help': 'A XML file using the IVOA VOTable format. Use this option if you intend to use VO compatible software to further process the data.'
-    },
-    {
-        'key': 'votable-binary',
-        'extension': 'votable.binary.xml',
-        'content_type': 'application/xml',
-        'label': 'IVOA VOTable XML file - BINARY serialization',
-        'help': 'A XML file using the IVOA VOTable format (BINARY Serialization). Use this option if you intend to use VO compatible software to process the data and prefer the use of a binary file.'
-    },
-    {
-        'key': 'votable-binary2',
-        'extension': 'votable.binary2.xml',
-        'content_type': 'application/xml',
-        'label': 'IVOA VOTable XML file - BINARY 2 serialization',
-        'help': 'A XML file using the IVOA VOTable format (BINARY2 Serialization). Use this option if you intend to use VO compatible software to process the data and prefer the use of a binary file.'
     }
 ]
 

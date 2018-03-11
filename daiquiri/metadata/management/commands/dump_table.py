@@ -13,9 +13,8 @@ class Command(BaseCommand):
         parser.add_argument('table', help='the table to dump')
         parser.add_argument('format', help='the format for the dump')
 
-
     def handle(self, *args, **options):
-        table = Table.objects.filter(database__name=options['schema']).get(name=options['table'])
+        table = Table.objects.filter(schema__name=options['schema']).get(name=options['table'])
 
         for line in DownloadAdapter().generate(options['format'], options['schema'], options['table'], {
                 'columns': table.columns.values()

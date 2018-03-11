@@ -1,14 +1,10 @@
-angular.module('cutout', ['core'])
+angular.module('stream', ['core'])
 
-.factory('CutoutService', ['$http', '$httpParamSerializer', function($http, $httpParamSerializer) {
+.factory('StreamService', ['$http', '$httpParamSerializer', function($http, $httpParamSerializer) {
 
     /* get the base url */
 
     var baseurl = angular.element('meta[name="baseurl"]').attr('content');
-
-    /* get the cutout url */
-
-    var cutout_url = baseurl + 'cutout/api/datacubes';
 
     /* create the metadata service */
 
@@ -19,20 +15,27 @@ angular.module('cutout', ['core'])
 
     /* define service functions */
 
-    service.init = function(defaults) {
-        service.defaults = defaults;
+    service.init = function(opt) {
+        service.stream_url = baseurl + opt.stream_url;
+        service.defaults = opt.defaults;
+
+        if (angular.isDefined(opt.resource)) {
+            service.resource = opt.resource;
+        }
+
         service.reset();
     };
 
     service.reset = function() {
+        console.log(service.defaults);
         angular.forEach(service.defaults, function(value, key) {
             service.values[key] = value;
         });
     };
 
     service.download = function() {
-        // construct the url for the cutout
-        var url = cutout_url + '?' + $httpParamSerializer(service.values);
+        // construct the url for the stream
+        var url = service.stream_url + '/' + service.resource + '/?' + $httpParamSerializer(service.values);
 
         $http.get(url + '&download=').then(function() {
             // download the file, headers will prevent the browser reloading the page
@@ -49,9 +52,9 @@ angular.module('cutout', ['core'])
     return service;
 }])
 
-.controller('CutoutController', ['$scope', 'CutoutService', function($scope, CutoutService) {
+.controller('StreamController', ['$scope', 'StreamService', function($scope, StreamService) {
 
-    $scope.service = CutoutService;
+    $scope.service = StreamService;
     $scope.$watch('service.values', $scope.service.build_query_params, true);
 
 }]);

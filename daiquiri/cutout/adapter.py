@@ -3,11 +3,11 @@ from django.conf import settings
 from daiquiri.core.utils import import_class
 
 
-def ConeSearchAdapter():
-    return import_class(settings.CONESEARCH_ADAPTER)()
+def CutOutAdapter():
+    return import_class(settings.CUTOUT_ADAPTER)()
 
 
-class BaseConeSearchAdapter(object):
+class BaseCutOutAdapter(object):
 
     def clean(self, request, resource):
         raise NotImplementedError()

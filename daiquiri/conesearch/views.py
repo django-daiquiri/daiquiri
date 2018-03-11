@@ -8,19 +8,19 @@ from daiquiri.core.utils import get_client_ip
 from daiquiri.stats.models import Record
 from daiquiri.core.renderers import ErrorRenderer
 
-from .adapter import CutOutAdapter
+from .adapter import ConeSearchAdapter
 
 
-class CutOutViewSet(AccessMixin, View):
+class ConeSearchView(AccessMixin, View):
 
     def dispatch(self, request, *args, **kwargs):
-        if not settings.CUTOUT_ANONYMOUS and not request.user.is_authenticated:
+        if not settings.CONESEARCH_ANONYMOUS and not request.user.is_authenticated:
             return self.handle_no_permission()
-        return super(CutOutViewSet, self).dispatch(request, *args, **kwargs)
+        return super(ConeSearchView, self).dispatch(request, *args, **kwargs)
 
     def get(self, request, resource=None):
 
-        adapter = CutOutAdapter()
+        adapter = ConeSearchAdapter()
         errors = adapter.clean(request, resource)
 
         if errors:
@@ -31,7 +31,7 @@ class CutOutViewSet(AccessMixin, View):
                 # create a stats record for this cutout
                 Record.objects.create(
                     time=now(),
-                    resource_type='CUTOUT',
+                    resource_type='CONESEARCH',
                     resource=adapter.args,
                     client_ip=get_client_ip(request),
                     user=request.user if request.user.is_authenticated else None
