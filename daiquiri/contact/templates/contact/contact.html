@@ -16,7 +16,7 @@
         {% include 'core/bootstrap_form_fields.html' %}
 
         <input type="submit" value="{% trans 'Send message' %}" class="btn {{ submit_danger|yesno:'btn-danger,btn-primary' }}" />
-        <input type="submit" name="cancel" value="{% trans 'Cancel' %}" class="btn" />
+        <input type="submit" name="cancel" value="{% trans 'Cancel' %}" class="btn btn-default" />
     </form>
 
 {% endblock %}
