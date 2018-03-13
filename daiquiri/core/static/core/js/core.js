@@ -20,7 +20,6 @@ angular.module('core', ['ngResource', 'ngSanitize'])
 }])
 
 .directive('codemirror', function() {
-
     return {
         scope: {
             id: '@',
@@ -53,3 +52,28 @@ angular.module('core', ['ngResource', 'ngSanitize'])
         }
     };
 })
+
+.directive('pending', ['$http', '$timeout', function ($http, $timeout) {
+    return {
+        restrict: 'E',
+        template: '<i class="fa fa-circle-o-notch fa-spin fa-fw"></i>',
+        link: function (scope, element, attrs) {
+            scope.isPending = function () {
+                return $http.pendingRequests.length > 0;
+            };
+            scope.$watch(scope.isPending, function (value) {
+                if (value) {
+                    if (angular.isUndefined(scope.promise) || scope.pending === null) {
+                        scope.promise = $timeout(function(){
+                            element.removeClass('ng-hide');
+                        }, 500);
+                    }
+                } else {
+                    $timeout.cancel(scope.promise);
+                    scope.pending = null;
+                    element.addClass('ng-hide');
+                }
+            });
+        }
+    };
+}]);
