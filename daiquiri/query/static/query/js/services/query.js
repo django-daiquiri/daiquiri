@@ -48,8 +48,8 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
                     service.forms[form.key] = $injector.get(form.form_service);
                 });
 
-                // activate first form
-                service.forms[response[0].key].activate();
+                service.first_form = service.forms[response[0].key]
+                service.activateFirstForm();
             });
         });
 
@@ -150,11 +150,11 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
             service.run_ids.push(null);
 
             if (service.job) {
-                // get the phase of the current job in the jobs list
-                var phase = $filter('filter')(service.jobs, {'id': service.job.id})[0].phase;
+                // get the current job from the jobs list
+                var current_job = $filter('filter')(service.jobs, {'id': service.job.id})[0];
 
                 // if the phase has changed, fetch it again
-                if (phase != service.job.phase) {
+                if (current_job && current_job.phase != service.job.phase) {
                     service.activateJob(service.job);
                 }
             }
@@ -179,6 +179,10 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
     service.activateForm = function(key) {
         service.form = key;
         service.job = null;
+    };
+
+    service.activateFirstForm = function() {
+        service.first_form.activate();
     };
 
     service.activateJob = function(job) {
@@ -245,19 +249,27 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
     };
 
     service.removeJob = function() {
-        var index = service.jobs.indexOf($filter('filter')(service.jobs, {'id': service.job.id})[0]);
+        var index = service.jobs.indexOf($filter('filter')(service.jobs, {
+            'id': service.job.id
+        })[0]);
 
-        var next_job;
-        if (index == 0) {
+        var next_job = null;
+        if (index == 0 && angular.isDefined(service.jobs[1])) {
             next_job = service.jobs[1];
-        } else {
+        } else if (angular.isDefined(service.jobs[index - 1])){
             next_job = service.jobs[index - 1];
         }
 
         resources.jobs.delete({id: service.values.id}, function() {
             service.fetchStatus();
             service.fetchJobs();
-            service.activateJob(next_job);
+
+            if (next_job) {
+                service.activateJob(next_job);
+            } else {
+                service.activateFirstForm();
+            }
+
             $('.modal').modal('hide');
         });
     };
