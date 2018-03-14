@@ -7,10 +7,15 @@ from daiquiri.core.utils import get_referer_path_info, get_next
 from django.views.generic import TemplateView
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
+from django.urls import reverse_lazy
 
 from rest_framework.authtoken.models import Token
 
-from allauth.account.views import logout as allauth_logout
+from allauth.account.views import (
+    logout as allauth_logout,
+    PasswordChangeView as AllauthPasswordChangeView,
+    PasswordSetView as AllauthPasswordSetView
+)
 
 from daiquiri.core.views import ModelPermissionMixin
 
@@ -92,3 +97,19 @@ class UsersView(ModelPermissionMixin, TemplateView):
             'profile_admin_url': profile_admin_url
         })
         return context
+
+
+class PasswordChangeView(AllauthPasswordChangeView):
+
+    success_url = reverse_lazy('account_change_password_done')
+
+
+password_change = login_required(PasswordChangeView.as_view())
+
+
+class PasswordSetView(AllauthPasswordSetView):
+
+    success_url = reverse_lazy('account_set_password_done')
+
+
+password_set = login_required(PasswordSetView.as_view())
