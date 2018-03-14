@@ -4,7 +4,7 @@
 
 {% get_providers as socialaccount_providers %}
 
-<form method="post" action="{% url 'account_login' %}">
+<form method="post" action="{% url 'account_login' %}" novalidate>
     {% csrf_token %}
 
     {% if redirect_field_value %}

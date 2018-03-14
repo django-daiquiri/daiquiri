@@ -13,7 +13,7 @@
         {% endblocktrans %}
     </p>
 
-    <form method="post" action="{% url 'account_profile' %}">
+    <form method="post" action="{% url 'account_profile' %}" novalidate>
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ next }}" />
 

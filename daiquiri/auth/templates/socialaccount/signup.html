@@ -17,7 +17,7 @@
     </p>
     {% endif %}
 
-    <form method="post" action="{% url 'socialaccount_signup' %}">
+    <form method="post" action="{% url 'socialaccount_signup' %}" novalidate>
         {% csrf_token %}
 
         {% if redirect_field_value %}

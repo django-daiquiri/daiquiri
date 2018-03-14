@@ -9,7 +9,7 @@
         {% trans "Please enter your contact details and your message." %}
     </p>
 
-    <form method="post" action="{% url 'contact:contact' %}">
+    <form method="post" action="{% url 'contact:contact' %}" novalidate>
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ next }}" />
 
