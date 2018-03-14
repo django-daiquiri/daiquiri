@@ -14,13 +14,13 @@
         <h2>Your data</h2>
 
         <fieldset>
-            {% include 'core/bootstrap_form_fields.html' with form=participant_form %}
+            {% include 'core/partials/form_fields.html' with form=participant_form %}
         </fieldset>
 
         <h2>Your contribution</h2>
 
         <fieldset>
-            {% include 'core/bootstrap_form_fields.html' with form=contribution_form %}
+            {% include 'core/partials/form_fields.html' with form=contribution_form %}
         </fieldset>
 
         <input type="submit" value="{% trans 'Register' %}" class="btn btn-primary" />

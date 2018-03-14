@@ -24,7 +24,7 @@ install:
 - pip install mysqlclient psycopg2-binary coveralls
 
 before_script:
-- sh -c "cp testing/config/settings/$DB.local.py testing/config/settings/local.py; fi"
+- sh -c "cp testing/config/settings/$DB.py testing/config/settings/local.py; fi"
 - mkdir testing/log testing/download
 - mysql -e "CREATE USER daiquiri_app@localhost IDENTIFIED BY 'daiquiri_app';"
 - mysql -e "CREATE USER daiquiri_data@localhost IDENTIFIED BY 'daiquiri_data';"

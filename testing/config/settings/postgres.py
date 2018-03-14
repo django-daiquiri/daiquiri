@@ -6,7 +6,7 @@ DATABASES = {
         'NAME': 'daiquiri_app',
         'USER': 'daiquiri_app',
         'PASSWORD': 'daiquiri_app',
-        'HOST': 'localhost'
+        'HOST': '127.0.0.1'
     },
     'data': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -16,7 +16,7 @@ DATABASES = {
         'NAME': 'daiquiri_data',
         'USER': 'daiquiri_data',
         'PASSWORD': 'daiquiri_data',
-        'HOST': 'localhost'
+        'HOST': '127.0.0.1'
     }
 }
 

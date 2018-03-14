@@ -17,8 +17,8 @@
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ next }}" />
 
-        {% include 'core/bootstrap_form_fields.html' with form=user_form %}
-        {% include 'core/bootstrap_form_fields.html' with form=profile_form %}
+        {% include 'core/partials/form_fields.html' with form=user_form %}
+        {% include 'core/partials/form_fields.html' with form=profile_form %}
 
         <input type="submit" value="{% trans 'Update profile' %}" class="btn btn-primary" />
         <input type="submit" name="cancel" value="{% trans 'Cancel' %}" class="btn btn-default" />

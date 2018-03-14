@@ -3,5 +3,5 @@
 {% endfor %}
 
 {% for field in form.visible_fields %}
-    {% include 'core/bootstrap_form_field.html' with field=field %}
+    {% include 'core/partials/form_field.html' with field=field %}
 {% endfor %}

@@ -67,47 +67,6 @@ def vendor(vendor_key):
     return mark_safe(''.join(tags))
 
 
-@register.simple_tag(takes_context=True)
-def bootstrap_form(context, **kwargs):
-    form_context = {}
-
-    if 'form' in kwargs:
-        form_context['form'] = kwargs['form']
-    else:
-        form_context['form'] = context['form']
-
-    if 'next' in kwargs:
-        form_context['next'] = kwargs['next']
-    elif 'next' in context:
-        form_context['next'] = context['next']
-
-    if 'action_url_name' in kwargs:
-        form_context['action'] = reverse(kwargs['action_url_name'])
-
-    if 'submit' in kwargs:
-        form_context['submit'] = kwargs['submit']
-
-    return render_to_string('core/bootstrap_form.html', form_context, request=context.request)
-
-
-@register.simple_tag(takes_context=True)
-def bootstrap_delete_form(context, **kwargs):
-    form_context = {}
-
-    if 'next' in kwargs:
-        form_context['next'] = kwargs['next']
-    elif 'next' in context:
-        form_context['next'] = context['next']
-
-    if 'action_url_name' in kwargs:
-        form_context['action'] = reverse(kwargs['action_url_name'])
-
-    if 'submit' in kwargs:
-        form_context['submit'] = kwargs['submit']
-
-    return render_to_string('core/bootstrap_delete_form.html', form_context, request=context.request)
-
-
 @register.filter(name='next')
 def next(value, arg):
     try:

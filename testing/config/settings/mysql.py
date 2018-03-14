@@ -5,13 +5,15 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'daiquiri_app',
         'USER': 'daiquiri_app',
-        'PASSWORD': 'daiquiri_app'
+        'PASSWORD': 'daiquiri_app',
+        'HOST': '127.0.0.1'
     },
     'data': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'TAP_SCHEMA',
         'USER': 'daiquiri_data',
-        'PASSWORD': 'daiquiri_data'
+        'PASSWORD': 'daiquiri_data',
+        'HOST': '127.0.0.1'
     }
 }
 
