@@ -8,7 +8,6 @@ from rest_framework.authentication import SessionAuthentication, BasicAuthentica
 
 from daiquiri.core.responses import HttpResponseSeeOther
 from daiquiri.core.utils import get_client_ip
-from daiquiri.core.renderers import ErrorRenderer
 
 from .models import Job
 from .serializers import (
@@ -18,7 +17,7 @@ from .serializers import (
     SyncJobSerializer,
     AsyncJobSerializer
 )
-from .renderers import UWSRenderer
+from .renderers import UWSRenderer, UWSErrorRenderer
 from .filters import UWSFilterBackend
 from .utils import get_job_url
 
@@ -42,7 +41,7 @@ class SyncJobViewSet(JobViewSet):
 
     serializer_class = SyncJobSerializer
 
-    renderer_classes = (ErrorRenderer, )
+    renderer_classes = (UWSErrorRenderer, )
 
     def create_job(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -84,7 +83,7 @@ class SyncJobViewSet(JobViewSet):
 class AsyncJobViewSet(JobViewSet):
 
     serializer_class = AsyncJobSerializer
-    renderer_classes = (ErrorRenderer, )
+    renderer_classes = (UWSErrorRenderer, )
     filter_backends = (UWSFilterBackend, )
 
     def get_success_url(self, job=None):

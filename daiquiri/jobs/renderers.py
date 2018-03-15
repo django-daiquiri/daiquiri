@@ -1,4 +1,4 @@
-from daiquiri.core.renderers import XMLRenderer
+from daiquiri.core.renderers import XMLRenderer, ErrorRenderer
 
 from .utils import get_job_url
 
@@ -76,3 +76,16 @@ class UWSRenderer(XMLRenderer):
             self.node('uws:parameter', {'id': parameter_key}, parameter_value)
 
         self.end('uws:parameters')
+
+
+class UWSErrorRenderer(ErrorRenderer):
+
+    def render_votable(self, data, accepted_media_type=None, renderer_context=None):
+        self.start('RESOURCE', {
+            'type': 'results'
+        })
+        self.node('INFO', {
+            'name': 'QUERY_STATUS',
+            'value': 'ERROR'
+        }, self.get_error_string(data))
+        self.end('RESOURCE')

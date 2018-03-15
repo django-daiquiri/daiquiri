@@ -79,13 +79,3 @@ class ErrorRenderer(VOTableRenderer):
             return '\n'.join(data)
         else:
             return data
-
-    def render_votable(self, data, accepted_media_type=None, renderer_context=None):
-        self.start('RESOURCE', {
-            'type': 'results'
-        })
-        self.node('INFO', {
-            'name': 'QUERY_STATUS',
-            'value': 'ERROR'
-        }, self.get_error_string(data))
-        self.end('RESOURCE')

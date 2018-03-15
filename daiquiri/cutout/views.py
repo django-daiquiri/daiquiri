@@ -6,9 +6,9 @@ from django.utils.timezone import now
 
 from daiquiri.core.utils import get_client_ip
 from daiquiri.stats.models import Record
-from daiquiri.core.renderers import ErrorRenderer
 
 from .adapter import CutOutAdapter
+from .renderers import CutOutErrorRenderer
 
 
 class CutOutViewSet(AccessMixin, View):
@@ -24,8 +24,8 @@ class CutOutViewSet(AccessMixin, View):
         errors = adapter.clean(request, resource)
 
         if errors:
-            renderered_data = ErrorRenderer().render(errors)
-            return HttpResponse(renderered_data, content_type=ErrorRenderer.media_type)
+            renderered_data = CutOutErrorRenderer().render(errors)
+            return HttpResponse(renderered_data, content_type=CutOutErrorRenderer.media_type)
         else:
             if request.GET.get('download', True):
                 # create a stats record for this cutout
