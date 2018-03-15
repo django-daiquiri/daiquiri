@@ -30,7 +30,7 @@ angular.module('core')
                 return service.files_url + '?search=' + window.encodeURIComponent(row[column_index]);
             },
             reference_url: function(row, column_index) {
-                var key = window.encodeURIComponent(service.columns[column_index]),
+                var key = window.encodeURIComponent(service.columns[column_index].name),
                     value = window.encodeURIComponent(row[column_index]);
 
                 return service.references_url + '?key=' + key + '&value=' + value;
