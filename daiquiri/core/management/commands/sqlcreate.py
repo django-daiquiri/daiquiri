@@ -106,7 +106,8 @@ GRANT ALL PRIVILEGES ON `%(PREFIX)s%%`.* to \'%(USER)s\'@\'%(CLIENT)s\';
                 elif config['data']['ENGINE'] == 'django.db.backends.postgresql':
                     print('''-- Run the following commands on \'%(HOST)s\':
 CREATE USER %(USER)s WITH PASSWORD \'%(PASSWORD)s\';
-CREATE DATABASE %(NAME)s WITH OWNER %(USER)s;
+CREATE DATABASE %(NAME)s;
+GRANT CREATE ON DATABASE %(NAME)s TO %(USER)s;
 \c %(NAME)s
 CREATE SCHEMA %(TAP_SCHEMA)s AUTHORIZATION %(USER)s;
 ''' % config['data'])
