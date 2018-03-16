@@ -1,8 +1,11 @@
+import logging
 import os
 
 from django.conf import settings
 
 from .models import Directory
+
+logger = logging.getLogger(__name__)
 
 
 def check_file(user, file_path):
@@ -26,8 +29,15 @@ def search_file(search_path):
 
     if len(results) == 1:
         # subtract the base path and return
-        return results.pop().split(base_path, 1)[1].lstrip('/')
+        file_path = results.pop().split(base_path, 1)[1].lstrip('/')
+
+        logger.debug('%s => %s', search_path, file_path)
+        return file_path
+    elif len(results) > 1:
+        logger.debug('search_path = %s found more than once', search_path)
+        return None
     else:
+        logger.debug('search_path = %s not found', search_path)
         return None
 
 
