@@ -43,7 +43,7 @@ class Directory(models.Model):
         return self.absolute_path
 
     def save(self):
-        self.depth = len(self.normpath.split(os.path.sep))
+        self.depth = len(os.path.normpath(self.path).split(os.path.sep))
         super(Directory, self).save()
 
     @property
