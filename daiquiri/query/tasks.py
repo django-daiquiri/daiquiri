@@ -198,7 +198,7 @@ def create_download_file(download_id):
                     download_job.format_key,
                     download_job.job.schema_name,
                     download_job.job.table_name,
-                    download_job.job.metadata,
+                    download_job.job.metadata['columns'],
                     download_job.job.result_status,
                     (download_job.job.nrows == 0)):
                 f.write(line)

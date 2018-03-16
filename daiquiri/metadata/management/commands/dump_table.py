@@ -16,7 +16,5 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         table = Table.objects.filter(schema__name=options['schema']).get(name=options['table'])
 
-        for line in DownloadAdapter().generate(options['format'], options['schema'], options['table'], {
-                'columns': table.columns.values()
-            }):
+        for line in DownloadAdapter().generate(options['format'], options['schema'], options['table'], table.columns.values()):
             sys.stdout.write(line)

@@ -1,18 +1,10 @@
-import os
-
-from sendfile import sendfile
-
-from django.conf import settings
-from django.utils.timezone import now
+from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import viewsets
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.response import Response
 
-from daiquiri.core.utils import get_client_ip
-from daiquiri.stats.models import Record
-
-from .utils import check_file, search_file
+from .utils import check_file, search_file, send_file
 
 
 class FileViewSet(viewsets.GenericViewSet):
@@ -27,21 +19,7 @@ class FileViewSet(viewsets.GenericViewSet):
             if file_path and check_file(request.user, file_path):
 
                 if request.GET.get('download', True):
-                    # create a stats record for this download
-                    Record.objects.create(
-                        time=now(),
-                        resource_type='FILE',
-                        resource={
-                            'search': search,
-                            'file_path': file_path
-                        },
-                        client_ip=get_client_ip(request),
-                        user=request.user
-                    )
-
-                    # send the file to the client
-                    absolute_file_path = os.path.join(settings.FILES_BASE_PATH, file_path)
-                    return sendfile(request, absolute_file_path, attachment=True)
+                    return send_file(request, file_path, search)
                 else:
                     # send an empty response
                     return Response()
@@ -49,4 +27,6 @@ class FileViewSet(viewsets.GenericViewSet):
                 raise NotFound()
 
         else:
-            raise NotFound()
+            raise ValidationError({
+                'search': [_('This field may not be blank.')]
+            })

@@ -7,6 +7,8 @@ ASYNC = False
 IPV4_PRIVACY_MASK = 16
 IPV6_PRIVACY_MASK = 32
 
+DOWNLOAD_PREPEND = {}
+
 ARCHIVE_ANONYMOUS = False
 ARCHIVE_SCHEMA = 'daiquiri_archive'
 ARCHIVE_TABLE = 'files'
@@ -47,6 +49,7 @@ CUTOUT_ADAPTER = 'daiquiri.cutout.adapter.DefaultAdapter'
 CUTOUT_ANONYMOUS = False
 
 FILES_BASE_PATH = os.path.join(BASE_DIR, 'files')
+FILES_SEARCH_URL = None
 
 MEETINGS_CONTRIBUTION_TYPES = [
     (None, 'no contribution'),

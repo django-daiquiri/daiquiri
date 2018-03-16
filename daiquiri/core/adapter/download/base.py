@@ -3,7 +3,9 @@ import csv
 import six
 import subprocess
 import re
-import string
+
+from django.conf import settings
+from django.urls import reverse
 
 from daiquiri.core.generators import generate_csv, generate_votable
 
@@ -16,22 +18,28 @@ class DownloadAdapter(object):
         self.database_key = database_key
         self.database_config = database_config
 
-    def generate(self, format_key, schema_name, table_name, metadata, status=None, empty=False):
+    def generate(self, format_key, schema_name, table_name, columns, status=None, empty=False):
         # create the final list of arguments subprocess.Popen
         self.set_args(schema_name, table_name)
 
+        prepend = {}
+        for ucd, value in settings.DOWNLOAD_PREPEND.items():
+            for i, column in enumerate(columns):
+                if ucd in column['ucd']:
+                    prepend[i] = value
+
         if format_key == 'csv':
-            return generate_csv(self.execute())
+            return generate_csv(self.execute(prepend=prepend))
 
         elif format_key == 'votable':
-            return generate_votable(self.execute(), metadata['columns'],
+            return generate_votable(self.execute(prepend=prepend), columns,
                                     resource_name=schema_name, table_name=table_name,
                                     query_status=status, empty=empty)
 
         else:
             raise Exception('Not supported.')
 
-    def execute(self):
+    def execute(self, prepend=None):
         # log the arguments
         logger.debug('execute "%s"' % ' '.join(self.args))
 
@@ -46,7 +54,11 @@ class DownloadAdapter(object):
                     line = insert_result.group(1)
                     reader = csv.reader([line], quotechar="'", skipinitialspace=True)
                     row = six.next(reader)
-                    yield map(string.strip, row)
+
+                    if prepend:
+                        yield [(prepend[i] + cell if i in prepend else cell) for i, cell in enumerate(row)]
+                    else:
+                        yield row
 
         except subprocess.CalledProcessError as e:
             logger.error('Command PIPE returned non-zero exit status: %s' % e)

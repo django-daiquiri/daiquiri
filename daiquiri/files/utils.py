@@ -1,7 +1,13 @@
 import logging
 import os
 
+from sendfile import sendfile
+
 from django.conf import settings
+from django.utils.timezone import now
+
+from daiquiri.core.utils import get_client_ip
+from daiquiri.stats.models import Record
 
 from .models import Directory
 
@@ -39,6 +45,27 @@ def search_file(search_path):
     else:
         logger.debug('search_path = %s not found', search_path)
         return None
+
+
+def send_file(request, file_path, search=None):
+    # create a stats record for this download
+    resource = {
+        'file_path': file_path
+    }
+    if search:
+        resource['search'] = search
+
+    Record.objects.create(
+        time=now(),
+        resource_type='FILE',
+        resource=resource,
+        client_ip=get_client_ip(request),
+        user=request.user
+    )
+
+    # send the file to the client
+    absolute_file_path = os.path.join(settings.FILES_BASE_PATH, file_path)
+    return sendfile(request, absolute_file_path, attachment=True)
 
 
 def normalize_file_path(directory_path, file_path):

@@ -67,10 +67,10 @@ def generate_votable(generator, fields, resource_name=None, table_name=None, que
             # write rows of the table yielded by the generator
             for row in generator:
                 yield '''
-                <TR>
-                    <TD>%s</TD>
-                </TR>''' % '''</TD>
-                    <TD>'''.join([('' if cell == 'NULL' else str(cell)) for cell in row])
+                    <TR>
+                        <TD>%s</TD>
+                    </TR>''' % '''</TD>
+                        <TD>'''.join([('' if cell == 'NULL' else str(cell)) for cell in row])
 
             yield '''
                 </TABLEDATA>
