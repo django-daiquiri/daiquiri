@@ -1,8 +1,8 @@
 from django.conf.urls import url
 
-from .views import CutOutViewSet
+from .viewsets import CutOutViewSet
 
 
 urlpatterns = [
-    url(r'^(?P<resource>.+)/$', CutOutViewSet.as_view(), name='cutout'),
+    url(r'^api/(?P<resource>.+)/$', CutOutViewSet.as_view(), name='cutout'),
 ]
