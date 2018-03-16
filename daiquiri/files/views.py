@@ -6,7 +6,7 @@ from .utils import check_file, send_file
 
 class FileView(View):
 
-    def get(request, file_path=None):
+    def get(self, request, file_path):
         if not file_path:
             raise Http404
 
