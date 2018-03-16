@@ -261,10 +261,10 @@ angular.module('core')
     };
 
     service.activate = function(column_index, row_index) {
-        // service.active = {
-        //     column_index: column_index,
-        //     row_index: row_index
-        // }
+        service.active = {
+            column_index: column_index,
+            row_index: row_index
+        }
     };
 
     service.check_all = function() {

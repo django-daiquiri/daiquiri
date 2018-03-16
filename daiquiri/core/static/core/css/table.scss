@@ -46,6 +46,11 @@
                     border-right: none;
                 }
             }
+            tr {
+                &.selected {
+                    background-color: $table-active-background-color;
+                }
+            }
             th.daiquiri-table-check {
                 width: 32px;
 
@@ -65,13 +70,15 @@
                 padding: 9px 4px 7px 6px;
                 text-align: center;
             }
-            tr.active {
-                td.active {
-                    .cell {
-                        background-color: $table-active-background-color;
-                    }
-                }
-            }
+
+
+            // tr.active {
+            //     td.active {
+            //         .cell {
+            //             background-color: $table-active-background-color;
+            //         }
+            //     }
+            // }
             th {
                 position: relative;
 

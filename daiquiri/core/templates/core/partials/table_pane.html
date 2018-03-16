@@ -30,7 +30,7 @@
         </thead>
         <tbody>
             <tr ng-repeat="row in service.table.rows" ng-init="row_index = $index"
-                ng-class="{'active': row_index == service.table.active.row_index}">
+                ng-class="{'selected': row_index == service.table.active.row_index}">
 
                 <td class="daiquiri-table-check" ng-if="service.table.checkboxes">
                     <input type="checkbox"
@@ -41,7 +41,7 @@
                 <td ng-repeat="column in service.table.columns"
                     ng-if="!column.hidden"
                     ng-init="column_index = $index"
-                    ng-class="{'active': column_index == service.table.active.column_index}">
+                    ng-class="{'selected': column_index == service.table.active.column_index}">
 
                     <div class="daiquiri-table-cell" ng-click="service.table.activate(column_index, row_index)">
                         <div ng-if="column.display == 'modal'">
@@ -56,12 +56,12 @@
                             </a>
                         </div>
                         <div ng-if="column.display == 'reference'">
-                            <a href="{$ service.table.getter.reference_url(row, column_index) $}" target="blank">
+                            <a href="{$ service.table.getter.reference_url(row, column_index) $}" target="_blank">
                                 {$ row[column_index] $}
                             </a>
                         </div>
                         <div ng-if="column.display == 'link'">
-                            <a href="{$ service.table.getter.link_url(row, column_index) $}" target="blank">
+                            <a href="{$ service.table.getter.link_url(row, column_index) $}" target="_blank">
                                 {$ row[column_index] $}
                             </a>
                         </div>
