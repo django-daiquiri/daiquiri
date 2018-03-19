@@ -94,7 +94,7 @@ class FileViewSet(viewsets.GenericViewSet):
                     resource_type='ARCHIVE_DOWNLOAD',
                     resource=row[0],
                     client_ip=get_client_ip(request),
-                    user=request.user
+                    user=request.user if request.user.is_authenticated else None
                 )
 
                 # send the file to the client
