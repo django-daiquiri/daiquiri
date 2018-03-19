@@ -79,7 +79,13 @@ angular.module('core')
         // set additional options
         angular.forEach(opt, function(value, key) {
             if ([
-                'rows_url', 'columns_url', 'files_url', 'references_url', 'params', 'page_sizes', 'getter'
+                'rows_url',
+                'columns_url',
+                'files_url',
+                'references_url',
+                'params',
+                'page_sizes',
+                'getter'
             ].indexOf(key) == -1) {
                 service[key] = opt[key];
             }
