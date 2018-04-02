@@ -85,9 +85,3 @@ def markdown(value):
 @stringfilter
 def semicolonbr(value):
     return mark_safe(value.replace(';', '<br />'))
-
-
-@register.filter(is_safe=True)
-@stringfilter
-def dict2js(dict):
-    return mark_safe(str(dict))

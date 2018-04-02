@@ -1,20 +1,24 @@
-from django.conf import settings
-from django.contrib.auth.mixins import AccessMixin
 from django.views.generic import TemplateView
 
-from daiquiri.core.views import ModelPermissionMixin
+from daiquiri.core.views import ModelPermissionMixin, AnonymousAccessMixin
 from daiquiri.core.utils import get_model_field_meta
 
-from .models import Example
+from .models import QueryJob, Example
 
 
-class QueryView(AccessMixin, TemplateView):
+class QueryView(AnonymousAccessMixin, TemplateView):
     template_name = 'query/query.html'
+    anonymous_setting = 'QUERY_ANONYMOUS'
 
-    def dispatch(self, request, *args, **kwargs):
-        if not settings.QUERY_ANONYMOUS and not request.user.is_authenticated:
-            return self.handle_no_permission()
-        return super(QueryView, self).dispatch(request, *args, **kwargs)
+
+class JobsView(AnonymousAccessMixin, TemplateView):
+    template_name = 'query/jobs.html'
+    anonymous_setting = 'QUERY_ANONYMOUS'
+
+    def get_context_data(self, **kwargs):
+        context = super(JobsView, self).get_context_data(**kwargs)
+        context['phases'] = QueryJob.PHASE_CHOICES
+        return context
 
 
 class ExamplesView(ModelPermissionMixin, TemplateView):

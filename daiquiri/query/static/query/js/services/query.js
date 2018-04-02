@@ -139,8 +139,11 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
     }
 
     service.fetchJobs = function() {
-        return resources.jobs.query(function(response) {
-            service.jobs = response;
+        return resources.jobs.paginate({
+            page_size: 1000,
+            archived: ''
+        }, function(response) {
+            service.jobs = response.results;
 
             service.run_ids = service.jobs.map(function(job) {
                 return job.run_id;
