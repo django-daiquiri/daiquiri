@@ -60,7 +60,7 @@ def send_file(request, file_path, search=None):
         resource_type='FILE',
         resource=resource,
         client_ip=get_client_ip(request),
-        user=request.user
+        user=request.user if request.user.is_authenticated else None
     )
 
     # send the file to the client
