@@ -26,8 +26,13 @@ app.factory('BoxFormService', ['QueryService', function(QueryService) {
                 service.errors = {};
 
             }, function (response) {
-                // error
-                service.errors = response.data;
+                if (response.status == 400) {
+                    service.errors = response.data;
+                } else {
+                    service.errors = {
+                        server_error: true
+                    };
+                }
             });
     };
 

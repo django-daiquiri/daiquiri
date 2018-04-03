@@ -74,3 +74,6 @@
 <p class="text-danger" ng-show="service.forms.sql.errors.detail">
     {$ service.forms.sql.errors.detail $}
 </p>
+<p class="text-danger" ng-show="service.forms.sql.errors.server_error">
+    {% trans 'There has been an error on the server. Please contact the maintainers of this site, if the problem persists.' %}
+</p>

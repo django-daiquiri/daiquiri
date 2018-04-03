@@ -21,8 +21,13 @@ app.factory('ConeFormService', ['QueryService', function(QueryService) {
             .then(function() {
                 // success
             }, function (response) {
-                // error
-                service.errors = response.data;
+                if (response.status == 400) {
+                    service.errors = response.data;
+                } else {
+                    service.errors = {
+                        server_error: true
+                    };
+                }
             });
     };
 

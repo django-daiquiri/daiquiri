@@ -56,3 +56,10 @@
 <button class="btn btn-default" ng-click="">
     {% trans 'Clear input window' %}
 </button>
+
+<p class="text-danger" ng-show="service.forms.cone.errors.detail">
+    {$ service.forms.cone.errors.detail $}
+</p>
+<p class="text-danger" ng-show="service.forms.cone.errors.server_error">
+    {% trans 'There has been an error on the server. Please contact the maintainers of this site, if the problem persists.' %}
+</p>

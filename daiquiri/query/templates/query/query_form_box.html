@@ -92,3 +92,10 @@
 <button class="btn btn-primary" ng-click="service.forms.box.submit()">
     {% trans 'Submit new box search' %}
 </button>
+
+<p class="text-danger" ng-if="service.forms.box.errors.detail">
+    {$ service.forms.box.errors.detail $}
+</p>
+<p class="text-danger" ng-if="service.forms.box.errors.server_error">
+    {% trans 'There has been an error on the server. Please contact the maintainers of this site, if the problem persists' %}
+</p>

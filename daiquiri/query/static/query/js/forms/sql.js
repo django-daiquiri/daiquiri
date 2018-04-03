@@ -37,25 +37,31 @@ app.factory('SqlFormService', ['$timeout', '$filter', 'QueryService', 'BrowserSe
             .then(function() {
                 // success
             }, function (response) {
-                // error
-                service.errors = response.data;
-
-                var editor = $('.CodeMirror')[0].CodeMirror;
-
-                if (angular.isDefined(service.errors.query) && angular.isDefined(service.errors.query.positions)) {
+                if (response.status == 400) {
+                    // error
+                    service.errors = response.data;
 
                     var editor = $('.CodeMirror')[0].CodeMirror;
 
-                    angular.forEach(angular.fromJson(service.errors.query.positions), function(position) {
-                        service.markers.push(editor.markText(
-                            {line: position[0] - 1, ch: position[1]},
-                            {line: position[0] - 1, ch: position[1] + position[2].length},
-                            {className: 'codemirror-error'},
-                            {clearOnEnter: true}
-                        ));
-                    });
+                    if (angular.isDefined(service.errors.query) && angular.isDefined(service.errors.query.positions)) {
 
-                    service.errors.query = service.errors.query.messages;
+                        var editor = $('.CodeMirror')[0].CodeMirror;
+
+                        angular.forEach(angular.fromJson(service.errors.query.positions), function(position) {
+                            service.markers.push(editor.markText(
+                                {line: position[0] - 1, ch: position[1]},
+                                {line: position[0] - 1, ch: position[1] + position[2].length},
+                                {className: 'codemirror-error'},
+                                {clearOnEnter: true}
+                            ));
+                        });
+
+                        service.errors.query = service.errors.query.messages;
+                    }
+                } else {
+                    service.errors = {
+                        server_error: true
+                    };
                 }
             });
     };
