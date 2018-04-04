@@ -83,7 +83,7 @@
                         <th style="width: 20%" data-order-list="table_name">{% trans 'Table' %}</th>
                         <th style="width: 10%" data-order-list="phase">{% trans 'Phase' %}</th>
                         <th style="width: 20%" data-order-list="creation_time">{% trans 'Created' %}</th>
-                        <th style="width: 5%"></th>
+                        <th style="width: 10%"></th>
                     </thead>
                     <tbody>
                         <tr ng-repeat="row in service.list.rows">
@@ -108,6 +108,10 @@
                                 <a href="" class="fa fa-pencil" title="{% trans 'Update job' %}"
                                     ng-click="service.modal('update-job-modal', $index)"
                                     ng-show="row.phase == 'COMPLETED'">
+                                </a>
+                                <a href="{% url 'query:query' %}" class="fa fa-repeat" target="_blank"
+                                    title="{% trans 'Open new query form with this query' %}"
+                                    ng-click="service.copy_query(row.id)">
                                 </a>
                                 <a href="" class="fa fa-remove" title="{% trans 'Archive job' %}"
                                     ng-click="service.modal('archive-job-modal', $index)"

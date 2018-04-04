@@ -10,6 +10,6 @@ app.controller('QueryController', ['$scope', 'QueryService', function($scope, Qu
         event.stopPropagation();
     })
     $scope.$on('browserDblItemClicked', function(event, resource, item) {
-        $scope.service.forms.sql.pasteItem(resource, item);
+        $scope.service.forms.sql.paste_iStem(resource, item);
     });
 }]);

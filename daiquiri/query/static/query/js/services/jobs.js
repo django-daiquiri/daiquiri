@@ -82,6 +82,13 @@ app.factory('JobsService', ['$resource', '$timeout', 'ListService', function($re
         }
     };
 
+    service.copy_query = function(row_id) {
+        resources.jobs.get({id: row_id}, function(response) {
+            localStorage.setItem('stored_query_language', response.query_language);
+            localStorage.setItem('stored_query', response.query);
+        });
+    };
+
     service.update_job = function() {
         resources.jobs.update({id: service.values.id}, service.values, function(response) {
             service.list.rows[service.current_index].table_name = response.table_name;

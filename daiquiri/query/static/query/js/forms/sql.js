@@ -20,6 +20,16 @@ app.factory('SqlFormService', ['$timeout', '$filter', 'QueryService', 'BrowserSe
     service.activate = function() {
         QueryService.activate_form('sql');
 
+        // check if a query was copied into the localStorage
+        var stored_query_language = localStorage.getItem('stored_query_language'),
+            stored_query = localStorage.getItem('stored_query');
+        if (stored_query_language && stored_query) {
+            localStorage.removeItem('stored_query_language');
+            localStorage.removeItem('stored_query');
+
+            service.copy_query(stored_query_language, stored_query)
+        }
+
         $timeout(function() {
             angular.element('.CodeMirror').get(0).CodeMirror.refresh();
         });
@@ -60,12 +70,12 @@ app.factory('SqlFormService', ['$timeout', '$filter', 'QueryService', 'BrowserSe
             });
     };
 
-    service.clearQuery = function(string) {
+    service.clear_query = function(string) {
         service.values.query = '';
         $('.CodeMirror')[0].CodeMirror.focus();
     };
 
-    service.pasteItem = function(resource, item) {
+    service.paste_item = function(resource, item) {
         var string = '';
         if (angular.isDefined(item.query_strings)) {
             var query_language = $filter('filter')(QueryService.query_languages, {id: service.values.query_language})[0];
@@ -89,20 +99,20 @@ app.factory('SqlFormService', ['$timeout', '$filter', 'QueryService', 'BrowserSe
         $('.daiquiri-query-dropdowns .btn-group').removeClass('open');
     }
 
-    service.pasteString = function(string) {
+    service.paste_string = function(string) {
         var editor = $('.CodeMirror')[0].CodeMirror;
         editor.replaceSelection(string);
         editor.focus();
         $('.daiquiri-query-dropdowns .btn-group').removeClass('open');
     }
 
-    service.copyQuery = function(query_language, query) {
+    service.copy_query = function(query_language, query) {
         service.values.query_language = query_language;
         service.values.query = query;
         service.activate();
     }
 
-    service.toggleDropdown = function(dropdown) {
+    service.toggle_dropdown = function(dropdown) {
         if (service.dropdown === dropdown) {
             service.dropdown = null;
         } else {
