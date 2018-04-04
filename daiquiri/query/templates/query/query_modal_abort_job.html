@@ -14,8 +14,8 @@
 
             <div class="modal-body">
                 <p>
-                    {% blocktrans trimmed with table_name='{$ service.job.table_name $}' %}
-                    You are about to abort the job `{{ table_name }}`.
+                    {% blocktrans trimmed with table_name='{$ service.values.table_name $}' %}
+                    You are about to abort the job <code>{{ table_name }}</code>.
                     {% endblocktrans %}
                 </p>
                 <p class="text-danger">
@@ -28,7 +28,7 @@
                     {% trans 'Close' %}
                 </button>
                 <button type="button" class="btn btn-danger"
-                        ng-click="service.abortJob()">
+                        ng-click="service.abort_job()">
                     {% trans 'Abort' %}
                 </button>
             </div>

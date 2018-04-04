@@ -18,7 +18,7 @@ app.factory('SqlFormService', ['$timeout', '$filter', 'QueryService', 'BrowserSe
     /* create and configure the browser service */
 
     service.activate = function() {
-        QueryService.activateForm('sql');
+        QueryService.activate_form('sql');
 
         $timeout(function() {
             angular.element('.CodeMirror').get(0).CodeMirror.refresh();
@@ -33,7 +33,7 @@ app.factory('SqlFormService', ['$timeout', '$filter', 'QueryService', 'BrowserSe
         service.markers = [];
         service.errors = {};
 
-        QueryService.submitJob(service.values)
+        QueryService.submit_job(service.values)
             .then(function() {
                 // success
             }, function (response) {

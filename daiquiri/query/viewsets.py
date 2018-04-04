@@ -90,7 +90,7 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
     filter_fields = ('phase', )
 
     def get_queryset(self):
-        queryset = QueryJob.objects.filter_by_owner(self.request.user)
+        queryset = QueryJob.objects.filter_by_owner(self.request.user).order_by('-creation_time')
 
         # hide TAP jobs in the list for the anonymous user
         if self.action == 'list' and self.request.user.is_anonymous:

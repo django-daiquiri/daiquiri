@@ -43,16 +43,8 @@ p.daiquiri-query-form-help {
     max-height: 400px;
     overflow-y: auto;
 
-    .daiquiri-query-joblist-group {
-        .list-group-item:first-child {
-            border-top-width: 1px;
-        }
-
-        &:first-child {
-            .list-group-item:first-child {
-                border-top-width: 0;
-            }
-        }
+    .daiquiri-query-joblist-run-id {
+        background-color: #f9f9f9;
     }
 }
 

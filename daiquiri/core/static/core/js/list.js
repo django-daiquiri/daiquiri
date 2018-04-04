@@ -42,7 +42,6 @@ angular.module('core')
         if (service.idle && service.params.page) {
             service.idle = false;
 
-            console.log(service.params);
             return service.resource.get(service.params, function(response) {
                 service.count = response.count;
                 if (service.params.page == 1) {
