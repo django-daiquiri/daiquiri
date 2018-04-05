@@ -255,7 +255,7 @@ class Column(models.Model):
         help_text=_('Designates whether the column is defined by some standard.')
     )
     index_for = models.CharField(
-        max_length=256, null=True, blank=True,
+        max_length=256, blank=True, default='',
         verbose_name=_('Index for'),
         help_text=_('The columns which this column is an index for (e.g. for pgSphere).')
     )
