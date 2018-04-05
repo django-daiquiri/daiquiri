@@ -60,7 +60,7 @@
         </ul>
     </div>
 
-    <div class="panel panel-default">
+    <div class="panel panel-default daiquiri-query-joblist">
         <div class="panel-heading">
             {% trans 'Job list' %}
         </div>
@@ -71,11 +71,11 @@
             </li>
         </ul>
 
-        <ul class="list-group daiquiri-query-joblist">
+        <ul class="list-group daiquiri-query-joblist-jobs">
             <div class="daiquiri-query-joblist-group" ng-repeat="run_id in service.run_ids">
-
-                <li class="list-group-item list-group-link" ng-if="service.run_ids[0] !== null">
-                    <a href="" ng-click="service.show[run_id] = !service.show[run_id]">
+                <li class="list-group-item list-group-link" ng-if="service.run_ids[0] !== ''">
+                    <a href="" ng-click="service.show[run_id] = !service.show[run_id]"
+                        class="daiquiri-query-joblist-run-id">
                         <div class="pull-right">
                             <i class="fa fa-folder-o" title="{% trans 'Open group' %}"
                                 ng-hide="service.show[run_id]"></i>
@@ -83,8 +83,8 @@
                                 ng-show="service.show[run_id]"></i>
                         </div>
                         <div>
-                            <span ng-show="run_id">{$ run_id $}</span>
-                            <span ng-hide="run_id">{% trans 'unasigned' %}</span>
+                            <span ng-show="run_id">{% trans 'Run id' %}: {$ run_id $}</span>
+                            <span ng-hide="run_id">{% trans 'No run id' %}</span>
                         </div>
                     </a>
                 </li>
@@ -92,7 +92,7 @@
                 <li class="list-group-item list-group-link"
                     ng-repeat="job in service.jobs | orderBy: '-creation_time'"
                     ng-if="job.run_id == run_id && service.show[run_id]">
-                    <a href="" ng-click="service.activateJob(job)" ng-class="{active: service.job.id == job.id}">
+                    <a href="" ng-click="service.activate_job(job)" ng-class="{active: service.job.id == job.id}">
                         <div class="pull-right">
                             <i class="fa fa-pause" title="PENDING" ng-show="job.phase == 'PENDING'"></i>
                             <i class="fa fa-spinner fa-spin" title="QUEUED" ng-show="job.phase == 'QUEUED'"></i>
@@ -108,8 +108,13 @@
                         <div>{$ job.table_name $}</div>
                     </a>
                 </li>
-
             </div>
         </ul>
+
+        <div class="panel-footer">
+            <a href="{% url 'query:jobs' %}" target="_blank">
+                {% trans 'View verbose job list' %}
+            </a>
+        </div>
     </div>
 </div>

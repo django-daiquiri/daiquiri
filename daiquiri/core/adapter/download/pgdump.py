@@ -1,11 +1,11 @@
 import logging
 
-from .base import DownloadAdapter
+from .base import BaseDownloadAdapter
 
 logger = logging.getLogger(__name__)
 
 
-class PgDumpAdapter(DownloadAdapter):
+class PgDumpAdapter(BaseDownloadAdapter):
 
     def set_args(self, schema_name, table_name):
         # command line for pg_dump:

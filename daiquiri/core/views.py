@@ -1,4 +1,8 @@
-from django.contrib.auth.mixins import PermissionRequiredMixin as DjangoPermissionRequiredMixin
+from django.conf import settings
+from django.contrib.auth.mixins import (
+    AccessMixin,
+    PermissionRequiredMixin as DjangoPermissionRequiredMixin
+)
 from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
@@ -48,3 +52,12 @@ class ModelPermissionMixin(PermissionRedirectMixin, DjangoPermissionRequiredMixi
 
 class ObjectPermissionMixin(PermissionRedirectMixin, RulesPermissionRequiredMixin, object):
     pass
+
+
+class AnonymousAccessMixin(AccessMixin):
+    anonymous_setting = None
+
+    def dispatch(self, request, *args, **kwargs):
+        if not getattr(settings, self.anonymous_setting) and not request.user.is_authenticated:
+            return self.handle_no_permission()
+        return super(AnonymousAccessMixin, self).dispatch(request, *args, **kwargs)

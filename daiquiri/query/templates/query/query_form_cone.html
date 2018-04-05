@@ -33,11 +33,18 @@
 
 <div class="row">
     <formgroup
-        class="col-md-9"
+        class="col-md-6"
         data-type="text"
         data-label="{% trans 'Table name' %}"
         data-model="service.forms.cone.values.table_name"
         data-errors="service.forms.cone.errors.table_name">
+    </formgroup>
+    <formgroup
+        class="col-md-3"
+        data-type="text"
+        data-label="{% trans 'Run id' %}"
+        data-model="service.forms.cone.values.run_id"
+        data-errors="service.forms.cone.errors.run_id">
     </formgroup>
     <formgroup
         class="col-md-3"

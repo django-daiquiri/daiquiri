@@ -59,7 +59,7 @@ class Job(models.Model):
 
     response_format = models.CharField(max_length=64, blank=True, null=True)
     max_records = models.IntegerField(blank=True, null=True)
-    run_id = models.CharField(max_length=64, blank=True, null=True)
+    run_id = models.CharField(max_length=64, blank=True, default='')
 
     phase = models.CharField(max_length=10, choices=PHASE_CHOICES)
 

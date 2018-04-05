@@ -1,6 +1,6 @@
 {% load i18n %}
 
-<div class="modal" id="remove-job-modal" tabindex="-1">
+<div class="modal" id="archive-job-modal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -8,14 +8,14 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
                 <h4 class="modal-title">
-                    {% trans 'Remove job' %}
+                    {% trans 'Archive job' %}
                 </h4>
             </div>
 
             <div class="modal-body">
                 <p>
-                    {% blocktrans trimmed with table_name='{$ service.job.table_name $}' %}
-                    You are about to remove the job `{{ table_name }}`.
+                    {% blocktrans trimmed with table_name='{$ service.values.table_name $}' %}
+                    You are about to archive the job <code>{{ table_name }}</code>.
                     {% endblocktrans %}
                 </p>
                 <p class="text-danger">
@@ -28,8 +28,8 @@
                     {% trans 'Close' %}
                 </button>
                 <button type="button" class="btn btn-danger"
-                        ng-click="service.removeJob()">
-                    {% trans 'Remove' %}
+                        ng-click="service.archive_job()">
+                    {% trans 'Archive' %}
                 </button>
             </div>
         </div>

@@ -14,7 +14,7 @@
         </div>
     </div>
     <div class="panel-footer">
-        <a href="" ng-click="service.forms.sql.copyQuery(service.job.query_language, service.job.query)">
+        <a href="" ng-click="service.forms.sql.copy_query(service.job.query_language, service.job.query)">
             {% trans 'Open new query form with this query' %}
         </a>
     </div>
@@ -32,7 +32,7 @@
                 'text-warning': service.job.phase == 'TIMEOUT',
                 'text-danger': service.job.phase == 'ERROR',
                 'text-info': service.job.phase == 'QUEUED'}">
-                {$ service.job.phase $}
+                {$ (service.phases|filter: {'id': service.job.phase})[0].text $}
             </dd>
 
             <div ng-show="service.job.phase == 'ERROR'">
@@ -75,18 +75,18 @@
     </div>
     <div class="panel-footer">
         <div ng-show="service.job.phase == 'COMPLETED'">
-            <a href="" ng-click="service.showModal('rename-job', service.job)">
+            <a href="" ng-click="service.modal('update-job-modal')">
                 {% trans 'Rename the job\'s result table or run id' %}
             </button>
         </div>
         <div ng-show="service.job.phase == 'EXECUTING' || service.job.phase == 'PENDING' || service.job.phase == 'QUEUED'">
-            <a href="" ng-click="service.showModal('abort-job', service.job)">
+            <a href="" ng-click="service.modal('abort-job-modal')">
                 {% trans 'Abort the job' %}
             </a>
         </div>
         <div ng-hide="service.job.phase == 'EXECUTING' || service.job.phase == 'PENDING' || service.job.phase == 'QUEUED'">
-            <a href="" ng-click="service.showModal('remove-job', service.job)">
-                {% trans 'Remove the job' %}
+            <a href="" ng-click="service.modal('archive-job-modal')">
+                {% trans 'Archive the job' %}
             </a>
         </div>
     </div>

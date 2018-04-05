@@ -1,11 +1,11 @@
 import logging
 
-from .base import DownloadAdapter
+from .base import BaseDownloadAdapter
 
 logger = logging.getLogger(__name__)
 
 
-class MysqldumpAdapter(DownloadAdapter):
+class MysqldumpAdapter(BaseDownloadAdapter):
 
     def set_args(self, schema_name, table_name):
         self.args = ['mysqldump', '--compact', '--skip-extended-insert']

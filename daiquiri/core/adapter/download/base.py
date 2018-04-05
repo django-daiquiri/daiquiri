@@ -5,14 +5,13 @@ import subprocess
 import re
 
 from django.conf import settings
-from django.urls import reverse
 
 from daiquiri.core.generators import generate_csv, generate_votable
 
 logger = logging.getLogger(__name__)
 
 
-class DownloadAdapter(object):
+class BaseDownloadAdapter(object):
 
     def __init__(self, database_key, database_config):
         self.database_key = database_key

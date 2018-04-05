@@ -94,6 +94,7 @@ class QueryJobCreateSerializer(serializers.ModelSerializer):
     queue = serializers.CharField(required=False, validators=[QueueValidator()])
     query_language = serializers.CharField(required=True, validators=[QueryLanguageValidator()])
     query = serializers.CharField(required=True)
+    run_id = serializers.CharField(default='')
 
     class Meta:
         model = QueryJob

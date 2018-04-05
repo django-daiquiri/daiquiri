@@ -14,6 +14,7 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
         examples: $resource(baseurl + 'query/api/examples/user/'),
         queues: $resource(baseurl + 'query/api/queues/'),
         querylanguages: $resource(baseurl + 'query/api/querylanguages/'),
+        phases: $resource(baseurl + 'query/api/phases/'),
         schemas: $resource(baseurl + 'metadata/api/schemas/user/'),
         functions: $resource(baseurl + 'metadata/api/functions/user/'),
     };
@@ -28,7 +29,8 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
     /* create the query service */
 
     var service = {
-        show: {null: true},
+        first_form: null,
+        show: {'': true},
         forms: {},
         dropdowns: {},
         values: {},
@@ -46,12 +48,20 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
             resources.forms.query(function(response) {
                 angular.forEach(response, function(form) {
                     service.forms[form.key] = $injector.get(form.form_service);
+
+                    // remember the first form
+                    if (!service.first_form) {
+                        service.first_form = service.forms[form.key];
+                    }
                 });
 
-                service.first_form = service.forms[response[0].key]
-                service.activateFirstForm();
+                // activate the first form
+                service.first_form.activate();
             });
         });
+
+        // fetch job phases
+        service.phases = resources.phases.query();
 
         // load dropdowns
         resources.dropdowns.query(function(response) {
@@ -62,7 +72,7 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
         });
 
         // fetch status
-        service.fetchStatus();
+        service.fetch_status();
 
         // fetch functions
         resources.functions.query(function(response) {
@@ -90,11 +100,11 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
             });
 
             // load user schema when schemas have been fetched
-            service.fetchUserSchema();
+            service.fetch_user_schema();
         });
 
         // fetch joblist
-        service.fetchJobs();
+        service.fetch_jobs();
 
         // activate overview tab
         service.tab = 'overview';
@@ -102,9 +112,9 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
         // start the polling service
         service.polling = PollingService
         service.polling.init();
-        service.polling.register('status', service.fetchStatus, {}, true, false);
-        service.polling.register('jobs', service.fetchJobs, {}, true, false);
-        service.polling.register('schema', service.fetchUserSchema, {}, true, false);
+        service.polling.register('status', service.fetch_status, {}, true, false);
+        service.polling.register('jobs', service.fetch_jobs, {}, true, false);
+        service.polling.register('schema', service.fetch_user_schema, {}, true, false);
 
         // load the other services
         service.table = TableService;
@@ -112,13 +122,13 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
         service.downloads = DownloadService;
     };
 
-    service.fetchStatus = function() {
+    service.fetch_status = function() {
         return resources.status.query(function(response) {
             service.status = response[0];
         }).$promise;
     };
 
-    service.fetchUserSchema = function() {
+    service.fetch_user_schema = function() {
         return resources.jobs.query({
             'detail_route': 'tables'
         }, function(response) {
@@ -138,31 +148,37 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
         }).$promise;
     }
 
-    service.fetchJobs = function() {
-        return resources.jobs.query(function(response) {
-            service.jobs = response;
+    service.fetch_jobs = function() {
+        return resources.jobs.paginate({
+            page_size: 1000,
+            archived: ''
+        }, function(response) {
+            service.jobs = response.results;
 
             service.run_ids = service.jobs.map(function(job) {
                 return job.run_id;
             }).filter(function(run_id, index, run_ids) {
                 return run_id && run_ids.indexOf(run_id) == index;
             }).sort();
-            service.run_ids.push(null);
+            service.run_ids.push('');
 
             if (service.job) {
+                // show the run id of the current job
+                service.show[service.job.run_id] = true;
+
                 // get the current job from the jobs list
                 var current_job = $filter('filter')(service.jobs, {'id': service.job.id})[0];
 
                 // if the phase has changed, fetch it again
                 if (current_job && current_job.phase != service.job.phase) {
-                    service.activateJob(service.job);
+                    service.activate_job(service.job);
                 }
             }
 
         }).$promise;
     };
 
-    service.fetchJob = function(job) {
+    service.fetch_job = function(job) {
         return resources.jobs.get({id: job.id}, function(response) {
             service.job = response;
 
@@ -171,32 +187,41 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
 
             if (angular.isUndefined(jobs_job) || jobs_job.phase != service.job.phase) {
                 // if the phase has changed, fetch the job list again
-                service.fetchJobs();
+                service.fetch_jobs();
             }
         }).$promise;
     };
 
-    service.activateForm = function(key) {
+    service.activate_form = function(key) {
+        // this function should be called from the form service
         service.form = key;
         service.job = null;
     };
 
-    service.activateFirstForm = function() {
-        service.first_form.activate();
+    service.submit_job = function(values) {
+        // this function should be called from the form service
+        values = angular.extend({}, values, {
+            'queue': service.active_queue
+        });
+
+        return resources.jobs.save(values).$promise.then(function(job) {
+            service.fetch_status();
+            service.activate_job(job);
+        });
     };
 
-    service.activateJob = function(job) {
+    service.activate_job = function(job) {
         service.form = null;
-        service.fetchJob(job).then(function() {
+        service.fetch_job(job).then(function() {
             service.table.ready = false;
             service.plot.ready = false;
 
             if (service.job.phase == 'COMPLETED') {
                 // re-init current tab
-                service.initTab(service.tab);
+                service.init_tab(service.tab);
             } else {
                 // activate overview tab
-                service.activateTab('overview');
+                service.activate_tab('overview');
             }
 
             CodeMirror.runMode(service.job.query, "text/x-sql", angular.element('#query')[0]);
@@ -210,45 +235,31 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
         });
     };
 
-    service.submitJob = function(values) {
-        values = angular.extend({}, values, {
-            'queue': service.active_queue
-        });
-
-        return resources.jobs.save(values).$promise.then(function(job) {
-            service.fetchStatus();
-            service.activateJob(job);
-        });
-    };
-
-    service.showModal = function(modal, job) {
+    service.modal = function(modal_id) {
         service.errors = {};
+        service.values = service.job;
 
-        if (angular.isDefined(job)) {
-            service.values = job;
-        }
-
-        $('#' + modal + '-modal').modal('show');
+        $('#' + modal_id).modal('show');
     };
 
-    service.updateJob = function() {
+    service.update_job = function() {
         resources.jobs.update({id: service.values.id}, service.values).$promise.then(function() {
-            service.fetchJobs();
+            service.fetch_jobs();
             $('.modal').modal('hide');
         }, function(response) {
             service.errors = response.data;
         });
     };
 
-    service.abortJob = function() {
+    service.abort_job = function() {
         resources.jobs.update({id: service.values.id, detail_route: 'abort'}, {}, function() {
-            service.fetchStatus();
-            service.fetchJobs();
+            service.fetch_status();
+            service.fetch_jobs();
             $('.modal').modal('hide');
         });
     };
 
-    service.removeJob = function() {
+    service.archive_job = function() {
         var index = service.jobs.indexOf($filter('filter')(service.jobs, {
             'id': service.job.id
         })[0]);
@@ -261,25 +272,25 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
         }
 
         resources.jobs.delete({id: service.values.id}, function() {
-            service.fetchStatus();
-            service.fetchJobs();
+            service.fetch_status();
+            service.fetch_jobs();
 
             if (next_job) {
-                service.activateJob(next_job);
+                service.activate_job(next_job);
             } else {
-                service.activateFirstForm();
+                service.first_form.activate();
             }
 
             $('.modal').modal('hide');
         });
     };
 
-    service.activateTab = function(tab) {
-        service.initTab(tab);
+    service.activate_tab = function(tab) {
+        service.init_tab(tab);
         service.tab = tab;
     };
 
-    service.initTab = function(tab) {
+    service.init_tab = function(tab) {
         if (tab == 'results') {
             if (!service.table.ready) {
                 if (service.job && service.job.phase == 'COMPLETED') {
