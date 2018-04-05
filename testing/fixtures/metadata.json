@@ -40,6 +40,26 @@
     "pk": 3,
     "fields": {
       "order": 3,
+      "name": "daiquiri_data_test",
+      "title": "A schema of test data.",
+      "description": null,
+      "long_description": null,
+      "attribution": null,
+      "license": null,
+      "doi": null,
+      "utype": null,
+      "access_level": "PRIVATE",
+      "metadata_access_level": "PRIVATE",
+      "groups": [
+        2
+      ]
+    }
+  },
+  {
+    "model": "daiquiri_metadata.schema",
+    "pk": 4,
+    "fields": {
+      "order": 4,
       "name": "daiquiri_archive",
       "title": null,
       "description": "A generated archive of files",
@@ -60,7 +80,7 @@
     "pk": 1,
     "fields": {
       "schema": 1,
-      "order": 0,
+      "order": 1,
       "name": "stars",
       "title": null,
       "description": null,
@@ -80,7 +100,7 @@
     "pk": 2,
     "fields": {
       "schema": 2,
-      "order": 0,
+      "order": 1,
       "name": "halos",
       "title": null,
       "description": null,
@@ -100,7 +120,29 @@
     "pk": 3,
     "fields": {
       "schema": 3,
-      "order": 0,
+      "order": 1,
+      "name": "test",
+      "title": null,
+      "description": null,
+      "long_description": null,
+      "attribution": null,
+      "license": null,
+      "doi": null,
+      "type": "table",
+      "utype": null,
+      "access_level": "PRIVATE",
+      "metadata_access_level": "PRIVATE",
+      "groups": [
+        2
+      ]
+    }
+  },
+  {
+    "model": "daiquiri_metadata.table",
+    "pk": 4,
+    "fields": {
+      "schema": 4,
+      "order": 1,
       "name": "files",
       "title": null,
       "description": null,
@@ -119,10 +161,10 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 10,
+    "pk": 11,
     "fields": {
       "table": 1,
-      "order": 0,
+      "order": 1,
       "name": "id",
       "description": "unique identifier",
       "unit": null,
@@ -140,10 +182,10 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 11,
+    "pk": 12,
     "fields": {
       "table": 1,
-      "order": 1,
+      "order": 2,
       "name": "ra",
       "description": "Right ascension",
       "unit": "Angle[deg]",
@@ -161,10 +203,10 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 12,
+    "pk": 13,
     "fields": {
       "table": 1,
-      "order": 2,
+      "order": 3,
       "name": "dec",
       "description": "Declination",
       "unit": "Angle[deg]",
@@ -182,10 +224,10 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 13,
+    "pk": 14,
     "fields": {
       "table": 1,
-      "order": 3,
+      "order": 4,
       "name": "parallax",
       "description": "Parallax",
       "unit": "Angle[mas]",
@@ -203,10 +245,10 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 20,
+    "pk": 21,
     "fields": {
       "table": 2,
-      "order": 0,
+      "order": 1,
       "name": "id",
       "description": "unique id for particle",
       "unit": null,
@@ -224,10 +266,10 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 21,
+    "pk": 22,
     "fields": {
       "table": 2,
-      "order": 1,
+      "order": 2,
       "name": "x",
       "description": "comoving position, x-component",
       "unit": "h-1.Mpc",
@@ -245,10 +287,10 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 22,
+    "pk": 23,
     "fields": {
       "table": 2,
-      "order": 2,
+      "order": 3,
       "name": "y",
       "description": "comoving position, y-component",
       "unit": "h-1.Mpc",
@@ -266,10 +308,10 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 23,
+    "pk": 24,
     "fields": {
       "table": 2,
-      "order": 3,
+      "order": 4,
       "name": "z",
       "description": "comoving position, z-component",
       "unit": "h-1.Mpc",
@@ -287,10 +329,10 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 24,
+    "pk": 25,
     "fields": {
       "table": 2,
-      "order": 4,
+      "order": 5,
       "name": "vx",
       "description": "peculiar velocity, x-component",
       "unit": "km/s",
@@ -308,10 +350,10 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 25,
+    "pk": 26,
     "fields": {
       "table": 2,
-      "order": 5,
+      "order": 6,
       "name": "vy",
       "description": "peculiar velocity, y-component",
       "unit": "km/s",
@@ -329,10 +371,10 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 26,
+    "pk": 27,
     "fields": {
       "table": 2,
-      "order": 6,
+      "order": 7,
       "name": "vz",
       "description": "peculiar velocity, z-component",
       "unit": "km/s",
@@ -350,10 +392,10 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 27,
+    "pk": 28,
     "fields": {
       "table": 2,
-      "order": 7,
+      "order": 8,
       "name": "mass",
       "description": "total mass of the FOF group",
       "unit": "h-1.solMass",
@@ -371,10 +413,76 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 30,
+    "pk": 31,
     "fields": {
       "table": 3,
-      "order": 0,
+      "order": 1,
+      "name": "id",
+      "description": null,
+      "unit": null,
+      "ucd": null,
+      "utype": null,
+      "datatype": "long",
+      "arraysize": null,
+      "principal": false,
+      "indexed": true,
+      "std": false,
+      "index_for": null,
+      "access_level": "",
+      "metadata_access_level": "",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_metadata.column",
+    "pk": 32,
+    "fields": {
+      "table": 3,
+      "order": 2,
+      "name": "array",
+      "description": null,
+      "unit": null,
+      "ucd": null,
+      "utype": null,
+      "datatype": null,
+      "arraysize": null,
+      "principal": false,
+      "indexed": false,
+      "std": false,
+      "index_for": null,
+      "access_level": "",
+      "metadata_access_level": "",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_metadata.column",
+    "pk": 33,
+    "fields": {
+      "table": 3,
+      "order": 3,
+      "name": "matrix",
+      "description": null,
+      "unit": null,
+      "ucd": null,
+      "utype": null,
+      "datatype": null,
+      "arraysize": null,
+      "principal": false,
+      "indexed": false,
+      "std": false,
+      "index_for": null,
+      "access_level": "",
+      "metadata_access_level": "",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_metadata.column",
+    "pk": 41,
+    "fields": {
+      "table": 4,
+      "order": 1,
       "name": "id",
       "description": "unique identifier",
       "unit": null,
@@ -394,10 +502,10 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 31,
+    "pk": 42,
     "fields": {
-      "table": 3,
-      "order": 1,
+      "table": 4,
+      "order": 2,
       "name": "timestamp",
       "description": null,
       "unit": null,
@@ -417,10 +525,10 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 32,
+    "pk": 43,
     "fields": {
-      "table": 3,
-      "order": 2,
+      "table": 4,
+      "order": 3,
       "name": "file",
       "description": null,
       "unit": null,
@@ -440,10 +548,10 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 33,
+    "pk": 44,
     "fields": {
-      "table": 3,
-      "order": 3,
+      "table": 4,
+      "order": 4,
       "name": "collection",
       "description": null,
       "unit": null,
@@ -463,10 +571,10 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 34,
+    "pk": 45,
     "fields": {
-      "table": 3,
-      "order": 4,
+      "table": 4,
+      "order": 5,
       "name": "path",
       "description": null,
       "unit": null,
@@ -486,10 +594,10 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 35,
+    "pk": 46,
     "fields": {
-      "table": 3,
-      "order": 5,
+      "table": 4,
+      "order": 6,
       "name": "ra",
       "description": "Right ascension",
       "unit": "Angle[deg]",
@@ -509,10 +617,10 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 36,
+    "pk": 47,
     "fields": {
-      "table": 3,
-      "order": 6,
+      "table": 4,
+      "order": 7,
       "name": "dec",
       "description": "Declination",
       "unit": "Angle[deg]",
