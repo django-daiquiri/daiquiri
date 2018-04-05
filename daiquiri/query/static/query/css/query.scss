@@ -44,13 +44,18 @@ p.daiquiri-query-form-help {
         max-height: 400px;
         overflow-y: auto;
 
-        >.daiquiri-query-joblist-group:last-child .list-group-item:last-child {
+        .daiquiri-query-joblist-group:last-child .list-group-item:last-child {
             border-bottom-width: 0;
         }
+
+        .daiquiri-query-joblist-run-id {
+            background-color: #f9f9f9;
+        }
+
     }
 
-    .daiquiri-query-joblist-run-id {
-        background-color: #f9f9f9;
+    .daiquiri-query-joblist-no-jobs .list-group-item {
+        border-bottom-width: 0;
     }
 
     .list-group+.panel-footer {

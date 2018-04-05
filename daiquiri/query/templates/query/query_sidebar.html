@@ -65,13 +65,13 @@
             {% trans 'Job list' %}
         </div>
 
-        <ul class="list-group" ng-if="!service.jobs.length">
+        <ul class="list-group daiquiri-query-joblist-no-jobs" ng-if="!service.jobs.length">
             <li class="list-group-item">
                 {% trans 'No jobs found.' %}
             </li>
         </ul>
 
-        <ul class="list-group daiquiri-query-joblist-jobs">
+        <ul class="list-group daiquiri-query-joblist-jobs" ng-if="service.jobs.length">
             <div class="daiquiri-query-joblist-group" ng-repeat="run_id in service.run_ids">
                 <li class="list-group-item list-group-link" ng-if="service.run_ids[0] !== ''">
                     <a href="" ng-click="service.show[run_id] = !service.show[run_id]"
