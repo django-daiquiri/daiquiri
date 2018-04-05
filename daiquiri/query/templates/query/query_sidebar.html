@@ -60,7 +60,7 @@
         </ul>
     </div>
 
-    <div class="panel panel-default">
+    <div class="panel panel-default daiquiri-query-joblist">
         <div class="panel-heading">
             {% trans 'Job list' %}
         </div>
@@ -71,10 +71,9 @@
             </li>
         </ul>
 
-        <ul class="list-group daiquiri-query-joblist">
+        <ul class="list-group daiquiri-query-joblist-jobs">
             <div class="daiquiri-query-joblist-group" ng-repeat="run_id in service.run_ids">
-
-                <li class="list-group-item list-group-link" ng-if="service.run_ids[0] !== null">
+                <li class="list-group-item list-group-link" ng-if="service.run_ids[0] !== ''">
                     <a href="" ng-click="service.show[run_id] = !service.show[run_id]"
                         class="daiquiri-query-joblist-run-id">
                         <div class="pull-right">
@@ -110,7 +109,6 @@
                     </a>
                 </li>
             </div>
-
         </ul>
 
         <div class="panel-footer">

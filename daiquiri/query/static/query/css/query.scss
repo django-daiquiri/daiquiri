@@ -40,11 +40,21 @@ p.daiquiri-query-form-help {
 }
 
 .daiquiri-query-joblist {
-    max-height: 400px;
-    overflow-y: auto;
+    .daiquiri-query-joblist-jobs {
+        max-height: 400px;
+        overflow-y: auto;
+
+        >.daiquiri-query-joblist-group:last-child .list-group-item:last-child {
+            border-bottom-width: 0;
+        }
+    }
 
     .daiquiri-query-joblist-run-id {
         background-color: #f9f9f9;
+    }
+
+    .list-group+.panel-footer {
+        border-top-width: 1px;
     }
 }
 

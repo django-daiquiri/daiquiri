@@ -7,7 +7,7 @@ app.factory('BoxFormService', ['QueryService', function(QueryService) {
             y_min: 0.0,
             y_max: 50.0,
             z_min: 0.0,
-            z_max: 20.0,
+            z_max: 20.0
         },
         errors: {}
     };
