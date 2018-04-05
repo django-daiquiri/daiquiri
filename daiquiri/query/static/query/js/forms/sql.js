@@ -100,7 +100,14 @@ app.factory('SqlFormService', ['$timeout', '$filter', 'QueryService', 'BrowserSe
         }
 
         var editor = $('.CodeMirror')[0].CodeMirror;
-        editor.replaceSelection(string);
+
+        if (resource == 'examples') {
+            service.values.query = string
+            editor.refresh();
+        } else {
+            editor.replaceSelection(string);
+        }
+
         editor.focus();
         $('.daiquiri-query-dropdowns .btn-group').removeClass('open');
     }
