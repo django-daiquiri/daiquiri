@@ -427,7 +427,6 @@
       "principal": false,
       "indexed": true,
       "std": false,
-      "index_for": null,
       "access_level": "",
       "metadata_access_level": "",
       "groups": []
@@ -449,7 +448,6 @@
       "principal": false,
       "indexed": false,
       "std": false,
-      "index_for": null,
       "access_level": "",
       "metadata_access_level": "",
       "groups": []
@@ -471,7 +469,6 @@
       "principal": false,
       "indexed": false,
       "std": false,
-      "index_for": null,
       "access_level": "",
       "metadata_access_level": "",
       "groups": []
