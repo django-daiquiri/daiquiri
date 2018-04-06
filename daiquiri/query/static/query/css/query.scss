@@ -44,8 +44,8 @@ p.daiquiri-query-form-help {
         max-height: 400px;
         overflow-y: auto;
 
-        .daiquiri-query-joblist-group:last-child .list-group-item:last-child {
-            border-bottom-width: 0;
+        .list-group-link:last-child > a {
+            border-radius: 0;
         }
 
         .daiquiri-query-joblist-run-id {
@@ -54,13 +54,40 @@ p.daiquiri-query-form-help {
 
     }
 
-    .daiquiri-query-joblist-no-jobs .list-group-item {
+    .daiquiri-query-joblist-jobs:last-child {
+        .daiquiri-query-joblist-group {
+            .list-group-link:first-child {
+                // the first li of any group should have a top border
+                border-top-width: 1px;
+            }
+        }
+
+        .daiquiri-query-joblist-group:first-child {
+            .list-group-link:first-child {
+                // the first li of the first group should not have border
+                border-top-width: 0;
+            }
+        }
+
+        .daiquiri-query-joblist-group:last-child {
+            .list-group-link:last-child {
+                > a {
+                    // the link of the last li of the last group should have a border bottom radius
+                    // if no footer is present
+                    border-bottom-right-radius: 4px;
+                    border-bottom-left-radius: 4px;
+                }
+            }
+        }
+    }
+
+    .daiquiri-query-joblist-no-jobs .list-group-link {
         border-bottom-width: 0;
     }
 
-    .list-group+.panel-footer {
-        border-top-width: 1px;
-    }
+    // .list-group+.panel-footer {
+    //     border-top-width: 1px;
+    // }
 }
 
 .daiquiri-query-dropdowns {

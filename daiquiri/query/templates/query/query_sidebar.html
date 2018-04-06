@@ -111,10 +111,12 @@
             </div>
         </ul>
 
+        {% if user.is_authenticated %}
         <div class="panel-footer">
             <a href="{% url 'query:jobs' %}" target="_blank">
                 {% trans 'View verbose job list' %}
             </a>
         </div>
+        {% endif %}
     </div>
 </div>
