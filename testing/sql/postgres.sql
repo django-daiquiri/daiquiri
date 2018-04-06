@@ -70,6 +70,9 @@ ALTER TABLE daiquiri_user_user.test OWNER TO daiquiri_data;
 GRANT USAGE ON SCHEMA daiquiri_archive TO daiquiri_data;
 GRANT SELECT ON ALL TABLES IN SCHEMA daiquiri_archive TO daiquiri_data;
 
+GRANT USAGE ON SCHEMA daiquiri_data_test TO daiquiri_data;
+GRANT SELECT ON ALL TABLES IN SCHEMA daiquiri_data_test TO daiquiri_data;
+
 GRANT USAGE ON SCHEMA daiquiri_data_sim TO daiquiri_data;
 GRANT SELECT ON ALL TABLES IN SCHEMA daiquiri_data_sim TO daiquiri_data;
 
