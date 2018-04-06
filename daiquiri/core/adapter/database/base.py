@@ -3,7 +3,7 @@ import six
 from django.db import connections
 
 
-class DatabaseAdapter(object):
+class BaseDatabaseAdapter(object):
 
     def __init__(self, database_key, database_config):
         self.database_key = database_key

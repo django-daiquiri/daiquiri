@@ -68,9 +68,8 @@ angular.module('core')
     };
 
     service.search = function() {
-        service.params.page = 1;
         service.params.search = service.search_string;
-        service.fetch();
+        service.reload();
     };
 
     service.order = function(column_name) {
@@ -79,15 +78,17 @@ angular.module('core')
         } else {
             service.params.ordering = column_name;
         }
-
-        service.params.page = 1;
-        service.fetch();
+        service.reload();
     };
 
     service.reset = function() {
         service.params.page = 1;
         service.params.ordering = null;
-        service.params.search = null;
+        service.reload();
+    };
+
+    service.reload = function() {
+        service.params.page = 1;
         service.fetch();
     };
 

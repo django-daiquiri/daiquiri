@@ -4,12 +4,12 @@ import warnings
 
 from django.db import OperationalError, ProgrammingError
 
-from .base import DatabaseAdapter
+from .base import BaseDatabaseAdapter
 
 logger = logging.getLogger(__name__)
 
 
-class MySQLAdapter(DatabaseAdapter):
+class MySQLAdapter(BaseDatabaseAdapter):
 
     DATATYPES = {
         'char': {

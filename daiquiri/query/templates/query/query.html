@@ -67,22 +67,22 @@
 
                 <ul class="nav nav-tabs daiquiri-query-job-tabs">
                     <li role="presentation" ng-class="{active: service.tab == 'overview'}">
-                        <a href="" ng-click="service.activateTab('overview')">
+                        <a href="" ng-click="service.activate_tab('overview')">
                             {% trans 'Job overview' %}
                         </a>
                     </li>
                     <li role="presentation" ng-class="{active: service.tab == 'results'}" ng-show="service.job.phase == 'COMPLETED'">
-                        <a href="" ng-click="service.activateTab('results');">
+                        <a href="" ng-click="service.activate_tab('results');">
                             {% trans 'Results table' %}
                         </a>
                     </li>
                     <li role="presentation" ng-class="{active: service.tab == 'plot'}" ng-show="service.job.phase == 'COMPLETED'">
-                        <a href="" ng-click="service.activateTab('plot');">
+                        <a href="" ng-click="service.activate_tab('plot');">
                             {% trans 'Plot' %}
                         </a>
                     </li>
                     <li role="presentation" ng-class="{active: service.tab == 'download'}" ng-show="service.job.phase == 'COMPLETED'">
-                        <a href="" ng-click="service.activateTab('download');">
+                        <a href="" ng-click="service.activate_tab('download');">
                             {% trans 'Download' %}
                         </a>
                     </li>
@@ -108,6 +108,6 @@
 
 {% include 'query/query_modal_update_job.html' %}
 {% include 'query/query_modal_abort_job.html' %}
-{% include 'query/query_modal_remove_job.html' %}
+{% include 'query/query_modal_archive_job.html' %}
 
 {% endblock %}

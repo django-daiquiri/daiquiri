@@ -3,7 +3,7 @@
     "model": "daiquiri_query.example",
     "pk": 1,
     "fields": {
-      "order": 0,
+      "order": 1,
       "name": "Select all stars from daiquiri_data_obs.stars",
       "description": "",
       "query_language": "adql-2.0",
@@ -16,7 +16,7 @@
     "model": "daiquiri_query.example",
     "pk": 2,
     "fields": {
-      "order": 1,
+      "order": 2,
       "name": "Select all particles from daiquiri_data_sim.particles",
       "description": "",
       "query_language": "adql-2.0",
@@ -29,7 +29,22 @@
     "model": "daiquiri_query.example",
     "pk": 3,
     "fields": {
-      "order": 2,
+      "order": 3,
+      "name": "Select all particles from daiquiri_data_test.test",
+      "description": "",
+      "query_language": "adql-2.0",
+      "query_string": "SELECT id, \"array\", matrix FROM daiquiri_data_test.test",
+      "access_level": "PRIVATE",
+      "groups": [
+        2
+      ]
+    }
+  },
+  {
+    "model": "daiquiri_query.example",
+    "pk": 4,
+    "fields": {
+      "order": 4,
       "name": "Select all particles from daiquiri_archive.files",
       "description": "",
       "query_language": "adql-2.0",

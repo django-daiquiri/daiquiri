@@ -33,11 +33,18 @@
 
 <div class="row">
     <formgroup
-        class="col-md-9"
+        class="col-md-6"
         data-type="text"
         data-label="{% trans 'Table name' %}"
         data-model="service.forms.cone.values.table_name"
         data-errors="service.forms.cone.errors.table_name">
+    </formgroup>
+    <formgroup
+        class="col-md-3"
+        data-type="text"
+        data-label="{% trans 'Run id' %}"
+        data-model="service.forms.cone.values.run_id"
+        data-errors="service.forms.cone.errors.run_id">
     </formgroup>
     <formgroup
         class="col-md-3"
@@ -50,9 +57,12 @@
 </div>
 
 <button class="btn btn-primary" ng-click="service.forms.cone.submit()">
-    {% trans 'Submit new cone search' %}
+    {% trans 'Submit new cone search' %} <submitting />
 </button>
 
-<button class="btn btn-default" ng-click="">
-    {% trans 'Clear input window' %}
-</button>
+<p class="text-danger" ng-show="service.forms.cone.errors.detail">
+    {$ service.forms.cone.errors.detail $}
+</p>
+<p class="text-danger" ng-show="service.forms.cone.errors.server_error">
+    {% trans 'There has been an error on the server. Please contact the maintainers of this site, if the problem persists.' %}
+</p>

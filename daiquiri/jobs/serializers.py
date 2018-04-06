@@ -53,7 +53,7 @@ class SyncJobSerializer(CaseInsensitiveSerializer):
 
     RESPONSEFORMAT = serializers.CharField(required=False)
     MAXREC = serializers.IntegerField(required=False)
-    RUNID = serializers.CharField(required=False)
+    RUNID = serializers.CharField(required=False, default='')
 
 
 class AsyncJobSerializer(CaseInsensitiveSerializer):
@@ -61,4 +61,4 @@ class AsyncJobSerializer(CaseInsensitiveSerializer):
     PHASE = serializers.CharField(required=False)
     RESPONSEFORMAT = serializers.CharField(required=False)
     MAXREC = serializers.IntegerField(required=False)
-    RUNID = serializers.CharField(required=False)
+    RUNID = serializers.CharField(required=False, default='')

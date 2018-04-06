@@ -1,0 +1,102 @@
+{% load i18n %}
+
+<div class="modal" id="show-job-modal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">
+                    {% trans 'Job parameters' %}
+                </h4>
+            </div>
+
+            <div class="modal-body">
+                <dl class="dl-horizontal">
+                    <dt>{% trans 'Job status' %}</dt>
+                    <dd ng-class="{
+                        'text-success': service.job.phase == 'COMPLETED',
+                        'text-warning': service.job.phase == 'TIMEOUT',
+                        'text-danger': service.job.phase == 'ERROR',
+                        'text-info': service.job.phase == 'QUEUED'}">
+                        {$ (service.phases|filter: {'id': service.job.phase})[0].text $}
+                    </dd>
+
+                    <div ng-show="service.job.phase == 'ERROR'">
+                        <dt>{% trans 'Error' %}</dt>
+                        <dd class="text-danger">{$ service.job.error_summary $}</dd>
+                    </div>
+
+                    <div class="modal-seperator"></div>
+
+                    <dt>{% trans 'Internal job id' %}</dt>
+                    <dd>{$ service.job.id $}</dd>
+
+                    <dt>{% trans 'Schema name' %}</dt>
+                    <dd>{$ service.job.schema_name $}</dd>
+
+                    <dt>{% trans 'Table name' %}</dt>
+                    <dd>{$ service.job.table_name $}</dd>
+
+                    <div class="modal-seperator"></div>
+
+                    <dt>{% trans 'Time submitted' %}</dt>
+                    <dd>{$ service.job.creation_time | date:'medium' $}</dd>
+
+                    <dt>{% trans 'Queue' %}</dt>
+                    <dd>{$ (service.queues|filter: {'id': service.job.queue})[0].text $}</dd>
+
+                    <div ng-show="service.job.start_time && service.job.creation_time">
+                        <dt>{% trans 'Time in queue' %}</dt>
+                        <dd>{$ service.job.time_queue $} s</dd>
+                    </div>
+
+                    <div ng-show="service.job.end_time && service.job.start_time">
+                        <dt>{% trans 'Time for query' %}</dt>
+                        <dd>{$ service.job.time_query $} s</dd>
+                    </div>
+
+                    <div ng-show="service.job.nrows != null">
+                        <dt>{% trans 'Number of rows' %}</dt>
+                        <dd>{$ service.job.nrows $}</dd>
+                    </div>
+
+                    <div ng-show="service.job.size != null">
+                        <dt>{% trans 'Size of the table' %}</dt>
+                        <dd>{$ service.job.size | bytes $}</dd>
+                    </div>
+
+                    <div class="modal-seperator"></div>
+
+                    <dt>{% trans 'Query' %}</dt>
+                    <dd>
+                        <div class="cm-s-default" id="query">
+                            {$ service.job.query $}
+                        </div>
+                    </dd>
+
+                    <dt>{% trans 'Native query' %}</dt>
+                    <dd>
+                        <div class="cm-s-default" id="native-query">
+                            {$ service.job.native_query $}
+                        </div>
+                    </dd>
+
+                    <dt>{% trans 'Actual query' %}</dt>
+                    <dd>
+                        <div class="cm-s-default" id="actual-query">
+                            {$ service.job.actual_query $}
+                        </div>
+                    </dd>
+                </dl>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    {% trans 'Close' %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

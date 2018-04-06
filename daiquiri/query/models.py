@@ -212,10 +212,11 @@ class QueryJob(Job):
             except QuerySyntaxError as e:
                 raise ValidationError({
                     'query': {
-                        'messages': [_('There has been an error while parsing your query.')],
+                        'messages': [_('There has been an error while translating your query.')],
                         'positions': json.dumps(e.syntax_errors),
                     }
                 })
+
             except QueryError as e:
                 raise ValidationError({
                     'query': {
@@ -252,6 +253,7 @@ class QueryJob(Job):
                     'positions': json.dumps(e.syntax_errors),
                 }
             })
+
         except QueryError as e:
             raise ValidationError({
                 'query': {

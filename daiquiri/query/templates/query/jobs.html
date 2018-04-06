@@ -1,0 +1,133 @@
+{% extends 'core/wide.html' %}
+{% load staticfiles %}
+{% load i18n %}
+{% load compress %}
+{% load core_tags %}
+
+{% block bodyargs %}
+    ng-app="jobs"
+    ng-controller="JobsController"
+{% endblock %}
+
+{% block headextra %}
+    {% vendor 'angular' %}
+    {% vendor 'ng-infinite-scroll' %}
+    {% vendor 'codemirror' %}
+
+    {% compress css %}
+    <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/list.scss' %}" />
+    <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/codemirror.scss' %}" />
+    <link rel="stylesheet" type="text/x-scss" href="{% static 'query/css/jobs.scss' %}" />
+    {% endcompress css %}
+
+    {% compress js %}
+    <script type="text/javascript" src="{% static 'core/js/core.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'core/js/list.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'core/js/filter.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'core/js/multiCheckbox.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'core/js/byNumber.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'core/js/formgroup.js' %}" ></script>
+
+    <script type="text/javascript" src="{% static 'query/js/apps/jobs.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'query/js/services/jobs.js' %}" ></script>
+    {% endcompress js %}
+{% endblock %}
+
+{% block wide %}
+
+    <div ng-cloak ng-show="service.list.ready">
+
+        <h1>Query jobs</h1>
+
+        <div class="daiquiri-list">
+            <div class="row daiquiri-list-header">
+                <form class="col-sm-6" ng-submit="service.list.search()">
+                    <div class="input-group">
+                        <input class="form-control"
+                               id="table-pager-search-input"
+                               placeholder="{% trans 'Search jobs' %}"
+                               type="text" ng-model="service.list.search_string">
+                        <a href="" class="input-group-addon" ng-click="service.list.search()">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                </form>
+                <div class="col-sm-6">
+                    <p class="count">
+                        {$ service.list.count $} {% trans 'jobs found' %}
+                    </p>
+                    <ul class="pagination pull-right">
+                        <li>
+                            <a href="" ng-click="service.list.reset()">{% trans 'Reset' %}</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-sm-12">
+                    <div class="daiquiri-query-jobs-phases">
+                        <strong>{% trans 'Filter phases' %}:</strong>
+                        <label ng-repeat="phase in service.phases">
+                            <input type="checkbox" autocomplete="off"
+                                ng-model="service.selected[phase.id]"
+                                ng-change="service.reload();">
+                            {$ phase.text $}
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive" ng-if="service.ready">
+                <table class="table daiquiri-list-table" infinite-scroll="service.list.fetch()" infinite-scroll-distance="0.2">
+                    <thead>
+                        <th style="width: 25%" data-order-list="id">{% trans 'ID' %}</th>
+                        <th style="width: 10%" data-order-list="run_id">{% trans 'Run ID' %}</th>
+                        <th style="width: 20%" data-order-list="table_name">{% trans 'Table' %}</th>
+                        <th style="width: 10%" data-order-list="phase">{% trans 'Phase' %}</th>
+                        <th style="width: 20%" data-order-list="creation_time">{% trans 'Created' %}</th>
+                        <th style="width: 10%"></th>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="row in service.list.rows">
+                            <td>
+                                <a href="" ng-click="service.modal('show-job-modal', $index)">{$ row.id $}</a>
+                            </td>
+                            <td>{$ row.run_id $}</td>
+                            <td>{$ row.table_name $}</td>
+                            <td ng-class="{
+                                'text-success': row.phase == 'COMPLETED',
+                                'text-warning': row.phase == 'TIMEOUT',
+                                'text-danger': row.phase == 'ERROR',
+                                'text-info': row.phase == 'QUEUED'
+                            }">
+                                {$ service.phase_map[row.phase] $}
+                            </td>
+                            <td>{$ row.creation_time | date:'medium' $}</td>
+                            <td class="text-right list-table-options">
+                                <a href="" class="fa fa-eye" title="{% trans 'Show job' %}"
+                                    ng-click="service.modal('show-job-modal', $index)">
+                                </a>
+                                <a href="" class="fa fa-pencil" title="{% trans 'Update job' %}"
+                                    ng-click="service.modal('update-job-modal', $index)"
+                                    ng-show="row.phase == 'COMPLETED'">
+                                </a>
+                                <a href="{% url 'query:query' %}" class="fa fa-repeat" target="_blank"
+                                    title="{% trans 'Open new query form with this query' %}"
+                                    ng-click="service.copy_query(row.id)">
+                                </a>
+                                <a href="" class="fa fa-remove" title="{% trans 'Archive job' %}"
+                                    ng-click="service.modal('archive-job-modal', $index)"
+                                    ng-show="row.phase != 'ARCHIVED'">
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {% include 'query/jobs_modal_show_job.html' %}
+    {% include 'query/query_modal_update_job.html' %}
+    {% include 'query/query_modal_abort_job.html' %}
+    {% include 'query/query_modal_archive_job.html' %}
+
+{% endblock %}

@@ -73,11 +73,18 @@
 
 <div class="row">
     <formgroup
-        class="col-md-9"
+        class="col-md-6"
         data-type="text"
         data-label="{% trans 'Table name' %}"
         data-model="service.forms.box.values.table_name"
         data-errors="service.forms.box.errors.table_name">
+    </formgroup>
+    <formgroup
+        class="col-md-3"
+        data-type="text"
+        data-label="{% trans 'Run id' %}"
+        data-model="service.forms.box.values.run_id"
+        data-errors="service.forms.box.errors.run_id">
     </formgroup>
     <formgroup
         class="col-md-3"
@@ -90,5 +97,12 @@
 </div>
 
 <button class="btn btn-primary" ng-click="service.forms.box.submit()">
-    {% trans 'Submit new box search' %}
+    {% trans 'Submit new box search' %} <submitting />
 </button>
+
+<p class="text-danger" ng-if="service.forms.box.errors.detail">
+    {$ service.forms.box.errors.detail $}
+</p>
+<p class="text-danger" ng-if="service.forms.box.errors.server_error">
+    {% trans 'There has been an error on the server. Please contact the maintainers of this site, if the problem persists' %}
+</p>

@@ -11,8 +11,13 @@ from rest_framework import viewsets, mixins, filters
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError, NotFound
 from rest_framework.decorators import list_route, detail_route
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
-from rest_framework.throttling import UserRateThrottle
+from rest_framework.authentication import (
+    SessionAuthentication,
+    BasicAuthentication,
+    TokenAuthentication
+)
+
+from django_filters.rest_framework import DjangoFilterBackend
 
 from daiquiri.core.viewsets import ChoicesViewSet, RowViewSetMixin
 from daiquiri.core.permissions import HasModelPermission
@@ -35,9 +40,9 @@ from .serializers import (
     SyncQueryJobSerializer,
     AsyncQueryJobSerializer
 )
-
 from .permissions import HasPermission
 from .utils import get_format_config, get_quota, fetch_user_schema_metadata
+from .filters import JobFilterBackend
 
 
 class StatusViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -74,9 +79,18 @@ class DropdownViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
     permission_classes = (HasPermission, )
     authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
+    pagination_class = ListPagination
+
+    filter_backends = (
+        filters.SearchFilter,
+        filters.OrderingFilter,
+        JobFilterBackend
+    )
+    search_fields = ('id', 'run_id', 'table_name', 'phase')
+    filter_fields = ('phase', )
 
     def get_queryset(self):
-        queryset = QueryJob.objects.filter_by_owner(self.request.user).exclude(phase=QueryJob.PHASE_ARCHIVED)
+        queryset = QueryJob.objects.filter_by_owner(self.request.user).order_by('-creation_time')
 
         # hide TAP jobs in the list for the anonymous user
         if self.action == 'list' and self.request.user.is_anonymous:
@@ -205,7 +219,7 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
 
             # check if the file was lost
             if download_job.phase == download_job.PHASE_COMPLETED and \
-                not os.path.isfile(download_job.file_path):
+                    not os.path.isfile(download_job.file_path):
 
                 # set the phase back to pending so that the file is recreated
                 download_job.phase = download_job.PHASE_PENDING
@@ -258,7 +272,7 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
 
             # check if the file was lost
             if archive_job.phase == archive_job.PHASE_COMPLETED and \
-                not os.path.isfile(archive_job.file_path):
+                    not os.path.isfile(archive_job.file_path):
 
                 # set the phase back to pending so that the file is recreated
                 archive_job.phase = archive_job.PHASE_PENDING
@@ -309,7 +323,6 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
         return response
 
 
-
 class ExampleViewSet(viewsets.ModelViewSet):
     permission_classes = (HasModelPermission, )
     serializer_class = ExampleSerializer
@@ -338,6 +351,12 @@ class QueryLanguageViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     permission_classes = (HasPermission, )
     serializer_class = QueryLanguageSerializer
     queryset = settings.QUERY_LANGUAGES
+
+
+class PhaseViewSet(ChoicesViewSet):
+    permission_classes = (HasPermission, )
+    authentication_classes = (SessionAuthentication, TokenAuthentication)
+    queryset = QueryJob.PHASE_CHOICES
 
 
 class SyncQueryJobViewSet(SyncJobViewSet):

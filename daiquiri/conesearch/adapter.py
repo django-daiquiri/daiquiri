@@ -1,11 +1,11 @@
 from django.conf import settings
 from django.http import FileResponse
-from django.utils.translation import ugettext_lazy as _
 
 from rest_framework.exceptions import NotFound, ValidationError
 
 from daiquiri.core.adapter import DatabaseAdapter
-from daiquiri.core.utils import import_class, make_query_dict_upper_case
+from daiquiri.core.adapter.stream import BaseServiceAdapter
+from daiquiri.core.utils import import_class
 from daiquiri.core.generators import generate_votable
 
 
@@ -13,7 +13,7 @@ def ConeSearchAdapter():
     return import_class(settings.CONESEARCH_ADAPTER)()
 
 
-class BaseConeSearchAdapter(object):
+class BaseConeSearchAdapter(BaseServiceAdapter):
 
     keys = ['RA', 'DEC', 'SR']
 
@@ -53,36 +53,8 @@ class BaseConeSearchAdapter(object):
         }
     ]
 
-    def clean(self, request, resource):
-        raise NotImplementedError()
-
     def stream(self):
         return FileResponse(generate_votable(DatabaseAdapter().fetchall(self.sql, self.args), self.columns), content_type='application/xml')
-
-    def parse_query_dict(self, request):
-        data = make_query_dict_upper_case(request.GET)
-
-        args = {}
-        errors = {}
-        for key in self.keys:
-            try:
-                value = float(data[key])
-
-                if self.ranges[key]['min'] <= value <= self.ranges[key]['max']:
-                    args[key] = value
-                else:
-                    errors[key] = [_('This value must be between %(min)g and %(max)g.' % self.ranges[key])]
-
-            except KeyError:
-                if key in self.defaults:
-                    args[key] = self.defaults[key]
-                else:
-                    errors[key] = [_('This field may not be blank.')]
-
-            except ValueError:
-                errors[key] = [_('This field must be a float.')]
-
-        return args, errors
 
 
 class SimpleConeSearchAdapter(BaseConeSearchAdapter):

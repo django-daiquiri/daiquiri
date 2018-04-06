@@ -1,7 +1,7 @@
 {% load i18n %}
 
 <button type="button" class="btn btn-default"
-    ng-click="service.forms.sql.toggleDropdown('vizier')"
+    ng-click="service.forms.sql.toggle_dropdown('vizier')"
     ng-class="{'active': service.forms.sql.dropdown == 'vizier'}">
 
     {% trans 'VizieR' %} <span class="caret"></span>
@@ -38,23 +38,23 @@
             <tbody>
                 <tr ng-repeat="row in service.dropdowns.vizier.results">
                     <td>
-                        <a href="" ng-click="service.forms.sql.pasteString(row.id)"
+                        <a href="" ng-click="service.forms.sql.paste_string(row.id)"
                             title="{% trans 'Paste ID to query field' %}">
                             {$ row.id $}
                         </a>
                     </td>
                     <td>
-                        <a href="" ng-click="service.forms.sql.pasteString(row.ra)"
+                        <a href="" ng-click="service.forms.sql.paste_string(row.ra)"
                             title="{% trans 'Paste RA to query field' %}">
                             {$ row.ra $}
                         </a>
-                        <a href="" ng-click="service.forms.sql.pasteString(row.de)"
+                        <a href="" ng-click="service.forms.sql.paste_string(row.de)"
                             title="{% trans 'Paste DE to query field' %}">
                             {$ row.de $}
                         </a>
                     </td>
                     <td>
-                        <a href="" ng-click="service.forms.sql.pasteString(row.distance)"
+                        <a href="" ng-click="service.forms.sql.paste_string(row.distance)"
                             title="{% trans 'Paste distance to query field' %}">
                             {$ row.distance $}
                         </a>

@@ -121,7 +121,7 @@ def get_asterisk_columns(display_column):
 def get_indexed_objects():
     indexed_objects = {}
 
-    for column in Column.objects.exclude(index_for=None):
+    for column in Column.objects.exclude(index_for=''):
         if column.datatype not in indexed_objects:
             indexed_objects[column.datatype] = [column.indexed_columns]
         else:

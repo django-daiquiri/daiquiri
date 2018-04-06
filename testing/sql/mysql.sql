@@ -3,6 +3,9 @@
 DROP DATABASE IF EXISTS `daiquiri_archive`;
 CREATE DATABASE `daiquiri_archive`;
 
+DROP DATABASE IF EXISTS `daiquiri_data_test`;
+CREATE DATABASE `daiquiri_data_test`;
+
 DROP DATABASE IF EXISTS `daiquiri_data_obs`;
 CREATE DATABASE `daiquiri_data_obs`;
 
@@ -23,6 +26,12 @@ CREATE TABLE `daiquiri_archive`.`files` (
     `ra` FLOAT NOT NULL,
     `dec` FLOAT NOT NULL
 ) ENGINE=MyISAM;
+
+CREATE TABLE `daiquiri_data_test`.`test` (
+  `id` bigint primary key not null,
+  `array` varchar(32) not null,
+  `matrix` varchar(32) not null
+);
 
 CREATE TABLE `daiquiri_data_obs`.`stars` (
   `id` BIGINT PRIMARY KEY NOT NULL,
@@ -52,6 +61,7 @@ CREATE TABLE `daiquiri_user_user`.`test` (
 -- change permissions
 
 GRANT SELECT ON `daiquiri_archive`.* TO 'daiquiri_data'@'localhost';
+GRANT SELECT ON `daiquiri_data_test`.* TO 'daiquiri_data'@'localhost';
 GRANT SELECT ON `daiquiri_data_obs`.* TO 'daiquiri_data'@'localhost';
 GRANT SELECT ON `daiquiri_data_sim`.* TO 'daiquiri_data'@'localhost';
 
@@ -103,6 +113,11 @@ INSERT INTO daiquiri_archive.files VALUES
 ('f1c3974f-9c14-4e64-a8c2-a7e7a2e05639', '2017-10-18 00:00:00', 'image_18.fits', 'c18', 'images/image_18.fits', -71.60346050383421, -27.935554707115326),
 ('92d9936a-8f7b-4501-a61c-96ceddcb469d', '2017-10-19 00:00:00', 'image_19.fits', 'c19', 'images/image_19.fits', 67.70930246685508, -19.813289604840673),
 ('3436066b-38ec-4ea2-9c59-81212104555a', '2017-10-20 00:00:00', 'image_20.fits', 'c20', 'images/image_20.fits', 59.53285933408349, 20.269240354748845);
+
+INSERT INTO daiquiri_data_test.test VALUES
+(1, '{1, 2, 3, 4, 5}', '{{1, 10}, {0, 0.1}}'),
+(2, '{2, 4, 6, 8, 10}', '{{2, 20}, {0, 0.2}}'),
+(3, '{3, 6, 9, 12, 15}', '{{3, 30}, {0, 0.3}}');
 
 INSERT INTO daiquiri_data_obs.stars VALUES
 (1714709274237701248, 217.15029024160114, 79.25035531595992, 0.8476529854157501),
