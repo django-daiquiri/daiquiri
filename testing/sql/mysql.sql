@@ -61,6 +61,7 @@ CREATE TABLE `daiquiri_user_user`.`test` (
 -- change permissions
 
 GRANT SELECT ON `daiquiri_archive`.* TO 'daiquiri_data'@'localhost';
+GRANT SELECT ON `daiquiri_data_test`.* TO 'daiquiri_data'@'localhost';
 GRANT SELECT ON `daiquiri_data_obs`.* TO 'daiquiri_data'@'localhost';
 GRANT SELECT ON `daiquiri_data_sim`.* TO 'daiquiri_data'@'localhost';
 
