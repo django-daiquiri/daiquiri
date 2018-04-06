@@ -15,6 +15,7 @@ from rules.contrib.views import PermissionRequiredMixin as RulesPermissionRequir
 def home(request):
     if not request.user.is_authenticated():
         login_form = LoginForm()
+        login_form.fields['login'].widget.attrs.pop("autofocus", None)
     else:
         login_form = None
 
