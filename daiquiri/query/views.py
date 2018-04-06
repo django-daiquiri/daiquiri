@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
 
 from daiquiri.core.views import ModelPermissionMixin, AnonymousAccessMixin
@@ -11,9 +12,8 @@ class QueryView(AnonymousAccessMixin, TemplateView):
     anonymous_setting = 'QUERY_ANONYMOUS'
 
 
-class JobsView(AnonymousAccessMixin, TemplateView):
+class JobsView(LoginRequiredMixin, TemplateView):
     template_name = 'query/jobs.html'
-    anonymous_setting = 'QUERY_ANONYMOUS'
 
     def get_context_data(self, **kwargs):
         context = super(JobsView, self).get_context_data(**kwargs)
