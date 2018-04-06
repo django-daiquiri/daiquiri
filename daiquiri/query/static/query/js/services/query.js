@@ -30,6 +30,7 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
 
     var service = {
         first_form: null,
+        submitting: false,
         show: {'': true},
         forms: {},
         dropdowns: {},
@@ -204,10 +205,14 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
             'queue': service.active_queue
         });
 
-        return resources.jobs.save(values).$promise.then(function(job) {
-            service.fetch_status();
-            service.activate_job(job);
-        });
+        service.submitting = true;
+        return resources.jobs.save(values).$promise
+            .then(function(job) {
+                service.fetch_status();
+                service.activate_job(job);
+            }).finally(function() {
+                service.submitting = false;
+            });
     };
 
     service.activate_job = function(job) {
