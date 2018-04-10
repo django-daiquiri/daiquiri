@@ -44,6 +44,8 @@ from .utils import (
     check_permissions
 )
 from .process import (
+    process_schema_name,
+    process_table_name,
     process_query_language,
     process_queue,
     process_response_format
@@ -153,15 +155,10 @@ class QueryJob(Job):
         return [column['name'] for column in self.metadata['columns']]
 
     def process(self):
-        # set the schema name
-        if not self.schema_name:
-            self.schema_name = get_user_schema_name(self.owner)
 
-        # set a default table name
-        if not self.table_name:
-            self.table_name = get_default_table_name()
-
-        # process the query_language, queue, response_format
+        # process all the things!
+        self.schema_name = process_schema_name(self.schema_name, self.owner)
+        self.table_name = process_table_name(self.table_name)
         self.query_language = process_query_language(self.query_language)
         self.queue = process_queue(self.queue)
         self.response_format = process_response_format(self.response_format)

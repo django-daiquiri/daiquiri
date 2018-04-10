@@ -3,9 +3,29 @@ from django.utils.translation import ugettext_lazy as _
 
 from rest_framework.exceptions import ValidationError
 
+from .utils import get_user_schema_name, get_default_table_name
+
+
+def process_schema_name(schema_name, user):
+    user_schema_name = get_user_schema_name(user)
+
+    if schema_name:
+        if schema_name == user_schema_name:
+            return schema_name
+        else:
+            raise ValidationError({
+                'schema_name': [_('Only the user schema is allowed.')]
+            })
+    else:
+        return user_schema_name
+
 
 def process_table_name(table_name):
-    pass
+    if table_name:
+        # the tablename was checked by the TableNameValidator
+        return table_name
+    else:
+        return get_default_table_name()
 
 
 def process_query_language(query_language):
