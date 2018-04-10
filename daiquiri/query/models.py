@@ -37,12 +37,16 @@ from .utils import (
     get_quota,
     get_max_active_jobs,
     get_default_table_name,
-    get_default_queue,
     get_format_config,
     get_user_schema_name,
     get_asterisk_columns,
     get_indexed_objects,
     check_permissions
+)
+from .process import (
+    process_query_language,
+    process_queue,
+    process_response_format
 )
 from .tasks import run_query, create_download_file, create_archive_file
 
@@ -149,9 +153,6 @@ class QueryJob(Job):
         return [column['name'] for column in self.metadata['columns']]
 
     def process(self):
-        if not self.response_format:
-            self.response_format = settings.QUERY_DEFAULT_DOWNLOAD_FORMAT
-
         # set the schema name
         if not self.schema_name:
             self.schema_name = get_user_schema_name(self.owner)
@@ -160,22 +161,13 @@ class QueryJob(Job):
         if not self.table_name:
             self.table_name = get_default_table_name()
 
-        # set a default queue
-        if not self.queue:
-            self.queue = get_default_queue()
+        # process the query_language, queue, response_format
+        self.query_language = process_query_language(self.query_language)
+        self.queue = process_queue(self.queue)
+        self.response_format = process_response_format(self.response_format)
 
         # set the execution_duration to the queues timeout
         self.execution_duration = self.timeout
-
-        # validate query_language and query
-        if not self.query_language:
-            raise ValidationError({
-                 'query_language': [_('This field may not be blank.')]
-            })
-        if not self.query:
-            raise ValidationError({
-                 'query': [_('This field may not be blank.')]
-            })
 
         # check quota
         if QueryJob.objects.get_size(self.owner) > get_quota(self.owner):

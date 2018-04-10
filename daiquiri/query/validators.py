@@ -29,30 +29,3 @@ class TableNameValidator(object):
                     raise ValidationError([self.message])
                 except QueryJob.DoesNotExist:
                     pass
-
-
-class QueryLanguageValidator(object):
-
-    message = _('This query language is not supported.')
-
-    def __call__(self, query_language):
-        if query_language.lower() not in ['%(key)s-%(version)s' % item for item in settings.QUERY_LANGUAGES]:
-            raise ValidationError([self.message])
-
-
-class QueueValidator(object):
-
-    message = _('This queue is not supported.')
-
-    def __call__(self, queue):
-        if queue.lower() not in [item['key'] for item in settings.QUERY_QUEUES]:
-            raise ValidationError([self.message])
-
-
-class ResponseFormatValidator(object):
-
-    message = _('This response format is not supported.')
-
-    def __call__(self, response_format):
-        if response_format.lower() not in [item['key'] for item in settings.QUERY_DOWNLOAD_FORMATS]:
-            raise ValidationError([self.message])

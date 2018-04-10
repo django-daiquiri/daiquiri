@@ -17,10 +17,6 @@ def get_default_table_name():
     return now().strftime("%Y-%m-%d-%H-%M-%S")
 
 
-def get_default_queue():
-    return settings.QUERY_QUEUES[0]['key']
-
-
 def get_query_language_choices():
     return [('%(key)s-%(version)s' % item, item['label']) for item in settings.QUERY_LANGUAGES]
 
