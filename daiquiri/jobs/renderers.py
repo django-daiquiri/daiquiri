@@ -5,6 +5,8 @@ from .utils import get_job_url
 
 class UWSRenderer(XMLRenderer):
 
+    media_type = '*/*'
+
     root_attrs = {
         'xmlns:uws': 'http://www.ivoa.net/xml/UWS/v1.0',
         'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
@@ -79,6 +81,8 @@ class UWSRenderer(XMLRenderer):
 
 
 class UWSErrorRenderer(ErrorRenderer):
+
+    media_type = '*/*'
 
     def render_votable(self, data, accepted_media_type=None, renderer_context=None):
         self.start('RESOURCE', {
