@@ -81,29 +81,29 @@ class TablesetRenderer(XMLRenderer):
         })
 
         for schema in data:
-            self.start('vosi:schema')
+            self.start('schema')
             self.node('name', {}, schema['name'])
             self.node('description', {}, schema['description'])
 
             for table in schema['tables']:
-                self.start('vosi:table')
+                self.start('table')
                 self.node('name', {}, table['name'])
                 self.node('description', {}, table['description'])
 
                 for column in table['columns']:
-                    self.start('vosi:column')
+                    self.start('column', {'std': 'true'} if column['std'] else {})
                     self.node('name', {}, column['name'])
                     self.node('dataType', {'xsi:type': 'vod:TAPType'}, column['datatype'])
                     self.node('ucd', {}, column['ucd'])
                     self.node('unit', {}, column['unit'])
-                    for key in ['indexed', 'principal', 'std']:
+                    for key in ['indexed', 'principal']:
                         if key in column and column[key]:
                             self.node('flag', {}, key)
 
-                    self.end('vosi:column')
+                    self.end('column')
 
-                self.end('vosi:table')
+                self.end('table')
 
-            self.end('vosi:schema')
+            self.end('schema')
 
         self.end('vosi:tableset')
