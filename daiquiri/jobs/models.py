@@ -25,7 +25,6 @@ class Job(models.Model):
     PHASE_RUN = 'RUN'
     PHASE_ABORT = 'ABORT'
     PHASE_ACTIVE = (
-        PHASE_PENDING,
         PHASE_QUEUED,
         PHASE_EXECUTING
     )
@@ -100,11 +99,7 @@ class Job(models.Model):
         raise NotImplementedError
 
     @property
-    def results(self):
-        raise NotImplementedError
-
-    @property
-    def result(self):
+    def formats(self):
         raise NotImplementedError
 
     @property
@@ -121,4 +116,7 @@ class Job(models.Model):
         raise NotImplementedError
 
     def archive(self):
+        raise NotImplementedError
+
+    def stream(self):
         raise NotImplementedError

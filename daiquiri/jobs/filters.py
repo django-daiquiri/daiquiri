@@ -12,7 +12,7 @@ class UWSFilterBackend(BaseFilterBackend):
         query_dict = make_query_dict_upper_case(request.GET)
 
         # apply only for list
-        if view.action == 'list_jobs':
+        if view.action == 'list':
             phases = query_dict.getlist('PHASE')
 
             if phases:

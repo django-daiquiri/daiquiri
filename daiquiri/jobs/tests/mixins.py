@@ -28,12 +28,11 @@ class SyncTestMixin(TestMixin):
         for new_job in self.get_parameter_for_new_jobs(username):
             url = reverse(self.url_names['list'])
             response = self.client.post(url, urlencode(new_job), content_type='application/x-www-form-urlencoded')
-            self.assertEqual(response.status_code, 303, msg=(
+            self.assertEqual(response.status_code, 200, msg=(
                 ('username', username),
                 ('url', url),
                 ('data', new_job),
-                ('status_code', response.status_code),
-                ('content', response.content)
+                ('status_code', response.status_code)
             ))
 
     def _test_post_job_list_create_internal(self, username):
@@ -45,12 +44,11 @@ class SyncTestMixin(TestMixin):
         for new_job in self.get_parameter_for_new_jobs_internal(username):
             url = reverse(self.url_names['list'])
             response = self.client.post(url, urlencode(new_job), content_type='application/x-www-form-urlencoded')
-            self.assertEqual(response.status_code, 400 if username == 'anonymous' else 303, msg=(
+            self.assertEqual(response.status_code, 400 if username == 'anonymous' else 200, msg=(
                 ('username', username),
                 ('url', url),
                 ('data', new_job),
-                ('status_code', response.status_code),
-                ('content', response.content)
+                ('status_code', response.status_code)
             ))
 
 
@@ -210,14 +208,17 @@ class AsyncTestMixin(TestMixin):
         GET /{jobs}/{job-id}/results/result returns a 303 to the stream url for this job.
         '''
         for job in self.jobs:
-            url = reverse(self.url_names['result'], kwargs={'pk': job.pk})
+            url = reverse(self.url_names['result'], kwargs={
+                'pk': job.pk,
+                'result': 'result'
+            })
             response = self.client.get(url)
 
             if username == 'user':
                 if job.phase == 'COMPLETED':
-                    self.assertRedirects(response, job.result, status_code=303, target_status_code=200)
+                    self.assertEqual(response.status_code, 200)
                 else:
-                    self.assertRedirects(response, job.result, status_code=303, target_status_code=400)
+                    self.assertEqual(response.status_code, 400)
             else:
                 self.assertEqual(response.status_code, 404)
 
@@ -486,7 +487,7 @@ class AsyncTestMixin(TestMixin):
                 redirect_url = 'http://testserver' + reverse(self.url_names['detail'], kwargs={'pk': job.pk})
                 self.assertRedirects(response, redirect_url, status_code=303)
 
-                if job.phase in ['PENDING', 'QUEUED', 'EXECUTING']:
+                if job.phase in ['QUEUED', 'EXECUTING']:
                     self.assertEqual(self.jobs.get(pk=job.pk).phase, 'ABORTED')
                 else:
                     self.assertEqual(self.jobs.get(pk=job.pk).phase, job.phase)

@@ -3,6 +3,8 @@ from rest_framework import serializers
 from daiquiri.core.serializers import CaseInsensitiveSerializer
 from daiquiri.jobs.models import Job
 
+from .utils import get_job_results
+
 
 class JobListSerializer(serializers.ModelSerializer):
 
@@ -16,6 +18,7 @@ class JobRetrieveSerializer(serializers.ModelSerializer):
     job_id = serializers.UUIDField(source='id')
     owner_id = serializers.SerializerMethodField()
     destruction = serializers.DateTimeField(source='destruction_time')
+    results = serializers.SerializerMethodField()
 
     class Meta:
         model = Job
@@ -39,6 +42,9 @@ class JobRetrieveSerializer(serializers.ModelSerializer):
             return obj.owner.username
         else:
             return None
+
+    def get_results(self, obj):
+        return get_job_results(self.context['request'], obj)
 
 
 class JobUpdateSerializer(CaseInsensitiveSerializer):

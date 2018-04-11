@@ -61,11 +61,11 @@ class UWSRenderer(XMLRenderer):
     def render_results(self, data, request, root=False):
         self.start('uws:results', self.root_attrs if root else {})
 
-        for format_key, url in data.items():
+        for result in data:
             self.start('uws:result', {
-                'id': format_key,
-                'xlink:href': request.build_absolute_uri(url),
-                'xlink:type': format_key
+                'id': result['result_type'],
+                'xlink:href': result['href'],
+                'xlink:type': result['result_type']
             })
             self.end('uws:result')
 

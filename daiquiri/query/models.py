@@ -99,31 +99,16 @@ class QueryJob(Job):
         }
 
     @property
-    def results(self):
-        if self.phase == self.PHASE_COMPLETED:
-            # create dictionary of the form
-            # 'votable': '/query/api/jobs/{job.id}/stream/votable'
-            return {download_format['key']: reverse('query:job-stream', kwargs={
-                'pk': str(self.id),
-                'format_key': download_format['key']
-            }) for download_format in settings.QUERY_DOWNLOAD_FORMATS}
-        else:
-            return {}
-
-    @property
-    def result(self):
-        return reverse('query:job-stream', kwargs={
-            'pk': str(self.id),
-            'format_key': self.response_format
-        })
-
-    @property
-    def quote(self):
-        return None
+    def formats(self):
+        return {item['key']: item['content_type'] for item in settings.QUERY_DOWNLOAD_FORMATS}
 
     @property
     def result_status(self):
         return 'OK' if self.max_records is None else 'OVERFLOW'
+
+    @property
+    def quote(self):
+        return None
 
     @property
     def time_queue(self):

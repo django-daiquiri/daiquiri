@@ -1,10 +1,12 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, FileResponse
+from django.urls import reverse
 
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.parsers import FormParser
 from rest_framework.exceptions import ValidationError
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
+from rest_framework.decorators import detail_route
 
 from daiquiri.core.responses import HttpResponseSeeOther
 from daiquiri.core.utils import get_client_ip
@@ -19,7 +21,7 @@ from .serializers import (
 )
 from .renderers import UWSRenderer, UWSErrorRenderer
 from .filters import UWSFilterBackend
-from .utils import get_job_url
+from .utils import get_job_url, get_job_results
 
 
 class JobViewSet(viewsets.GenericViewSet):
@@ -43,7 +45,7 @@ class SyncJobViewSet(JobViewSet):
 
     renderer_classes = (UWSErrorRenderer, )
 
-    def create_job(self, request, *args, **kwargs):
+    def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -75,7 +77,7 @@ class SyncJobViewSet(JobViewSet):
         job = self.get_queryset().get(pk=job.pk)
 
         if job.phase == job.PHASE_COMPLETED:
-            return HttpResponseSeeOther(self.request.build_absolute_uri(job.result))
+            return FileResponse(job.stream(job.response_format), content_type=job.formats[job.response_format])
         else:
             return Response(job.error_summary, content_type='application/xml')
 
@@ -94,19 +96,19 @@ class AsyncJobViewSet(JobViewSet):
 
         return get_job_url(self.request, kwargs=kwargs)
 
-    def list_jobs(self, request, *args, **kwargs):
+    def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         serializer = JobListSerializer(queryset, many=True)
         renderered_data = UWSRenderer().render(serializer.data, renderer_context=self.get_renderer_context())
         return HttpResponse(renderered_data, content_type=UWSRenderer.media_type)
 
-    def retrieve_job(self, request, *args, **kwargs):
+    def retrieve(self, request, *args, **kwargs):
         job = self.get_object()
-        serializer = JobRetrieveSerializer(job)
+        serializer = JobRetrieveSerializer(job, context={'request': request})
         renderered_data = UWSRenderer().render(serializer.data, renderer_context=self.get_renderer_context())
         return HttpResponse(renderered_data, content_type=UWSRenderer.media_type)
 
-    def create_job(self, request, *args, **kwargs):
+    def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -138,7 +140,7 @@ class AsyncJobViewSet(JobViewSet):
 
         return HttpResponseSeeOther(self.get_success_url(job))
 
-    def update_job(self, request, *args, **kwargs):
+    def update(self, request, *args, **kwargs):
         self.get_object()  # necessary to check permissions
 
         serializer = JobUpdateSerializer(data=request.data)
@@ -146,7 +148,7 @@ class AsyncJobViewSet(JobViewSet):
 
         if 'ACTION' in serializer.data:
             if serializer.data['ACTION'] == 'DELETE':
-                return self.destroy_job(self, request)
+                return self.destroy(self, request)
             else:
                 raise ValidationError({
                     'PHASE': 'Unsupported value.'
@@ -156,112 +158,131 @@ class AsyncJobViewSet(JobViewSet):
                 'ACTION': 'Parameter not found.'
             })
 
-    def destroy_job(self, request, *args, **kwargs):
+    def destroy(self, request, *args, **kwargs):
         job = self.get_object()
         job.archive()
         return HttpResponseSeeOther(self.get_success_url())
 
-    def get_results(self, request, pk):
+    @detail_route(methods=['get'])
+    def results(self, request, pk, key=None):
         job = self.get_object()
 
         renderered_data = UWSRenderer().render({
-            'results': job.results
+            'results': get_job_results(request, job)
         }, renderer_context=self.get_renderer_context())
         return HttpResponse(renderered_data, content_type=UWSRenderer.media_type)
 
-    def get_result(self, request, pk):
+    @detail_route(methods=['get'], url_path='results/(?P<result>[A-Za-z0-9\-]+)', url_name='result')
+    def result(self, request, pk, result):
         job = self.get_object()
-        return HttpResponseSeeOther(job.result)
 
-    def get_parameters(self, request, pk):
+        if result == 'result':
+            return FileResponse(job.stream(job.response_format), content_type=job.formats[job.response_format])
+        elif result in job.formats:
+            return FileResponse(job.stream(result), content_type=job.formats[result])
+        else:
+            raise ValidationError({
+                'result': 'Unsupported value.'
+            })
+
+    @detail_route(methods=['get'])
+    def parameters(self, request, pk):
         renderered_data = UWSRenderer().render({
             'parameters': self.get_object().parameters
         }, renderer_context=self.get_renderer_context())
         return HttpResponse(renderered_data, content_type=UWSRenderer.media_type)
 
-    def get_destruction(self, request, pk):
+    @detail_route(methods=['get', 'post'])
+    def destruction(self, request, pk):
         job = self.get_object()
 
-        if job.destruction_time:
-            # use the JobUpdateSerializer to create timestamp
-            serializer = JobUpdateSerializer({
-                'DESTRUCTION': job.destruction_time
-            })
+        if request.method == 'GET':
+            if job.destruction_time:
+                # use the JobUpdateSerializer to create timestamp
+                serializer = JobUpdateSerializer({
+                    'DESTRUCTION': job.destruction_time
+                })
 
-            return HttpResponse(serializer.data['DESTRUCTION'])
+                return HttpResponse(serializer.data['DESTRUCTION'])
+            else:
+                return HttpResponse()
         else:
-            return HttpResponse()
+            serializer = JobUpdateSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
 
-    def set_destruction(self, request, pk):
+            if 'DESTRUCTION' in serializer.data:
+                job.destruction_time = serializer.data['DESTRUCTION']
+                job.save()
+                return HttpResponseSeeOther(self.get_success_url(), status=303)
+            else:
+                raise ValidationError({
+                    'DESTRUCTION': 'Parameter not found.'
+                })
+
+    @detail_route(methods=['get', 'post'])
+    def executionduration(self, request, pk):
         job = self.get_object()
 
-        serializer = JobUpdateSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        if 'DESTRUCTION' in serializer.data:
-            job.destruction_time = serializer.data['DESTRUCTION']
-            job.save()
-            return HttpResponseSeeOther(self.get_success_url(), status=303)
+        if request.method == 'GET':
+            return HttpResponse(job.execution_duration)
         else:
-            raise ValidationError({
-                'DESTRUCTION': 'Parameter not found.'
-            })
+            serializer = JobUpdateSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
 
-    def get_executionduration(self, request, pk):
-        job = self.get_object()
-        return HttpResponse(job.execution_duration)
-
-    def set_executionduration(self, request, pk):
-        job = self.get_object()
-
-        serializer = JobUpdateSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        if 'EXECUTIONDURATION' in serializer.data:
-            job.execution_duration = serializer.data['EXECUTIONDURATION']
-            job.save()
-            return HttpResponseSeeOther(self.get_success_url())
-        else:
-            raise ValidationError({
-                'EXECUTIONDURATION': 'Parameter not found.'
-            })
-
-    def get_phase(self, request, pk):
-        job = self.get_object()
-        return HttpResponse(job.phase)
-
-    def set_phase(self, request, pk):
-        job = self.get_object()
-
-        serializer = JobUpdateSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        if 'PHASE' in serializer.data:
-            phase = serializer.data['PHASE']
-            if phase == job.PHASE_RUN:
-                job.process()
-                job.run()
-                return HttpResponseSeeOther(self.get_success_url())
-            elif phase == job.PHASE_ABORT:
-                job.abort()
+            if 'EXECUTIONDURATION' in serializer.data:
+                job.execution_duration = serializer.data['EXECUTIONDURATION']
+                job.save()
                 return HttpResponseSeeOther(self.get_success_url())
             else:
                 raise ValidationError({
-                    'PHASE': 'Unsupported value.'
+                    'EXECUTIONDURATION': 'Parameter not found.'
                 })
-        else:
-            raise ValidationError({
-                'PHASE': 'Parameter not found.'
-            })
 
-    def get_error(self, request, pk):
+    @detail_route(methods=['get', 'post'])
+    def phase(self, request, pk):
+        job = self.get_object()
+
+        if request.method == 'GET':
+            return HttpResponse(job.phase)
+        else:
+            serializer = JobUpdateSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+
+            if 'PHASE' in serializer.data:
+                phase = serializer.data['PHASE']
+                if phase == job.PHASE_RUN:
+                    try:
+                        job.process()
+                    except ValidationError as e:
+                        raise ValidationError(self.rewrite_exception(e))
+
+                    job.run()
+                    return HttpResponseSeeOther(self.get_success_url())
+
+                elif phase == job.PHASE_ABORT:
+                    job.abort()
+                    return HttpResponseSeeOther(self.get_success_url())
+
+                else:
+                    raise ValidationError({
+                        'PHASE': 'Unsupported value.'
+                    })
+            else:
+                raise ValidationError({
+                    'PHASE': 'Parameter not found.'
+                })
+
+    @detail_route(methods=['get'])
+    def error(self, request, pk):
         job = self.get_object()
         return Response(job.error_summary, content_type='application/xml') if job.error_summary else HttpResponse()
 
-    def get_quote(self, request, pk):
+    @detail_route(methods=['get'])
+    def quote(self, request, pk):
         job = self.get_object()
         return HttpResponse(job.quote) if job.quote else HttpResponse()
 
-    def get_owner(self, request, pk):
+    @detail_route(methods=['get'])
+    def owner(self, request, pk):
         job = self.get_object()
         return HttpResponse(job.owner) if job.owner else HttpResponse()

@@ -1,72 +1,38 @@
-from rest_framework.routers import Route, SimpleRouter
+from rest_framework.routers import Route, DynamicRoute, SimpleRouter
 
 
 class JobRouter(SimpleRouter):
+    '''
+    A dedicated router for UWS services. The main difference is that a POST on an instance
+    maps to update, not PUT. Also list_routes are removed.
+    '''
+
     routes = [
         Route(
             url=r'^{prefix}$',
-            mapping={'get': 'list_jobs', 'post': 'create_job'},
+            mapping={
+                'get': 'list',
+                'post': 'create'
+            },
             name='{basename}-list',
+            detail=False,
             initkwargs={'suffix': 'List'}
         ),
         Route(
             url=r'^{prefix}/{lookup}$',
-            mapping={'get': 'retrieve_job', 'post': 'update_job', 'delete': 'destroy_job'},
+            mapping={
+                'get': 'retrieve',
+                'post': 'update',
+                'delete': 'destroy'
+            },
             name='{basename}-detail',
-            initkwargs={'suffix': 'Detail'}
+            detail=True,
+            initkwargs={'suffix': 'Instance'}
         ),
-        Route(
-            url=r'^{prefix}/{lookup}/results$',
-            mapping={'get': 'get_results'},
-            name='{basename}-results',
-            initkwargs={'suffix': 'Results'}
-        ),
-        Route(
-            url=r'^{prefix}/{lookup}/results/result$',
-            mapping={'get': 'get_result'},
-            name='{basename}-result',
-            initkwargs={'suffix': 'Result'}
-        ),
-        Route(
-            url=r'^{prefix}/{lookup}/parameters$',
-            mapping={'get': 'get_parameters'},
-            name='{basename}-parameters',
-            initkwargs={'suffix': 'Parameters'}
-        ),
-        Route(
-            url=r'^{prefix}/{lookup}/destruction$',
-            mapping={'get': 'get_destruction', 'post': 'set_destruction'},
-            name='{basename}-destruction',
-            initkwargs={'suffix': 'Destruction'}
-        ),
-        Route(
-            url=r'^{prefix}/{lookup}/executionduration$',
-            mapping={'get': 'get_executionduration', 'post': 'set_executionduration'},
-            name='{basename}-executionduration',
-            initkwargs={'suffix': 'Executionduration'}
-        ),
-        Route(
-            url=r'^{prefix}/{lookup}/phase$',
-            mapping={'get': 'get_phase', 'post': 'set_phase'},
-            name='{basename}-phase',
-            initkwargs={'suffix': 'Phase'}
-        ),
-        Route(
-            url=r'^{prefix}/{lookup}/error$',
-            mapping={'get': 'get_error'},
-            name='{basename}-error',
-            initkwargs={'suffix': 'Error'}
-        ),
-        Route(
-            url=r'^{prefix}/{lookup}/quote$',
-            mapping={'get': 'get_quote'},
-            name='{basename}-quote',
-            initkwargs={'suffix': 'Quote'}
-        ),
-        Route(
-            url=r'^{prefix}/{lookup}/owner$',
-            mapping={'get': 'get_owner'},
-            name='{basename}-owner',
-            initkwargs={'suffix': 'Owner'}
-        ),
+        DynamicRoute(
+            url=r'^{prefix}/{lookup}/{url_path}$',
+            name='{basename}-{url_name}',
+            detail=True,
+            initkwargs={}
+        )
     ]
