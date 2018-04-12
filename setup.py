@@ -19,7 +19,7 @@ setup(
     long_description=open('README.rst').read(),
     install_requires=[
         'Django>=1.11,<2.0',
-        'djangorestframework==3.7.0',
+        'djangorestframework==3.8.0',
         'drf-extensions>=0.3.1',
         'django-extensions>=1.8.1',
         'wheel>=0.30.0',
