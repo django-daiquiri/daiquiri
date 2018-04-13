@@ -9,15 +9,20 @@ from .models import (
 )
 
 
+def check_tap_visibility(obj):
+    # check if the metadata_access_level of the object is
+    #   (a) PUBLIC or INTERNAL if QUERY_ANONYMOUS is True
+    # or
+    #   (b) INTERNAL if QUERY_ANONYMOUS is False
+    return (obj.metadata_access_level == ACCESS_LEVEL_PUBLIC) or \
+        (obj.metadata_access_level == ACCESS_LEVEL_INTERNAL and not settings.QUERY_ANONYMOUS)
+
+
 def update_schema(schema):
     '''
     Update or create the schema in the TAP_SCHEMA.
     '''
-    # check if the metadata_access_level is (a) PUBLIC or (b) INTRENAL and QUERY_ANONYMOUS is False
-    tap = (schema.metadata_access_level == ACCESS_LEVEL_PUBLIC) or \
-        (schema.metadata_access_level == ACCESS_LEVEL_INTERNAL and not settings.QUERY_ANONYMOUS)
-
-    if tap:
+    if check_tap_visibility(schema):
         try:
             tap_schema = TapSchema.objects.get(pk=schema.id)
         except TapSchema.DoesNotExist:
@@ -55,9 +60,6 @@ def update_table(table):
     '''
     Update or create the table in the TAP_SCHEMA.
     '''
-    # check if the metadata_access_level is (a) PUBLIC or (b) INTRENAL and QUERY_ANONYMOUS is False
-    tap = (table.metadata_access_level == ACCESS_LEVEL_PUBLIC) or \
-        (table.metadata_access_level == ACCESS_LEVEL_INTERNAL and not settings.QUERY_ANONYMOUS)
 
     # get the schema from the TAP_SCHEMA
     try:
@@ -65,7 +67,7 @@ def update_table(table):
     except TapSchema.DoesNotExist:
         tap_schema = None
 
-    if tap and tap_schema:
+    if check_tap_visibility(table) and tap_schema:
         try:
             tap_table = TapTable.objects.get(pk=table.id)
             tap_table.schema = tap_schema
@@ -108,9 +110,10 @@ def update_column(column):
     '''
     Update or create the column in the TAP_SCHEMA.
     '''
-    # check if the metadata_access_level is (a) PUBLIC or (b) INTRENAL and QUERY_ANONYMOUS is False
-    tap = (column.metadata_access_level == ACCESS_LEVEL_PUBLIC) or \
-        (column.metadata_access_level == ACCESS_LEVEL_INTERNAL and not settings.QUERY_ANONYMOUS)
+    if settings.METADATA_COLUMN_PERMISSIONS:
+        tap_visibility = check_tap_visibility(column)
+    else:
+        tap_visibility = check_tap_visibility(column.table)
 
     # get the table from the TAP_SCHEMA
     try:
@@ -118,7 +121,9 @@ def update_column(column):
     except TapTable.DoesNotExist:
         tap_table = None
 
-    if tap and tap_table:
+    print(tap_visibility)
+
+    if tap_visibility and tap_table:
         try:
             tap_column = TapColumn.objects.get(pk=column.id)
             tap_column.table = tap_table
