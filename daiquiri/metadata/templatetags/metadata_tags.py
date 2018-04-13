@@ -4,6 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from daiquiri.core.constants import LICENSE_CHOICES, LICENSE_URLS
 
 from ..models import Schema
+from ..utils import get_doi_url
 
 register = template.Library()
 
@@ -26,7 +27,6 @@ def schemas_menu(context):
 @register.inclusion_tag('metadata/tags/access_panel.html')
 def access_panel(doi, dataset=_('dataset')):
     return {
-        'doi': doi,
         'dataset': dataset
     }
 
@@ -34,7 +34,7 @@ def access_panel(doi, dataset=_('dataset')):
 @register.inclusion_tag('metadata/tags/doi_panel.html')
 def doi_panel(doi, dataset=_('dataset')):
     return {
-        'doi': doi,
+        'doi_url': get_doi_url(doi),
         'dataset': dataset
     }
 

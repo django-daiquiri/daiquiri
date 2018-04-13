@@ -1,4 +1,5 @@
 from daiquiri.jobs.renderers import XMLRenderer
+from daiquiri.metadata.utils import get_doi_url
 
 
 class ExampleRenderer(XMLRenderer):
@@ -88,7 +89,10 @@ class TablesetRenderer(XMLRenderer):
             for table in schema['tables']:
                 table_attr = {}
 
-                if 'nrows' in table:
+                if table['doi']:
+                    table_attr['doi'] = get_doi_url(table['doi'])
+
+                if table['nrows'] is not None:
                     table_attr['size'] = str(table['nrows'])
 
                 self.start('table', table_attr)

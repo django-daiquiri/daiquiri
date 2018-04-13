@@ -43,6 +43,7 @@ class TableSerializer(serializers.ModelSerializer):
             'name',
             'description',
             'columns',
+            'doi',
             'nrows'
         )
 
