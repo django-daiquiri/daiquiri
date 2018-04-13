@@ -58,6 +58,8 @@
 
 {% block sidebar %}
 
+    {% access_panel schema _('schema') %}
+
     {% if schema.doi %}
     {% doi_panel schema.doi _('schema') %}
     {% endif %}
