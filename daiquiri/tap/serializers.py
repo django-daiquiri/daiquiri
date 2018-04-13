@@ -42,7 +42,8 @@ class TableSerializer(serializers.ModelSerializer):
         fields = (
             'name',
             'description',
-            'columns'
+            'columns',
+            'nrows'
         )
 
     def get_columns(self, obj):

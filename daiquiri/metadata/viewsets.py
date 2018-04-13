@@ -144,7 +144,10 @@ class TableViewSet(viewsets.ModelViewSet):
         table_name = request.GET.get('table')
 
         if schema_name and table_name:
-            return Response([DatabaseAdapter().fetch_table(schema_name, table_name)])
+            adapter = DatabaseAdapter()
+            table_metadata = adapter.fetch_table(schema_name, table_name)
+            table_metadata['nrows'], table_metadata['size'] = adapter.fetch_stats(schema_name, table_name)
+            return Response([table_metadata])
         else:
             return Response([])
 

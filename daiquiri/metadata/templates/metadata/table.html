@@ -69,6 +69,8 @@
 
 {% block sidebar %}
 
+    {% access_panel table _('table') %}
+
     {% if table.doi %}
     {% doi_panel table.doi _('table') %}
     {% endif %}

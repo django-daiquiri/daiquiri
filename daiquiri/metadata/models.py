@@ -151,6 +151,14 @@ class Table(models.Model):
         max_length=8, choices=TYPE_CHOICES,
         verbose_name=_('Type of table')
     )
+    nrows = models.BigIntegerField(
+        null=True, blank=True,
+        verbose_name=_('Number of rows in the table')
+    )
+    size = models.BigIntegerField(
+        null=True, blank=True,
+        verbose_name=_('Size of the table in bytes')
+    )
     utype = models.CharField(
         max_length=256, null=True, blank=True,
         verbose_name=_('IVOA Utype')

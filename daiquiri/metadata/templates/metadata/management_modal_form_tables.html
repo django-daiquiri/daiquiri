@@ -46,7 +46,7 @@
                     </div>
                     <div class="row">
                         <formgroup
-                            class="col-md-10"
+                            class="col-md-6"
                             data-id="title"
                             data-type="text"
                             data-label="{{ meta.Table.title.verbose_name }}"
@@ -63,6 +63,22 @@
                             data-errors="service.errors.type"
                             data-options="service.tabletypes"
                             data-options-label="text">
+                        </formgroup>
+                        <formgroup
+                            class="col-md-2"
+                            data-id="type"
+                            data-type="number"
+                            data-label="{% trans '# rows' %}"
+                            data-model="service.values.nrows"
+                            data-errors="service.errors.nrows">
+                        </formgroup>
+                        <formgroup
+                            class="col-md-2"
+                            data-id="type"
+                            data-type="number"
+                            data-label="{% trans 'Size' %}"
+                            data-model="service.values.size"
+                            data-errors="service.errors.size">
                         </formgroup>
                     </div>
                     <formgroup

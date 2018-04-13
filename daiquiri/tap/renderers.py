@@ -86,7 +86,12 @@ class TablesetRenderer(XMLRenderer):
             self.node('description', {}, schema['description'])
 
             for table in schema['tables']:
-                self.start('table')
+                table_attr = {}
+
+                if 'nrows' in table:
+                    table_attr['size'] = str(table['nrows'])
+
+                self.start('table', table_attr)
                 self.node('name', {}, table['name'])
                 self.node('description', {}, table['description'])
 

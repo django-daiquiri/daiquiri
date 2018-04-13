@@ -23,6 +23,14 @@ def schemas_menu(context):
     return context
 
 
+@register.inclusion_tag('metadata/tags/access_panel.html')
+def access_panel(doi, dataset=_('dataset')):
+    return {
+        'doi': doi,
+        'dataset': dataset
+    }
+
+
 @register.inclusion_tag('metadata/tags/doi_panel.html')
 def doi_panel(doi, dataset=_('dataset')):
     return {
