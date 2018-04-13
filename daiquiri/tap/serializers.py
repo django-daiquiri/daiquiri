@@ -4,18 +4,6 @@ from daiquiri.query.models import Example
 from daiquiri.metadata.models import Schema, Table, Column
 
 
-class ExampleSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Example
-        fields = (
-            'id',
-            'name',
-            'description',
-            'query_string'
-        )
-
-
 class ColumnSerializer(serializers.ModelSerializer):
 
     class Meta:

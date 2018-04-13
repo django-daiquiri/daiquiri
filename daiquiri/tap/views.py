@@ -1,13 +1,13 @@
 from django.conf import settings
 from django.http import HttpResponse
+from django.shortcuts import render
 from django.urls import reverse
 
 from daiquiri.metadata.models import Schema
 from daiquiri.query.models import Example
 
-from .serializers import ExampleSerializer, SchemaSerializer
+from .serializers import SchemaSerializer
 from .renderers import (
-    ExampleRenderer,
     AvailabilityRenderer,
     CapabilitiesRenderer,
     TablesetRenderer
@@ -15,9 +15,9 @@ from .renderers import (
 
 
 def examples(request):
-    queryset = Example.objects.filter_by_access_level(request.user)
-    serializer = ExampleSerializer(queryset, many=True)
-    return HttpResponse(ExampleRenderer().render(serializer.data), content_type="application/xml")
+    return render(request, 'tap/examples.html', {
+        'examples': Example.objects.filter_by_access_level(request.user)
+    })
 
 
 def availability(request):

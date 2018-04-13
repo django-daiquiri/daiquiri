@@ -1,0 +1,28 @@
+{% extends 'core/wide.html' %}
+{% load staticfiles %}
+{% load compress %}
+{% load i18n %}
+
+{% block headextra %}
+    {% compress css %}
+    <link rel="stylesheet" type="text/x-scss" href="{% static 'tap/css/examples.scss' %}" />
+    {% endcompress css %}
+{% endblock %}
+
+{% block htmlargs %}version="XHTML+RDFa 1.1" xmlns="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"{% endblock %}
+
+{% block bodyargs %}vocab="ivo://ivoa.net/std/DALI-examples"{% endblock %}
+
+{% block wide %}
+
+    <h1>{% trans 'Examples' %}</h1>
+
+    {% for example in examples %}
+    <div id="example-{{ example.id }}" resource="#example-{{ example.id }}" typeof="example" class="daiquiri-tap-example">
+        <h2 property="name">{{ example.name }}</h2>
+        <p property="description">{{ example.description }}</p>
+        <pre property="query">{{ example.query_string }}</pre>
+    </div>
+    {% endfor %}
+
+{% endblock %}

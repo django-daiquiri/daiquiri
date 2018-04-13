@@ -2,28 +2,6 @@ from daiquiri.jobs.renderers import XMLRenderer
 from daiquiri.metadata.utils import get_doi_url
 
 
-class ExampleRenderer(XMLRenderer):
-
-    def render_document(self, data, accepted_media_type=None, renderer_context=None):
-
-        self.start('div', {
-            'vocab': 'http://www.ivoa.net/rdf/examples',
-            'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance'
-        })
-        for example in data:
-            self.start('div', {
-                'id': 'example-%i' % example['id'],
-                'resource': '#example-%i' % example['id'],
-                'typeof': 'example'
-            })
-            self.node('h2', {'property': 'name'}, example['name'])
-            self.node('p', {'property': 'capability'}, 'ivo://ivoa.net/std/TAP')
-            self.node('p', {'property': 'description'}, example['description'])
-            self.node('pre', {'property': 'query'}, example['query_string'])
-            self.end('div')
-
-        self.end('div')
-
 class AvailabilityRenderer(XMLRenderer):
 
     def render_document(self, data, accepted_media_type=None, renderer_context=None):
