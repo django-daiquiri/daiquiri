@@ -18,11 +18,19 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
         values: {},
         errors: {},
         labels: {},
-        ready: false
+        ready: false,
+        webgl: true
     };
 
     service.init = function(opt) {
         service.ready = false;
+
+        // look for a webgl key in localStorage
+        if (localStorage.getItem('webgl') === 'true') {
+            service.webgl = true;
+        } else if (localStorage.getItem('webgl') === 'false') {
+            service.webgl = false;
+        }
 
         // set up resources and urls
         resources.rows = $resource(baseurl + opt.rows_url);
@@ -151,17 +159,21 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
             });
 
             // make the plot
-            var tools = "pan,crosshair,wheel_zoom,box_zoom,reset,save";
-            var figure = new Bokeh.Plotting.figure({
+            var figure_options = {
                 height: 840,
                 height: 500,
                 x_range: x_range,
                 y_range: y_range,
                 plot_width: $('.col-md-9').width(),
-                tools: tools,
-                output_backend: 'webgl',
+                tools: 'pan,crosshair,wheel_zoom,box_zoom,reset,save',
                 background_fill_color: '#f5f5f5'
-            });
+            }
+
+            if (service.webgl) {
+                figure_options['output_backend'] = 'webgl';
+            }
+
+            var figure = new Bokeh.Plotting.figure(figure_options);
 
             figure.xaxis.axis_label = service.labels.x;
             figure.xaxis.axis_label_text_font = 'DroidSans'
@@ -184,6 +196,12 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
             $('.bk-button-bar-list[type="scroll"] .bk-toolbar-button').click();
             $('.bk-button-bar-list[type="inspectors"] .bk-toolbar-button').click();
         }
+    }
+
+    service.toggle_webgl = function() {
+        service.webgl = !service.webgl;
+        service.update();
+        localStorage.setItem('webgl', service.webgl);
     }
 
     return service;
