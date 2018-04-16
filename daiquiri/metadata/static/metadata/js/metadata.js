@@ -206,7 +206,7 @@ angular.module('metadata', ['core'])
             parameters['schema'] = $filter('filter')(service.schemas, {'id': service.values.schema})[0].name;
             parameters['table'] = service.values.name;
         } else if (resource === 'columns') {
-            var split = $filter('filter')(service.tables, {'id': service.values.table})[0].__str__.split('.');
+            var split = $filter('filter')(service.tables, {'id': service.values.table})[0].label.split('.');
 
             parameters['schema'] = split[0];
             parameters['table'] = split[1];
