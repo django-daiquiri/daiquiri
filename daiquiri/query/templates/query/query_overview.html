@@ -71,6 +71,15 @@
                 <dt>{% trans 'Size of the table' %}</dt>
                 <dd>{$ service.job.size | bytes $}</dd>
             </div>
+
+            <div ng-show="service.job.sources">
+                <dt>{% trans 'Source tables' %}</dt>
+                <dd ng-repeat="source in service.job.sources">
+                    <a href="{$ source.url $}" target="blank">
+                        {$ source.schema_name $}.{$ source.table_name $}
+                    </a>
+                </dd>
+            </div>
         </dl>
     </div>
     <div class="panel-footer">

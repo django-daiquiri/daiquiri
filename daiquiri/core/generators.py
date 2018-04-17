@@ -16,7 +16,7 @@ def generate_csv(generator):
             yield f.getvalue()
 
 
-def generate_votable(generator, fields, resource_name=None, table_name=None, query_status=None, empty=None):
+def generate_votable(generator, fields, resource_name=None, table_name=None, links=None, query_status=None, empty=None):
 
         yield '''<?xml version="1.0"?>
 <VOTABLE version="1.3"
@@ -44,6 +44,16 @@ def generate_votable(generator, fields, resource_name=None, table_name=None, que
         else:
             yield '''
         <TABLE>'''
+
+        if links:
+            for link in links:
+                attrs = []
+                for key in ['name', 'href', 'content-type', 'content-role']:
+                    if key in link and link[key]:
+                        attrs.append('%s="%s"' % (key, link[key]))
+
+                yield '''
+        <LINK %s />''' % ' '.join(attrs)
 
         for field in fields:
             attrs = []

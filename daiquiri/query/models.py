@@ -279,7 +279,7 @@ class QueryJob(Job):
         # initialize metadata and store map of aliases
         self.metadata = {
             'display_columns': OrderedDict(display_columns),
-            'source_tables': processor.tables
+            'tables': processor.tables
         }
 
         # get the native query from the processor (without trailing semicolon)
@@ -364,6 +364,7 @@ class QueryJob(Job):
                 self.schema_name,
                 self.table_name,
                 self.metadata['columns'],
+                self.metadata['sources'],
                 self.result_status,
                 (self.nrows == 0)
             )

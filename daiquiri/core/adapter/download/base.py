@@ -17,7 +17,7 @@ class BaseDownloadAdapter(object):
         self.database_key = database_key
         self.database_config = database_config
 
-    def generate(self, format_key, schema_name, table_name, columns, status=None, empty=False):
+    def generate(self, format_key, schema_name, table_name, columns, sources=None, status=None, empty=False):
         # create the final list of arguments subprocess.Popen
         self.set_args(schema_name, table_name)
 

@@ -7,6 +7,7 @@ import zipfile
 from celery import shared_task
 
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.db.utils import OperationalError, ProgrammingError, InternalError
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
@@ -42,7 +43,7 @@ class RunQueryTask(Task):
 def run_query(job_id):
     # always import daiquiri packages inside the task
     from daiquiri.core.adapter import DatabaseAdapter
-    from daiquiri.metadata.models import Column
+    from daiquiri.metadata.models import Table, Column
     from daiquiri.query.models import QueryJob
     from daiquiri.query.utils import get_quota
     from daiquiri.stats.models import Record
@@ -118,6 +119,37 @@ def run_query(job_id):
             job.nrows = adapter.count_rows(job.schema_name, job.table_name)
             job.size = adapter.fetch_size(job.schema_name, job.table_name)
 
+            # fetch the metadata for used tables
+            job.metadata['sources'] = []
+
+            if 'sources' in job.metadata:
+                for schema_name, table_name in job.metadata['tables']:
+                    table = {
+                        'schema_name': schema_name,
+                        'table_name': table_name
+                    }
+
+                    # fetch additional metadata from the metadata store
+                    try:
+                        original_table = Table.objects.get(
+                            name=table_name,
+                            schema__name=schema_name
+                        )
+
+                        table.update({
+                            'title': original_table.title,
+                            'description': original_table.description,
+                            'attribution': original_table.attribution,
+                            'license': original_table.license,
+                            'doi': original_table.doi,
+                            'url': reverse('metadata:table', args=[schema_name, table_name])
+                        })
+
+                        job.metadata['sources'].append(table)
+
+                    except Table.DoesNotExist:
+                        pass
+
             # fetch the metadata for the columns
             job.metadata['columns'] = adapter.fetch_columns(job.schema_name, job.table_name)
 
@@ -136,18 +168,23 @@ def run_query(job_id):
                             table__name=table_name,
                             table__schema__name=schema_name
                         )
-                    except Column.DoesNotExist:
-                        continue
 
-                    column.update({
-                        'description': original_column.description,
-                        'unit': original_column.unit,
-                        'ucd': original_column.ucd,
-                        'utype': original_column.utype,
-                        'principal': original_column.principal,
-                        'indexed': False,
-                        'std': original_column.std
-                    })
+                        column.update({
+                            'description': original_column.description,
+                            'unit': original_column.unit,
+                            'ucd': original_column.ucd,
+                            'utype': original_column.utype,
+                            'principal': original_column.principal,
+                            'indexed': False,
+                            'std': original_column.std
+                        })
+
+                    except Column.DoesNotExist:
+                        pass
+
+        # remove unneeded metadata
+        job.metadata.pop('display_columns', None)
+        job.metadata.pop('tables', None)
 
         # create a stats record for this job
         Record.objects.create(
@@ -156,7 +193,7 @@ def run_query(job_id):
             resource={
                 'job_id': job.id,
                 'job_type': job.job_type,
-                'tables': job.metadata['source_tables']
+                'sources': job.metadata['sources']
             },
             client_ip=job.client_ip,
             user=job.owner
@@ -200,6 +237,7 @@ def create_download_file(download_id):
                     download_job.job.schema_name,
                     download_job.job.table_name,
                     download_job.job.metadata['columns'],
+                    download_job.job.metadata['sources'],
                     download_job.job.result_status,
                     (download_job.job.nrows == 0)):
                 f.write(line)
