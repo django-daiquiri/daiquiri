@@ -8,7 +8,9 @@ from daiquiri.query.models import QueryJob, Example
 
 @override_settings(QUERY_ANONYMOUS=True)
 @mock.patch(settings.ADAPTER_DATABASE + '.submit_query', mock.Mock())
-@mock.patch(settings.ADAPTER_DATABASE + '.fetch_stats', mock.Mock(return_value=[100, 100]))
+@mock.patch(settings.ADAPTER_DATABASE + '.fetch_nrows', mock.Mock(return_value=100))
+@mock.patch(settings.ADAPTER_DATABASE + '.fetch_size', mock.Mock(return_value=100))
+@mock.patch(settings.ADAPTER_DATABASE + '.count_rows', mock.Mock(return_value=100))
 @mock.patch(settings.ADAPTER_DATABASE + '.rename_table', mock.Mock())
 @mock.patch(settings.ADAPTER_DATABASE + '.drop_table', mock.Mock())
 class SyncTestCase(SyncTestMixin, TestCase):

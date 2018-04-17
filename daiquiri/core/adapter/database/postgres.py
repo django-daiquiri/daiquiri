@@ -96,14 +96,7 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         sql = 'select pg_cancel_backend(%(pid)i)' % {'pid': pid}
         self.execute(sql)
 
-    def fetch_stats(self, schema_name, table_name):
-        # fetch the number of rows
-        sql = 'SELECT count(*) FROM %(schema)s.%(table)s' % {
-            'schema': self.escape_identifier(schema_name),
-            'table': self.escape_identifier(table_name)
-        }
-        nrows = self.fetchone(sql)[0]
-
+    def fetch_size(self, schema_name, table_name):
         # fetch the size of the table using pg_total_relation_size
         sql = 'SELECT pg_total_relation_size(\'%(schema)s.%(table)s\')' % {
             'schema': self.escape_identifier(schema_name),
@@ -112,9 +105,17 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         size = self.fetchone(sql)[0]
 
         # log values and return
-        logger.debug('nrows = %d', nrows)
         logger.debug('size = %d', size)
-        return nrows, size
+        return size
+
+    def fetch_nrows(self, schema_name, table_name):
+        # fetch the size of the table using pg_total_relation_size
+        sql = 'SELECT n_tup_ins FROM pg_stat_user_tables WHERE schemaname = %s AND relname = %s;'
+        nrows = self.fetchone(sql, (schema_name, table_name))[0]
+
+        # log values and return
+        logger.debug('size = %d', nrows)
+        return nrows
 
     def count_rows(self, schema_name, table_name, column_names=None, search=None, filters=None):
         # if no column names are provided get all column_names from the table

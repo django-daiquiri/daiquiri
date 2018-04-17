@@ -121,8 +121,6 @@ def update_column(column):
     except TapTable.DoesNotExist:
         tap_table = None
 
-    print(tap_visibility)
-
     if tap_visibility and tap_table:
         try:
             tap_column = TapColumn.objects.get(pk=column.id)

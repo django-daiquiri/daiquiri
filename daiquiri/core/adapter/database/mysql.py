@@ -85,9 +85,21 @@ class MySQLAdapter(BaseDatabaseAdapter):
         sql = 'KILL %(pid)i' % {'pid': pid}
         self.execute(sql)
 
-    def fetch_stats(self, schema_name, table_name):
-        sql = 'SELECT table_rows as nrows, data_length + index_length AS size FROM `information_schema`.`tables` WHERE `table_schema` = %s AND table_name = %s;'
-        return self.fetchone(sql, (schema_name, table_name))
+    def fetch_size(self, schema_name, table_name):
+        sql = 'SELECT data_length + index_length AS size FROM `information_schema`.`tables` WHERE `table_schema` = %s AND table_name = %s;'
+        size = self.fetchone(sql, (schema_name, table_name))[0]
+
+        # log values and return
+        logger.debug('size = %d', size)
+        return size
+
+    def fetch_nrows(self, schema_name, table_name):
+        sql = 'SELECT table_rows as nrows FROM `information_schema`.`tables` WHERE `table_schema` = %s AND table_name = %s;'
+        nrows = self.fetchone(sql, (schema_name, table_name))[0]
+
+        # log values and return
+        logger.debug('size = %d', nrows)
+        return nrows
 
     def count_rows(self, schema_name, table_name, column_names=None, search=None, filters=None):
         # if no column names are provided get all column_names from the table

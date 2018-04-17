@@ -33,10 +33,13 @@ class CoreAdapterTestCase(TestCase):
         self.assertEqual(len(rows[0]), 8)
         self.assertEqual(rows[0][0], 85000000000)
 
-    def test_fetch_stats(self):
-        rows = DatabaseAdapter().fetch_stats('daiquiri_data_obs', 'stars')
-        self.assertEqual(rows[0], 10000)
-        self.assertGreater(rows[1], 250000)
+    def test_fetch_nrows(self):
+        nrows = DatabaseAdapter().fetch_nrows('daiquiri_data_obs', 'stars')
+        self.assertEqual(nrows, 10000)
+
+    def test_fetch_size(self):
+        size = DatabaseAdapter().fetch_size('daiquiri_data_obs', 'stars')
+        self.assertGreater(size, 250000)
 
     def test_fetch_columns(self):
         columns = DatabaseAdapter().fetch_columns('daiquiri_archive', 'files')

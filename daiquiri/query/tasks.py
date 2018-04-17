@@ -115,7 +115,8 @@ def run_query(job_id):
 
         # get additional information about the completed job
         if job.phase == job.PHASE_COMPLETED:
-            job.nrows, job.size = adapter.fetch_stats(job.schema_name, job.table_name)
+            job.nrows = adapter.count_rows(job.schema_name, job.table_name)
+            job.size = adapter.fetch_size(job.schema_name, job.table_name)
 
             # fetch the metadata for the columns
             job.metadata['columns'] = adapter.fetch_columns(job.schema_name, job.table_name)
