@@ -1,0 +1,45 @@
+from django.conf import settings
+from django.core.management.base import BaseCommand
+from django.db.utils import ProgrammingError
+
+from rest_framework.exceptions import ValidationError
+
+from daiquiri.core.adapter import DatabaseAdapter
+from daiquiri.query.models import QueryJob
+
+
+class Command(BaseCommand):
+
+
+    def add_arguments(self, parser):
+        parser.add_argument('--user', help='Only fix jobs for this user.')
+        parser.add_argument('--dry', action='store_true', help='Perform a dryrun.')
+
+    def handle(self, *args, **options):
+        # look for completed jobs with no table
+        queryset = QueryJob.objects.filter(phase=QueryJob.PHASE_COMPLETED)
+
+        if options['user']:
+            queryset = queryset.filter(owner__username=options['user'])
+
+        for job in queryset:
+            try:
+                DatabaseAdapter().fetch_size(job.schema_name, job.table_name)
+            except ProgrammingError:
+                try:
+                    job.phase = QueryJob.PHASE_PENDING
+                    job.process()
+
+                    print('Run %s by %s again.' % (job.id, job.owner))
+
+                    if not options['dry']:
+                        job.run()
+
+                except ValidationError as e:
+                    job.phase = QueryJob.PHASE_ERROR
+                    job.error_summary = ' '.join([error for error in e.detail['query']])
+
+                    print('Error for %s by %s: %s' % (job.id, job.owner, job.error_summary))
+
+                    if not options['dry']:
+                        job.save()
