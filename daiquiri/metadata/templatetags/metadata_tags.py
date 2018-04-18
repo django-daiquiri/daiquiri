@@ -21,7 +21,7 @@ def schemas_menu(context):
             'label': schema.title or schema.name,
             'tables': [{
                 'name': table.name,
-                'label': table.name
+                'label': '%s.%s' % (schema.name, table.name)
                 } for table in schema.tables.filter_by_metadata_access_level(context.request.user)
             ]
         })
