@@ -13,6 +13,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--user', help='Only fix jobs for this user.')
+        parser.add_argument('--queue', help='Name of the queue to use.')
         parser.add_argument('--dry', action='store_true', help='Perform a dryrun.')
 
     def handle(self, *args, **options):
@@ -28,6 +29,10 @@ class Command(BaseCommand):
             except ProgrammingError:
                 try:
                     job.phase = QueryJob.PHASE_PENDING
+
+                    if options['queue']:
+                        job.queue = options['queue']
+
                     job.process()
 
                     print('Run %s by %s again.' % (job.id, job.owner))
@@ -37,7 +42,10 @@ class Command(BaseCommand):
 
                 except ValidationError as e:
                     job.phase = QueryJob.PHASE_ERROR
-                    job.error_summary = ' '.join([error for error in e.detail['query']])
+
+                    job.error_summary = ''
+                    for key, errors in e.detail.items():
+                        job.error_summary += ''.join(errors)
 
                     print('Error for %s by %s: %s' % (job.id, job.owner, job.error_summary))
 
