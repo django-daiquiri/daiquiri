@@ -72,7 +72,7 @@ class QueryJob(Job):
     nrows = models.BigIntegerField(null=True, blank=True)
     size = models.BigIntegerField(null=True, blank=True)
 
-    metadata = JSONField()
+    metadata = JSONField(blank=True)
 
     pid = models.IntegerField(null=True, blank=True)
 
@@ -408,6 +408,11 @@ class QueryJob(Job):
             raise ValidationError({
                 'phase': ['Job is not COMPLETED.']
             })
+
+    def columns(self):
+        if self.metadata:
+            return self.metadata.get('columns', [])
+
 
 class DownloadJob(Job):
 

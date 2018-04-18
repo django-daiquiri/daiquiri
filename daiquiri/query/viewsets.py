@@ -186,7 +186,7 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
         except QueryJob.DoesNotExist:
             raise NotFound
 
-        return Response(job.metadata['columns'])
+        return Response(job.columns())
 
     @detail_route(methods=['get'], url_path='download/(?P<download_id>[A-Za-z0-9\-]+)', url_name='download')
     def download(self, request, pk=None, download_id=None):
