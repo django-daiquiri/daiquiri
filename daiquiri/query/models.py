@@ -412,6 +412,8 @@ class QueryJob(Job):
     def columns(self):
         if self.metadata:
             return self.metadata.get('columns', [])
+        else:
+            return []
 
 
 class DownloadJob(Job):

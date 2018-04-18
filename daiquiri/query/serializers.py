@@ -86,11 +86,15 @@ class QueryJobRetrieveSerializer(serializers.ModelSerializer):
     def get_sources(self, obj):
         if obj.metadata:
             return obj.metadata.get('sources', [])
+        else:
+            return []
 
 
     def get_columns(self, obj):
         if obj.metadata:
             return obj.metadata.get('columns', [])
+        else:
+            return []
 
 
 class QueryJobCreateSerializer(serializers.ModelSerializer):
