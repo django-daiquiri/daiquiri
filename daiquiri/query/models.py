@@ -388,17 +388,22 @@ class QueryJob(Job):
             # get database adapter
             adapter = DatabaseAdapter()
 
-            # query the database for the total number of rows
-            count = adapter.count_rows(self.schema_name, self.table_name, column_names, search, filters)
+            try:
+                # query the database for the total number of rows
+                count = adapter.count_rows(self.schema_name, self.table_name, column_names, search, filters)
 
-            # query the paginated rowset
-            rows = adapter.fetch_rows(self.schema_name, self.table_name, column_names, ordering, page, page_size, search, filters)
+                # query the paginated rowset
+                rows = adapter.fetch_rows(self.schema_name, self.table_name, column_names, ordering, page, page_size, search, filters)
 
-            # flatten the list if only one column is retrieved
-            if len(column_names) == 1:
-                return count, [element for row in rows for element in row]
-            else:
-                return count, rows
+                # flatten the list if only one column is retrieved
+                if len(column_names) == 1:
+                    return count, [element for row in rows for element in row]
+                else:
+                    return count, rows
+
+            except ProgrammingError:
+                return 0, []
+
         else:
             raise ValidationError({
                 'phase': ['Job is not COMPLETED.']

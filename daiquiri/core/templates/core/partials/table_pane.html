@@ -1,3 +1,5 @@
+{% load i18n %}
+
 <div class="daiquiri-table-pane">
     <table class="table">
         <thead>
@@ -73,6 +75,13 @@
                                 {$ row[column_index] $}
                             </div>
                         </div>
+                    </div>
+                </td>
+            </tr>
+            <tr class="daiquiri-table-pane-empty" ng-hide="service.table.rows.length">
+                <td>
+                    <div class="daiquiri-table-cell">
+                        {% trans 'No rows were retrieved.' %}
                     </div>
                 </td>
             </tr>
