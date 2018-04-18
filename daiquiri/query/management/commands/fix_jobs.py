@@ -45,7 +45,10 @@ class Command(BaseCommand):
 
                     job.error_summary = ''
                     for key, errors in e.detail.items():
-                        job.error_summary += ''.join(errors)
+                        try:
+                            job.error_summary += ''.join(errors['messages'])
+                        except TypeError:
+                            job.error_summary += ''.join(errors)
 
                     print('Error for %s by %s: %s' % (job.id, job.owner, job.error_summary))
 
