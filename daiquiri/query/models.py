@@ -436,8 +436,11 @@ class DownloadJob(Job):
 
         format_config = get_format_config(self.format_key)
 
-        directory_name = os.path.join(settings.QUERY_DOWNLOAD_DIR, username)
-        return os.path.join(directory_name, '%s.%s' % (self.job.table_name, format_config['extension']))
+        if format_config:
+            directory_name = os.path.join(settings.QUERY_DOWNLOAD_DIR, username)
+            return os.path.join(directory_name, '%s.%s' % (self.job.table_name, format_config['extension']))
+        else:
+            return None
 
     def process(self):
         if self.job.phase == self.PHASE_COMPLETED:

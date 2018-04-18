@@ -10,7 +10,12 @@ from daiquiri.metadata.models import Schema, Table, Column, Function
 
 
 def get_format_config(format_key):
-    return [f for f in settings.QUERY_DOWNLOAD_FORMATS if f['key'] == format_key][0]
+
+    for format_config in settings.QUERY_DOWNLOAD_FORMATS:
+        if format_config['key'] == format_key:
+            return format_config
+
+    return None
 
 
 def get_default_table_name():
