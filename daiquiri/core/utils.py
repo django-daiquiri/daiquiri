@@ -119,6 +119,10 @@ def get_admin_emails():
     return [user.email for user in User.objects.filter(is_superuser=True)]
 
 
+def get_doi_url(doi):
+    return 'https://doi.org/%s' % doi.rstrip('/') if doi else None
+
+
 def human2bytes(string):
     if not string:
         return 0

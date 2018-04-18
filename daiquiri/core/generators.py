@@ -38,13 +38,6 @@ def generate_votable(generator, fields, resource_name=None, table_name=None, lin
             yield '''
         <INFO name="QUERY_STATUS" value="OVERFLOW" />'''
 
-        if table_name:
-            yield '''
-        <TABLE name="%(table)s">''' % {'table': table_name}
-        else:
-            yield '''
-        <TABLE>'''
-
         if links:
             for link in links:
                 attrs = []
@@ -54,6 +47,13 @@ def generate_votable(generator, fields, resource_name=None, table_name=None, lin
 
                 yield '''
         <LINK %s />''' % ' '.join(attrs)
+
+        if table_name:
+            yield '''
+        <TABLE name="%(table)s">''' % {'table': table_name}
+        else:
+            yield '''
+        <TABLE>'''
 
         for field in fields:
             attrs = []

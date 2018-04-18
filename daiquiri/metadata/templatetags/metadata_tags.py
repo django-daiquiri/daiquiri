@@ -2,9 +2,9 @@ from django import template
 from django.utils.translation import ugettext_lazy as _
 
 from daiquiri.core.constants import LICENSE_CHOICES, LICENSE_URLS
+from daiquiri.core.utils import get_doi_url
 
 from ..models import Schema
-from ..utils import get_doi_url
 
 register = template.Library()
 

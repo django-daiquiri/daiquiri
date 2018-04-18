@@ -1,5 +1,5 @@
+from daiquiri.core.utils import get_doi_url
 from daiquiri.jobs.renderers import XMLRenderer
-from daiquiri.metadata.utils import get_doi_url
 
 
 class AvailabilityRenderer(XMLRenderer):

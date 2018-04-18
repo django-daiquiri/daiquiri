@@ -7,6 +7,7 @@ import re
 from django.conf import settings
 
 from daiquiri.core.generators import generate_csv, generate_votable
+from daiquiri.core.utils import get_doi_url
 
 logger = logging.getLogger(__name__)
 
@@ -27,13 +28,24 @@ class BaseDownloadAdapter(object):
                 if ucd in column['ucd']:
                     prepend[i] = value
 
+        if sources:
+            links = []
+            for source in sources:
+                links.append({
+                    'content-role': 'source',
+                    'href': get_doi_url(source['doi']),
+                    'name': '%(schema_name)s.%(table_name)s' % source,
+                })
+        else:
+            links = None
+
         if format_key == 'csv':
             return generate_csv(self.execute(prepend=prepend))
 
         elif format_key == 'votable':
             return generate_votable(self.execute(prepend=prepend), columns,
                                     resource_name=schema_name, table_name=table_name,
-                                    query_status=status, empty=empty)
+                                    links=links, query_status=status, empty=empty)
 
         else:
             raise Exception('Not supported.')

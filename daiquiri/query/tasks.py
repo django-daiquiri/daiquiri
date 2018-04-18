@@ -232,15 +232,9 @@ def create_download_file(download_id):
     # write file using the generator in the adapter
     try:
         with open(download_job.file_path, 'w') as f:
-            for line in DownloadAdapter().generate(
-                    download_job.format_key,
-                    download_job.job.schema_name,
-                    download_job.job.table_name,
-                    download_job.job.metadata['columns'],
-                    download_job.job.metadata['sources'],
-                    download_job.job.result_status,
-                    (download_job.job.nrows == 0)):
+            for line in download_job.job.stream(download_job.format_key):
                 f.write(line)
+
     except Exception as e:
         download_job.phase = download_job.PHASE_ERROR
         download_job.error_summary = str(e)
