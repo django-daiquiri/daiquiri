@@ -193,7 +193,7 @@ def run_query(job_id):
             resource={
                 'job_id': job.id,
                 'job_type': job.job_type,
-                'sources': job.metadata['sources']
+                'sources': job.metadata.get('sources', [])
             },
             client_ip=job.client_ip,
             user=job.owner
