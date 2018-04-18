@@ -363,8 +363,8 @@ class QueryJob(Job):
                 format_key,
                 self.schema_name,
                 self.table_name,
-                self.metadata['columns'],
-                self.metadata['sources'],
+                self.metadata.get('columns'),
+                self.metadata.get('sources'),
                 self.result_status,
                 (self.nrows == 0)
             )
