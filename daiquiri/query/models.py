@@ -477,7 +477,8 @@ class DownloadJob(Job):
 
     def delete_file(self):
         try:
-            os.remove(self.file_path)
+            if self.file_path is not None:
+                os.remove(self.file_path)
         except OSError:
             pass
 
