@@ -141,32 +141,42 @@ def check_permissions(user, keywords, tables, columns, functions):
         pass
 
     if not settings.METADATA_COLUMN_PERMISSIONS:
-        # check permissions on schemas/tables
+
+        # loop over tables to check permissions on schemas/tables
         for schema_name, table_name in tables:
             # check permission on schema
             if schema_name in [None, settings.TAP_SCHEMA, get_user_schema_name(user)]:
+                # all tables are allowed move to next table
                 continue
             else:
+                # check permissions on the schema
                 try:
                     schema = Schema.objects.filter_by_access_level(user).get(name=schema_name)
                 except Schema.DoesNotExist:
+                    # schema not found or not allowed, move to next table
                     messages.append(_('Schema %s not found.') % schema_name)
                     continue
 
             # check permission on table
             if table_name is None:
+                # None doesn't need to be checked, move to next table
                 continue
             else:
                 try:
                     Table.objects.filter_by_access_level(user).filter(schema=schema).get(name=table_name)
                 except Table.DoesNotExist:
+                    # table not found or not allowed, move to next table
                     messages.append(_('Table %s not found.') % table_name)
                     continue
 
+        # loop over columns just to see if they are there
         for schema_name, table_name, column_name in columns:
-            if column_name in [None, '*']:
+
+            if schema_name is None or schema_name is None or column_name in [None, '*']:
+                # None or * doesn't need to be checked, move to next table
                 continue
             else:
+                # just check if the column exist
                 try:
                     Column.objects.filter(table__schema__name=schema_name).filter(table__name=table_name).get(name=column_name)
                 except Column.DoesNotExist:
