@@ -41,7 +41,7 @@
 {% include "socialaccount/snippets/login_extra.html" %}
 
 <p>
-    {% url 'account_connections' as account_connections_url %}
+    {% url 'socialaccount_connections' as account_connections_url %}
     {% blocktrans %}If you already have an account, but did not connect a third party account yet, you can do so on the <a href="{{ account_connections_url }}">account connections page.</a>{% endblocktrans %}
 </p>
 
