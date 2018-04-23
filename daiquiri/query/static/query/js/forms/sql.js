@@ -82,34 +82,30 @@ app.factory('SqlFormService', ['$timeout', '$filter', 'QueryService', 'BrowserSe
     };
 
     service.paste_item = function(resource, item) {
-        var string = '';
-        if (angular.isDefined(item.query_strings)) {
-            var query_language = $filter('filter')(QueryService.query_languages, {id: service.values.query_language})[0];
-            var quote_char = query_language.quote_char
-            var strings = [];
-
-            angular.forEach(item.query_strings, function(query_string) {
-                strings.push(quote_char + query_string + quote_char);
-            })
-
-            string = strings.join('.')
-        } else if (angular.isDefined(item.query_string)) {
-            string = item.query_string;
-        } else {
-            string = item.name;
-        }
-
+        // get the editor object
         var editor = $('.CodeMirror')[0].CodeMirror;
 
         if (resource == 'examples') {
-            service.values.query = string
+            service.values.query = item.query_string;
+            service.values.query_language = item.query_language;
+
             editor.refresh();
         } else {
-            editor.replaceSelection(string);
+            var query_language = $filter('filter')(QueryService.query_languages, {id: service.values.query_language})[0];
+            var quote_char = query_language.quote_char;
+
+            var query_strings = [];
+            angular.forEach(item.query_strings, function(query_string) {
+                query_strings.push(quote_char + query_string + quote_char);
+            })
+
+            var query_string = strings.join('.');
+
+            editor.replaceSelection(query_string);
         }
 
+        // focus the editor
         editor.focus();
-        $('.daiquiri-query-dropdowns .btn-group').removeClass('open');
     }
 
     service.paste_string = function(string) {

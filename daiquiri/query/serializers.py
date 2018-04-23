@@ -166,6 +166,7 @@ class UserExampleSerializer(serializers.ModelSerializer):
             'name',
             'description',
             'query_string',
+            'query_language',
             'groups'
         )
 
