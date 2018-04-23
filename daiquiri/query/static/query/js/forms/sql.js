@@ -99,7 +99,7 @@ app.factory('SqlFormService', ['$timeout', '$filter', 'QueryService', 'BrowserSe
                 query_strings.push(quote_char + query_string + quote_char);
             })
 
-            var query_string = strings.join('.');
+            var query_string = query_strings.join('.');
 
             editor.replaceSelection(query_string);
         }
