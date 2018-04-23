@@ -306,6 +306,12 @@ div.fieldset {
     word-wrap: break-word;
 }
 
+.hide-overflow {
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .email-form label,
 .connections-form label {
     display: block;
