@@ -59,3 +59,46 @@ class QueryPermissionsTestCase(TestCase):
         result = check_permissions(user, keywords, tables, columns, functions)
 
         self.assertEqual(result, [])
+
+    def test_missing_schema(self):
+        user = User.objects.get(username='admin')
+        keywords = []
+        tables = [(None, 'stars')]
+        columns = [
+            ('daiquiri_data_obs', 'stars', 'ra'),
+            ('daiquiri_data_obs', 'stars', 'dec'),
+            (None, None, 'alias')
+        ]
+        functions = []
+
+        result = check_permissions(user, keywords, tables, columns, functions)
+
+        self.assertEqual(result, ['No schema given for table stars.'])
+
+    def test_missing_table(self):
+        user = User.objects.get(username='admin')
+        keywords = []
+        tables = [('daiquiri_data_obs', None)]
+        columns = [
+            ('daiquiri_data_obs', 'stars', 'ra'),
+            ('daiquiri_data_obs', 'stars', 'dec'),
+            (None, None, 'alias')
+        ]
+        functions = []
+
+        result = check_permissions(user, keywords, tables, columns, functions)
+
+        self.assertEqual(result, ['No table given for schema daiquiri_data_obs.'])
+
+    def test_user_schema(self):
+        user = User.objects.get(username='user')
+        keywords = []
+        tables = [('daiquiri_user_user', 'test')]
+        columns = [
+            (None, None, '*')
+        ]
+        functions = []
+
+        result = check_permissions(user, keywords, tables, columns, functions)
+
+        self.assertEqual(result, [])

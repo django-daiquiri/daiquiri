@@ -140,56 +140,60 @@ def check_permissions(user, keywords, tables, columns, functions):
     for keywords in keywords:
         pass
 
-    if not settings.METADATA_COLUMN_PERMISSIONS:
+    # loop over tables to check permissions on schemas/tables
+    for schema_name, table_name in tables:
 
-        # loop over tables to check permissions on schemas/tables
-        for schema_name, table_name in tables:
-            # check permission on schema
-            if schema_name in [None, settings.TAP_SCHEMA, get_user_schema_name(user)]:
-                # all tables are allowed move to next table
+        # check permission on schema
+        if schema_name is None:
+            # schema_name must not be null, move to next table
+            messages.append(_('No schema given for table %s.') % table_name)
+            continue
+        elif schema_name in [settings.TAP_SCHEMA, get_user_schema_name(user)]:
+            # all tables are allowed move to next table
+            continue
+        else:
+            # check permissions on the schema
+            try:
+                schema = Schema.objects.filter_by_access_level(user).get(name=schema_name)
+            except Schema.DoesNotExist:
+                # schema not found or not allowed, move to next table
+                messages.append(_('Schema %s not found.') % schema_name)
                 continue
-            else:
-                # check permissions on the schema
-                try:
-                    schema = Schema.objects.filter_by_access_level(user).get(name=schema_name)
-                except Schema.DoesNotExist:
-                    # schema not found or not allowed, move to next table
-                    messages.append(_('Schema %s not found.') % schema_name)
-                    continue
 
-            # check permission on table
-            if table_name is None:
-                # None doesn't need to be checked, move to next table
+        # check permission on table
+        if table_name is None:
+            # table_name must not be null, move to next table
+            messages.append(_('No table given for schema %s.') % schema_name)
+            continue
+        else:
+            try:
+                Table.objects.filter_by_access_level(user).filter(schema=schema).get(name=table_name)
+            except Table.DoesNotExist:
+                # table not found or not allowed, move to next table
+                messages.append(_('Table %s not found.') % table_name)
                 continue
-            else:
-                try:
-                    Table.objects.filter_by_access_level(user).filter(schema=schema).get(name=table_name)
-                except Table.DoesNotExist:
-                    # table not found or not allowed, move to next table
-                    messages.append(_('Table %s not found.') % table_name)
-                    continue
 
-        # loop over columns just to see if they are there
-        for schema_name, table_name, column_name in columns:
+    # loop over columns to check permissions or just to see if they are there
+    for schema_name, table_name, column_name in columns:
 
-            if schema_name is None or schema_name is None or column_name in [None, '*']:
-                # None or * doesn't need to be checked, move to next table
-                continue
-            else:
+        if schema_name in [None, settings.TAP_SCHEMA, get_user_schema_name(user)] \
+            or table_name is None \
+            or column_name is None:
+            # doesn't need to be checked, move to next column
+            continue
+        else:
+            if not settings.METADATA_COLUMN_PERMISSIONS:
                 # just check if the column exist
-                try:
-                    Column.objects.filter(table__schema__name=schema_name).filter(table__name=table_name).get(name=column_name)
-                except Column.DoesNotExist:
-                    messages.append(_('Column %s not found.') % column_name)
+                if column_name == '*':
+                    # doesn't need to be checked, move to next table
                     continue
-    else:
-        # check permissions on schemas/tables/columns
-        for column in columns:
-            schema_name, table_name, column_name = column
 
-            # check permission on schema
-            if schema_name in [None, settings.TAP_SCHEMA, get_user_schema_name(user)]:
-                continue
+                else:
+                    try:
+                        Column.objects.filter(table__schema__name=schema_name).filter(table__name=table_name).get(name=column_name)
+                    except Column.DoesNotExist:
+                        messages.append(_('Column %s not found.') % column_name)
+                        continue
             else:
                 try:
                     schema = Schema.objects.filter_by_access_level(user).get(name=schema_name)
@@ -197,35 +201,29 @@ def check_permissions(user, keywords, tables, columns, functions):
                     messages.append(_('Schema %s not found.') % schema_name)
                     continue
 
-            # check permission on table
-            if table_name is None:
-                continue
-            else:
                 try:
                     table = Table.objects.filter_by_access_level(user).filter(schema=schema).get(name=table_name)
                 except Table.DoesNotExist:
                     messages.append(_('Table %s not found.') % table_name)
                     continue
 
-            # check permission on column
-            if column_name is None:
-                continue
-            elif column_name == '*':
-                columns = Column.objects.filter_by_access_level(user).filter(table=table)
-                actual_columns = DatabaseAdapter().fetch_columns(schema_name, table_name)
+                if column_name == '*':
+                    columns = Column.objects.filter_by_access_level(user).filter(table=table)
+                    actual_columns = DatabaseAdapter().fetch_columns(schema_name, table_name)
 
-                column_names_set = set([column.name for column in columns])
-                actual_column_names_set = set([column['name'] for column in actual_columns])
+                    column_names_set = set([column.name for column in columns])
+                    actual_column_names_set = set([column['name'] for column in actual_columns])
 
-                if column_names_set != actual_column_names_set:
-                    messages.append(_('The asterisk (*) is not allowed for this table.'))
-                    continue
-            else:
-                try:
-                    column = Column.objects.filter_by_access_level(user).filter(table=table).get(name=column_name)
-                except Column.DoesNotExist:
-                    messages.append(_('Column %s not found.') % column_name)
-                    continue
+                    if column_names_set != actual_column_names_set:
+                        messages.append(_('The asterisk (*) is not allowed for this table.'))
+                        continue
+
+                else:
+                    try:
+                        column = Column.objects.filter_by_access_level(user).filter(table=table).get(name=column_name)
+                    except Column.DoesNotExist:
+                        messages.append(_('Column %s not found.') % column_name)
+                        continue
 
     # check permissions on functions
     for function_name in functions:
