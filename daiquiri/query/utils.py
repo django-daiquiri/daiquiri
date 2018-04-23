@@ -173,57 +173,60 @@ def check_permissions(user, keywords, tables, columns, functions):
                 messages.append(_('Table %s not found.') % table_name)
                 continue
 
-    # loop over columns to check permissions or just to see if they are there
-    for schema_name, table_name, column_name in columns:
+    # loop over columns to check permissions or just to see if they are there,
+    # but only if no error messages where appended so far
+    if not messages:
 
-        if schema_name in [None, settings.TAP_SCHEMA, get_user_schema_name(user)] \
-            or table_name is None \
-            or column_name is None:
-            # doesn't need to be checked, move to next column
-            continue
-        else:
-            if not settings.METADATA_COLUMN_PERMISSIONS:
-                # just check if the column exist
-                if column_name == '*':
-                    # doesn't need to be checked, move to next table
-                    continue
+        for schema_name, table_name, column_name in columns:
 
-                else:
-                    try:
-                        Column.objects.filter(table__schema__name=schema_name).filter(table__name=table_name).get(name=column_name)
-                    except Column.DoesNotExist:
-                        messages.append(_('Column %s not found.') % column_name)
-                        continue
+            if schema_name in [None, settings.TAP_SCHEMA, get_user_schema_name(user)] \
+                or table_name is None \
+                or column_name is None:
+                # doesn't need to be checked, move to next column
+                continue
             else:
-                try:
-                    schema = Schema.objects.filter_by_access_level(user).get(name=schema_name)
-                except Schema.DoesNotExist:
-                    messages.append(_('Schema %s not found.') % schema_name)
-                    continue
-
-                try:
-                    table = Table.objects.filter_by_access_level(user).filter(schema=schema).get(name=table_name)
-                except Table.DoesNotExist:
-                    messages.append(_('Table %s not found.') % table_name)
-                    continue
-
-                if column_name == '*':
-                    columns = Column.objects.filter_by_access_level(user).filter(table=table)
-                    actual_columns = DatabaseAdapter().fetch_columns(schema_name, table_name)
-
-                    column_names_set = set([column.name for column in columns])
-                    actual_column_names_set = set([column['name'] for column in actual_columns])
-
-                    if column_names_set != actual_column_names_set:
-                        messages.append(_('The asterisk (*) is not allowed for this table.'))
+                if not settings.METADATA_COLUMN_PERMISSIONS:
+                    # just check if the column exist
+                    if column_name == '*':
+                        # doesn't need to be checked, move to next table
                         continue
 
+                    else:
+                        try:
+                            Column.objects.filter(table__schema__name=schema_name).filter(table__name=table_name).get(name=column_name)
+                        except Column.DoesNotExist:
+                            messages.append(_('Column %s not found.') % column_name)
+                            continue
                 else:
                     try:
-                        column = Column.objects.filter_by_access_level(user).filter(table=table).get(name=column_name)
-                    except Column.DoesNotExist:
-                        messages.append(_('Column %s not found.') % column_name)
+                        schema = Schema.objects.filter_by_access_level(user).get(name=schema_name)
+                    except Schema.DoesNotExist:
+                        messages.append(_('Schema %s not found.') % schema_name)
                         continue
+
+                    try:
+                        table = Table.objects.filter_by_access_level(user).filter(schema=schema).get(name=table_name)
+                    except Table.DoesNotExist:
+                        messages.append(_('Table %s not found.') % table_name)
+                        continue
+
+                    if column_name == '*':
+                        columns = Column.objects.filter_by_access_level(user).filter(table=table)
+                        actual_columns = DatabaseAdapter().fetch_columns(schema_name, table_name)
+
+                        column_names_set = set([column.name for column in columns])
+                        actual_column_names_set = set([column['name'] for column in actual_columns])
+
+                        if column_names_set != actual_column_names_set:
+                            messages.append(_('The asterisk (*) is not allowed for this table.'))
+                            continue
+
+                    else:
+                        try:
+                            column = Column.objects.filter_by_access_level(user).filter(table=table).get(name=column_name)
+                        except Column.DoesNotExist:
+                            messages.append(_('Column %s not found.') % column_name)
+                            continue
 
     # check permissions on functions
     for function_name in functions:
