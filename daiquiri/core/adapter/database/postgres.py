@@ -110,11 +110,16 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
 
     def fetch_nrows(self, schema_name, table_name):
         # fetch the size of the table using pg_total_relation_size
-        sql = 'SELECT n_tup_ins FROM pg_stat_user_tables WHERE schemaname = %s AND relname = %s;'
-        nrows = self.fetchone(sql, (schema_name, table_name))[0]
+        sql = 'SELECT reltuples::BIGINT FROM pg_class WHERE oid = \'%(schema)s.%(table)s\'::regclass;' % {
+            'schema': self.escape_identifier(schema_name),
+            'table': self.escape_identifier(table_name)
+        }
+        nrows = self.fetchone(sql)[0]
+
+        print(nrows)
 
         # log values and return
-        logger.debug('size = %d', nrows)
+        logger.debug('nrows = %d', nrows)
         return nrows
 
     def count_rows(self, schema_name, table_name, column_names=None, search=None, filters=None):
