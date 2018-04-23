@@ -116,8 +116,6 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         }
         nrows = self.fetchone(sql)[0]
 
-        print(nrows)
-
         # log values and return
         logger.debug('nrows = %d', nrows)
         return nrows
