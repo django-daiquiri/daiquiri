@@ -10,12 +10,28 @@ html {
 }
 body {
     // make footer sticky
-    margin: 0 0 ($footer-content-height + $footer-bottom-height);
+    @media (min-width: $screen-sm-max) {
+        margin: 0 0 ($footer-content-height + $footer-bottom-height);
+    }
 }
 
-.page, .wide, .sidebar {
+.page,
+.wide,
+.sidebar {
     margin-top: 100px;
     margin-bottom: 100px;
+
+    @media (max-width: $screen-sm-max) {
+        margin-top: 20px;
+        margin-bottom: 20px;
+
+        &:first-child {
+            margin-top: 100px;
+        }
+        &:last-child {
+            margin-bottom: 40px;
+        }
+    }
 }
 
 /* typography */
@@ -89,57 +105,137 @@ blockquote {
     background-color: $navigation-background-color;
     border-bottom: none;
 
-    .navbar-brand,
-    .navbar-nav > li > a,
-    .navbar-nav > li > a:focus {
+    .navbar-brand {
         color: $navigation-color;
         background-color: transparent;
-    }
-    .navbar-brand:hover,
-    .navbar-nav > li > a:hover,
-    .navbar-nav > .open > a,
-    .navbar-nav > .open > a:focus,
-    .navbar-nav > .open > a:hover {
-        color: $navigation-hover-color;
-        background-color: $navigation-hover-background-color;
+
+        &:hover {
+            color: $navigation-hover-color;
+            background-color: $navigation-hover-background-color;
+        }
     }
 
-    .dropdown li.divider:first-child {
-        display: none;
-    }
-
-    .dropdown-menu {
-        .sub-menu {
-            padding-left: 0;
-            list-style-type: none;
-
-            a {
-                color: inherit;
-                text-decoration: none;
+    .navbar-nav {
+        li {
+            a,
+            a:focus,
+            a:visited {
+                color: $navigation-color;
+                background-color: transparent;
             }
-            li {
-                padding: 1px 20px 1px 40px;
-            }
-            :hover {
-                background-color: $navigation-dropdown-hover-background-color;
+            a:hover {
+                color: $navigation-hover-color;
+                background-color: $navigation-hover-background-color;
             }
         }
+
+        > .open {
+            > a,
+            > a:focus,
+            > a:hover,
+            > a:visited {
+                color: $navigation-hover-color;
+                background-color: $navigation-hover-background-color;
+            }
+
+            .dropdown-menu {
+                > li {
+                    > a,
+                    > a:focus,
+                    > a:visited {
+                        color: $navigation-dropdown-color;
+                        background-color: transparent;
+                    }
+                    > a:hover {
+                        color: $navigation-dropdown-hover-color;
+                        background-color: $navigation-dropdown-hover-background-color;
+                    }
+
+                    @media (max-width: $screen-sm-max) {
+                        // same as .navbar-nav li a
+                        > a,
+                        > a:focus,
+                        > a:visited {
+                            color: $navigation-color;
+                            background-color: transparent;
+                        }
+                        > a:hover {
+                            color: $navigation-hover-color;
+                            background-color: $navigation-hover-background-color;
+                        }
+                    }
+                }
+
+                .sub-menu {
+                    padding: 0;
+
+                    > li {
+                        list-style-type: none;
+
+                        > a {
+                            display: block;
+                            padding: 3px 20px 3px 30px;
+                        }
+
+                        > a,
+                        > a:focus,
+                        > a:visited {
+                            text-decoration: none;
+                            color: $navigation-dropdown-color;
+                            background-color: transparent;
+                        }
+                        > a:hover {
+                            text-decoration: none;
+                            color: $navigation-dropdown-hover-color;
+                            background-color: $navigation-dropdown-hover-background-color;
+                        }
+
+                        @media (max-width: $screen-sm-max) {
+                        // same as .navbar-nav li a
+                            > a,
+                            > a:focus,
+                            > a:visited {
+                                color: $navigation-color;
+                                background-color: transparent;
+                            }
+                            > a:hover {
+                                color: $navigation-hover-color;
+                                background-color: $navigation-hover-background-color;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+            //                 @media (max-width: $screen-sm-max) {
+            //                     color: $navigation-color;
+            //                 }
+            //             }
     }
 }
 
 /* footer */
 
 footer {
-    // make footer sticky
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    overflow: hidden;
+
+    // give the footer a fixed height and make it sticky
+    @media (min-width: $screen-sm-max) {
+        // make footer sticky
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        overflow: hidden;
+
+        .content {
+            height: $footer-content-height;
+        }
+    }
 
     .content {
-        height: $footer-content-height;
         padding-top: 40px;
+        padding-bottom: 40px;
 
         color: $footer-content-color;
         background-color: $footer-content-background-color;
@@ -168,6 +264,11 @@ footer {
 
         p {
             margin: 0;
+
+            @media (min-width: $screen-xs-max) {
+                display: inline-block;
+                margin-right: 20px;
+            }
         }
 
         padding-top: 15px;
@@ -192,6 +293,12 @@ footer {
             &.fa {
                 text-decoration: none;
             }
+        }
+    }
+
+    .text-right {
+        @media (max-width: $screen-sm-max) {
+            text-align: left;
         }
     }
 }
