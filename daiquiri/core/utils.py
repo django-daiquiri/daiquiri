@@ -175,8 +175,7 @@ def replace_nan(elements):
         if isinstance(element, (list, tuple)):
             replace_nan(element)
         else:
-            if math.isnan(element):
-                print('-->', elements[i])
+            if isinstance(element, float) and math.isnan(element):
                 elements[i] = None
 
 
