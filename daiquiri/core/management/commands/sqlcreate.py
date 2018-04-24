@@ -57,7 +57,7 @@ GRANT SELECT ON ALL TABLES IN SCHEMA %(SCHEMA_NAME)s TO %(USER)s;
             if config['default']:
                 if config['default']['ENGINE'] == 'django.db.backends.mysql':
                     print('''-- For testing, run the following commands on \'%(HOST)s\':
-CREATE DATABASE `%(TEST_NAME)s`;
+CREATE DATABASE `%(TEST_NAME)s` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 GRANT ALL PRIVILEGES ON `%(TEST_NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\';
 ''' % config['default'])
 
@@ -85,7 +85,7 @@ CREATE SCHEMA %(TAP_SCHEMA)s AUTHORIZATION %(USER)s;
                 if config['default']['ENGINE'] == 'django.db.backends.mysql':
                     print('''-- Run the following commands on \'%(HOST)s\':
 CREATE USER \'%(USER)s\'@\'%(CLIENT)s\' identified by \'%(PASSWORD)s\';
-CREATE DATABASE `%(NAME)s`;
+CREATE DATABASE `%(NAME)s` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 GRANT ALL PRIVILEGES ON `%(NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\';
 ''' % config['default'])
 
