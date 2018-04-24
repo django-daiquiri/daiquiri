@@ -17,12 +17,10 @@ from rest_framework.authentication import (
     TokenAuthentication
 )
 
-from django_filters.rest_framework import DjangoFilterBackend
-
 from daiquiri.core.viewsets import ChoicesViewSet, RowViewSetMixin
 from daiquiri.core.permissions import HasModelPermission
 from daiquiri.core.paginations import ListPagination
-from daiquiri.core.utils import get_client_ip
+from daiquiri.core.utils import get_client_ip, replace_nan
 from daiquiri.jobs.viewsets import SyncJobViewSet, AsyncJobViewSet
 
 from .models import QueryJob, DownloadJob, QueryArchiveJob, Example
@@ -170,6 +168,8 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
 
         # get the count and the rows from the job
         count, results = job.rows(column_names, ordering, page, page_size, search, filters)
+
+        replace_nan(results)
 
         # return ordered dict to be send as json
         return Response(OrderedDict((

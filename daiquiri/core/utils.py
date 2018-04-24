@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import ipaddress
 import importlib
+import math
 import re
 
 from django import forms
@@ -167,6 +168,16 @@ def make_query_dict_upper_case(input_dict):
             output_dict.pop(key)
 
     return output_dict
+
+
+def replace_nan(elements):
+    for i, element in enumerate(elements):
+        if isinstance(element, (list, tuple)):
+            replace_nan(element)
+        else:
+            if math.isnan(element):
+                print('-->', elements[i])
+                elements[i] = None
 
 
 def send_mail(request, template_prefix, context, to_emails, cc_emails=[], bcc_emails=[]):

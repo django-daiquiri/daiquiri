@@ -85,7 +85,7 @@ GRANT SELECT ON ALL TABLES IN SCHEMA daiquiri_data_obs TO daiquiri_data;
 INSERT INTO daiquiri_data_test.test VALUES
 (1, TRUE, '{1, 2, 3, 4, 5}', '{{1, 10}, {0, 0.1}}'),
 (2, TRUE, '{2, 4, 6, 8, 10}', '{{2, 20}, {0, 0.2}}'),
-(3, FALSE, '{3, 6, 9, 12, 15}', '{{3, 30}, {0, 0.3}}');
+(3, FALSE, '{3, 6, Nan, 12, 15}', '{{3, 30}, {0, 0.3}}');
 
 INSERT INTO daiquiri_archive.files VALUES 
 ('074fec76-6143-4d58-a1f6-a7e8c23af15e', '2017-10-01 00:00:00', 'image_01.jpg', 'c01', 'images/image_01.jpg', 5.810915172365783, -27.665464907831577),
