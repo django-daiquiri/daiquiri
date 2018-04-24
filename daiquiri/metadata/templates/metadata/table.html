@@ -17,12 +17,14 @@
     {% if table.long_description %}
 
     <h2>Description</h2>
-    <p>{{ table.long_description | markdown }}</p>
+
+    {{ table.long_description | markdown }}
 
     {% elif table.description %}
 
     <h2>Description</h2>
-    <p>{{ table.description | markdown }}</p>
+
+    {{ table.description | markdown }}
 
     {% endif %}
 
