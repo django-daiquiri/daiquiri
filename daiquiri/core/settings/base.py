@@ -150,7 +150,7 @@ REST_FRAMEWORK = {
         'rest_framework.throttling.ScopedRateThrottle',
     ),
     'DEFAULT_THROTTLE_RATES': {
-        'query.create': '1/second'
+        'query.create': '10/second'
     }
 }
 

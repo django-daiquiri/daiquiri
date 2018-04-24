@@ -12,7 +12,7 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
 
     var service = {
         params: {
-            page_size: 10000,
+            page_size: 100000,
         },
         columns: null,
         values: {},

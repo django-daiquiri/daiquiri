@@ -148,7 +148,7 @@ blockquote {
             .dropdown-menu {
                 @media (min-width: $screen-xs-max) {
                     max-height: 600px;
-                    overflow-y: scroll;
+                    overflow-y: auto;
                 }
 
                 > li {
@@ -219,11 +219,6 @@ blockquote {
                 }
             }
         }
-
-            //                 @media (max-width: $screen-sm-max) {
-            //                     color: $navigation-color;
-            //                 }
-            //             }
     }
 }
 
