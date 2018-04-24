@@ -399,16 +399,17 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         logger.debug('sql = "%s"', sql)
         return [column[0] for column in self.fetchall(sql)]
 
-
     def parse_column(self, row):
+        column_name, data_type, udt_name, character_maximum_length, ordinal_position = row
+
         column = {
-            'name': row[0]
+            'name': column_name
         }
 
-        if row[1] in self.DATATYPES:
-            datatype = self.DATATYPES[row[1]]
-        elif row[2] in self.DATATYPES:
-            datatype = self.DATATYPES[row[2]]
+        if data_type.lower() in self.DATATYPES:
+            datatype = self.DATATYPES[data_type.lower()]
+        elif udt_name.lower() in self.DATATYPES:
+            datatype = self.DATATYPES[udt_name.lower()]
         else:
             datatype = None
 
@@ -416,14 +417,14 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
             column['datatype'] = datatype['datatype']
 
             if datatype['arraysize']:
-                column['arraysize'] = row[3]
+                column['arraysize'] = character_maximum_length
             else:
                 column['arraysize'] = None
         else:
             column['datatype'] = None
             column['arraysize'] = None
 
-        column['order'] = row[4]
+        column['order'] = ordinal_position
 
         # log values and return
         logger.debug('row = %s', row)

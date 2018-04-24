@@ -171,7 +171,7 @@ class ColumnViewSet(viewsets.ModelViewSet):
         table_name = request.GET.get('table')
         column_name = request.GET.get('column')
 
-        if schema_name and table_name:
+        if schema_name and table_name and column_name:
             return Response([DatabaseAdapter().fetch_column(schema_name, table_name, column_name)])
         else:
             return Response([])
