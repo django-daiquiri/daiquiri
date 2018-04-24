@@ -53,18 +53,24 @@ h3:first-child,
 h4:first-child {
     margin-top: 0;
 }
+
+h1 {
+    font-size: 32px;
+    line-height: 40px;
+}
 h2 {
     font-size: 28px;
-}
-h1, h2, h3 {
     line-height: 40px;
-    margin-bottom: 20px;
+}
+h3 {
+    font-size: 24px;
+    line-height: 30px;
 }
 h4 {
-    margin-top: 20px;
+    font-size: 20px;
+    line-height: 30px;
 }
 h5, h6 {
-    font-size: medium;
     line-height: 20px;
 }
 
