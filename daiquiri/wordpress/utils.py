@@ -1,27 +1,9 @@
-import random
-import string
-
 from django.conf import settings
 
 from .tasks import (
-    create_wordpress_user as create_wordpress_user_task,
     update_wordpress_user as update_wordpress_user_task,
     update_wordpress_role as update_wordpress_role_task
 )
-
-
-def create_wordpress_user(user):
-    # generate a random email if no email is provided
-    if user.email:
-        email = user.email
-    else:
-        random_string = ''.join(random.choice(string.ascii_lowercase) for _ in range(8))
-        email = random_string + '@example.com'
-
-    if not settings.ASYNC:
-        create_wordpress_user_task.apply((user.username, email, user.first_name, user.last_name), throw=True)
-    else:
-        create_wordpress_user_task.apply_async((user.username, user.email, user.first_name, user.last_name))
 
 
 def update_wordpress_user(user):

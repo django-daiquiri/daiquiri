@@ -7,7 +7,6 @@ from daiquiri.auth.signals import (
 )
 
 from .utils import (
-    create_wordpress_user,
     update_wordpress_user,
     update_wordpress_role
 )
@@ -15,7 +14,7 @@ from .utils import (
 
 @receiver(user_created)
 def user_created_handler(sender, **kwargs):
-    create_wordpress_user(kwargs['user'])
+    update_wordpress_user(kwargs['user'])
 
 
 @receiver(user_updated)

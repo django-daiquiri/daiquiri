@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 import rules
 
+
 @rules.predicate
 def is_wordpress_admin(user):
     return user.groups.filter(name='wordpress_admin').exists()
