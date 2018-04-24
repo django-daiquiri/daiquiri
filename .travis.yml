@@ -35,6 +35,8 @@ before_script:
 - psql -U postgres -c "CREATE DATABASE test_daiquiri_app OWNER daiquiri_app;"
 - psql -U postgres -c "CREATE DATABASE test_daiquiri_data OWNER daiquiri_data;"
 - psql -U postgres -f testing/sql/postgres.sql test_daiquiri_data
+- psql -U postgres -f testing/sql/postgres.sql test_daiquiri_data
+- psql -U postgres -c "VACUUM ANALYZE;" test_daiquiri_data
 
 script:
 - coverage run testing/runtests.py -k
