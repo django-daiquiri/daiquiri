@@ -54,152 +54,153 @@ def run_query(job_id):
     # get the job object from the database
     job = QueryJob.objects.get(pk=job_id)
 
-    # get the adapter with the database specific functions
-    adapter = DatabaseAdapter()
+    if job.phase == job.PHASE_QUEUED:
+        # get the adapter with the database specific functions
+        adapter = DatabaseAdapter()
 
-    # create the database of the user if it not already exists
-    try:
-        adapter.create_user_schema_if_not_exists(job.schema_name)
-    except OperationalError as e:
-        job.phase = job.PHASE_ERROR
-        job.error_summary = str(e)
+        # create the database of the user if it not already exists
+        try:
+            adapter.create_user_schema_if_not_exists(job.schema_name)
+        except OperationalError as e:
+            job.phase = job.PHASE_ERROR
+            job.error_summary = str(e)
+            job.save()
+
+            return job.phase
+
+        # check if the quota is exceeded
+        if QueryJob.objects.get_size(job.owner) > get_quota(job.owner):
+            job.phase = job.PHASE_ERROR
+            job.error_summary = str(_('Quota is exceeded. Please remove some of your jobs.'))
+            job.save()
+
+            return job.phase
+
+        # set database and start time
+        job.start_time = now()
+
+        job.pid = adapter.fetch_pid()
+        job.actual_query = adapter.build_query(job.schema_name, job.table_name, job.native_query, job.timeout, job.max_records)
+        job.phase = job.PHASE_EXECUTING
+        job.start_time = now()
         job.save()
 
-        return job.phase
+        logger.info('job %s started' % job.id)
 
-    # check if the quota is exceeded
-    if QueryJob.objects.get_size(job.owner) > get_quota(job.owner):
-        job.phase = job.PHASE_ERROR
-        job.error_summary = str(_('Quota is exceeded. Please remove some of your jobs.'))
-        job.save()
+        # get the actual query and submit the job to the database
+        try:
+            # this is where the work ist done (and the time is spend)
+            adapter.submit_query(job.actual_query)
 
-        return job.phase
-
-    # set database and start time
-    job.start_time = now()
-
-    job.pid = adapter.fetch_pid()
-    job.actual_query = adapter.build_query(job.schema_name, job.table_name, job.native_query, job.timeout, job.max_records)
-    job.phase = job.PHASE_EXECUTING
-    job.start_time = now()
-    job.save()
-
-    logger.info('job %s started' % job.id)
-
-    # get the actual query and submit the job to the database
-    try:
-        # this is where the work ist done (and the time is spend)
-        adapter.submit_query(job.actual_query)
-
-    except (ProgrammingError, InternalError) as e:
-        job.phase = job.PHASE_ERROR
-        job.error_summary = str(e)
-        logger.info('job %s failed (%s)' % (job.id, job.error_summary))
-
-    except OperationalError as e:
-        # load the job again and check if the job was killed
-        job = QueryJob.objects.get(pk=job_id)
-
-        if job.phase != job.PHASE_ABORTED:
+        except (ProgrammingError, InternalError) as e:
             job.phase = job.PHASE_ERROR
             job.error_summary = str(e)
             logger.info('job %s failed (%s)' % (job.id, job.error_summary))
 
-    else:
-        # get additional information about the completed job
-        job.phase = job.PHASE_COMPLETED
-        logger.info('job %s completed' % job.id)
+        except OperationalError as e:
+            # load the job again and check if the job was killed
+            job = QueryJob.objects.get(pk=job_id)
 
-    finally:
-        # get timing and save the job object
-        job.end_time = now()
+            if job.phase != job.PHASE_ABORTED:
+                job.phase = job.PHASE_ERROR
+                job.error_summary = str(e)
+                logger.info('job %s failed (%s)' % (job.id, job.error_summary))
 
-        # get additional information about the completed job
-        if job.phase == job.PHASE_COMPLETED:
-            job.nrows = adapter.count_rows(job.schema_name, job.table_name)
-            job.size = adapter.fetch_size(job.schema_name, job.table_name)
+        else:
+            # get additional information about the completed job
+            job.phase = job.PHASE_COMPLETED
+            logger.info('job %s completed' % job.id)
 
-            # fetch the metadata for used tables
-            job.metadata['sources'] = []
+        finally:
+            # get timing and save the job object
+            job.end_time = now()
 
-            if 'sources' in job.metadata:
-                for schema_name, table_name in job.metadata['tables']:
-                    table = {
-                        'schema_name': schema_name,
-                        'table_name': table_name
-                    }
+            # get additional information about the completed job
+            if job.phase == job.PHASE_COMPLETED:
+                job.nrows = adapter.count_rows(job.schema_name, job.table_name)
+                job.size = adapter.fetch_size(job.schema_name, job.table_name)
 
-                    # fetch additional metadata from the metadata store
-                    try:
-                        original_table = Table.objects.get(
-                            name=table_name,
-                            schema__name=schema_name
-                        )
+                # fetch the metadata for used tables
+                job.metadata['sources'] = []
 
-                        table.update({
-                            'title': original_table.title,
-                            'description': original_table.description,
-                            'attribution': original_table.attribution,
-                            'license': original_table.license,
-                            'doi': original_table.doi,
-                            'url': reverse('metadata:table', args=[schema_name, table_name])
-                        })
+                if 'sources' in job.metadata:
+                    for schema_name, table_name in job.metadata['tables']:
+                        table = {
+                            'schema_name': schema_name,
+                            'table_name': table_name
+                        }
 
-                        job.metadata['sources'].append(table)
+                        # fetch additional metadata from the metadata store
+                        try:
+                            original_table = Table.objects.get(
+                                name=table_name,
+                                schema__name=schema_name
+                            )
 
-                    except Table.DoesNotExist:
-                        pass
+                            table.update({
+                                'title': original_table.title,
+                                'description': original_table.description,
+                                'attribution': original_table.attribution,
+                                'license': original_table.license,
+                                'doi': original_table.doi,
+                                'url': reverse('metadata:table', args=[schema_name, table_name])
+                            })
 
-            # fetch the metadata for the columns
-            job.metadata['columns'] = adapter.fetch_columns(job.schema_name, job.table_name)
+                            job.metadata['sources'].append(table)
 
-            # fetch additional metadata from the metadata store
-            for column in job.metadata['columns']:
-                if column['name'] in job.metadata['display_columns']:
+                        except Table.DoesNotExist:
+                            pass
 
-                    try:
-                        schema_name, table_name, column_name = job.metadata['display_columns'][column['name']]
-                    except ValueError:
-                        continue
+                # fetch the metadata for the columns
+                job.metadata['columns'] = adapter.fetch_columns(job.schema_name, job.table_name)
 
-                    try:
-                        original_column = Column.objects.get(
-                            name=column_name,
-                            table__name=table_name,
-                            table__schema__name=schema_name
-                        )
+                # fetch additional metadata from the metadata store
+                for column in job.metadata['columns']:
+                    if column['name'] in job.metadata['display_columns']:
 
-                        column.update({
-                            'description': original_column.description,
-                            'unit': original_column.unit,
-                            'ucd': original_column.ucd,
-                            'utype': original_column.utype,
-                            'principal': original_column.principal,
-                            'indexed': False,
-                            'std': original_column.std
-                        })
+                        try:
+                            schema_name, table_name, column_name = job.metadata['display_columns'][column['name']]
+                        except ValueError:
+                            continue
 
-                    except Column.DoesNotExist:
-                        pass
+                        try:
+                            original_column = Column.objects.get(
+                                name=column_name,
+                                table__name=table_name,
+                                table__schema__name=schema_name
+                            )
 
-        # remove unneeded metadata
-        job.metadata.pop('display_columns', None)
-        job.metadata.pop('tables', None)
+                            column.update({
+                                'description': original_column.description,
+                                'unit': original_column.unit,
+                                'ucd': original_column.ucd,
+                                'utype': original_column.utype,
+                                'principal': original_column.principal,
+                                'indexed': False,
+                                'std': original_column.std
+                            })
 
-        # create a stats record for this job
-        Record.objects.create(
-            time=job.end_time,
-            resource_type='QUERY_JOB',
-            resource={
-                'job_id': job.id,
-                'job_type': job.job_type,
-                'sources': job.metadata.get('sources', [])
-            },
-            client_ip=job.client_ip,
-            user=job.owner
-        )
+                        except Column.DoesNotExist:
+                            pass
 
-        job.save()
+            # remove unneeded metadata
+            job.metadata.pop('display_columns', None)
+            job.metadata.pop('tables', None)
+
+            # create a stats record for this job
+            Record.objects.create(
+                time=job.end_time,
+                resource_type='QUERY_JOB',
+                resource={
+                    'job_id': job.id,
+                    'job_type': job.job_type,
+                    'sources': job.metadata.get('sources', [])
+                },
+                client_ip=job.client_ip,
+                user=job.owner
+            )
+
+            job.save()
 
     return job.phase
 
@@ -216,36 +217,37 @@ def create_download_file(download_id):
     # get the job object from the database
     download_job = DownloadJob.objects.get(pk=download_id)
 
-    # log start
-    logger.info('download_job %s started' % download_job.file_path)
+    if download_job.phase == download_job.PHASE_QUEUED:
+        # log start
+        logger.info('download_job %s started' % download_job.file_path)
 
-    # create directory if necessary
-    try:
-        os.mkdir(os.path.dirname(download_job.file_path))
-    except OSError:
-        pass
+        # create directory if necessary
+        try:
+            os.mkdir(os.path.dirname(download_job.file_path))
+        except OSError:
+            pass
 
-    download_job.phase = download_job.PHASE_EXECUTING
-    download_job.start_time = now()
-    download_job.save()
-
-    # write file using the generator in the adapter
-    try:
-        with open(download_job.file_path, 'w') as f:
-            for line in download_job.job.stream(download_job.format_key):
-                f.write(line)
-
-    except Exception as e:
-        download_job.phase = download_job.PHASE_ERROR
-        download_job.error_summary = str(e)
+        download_job.phase = download_job.PHASE_EXECUTING
+        download_job.start_time = now()
         download_job.save()
-        logger.info('download_job %s failed (%s)' % (download_job.id, download_job.error_summary))
-    else:
-        download_job.phase = download_job.PHASE_COMPLETED
-        logger.info('download_job %s completed' % download_job.file_path)
-    finally:
-        download_job.end_time = now()
-        download_job.save()
+
+        # write file using the generator in the adapter
+        try:
+            with open(download_job.file_path, 'w') as f:
+                for line in download_job.job.stream(download_job.format_key):
+                    f.write(line)
+
+        except Exception as e:
+            download_job.phase = download_job.PHASE_ERROR
+            download_job.error_summary = str(e)
+            download_job.save()
+            logger.info('download_job %s failed (%s)' % (download_job.id, download_job.error_summary))
+        else:
+            download_job.phase = download_job.PHASE_COMPLETED
+            logger.info('download_job %s completed' % download_job.file_path)
+        finally:
+            download_job.end_time = now()
+            download_job.save()
 
 
 @shared_task(track_started=True, base=Task)
@@ -259,28 +261,29 @@ def create_archive_file(archive_id):
     # get the job object from the database
     archive_job = QueryArchiveJob.objects.get(pk=archive_id)
 
-    # log start
-    logger.info('create_archive_zip_file %s started' % archive_job.file_path)
+    if archive_job.phase == archive_job.PHASE_QUEUED:
+        # log start
+        logger.info('create_archive_zip_file %s started' % archive_job.file_path)
 
-    # create directory if necessary
-    try:
-        os.makedirs(os.path.dirname(archive_job.file_path))
-    except OSError:
-        pass
+        # create directory if necessary
+        try:
+            os.makedirs(os.path.dirname(archive_job.file_path))
+        except OSError:
+            pass
 
-    archive_job.phase = archive_job.PHASE_EXECUTING
-    archive_job.start_time = now()
-    archive_job.save()
+        archive_job.phase = archive_job.PHASE_EXECUTING
+        archive_job.start_time = now()
+        archive_job.save()
 
-    # create a zipfile with all files
-    with zipfile.ZipFile(archive_job.file_path, 'w') as z:
-        for file_path in archive_job.files:
-            os.chdir(settings.ARCHIVE_BASE_PATH)
-            z.write(file_path)
+        # create a zipfile with all files
+        with zipfile.ZipFile(archive_job.file_path, 'w') as z:
+            for file_path in archive_job.files:
+                os.chdir(settings.ARCHIVE_BASE_PATH)
+                z.write(file_path)
 
-    archive_job.end_time = now()
-    archive_job.phase = archive_job.PHASE_COMPLETED
-    archive_job.save()
+        archive_job.end_time = now()
+        archive_job.phase = archive_job.PHASE_COMPLETED
+        archive_job.save()
 
-    # log completion
-    logger.info('create_archive_zip_file %s completed' % archive_job.file_path)
+        # log completion
+        logger.info('create_archive_zip_file %s completed' % archive_job.file_path)
