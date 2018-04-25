@@ -140,7 +140,8 @@ blockquote {
             > a,
             > a:focus,
             > a:hover,
-            > a:visited {
+            > a:visited,
+            button.btn-link {
                 color: $navigation-hover-color;
                 background-color: $navigation-hover-background-color;
             }
@@ -154,11 +155,13 @@ blockquote {
                 > li {
                     > a,
                     > a:focus,
-                    > a:visited {
+                    > a:visited,
+                    button.btn-link {
                         color: $navigation-dropdown-color;
                         background-color: transparent;
                     }
-                    > a:hover {
+                    > a:hover,
+                    button.btn-link:hover {
                         color: $navigation-dropdown-hover-color;
                         background-color: $navigation-dropdown-hover-background-color;
                     }
@@ -167,13 +170,18 @@ blockquote {
                         // same as .navbar-nav li a
                         > a,
                         > a:focus,
-                        > a:visited {
+                        > a:visited,
+                        button.btn-link {
                             color: $navigation-color;
                             background-color: transparent;
                         }
-                        > a:hover {
+                        > a:hover,
+                        button.btn-link:hover {
                             color: $navigation-hover-color;
                             background-color: $navigation-hover-background-color;
+                        }
+                        button.btn-link {
+                            padding: 5px 20px;
                         }
                     }
                 }
@@ -206,13 +214,18 @@ blockquote {
                         // same as .navbar-nav li a
                             > a,
                             > a:focus,
-                            > a:visited {
+                            > a:visited,
+                            button.btn-link {
                                 color: $navigation-color;
                                 background-color: transparent;
                             }
-                            > a:hover {
+                            > a:hover,
+                            button.btn-link:hover {
                                 color: $navigation-hover-color;
                                 background-color: $navigation-hover-background-color;
+                            }
+                            button.btn-link {
+                                padding: 5px 20px;
                             }
                         }
                     }
@@ -466,7 +479,6 @@ div.fieldset {
 }
 .logout-form .btn-link {
     padding: 3px 20px;
-    color: $navigation-dropdown-color;
     display: block;
     width: 100%;
     text-align: left;
