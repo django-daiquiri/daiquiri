@@ -37,7 +37,7 @@
     <ul class="list-unstyled">
         {% for table in tables %}
         <li>
-            <h6>
+            <h4>
                 <a href="{% url 'metadata:table' schema.name table.name %}">
                     {% if table.title %}
                     {{ table.title }} ({{ table }})
@@ -45,7 +45,7 @@
                     {{ table }}
                     {% endif %}
                 </a>
-            </h6>
+            </h4>
 
             {% if table.description %}
             {{ table.description }}
