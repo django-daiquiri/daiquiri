@@ -33,4 +33,4 @@ class PgDumpAdapter(BaseDownloadAdapter):
 
             self.args.append('--dbname=%(NAME)s' % self.database_config)
 
-        self.args.append('--table=%s.%s' % (schema_name, table_name))
+        self.args.append('--table="%s"."%s"' % (schema_name, table_name))
