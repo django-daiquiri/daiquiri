@@ -40,7 +40,7 @@ class BaseDownloadAdapter(object):
             links = None
 
         if format_key == 'csv':
-            return generate_csv(self.execute(prepend=prepend))
+            return generate_csv(self.execute(prepend=prepend), columns)
 
         elif format_key == 'votable':
             return generate_votable(self.execute(prepend=prepend), columns,

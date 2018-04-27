@@ -3,11 +3,16 @@ import io
 import sys
 
 
-def generate_csv(generator):
+def generate_csv(generator, fields):
     if sys.version_info.major >= 3:
         io_class = io.StringIO
     else:
         io_class = io.BytesIO
+
+    # write header
+    f = io_class()
+    csv.writer(f, quotechar='"').writerow([field['name'] for field in fields])
+    yield f.getvalue()
 
     for row in generator:
         if row:
