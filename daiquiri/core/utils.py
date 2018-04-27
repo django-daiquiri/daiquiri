@@ -170,13 +170,26 @@ def make_query_dict_upper_case(input_dict):
     return output_dict
 
 
-def replace_nan(elements):
-    for i, element in enumerate(elements):
-        if isinstance(element, (list, tuple)):
-            replace_nan(element)
-        else:
-            if isinstance(element, float) and math.isnan(element):
-                elements[i] = None
+def fix_for_json(elements):
+
+    for i in range(len(elements)):
+        # replace the tuple by a list and run fix_for_json recursively
+        if isinstance(elements[i], tuple):
+            elements[i] = fix_for_json(list(elements[i]))
+
+        # for a list run fix_for_json recursively
+        elif isinstance(elements[i], list):
+            elements[i] = fix_for_json(elements[i])
+
+        # check the float fields for nan
+        elif isinstance(elements[i], float) and math.isnan(elements[i]):
+            elements[i] = None
+
+        # convert a long fields to a strings
+        elif isinstance(elements[i], int) and elements[i] > 9007199254740991:
+            elements[i] = str(elements[i])
+
+    return elements
 
 
 def send_mail(request, template_prefix, context, to_emails, cc_emails=[], bcc_emails=[]):
