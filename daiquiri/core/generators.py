@@ -57,9 +57,13 @@ def generate_votable(generator, fields, resource_name=None, table_name=None, lin
 
         for field in fields:
             attrs = []
-            for key in ['name', 'arraysize', 'unit', 'ucd', 'utype']:
+            for key in ['name', 'unit', 'ucd', 'utype']:
                 if key in field and field[key]:
-                    attrs.append('%s="%s"' % (key, field[key]))
+                    value = field[key].replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+                    attrs.append('%s="%s"' % (key, value))
+
+            if 'arraysize' in field and field['arraysize']:
+                attrs.append('arraysize="%d"' % field['arraysize'])
 
             if field['datatype'] in ['char', 'unsignedByte', 'short', 'int', 'long', 'float', 'double']:
                 attrs.append('datatype="%s"' % field['datatype'])
