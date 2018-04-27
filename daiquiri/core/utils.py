@@ -4,6 +4,7 @@ import ipaddress
 import importlib
 import math
 import re
+import sys
 
 from django import forms
 from django.conf import settings
@@ -15,6 +16,12 @@ from django.template import TemplateDoesNotExist
 from django.utils.six.moves.urllib.parse import urlparse
 
 from ipware.ip import get_real_ip
+
+
+if sys.version_info.major >= 3:
+    long_type = int
+else:
+    long_type = long
 
 
 def import_class(string):
@@ -186,7 +193,7 @@ def fix_for_json(elements):
             elements[i] = None
 
         # convert a long fields to a strings
-        elif isinstance(elements[i], int) and elements[i] > 9007199254740991:
+        elif isinstance(elements[i], long_type) and elements[i] > 9007199254740991:
             elements[i] = str(elements[i])
 
     return elements
