@@ -1,0 +1,62 @@
+{% load i18n %}
+
+    <div class="modal" id="participants-form-modal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="{% trans 'Close' %}">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">{% trans 'Example query' %}</h4>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row">
+                        <formgroup
+                            class="col-md-6"
+                            data-id="first_name"
+                            data-type="text"
+                            data-label="{{ meta.Participant.first_name.verbose_name }}"
+                            data-model="service.values.first_name"
+                            data-errors="service.errors.first_name">
+                        </formgroup>
+                        <formgroup
+                            class="col-md-6"
+                            data-id="last_name"
+                            data-type="text"
+                            data-label="{{ meta.Participant.last_name.verbose_name }}"
+                            data-model="service.values.last_name"
+                            data-errors="service.errors.last_name">
+                        </formgroup>
+                    </div>
+                    {% for detail_key in detail_keys %}
+                    <formgroup
+                        data-id="{{ detail_key.key }}"
+                        data-type="{{ detail_key.data_type }}"
+                        data-label="{{ detail_key.label }}"
+                        data-model="{{ detail_key.model }}"
+                        data-errors="{{ detail_key.errors }}"
+                        data-options='{{ detail_key.options_json|safe }}'
+                        data-options-label="label">
+                    </formgroup>
+                    {% endfor %}
+                    <formgroup
+                        data-id="accepted"
+                        data-type="checkbox"
+                        data-label="{{ meta.Participant.accepted.verbose_name }}"
+                        data-model="service.values.accepted"
+                        data-errors="service.errors.accepted">
+                    </formgroup>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                        {% trans 'Close' %}
+                    </button>
+                    <button type="button" class="btn btn-primary" ng-click="service.store_participant()">
+                        {% trans 'Save' %}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>

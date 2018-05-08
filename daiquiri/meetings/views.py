@@ -1,8 +1,14 @@
+import json
 import logging
 
+from django.conf import settings
 from django.shortcuts import render
 from django.http import Http404, HttpResponseRedirect
 from django.urls import reverse
+from django.views.generic import TemplateView
+
+from daiquiri.core.views import ModelPermissionMixin
+from daiquiri.core.utils import get_model_field_meta
 
 from .models import Meeting, Participant, Contribution
 from .forms import ParticipantForm, ContributionForm
@@ -91,3 +97,45 @@ def contributions(request, slug):
         })
     else:
         return render(request, 'meetings/contributions_closed.html', {})
+
+
+class ManagementView(ModelPermissionMixin, TemplateView):
+
+    template_name = 'meetings/management.html'
+    permission_required = (
+        'daiquiri_meetings.view_meeting',
+        'daiquiri_meetings.view_participant',
+        'daiquiri_meetings.view_contribution'
+    )
+
+    def get_context_data(self, **kwargs):
+        context = super(ManagementView, self).get_context_data(**kwargs)
+
+        try:
+            meeting = Meeting.objects.get(slug=kwargs['slug'])
+        except Meeting.DoesNotExist:
+            raise Http404
+
+        # get urls to the admin interface to be used with angular
+        meeting_admin_url = reverse('admin:daiquiri_meetings_meeting_change', args=[meeting.id])
+        participant_admin_url = reverse('admin:daiquiri_meetings_participant_change', args=['row.id']).replace('row.id', '{$ row.id $}')
+        contribution_admin_url = reverse('admin:daiquiri_meetings_contribution_change', args=['row.id']).replace('row.id', '{$ row.id $}')
+
+        detail_keys = settings.MEETINGS_PARTICIPANT_DETAIL_KEYS
+        for detail_key in detail_keys:
+            detail_key['options_json'] = json.dumps(detail_key.get('options', {}))
+            detail_key['model'] = 'service.values.details.%s' % detail_key['key']
+            detail_key['errors'] = 'service.errors.%s' % detail_key['key']
+
+        context.update({
+            'meeting': meeting,
+            'detail_keys': detail_keys,
+            'meeting_admin_url': meeting_admin_url,
+            'participant_admin_url': participant_admin_url,
+            'contribution_admin_url': contribution_admin_url,
+            'meta': {
+                'Participant': get_model_field_meta(Participant),
+                'Contribution': get_model_field_meta(Contribution)
+            }
+        })
+        return context

@@ -146,7 +146,7 @@ class Contribution(models.Model):
         verbose_name=_('Abstract')
     )
     contribution_type = models.CharField(
-        max_length=8,
+        max_length=8, blank=True,
         verbose_name=_('Contribution type'),
         help_text=_('Choices are given by settings.MEETINGS_CONTRIBUTION_TYPES')
     )

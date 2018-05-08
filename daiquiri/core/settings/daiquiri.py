@@ -52,7 +52,7 @@ FILES_BASE_PATH = os.path.join(BASE_DIR, 'files')
 FILES_SEARCH_URL = None
 
 MEETINGS_CONTRIBUTION_TYPES = [
-    (None, 'no contribution'),
+    ('', 'no contribution'),
     ('talk', 'Talk'),
     ('poster', 'Poster')
 ]
