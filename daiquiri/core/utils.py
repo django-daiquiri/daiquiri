@@ -273,18 +273,21 @@ def render_to_xlsx(request, filename, columns, rows):
         'strings_to_formulas': False
     })
     worksheet = workbook.add_worksheet()
+    bold = workbook.add_format({'bold': True})
+
+    for j, column in enumerate(columns):
+        worksheet.write(0, j, str(column), bold)
 
     for i, row in enumerate(rows):
         for j, cell in enumerate(row):
             if isinstance(cell, list):
-                worksheet.write(i, j, ', '.join(cell))
+                worksheet.write(i + 1, j, ', '.join(cell))
             elif isinstance(cell, bool):
-                worksheet.write(i, j, str(_('yes') if cell else _('no')))
+                worksheet.write(i + 1, j, str(_('yes') if cell else _('no')))
             elif isinstance(cell, datetime):
-                print(localtime(cell), cell)
-                worksheet.write(i, j, localtime(cell).strftime("%Y-%m-%d %H:%M:%S"))
+                worksheet.write(i + 1, j, localtime(cell).strftime("%Y-%m-%d %H:%M:%S"))
             else:
-                worksheet.write(i, j, cell)
+                worksheet.write(i + 1, j, cell)
 
     workbook.close()
 
