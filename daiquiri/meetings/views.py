@@ -5,10 +5,11 @@ from django.conf import settings
 from django.shortcuts import render
 from django.http import Http404, HttpResponseRedirect
 from django.urls import reverse
-from django.views.generic import TemplateView
+from django.views.generic import View, TemplateView
+from django.utils.translation import ugettext_lazy as _
 
 from daiquiri.core.views import ModelPermissionMixin
-from daiquiri.core.utils import get_model_field_meta
+from daiquiri.core.utils import get_model_field_meta, render_to_csv, render_to_xlsx
 
 from .models import Meeting, Participant, Contribution
 from .forms import ParticipantForm, ContributionForm
@@ -139,3 +140,69 @@ class ManagementView(ModelPermissionMixin, TemplateView):
             }
         })
         return context
+
+
+class ExportView(ModelPermissionMixin, View):
+
+    template_name = 'meetings/management.html'
+    permission_required = (
+        'daiquiri_meetings.view_meeting',
+        'daiquiri_meetings.view_participant',
+        'daiquiri_meetings.view_contribution'
+    )
+
+    def get_columns(self):
+        detail_keys = settings.MEETINGS_PARTICIPANT_DETAIL_KEYS
+
+        return [
+            _('First name'),
+            _('Last name'),
+            _('Email'),
+            _('Registered'),
+            _('Accepted')
+        ] + [detail_key['label'] for detail_key in detail_keys] + [
+            _('Contribution title'),
+            _('Contribution abstract'),
+            _('Contribution type'),
+            _('Contribution accepted')
+        ]
+
+    def get_rows(self, participants):
+        detail_keys = settings.MEETINGS_PARTICIPANT_DETAIL_KEYS
+
+        for participant in participants:
+            contribution = participant.contributions.first()
+
+            row = [
+                participant.first_name,
+                participant.last_name,
+                participant.email,
+                participant.registered,
+                participant.accepted
+            ] + [participant.details.get(detail_key['key'], '') for detail_key in detail_keys]
+
+            if contribution:
+                row += [
+                    contribution.title,
+                    contribution.abstract,
+                    contribution.contribution_type,
+                    contribution.accepted
+                ]
+
+            yield row
+
+    def get(self, request, slug, format):
+        try:
+            meeting = Meeting.objects.get(slug=slug)
+        except Meeting.DoesNotExist:
+            raise Http404
+
+        # get participants from the database
+        participants = meeting.participants.all()
+
+        if format == 'csv':
+            return render_to_csv(request, meeting.title, self.get_columns(), self.get_rows(participants))
+        elif format == 'xlsx':
+            return render_to_xlsx(request, meeting.title, self.get_columns(), self.get_rows(participants))
+        else:
+            raise Http404

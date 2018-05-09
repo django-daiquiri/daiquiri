@@ -82,7 +82,7 @@ angular.module('core')
     };
 
     service.reset = function() {
-        service.params.page = 1;
+        service.params.search = null;
         service.params.ordering = null;
         service.reload();
     };

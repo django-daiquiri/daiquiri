@@ -36,7 +36,9 @@
 
     <div ng-cloak ng-show="service.ready && service.list.ready">
 
-        <h1>{% trans 'Meetings management' %}</h1>
+        <h1>{% trans 'Meeting management' %}</h1>
+
+        <h2>{{ meeting.title }}</h2>
 
         <div class="daiquiri-list">
             <div class="row daiquiri-list-header">
@@ -51,27 +53,33 @@
                         </a>
                     </div>
                 </form>
-                <div class="col-sm-6">
+                <div class="col-sm-2">
                     <p class="count">
                         {$ service.list.count $} {% trans 'participants found' %}
                     </p>
-                    <ul class="pagination pull-right">
-                        <li>
-                            <a href="" ng-click="">
-                                {% trans 'Export' %}<span class="caret"></span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="" ng-click="service.modal('meetings-modal-form')">
-                                {% trans 'Update meeting' %}
-                            </a>
-                        </li>
-                    </ul>
-                    <ul class="pagination pull-right">
-                        <li>
-                            <a href="" ng-click="service.list.reset()">{% trans 'Reset' %}</a>
-                        </li>
-                    </ul>
+                </div>
+                <div class="col-sm-4">
+                    <div class="pull-right">
+                        <button class="btn btn-default" ng-click="service.list.reset()">
+                            {% trans 'Reset' %}
+                        </button>
+
+                        <button class="btn btn-default" ng-click="service.modal('meetings-modal-form')">
+                            {% trans 'Update meeting' %}
+                        </button>
+
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default dropdown-toggle"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+
+                            {% trans 'Export' %}<span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-right">
+                                <li><a href="{% url 'meetings:export' meeting.slug 'csv' %}">CSV</a></li>
+                                <li><a href="{% url 'meetings:export' meeting.slug 'xlsx' %}">Excel</a></li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
 

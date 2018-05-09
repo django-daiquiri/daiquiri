@@ -2,7 +2,7 @@ from django.conf.urls import url, include
 
 from rest_framework import routers
 
-from .views import registration, registration_done, participants, contributions, ManagementView
+from .views import registration, registration_done, participants, contributions, ManagementView, ExportView
 from .viewsets import MeetingViewSet, ParticipantViewSet, ContributionViewSet, ContributionTypeViewSet
 
 router = routers.DefaultRouter()
@@ -19,4 +19,5 @@ urlpatterns = [
     url(r'^(?P<slug>[-\w]+)/participants/$', participants, name='participants'),
     url(r'^(?P<slug>[-\w]+)/contributions/$', contributions, name='contributions'),
     url(r'^(?P<slug>[-\w]+)/management/$', ManagementView.as_view(), name='management'),
+    url(r'^(?P<slug>[-\w]+)/export/(?P<format>[a-z]+)/$', ExportView.as_view(), name='export'),
 ]

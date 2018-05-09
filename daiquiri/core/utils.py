@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import unicodecsv as csv
 import ipaddress
 import importlib
 import math
@@ -11,12 +12,15 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMultiAlternatives, EmailMessage
+from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.template import TemplateDoesNotExist
 from django.utils.six.moves.urllib.parse import urlparse
+from django.utils.translation import ugettext_lazy as _
 
 from ipware.ip import get_real_ip
 
+import xlsxwriter
 
 if sys.version_info.major >= 3:
     long_type = int
@@ -241,3 +245,42 @@ def send_mail(request, template_prefix, context, to_emails, cc_emails=[], bcc_em
         msg.content_subtype = 'html'  # Main content is now text/html
 
     msg.send()
+
+
+def render_to_csv(request, filename, columns, rows):
+    response = HttpResponse(content_type='text/csv', charset='utf-8')
+    response['Content-Disposition'] = ('attachment; filename="%s.csv"' % filename).encode('utf-8')
+
+    writer = csv.writer(response)
+
+    writer.writerow(tuple(columns))
+
+    for row in rows:
+        writer.writerow(tuple(row))
+
+    return response
+
+
+def render_to_xlsx(request, filename, columns, rows):
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', charset='utf-8')
+    response['Content-Disposition'] = ('attachment; filename="%s.xlsx"' % filename).encode('utf-8')
+
+    workbook = xlsxwriter.Workbook(response, {
+        'in_memory': True,
+        'strings_to_formulas': False,
+        'remove_timezone': True
+    })
+    worksheet = workbook.add_worksheet()
+
+    for i, row in enumerate(rows):
+        for j, cell in enumerate(row):
+            if isinstance(cell, list):
+                cell = ', '.join(cell)
+            if isinstance(cell, bool):
+                cell = str(_('yes') if cell else _('no'))
+
+            worksheet.write(i, j, cell)
+
+    workbook.close()
+
+    return response

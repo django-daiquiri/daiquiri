@@ -12,10 +12,16 @@
         }
         .count {
             display: inline-block;
-            line-height: 34px;
+            padding: 7px 0;
         }
         .pagination {
             margin-left: 5px;
+        }
+
+        @media (max-width: $screen-md-max) {
+            .pull-right {
+                float: none!important;
+            }
         }
     }
     .daiquiri-list-table {
