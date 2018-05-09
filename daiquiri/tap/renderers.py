@@ -30,7 +30,7 @@ class CapabilitiesRenderer(XMLRenderer):
 
         for capability in data:
 
-            self.start('vosi:capability', {'standardID': capability['schemaID']})
+            self.start('capability', {'standardID': capability['schemaID']})
 
             self.start('interface', capability['interface']['attrs'])
             self.node('accessURL', capability['interface']['accessURL']['attrs'], capability['interface']['accessURL']['text'])
@@ -44,7 +44,7 @@ class CapabilitiesRenderer(XMLRenderer):
                     self.node('description', {}, language['description'])
                     self.end('language')
 
-            self.end('vosi:capability')
+            self.end('capability')
 
         self.end('vosi:capabilities')
 
@@ -80,9 +80,10 @@ class TablesetRenderer(XMLRenderer):
                 for column in table['columns']:
                     self.start('column', {'std': 'true'} if column['std'] else {})
                     self.node('name', {}, column['name'])
-                    self.node('dataType', {'xsi:type': 'vod:TAPType'}, column['datatype'])
+                    if column['unit'] is not None: 
+                        self.node('unit', {}, column['unit'])
                     self.node('ucd', {}, column['ucd'])
-                    self.node('unit', {}, column['unit'])
+                    self.node('dataType', {'xsi:type': 'vs:VOTableType'}, column['datatype'])
                     for key in ['indexed', 'principal']:
                         if key in column and column[key]:
                             self.node('flag', {}, key)
