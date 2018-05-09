@@ -7,6 +7,8 @@ import math
 import re
 import sys
 
+from datetime import datetime
+
 from django import forms
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -16,6 +18,7 @@ from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.template import TemplateDoesNotExist
 from django.utils.six.moves.urllib.parse import urlparse
+from django.utils.timezone import localtime
 from django.utils.translation import ugettext_lazy as _
 
 from ipware.ip import get_real_ip
@@ -267,19 +270,21 @@ def render_to_xlsx(request, filename, columns, rows):
 
     workbook = xlsxwriter.Workbook(response, {
         'in_memory': True,
-        'strings_to_formulas': False,
-        'remove_timezone': True
+        'strings_to_formulas': False
     })
     worksheet = workbook.add_worksheet()
 
     for i, row in enumerate(rows):
         for j, cell in enumerate(row):
             if isinstance(cell, list):
-                cell = ', '.join(cell)
-            if isinstance(cell, bool):
-                cell = str(_('yes') if cell else _('no'))
-
-            worksheet.write(i, j, cell)
+                worksheet.write(i, j, ', '.join(cell))
+            elif isinstance(cell, bool):
+                worksheet.write(i, j, str(_('yes') if cell else _('no')))
+            elif isinstance(cell, datetime):
+                print(localtime(cell), cell)
+                worksheet.write(i, j, localtime(cell).strftime("%Y-%m-%d %H:%M:%S"))
+            else:
+                worksheet.write(i, j, cell)
 
     workbook.close()
 
