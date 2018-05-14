@@ -11,6 +11,7 @@ class ColumnSerializer(serializers.ModelSerializer):
         model = Column
         fields = (
             'name',
+            'description',
             'datatype',
             'ucd',
             'unit',

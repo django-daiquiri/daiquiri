@@ -54,7 +54,7 @@ class TablesetRenderer(XMLRenderer):
     def render_document(self, data, accepted_media_type=None, renderer_context=None):
         self.start('vosi:tableset', {
             'xmlns:vosi': 'http://www.ivoa.net/xml/VOSITables/v1.0',
-            'xmlns:vod': 'http://www.ivoa.net/xml/VODataService/v1.1',
+            'xmlns:vs': 'http://www.ivoa.net/xml/VODataService/v1.1',
             'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
             'xsi:schemaLocation': 'http://www.ivoa.net/xml/VODataService/v1.1 http://www.ivoa.net/xml/VOSITables/v1.0'
         })
@@ -62,7 +62,8 @@ class TablesetRenderer(XMLRenderer):
         for schema in data:
             self.start('schema')
             self.node('name', {}, schema['name'])
-            self.node('description', {}, schema['description'])
+            if schema['description']:
+                self.node('description', {}, schema['description'])
 
             for table in schema['tables']:
                 table_attr = {}
@@ -75,13 +76,21 @@ class TablesetRenderer(XMLRenderer):
 
                 self.start('table', table_attr)
                 self.node('name', {}, table['name'])
-                self.node('description', {}, table['description'])
+
+                if table['description']:
+                    self.node('description', {}, table['description'])
 
                 for column in table['columns']:
                     self.start('column', {'std': 'true'} if column['std'] else {})
                     self.node('name', {}, column['name'])
-                    if column['unit']: self.node('unit', {}, column['unit'])
-                    if column['ucd']: self.node('ucd', {}, column['ucd'])
+
+                    if column['description']:
+                        self.node('description', {}, column['description'])
+                    if column['unit']:
+                        self.node('unit', {}, column['unit'])
+                    if column['ucd']:
+                        self.node('ucd', {}, column['ucd'])
+
                     self.node('dataType', {'xsi:type': 'vs:VOTableType'}, column['datatype'])
                     for key in ['indexed', 'principal']:
                         if key in column and column[key]:
