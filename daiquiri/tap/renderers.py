@@ -80,9 +80,8 @@ class TablesetRenderer(XMLRenderer):
                 for column in table['columns']:
                     self.start('column', {'std': 'true'} if column['std'] else {})
                     self.node('name', {}, column['name'])
-                    if column['unit'] is not None: 
-                        self.node('unit', {}, column['unit'])
-                    self.node('ucd', {}, column['ucd'])
+                    if column['unit']: self.node('unit', {}, column['unit'])
+                    if column['ucd']: self.node('ucd', {}, column['ucd'])
                     self.node('dataType', {'xsi:type': 'vs:VOTableType'}, column['datatype'])
                     for key in ['indexed', 'principal']:
                         if key in column and column[key]:
