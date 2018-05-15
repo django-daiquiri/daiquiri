@@ -12,7 +12,6 @@ class MeetingSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'title',
-            'slug',
             'registration_message',
             'registration_done_message',
             'participants_message',

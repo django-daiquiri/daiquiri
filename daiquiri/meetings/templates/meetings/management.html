@@ -7,7 +7,7 @@
 {% block bodyargs %}
     ng-app="meetings"
     ng-controller="MeetingsController"
-    ng-init="service.init({{ meeting.pk }})"
+    ng-init="service.init({{ meeting_id }})"
 {% endblock %}
 
 {% block headextra %}
@@ -38,7 +38,7 @@
 
         <h1>{% trans 'Meeting management' %}</h1>
 
-        <h2>{{ meeting.title }}</h2>
+        <h2>{$ service.meeting.title $}</h2>
 
         <div class="daiquiri-list">
             <div class="row daiquiri-list-header">
@@ -64,7 +64,7 @@
                             {% trans 'Reset' %}
                         </button>
 
-                        <button class="btn btn-default" ng-click="service.modal('meetings-modal-form')">
+                        <button class="btn btn-default" ng-click="service.modal('meetings-form-modal')">
                             {% trans 'Update meeting' %}
                         </button>
 
@@ -75,8 +75,8 @@
                             {% trans 'Export' %}<span class="caret"></span>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-right">
-                                <li><a href="{% url 'meetings:export' meeting.slug 'csv' %}">CSV</a></li>
-                                <li><a href="{% url 'meetings:export' meeting.slug 'xlsx' %}">Excel</a></li>
+                                <li><a href="{% url 'meetings:export' meeting_slug 'csv' %}">CSV</a></li>
+                                <li><a href="{% url 'meetings:export' meeting_slug 'xlsx' %}">Excel</a></li>
                             </ul>
                         </div>
                     </div>

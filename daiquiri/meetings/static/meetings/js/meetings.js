@@ -41,7 +41,9 @@ angular.module('meetings', ['core', 'infinite-scroll'])
         service.values = {};
         service.errors = {};
 
-        if (modal_id === 'meetings-modal-form') {
+        if (modal_id === 'meetings-form-modal') {
+
+            service.values = angular.copy(service.meeting);
 
         } else {
 
@@ -58,6 +60,21 @@ angular.module('meetings', ['core', 'infinite-scroll'])
         }
 
         $('#' + modal_id).modal('show');
+    };
+
+    service.store_meeting = function() {
+        service.errors = {};
+
+        resources.meetings.update({
+            id: service.values.id
+        }, service.values, function(response) {
+            // copy the data back to the rows array and close the modal
+            service.meeting = response;
+
+            $('.modal').modal('hide');
+        }, function(result) {
+            service.errors = result.data;
+        });
     };
 
     service.store_participant = function() {

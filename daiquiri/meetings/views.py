@@ -129,12 +129,14 @@ class ManagementView(ModelPermissionMixin, TemplateView):
             detail_key['errors'] = 'service.errors.%s' % detail_key['key']
 
         context.update({
-            'meeting': meeting,
+            'meeting_id': meeting.id,
+            'meeting_slug': meeting.slug,
             'detail_keys': detail_keys,
             'meeting_admin_url': meeting_admin_url,
             'participant_admin_url': participant_admin_url,
             'contribution_admin_url': contribution_admin_url,
             'meta': {
+                'Meeting': get_model_field_meta(Meeting),
                 'Participant': get_model_field_meta(Participant),
                 'Contribution': get_model_field_meta(Contribution)
             }
