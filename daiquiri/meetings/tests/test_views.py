@@ -1,6 +1,9 @@
 from django.test import TestCase
+from django.contrib.auth.models import User
 
-from test_generator.views import TestViewMixin
+from test_generator.views import TestViewMixin, TestDetailViewMixin
+
+from daiquiri.core.utils import setup_group
 
 from ..models import Meeting
 
@@ -32,6 +35,11 @@ class MeetingsViewTestCase(TestCase):
             'admin': 302, 'user': 302, 'anonymous': 302
         }
     }
+
+    def setUp(self):
+        group, created = setup_group('meetings_manager')
+        User.objects.get(username='manager').groups.add(group)
+
 
 class RegistrationTests(TestViewMixin, MeetingsViewTestCase):
 
@@ -184,3 +192,53 @@ class ContributionsTests(TestViewMixin, MeetingsViewTestCase):
         self.assert_view('detail_view_not_found', 'get', 'detail_view', username, {
             'slug': 'invalid'
         })
+
+
+class ManagementTests(TestViewMixin, MeetingsViewTestCase):
+
+    url_names = {
+        'detail_view': 'meetings:management'
+    }
+
+    status_map = {
+        'detail_view': {
+            'admin': 200, 'manager': 200, 'user': 403, 'anonymous': 302
+        }
+    }
+
+    instances = Meeting.objects.all()
+
+    def _test_retrieve_view(self, username):
+        for instance in self.instances:
+            self.assert_detail_view(username, {
+                'slug': instance.slug
+            })
+
+
+class ExportTests(TestViewMixin, MeetingsViewTestCase):
+
+    url_names = {
+        'export_view': 'meetings:export'
+    }
+
+    status_map = {
+        'export_view': {
+            'admin': 200, 'manager': 200, 'user': 403, 'anonymous': 302
+        }
+    }
+
+    instances = Meeting.objects.all()
+
+    def _test_export_csv_view(self, username):
+        for instance in self.instances:
+            self.assert_view('export_view', 'get', 'export_view', username, {
+                'slug': instance.slug,
+                'format': 'csv'
+            })
+
+    def _test_export_xlsx_view(self, username):
+        for instance in self.instances:
+            self.assert_view('export_view', 'get', 'export_view', username, {
+                'slug': instance.slug,
+                'format': 'xlsx'
+            })

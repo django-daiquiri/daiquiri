@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from rest_framework import viewsets, filters
+from rest_framework import viewsets, mixins, filters
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
@@ -12,7 +12,11 @@ from .models import Meeting, Participant, Contribution
 from .serializers import MeetingSerializer, ParticipantSerializer, ContributionSerializer
 
 
-class MeetingViewSet(viewsets.ModelViewSet):
+class MeetingViewSet(mixins.ListModelMixin,
+                     mixins.RetrieveModelMixin,
+                     mixins.UpdateModelMixin,
+                     viewsets.GenericViewSet):
+
     permission_classes = (HasModelPermission, )
     authentication_classes = (SessionAuthentication, TokenAuthentication)
 
@@ -20,7 +24,11 @@ class MeetingViewSet(viewsets.ModelViewSet):
     serializer_class = MeetingSerializer
 
 
-class ParticipantViewSet(viewsets.ModelViewSet):
+class ParticipantViewSet(mixins.ListModelMixin,
+                         mixins.RetrieveModelMixin,
+                         mixins.UpdateModelMixin,
+                         viewsets.GenericViewSet):
+
     permission_classes = (HasModelPermission, )
     authentication_classes = (SessionAuthentication, TokenAuthentication)
 
@@ -33,7 +41,12 @@ class ParticipantViewSet(viewsets.ModelViewSet):
     search_fields = ('first_name', 'last_name', 'email')
 
 
-class ContributionViewSet(viewsets.ModelViewSet):
+class ContributionViewSet(mixins.ListModelMixin,
+                          mixins.RetrieveModelMixin,
+                          mixins.CreateModelMixin,
+                          mixins.UpdateModelMixin,
+                          viewsets.GenericViewSet):
+
     permission_classes = (HasModelPermission, )
     authentication_classes = (SessionAuthentication, TokenAuthentication)
 

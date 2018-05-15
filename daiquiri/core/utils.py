@@ -11,7 +11,7 @@ from datetime import datetime
 
 from django import forms
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group, Permission
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMultiAlternatives, EmailMessage
 from django.http import HttpResponse
@@ -29,6 +29,8 @@ if sys.version_info.major >= 3:
     long_type = int
 else:
     long_type = long
+
+from daiquiri.core.constants import GROUPS
 
 
 def import_class(string):
@@ -204,6 +206,16 @@ def fix_for_json(elements):
             elements[i] = str(elements[i])
 
     return elements
+
+
+def setup_group(name):
+    group, created = Group.objects.get_or_create(name=name)
+    group.permissions.clear()
+
+    for codename in GROUPS[name]:
+        group.permissions.add(Permission.objects.get(codename=codename))
+
+    return group, created
 
 
 def send_mail(request, template_prefix, context, to_emails, cc_emails=[], bcc_emails=[]):

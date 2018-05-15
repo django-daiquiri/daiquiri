@@ -38,3 +38,22 @@ ACCESS_LEVEL_CHOICES = (
     (ACCESS_LEVEL_INTERNAL, _('Internal - logged in users can access')),
     (ACCESS_LEVEL_PUBLIC, _('Public - anonymous visitors can access'))
 )
+
+GROUPS = {
+    'wordpress_editor': [],
+    'wordpress_admins': [],
+    'meetings_manager': [
+        'view_meeting',
+        'add_meeting',
+        'change_meeting',
+        'delete_meeting',
+        'view_participant',
+        'add_participant',
+        'change_participant',
+        'delete_participant',
+        'view_contribution',
+        'add_contribution',
+        'change_contribution',
+        'delete_contribution'
+    ]
+}
