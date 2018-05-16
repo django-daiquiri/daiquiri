@@ -47,8 +47,19 @@ class ProfileForm(forms.ModelForm):
 
 class SignupForm(ProfileForm):
 
-    first_name = forms.CharField(max_length=30, label=_('First name'), widget=forms.TextInput(attrs={'placeholder': _('First name')}))
-    last_name = forms.CharField(max_length=30, label=_('Last name'), widget=forms.TextInput(attrs={'placeholder': _('Last name')}))
+    first_name = forms.CharField(max_length=30,
+        label=_('First name'), widget=forms.TextInput(attrs={'placeholder': _('First name')}))
+    last_name = forms.CharField(max_length=30,
+        label=_('Last name'), widget=forms.TextInput(attrs={'placeholder': _('Last name')}))
+
+    field_order = ['username', 'email', 'password1', 'password2']
+
+    def __init__(self, *args, **kwargs):
+        super(SignupForm, self).__init__(*args, **kwargs)
+
+        # add a consent field, the label is added in the template
+        if settings.AUTH_TERMS_OF_USE:
+            self.fields['consent'] = forms.BooleanField(required=True)
 
     def signup(self, request, user):
         # create an empty details dict
@@ -57,6 +68,10 @@ class SignupForm(ProfileForm):
         # store the form date for each detail key
         for detail_key in settings.AUTH_DETAIL_KEYS:
             user.profile.details[detail_key['key']] = self.cleaned_data[detail_key['key']]
+
+        # store the consent field
+        if settings.AUTH_TERMS_OF_USE:
+            user.profile.consent = self.cleaned_data['consent']
 
         # save the profile model
         user.profile.save()

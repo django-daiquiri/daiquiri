@@ -25,10 +25,19 @@ logger = logging.getLogger(__name__)
 class Profile(models.Model):
 
     user = models.OneToOneField(User)
-    is_pending = models.BooleanField(default=False)
-    is_confirmed = models.BooleanField(default=False)
+    is_pending = models.BooleanField(
+        default=False,
+        help_text='Designates whether the user waiting on confirmation by a manager.')
+    is_confirmed = models.BooleanField(
+        default=False,
+        help_text='Designates whether the user was confirmed by a manager.')
     details = JSONField(null=True, blank=True)
     attributes = JSONField(null=True, blank=True)
+    consent = models.BooleanField(
+        default=False,
+        help_text='Designates whether the user has agreed to the terms of use.',
+        verbose_name='Consent'
+    )
 
     class Meta:
         ordering = ('user__last_name', 'user__last_name', 'user__username')

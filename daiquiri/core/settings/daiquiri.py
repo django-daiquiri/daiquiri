@@ -41,6 +41,7 @@ ARCHIVE_DOWNLOAD_DIR = os.path.join(BASE_DIR, 'download')
 AUTH_SIGNUP = False
 AUTH_WORKFLOW = None
 AUTH_DETAIL_KEYS = []
+AUTH_TERMS_OF_USE = False
 
 CONESEARCH_ADAPTER = 'daiquiri.conesearch.adapter.SimpleConeSearchAdapter'
 CONESEARCH_ANONYMOUS = False
