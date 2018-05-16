@@ -35,9 +35,9 @@ def process_table_name(table_name):
 def process_query_language(user, query_language):
     # get the possible query languages for this user and create a map
     query_language_map = {}
-    for query_language in filter_by_access_level(user, settings.QUERY_LANGUAGES):
-        query_language_map['%(key)s-%(version)s' % query_language] = '%(key)s-%(version)s' % query_language
-        query_language_map['%(key)s' % query_language] = '%(key)s-%(version)s' % query_language
+    for item in filter_by_access_level(user, settings.QUERY_LANGUAGES):
+        query_language_map['%(key)s-%(version)s' % item] = '%(key)s-%(version)s' % item
+        query_language_map['%(key)s' % item] = '%(key)s-%(version)s' % item
 
     # check if a query language is set
     if query_language:
