@@ -1,3 +1,6 @@
+import random
+import string
+
 from django.conf import settings
 
 from .tasks import (
@@ -7,10 +10,16 @@ from .tasks import (
 
 
 def update_wordpress_user(user):
-    if not settings.ASYNC:
-        update_wordpress_user_task.apply((user.username, user.email, user.first_name, user.last_name), throw=True)
+    if user.email:
+        email = user.email
     else:
-        update_wordpress_user_task.apply_async((user.username, user.email, user.first_name, user.last_name))
+        random_string = ''.join(random.choice(string.ascii_lowercase) for _ in range(8))
+        email = random_string + '@example.com'
+
+    if not settings.ASYNC:
+        update_wordpress_user_task.apply((user.username, email, user.first_name, user.last_name), throw=True)
+    else:
+        update_wordpress_user_task.apply_async((user.username, email, user.first_name, user.last_name))
 
 
 def update_wordpress_role(user):

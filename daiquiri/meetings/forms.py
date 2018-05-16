@@ -31,6 +31,9 @@ class ParticipantForm(forms.ModelForm):
         self.instance.meeting = self.meeting
         self.instance.registered = now()
 
+        if hasattr(settings, 'MEETINGS_PARTICIPANT_ACCEPTED_DEFAULT'):
+            self.instance.accepted = settings.MEETINGS_PARTICIPANT_ACCEPTED_DEFAULT
+
         # create an empty details dict if it does not exist
         if not self.instance.details:
             self.instance.details = {}
@@ -46,7 +49,7 @@ class ParticipantForm(forms.ModelForm):
 
         try:
             self.meeting.participants.get(email=email)
-            self.add_error('email', _('You have already registred with this email address.'))
+            self.add_error('email', _('You have already registered with this email address.'))
         except Participant.DoesNotExist:
             pass
 

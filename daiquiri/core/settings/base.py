@@ -168,6 +168,7 @@ SETTINGS_EXPORT = [
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_FROM = 'info@example.com'
+EMAIL_REPLY_TO = None
 
 SENDFILE_BACKEND = 'sendfile.backends.simple'
 

@@ -1,27 +1,36 @@
 from __future__ import unicode_literals
 
+import unicodecsv as csv
 import ipaddress
 import importlib
 import math
 import re
 import sys
 
+from datetime import datetime
+
 from django import forms
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group, Permission
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMultiAlternatives, EmailMessage
+from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.template import TemplateDoesNotExist
 from django.utils.six.moves.urllib.parse import urlparse
+from django.utils.timezone import localtime
+from django.utils.translation import ugettext_lazy as _
 
 from ipware.ip import get_real_ip
 
+import xlsxwriter
 
 if sys.version_info.major >= 3:
     long_type = int
 else:
     long_type = long
+
+from daiquiri.core.constants import GROUPS
 
 
 def import_class(string):
@@ -199,6 +208,16 @@ def fix_for_json(elements):
     return elements
 
 
+def setup_group(name):
+    group, created = Group.objects.get_or_create(name=name)
+    group.permissions.clear()
+
+    for codename in GROUPS[name]:
+        group.permissions.add(Permission.objects.get(codename=codename))
+
+    return group, created
+
+
 def send_mail(request, template_prefix, context, to_emails, cc_emails=[], bcc_emails=[]):
     '''
     This is heavily inspired by allauth.account.adapter.
@@ -221,6 +240,9 @@ def send_mail(request, template_prefix, context, to_emails, cc_emails=[], bcc_em
     # get from email
     from_email = settings.DEFAULT_FROM_EMAIL
 
+    # get reply_to
+    reply_to = settings.EMAIL_REPLY_TO
+
     # render bodie(s)
     bodies = {}
     for ext in ['html', 'txt']:
@@ -233,11 +255,55 @@ def send_mail(request, template_prefix, context, to_emails, cc_emails=[], bcc_em
                 # We need at least one body
                 raise
     if 'txt' in bodies:
-        msg = EmailMultiAlternatives(subject, bodies['txt'], from_email, to_emails, cc=cc_emails, bcc=bcc_emails)
+        msg = EmailMultiAlternatives(subject, bodies['txt'], from_email, to_emails, cc=cc_emails, bcc=bcc_emails, reply_to=reply_to)
         if 'html' in bodies:
             msg.attach_alternative(bodies['html'], 'text/html')
     else:
-        msg = EmailMessage(subject, bodies['html'], from_email, to_emails, cc=cc_emails, bcc=bcc_emails)
+        msg = EmailMessage(subject, bodies['html'], from_email, to_emails, cc=cc_emails, bcc=bcc_emails, reply_to=reply_to)
         msg.content_subtype = 'html'  # Main content is now text/html
 
     msg.send()
+
+
+def render_to_csv(request, filename, columns, rows):
+    response = HttpResponse(content_type='text/csv', charset='utf-8')
+    response['Content-Disposition'] = ('attachment; filename="%s.csv"' % filename).encode('utf-8')
+
+    writer = csv.writer(response)
+
+    writer.writerow(tuple(columns))
+
+    for row in rows:
+        writer.writerow(tuple(row))
+
+    return response
+
+
+def render_to_xlsx(request, filename, columns, rows):
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', charset='utf-8')
+    response['Content-Disposition'] = ('attachment; filename="%s.xlsx"' % filename).encode('utf-8')
+
+    workbook = xlsxwriter.Workbook(response, {
+        'in_memory': True,
+        'strings_to_formulas': False
+    })
+    worksheet = workbook.add_worksheet()
+    bold = workbook.add_format({'bold': True})
+
+    for j, column in enumerate(columns):
+        worksheet.write(0, j, str(column), bold)
+
+    for i, row in enumerate(rows):
+        for j, cell in enumerate(row):
+            if isinstance(cell, list):
+                worksheet.write(i + 1, j, ', '.join(cell))
+            elif isinstance(cell, bool):
+                worksheet.write(i + 1, j, str(_('yes') if cell else _('no')))
+            elif isinstance(cell, datetime):
+                worksheet.write(i + 1, j, localtime(cell).strftime("%Y-%m-%d %H:%M:%S"))
+            else:
+                worksheet.write(i + 1, j, cell)
+
+    workbook.close()
+
+    return response

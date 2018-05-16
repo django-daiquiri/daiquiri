@@ -1,0 +1,149 @@
+{% extends 'core/wide.html' %}
+{% load staticfiles %}
+{% load i18n %}
+{% load compress %}
+{% load core_tags %}
+
+{% block bodyargs %}
+    ng-app="meetings"
+    ng-controller="MeetingsController"
+    ng-init="service.init({{ meeting_id }})"
+{% endblock %}
+
+{% block headextra %}
+    {% vendor 'angular' %}
+    {% vendor 'ng-infinite-scroll' %}
+    {% vendor 'codemirror' %}
+
+    {% compress css %}
+    <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/list.scss' %}" />
+    <link rel="stylesheet" type="text/x-scss" href="{% static 'meetings/css/meetings.scss' %}" />
+    {% endcompress css %}
+
+    {% compress js %}
+    <script type="text/javascript" src="{% static 'core/js/core.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'core/js/list.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'core/js/filter.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'core/js/multiCheckbox.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'core/js/byNumber.js' %}" ></script>
+    <script type="text/javascript" src="{% static 'core/js/formgroup.js' %}" ></script>
+
+    <script type="text/javascript" src="{% static 'meetings/js/meetings.js' %}" ></script>
+    {% endcompress js %}
+{% endblock %}
+
+{% block wide %}
+
+    <div ng-cloak ng-show="service.ready && service.list.ready">
+
+        <h1>{% trans 'Meeting management' %}</h1>
+
+        <h2>{$ service.meeting.title $}</h2>
+
+        <div class="daiquiri-list">
+            <div class="row daiquiri-list-header">
+                <form class="col-sm-6" ng-submit="service.list.search()">
+                    <div class="input-group">
+                        <input class="form-control"
+                               id="table-pager-search-input"
+                               placeholder="{% trans 'Search examples' %}"
+                               type="text" ng-model="service.list.search_string">
+                        <a href="" class="input-group-addon" ng-click="service.list.search()">
+                            <span class="fa fa-search"></span>
+                        </a>
+                    </div>
+                </form>
+                <div class="col-sm-2">
+                    <p class="count">
+                        {$ service.list.count $} {% trans 'participants found' %}
+                    </p>
+                </div>
+                <div class="col-sm-4">
+                    <div class="pull-right">
+                        <button class="btn btn-default" ng-click="service.list.reset()">
+                            {% trans 'Reset' %}
+                        </button>
+
+                        <button class="btn btn-default" ng-click="service.modal('meetings-form-modal')">
+                            {% trans 'Update meeting' %}
+                        </button>
+
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default dropdown-toggle"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+
+                            {% trans 'Export' %}<span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-right">
+                                <li><a href="{% url 'meetings:export' meeting_slug 'csv' %}">CSV</a></li>
+                                <li><a href="{% url 'meetings:export' meeting_slug 'xlsx' %}">Excel</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table daiquiri-list-table" infinite-scroll="service.list.fetch()" infinite-scroll-distance="0.2">
+                    <thead>
+                        <th style="width: 30%" data-order-list="last_name">{% trans 'Participant' %}</th>
+                        <th style="width: 30%;" data-order-list="email">{% trans 'Email' %}</th>
+                        <th style="width: 20%;">{% trans 'Contribution' %}</th>
+                        <th style="width: 10%;">{% trans 'Status' %}</th>
+                        <th style="width: 10%;"></th>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="row in service.list.rows">
+                            <td>
+                                <a href="" ng-click="service.modal('participants-show-modal', $index)">
+                                   {$ row.first_name $} {$ row.last_name $}</span>
+                                </a>
+                            </td>
+                            <td>
+                                <a href="mailto:{$ row.first_name $} {$ row.last_name $} <{$ row.email $}>">
+                                    {$ row.email $}
+                                </a>
+                            </td>
+                            <td>
+                                <span ng-click="service.modal('participants-show-modal', $index)">
+                                    <a href="" ng-repeat="contribution in row.contributions"
+                                        ng-show="contribution.contribution_type">
+                                        {$ (service.contribution_types|filter: {'id': contribution.contribution_type})[0].text $}
+                                    </a>
+                                </span>
+                            </td>
+                            <td>
+                                <span ng-show="row.accepted">
+                                    {% trans 'accepted' %}
+                                </span>
+                            </td>
+                            <td class="text-right list-table-options">
+                                <a href="" class="fa fa-eye" title="{% trans 'Show participant details' %}"
+                                    ng-click="service.modal('participants-show-modal', $index)">
+                                </a>
+                                <a href="" class="fa fa-pencil" title="{% trans 'Update participant' %}"
+                                    ng-click="service.modal('participants-form-modal', $index)">
+                                </a>
+                                <a href="" class="fa fa fa-file-text" title="{% trans 'Update contribution' %}"
+                                    ng-click="service.modal('contributions-form-modal', $index)">
+                                </a>
+                                <a href="" class="fa fa-check-circle" ng-hide="row.accepted" title="{% trans 'Accept participant' %}"
+                                    ng-click="service.accept_participant($index)">
+                                </a>
+                                <a href="" class="fa fa-times-circle" ng-show="row.accepted" title="{% trans 'Reject participant' %}"
+                                    ng-click="service.reject_participant($index)">
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    {% include 'meetings/management_modal_show_participants.html' %}
+
+    {% include 'meetings/management_modal_form_meetings.html' %}
+    {% include 'meetings/management_modal_form_participants.html' %}
+    {% include 'meetings/management_modal_form_contributions.html' %}
+
+{% endblock %}

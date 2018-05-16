@@ -39,6 +39,8 @@ setup(
         'iso8601>=0.1.11',
         'bitstring>=3.1.5',
         'ipaddress>=1.0.18',
+        'unicodecsv>=0.14.0',
+        'XlsxWriter>=1.0.0',
         'django-test-generator>=0.3.3',
         'typing',
         'mock',
