@@ -1,12 +1,16 @@
+import six
+
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
 from rest_framework.exceptions import ValidationError
 
+from daiquiri.core.utils import filter_by_access_level
+
 from .utils import get_user_schema_name, get_default_table_name
 
 
-def process_schema_name(schema_name, user):
+def process_schema_name(user, schema_name):
     user_schema_name = get_user_schema_name(user)
 
     if schema_name:
@@ -28,39 +32,49 @@ def process_table_name(table_name):
         return get_default_table_name()
 
 
-def process_query_language(query_language):
+def process_query_language(user, query_language):
+    # get the possible query languages for this user and create a map
+    query_language_map = {}
+    for query_language in filter_by_access_level(user, settings.QUERY_LANGUAGES):
+        query_language_map['%(key)s-%(version)s' % query_language] = '%(key)s-%(version)s' % query_language
+        query_language_map['%(key)s' % query_language] = '%(key)s-%(version)s' % query_language
+
+    # check if a query language is set
     if query_language:
         query_language = query_language.lower()
 
-        query_languages = {}
-        for item in settings.QUERY_LANGUAGES:
-            query_languages['%(key)s-%(version)s' % item] = '%(key)s-%(version)s' % item
-            query_languages['%(key)s' % item] = '%(key)s-%(version)s' % item
-
-        if query_language in query_languages:
-            return query_languages[query_language]
+        if query_language in query_language_map:
+            return query_language_map[query_language]
         else:
             raise ValidationError({
                 'query_language': [_('This query language is not supported.')]
             })
+
     else:
         # return the default query_language
         return settings.QUERY_LANGUAGES[0]['key']
 
 
-def process_queue(queue):
+def process_queue(user, queue):
+    # get the possible queues for this user
+    queues = filter_by_access_level(user, settings.QUERY_QUEUES)
+
+    # check if a queue is set
     if queue:
         queue = queue.lower()
 
-        if queue in [item['key'] for item in settings.QUERY_QUEUES]:
-            return queue
-        else:
+        # check if this queue is in the possible queues
+        try:
+            six.next((item for item in queues if item['key'] == queue))
+        except StopIteration:
             raise ValidationError({
                 'queue': [_('This queue is not supported.')]
             })
+
+        return queue
     else:
-        # return the default queue
-        return settings.QUERY_QUEUES[0]['key']
+        # set the default queue
+        return queues[0]['key']
 
 
 def process_response_format(response_format):

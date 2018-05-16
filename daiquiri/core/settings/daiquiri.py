@@ -78,7 +78,9 @@ QUERY_QUEUES = [
         'key': 'default',
         'label': 'Default',
         'timeout': 10,
-        'priority': 1
+        'priority': 1,
+        'access_level': 'PUBLIC',
+        'groups': []
     }
 ]
 QUERY_LANGUAGES = [

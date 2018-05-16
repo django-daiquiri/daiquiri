@@ -9,6 +9,7 @@ from daiquiri.core.utils import human2bytes
 from daiquiri.metadata.models import Schema, Table, Column, Function
 
 
+
 def get_format_config(format_key):
 
     for format_config in settings.QUERY_DOWNLOAD_FORMATS:
@@ -20,14 +21,6 @@ def get_format_config(format_key):
 
 def get_default_table_name():
     return now().strftime("%Y-%m-%d-%H-%M-%S")
-
-
-def get_query_language_choices():
-    return [('%(key)s-%(version)s' % item, item['label']) for item in settings.QUERY_LANGUAGES]
-
-
-def get_queue_choices():
-    return [(item['key'], item['label']) for item in settings.QUERY_QUEUES]
 
 
 def get_user_schema_name(user):

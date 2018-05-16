@@ -20,7 +20,7 @@ from rest_framework.authentication import (
 from daiquiri.core.viewsets import ChoicesViewSet, RowViewSetMixin
 from daiquiri.core.permissions import HasModelPermission
 from daiquiri.core.paginations import ListPagination
-from daiquiri.core.utils import get_client_ip, fix_for_json
+from daiquiri.core.utils import get_client_ip, fix_for_json, filter_by_access_level
 from daiquiri.jobs.viewsets import SyncJobViewSet, AsyncJobViewSet
 
 from .models import QueryJob, DownloadJob, QueryArchiveJob, Example
@@ -342,13 +342,18 @@ class ExampleViewSet(viewsets.ModelViewSet):
 
 class QueueViewSet(ChoicesViewSet):
     permission_classes = (HasPermission, )
-    queryset = [(item['key'], item['label']) for item in settings.QUERY_QUEUES]
+
+    def get_queryset(self):
+        items = filter_by_access_level(self.request.user, settings.QUERY_QUEUES)
+        return [(item['key'], item['label']) for item in items]
 
 
 class QueryLanguageViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     permission_classes = (HasPermission, )
     serializer_class = QueryLanguageSerializer
-    queryset = settings.QUERY_LANGUAGES
+
+    def get_queryset(self):
+        return filter_by_access_level(self.request.user, settings.QUERY_LANGUAGES)
 
 
 class PhaseViewSet(ChoicesViewSet):

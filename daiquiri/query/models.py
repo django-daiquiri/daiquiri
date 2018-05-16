@@ -142,10 +142,10 @@ class QueryJob(Job):
     def process(self):
 
         # process all the things!
-        self.schema_name = process_schema_name(self.schema_name, self.owner)
+        self.schema_name = process_schema_name(self.owner, self.schema_name)
         self.table_name = process_table_name(self.table_name)
-        self.query_language = process_query_language(self.query_language)
-        self.queue = process_queue(self.queue)
+        self.query_language = process_query_language(self.owner, self.query_language)
+        self.queue = process_queue(self.owner, self.queue)
         self.response_format = process_response_format(self.response_format)
 
         # set the execution_duration to the queues timeout

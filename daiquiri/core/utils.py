@@ -30,7 +30,12 @@ if sys.version_info.major >= 3:
 else:
     long_type = long
 
-from daiquiri.core.constants import GROUPS
+from daiquiri.core.constants import (
+    GROUPS,
+    ACCESS_LEVEL_PRIVATE,
+    ACCESS_LEVEL_INTERNAL,
+    ACCESS_LEVEL_PUBLIC
+)
 
 
 def import_class(string):
@@ -138,6 +143,23 @@ def get_admin_emails():
 
 def get_doi_url(doi):
     return 'https://doi.org/%s' % doi.rstrip('/') if doi else None
+
+
+def filter_by_access_level(user, items):
+    filtered_items = []
+
+    for item in items:
+        # check for the access level of the queue
+        if 'access_level' not in item or item['access_level'] == ACCESS_LEVEL_PUBLIC:
+            filtered_items.append(item)
+        elif item['access_level'] == ACCESS_LEVEL_INTERNAL:
+            if user is not None:
+                filtered_items.append(item)
+        elif item['access_level'] == ACCESS_LEVEL_PRIVATE and 'groups' in item:
+            if user is not None and user.groups.filter(name__in=item['groups']).exists():
+                filtered_items.append(item)
+
+    return filtered_items
 
 
 def human2bytes(string):
