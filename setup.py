@@ -16,7 +16,7 @@ setup(
     license=metadata['license'],
     url='https://github.com/aipescience/django-daiquiri',
     description=u'Daiquiri is a framework for the publication of scientific databases.',
-    long_description=open('README.rst').read(),
+    long_description=open('README.md').read(),
     install_requires=[
         'Django>=1.11,<2.0',
         'djangorestframework==3.8.0',
