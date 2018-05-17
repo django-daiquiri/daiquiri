@@ -13,6 +13,7 @@ from daiquiri.core.paginations import ListPagination
 
 from .models import Profile
 from .serializers import ProfileSerializer, GroupSerializer
+from .permissions import IsAuthManager
 
 
 class ProfileViewSet(mixins.UpdateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
@@ -68,8 +69,8 @@ class ProfileViewSet(mixins.UpdateModelMixin, mixins.ListModelMixin, mixins.Retr
 
 
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):
-    permission_classes = (HasModelPermission, )
+    permission_classes = (IsAuthManager, )
     authentication_classes = (SessionAuthentication, TokenAuthentication)
 
-    queryset = Group.objects.all()
+    queryset = Group.objects.order_by('name')
     serializer_class = GroupSerializer

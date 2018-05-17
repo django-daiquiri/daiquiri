@@ -39,8 +39,8 @@ class AccountsTestCase(TestCase):
     def test_signup_post(self):
         url = reverse('account_signup')
         response = self.client.post(url, {
-            'email': 'test@example.com',
-            'username': 'test',
+            'email': 'testing@example.com',
+            'username': 'testing',
             'first_name': 'Tanja',
             'last_name': 'Test',
             'password1': 'testing',
@@ -51,14 +51,14 @@ class AccountsTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
 
         # check that a profile was created
-        profile = Profile.objects.get(user__username='test')
+        profile = Profile.objects.get(user__username='testing')
         self.assertEqual(profile.is_pending, True)
 
     def test_signup_post_invalid(self):
         url = reverse('account_signup')
         response = self.client.post(url, {
-            'email': 'test@example.com',
-            'username': 'test',
+            'email': 'testing@example.com',
+            'username': 'testing',
             'first_name': 'Tanja',
             'last_name': 'Test',
             'password1': 'testing',
@@ -70,7 +70,7 @@ class AccountsTestCase(TestCase):
         self.assertContains(response, '* You must type the same password each time.')
 
         # check that a profile was not created
-        exists = Profile.objects.filter(user__username='test').exists()
+        exists = Profile.objects.filter(user__username='testing').exists()
         self.assertEqual(exists, False)
 
     def test_signup_post_exists(self):
@@ -90,7 +90,7 @@ class AccountsTestCase(TestCase):
         self.assertContains(response, '* A user is already registered with this e-mail address.')
 
         # check that a profile was not created
-        exists = Profile.objects.filter(user__username='test').exists()
+        exists = Profile.objects.filter(user__username='testing').exists()
         self.assertEqual(exists, False)
 
     def test_profile_get_for_user(self):

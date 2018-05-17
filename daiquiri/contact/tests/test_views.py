@@ -2,6 +2,8 @@ from django.test import TestCase
 
 from test_generator.views import TestViewMixin, TestListViewMixin
 
+from daiquiri.core.utils import setup_group
+
 
 class ContactViewTestCase(TestCase):
 
@@ -13,15 +15,19 @@ class ContactViewTestCase(TestCase):
 
     users = (
         ('admin', 'admin'),
+        ('manager', 'manager'),
         ('user', 'user'),
         ('anonymous', None),
     )
 
     status_map = {
         'list_view': {
-            'admin': 200, 'user': 403, 'anonymous': 302
+            'admin': 200, 'manager': 200, 'user': 403, 'anonymous': 302
         }
     }
+
+    def setUp(self):
+        setup_group('contact_manager')
 
 
 class MessagesTests(TestListViewMixin, ContactViewTestCase):
@@ -39,10 +45,10 @@ class ContactTests(TestViewMixin, ContactViewTestCase):
 
     status_map = {
         'create_view_get': {
-            'admin': 200, 'user': 200, 'anonymous': 200
+            'admin': 200, 'manager': 200, 'user': 200, 'anonymous': 200
         },
         'create_view_post': {
-            'admin': 200, 'user': 200, 'anonymous': 200
+            'admin': 200, 'manager': 200, 'user': 200, 'anonymous': 200
         }
     }
 

@@ -234,8 +234,9 @@ def setup_group(name):
     group, created = Group.objects.get_or_create(name=name)
     group.permissions.clear()
 
-    for codename in GROUPS[name]:
-        group.permissions.add(Permission.objects.get(codename=codename))
+    for row in GROUPS[name]:
+        app_label, codename = row.split('.')
+        group.permissions.add(Permission.objects.get(content_type__app_label=app_label, codename=codename))
 
     return group, created
 

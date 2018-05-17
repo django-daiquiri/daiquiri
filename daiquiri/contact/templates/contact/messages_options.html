@@ -4,7 +4,6 @@
     <a href="{% include 'contact/messages_mailto.html' %}" class="fa fa-reply"
         title="{% trans 'Reply to message' %}">
     </a>
-
     <a href="" class="fa fa-eye" title="{% trans 'Show message details' %}"
         ng-click="service.modal('show-message-modal', $index)">
     </a>
@@ -15,29 +14,11 @@
     <a href="" ng-show="row.status == 'CLOSED'" class="fa fa-check" title="{% trans 'Open the thread' %}"
         ng-click="service.updateMessage(row, 'ACTIVE')">
     </a>
-
-    <div class="dropdown">
-        <a class="dropdown-toggle" type="button" id="messages-options"
-            data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"
-            title="{% trans 'Show options' %}">
-            <span class="fa fa-ellipsis-h"></span>
-        </a>
-        <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="messages-options">
-            <li>
-                <a href=""
-                    ng-hide="row.status == 'SPAM'"
-                    ng-click="service.updateMessage(row, 'SPAM')">
-                    <i class="fa fa-ban"></i>
-                    <span>{% trans 'Mark as spam' %}</span>
-                </a>
-            <li>
-            <li>
-                <a href=""
-                    ng-hide="row.status != 'SPAM'"
-                    ng-click="service.updateMessage(row, 'ACTIVE')">
-                    <i class="fa fa-check"></i>
-                    <span>{% trans 'Not spam' %}</span>
-                </a>
-            <li>
-        </ul>
-    </div>
+    <a href="" class="fa fa-ban" title="{% trans 'Mark as spam' %}"
+        ng-hide="row.status == 'SPAM'"
+        ng-click="service.updateMessage(row, 'SPAM')">
+    </a>
+    <a href="" class="fa fa-thumbs-o-up" title="{% trans 'Not spam' %}"
+        ng-hide="row.status != 'SPAM'"
+        ng-click="service.updateMessage(row, 'ACTIVE')">
+    </a>

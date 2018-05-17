@@ -14,8 +14,8 @@ class ServeViewTestCase(TestCase):
 
     users = (
         ('admin', 'admin'),
-        ('manager', 'manager'),
         ('user', 'user'),
+        ('test', 'test'),
         ('anonymous', None),
     )
 
@@ -28,7 +28,7 @@ class PublicTableTests(TestViewMixin, ServeViewTestCase):
 
     status_map = {
         'list_view': {
-            'admin': 200, 'manager': 200, 'user': 200, 'anonymous': 200
+            'admin': 200, 'user': 200, 'test': 200, 'anonymous': 200
         }
     }
 
@@ -47,7 +47,7 @@ class InternalTableTests(TestViewMixin, ServeViewTestCase):
 
     status_map = {
         'list_view': {
-            'admin': 200, 'manager': 200, 'user': 200, 'anonymous': 404
+            'admin': 200, 'user': 200, 'test': 200, 'anonymous': 404
         }
     }
 
@@ -66,14 +66,14 @@ class PrivateTableTests(TestViewMixin, ServeViewTestCase):
 
     status_map = {
         'list_view': {
-            'admin': 404, 'manager': 200, 'user': 404, 'anonymous': 404
+            'admin': 404, 'user': 404, 'test': 200, 'anonymous': 404
         }
     }
 
     def _test_list_view(self, username):
         self.assert_list_view(username, {
-            'schema_name': 'daiquiri_archive',
-            'table_name': 'files'
+            'schema_name': 'daiquiri_data_test',
+            'table_name': 'test'
         })
 
 
@@ -85,7 +85,7 @@ class NotFoundTableTests(TestViewMixin, ServeViewTestCase):
 
     status_map = {
         'list_view': {
-            'admin': 404, 'manager': 404, 'user': 404, 'anonymous': 404
+            'admin': 404, 'user': 404, 'test': 404, 'anonymous': 404
         }
     }
 

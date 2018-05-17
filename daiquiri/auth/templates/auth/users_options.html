@@ -19,50 +19,31 @@
         </a>
     </span>
 
+    {% if settings.AUTH_WORKFLOW == 'confirmation' %}
+    <span ng-show="row.is_pending && !row.is_confirmed">
+        <a href="" class="fa fa-thumbs-up" title="{% trans 'Confirm the user' %}"
+            ng-click="service.modal('confirm-user-modal', $index)">
+        </a>
+        <a href="" class="fa fa-thumbs-down" title="{% trans 'Reject the user' %}"
+            ng-click="service.modal('reject-user-modal', $index)">
+        </a>
+    </span>
+    {% elif settings.AUTH_WORKFLOW == 'activation' %}
     <span ng-show="row.is_pending">
-        {% if settings.AUTH_WORKFLOW == 'confirmation' %}
-        <span ng-show="!row.is_confirmed">
-            <a href="" class="fa fa-check" title="{% trans 'Confirm the user' %}"
-                ng-click="service.modal('confirm-user-modal', $index)">
-            </a>
-            <a href="" class="fa fa-times" title="{% trans 'Reject the user' %}"
-                ng-click="service.modal('reject-user-modal', $index)">
-            </a>
-        </span>
-        {% endif %}
-
-        {% if settings.AUTH_WORKFLOW == 'activation' %}
         <a href="" class="fa fa-check" title="{% trans 'Activate the user' %}"
             ng-click="service.modal('activate-user-modal', $index)">
         </a>
         <a href="" class="fa fa-times" title="{% trans 'Reject the user' %}"
             ng-click="service.modal('reject-user-modal', $index)">
         </a>
-        {% endif %}
     </span>
+    {% endif %}
 
     {% if user.is_staff %}
-    <div class="dropdown">
-        <a class="dropdown-toggle" type="button" id="users-options"
-            data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"
-            title="{% trans 'Show options' %}">
-            <span class="fa fa-ellipsis-h"></span>
-        </a>
-        <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="users-options">
-            {% if settings.AUTH_WORKFLOW == 'confirmation' %}
-            <li>
-                <a href="" ng-show="row.is_pending && row.is_confirmed" ng-click="service.modal('activate-user-modal', $index)">
-                    {% trans 'Activate the user' %}
-                </a>
-            <li>
-            {% endif %}
-            <li>
-                <a href="{{ user_admin_url }}">{% trans 'User Admin' %}</a>
-            </li>
-            <li>
-                <a href="{{ profile_admin_url }}">{% trans 'Profile Admin' %}</a>
-            </li>
-        </ul>
-    </div>
-
+    {% if settings.AUTH_WORKFLOW == 'confirmation' %}
+    <a href="" class="fa fa-check" ng-show="row.is_pending && row.is_confirmed"
+        ng-click="service.modal('activate-user-modal', $index)"></a>
+    {% endif %}
+    <a href="{{ user_admin_url }}" class="fa fa-user" title="{% trans 'User Admin' %}"></a>
+    <a href="{{ profile_admin_url }}" class="fa fa-user-circle-o" title="{% trans 'Profile Admin' %}"></a>
     {% endif %}

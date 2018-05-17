@@ -2,6 +2,8 @@ from django.test import TestCase
 
 from test_generator.viewsets import TestModelViewsetMixin
 
+from daiquiri.core.utils import setup_group
+
 from ..models import Schema, Table, Column, Function
 
 
@@ -16,35 +18,39 @@ class MetadataViewsetTestCase(TestCase):
         ('admin', 'admin'),
         ('manager', 'manager'),
         ('user', 'user'),
+        ('test', 'test'),
         ('anonymous', None),
     )
 
     status_map = {
         'list_viewset': {
-            'admin': 200, 'manager': 403, 'user': 403, 'anonymous': 403
+            'admin': 200, 'manager': 200, 'user': 403, 'test': 403, 'anonymous': 403
         },
         'detail_viewset': {
-            'admin': 200, 'manager': 403, 'user': 403, 'anonymous': 403
+            'admin': 200, 'manager': 200, 'user': 403, 'test': 403, 'anonymous': 403
         },
         'create_viewset': {
-            'admin': 201, 'manager': 403, 'user': 403, 'anonymous': 403
+            'admin': 201, 'manager': 201, 'user': 403, 'test': 403, 'anonymous': 403
         },
         'update_viewset': {
-            'admin': 200, 'manager': 403, 'user': 403, 'anonymous': 403
+            'admin': 200, 'manager': 200, 'user': 403, 'test': 403, 'anonymous': 403
         },
         'delete_viewset': {
-            'admin': 204, 'manager': 403, 'user': 403, 'anonymous': 403
+            'admin': 204, 'manager': 204, 'user': 403, 'test': 403, 'anonymous': 403
         },
         'discover_viewset': {
-            'admin': 200, 'manager': 403, 'user': 403, 'anonymous': 403
+            'admin': 200, 'manager': 200, 'user': 403, 'test': 403, 'anonymous': 403
         },
         'management_viewset': {
-            'admin': 200, 'manager': 403, 'user': 403, 'anonymous': 403
+            'admin': 200, 'manager': 200, 'user': 403, 'test': 403, 'anonymous': 403
         },
         'user_viewset': {
-            'admin': 200, 'manager': 200, 'user': 200, 'anonymous': 200
+            'admin': 200, 'manager': 200, 'user': 200, 'test': 200, 'anonymous': 200
         }
     }
+
+    def setUp(self):
+        setup_group('metadata_manager')
 
 
 class SchemaTests(TestModelViewsetMixin, MetadataViewsetTestCase):

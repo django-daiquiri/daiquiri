@@ -36,7 +36,7 @@
       "query_string": "SELECT id, \"array\", matrix FROM daiquiri_data_test.test",
       "access_level": "PRIVATE",
       "groups": [
-        2
+        100
       ]
     }
   },
@@ -51,7 +51,7 @@
       "query_string": "SELECT id, \"timestamp\", file, collection, path, ra, dec FROM daiquiri_archive.files",
       "access_level": "PRIVATE",
       "groups": [
-        1
+        10
       ]
     }
   }

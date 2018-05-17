@@ -2,6 +2,8 @@ from django.test import TestCase
 
 from test_generator.views import TestViewMixin, TestListViewMixin
 
+from daiquiri.core.utils import setup_group
+
 
 class MetadataViewTestCase(TestViewMixin, TestCase):
 
@@ -14,8 +16,12 @@ class MetadataViewTestCase(TestViewMixin, TestCase):
         ('admin', 'admin'),
         ('manager', 'manager'),
         ('user', 'user'),
+        ('test', 'test'),
         ('anonymous', None),
     )
+
+    def setUp(self):
+        setup_group('metadata_manager')
 
 
 class ManagementTests(TestListViewMixin, MetadataViewTestCase):
@@ -26,7 +32,7 @@ class ManagementTests(TestListViewMixin, MetadataViewTestCase):
 
     status_map = {
         'list_view': {
-            'admin': 200, 'manager': 403, 'user': 403, 'anonymous': 302
+            'admin': 200, 'manager': 200, 'user': 403, 'test': 403, 'anonymous': 302
         }
     }
 
@@ -39,7 +45,7 @@ class PublicSchemaTests(MetadataViewTestCase):
 
     status_map = {
         'list_view': {
-            'admin': 200, 'manager': 200, 'user': 200, 'anonymous': 200
+            'admin': 200, 'manager': 200, 'user': 200, 'test': 200, 'anonymous': 200
         }
     }
 
@@ -57,7 +63,7 @@ class InternalSchemaTests(MetadataViewTestCase):
 
     status_map = {
         'list_view': {
-            'admin': 200, 'manager': 200, 'user': 200, 'anonymous': 404
+            'admin': 200, 'manager': 200, 'user': 200, 'test': 200, 'anonymous': 404
         }
     }
 
@@ -75,13 +81,13 @@ class PrivateSchemaTests(MetadataViewTestCase):
 
     status_map = {
         'list_view': {
-            'admin': 404, 'manager': 200, 'user': 404, 'anonymous': 404
+            'admin': 404, 'manager': 404, 'user': 404, 'test': 200, 'anonymous': 404
         }
     }
 
     def _test_list_viewset(self, username):
         self.assert_list_view(username, {
-            'schema_name': 'daiquiri_archive'
+            'schema_name': 'daiquiri_data_test'
         })
 
 
@@ -93,7 +99,7 @@ class PublicTableTests(MetadataViewTestCase):
 
     status_map = {
         'list_view': {
-            'admin': 200, 'manager': 200, 'user': 200, 'anonymous': 200
+            'admin': 200, 'manager': 200, 'user': 200, 'test': 200, 'anonymous': 200
         }
     }
 
@@ -112,7 +118,7 @@ class InternalTableTests(MetadataViewTestCase):
 
     status_map = {
         'list_view': {
-            'admin': 200, 'manager': 200, 'user': 200, 'anonymous': 404
+            'admin': 200, 'manager': 200, 'user': 200, 'test': 200, 'anonymous': 404
         }
     }
 
@@ -131,12 +137,12 @@ class PrivateTableTests(MetadataViewTestCase):
 
     status_map = {
         'list_view': {
-            'admin': 404, 'manager': 200, 'user': 404, 'anonymous': 404
+            'admin': 404, 'manager': 404, 'user': 404, 'test': 200, 'anonymous': 404
         }
     }
 
     def _test_list_viewset(self, username):
         self.assert_list_view(username, {
-            'schema_name': 'daiquiri_archive',
-            'table_name': 'files'
+            'schema_name': 'daiquiri_data_test',
+            'table_name': 'test'
         })

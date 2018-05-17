@@ -2,6 +2,8 @@ from django.test import TestCase
 
 from test_generator.views import TestListViewMixin
 
+from daiquiri.core.utils import setup_group
+
 
 class QueryViewTestCase(TestCase):
 
@@ -12,9 +14,13 @@ class QueryViewTestCase(TestCase):
 
     users = (
         ('admin', 'admin'),
+        ('manager', 'manager'),
         ('user', 'user'),
         ('anonymous', None),
     )
+
+    def setUp(self):
+        setup_group('query_manager')
 
 
 class QueryTests(TestListViewMixin, QueryViewTestCase):
@@ -25,7 +31,7 @@ class QueryTests(TestListViewMixin, QueryViewTestCase):
 
     status_map = {
         'list_view': {
-            'admin': 200, 'user': 200, 'anonymous': 302
+            'admin': 200, 'manager': 200, 'user': 200, 'anonymous': 302
         }
     }
 
@@ -38,6 +44,6 @@ class ExamplesTests(TestListViewMixin, QueryViewTestCase):
 
     status_map = {
         'list_view': {
-            'admin': 200, 'user': 403, 'anonymous': 302
+            'admin': 200, 'manager': 200, 'user': 403, 'anonymous': 302
         }
     }

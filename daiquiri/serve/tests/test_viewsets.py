@@ -14,37 +14,10 @@ class ServeTestCase(TestCase):
 
     users = (
         ('admin', 'admin'),
-        ('manager', 'manager'),
         ('user', 'user'),
+        ('test', 'test'),
         ('anonymous', None),
     )
-
-    status_map = {
-        'list_viewset': {
-            'admin': 200, 'manager': 403, 'user': 403, 'anonymous': 403
-        },
-        'retrieve_viewset': {
-            'admin': 200, 'manager': 403, 'user': 403, 'anonymous': 403
-        },
-        'create_viewset': {
-            'admin': 201, 'manager': 403, 'user': 403, 'anonymous': 403
-        },
-        'update_viewset': {
-            'admin': 200, 'manager': 403, 'user': 403, 'anonymous': 403
-        },
-        'delete_viewset': {
-            'admin': 204, 'manager': 403, 'user': 403, 'anonymous': 403
-        },
-        'discover_viewset': {
-            'admin': 200, 'manager': 403, 'user': 403, 'anonymous': 403
-        },
-        'management_viewset': {
-            'admin': 200, 'manager': 403, 'user': 403, 'anonymous': 403
-        },
-        'user_viewset': {
-            'admin': 200, 'manager': 200, 'user': 200, 'anonymous': 200
-        }
-    }
 
 
 class PublicRowTests(TestViewsetMixin, ServeTestCase):
@@ -55,7 +28,7 @@ class PublicRowTests(TestViewsetMixin, ServeTestCase):
 
     status_map = {
         'list_viewset': {
-            'admin': 200, 'manager': 200, 'user': 200, 'anonymous': 200
+            'admin': 200, 'user': 200, 'test': 200, 'anonymous': 200
         }
     }
 
@@ -74,7 +47,7 @@ class InternalRowTests(TestViewsetMixin, ServeTestCase):
 
     status_map = {
         'list_viewset': {
-            'admin': 200, 'manager': 200, 'user': 200, 'anonymous': 404
+            'admin': 200, 'user': 200, 'test': 200, 'anonymous': 404
         }
     }
 
@@ -93,14 +66,14 @@ class PrivateRowTests(TestViewsetMixin, ServeTestCase):
 
     status_map = {
         'list_viewset': {
-            'admin': 404, 'manager': 200, 'user': 404, 'anonymous': 404
+            'admin': 404, 'user': 404, 'test': 200, 'anonymous': 404
         }
     }
 
     def _test_list_viewset(self, username):
         self.assert_list_viewset(username, query_params={
-            'schema': 'daiquiri_archive',
-            'table': 'files'
+            'schema': 'daiquiri_data_test',
+            'table': 'test'
         })
 
 
@@ -112,7 +85,7 @@ class NotFoundRowTests(TestViewsetMixin, ServeTestCase):
 
     status_map = {
         'list_viewset': {
-            'admin': 404, 'manager': 404, 'user': 404, 'anonymous': 404
+            'admin': 404, 'user': 404, 'test': 404, 'anonymous': 404
         }
     }
 
@@ -143,7 +116,7 @@ class PublicColumnTests(TestViewsetMixin, ServeTestCase):
 
     status_map = {
         'list_viewset': {
-            'admin': 200, 'manager': 200, 'user': 200, 'anonymous': 200
+            'admin': 200, 'user': 200, 'test': 200, 'anonymous': 200
         }
     }
 
@@ -162,7 +135,7 @@ class InternalColumnTests(TestViewsetMixin, ServeTestCase):
 
     status_map = {
         'list_viewset': {
-            'admin': 200, 'manager': 200, 'user': 200, 'anonymous': 404
+            'admin': 200, 'user': 200, 'test': 200, 'anonymous': 404
         }
     }
 
@@ -181,14 +154,14 @@ class PrivateColumnTests(TestViewsetMixin, ServeTestCase):
 
     status_map = {
         'list_viewset': {
-            'admin': 404, 'manager': 200, 'user': 404, 'anonymous': 404
+            'admin': 404, 'user': 404, 'test': 200, 'anonymous': 404
         }
     }
 
     def _test_list_viewset(self, username):
         self.assert_list_viewset(username, query_params={
-            'schema': 'daiquiri_archive',
-            'table': 'files'
+            'schema': 'daiquiri_data_test',
+            'table': 'test'
         })
 
 
@@ -200,7 +173,7 @@ class NotFoundColumnTests(TestViewsetMixin, ServeTestCase):
 
     status_map = {
         'list_viewset': {
-            'admin': 404, 'manager': 404, 'user': 404, 'anonymous': 404
+            'admin': 404, 'user': 404, 'test': 404, 'anonymous': 404
         }
     }
 

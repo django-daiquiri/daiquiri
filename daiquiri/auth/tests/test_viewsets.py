@@ -1,7 +1,9 @@
 from django.test import TestCase
-from django.contrib.auth.models import User, Group, Permission
+from django.contrib.auth.models import User, Group
 
 from test_generator.viewsets import TestListViewsetMixin, TestDetailViewsetMixin, TestUpdateViewsetMixin
+
+from daiquiri.core.utils import setup_group
 
 from ..models import Profile
 
@@ -13,14 +15,7 @@ class AuthViewsetTestCase(TestCase):
     )
 
     def setUp(self):
-        group = Group.objects.get(name='managers')
-        for codename in (
-            'add_profile',
-            'change_profile',
-            'delete_profile',
-            'view_profile'
-        ):
-            group.permissions.add(Permission.objects.get(codename=codename))
+        setup_group('user_manager')
 
 
 class ProfileTests(TestListViewsetMixin, TestDetailViewsetMixin, TestUpdateViewsetMixin, AuthViewsetTestCase):
