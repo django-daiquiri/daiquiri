@@ -227,6 +227,7 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
 
         except DownloadJob.DoesNotExist:
             download_job = DownloadJob(
+                job_type=QueryJob.JOB_TYPE_INTERFACE,
                 client_ip=get_client_ip(self.request),
                 job=job,
                 format_key=format_key
@@ -280,6 +281,7 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
 
         except QueryArchiveJob.DoesNotExist:
             archive_job = QueryArchiveJob(
+                job_type=QueryJob.JOB_TYPE_INTERFACE,
                 client_ip=get_client_ip(self.request),
                 job=job,
                 column_name=column_name
