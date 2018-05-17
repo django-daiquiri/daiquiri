@@ -86,7 +86,7 @@ class UsersView(ModelPermissionMixin, TemplateView):
 
         detail_keys = settings.AUTH_DETAIL_KEYS
         for detail_key in detail_keys:
-            detail_key['options_json'] = json.dumps(detail_key['options'])
+            detail_key['options_json'] = json.dumps(detail_key.get('options', {}))
             detail_key['model'] = 'service.current_row.details.%s' % detail_key['key']
             detail_key['errors'] = 'service.errors.%s' % detail_key['key']
 
