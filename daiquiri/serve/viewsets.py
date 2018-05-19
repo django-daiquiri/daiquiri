@@ -8,9 +8,10 @@ from rest_framework.exceptions import NotFound
 
 from daiquiri.core.viewsets import RowViewSetMixin
 from daiquiri.core.adapter import DatabaseAdapter
+from daiquiri.metadata.utils import get_user_columns
 
 from .serializers import ColumnSerializer
-from .utils import get_columns, get_resolver
+from .utils import get_resolver
 
 
 class RowViewSet(RowViewSetMixin, viewsets.GenericViewSet):
@@ -22,15 +23,18 @@ class RowViewSet(RowViewSetMixin, viewsets.GenericViewSet):
         table_name = self.request.GET.get('table')
         column_names = self.request.GET.getlist('column')
 
-        # get the columns using the utils function
-        columns = get_columns(self.request.user, schema_name, table_name, column_names)
+        # get the columns which the user is allowed to access
+        user_columns = get_user_columns(self.request.user, schema_name, table_name)
 
-        if columns:
-            # get column names from the checked columns (again)
-            column_names = [column.name for column in columns]
-
+        if user_columns:
             # get the row query params from the request
-            ordering, page, page_size, search, filters = self._get_query_params(column_names)
+            ordering, page, page_size, search, filters = self._get_query_params(user_columns)
+
+            # filter by input column names by the the allowed columns
+            if column_names:
+                column_names = [column.name for column in user_columns if column.name in column_names]
+            else:
+                column_names = [column.name for column in user_columns]
 
             # get database adapter
             adapter = DatabaseAdapter()
@@ -62,12 +66,15 @@ class ColumnViewSet(viewsets.ViewSet):
         table_name = self.request.GET.get('table')
         column_names = self.request.GET.getlist('column')
 
-        # get the columns using the utils function
-        columns = get_columns(self.request.user, schema_name, table_name, column_names)
+        # get the columns which the user is allowed to access
+        user_columns = get_user_columns(self.request.user, schema_name, table_name)
 
-        if columns:
-            # get column names from the checked columns (again)
-            columns = [column for column in columns if column.name in column_names]
+        if user_columns:
+            # filter by input column names by the the allowed columns
+            if column_names:
+                columns = [column for column in user_columns if column.name in column_names]
+            else:
+                columns = [column for column in user_columns]
 
             return Response(ColumnSerializer(columns, many=True).data)
 

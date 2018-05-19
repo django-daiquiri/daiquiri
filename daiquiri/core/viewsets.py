@@ -13,7 +13,7 @@ class ChoicesViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
 class RowViewSetMixin(object):
 
-    def _get_query_params(self, column_names):
+    def _get_query_params(self, columns):
         # get the ordering
         ordering = self.request.GET.get('ordering')
 
@@ -33,6 +33,12 @@ class RowViewSetMixin(object):
             raise ParseError(_('page_size must be an integer'))
 
         # get additional filters from the querystring
+        filters = {}
+        try:
+            column_names = [column.name for column in columns]
+        except AttributeError:
+            column_names = [column['name'] for column in columns]
+
         filters = {}
         for key, value in self.request.GET.items():
             if key in column_names:

@@ -25,11 +25,8 @@ class RowViewSet(RowViewSetMixin, viewsets.GenericViewSet):
     permission_classes = (HasPermission, )
 
     def list(self, request, *args, **kwargs):
-        # fetch rows from the database
-        column_names = [column['name'] for column in settings.ARCHIVE_COLUMNS]
-
         # get the row query params from the request
-        ordering, page, page_size, search, filters = self._get_query_params(column_names)
+        ordering, page, page_size, search, filters = self._get_query_params(settings.ARCHIVE_COLUMNS)
 
         # get database adapter
         adapter = DatabaseAdapter()
@@ -41,6 +38,9 @@ class RowViewSet(RowViewSetMixin, viewsets.GenericViewSet):
         # get collecions for this user and add them to the filters
         collections = [collection.name for collection in Collection.objects.filter_by_access_level(request.user)]
         filters['collection'] = collections
+
+        # get the name of the columns
+        column_names = [column['name'] for column in settings.ARCHIVE_COLUMNS]
 
         # query the database for the total number of rows
         count = adapter.count_rows(schema_name, table_name, column_names, search, filters)
