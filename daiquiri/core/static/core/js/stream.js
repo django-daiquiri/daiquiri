@@ -27,7 +27,6 @@ angular.module('stream', ['core'])
     };
 
     service.reset = function() {
-        console.log(service.defaults);
         angular.forEach(service.defaults, function(value, key) {
             service.values[key] = value;
         });
