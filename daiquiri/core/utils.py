@@ -209,25 +209,24 @@ def make_query_dict_upper_case(input_dict):
 
 
 def fix_for_json(elements):
+    # first convert to a list
+    elements_list = list(elements)
 
-    for i in range(len(elements)):
-        # replace the tuple by a list and run fix_for_json recursively
-        if isinstance(elements[i], tuple):
-            elements[i] = fix_for_json(list(elements[i]))
-
+    # then, fix stuff or run the function recursively
+    for i in range(len(elements_list)):
         # for a list run fix_for_json recursively
-        elif isinstance(elements[i], list):
-            elements[i] = fix_for_json(elements[i])
+        if isinstance(elements_list[i], list):
+            elements_list[i] = fix_for_json(elements_list[i])
 
         # check the float fields for nan
-        elif isinstance(elements[i], float) and math.isnan(elements[i]):
-            elements[i] = None
+        elif isinstance(elements_list[i], float) and math.isnan(elements_list[i]):
+            elements_list[i] = None
 
         # convert a long fields to a strings
-        elif isinstance(elements[i], long_type) and elements[i] > 9007199254740991:
-            elements[i] = str(elements[i])
+        elif isinstance(elements_list[i], long_type) and elements_list[i] > 9007199254740991:
+            elements_list[i] = str(elements_list[i])
 
-    return elements
+    return elements_list
 
 
 def setup_group(name):
