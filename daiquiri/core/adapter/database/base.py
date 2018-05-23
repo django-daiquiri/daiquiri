@@ -15,7 +15,7 @@ class BaseDatabaseAdapter(object):
     def execute(self, sql):
         return self.connection().cursor().execute(sql)
 
-    def fetchone(self, sql, args=None):
+    def fetchone(self, sql, args=None, as_dict=False):
         cursor = self.connection().cursor()
 
         if args:
@@ -23,9 +23,13 @@ class BaseDatabaseAdapter(object):
         else:
             cursor.execute(sql)
 
-        return cursor.fetchone()
+        if as_dict:
+            columns = cursor.description
+            return {column.name: value for column, value in zip(columns, cursor.fetchone())}
+        else:
+            return cursor.fetchone()
 
-    def fetchall(self, sql, args=None):
+    def fetchall(self, sql, args=None, as_dict=False):
         cursor = self.connection().cursor()
 
         if args:
@@ -33,7 +37,14 @@ class BaseDatabaseAdapter(object):
         else:
             cursor.execute(sql)
 
-        return cursor.fetchall()
+        if as_dict:
+            columns = cursor.description
+            return [
+                {column.name: value for column, value in zip(columns, row)}
+                for row in cursor.fetchall()
+            ]
+        else:
+            return cursor.fetchall()
 
     def fetch_pid(self):
         raise NotImplementedError()
