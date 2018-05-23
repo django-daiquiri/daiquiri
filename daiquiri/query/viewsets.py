@@ -160,11 +160,11 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
         except QueryJob.DoesNotExist:
             raise NotFound
 
+        # get the row query params from the request
+        ordering, page, page_size, search, filters = self._get_query_params(job.columns())
+
         # get column names from the request
         column_names = self.request.GET.getlist('column')
-
-        # get the row query params from the request
-        ordering, page, page_size, search, filters = self._get_query_params(column_names)
 
         # get the count and the rows from the job
         count, results = job.rows(column_names, ordering, page, page_size, search, filters)
