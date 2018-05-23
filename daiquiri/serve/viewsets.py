@@ -8,6 +8,7 @@ from rest_framework.exceptions import NotFound
 
 from daiquiri.core.viewsets import RowViewSetMixin
 from daiquiri.core.adapter import DatabaseAdapter
+from daiquiri.core.utils import fix_for_json
 from daiquiri.metadata.utils import get_user_columns
 
 from .serializers import ColumnSerializer
@@ -48,7 +49,7 @@ class RowViewSet(RowViewSetMixin, viewsets.GenericViewSet):
             # return ordered dict to be send as json
             return Response(OrderedDict((
                 ('count', count),
-                ('results', results),
+                ('results', fix_for_json(results)),
                 ('next', self._get_next_url(page, page_size, count)),
                 ('previous', self._get_previous_url(page))
             )))
