@@ -215,7 +215,7 @@ def fix_for_json(elements):
     # then, fix stuff or run the function recursively
     for i in range(len(elements_list)):
         # for a list run fix_for_json recursively
-        if isinstance(elements_list[i], list):
+        if isinstance(elements_list[i], (list, tuple)):
             elements_list[i] = fix_for_json(elements_list[i])
 
         # check the float fields for nan
