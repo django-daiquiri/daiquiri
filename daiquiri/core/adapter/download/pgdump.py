@@ -7,12 +7,14 @@ logger = logging.getLogger(__name__)
 
 class PgDumpAdapter(BaseDownloadAdapter):
 
-    def set_args(self, schema_name, table_name):
+    def set_args(self, schema_name, table_name, data_only=False):
         # command line for pg_dump:
-        # pg_dump -a --inserts --dbname=postgresql://user:password@host:port/database --table=schema.table
-        # pg_dump -a --inserts --user=user --host=host --port=port --dbname=database --table=schema.table
+        # pg_dump ... --dbname=postgresql://user:password@host:port/database --table=schema.table
+        # pg_dump ... --user=user --host=host --port=port --dbname=database --table=schema.table
 
-        self.args = ['pg_dump', '-a', '--inserts']
+        self.args = ['pg_dump', '--no-owner']
+        if data_only:
+            self.args += ['--data-only', '--inserts']
 
         if 'PASSWORD' in self.database_config and self.database_config['PASSWORD']:
             if 'PORT' in self.database_config and self.database_config['PORT']:
