@@ -438,7 +438,7 @@
     "fields": {
       "table": 3,
       "order": 2,
-      "name": "array",
+      "name": "bool",
       "description": null,
       "unit": null,
       "ucd": null,
@@ -459,6 +459,27 @@
     "fields": {
       "table": 3,
       "order": 3,
+      "name": "array",
+      "description": null,
+      "unit": null,
+      "ucd": null,
+      "utype": null,
+      "datatype": null,
+      "arraysize": null,
+      "principal": false,
+      "indexed": false,
+      "std": false,
+      "access_level": "",
+      "metadata_access_level": "",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_metadata.column",
+    "pk": 34,
+    "fields": {
+      "table": 3,
+      "order": 4,
       "name": "matrix",
       "description": null,
       "unit": null,

@@ -33,7 +33,7 @@
       "name": "Select all particles from daiquiri_data_test.test",
       "description": "",
       "query_language": "adql-2.0",
-      "query_string": "SELECT id, \"array\", matrix FROM daiquiri_data_test.test",
+      "query_string": "SELECT id, \"bool\", \"array\", matrix FROM daiquiri_data_test.test",
       "access_level": "PRIVATE",
       "groups": [
         100
