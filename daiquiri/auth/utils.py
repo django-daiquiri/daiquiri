@@ -1,4 +1,6 @@
 from django.core.urlresolvers import reverse
+from django.contrib.auth.models import User, Permission
+from django.db.models import Q
 
 from daiquiri.core.utils import send_mail, get_admin_emails
 
@@ -10,11 +12,17 @@ def get_full_name(user):
         return user.username
 
 
+def get_manager_emails():
+    permissions = Permission.objects.filter(content_type__app_label='daiquiri_auth', codename='view_profile')
+    users = User.objects.filter(Q(groups__permissions__in=permissions) | Q(user_permissions__in=permissions)).distinct()
+    return [user.email for user in users] + get_admin_emails()
+
+
 def send_request_confirmation(request, user):
     '''
     Sends an email to the admins once a users email was validated.
     '''
-    emails = get_admin_emails()
+    emails = get_manager_emails()
     context = {
         'user': user,
         'users_url': request.build_absolute_uri(reverse('auth:users'))
@@ -26,7 +34,7 @@ def send_request_activation(request, user):
     '''
     Sends an email to the admins once a users email was validated.
     '''
-    emails = get_admin_emails()
+    emails = get_manager_emails()
     context = {
         'user': user,
         'users_url': request.build_absolute_uri(reverse('auth:users'))
@@ -38,7 +46,7 @@ def send_notify_confirmation(request, user):
     '''
     Sends an email to the admins once a user was confirmed.
     '''
-    emails = get_admin_emails()
+    emails = get_manager_emails()
     context = {
         'user': user,
         'request_user': request.user
@@ -50,7 +58,7 @@ def send_notify_rejection(request, user):
     '''
     Sends an email to the admins once a user was rejected.
     '''
-    emails = get_admin_emails()
+    emails = get_manager_emails()
     context = {
         'user': user,
         'request_user': request.user
@@ -62,7 +70,7 @@ def send_notify_activation(request, user):
     '''
     Sends an email to the admins once a user was activated.
     '''
-    emails = get_admin_emails()
+    emails = get_manager_emails()
     context = {
         'user': user,
         'request_user': request.user
