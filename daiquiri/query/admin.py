@@ -1,21 +1,26 @@
 from django.contrib import admin
 
+from daiquiri.jobs.admin import JobAdmin
+
 from .models import QueryJob, DownloadJob, QueryArchiveJob, Example
 
 
-class QueryJobAdmin(admin.ModelAdmin):
-    search_fields = ('id', 'job_type', 'owner__username', 'phase', 'schema_name', 'table_name')
-    list_display = ('id', 'job_type', 'owner', 'phase', 'creation_time', 'schema_name', 'table_name', 'nrows')
+class QueryJobAdmin(JobAdmin):
+    search_fields = JobAdmin.search_fields + ['schema_name', 'table_name']
+    list_display = JobAdmin.list_display + ['schema_name', 'table_name', 'nrows']
+    actions = ['abort_job', 'archive_job']
 
 
-class DownloadJobAdmin(admin.ModelAdmin):
-    search_fields = ('id', 'job_type', 'owner__username', 'phase', 'job__table_name', 'format_key')
-    list_display = ('id', 'job_type', 'owner', 'phase', 'creation_time', 'job', 'file_path')
+class DownloadJobAdmin(JobAdmin):
+    search_fields = JobAdmin.search_fields + ['schema_name', 'job__table_name', 'format_key']
+    list_display = JobAdmin.list_display + ['job', 'file_path']
+    actions = ['abort_job', 'archive_job']
 
 
-class QueryArchiveJobAdmin(admin.ModelAdmin):
-    search_fields = ('id', 'job_type', 'owner__username', 'phase', 'job__table_name', 'format_key')
-    list_display = ('id', 'job_type', 'owner', 'phase', 'creation_time', 'job', 'file_path')
+class QueryArchiveJobAdmin(JobAdmin):
+    search_fields = JobAdmin.search_fields + ['schema_name', 'job__table_name', 'format_key']
+    list_display = JobAdmin.list_display + ['job', 'file_path']
+    actions = ['abort_job', 'archive_job']
 
 
 class ExampleAdmin(admin.ModelAdmin):

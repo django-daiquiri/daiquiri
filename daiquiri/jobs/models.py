@@ -58,11 +58,11 @@ class Job(models.Model):
 
     response_format = models.CharField(max_length=64, blank=True, null=True)
     max_records = models.IntegerField(blank=True, null=True)
-    run_id = models.CharField(max_length=64, blank=True, default='')
+    run_id = models.CharField(max_length=64, blank=True, default='', db_index=True)
 
-    phase = models.CharField(max_length=10, choices=PHASE_CHOICES)
+    phase = models.CharField(max_length=10, choices=PHASE_CHOICES, db_index=True)
 
-    creation_time = models.DateTimeField(blank=True, null=True)
+    creation_time = models.DateTimeField(blank=True, null=True, db_index=True)
     start_time = models.DateTimeField(blank=True, null=True)
     end_time = models.DateTimeField(blank=True, null=True)
     execution_duration = models.PositiveIntegerField(blank=True, default=0)
