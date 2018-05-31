@@ -1,0 +1,27 @@
+{% load i18n %}
+
+<h1>{{ meeting.title }}</h1>
+
+{% for participant in participants %}
+
+<h2>{{ participant.first_name }} {{ participant.last_name }}</h2>
+
+{% if participant.contributions.all %}
+
+{% for contribution in participant.contributions.all %}
+
+    <h3>{{ contribution.title }}</h3>
+
+    <p>{{ contribution.contribution_type_str }}</p>
+
+    {{ contribution.abstract }}
+
+{% endfor %}
+
+{% else %}
+
+{% trans 'No contribution' %}
+
+{% endif %}
+
+{% endfor %}
