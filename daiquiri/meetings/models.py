@@ -175,3 +175,7 @@ class Contribution(models.Model):
             (_('Abstract'), self.abstract)
         ]
         return '\n' + ''.join(['%s: %s\n' % value for value in values])
+
+    @property
+    def contribution_type_str(self):
+        return dict(settings.MEETINGS_CONTRIBUTION_TYPES)[self.contribution_type]

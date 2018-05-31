@@ -229,6 +229,13 @@ class ExportTests(TestViewMixin, MeetingsViewTestCase):
 
     instances = Meeting.objects.all()
 
+    def _test_export_html_view(self, username):
+        for instance in self.instances:
+            self.assert_view('export_view', 'get', 'export_view', username, {
+                'slug': instance.slug,
+                'format': 'html'
+            })
+
     def _test_export_csv_view(self, username):
         for instance in self.instances:
             self.assert_view('export_view', 'get', 'export_view', username, {

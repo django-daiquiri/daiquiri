@@ -75,6 +75,7 @@
                             {% trans 'Export' %}<span class="caret"></span>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-right">
+                                <li><a href="{% url 'meetings:export' meeting_slug 'html' %}">HTML</a></li>
                                 <li><a href="{% url 'meetings:export' meeting_slug 'csv' %}">CSV</a></li>
                                 <li><a href="{% url 'meetings:export' meeting_slug 'xlsx' %}">Excel</a></li>
                             </ul>

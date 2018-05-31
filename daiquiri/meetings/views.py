@@ -202,7 +202,12 @@ class ExportView(ModelPermissionMixin, View):
         # get participants from the database
         participants = meeting.participants.all()
 
-        if format == 'csv':
+        if format == 'html':
+            return render(request, 'meetings/export.html', {
+                'meeting': meeting,
+                'participants': participants
+            })
+        elif format == 'csv':
             return render_to_csv(request, meeting.title, self.get_columns(), self.get_rows(participants))
         elif format == 'xlsx':
             return render_to_xlsx(request, meeting.title, self.get_columns(), self.get_rows(participants))
