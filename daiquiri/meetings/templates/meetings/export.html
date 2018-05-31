@@ -10,11 +10,9 @@
 
 {% for contribution in participant.contributions.all %}
 
-    <h3>{{ contribution.title }}</h3>
+<h3>{{ contribution.title }} ({{ contribution.contribution_type_str }})</h3>
 
-    <p>{{ contribution.contribution_type_str }}</p>
-
-    {{ contribution.abstract }}
+{{ contribution.abstract }}
 
 {% endfor %}
 
