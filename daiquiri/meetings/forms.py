@@ -84,11 +84,12 @@ class ContributionForm(forms.ModelForm):
 
         # if the contribution_type is set, title and abstract need to be provided
         if 'contribution_type' in cleaned_data and cleaned_data['contribution_type']:
-            if not cleaned_data['title']:
+            if 'title' in cleaned_data and not cleaned_data['title']:
                 self.add_error('title', _('This field is required.'))
 
-            if not cleaned_data['abstract']:
+            if 'abstract' in cleaned_data and not cleaned_data['abstract']:
                 self.add_error('abstract', _('This field is required.'))
         else:
-            if cleaned_data['title'] or cleaned_data['abstract']:
+            if ('title' in cleaned_data and cleaned_data['title']) or \
+               ('abstract' in cleaned_data and cleaned_data['abstract']):
                 self.add_error('contribution_type', _('This field is required.'))
