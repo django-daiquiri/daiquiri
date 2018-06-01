@@ -88,7 +88,7 @@ class Participant(models.Model):
         verbose_name=_('Email'),
     )
     details = JSONField(
-        null=True, blank=True,
+        null=True, blank=True, default={},
         verbose_name=_('Details'),
         help_text=_('Choices are given by settings.MEETINGS_PARTICIPANT_DETAIL_KEYS')
     )

@@ -181,7 +181,14 @@ class ExportView(ModelPermissionMixin, View):
                 participant.email,
                 participant.registered,
                 participant.accepted
-            ] + [participant.details.get(detail_key['key'], '') for detail_key in detail_keys]
+            ]
+
+            if participant.details:
+                for detail_key in detail_keys:
+                    if participant.details and detail_key['key'] in participant.details:
+                        row.append(participant.details[detail_key['key']])
+                    else:
+                        row.append('')
 
             if contribution:
                 row += [
