@@ -254,6 +254,6 @@ class EmailExportView(ExportView):
             return render(request, 'meetings/export_emails.html', {
                 'meeting': meeting,
                 'participants': participants
-            }, content_type='text')
+            }, content_type='text/plain; charset=utf-8')
         else:
             raise Http404
