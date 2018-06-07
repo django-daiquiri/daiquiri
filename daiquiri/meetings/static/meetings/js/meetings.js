@@ -12,7 +12,8 @@ angular.module('meetings', ['core', 'infinite-scroll'])
         'meetings': $resource(baseurl + 'meetings/api/meetings/:id/'),
         'participants': $resource(baseurl + 'meetings/api/participants/:id/'),
         'contributions': $resource(baseurl + 'meetings/api/contributions/:id/'),
-        'contribution_types': $resource(baseurl + 'meetings/api/contributiontypes/:id/')
+        'contribution_types': $resource(baseurl + 'meetings/api/contributiontypes/:id/'),
+        'statuses': $resource(baseurl + 'meetings/api/statuses/:id/')
     };
 
     /* init the list service */
@@ -30,7 +31,7 @@ angular.module('meetings', ['core', 'infinite-scroll'])
     service.init = function(meeting_id) {
         service.meeting = resources.meetings.get({id: meeting_id});
         service.contribution_types = resources.contribution_types.query();
-
+        service.statuses = resources.statuses.query();
 
         $q.all([service.meeting.$promise, service.contribution_types.$promise]).then(function() {
             service.ready = true;
@@ -120,7 +121,7 @@ angular.module('meetings', ['core', 'infinite-scroll'])
 
     service.accept_participant = function(index) {
         service.current_row = service.list.rows[index];
-        service.current_row.accepted = true;
+        service.current_row.status = 'ACCEPTED';
 
         resources.participants.update({id: service.current_row.id}, service.current_row);
 
@@ -131,7 +132,7 @@ angular.module('meetings', ['core', 'infinite-scroll'])
 
     service.reject_participant = function(index) {
         service.current_row = service.list.rows[index];
-        service.current_row.accepted = false;
+        service.current_row.status = 'REJECTED';
 
         resources.participants.update({id: service.current_row.id}, service.current_row);
 

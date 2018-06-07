@@ -50,6 +50,6 @@ class ParticipantSerializer(serializers.ModelSerializer):
             'email',
             'details',
             'registered',
-            'accepted',
+            'status',
             'contributions'
         )

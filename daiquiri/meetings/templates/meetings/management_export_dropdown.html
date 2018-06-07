@@ -1,0 +1,38 @@
+{% load i18n %}
+
+<div class="btn-group">
+    <button type="button" class="btn btn-default dropdown-toggle"
+    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+
+    {% trans 'Export' %}<span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-right">
+
+        <li>
+            <a href="{% url 'meetings:export_participants' meeting_slug 'csv' %}">
+                {% trans 'All participants (csv)' %}
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'meetings:export_participants' meeting_slug 'xlsx' %}">
+                {% trans 'All participants (xlsx)' %}
+            </a>
+        </li>
+        <li role="separator" class="divider"></li>
+        {% for status in statuses %}
+        <li>
+            <a href="{% url 'meetings:export_abstracts' meeting_slug 'html' status %}">
+                {% blocktrans %}Abstracts from {{ status }} users (html){% endblocktrans %}
+            </a>
+        </li>
+        {% endfor %}
+        <li role="separator" class="divider"></li>
+        {% for status in statuses %}
+        <li>
+            <a href="{% url 'meetings:export_emails' meeting_slug 'txt' status %}">
+                {% blocktrans %}Email addresses from {{ status }} users (html){% endblocktrans %}
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+</div>

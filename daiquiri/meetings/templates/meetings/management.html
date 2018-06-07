@@ -68,18 +68,7 @@
                             {% trans 'Update meeting' %}
                         </button>
 
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-default dropdown-toggle"
-                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-
-                            {% trans 'Export' %}<span class="caret"></span>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-right">
-                                <li><a href="{% url 'meetings:export' meeting_slug 'html' %}">HTML</a></li>
-                                <li><a href="{% url 'meetings:export' meeting_slug 'csv' %}">CSV</a></li>
-                                <li><a href="{% url 'meetings:export' meeting_slug 'xlsx' %}">Excel</a></li>
-                            </ul>
-                        </div>
+                        {% include 'meetings/management_export_dropdown.html' %}
                     </div>
                 </div>
             </div>
@@ -113,10 +102,12 @@
                                     </a>
                                 </span>
                             </td>
-                            <td>
-                                <span ng-show="row.accepted">
-                                    {% trans 'accepted' %}
-                                </span>
+                            <td ng-class="{
+                                'text-success': row.status == 'ACCEPTED',
+                                'text-danger': row.status == 'REJECTED',
+                                'text-info': row.status == 'INVITED' || row.status == 'ORGANIZER'
+                            }">
+                                {$ (service.statuses|filter: {'id': row.status})[0].text $}
                             </td>
                             <td class="text-right list-table-options">
                                 <a href="" class="fa fa-eye" title="{% trans 'Show participant details' %}"
@@ -128,10 +119,14 @@
                                 <a href="" class="fa fa fa-file-text" title="{% trans 'Update contribution' %}"
                                     ng-click="service.modal('contributions-form-modal', $index)">
                                 </a>
-                                <a href="" class="fa fa-check-circle" ng-hide="row.accepted" title="{% trans 'Accept participant' %}"
+                                <a href="" class="fa fa-check-circle"
+                                    ng-show="row.status == 'REGISTERED'"
+                                    title="{% trans 'Accept participant' %}"
                                     ng-click="service.accept_participant($index)">
                                 </a>
-                                <a href="" class="fa fa-times-circle" ng-show="row.accepted" title="{% trans 'Reject participant' %}"
+                                <a href="" class="fa fa-times-circle"
+                                    ng-show="row.status == 'REGISTERED'"
+                                    title="{% trans 'Reject participant' %}"
                                     ng-click="service.reject_participant($index)">
                                 </a>
                             </td>

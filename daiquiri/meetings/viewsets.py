@@ -64,3 +64,11 @@ class ContributionTypeViewSet(ChoicesViewSet):
     authentication_classes = (SessionAuthentication, TokenAuthentication)
 
     queryset = settings.MEETINGS_CONTRIBUTION_TYPES
+
+
+class StatusViewSet(ChoicesViewSet):
+    permission_classes = (IsAuthenticated, )
+    authentication_classes = (SessionAuthentication, TokenAuthentication)
+
+    queryset = Participant.STATUS_CHOICES
+

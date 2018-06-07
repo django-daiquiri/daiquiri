@@ -70,6 +70,19 @@ class Meeting(models.Model):
 @python_2_unicode_compatible
 class Participant(models.Model):
 
+    STATUS_ORGANIZER = 'ORGANIZER'
+    STATUS_INVITED = 'INVITED'
+    STATUS_REGISTERED = 'REGISTERED'
+    STATUS_ACCEPTED = 'ACCEPTED'
+    STATUS_REJECTED = 'REJECTED'
+    STATUS_CHOICES = (
+        (STATUS_ORGANIZER, _('organizer')),
+        (STATUS_INVITED, _('invited')),
+        (STATUS_REGISTERED, _('registered')),
+        (STATUS_ACCEPTED, _('accepted')),
+        (STATUS_REJECTED, _('rejected'))
+    )
+
     meeting = models.ForeignKey(
         Meeting, related_name='participants',
         verbose_name=_('Meeting'),
@@ -96,10 +109,10 @@ class Participant(models.Model):
         verbose_name=_('Registered on'),
         help_text=_('Datetime this participant has submitted his/her registration')
     )
-    accepted = models.BooleanField(
-        default=False,
-        verbose_name=_('Accepted'),
-        help_text=_('Designates whether the participant is accepted.')
+    status = models.CharField(
+        max_length=16, choices=STATUS_CHOICES,
+        verbose_name=_('Status'),
+        help_text=_('Status of the participant.')
     )
 
     class Meta:
@@ -176,6 +189,5 @@ class Contribution(models.Model):
         ]
         return '\n' + ''.join(['%s: %s\n' % value for value in values])
 
-    @property
-    def contribution_type_str(self):
+    def get_contribution_type_display(self):
         return dict(settings.MEETINGS_CONTRIBUTION_TYPES)[self.contribution_type]

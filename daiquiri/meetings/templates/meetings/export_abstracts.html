@@ -10,7 +10,7 @@
 
 {% for contribution in participant.contributions.all %}
 
-<h3>{{ contribution.title }} ({{ contribution.contribution_type_str }})</h3>
+<h3>{{ contribution.title }} ({{ contribution.get_contribution_type_display }})</h3>
 
 {{ contribution.abstract }}
 

@@ -41,11 +41,13 @@
                     </formgroup>
                     {% endfor %}
                     <formgroup
-                        data-id="accepted"
-                        data-type="checkbox"
-                        data-label="{{ meta.Participant.accepted.verbose_name }}"
-                        data-model="service.values.accepted"
-                        data-errors="service.errors.accepted">
+                        data-id="status"
+                        data-type="select"
+                        data-label="{{ meta.Participant.status.verbose_name }}"
+                        data-model="service.values.status"
+                        data-errors="service.errors.status"
+                        data-options="service.statuses"
+                        data-options-label="text">
                     </formgroup>
                 </div>
 

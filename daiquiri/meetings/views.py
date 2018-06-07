@@ -135,6 +135,7 @@ class ManagementView(ModelPermissionMixin, TemplateView):
             'meeting_admin_url': meeting_admin_url,
             'participant_admin_url': participant_admin_url,
             'contribution_admin_url': contribution_admin_url,
+            'statuses': ['all', 'invited', 'registered', 'accepted', 'rejected'],
             'meta': {
                 'Meeting': get_model_field_meta(Meeting),
                 'Participant': get_model_field_meta(Participant),
@@ -146,12 +147,28 @@ class ManagementView(ModelPermissionMixin, TemplateView):
 
 class ExportView(ModelPermissionMixin, View):
 
-    template_name = 'meetings/management.html'
     permission_required = (
         'daiquiri_meetings.view_meeting',
         'daiquiri_meetings.view_participant',
         'daiquiri_meetings.view_contribution'
     )
+
+    def get_meeting(self, slug):
+        try:
+            return Meeting.objects.get(slug=slug)
+        except Meeting.DoesNotExist:
+            raise Http404
+
+    def get_participants(self, meeting, status='all'):
+        if status == 'all':
+            return meeting.participants.all()
+        elif status in dict(Participant.STATUS_CHOICES).values():
+            return meeting.participants.filter(status=status)
+        else:
+            raise Http404
+
+
+class ParticipantExportView(ExportView):
 
     def get_columns(self):
         detail_keys = settings.MEETINGS_PARTICIPANT_DETAIL_KEYS
@@ -161,7 +178,7 @@ class ExportView(ModelPermissionMixin, View):
             _('Last name'),
             _('Email'),
             _('Registered'),
-            _('Accepted')
+            _('Status')
         ] + [detail_key['label'] for detail_key in detail_keys] + [
             _('Contribution title'),
             _('Contribution abstract'),
@@ -180,7 +197,7 @@ class ExportView(ModelPermissionMixin, View):
                 participant.last_name,
                 participant.email,
                 participant.registered,
-                participant.accepted
+                participant.get_status_display()
             ]
 
             if participant.details:
@@ -194,29 +211,49 @@ class ExportView(ModelPermissionMixin, View):
                 row += [
                     contribution.title,
                     contribution.abstract,
-                    contribution.contribution_type,
+                    contribution.get_contribution_type_display(),
                     contribution.accepted
                 ]
 
             yield row
 
     def get(self, request, slug, format):
-        try:
-            meeting = Meeting.objects.get(slug=slug)
-        except Meeting.DoesNotExist:
-            raise Http404
+        meeting = self.get_meeting(slug)
+        participants = self.get_participants(meeting)
 
-        # get participants from the database
-        participants = meeting.participants.all()
-
-        if format == 'html':
-            return render(request, 'meetings/export.html', {
-                'meeting': meeting,
-                'participants': participants
-            })
-        elif format == 'csv':
+        if format == 'csv':
             return render_to_csv(request, meeting.title, self.get_columns(), self.get_rows(participants))
         elif format == 'xlsx':
             return render_to_xlsx(request, meeting.title, self.get_columns(), self.get_rows(participants))
+        else:
+            raise Http404
+
+
+class AbstractExportView(ExportView):
+
+    def get(self, request, slug, format, status):
+        meeting = self.get_meeting(slug)
+        participants = self.get_participants(meeting, status)
+
+        if format == 'html':
+            return render(request, 'meetings/export_abstracts.html', {
+                'meeting': meeting,
+                'participants': participants
+            })
+        else:
+            raise Http404
+
+
+class EmailExportView(ExportView):
+
+    def get(self, request, slug, format, status):
+        meeting = self.get_meeting(slug)
+        participants = self.get_participants(meeting, status)
+
+        if format == 'txt':
+            return render(request, 'meetings/export_emails.html', {
+                'meeting': meeting,
+                'participants': participants
+            }, content_type='text')
         else:
             raise Http404

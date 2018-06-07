@@ -10,7 +10,8 @@ class MeetingAdmin(admin.ModelAdmin):
 
 class ParticipantAdmin(admin.ModelAdmin):
     search_fields = ('first_name', 'last_name', 'email')
-    list_display = ('full_name', 'email', 'meeting', 'accepted')
+    list_display = ('full_name', 'email', 'meeting', 'status')
+    list_filter = ['meeting', 'status']
 
 
 class ContributionAdmin(admin.ModelAdmin):
