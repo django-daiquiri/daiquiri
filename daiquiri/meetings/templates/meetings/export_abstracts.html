@@ -1,16 +1,12 @@
 {% load i18n %}
-
-<h1>{{ meeting.title }}</h1>
+{% load core_tags %}
 
 {% for participant in participants %}
-
-<h2>{{ participant.first_name }} {{ participant.last_name }}</h2>
-
-{% if participant.contributions.all %}
-
 {% for contribution in participant.contributions.all %}
 
 {% if contribution.contribution_type == contribution_type %}
+
+<h2>{% render_counter %} {{ participant.first_name }} {{ participant.last_name }} ({{ participant.details.affiliation}})</h2>
 
 <h3>{{ contribution.title }} ({{ contribution.get_contribution_type_display }})</h3>
 
@@ -19,11 +15,4 @@
 {% endif %}
 
 {% endfor %}
-
-{% else %}
-
-{% trans 'No contribution' %}
-
-{% endif %}
-
 {% endfor %}
