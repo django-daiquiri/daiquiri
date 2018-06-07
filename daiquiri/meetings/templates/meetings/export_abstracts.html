@@ -10,9 +10,13 @@
 
 {% for contribution in participant.contributions.all %}
 
+{% if contribution.contribution_type == contribution_type %}
+
 <h3>{{ contribution.title }} ({{ contribution.get_contribution_type_display }})</h3>
 
 {{ contribution.abstract }}
+
+{% endif %}
 
 {% endfor %}
 
