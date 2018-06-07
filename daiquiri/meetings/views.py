@@ -235,11 +235,16 @@ class AbstractExportView(ExportView):
         meeting = self.get_meeting(slug)
         participants = self.get_participants(meeting, status)
 
+        contributions = []
+        for participant in participants:
+            for contribution in participant.contributions.all():
+                if contribution.contribution_type == contribution_type:
+                    contributions.append(contribution)
+
         if format == 'html':
             return render(request, 'meetings/export_abstracts.html', {
                 'meeting': meeting,
-                'participants': participants,
-                'contribution_type': contribution_type
+                'contributions': contributions
             })
         else:
             raise Http404

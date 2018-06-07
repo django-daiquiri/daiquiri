@@ -1,18 +1,14 @@
 {% load i18n %}
-{% load core_tags %}
 
-{% for participant in participants %}
-{% for contribution in participant.contributions.all %}
+{% for contribution in contributions %}
 
-{% if contribution.contribution_type == contribution_type %}
-
-<h2>{% render_counter %} {{ participant.first_name }} {{ participant.last_name }} ({{ participant.details.affiliation}})</h2>
+<h2>
+    {{ forloop.counter }} {{ contribution.participant.full_name }}
+    ({{ contribution.participant.details.affiliation}})
+</h2>
 
 <h3>{{ contribution.title }} ({{ contribution.get_contribution_type_display }})</h3>
 
 {{ contribution.abstract }}
 
-{% endif %}
-
-{% endfor %}
 {% endfor %}

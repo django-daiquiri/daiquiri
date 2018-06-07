@@ -90,18 +90,3 @@ def semicolonbr(value):
 @stringfilter
 def to_safe_str(value):
     return mark_safe(str(value))
-
-
-class CounterNode(template.Node):
-
-    def __init__(self):
-        self.counter = 0
-
-    def render(self, context):
-        self.counter += 1
-        return self.counter
-
-
-@register.tag
-def render_counter(parser, token):
-    return CounterNode()
