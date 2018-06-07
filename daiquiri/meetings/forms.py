@@ -31,8 +31,8 @@ class ParticipantForm(forms.ModelForm):
         self.instance.meeting = self.meeting
         self.instance.registered = now()
 
-        if hasattr(settings, 'MEETINGS_PARTICIPANT_ACCEPTED_DEFAULT'):
-            self.instance.accepted = settings.MEETINGS_PARTICIPANT_ACCEPTED_DEFAULT
+        if hasattr(settings, 'MEETINGS_PARTICIPANT_DEFAULT_STATUS'):
+            self.instance.status = settings.MEETINGS_PARTICIPANT_DEFAULT_STATUS
 
         # create an empty details dict if it does not exist
         if not self.instance.details:

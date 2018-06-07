@@ -29,6 +29,16 @@
                             data-errors="service.errors.last_name">
                         </formgroup>
                     </div>
+                    <div class="row">
+                        <formgroup
+                            class="col-md-12"
+                            data-id="email"
+                            data-type="text"
+                            data-label="{{ meta.Participant.email.verbose_name }}"
+                            data-model="service.values.email"
+                            data-errors="service.errors.email">
+                        </formgroup>
+                    </div>
                     {% for detail_key in detail_keys %}
                     <formgroup
                         data-id="{{ detail_key.key }}"

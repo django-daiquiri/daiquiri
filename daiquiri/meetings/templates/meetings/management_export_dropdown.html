@@ -30,7 +30,7 @@
         {% for status in statuses %}
         <li>
             <a href="{% url 'meetings:export_emails' meeting_slug 'txt' status %}">
-                {% blocktrans %}Email addresses from {{ status }} users (html){% endblocktrans %}
+                {% blocktrans %}Email addresses from {{ status }} users (txt){% endblocktrans %}
             </a>
         </li>
         {% endfor %}

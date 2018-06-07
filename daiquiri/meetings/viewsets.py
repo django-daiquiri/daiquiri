@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.utils.timezone import now
 
 from rest_framework import viewsets, mixins, filters
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
@@ -26,6 +27,7 @@ class MeetingViewSet(mixins.ListModelMixin,
 
 class ParticipantViewSet(mixins.ListModelMixin,
                          mixins.RetrieveModelMixin,
+                         mixins.CreateModelMixin,
                          mixins.UpdateModelMixin,
                          viewsets.GenericViewSet):
 
@@ -39,6 +41,10 @@ class ParticipantViewSet(mixins.ListModelMixin,
     filter_backends = (filters.SearchFilter, filters.OrderingFilter)
     ordering_fields = ('last_name', 'email')
     search_fields = ('first_name', 'last_name', 'email')
+
+    def create(self, request, *args, **kwargs):
+        request.data['registered'] = now()
+        return super(ParticipantViewSet, self).create(request, *args, **kwargs)
 
 
 class ContributionViewSet(mixins.ListModelMixin,

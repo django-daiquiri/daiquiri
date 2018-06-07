@@ -45,6 +45,7 @@ class ParticipantSerializer(serializers.ModelSerializer):
         model = Participant
         fields = (
             'id',
+            'meeting',
             'first_name',
             'last_name',
             'email',

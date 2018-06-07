@@ -52,7 +52,14 @@ angular.module('meetings', ['core', 'infinite-scroll'])
             service.current_row = service.list.rows[index];
 
             if (modal_id === 'participants-show-modal' || modal_id === 'participants-form-modal') {
-                service.values = angular.copy(service.current_row);
+                if (angular.isDefined(service.current_row)) {
+                    service.values = angular.copy(service.current_row);
+                } else {
+                    service.values = {
+                        meeting: service.meeting.id,
+                        details: {}
+                    }
+                }
             } else if (modal_id === 'contributions-show-modal' || modal_id === 'contributions-form-modal') {
                 if (service.current_row.contributions.length) {
                     service.values = angular.copy(service.current_row.contributions[0]);
@@ -81,16 +88,25 @@ angular.module('meetings', ['core', 'infinite-scroll'])
     service.store_participant = function() {
         service.errors = {};
 
-        resources.participants.update({
-            id: service.values.id
-        }, service.values, function(response) {
-            // copy the data back to the rows array and close the modal
-            service.list.rows[service.current_index] = response;
+        if (angular.isDefined(service.values.id)) {
+            resources.participants.update({
+                id: service.values.id
+            }, service.values, function(response) {
+                // copy the data back to the rows array and close the modal
+                service.list.rows[service.current_index] = response;
 
-            $('.modal').modal('hide');
-        }, function(result) {
-            service.errors = result.data;
-        });
+                $('.modal').modal('hide');
+            }, function(result) {
+                service.errors = result.data;
+            });
+        } else {
+            resources.participants.save(service.values, function(response) {
+                service.list.reload();
+                $('.modal').modal('hide');
+            }, function(result) {
+                service.errors = result.data;
+            });
+        }
     };
 
     service.store_contribution = function() {

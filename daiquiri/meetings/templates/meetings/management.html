@@ -42,7 +42,7 @@
 
         <div class="daiquiri-list">
             <div class="row daiquiri-list-header">
-                <form class="col-sm-6" ng-submit="service.list.search()">
+                <form class="col-sm-4" ng-submit="service.list.search()">
                     <div class="input-group">
                         <input class="form-control"
                                id="table-pager-search-input"
@@ -58,7 +58,7 @@
                         {$ service.list.count $} {% trans 'participants found' %}
                     </p>
                 </div>
-                <div class="col-sm-4">
+                <div class="col-sm-6">
                     <div class="pull-right">
                         <button class="btn btn-default" ng-click="service.list.reset()">
                             {% trans 'Reset' %}
@@ -66,6 +66,10 @@
 
                         <button class="btn btn-default" ng-click="service.modal('meetings-form-modal')">
                             {% trans 'Update meeting' %}
+                        </button>
+
+                        <button class="btn btn-default" ng-click="service.modal('participants-form-modal')">
+                            {% trans 'Add participant' %}
                         </button>
 
                         {% include 'meetings/management_export_dropdown.html' %}
