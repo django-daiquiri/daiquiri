@@ -135,7 +135,7 @@ class ManagementView(ModelPermissionMixin, TemplateView):
             'meeting_admin_url': meeting_admin_url,
             'participant_admin_url': participant_admin_url,
             'contribution_admin_url': contribution_admin_url,
-            'statuses': ['all', 'invited', 'registered', 'accepted', 'rejected'],
+            'statuses': ['all'] + [label for _, label in Participant.STATUS_CHOICES],
             'meta': {
                 'Meeting': get_model_field_meta(Meeting),
                 'Participant': get_model_field_meta(Participant),
