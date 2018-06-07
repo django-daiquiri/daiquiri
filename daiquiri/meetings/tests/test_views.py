@@ -1,11 +1,11 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 
-from test_generator.views import TestViewMixin, TestDetailViewMixin
+from test_generator.views import TestViewMixin
 
 from daiquiri.core.utils import setup_group
 
-from ..models import Meeting
+from ..models import Meeting, Participant
 
 
 class MeetingsViewTestCase(TestCase):
@@ -217,10 +217,6 @@ class ManagementTests(TestViewMixin, MeetingsViewTestCase):
 
 class ExportTests(TestViewMixin, MeetingsViewTestCase):
 
-    url_names = {
-        'export_view': 'meetings:export'
-    }
-
     status_map = {
         'export_view': {
             'admin': 200, 'manager': 200, 'user': 403, 'anonymous': 302
@@ -229,12 +225,13 @@ class ExportTests(TestViewMixin, MeetingsViewTestCase):
 
     instances = Meeting.objects.all()
 
-    def _test_export_html_view(self, username):
-        for instance in self.instances:
-            self.assert_view('export_view', 'get', 'export_view', username, {
-                'slug': instance.slug,
-                'format': 'html'
-            })
+
+class ParticipantExportTests(ExportTests):
+
+    url_names = {
+        'export_view': 'meetings:export_participants'
+    }
+
 
     def _test_export_csv_view(self, username):
         for instance in self.instances:
@@ -249,3 +246,36 @@ class ExportTests(TestViewMixin, MeetingsViewTestCase):
                 'slug': instance.slug,
                 'format': 'xlsx'
             })
+
+
+class AbstractExportTests(ExportTests):
+
+    url_names = {
+        'export_view': 'meetings:export_abstracts'
+    }
+
+    def _test_export_html_view(self, username):
+        for instance in self.instances:
+            for status in ['all'] + [label for _, label in Participant.STATUS_CHOICES]:
+                self.assert_view('export_view', 'get', 'export_view', username, {
+                    'slug': instance.slug,
+                    'contribution_type': 'poster',
+                    'format': 'html',
+                    'status': status
+                })
+
+
+class AbstractEmailsTests(ExportTests):
+
+    url_names = {
+        'export_view': 'meetings:export_emails'
+    }
+
+    def _test_export_html_view(self, username):
+        for instance in self.instances:
+            for status in ['all'] + [label for _, label in Participant.STATUS_CHOICES]:
+                self.assert_view('export_view', 'get', 'export_view', username, {
+                    'slug': instance.slug,
+                    'format': 'txt',
+                    'status': status
+                })

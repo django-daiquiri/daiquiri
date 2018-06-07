@@ -1,1 +1,80 @@
-[{"model": "daiquiri_meetings.meeting", "pk": 1, "fields": {"title": "Open meeting", "slug": "open", "registration_message": "Please use the following form to register to the **Awesome meeting of awesomeness 2018**.", "registration_done_message": "", "participants_message": "", "contributions_message": "", "registration_open": true, "participants_open": true, "contributions_open": true}}, {"model": "daiquiri_meetings.meeting", "pk": 2, "fields": {"title": "Closed meeting", "slug": "closed", "registration_message": "", "registration_done_message": "", "participants_message": "", "contributions_message": "", "registration_open": false, "participants_open": false, "contributions_open": false}}, {"model": "daiquiri_meetings.participant", "pk": 1, "fields": {"meeting": 1, "first_name": "Tanja", "last_name": "Testuser", "email": "test@example.com", "details": "{\"affiliation\":\"Test\",\"dinner\":\"yes\"}", "registered": "2018-02-22T13:51:52Z", "accepted": true}}, {"model": "daiquiri_meetings.participant", "pk": 2, "fields": {"meeting": 1, "first_name": "Ernie", "last_name": "Evil", "email": "evil@example.com", "details": "{\"affiliation\":\"Evil\",\"dinner\":\"no\"}", "registered": "2018-02-22T14:39:21Z", "accepted": false}}, {"model": "daiquiri_meetings.contribution", "pk": 1, "fields": {"participant": 1, "title": "Lorem ipsum dolor sit amet", "abstract": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est. Lorem ipsum dolor sit amet.", "contribution_type": "talk", "accepted": true}}, {"model": "daiquiri_meetings.contribution", "pk": 2, "fields": {"participant": 2, "title": "consetetur sadipscing elitr", "abstract": "At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est. Lorem ipsum dolor sit amet.", "contribution_type": "poster", "accepted": false}}]
+[
+  {
+    "model": "daiquiri_meetings.meeting",
+    "pk": 1,
+    "fields": {
+      "title": "Open meeting",
+      "slug": "open",
+      "registration_message": "Please use the following form to register to the **Awesome meeting of awesomeness 2018**.",
+      "registration_done_message": "",
+      "participants_message": "",
+      "contributions_message": "",
+      "registration_open": true,
+      "participants_open": true,
+      "contributions_open": true
+    }
+  },
+  {
+    "model": "daiquiri_meetings.meeting",
+    "pk": 2,
+    "fields": {
+      "title": "Closed meeting",
+      "slug": "closed",
+      "registration_message": "",
+      "registration_done_message": "",
+      "participants_message": "",
+      "contributions_message": "",
+      "registration_open": false,
+      "participants_open": false,
+      "contributions_open": false
+    }
+  },
+  {
+    "model": "daiquiri_meetings.participant",
+    "pk": 1,
+    "fields": {
+      "meeting": 1,
+      "first_name": "Tanja",
+      "last_name": "Testuser",
+      "email": "test@example.com",
+      "details": "{\"affiliation\":\"Test\",\"dinner\":\"yes\"}",
+      "registered": "2018-02-22T13:51:52Z",
+      "status": "ACCEPTED"
+    }
+  },
+  {
+    "model": "daiquiri_meetings.participant",
+    "pk": 2,
+    "fields": {
+      "meeting": 1,
+      "first_name": "Ernie",
+      "last_name": "Evil",
+      "email": "evil@example.com",
+      "details": "{\"affiliation\":\"Evil\",\"dinner\":\"no\"}",
+      "registered": "2018-02-22T14:39:21Z",
+      "status": "REGISTERED"
+    }
+  },
+  {
+    "model": "daiquiri_meetings.contribution",
+    "pk": 1,
+    "fields": {
+      "participant": 1,
+      "title": "Lorem ipsum dolor sit amet",
+      "abstract": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est. Lorem ipsum dolor sit amet.",
+      "contribution_type": "talk",
+      "accepted": true
+    }
+  },
+  {
+    "model": "daiquiri_meetings.contribution",
+    "pk": 2,
+    "fields": {
+      "participant": 2,
+      "title": "consetetur sadipscing elitr",
+      "abstract": "At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est. Lorem ipsum dolor sit amet.",
+      "contribution_type": "poster",
+      "accepted": false
+    }
+  }
+]

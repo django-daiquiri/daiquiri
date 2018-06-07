@@ -79,7 +79,9 @@ def participants(request, slug):
     if meeting.participants_open:
         return render(request, 'meetings/participants.html', {
             'meeting': meeting,
-            'participants': Participant.objects.filter(meeting=meeting, accepted=True)
+            'participants': Participant.objects.filter(meeting=meeting, status__in=[
+                'ORGANIZER', 'INVITED', 'ACCEPTED'
+            ])
         })
     else:
         return render(request, 'meetings/participants_closed.html', {})

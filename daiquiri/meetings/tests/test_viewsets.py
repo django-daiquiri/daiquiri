@@ -1,14 +1,13 @@
-import os
-import mock
-
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import TestCase
 
 from test_generator.viewsets import (
     TestModelViewsetMixin,
     TestListViewsetMixin,
-    TestViewsetMixin
+    TestViewsetMixin,
+    TestDetailViewsetMixin,
+    TestUpdateViewsetMixin,
+    TestDeleteViewsetMixin,
 )
 
 from daiquiri.core.utils import setup_group
@@ -61,7 +60,11 @@ class MeetingTests(TestModelViewsetMixin, MeetingsViewsetTestCase):
     }
 
 
-class ParticipantTests(TestModelViewsetMixin, MeetingsViewsetTestCase):
+class ParticipantTests(TestListViewsetMixin,
+                       TestDetailViewsetMixin,
+                       TestUpdateViewsetMixin,
+                       TestDeleteViewsetMixin,
+                       MeetingsViewsetTestCase):
 
     status_map = {
         'list_viewset': {
@@ -71,7 +74,7 @@ class ParticipantTests(TestModelViewsetMixin, MeetingsViewsetTestCase):
             'admin': 200, 'manager': 200, 'user': 403, 'anonymous': 403
         },
         'create_viewset': {
-            'admin': 405, 'manager': 405, 'user': 403, 'anonymous': 403
+            'admin': 201, 'manager': 201, 'user': 403, 'anonymous': 403
         },
         'update_viewset': {
             'admin': 200, 'manager': 200, 'user': 403, 'anonymous': 403
