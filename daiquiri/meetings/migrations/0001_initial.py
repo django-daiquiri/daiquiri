@@ -36,7 +36,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('title', models.CharField(help_text='Title of the meeting', max_length=256, verbose_name='Title')),
-                ('slug', models.SlugField(help_text='Slug for the URL of the meeting', max_length=256, verbose_name='Slug')),
+                ('slug', models.SlugField(help_text='Slug for the URL of the meeting', max_length=32, verbose_name='Slug')),
                 ('registration_message', models.TextField(blank=True, help_text='Message on registration page', null=True, verbose_name='Registration message')),
                 ('participants_message', models.TextField(blank=True, help_text='Message on participants page', null=True, verbose_name='Participants message')),
                 ('contributions_message', models.TextField(blank=True, help_text='Message on contributions page', null=True, verbose_name='Contributions message')),

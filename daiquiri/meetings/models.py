@@ -15,7 +15,7 @@ class Meeting(models.Model):
         help_text=_('Title of the meeting')
     )
     slug = models.SlugField(
-        max_length=256,
+        max_length=32,
         verbose_name=_('Slug'),
         help_text=_('Slug for the URL of the meeting')
     )
