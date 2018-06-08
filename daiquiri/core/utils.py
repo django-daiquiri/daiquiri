@@ -235,7 +235,11 @@ def setup_group(name):
 
     for row in GROUPS[name]:
         app_label, codename = row.split('.')
-        group.permissions.add(Permission.objects.get(content_type__app_label=app_label, codename=codename))
+        try:
+            permission = Permission.objects.get(content_type__app_label=app_label, codename=codename)
+            group.permissions.add(permission)
+        except Permission.DoesNotExist:
+            pass
 
     return group, created
 
