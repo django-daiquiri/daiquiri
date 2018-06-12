@@ -2,6 +2,7 @@ from django.utils.timezone import now
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.renderers import JSONRenderer
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 
 from daiquiri.core.utils import get_client_ip
@@ -16,7 +17,7 @@ class CutOutViewSet(APIView):
 
     permission_classes = (HasPermission, )
     authentication_classes = (SessionAuthentication, TokenAuthentication)
-    renderer_classes = (CutOutErrorRenderer, )
+    renderer_classes = (CutOutErrorRenderer, JSONRenderer)
 
     def get(self, request, resource=None):
 
