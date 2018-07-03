@@ -79,9 +79,8 @@ def participants(request, slug):
     if meeting.participants_open:
         return render(request, 'meetings/participants.html', {
             'meeting': meeting,
-            'participants': Participant.objects.filter(meeting=meeting, status__in=[
-                'ORGANIZER', 'INVITED', 'ACCEPTED'
-            ])
+            'participants': Participant.objects.filter(meeting=meeting),
+            'contributions': Contribution.objects.filter(participant__meeting=meeting)
         })
     else:
         return render(request, 'meetings/participants_closed.html', {})
@@ -96,7 +95,8 @@ def contributions(request, slug):
     if meeting.contributions_open:
         return render(request, 'meetings/contributions.html', {
             'meeting': meeting,
-            'contributions': Contribution.objects.filter(participant__meeting=meeting, accepted=True)
+            'participants': Participant.objects.filter(meeting=meeting),
+            'contributions': Contribution.objects.filter(participant__meeting=meeting)
         })
     else:
         return render(request, 'meetings/contributions_closed.html', {})

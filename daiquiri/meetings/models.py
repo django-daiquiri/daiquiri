@@ -71,16 +71,21 @@ class Meeting(models.Model):
 class Participant(models.Model):
 
     STATUS_ORGANIZER = 'ORGANIZER'
+    STATUS_DISCUSSION_LEADER = 'DISCUSSION_LEADER'
     STATUS_INVITED = 'INVITED'
     STATUS_REGISTERED = 'REGISTERED'
     STATUS_ACCEPTED = 'ACCEPTED'
     STATUS_REJECTED = 'REJECTED'
+    STATUS_CANCELED = 'CANCELED'
+
     STATUS_CHOICES = (
         (STATUS_ORGANIZER, _('organizer')),
+        (STATUS_DISCUSSION_LEADER, _('discussion leader')),
         (STATUS_INVITED, _('invited')),
         (STATUS_REGISTERED, _('registered')),
         (STATUS_ACCEPTED, _('accepted')),
-        (STATUS_REJECTED, _('rejected'))
+        (STATUS_REJECTED, _('rejected')),
+        (STATUS_CANCELED, _('canceled')),
     )
 
     meeting = models.ForeignKey(
@@ -110,7 +115,7 @@ class Participant(models.Model):
         help_text=_('Datetime this participant has submitted his/her registration')
     )
     status = models.CharField(
-        max_length=16, choices=STATUS_CHOICES,
+        max_length=32, choices=STATUS_CHOICES,
         verbose_name=_('Status'),
         help_text=_('Status of the participant.')
     )

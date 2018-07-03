@@ -82,8 +82,8 @@
                     <thead>
                         <th style="width: 30%" data-order-list="last_name">{% trans 'Participant' %}</th>
                         <th style="width: 30%;" data-order-list="email">{% trans 'Email' %}</th>
-                        <th style="width: 20%;">{% trans 'Contribution' %}</th>
-                        <th style="width: 10%;">{% trans 'Status' %}</th>
+                        <th style="width: 15%;">{% trans 'Contribution' %}</th>
+                        <th style="width: 15%;">{% trans 'Status' %}</th>
                         <th style="width: 10%;"></th>
                     </thead>
                     <tbody>
@@ -109,7 +109,7 @@
                             <td ng-class="{
                                 'text-success': row.status == 'ACCEPTED',
                                 'text-danger': row.status == 'REJECTED',
-                                'text-info': row.status == 'INVITED' || row.status == 'ORGANIZER'
+                                'text-info': row.status == 'INVITED' || row.status == 'ORGANIZER' || row.status == 'DISCUSSION_LEADER'
                             }">
                                 {$ (service.statuses|filter: {'id': row.status})[0].text $}
                             </td>
