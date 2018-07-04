@@ -75,10 +75,32 @@
                         {% include 'meetings/management_export_dropdown.html' %}
                     </div>
                 </div>
+                <div class="col-sm-12">
+                    <div class="daiquiri-list-filter">
+                        <strong>{% trans 'Filter status' %}:</strong>
+                        <label ng-repeat="status in service.statuses">
+                            <input type="checkbox" autocomplete="off"
+                                ng-model="service.filters.status[status.id]"
+                                ng-change="service.reload();">
+                            {$ status.text $}
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="daiquiri-list-filter">
+                        <strong>{% trans 'Filter payment' %}:</strong>
+                        <label ng-repeat="payment in service.payments">
+                            <input type="checkbox" autocomplete="off"
+                                ng-model="service.filters.payment[payment.id]"
+                                ng-change="service.reload();">
+                            {$ payment.text $}
+                        </label>
+                    </div>
+                </div>
             </div>
 
-            <div class="table-responsive">
-                <table class="table daiquiri-list-table" infinite-scroll="service.list.fetch()" infinite-scroll-distance="0.2">
+            <div class="table-responsive" ng-if="service.ready">
+                <table class="table daiquiri-list-table" infinite-scroll="service.list.fetch()" infinite-scroll-distance="0.1">
                     <thead>
                         <th style="width: 27%" data-order-list="last_name">{% trans 'Participant' %}</th>
                         <th style="width: 27%;" data-order-list="email">{% trans 'Email' %}</th>

@@ -11,7 +11,7 @@ from daiquiri.core.viewsets import ChoicesViewSet
 
 from .models import Meeting, Participant, Contribution
 from .serializers import MeetingSerializer, ParticipantSerializer, ContributionSerializer
-
+from .filters import ParticipantFilterBackend
 
 class MeetingViewSet(mixins.ListModelMixin,
                      mixins.RetrieveModelMixin,
@@ -38,7 +38,7 @@ class ParticipantViewSet(mixins.ListModelMixin,
     serializer_class = ParticipantSerializer
     pagination_class = ListPagination
 
-    filter_backends = (filters.SearchFilter, filters.OrderingFilter)
+    filter_backends = (filters.SearchFilter, filters.OrderingFilter, ParticipantFilterBackend)
     ordering_fields = ('last_name', 'email')
     search_fields = ('first_name', 'last_name', 'email')
 

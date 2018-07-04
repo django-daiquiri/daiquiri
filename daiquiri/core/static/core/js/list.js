@@ -63,6 +63,9 @@ angular.module('core')
                 if (response.next) {
                     service.fetch();
                 }
+            }, function() {
+                service.idle = true;
+                service.ready = true;
             }).$promise;
         }
     };

@@ -17,14 +17,14 @@ angular.module('meetings', ['core', 'infinite-scroll'])
         'payments': $resource(baseurl + 'meetings/api/payments/:id/')
     };
 
-    /* init the list service */
-
-    ListService.init(resources.participants);
-
     /* create the metadata service */
 
     var service = {
-        list: ListService
+        list: ListService,
+        filters: {
+            status: {},
+            payment: {}
+        }
     };
 
     /* define service functions */
@@ -35,7 +35,13 @@ angular.module('meetings', ['core', 'infinite-scroll'])
         service.statuses = resources.statuses.query();
         service.payments = resources.payments.query();
 
-        $q.all([service.meeting.$promise, service.contribution_types.$promise]).then(function() {
+        $q.all([
+            service.meeting.$promise,
+            service.contribution_types.$promise,
+            service.statuses.$promise,
+            service.payments.$promise
+        ]).then(function() {
+            service.list.init(resources.participants);
             service.ready = true;
         })
     };
@@ -70,6 +76,22 @@ angular.module('meetings', ['core', 'infinite-scroll'])
         }
 
         $('#' + modal_id).modal('show');
+    };
+
+    service.reload = function() {
+        service.update_filters();
+        service.list.reload();
+    };
+
+    service.update_filters = function() {
+        angular.forEach(['status', 'payment'], function(filter) {
+            service.list.params[filter] = [];
+            angular.forEach(service.filters[filter], function(value, key) {
+                if (value) {
+                    service.list.params[filter].push(key);
+                }
+            });
+        });
     };
 
     service.store_meeting = function() {
