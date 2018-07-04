@@ -80,10 +80,11 @@
             <div class="table-responsive">
                 <table class="table daiquiri-list-table" infinite-scroll="service.list.fetch()" infinite-scroll-distance="0.2">
                     <thead>
-                        <th style="width: 30%" data-order-list="last_name">{% trans 'Participant' %}</th>
-                        <th style="width: 30%;" data-order-list="email">{% trans 'Email' %}</th>
-                        <th style="width: 15%;">{% trans 'Contribution' %}</th>
-                        <th style="width: 15%;">{% trans 'Status' %}</th>
+                        <th style="width: 27%" data-order-list="last_name">{% trans 'Participant' %}</th>
+                        <th style="width: 27%;" data-order-list="email">{% trans 'Email' %}</th>
+                        <th style="width: 12%;">{% trans 'Contribution' %}</th>
+                        <th style="width: 12%;">{% trans 'Status' %}</th>
+                        <th style="width: 12%;">{% trans 'Payment' %}</th>
                         <th style="width: 10%;"></th>
                     </thead>
                     <tbody>
@@ -112,6 +113,14 @@
                                 'text-info': row.status == 'INVITED' || row.status == 'ORGANIZER' || row.status == 'DISCUSSION_LEADER'
                             }">
                                 {$ (service.statuses|filter: {'id': row.status})[0].text $}
+                            </td>
+                            <td ng-class="{
+                                'text-success': row.payment_complete
+                            }">
+                                <span ng-show="row.payment">
+                                    {$ (service.payments|filter: {'id': row.payment})[0].text $}
+                                </span>
+                                <span ng-show="row.payment_complete" class="fa fa-check"></span>
                             </td>
                             <td class="text-right list-table-options">
                                 <a href="" class="fa fa-eye" title="{% trans 'Show participant details' %}"

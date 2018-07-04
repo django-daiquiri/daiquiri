@@ -50,6 +50,7 @@
                         data-options-label="label">
                     </formgroup>
                     {% endfor %}
+                    <div class="modal-seperator"></div>
                     <formgroup
                         data-id="status"
                         data-type="select"
@@ -58,6 +59,23 @@
                         data-errors="service.errors.status"
                         data-options="service.statuses"
                         data-options-label="text">
+                    </formgroup>
+                    <formgroup
+                        data-id="payment"
+                        data-type="select"
+                        data-label="{{ meta.Participant.payment.verbose_name }}"
+                        data-model="service.values.payment"
+                        data-errors="service.errors.payment"
+                        data-options="service.payments"
+                        data-options-label="text"
+                        data-options-null="1">
+                    </formgroup>
+                    <formgroup
+                        data-id="payment_complete"
+                        data-type="checkbox"
+                        data-label="{{ meta.Participant.payment_complete.verbose_name }}"
+                        data-model="service.values.payment_complete"
+                        data-errors="service.errors.payment_complete">
                     </formgroup>
                 </div>
 

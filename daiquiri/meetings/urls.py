@@ -17,7 +17,8 @@ from .viewsets import (
     ParticipantViewSet,
     ContributionViewSet,
     ContributionTypeViewSet,
-    StatusViewSet
+    StatusViewSet,
+    PaymentViewSet
 )
 
 router = routers.DefaultRouter()
@@ -26,6 +27,7 @@ router.register(r'participants', ParticipantViewSet, base_name='participant')
 router.register(r'contributions', ContributionViewSet, base_name='contribution')
 router.register(r'contributiontypes', ContributionTypeViewSet, base_name='contributiontype')
 router.register(r'statuses', StatusViewSet, base_name='status')
+router.register(r'payments', PaymentViewSet, base_name='payment')
 
 urlpatterns = [
     url(r'^api/', include(router.urls)),

@@ -52,5 +52,7 @@ class ParticipantSerializer(serializers.ModelSerializer):
             'details',
             'registered',
             'status',
+            'payment',
+            'payment_complete',
             'contributions'
         )

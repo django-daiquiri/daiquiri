@@ -78,3 +78,9 @@ class StatusViewSet(ChoicesViewSet):
 
     queryset = Participant.STATUS_CHOICES
 
+
+class PaymentViewSet(ChoicesViewSet):
+    permission_classes = (IsAuthenticated, )
+    authentication_classes = (SessionAuthentication, TokenAuthentication)
+
+    queryset = Participant.PAYMENT_CHOICES

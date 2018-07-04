@@ -88,6 +88,14 @@ class Participant(models.Model):
         (STATUS_CANCELED, _('canceled')),
     )
 
+    PAYMENT_CASH = 'CASH'
+    PAYMENT_WIRE = 'WIRE'
+
+    PAYMENT_CHOICES = (
+        (PAYMENT_CASH, _('cash')),
+        (PAYMENT_WIRE, _('wire transfer')),
+    )
+
     meeting = models.ForeignKey(
         Meeting, related_name='participants',
         verbose_name=_('Meeting'),
@@ -118,6 +126,16 @@ class Participant(models.Model):
         max_length=32, choices=STATUS_CHOICES,
         verbose_name=_('Status'),
         help_text=_('Status of the participant.')
+    )
+    payment = models.CharField(
+        max_length=32, blank=True, choices=PAYMENT_CHOICES,
+        verbose_name=_('Payment'),
+        help_text=_('Type of payment for the participant.')
+    )
+    payment_complete = models.BooleanField(
+        default=False,
+        verbose_name=_('Payment complete'),
+        help_text=_('Designates whether the payment is completed.')
     )
 
     class Meta:

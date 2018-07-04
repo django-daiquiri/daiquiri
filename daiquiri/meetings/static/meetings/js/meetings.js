@@ -13,7 +13,8 @@ angular.module('meetings', ['core', 'infinite-scroll'])
         'participants': $resource(baseurl + 'meetings/api/participants/:id/'),
         'contributions': $resource(baseurl + 'meetings/api/contributions/:id/'),
         'contribution_types': $resource(baseurl + 'meetings/api/contributiontypes/:id/'),
-        'statuses': $resource(baseurl + 'meetings/api/statuses/:id/')
+        'statuses': $resource(baseurl + 'meetings/api/statuses/:id/'),
+        'payments': $resource(baseurl + 'meetings/api/payments/:id/')
     };
 
     /* init the list service */
@@ -32,6 +33,7 @@ angular.module('meetings', ['core', 'infinite-scroll'])
         service.meeting = resources.meetings.get({id: meeting_id});
         service.contribution_types = resources.contribution_types.query();
         service.statuses = resources.statuses.query();
+        service.payments = resources.payments.query();
 
         $q.all([service.meeting.$promise, service.contribution_types.$promise]).then(function() {
             service.ready = true;
