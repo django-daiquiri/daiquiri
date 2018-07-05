@@ -83,4 +83,4 @@ class PaymentViewSet(ChoicesViewSet):
     permission_classes = (IsAuthenticated, )
     authentication_classes = (SessionAuthentication, TokenAuthentication)
 
-    queryset = Participant.PAYMENT_CHOICES
+    queryset = settings.MEETINGS_PAYMENT_CHOICES

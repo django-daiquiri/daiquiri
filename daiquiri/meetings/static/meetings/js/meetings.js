@@ -22,6 +22,7 @@ angular.module('meetings', ['core', 'infinite-scroll'])
     var service = {
         list: ListService,
         filters: {
+            contribution_type: {},
             status: {},
             payment: {}
         }
@@ -84,7 +85,7 @@ angular.module('meetings', ['core', 'infinite-scroll'])
     };
 
     service.update_filters = function() {
-        angular.forEach(['status', 'payment'], function(filter) {
+        angular.forEach(['contribution_type', 'status', 'payment'], function(filter) {
             service.list.params[filter] = [];
             angular.forEach(service.filters[filter], function(value, key) {
                 if (value) {

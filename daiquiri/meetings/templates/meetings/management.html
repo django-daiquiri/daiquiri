@@ -77,6 +77,17 @@
                 </div>
                 <div class="col-sm-12">
                     <div class="daiquiri-list-filter">
+                        <strong>{% trans 'Filter contribution' %}:</strong>
+                        <label ng-repeat="contribution_type in service.contribution_types">
+                            <input type="checkbox" autocomplete="off"
+                                ng-model="service.filters.contribution_type[contribution_type.id]"
+                                ng-change="service.reload();">
+                            {$ contribution_type.text $}
+                        </label>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="daiquiri-list-filter">
                         <strong>{% trans 'Filter status' %}:</strong>
                         <label ng-repeat="status in service.statuses">
                             <input type="checkbox" autocomplete="off"

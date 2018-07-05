@@ -1,5 +1,7 @@
 import os
 
+from django.utils.translation import ugettext_lazy as _
+
 from .base import BASE_DIR
 
 ASYNC = False
@@ -53,10 +55,14 @@ FILES_BASE_PATH = os.path.join(BASE_DIR, 'files')
 FILES_SEARCH_URL = None
 
 MEETINGS_CONTRIBUTION_TYPES = [
-    ('', 'no contribution'),
-    ('talk', 'Talk'),
-    ('poster', 'Poster')
+    ('talk', _('Talk')),
+    ('poster', _('Poster'))
 ]
+MEETINGS_PAYMENT_CHOICES = (
+    ('cash', _('cash')),
+    ('wire', _('wire transfer')),
+)
+
 MEETINGS_PARTICIPANT_DETAIL_KEYS = []
 MEETINGS_ABSTRACT_MAX_LENGTH = 2000
 
