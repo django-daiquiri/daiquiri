@@ -259,9 +259,6 @@ class AbstractExportTests(ExportTests):
             for status in ['all'] + [label for _, label in Participant.STATUS_CHOICES]:
                 self.assert_view('export_view', 'get', 'export_view', username, {
                     'slug': instance.slug,
-                    'contribution_type': 'poster',
-                    'format': 'html',
-                    'status': status
                 })
 
 
@@ -276,6 +273,4 @@ class AbstractEmailsTests(ExportTests):
             for status in ['all'] + [label for _, label in Participant.STATUS_CHOICES]:
                 self.assert_view('export_view', 'get', 'export_view', username, {
                     'slug': instance.slug,
-                    'format': 'txt',
-                    'status': status
                 })
