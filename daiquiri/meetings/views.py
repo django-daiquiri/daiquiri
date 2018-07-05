@@ -14,6 +14,7 @@ from daiquiri.core.utils import get_model_field_meta, render_to_csv, render_to_x
 from .models import Meeting, Participant, Contribution
 from .forms import ParticipantForm, ContributionForm
 from .utils import send_registration_mails
+from .filters import ParticipantFilterBackend
 
 logger = logging.getLogger(__name__)
 
@@ -161,14 +162,6 @@ class ExportView(ModelPermissionMixin, View):
         except Meeting.DoesNotExist:
             raise Http404
 
-    def get_participants(self, meeting, status='all'):
-        if status == 'all':
-            return meeting.participants.all()
-        elif status in dict(Participant.STATUS_CHOICES).values():
-            return meeting.participants.filter(status=status)
-        else:
-            raise Http404
-
 
 class ParticipantExportView(ExportView):
 
@@ -221,7 +214,7 @@ class ParticipantExportView(ExportView):
 
     def get(self, request, slug, format):
         meeting = self.get_meeting(slug)
-        participants = self.get_participants(meeting)
+        participants = meeting.participants.all()
 
         if format == 'csv':
             return render_to_csv(request, meeting.title, self.get_columns(), self.get_rows(participants))
@@ -233,35 +226,29 @@ class ParticipantExportView(ExportView):
 
 class AbstractExportView(ExportView):
 
-    def get(self, request, slug, contribution_type, format, status):
+    def get(self, request, slug):
+
         meeting = self.get_meeting(slug)
-        participants = self.get_participants(meeting, status)
 
-        contributions = []
-        for participant in participants:
-            for contribution in participant.contributions.all():
-                if contribution.contribution_type == contribution_type:
-                    contributions.append(contribution)
+        queryset = meeting.participants.all()
+        participants = ParticipantFilterBackend().filter_queryset(request, queryset, self)
 
-        if format == 'html':
-            return render(request, 'meetings/export_abstracts.html', {
-                'meeting': meeting,
-                'contributions': contributions
-            })
-        else:
-            raise Http404
+        return render(request, 'meetings/export_abstracts.html', {
+            'meeting': meeting,
+            'participants': participants
+        })
 
 
 class EmailExportView(ExportView):
 
-    def get(self, request, slug, format, status):
-        meeting = self.get_meeting(slug)
-        participants = self.get_participants(meeting, status)
+    def get(self, request, slug):
 
-        if format == 'txt':
-            return render(request, 'meetings/export_emails.html', {
-                'meeting': meeting,
-                'participants': participants
-            }, content_type='text/plain; charset=utf-8')
-        else:
-            raise Http404
+        meeting = self.get_meeting(slug)
+
+        queryset = meeting.participants.all()
+        participants = ParticipantFilterBackend().filter_queryset(request, queryset, self)
+
+        return render(request, 'meetings/export_emails.html', {
+            'meeting': meeting,
+            'participants': participants
+        }, content_type='text/plain; charset=utf-8')

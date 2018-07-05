@@ -18,29 +18,15 @@
                 {% trans 'All participants (xlsx)' %}
             </a>
         </li>
-        <li role="separator" class="divider"></li>
-        {% for status in statuses %}
         <li>
-            <a href="{% url 'meetings:export_abstracts' meeting_slug 'talk' 'html' status %}">
-                {% blocktrans %}Talks from {{ status }} users (html){% endblocktrans %}
+            <a href="{% url 'meetings:export_abstracts' meeting_slug %}?{$ service.query_param_string $}" target="_blank">
+                {% blocktrans %}Abstracts using filters (html){% endblocktrans %}
             </a>
         </li>
-        {% endfor %}
-        <li role="separator" class="divider"></li>
-        {% for status in statuses %}
         <li>
-            <a href="{% url 'meetings:export_abstracts' meeting_slug 'poster' 'html' status %}">
-                {% blocktrans %}Posters from {{ status }} users (html){% endblocktrans %}
+            <a href="{% url 'meetings:export_emails' meeting_slug %}?{$ service.query_param_string $}" target="_blank">
+                {% blocktrans %}Email addresses using filters (txt){% endblocktrans %}
             </a>
         </li>
-        {% endfor %}
-        <li role="separator" class="divider"></li>
-        {% for status in statuses %}
-        <li>
-            <a href="{% url 'meetings:export_emails' meeting_slug 'txt' status %}">
-                {% blocktrans %}Email addresses from {{ status }} users (txt){% endblocktrans %}
-            </a>
-        </li>
-        {% endfor %}
     </ul>
 </div>

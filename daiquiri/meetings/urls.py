@@ -39,8 +39,8 @@ urlpatterns = [
     url(r'^(?P<slug>[-\w]+)/management/$', ManagementView.as_view(), name='management'),
     url(r'^(?P<slug>[-\w]+)/export/participants/(?P<format>[a-z]+)/$',
         ParticipantExportView.as_view(), name='export_participants'),
-    url(r'^(?P<slug>[-\w]+)/export/abstracts/(?P<contribution_type>[a-z]+)/(?P<format>[a-z]+)/(?P<status>[\w|\W]+)/$',
+    url(r'^(?P<slug>[-\w]+)/export/abstracts/$',
         AbstractExportView.as_view(), name='export_abstracts'),
-    url(r'^(?P<slug>[-\w]+)/export/emails/(?P<format>[a-z]+)/(?P<status>[\w|\W]+)/$',
+    url(r'^(?P<slug>[-\w]+)/export/emails/$',
         EmailExportView.as_view(), name='export_emails'),
 ]

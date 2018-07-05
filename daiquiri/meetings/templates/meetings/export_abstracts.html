@@ -1,14 +1,20 @@
 {% load i18n %}
 
-{% for contribution in contributions %}
+<ol>
+    {% for participant in participants %}
+    {% with participant.contributions.first as contribution %}
+    <li>
 
-<h2>
-    {{ forloop.counter }} {{ contribution.participant.full_name }}
-    ({{ contribution.participant.details.affiliation}})
-</h2>
+        <h2>
+            {{ participant.full_name }}
+            ({{ contribution.details.affiliation}})
+        </h2>
 
-<h3>{{ contribution.title }} ({{ contribution.get_contribution_type_display }})</h3>
+        <h3>{{ contribution.title }} ({{ contribution.get_contribution_type_display }})</h3>
 
-{{ contribution.abstract }}
+        {{ contribution.abstract }}
 
-{% endfor %}
+    </li>
+    {% endwith %}
+    {% endfor %}
+</ol>

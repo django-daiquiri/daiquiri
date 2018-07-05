@@ -1,6 +1,6 @@
 angular.module('meetings', ['core', 'infinite-scroll'])
 
-.factory('MeetingsService', ['$resource', '$q', 'ListService', function($resource, $q, ListService) {
+.factory('MeetingsService', ['$resource', '$q', '$httpParamSerializer', 'ListService', function($resource, $q, $httpParamSerializer, ListService) {
 
     /* get the base url */
 
@@ -85,14 +85,20 @@ angular.module('meetings', ['core', 'infinite-scroll'])
     };
 
     service.update_filters = function() {
+        var params = {};
+
         angular.forEach(['contribution_type', 'status', 'payment'], function(filter) {
-            service.list.params[filter] = [];
+            params[filter] = [];
             angular.forEach(service.filters[filter], function(value, key) {
                 if (value) {
-                    service.list.params[filter].push(key);
+                    params[filter].push(key);
                 }
             });
+
+            service.list.params[filter] = params[filter];
         });
+
+        service.query_param_string = $httpParamSerializer(params);
     };
 
     service.store_meeting = function() {

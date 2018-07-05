@@ -328,7 +328,10 @@ def render_to_xlsx(request, filename, columns, rows):
             elif isinstance(cell, datetime):
                 worksheet.write(i + 1, j, localtime(cell).strftime("%Y-%m-%d %H:%M:%S"))
             else:
-                worksheet.write(i + 1, j, cell)
+                try:
+                    worksheet.write(i + 1, j, unicode(cell))
+                except NameError:
+                    worksheet.write(i + 1, j, str(cell))
 
     workbook.close()
 
