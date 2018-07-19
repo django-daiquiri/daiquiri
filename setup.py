@@ -24,7 +24,7 @@ setup(
         'django-extensions>=1.8.1',
         'wheel>=0.30.0',
         'django-allauth>=0.32.0',
-        'django-filter>=1.0.4',
+        'django-filter==1.1.0',
         'django-widget-tweaks>=1.4.1',
         'django-compressor>=2.1.1',
         'django-libsass>=0.7',
