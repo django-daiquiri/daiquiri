@@ -24,7 +24,8 @@ angular.module('meetings', ['core', 'infinite-scroll'])
         filters: {
             contribution_type: {},
             status: {},
-            payment: {}
+            payment: {},
+            payment_complete: {}
         }
     };
 
@@ -87,7 +88,7 @@ angular.module('meetings', ['core', 'infinite-scroll'])
     service.update_filters = function() {
         var params = {};
 
-        angular.forEach(['contribution_type', 'status', 'payment'], function(filter) {
+        angular.forEach(['contribution_type', 'status', 'payment', 'payment_complete'], function(filter) {
             params[filter] = [];
             angular.forEach(service.filters[filter], function(value, key) {
                 if (value) {

@@ -8,6 +8,7 @@ class ParticipantFilterBackend(filters.BaseFilterBackend):
         contribution_type = request.GET.getlist('contribution_type')
         status = request.GET.getlist('status')
         payment = request.GET.getlist('payment')
+        payment_complete = request.GET.getlist('payment_complete')
 
         if contribution_type:
             queryset = queryset.filter(contributions__contribution_type__in=contribution_type)
@@ -17,5 +18,8 @@ class ParticipantFilterBackend(filters.BaseFilterBackend):
 
         if payment:
             queryset = queryset.filter(payment__in=payment)
+
+        if payment_complete:
+            queryset = queryset.filter(payment_complete__in=payment_complete)
 
         return queryset

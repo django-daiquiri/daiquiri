@@ -108,6 +108,23 @@
                         </label>
                     </div>
                 </div>
+                <div class="col-sm-12">
+                    <div class="daiquiri-list-filter">
+                        <strong>{% trans 'Filter payment status' %}:</strong>
+                        <label>
+                            <input type="checkbox" autocomplete="off"
+                                ng-model="service.filters.payment_complete['1']"
+                                ng-change="service.reload();">
+                            {% trans 'complete' %}
+                        </label>
+                        <label>
+                            <input type="checkbox" autocomplete="off"
+                                ng-model="service.filters.payment_complete['0']"
+                                ng-change="service.reload();">
+                            {% trans 'not complete' %}
+                        </label>
+                    </div>
+                </div>
             </div>
 
             <div class="table-responsive" ng-if="service.ready">
