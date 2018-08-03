@@ -9,23 +9,23 @@
     <ul class="dropdown-menu dropdown-menu-right">
 
         <li>
-            <a href="{% url 'meetings:export_participants' meeting_slug 'csv' %}">
-                {% trans 'All participants (csv)' %}
+            <a href="{% url 'meetings:export_participants' meeting_slug 'csv' %}?{$ service.query_param_string $}">
+                {% trans 'Participants (csv)' %}
             </a>
         </li>
         <li>
-            <a href="{% url 'meetings:export_participants' meeting_slug 'xlsx' %}">
-                {% trans 'All participants (xlsx)' %}
+            <a href="{% url 'meetings:export_participants' meeting_slug 'xlsx' %}?{$ service.query_param_string $}">
+                {% trans 'Participants (xlsx)' %}
             </a>
         </li>
         <li>
             <a href="{% url 'meetings:export_abstracts' meeting_slug %}?{$ service.query_param_string $}" target="_blank">
-                {% blocktrans %}Abstracts using filters (html){% endblocktrans %}
+                {% blocktrans %}Abstracts (html){% endblocktrans %}
             </a>
         </li>
         <li>
             <a href="{% url 'meetings:export_emails' meeting_slug %}?{$ service.query_param_string $}" target="_blank">
-                {% blocktrans %}Email addresses using filters (txt){% endblocktrans %}
+                {% blocktrans %}Email addresses (txt){% endblocktrans %}
             </a>
         </li>
     </ul>

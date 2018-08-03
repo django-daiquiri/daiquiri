@@ -218,7 +218,9 @@ class ParticipantExportView(ExportView):
 
     def get(self, request, slug, format):
         meeting = self.get_meeting(slug)
-        participants = meeting.participants.all()
+
+        queryset = meeting.participants.all()
+        participants = ParticipantFilterBackend().filter_queryset(request, queryset, self)
 
         if format == 'csv':
             return render_to_csv(request, meeting.title, self.get_columns(), self.get_rows(participants))
