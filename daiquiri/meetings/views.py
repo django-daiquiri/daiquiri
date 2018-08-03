@@ -173,7 +173,9 @@ class ParticipantExportView(ExportView):
             _('Last name'),
             _('Email'),
             _('Registered'),
-            _('Status')
+            _('Status'),
+            _('Payment'),
+            _('Payment complete'),
         ] + [detail_key['label'] for detail_key in detail_keys] + [
             _('Contribution title'),
             _('Contribution abstract'),
@@ -192,7 +194,9 @@ class ParticipantExportView(ExportView):
                 participant.last_name,
                 participant.email,
                 participant.registered,
-                participant.get_status_display()
+                participant.get_status_display(),
+                participant.get_payment_display(),
+                participant.payment_complete
             ]
 
             if participant.details:

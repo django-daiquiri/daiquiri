@@ -158,6 +158,12 @@ class Participant(models.Model):
         return '\n' + ''.join(['%s: %s\n' % value for value in values])
 
 
+    def get_payment_display(self):
+        try:
+            return dict(settings.MEETINGS_PAYMENT_CHOICES)[self.payment]
+        except KeyError:
+            return ''
+
 @python_2_unicode_compatible
 class Contribution(models.Model):
 
