@@ -205,4 +205,7 @@ class Contribution(models.Model):
         return '\n' + ''.join(['%s: %s\n' % value for value in values])
 
     def get_contribution_type_display(self):
-        return dict(settings.MEETINGS_CONTRIBUTION_TYPES)[self.contribution_type]
+        try:
+            return dict(settings.MEETINGS_CONTRIBUTION_TYPES)[self.contribution_type]
+        except KeyError:
+            return ''
