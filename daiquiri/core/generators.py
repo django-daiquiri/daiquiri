@@ -152,7 +152,8 @@ def generate_fits(generator, fields, nrows, table_name=None):
        'TFIELDS = %20d / number of table fields'.ljust(64),
         ]
     if table_name is not None:
-        header1.append(("EXTNAME = '%s'" % str(table_name)).ljust(80))
+        # table_name needs to be shorter than 68 chars
+        header1.append(("EXTNAME = '%s'" % str(table_name[:68])).ljust(80))
 
     h1 = ''.join(header1) % (naxis1, naxis2, tfields)
 
