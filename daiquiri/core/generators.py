@@ -1,7 +1,12 @@
 import csv
+import datetime
 import io
 import sys
 import struct
+
+from django.contrib.sites.models import Site
+
+from daiquiri import __version__ as daiquiri_version
 
 
 def generate_csv(generator, fields):
@@ -132,6 +137,7 @@ def generate_fits(generator, fields, nrows, table_name=None):
         'BITPIX  =                    8 / array data type',
         'NAXIS   =                    0 / number of array dimensions',
         'EXTEND  =                    T',
+        'NTABLE  =                    1',
         'END'
         ]]
 
@@ -153,7 +159,7 @@ def generate_fits(generator, fields, nrows, table_name=None):
         ]
     if table_name is not None:
         # table_name needs to be shorter than 68 chars
-        header1.append(("EXTNAME = '%s'" % str(table_name[:68])).ljust(80))
+        header1.append(("EXTNAME = '%s' / table name" % str(table_name[:68])).ljust(80))
 
     h1 = ''.join(header1) % (naxis1, naxis2, tfields)
 
@@ -162,20 +168,36 @@ def generate_fits(generator, fields, nrows, table_name=None):
     tnull = "TNULL%s = %s"
 
     for i, d in enumerate(zip(names, datatypes, arraysizes)):
-        temp = (ttype % (str(i + 1).ljust(2), d[0].ljust(8)))[:80]
+        temp = (ttype % (str(i + 1).ljust(2), d[0][:68].ljust(8)))[:80].ljust(30)
+        temp += ' / label for column %d' % (i + 1)
+        temp = temp[:80]
         temp += ' ' * (80 - len(temp))
         h1 += temp
 
         ff = (str(d[2]) + formats_dict[d[1]][1]).ljust(8)
-        temp = (tform % (str(i + 1).ljust(2), ff))[:80]
+        temp = (tform % (str(i + 1).ljust(2), ff))[:80].ljust(31)
+        temp += '/ format for column %d' % (i + 1)
+        temp = temp[:80]
         temp += ' ' * (80 - len(temp))
         h1 += temp
 
         # NULL values only for int like types
         if d[1] in ('unsignedByte', 'short', 'int', 'long'):
-            temp = (tnull % (str(i + 1).ljust(2), formats_dict[d[1]][3]))[:80]
+            temp = (tnull % (str(i + 1).ljust(2), formats_dict[d[1]][3]))[:80].ljust(31)
+            temp += '/ blank value for column %d' % (i + 1)
+            temp = temp[:80]
             temp += ' ' * (80 - len(temp))
             h1 += temp
+
+    now = datetime.datetime.utcnow().replace(microsecond=0).isoformat()
+    site = Site.objects.get_current()
+    h1 += ("DATE-HDU= '%s' / UTC date of HDU creation" % now).ljust(80)
+    h1 += ("DAIQUIRI= '%s'%s / Daiquiri version" % (daiquiri_version,
+        ' ' * max(0, 18 - len(daiquiri_version)))).ljust(80)
+    print(1)
+    h1 += ("SOURCE  = '%s'%s / table origin" % (site,
+        ' ' * max(0, 18 - len(str(site))))).ljust(80)
+    print(2)
 
     h1 += 'END'.ljust(80)
     h1 += ' ' * (2880 * (len(h1) // 2880 + 1) - len(h1))
@@ -211,6 +233,6 @@ def generate_fits(generator, fields, nrows, table_name=None):
 
     # Footer padding
     ln = naxis1 * row_count
-    footer = ' ' * (2880 * (ln // 2880 + 1) - ln)
+    footer = '\x00' * (2880 * (ln // 2880 + 1) - ln)
 
     yield footer.encode()
