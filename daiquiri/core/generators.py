@@ -194,10 +194,8 @@ def generate_fits(generator, fields, nrows, table_name=None):
     h1 += ("DATE-HDU= '%s' / UTC date of HDU creation" % now).ljust(80)
     h1 += ("DAIQUIRI= '%s'%s / Daiquiri version" % (daiquiri_version,
         ' ' * max(0, 18 - len(daiquiri_version)))).ljust(80)
-    print(1)
     h1 += ("SOURCE  = '%s'%s / table origin" % (site,
         ' ' * max(0, 18 - len(str(site))))).ljust(80)
-    print(2)
 
     h1 += 'END'.ljust(80)
     h1 += ' ' * (2880 * (len(h1) // 2880 + 1) - len(h1))
