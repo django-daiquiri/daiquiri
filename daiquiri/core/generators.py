@@ -118,6 +118,8 @@ def generate_fits(generator, fields, nrows, table_name=None):
         'long': ('q', 'K', 8, 9223372036854775807),
         'float': ('f', 'E', 4, float('nan')),
         'double': ('d', 'D', 8, float('nan')),
+        'timestamp': ('s', 'A', 19, ''.encode()),
+        'array': ('s', 'A', 64, ''.encode()),
         'spoint': ('s', 'A', 64, ''.encode())
     }
 
@@ -125,6 +127,11 @@ def generate_fits(generator, fields, nrows, table_name=None):
     datatypes = [d['datatype'] for d in fields]
     arraysizes = [d['arraysize'] if d['arraysize'] is not None else ''
                   for d in fields]
+    for i, d in enumerate(zip(datatypes, arraysizes)):
+        if d[0] == 'timestamp':
+            arraysizes[i] = formats_dict['timestamp'][2]
+        if d[0] in ('char', 'spoint', 'array') and d[1] == '':
+            arraysizes[i] = 1
 
     naxis1 = sum([formats_dict[i[0]][2] if not i[1] else i[1]
                   for i in zip(datatypes, arraysizes)])
