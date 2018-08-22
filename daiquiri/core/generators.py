@@ -109,18 +109,18 @@ def generate_votable(generator, fields, resource_name=None, table_name=None, lin
 
 def generate_fits(generator, fields, nrows, table_name=None):
 
-    # VO format label, FITS format label, size, NULL value
+    # VO format label, FITS format label, size, NULL value, encoded value
     formats_dict = {
-        'char': ('s', 'A', 1, ''.encode),
-        'unsignedByte': ('B', 'B', 1, 255),
-        'short': ('h', 'I', 2, 32767),
-        'int': ('i', 'J', 4, 2147483647),
-        'long': ('q', 'K', 8, 9223372036854775807),
-        'float': ('f', 'E', 4, float('nan')),
-        'double': ('d', 'D', 8, float('nan')),
-        'timestamp': ('s', 'A', 19, ''.encode()),
-        'array': ('s', 'A', 64, ''.encode()),
-        'spoint': ('s', 'A', 64, ''.encode())
+        'unsignedByte': ('s', 'L', 1,  b'\x00',             lambda x: b'T' if x == 'true' else b'F'),
+        'short':        ('h', 'I', 2,  32767,               int),
+        'int':          ('i', 'J', 4,  2147483647,          int),
+        'long':         ('q', 'K', 8,  9223372036854775807, int),
+        'float':        ('f', 'E', 4,  float('nan'),        float),
+        'double':       ('d', 'D', 8,  float('nan'),        float),
+        'char':         ('s', 'A', 32,  b'',                lambda x: x.encode()),
+        'timestamp':    ('s', 'A', 19, b'',                 lambda x: x.encode()),
+        'array':        ('s', 'A', 64, b'NULL',             lambda x: x.encode()),
+        'spoint':       ('s', 'A', 64, b'NULL',             lambda x: x.encode())
     }
 
     names = [d['name'] for d in fields]
@@ -131,14 +131,14 @@ def generate_fits(generator, fields, nrows, table_name=None):
         if d[0] == 'timestamp':
             arraysizes[i] = formats_dict['timestamp'][2]
         if d[0] in ('char', 'spoint', 'array') and d[1] == '':
-            arraysizes[i] = 1
+            arraysizes[i] = formats_dict[d[0]][2] 
 
     naxis1 = sum([formats_dict[i[0]][2] if not i[1] else i[1]
                   for i in zip(datatypes, arraysizes)])
     naxis2 = nrows
     tfields = len(names)
 
-    # Main header
+    # Main header #############################################################
     header0 = [i.ljust(80) for i in [
         'SIMPLE  =                    T / conforms to FITS standard',
         'BITPIX  =                    8 / array data type',
@@ -153,7 +153,7 @@ def generate_fits(generator, fields, nrows, table_name=None):
 
     yield h0.encode()
 
-    # Table header
+    # Table header ############################################################
     header1 = [
        "XTENSION= 'BINTABLE'           / binary table extension".ljust(80),
        'BITPIX  =                    8 / array data type'.ljust(80),
@@ -166,7 +166,8 @@ def generate_fits(generator, fields, nrows, table_name=None):
         ]
     if table_name is not None:
         # table_name needs to be shorter than 68 chars
-        header1.append(("EXTNAME = '%s' / table name" % str(table_name[:68])).ljust(80))
+        header1.append(("EXTNAME = '%s' / table name" %
+                        str(table_name[:68])).ljust(80))
 
     h1 = ''.join(header1) % (naxis1, naxis2, tfields)
 
@@ -175,7 +176,8 @@ def generate_fits(generator, fields, nrows, table_name=None):
     tnull = "TNULL%s = %s"
 
     for i, d in enumerate(zip(names, datatypes, arraysizes)):
-        temp = (ttype % (str(i + 1).ljust(2), d[0][:68].ljust(8)))[:80].ljust(30)
+        temp = (ttype % (str(i + 1).ljust(2),
+                d[0][:68].ljust(8)))[:80].ljust(30)
         temp += ' / label for column %d' % (i + 1)
         temp = temp[:80]
         temp += ' ' * (80 - len(temp))
@@ -188,9 +190,10 @@ def generate_fits(generator, fields, nrows, table_name=None):
         temp += ' ' * (80 - len(temp))
         h1 += temp
 
-        # NULL values only for int like types
-        if d[1] in ('unsignedByte', 'short', 'int', 'long'):
-            temp = (tnull % (str(i + 1).ljust(2), formats_dict[d[1]][3]))[:80].ljust(31)
+        # NULL values only for int-like types
+        if d[1] in ('short', 'int', 'long'):
+            temp = (tnull % (str(i + 1).ljust(2),
+                    formats_dict[d[1]][3]))[:80].ljust(31)
             temp += '/ blank value for column %d' % (i + 1)
             temp = temp[:80]
             temp += ' ' * (80 - len(temp))
@@ -209,34 +212,19 @@ def generate_fits(generator, fields, nrows, table_name=None):
 
     yield h1.encode()
 
-    # Table data
-    conversions = [[], [], []]
-    for i, x in enumerate(datatypes):
-        if x in ('unsignedByte', 'short', 'int', 'long'):
-            conversions[0].append(i)
-        elif x in ('float', 'double'):
-            conversions[1].append(i)
-        else:
-            # The rest are strings and we store their location so we only
-            # encode (to bytes) these columns and not waste the energy
-            conversions[2].append(i)
-
+    # Data ####################################################################
     fmt = '>' + ''.join([str(i[1]) + formats_dict[i[0]][0]
                          for i in zip(datatypes, arraysizes)])
 
     row_count = 0
     for row in generator:
-        for i in conversions[0]:
-            row[i] = int(row[i])
-        for i in conversions[1]:
-            row[i] = float(row[i])
-        for i in conversions[2]:
-            row[i] = row[i].encode()
+        r = [formats_dict[i[1]][3] if i[0] == 'NULL'
+             else formats_dict[i[1]][4](i[0]) for i in zip(row, datatypes)]
 
-        yield struct.pack(fmt, *row)
+        yield struct.pack(fmt, *r)
         row_count += 1
 
-    # Footer padding
+    # Footer padding (to fill the last block to 2880 bytes) ###################
     ln = naxis1 * row_count
     footer = '\x00' * (2880 * (ln // 2880 + 1) - ln)
 
