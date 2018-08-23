@@ -142,20 +142,29 @@ def generate_fits(generator, fields, nrows, table_name=None):
     naxis2 = nrows
     tfields = len(names)
 
+    site = Site.objects.get_current()
+    content = 'Written by django-daiquiri v%s // Sourced from %s ' % (
+            daiquiri_version, site)
+
     # Main header #############################################################
     header0 = [i.ljust(80) for i in [
         'SIMPLE  =                    T / conforms to FITS standard',
         'BITPIX  =                    8 / array data type',
-        'NAXIS   =                    0 / number of array dimensions',
+        'NAXIS   =                    1 / number of array dimensions',
+        'NAXIS1  =                   %d / number of characters',
         'EXTEND  =                    T',
         'NTABLE  =                    1',
         'END'
         ]]
 
-    h0 = ''.join(header0)
+    h0 = ''.join(header0) % len(content)
     h0 += ' ' * (2880 * (len(h0) // 2880 + 1) - len(h0))
 
     yield h0.encode()
+
+    # Main table content - required by some FITS viewers ###################### 
+
+    yield (content + '\x00' * (2880 - len(content))).encode()
 
     # Table header ############################################################
     header1 = [
@@ -177,7 +186,7 @@ def generate_fits(generator, fields, nrows, table_name=None):
 
     ttype = ("TTYPE%s", "= '%s'")
     tform = ("TFORM%s", "= '%s'")
-    tnull = ("TNULL%s", "= %s")
+    tnull = ("TNULL%s", "=  %s")
 
     for i, d in enumerate(zip(names, datatypes, arraysizes)):
         temp = "".join(((ttype[0] % str(i + 1)).ljust(8),
@@ -205,12 +214,7 @@ def generate_fits(generator, fields, nrows, table_name=None):
             h1 += temp
 
     now = datetime.datetime.utcnow().replace(microsecond=0).isoformat()
-    site = Site.objects.get_current()
     h1 += ("DATE-HDU= '%s' / UTC date of HDU creation" % now).ljust(80)
-    h1 += ("DAIQUIRI= '%s'%s / Daiquiri version" % (daiquiri_version,
-        ' ' * max(0, 18 - len(daiquiri_version))))[:80].ljust(80)
-    h1 += ("SOURCE  = '%s'%s / table origin" % (site,
-        ' ' * max(0, 18 - len(str(site)))))[:80].ljust(80)
 
     h1 += 'END'.ljust(80)
     h1 += ' ' * (2880 * (len(h1) // 2880 + 1) - len(h1))
