@@ -136,6 +136,18 @@ def generate_fits(generator, fields, nrows, table_name=None):
         elif d[0] is None:
             datatypes[i] = 'unknown'
             arraysizes[i] = formats_dict['unknown'][2]
+    
+    units = []
+    ucds = []
+    for d in fields:
+        if 'unit' in d and d['unit'] is not None:
+            units.append(d['unit'])
+        else:
+            units.append('')
+        if 'ucd' in d and d['ucd'] is not None:
+            ucds.append(d['ucd'])
+        else:
+            ucds.append('')
 
     naxis1 = sum([formats_dict[i[0]][2] if not i[1] else i[1]
                   for i in zip(datatypes, arraysizes)])
@@ -187,8 +199,10 @@ def generate_fits(generator, fields, nrows, table_name=None):
     ttype = ("TTYPE%s", "= '%s'")
     tform = ("TFORM%s", "= '%s'")
     tnull = ("TNULL%s", "=  %s")
+    tunit = ("TUNIT%s", "= '%s'")
+    tucd = ("TUCD%s", "= '%s'")
 
-    for i, d in enumerate(zip(names, datatypes, arraysizes)):
+    for i, d in enumerate(zip(names, datatypes, arraysizes, units, ucds)):
         temp = "".join(((ttype[0] % str(i + 1)).ljust(8),
                        ttype[1] % d[0][:68].ljust(8)))[:80].ljust(30)
         temp += ' / label for column %d' % (i + 1)
@@ -209,6 +223,22 @@ def generate_fits(generator, fields, nrows, table_name=None):
             temp = "".join(((tnull[0] % str(i + 1)).ljust(8),
                            tnull[1] % formats_dict[d[1]][3]))[:80].ljust(31)
             temp += '/ blank value for column %d' % (i + 1)
+            temp = temp[:80]
+            temp += ' ' * (80 - len(temp))
+            h1 += temp
+
+        if d[3]:
+            temp = "".join(((tunit[0] % str(i + 1)).ljust(8),
+                           tunit[1] % d[3][:68].ljust(8)))[:80].ljust(30)
+            temp += ' / unit for column %d' % (i + 1)
+            temp = temp[:80]
+            temp += ' ' * (80 - len(temp))
+            h1 += temp
+
+        if d[4]:
+            temp = "".join(((tucd[0] % str(i + 1)).ljust(8),
+                           tucd[1] % d[4][:68].ljust(8)))[:80].ljust(30)
+            temp += ' / ucd for column %d' % (i + 1)
             temp = temp[:80]
             temp += ' ' * (80 - len(temp))
             h1 += temp
