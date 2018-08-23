@@ -117,10 +117,11 @@ def generate_fits(generator, fields, nrows, table_name=None):
         'long':         ('q', 'K', 8,  9223372036854775807, int),
         'float':        ('f', 'E', 4,  float('nan'),        float),
         'double':       ('d', 'D', 8,  float('nan'),        float),
-        'char':         ('s', 'A', 32,  b'',                lambda x: x.encode()),
+        'char':         ('s', 'A', 32, b'',                 lambda x: x.encode()),
         'timestamp':    ('s', 'A', 19, b'',                 lambda x: x.encode()),
-        'array':        ('s', 'A', 64, b'NULL',             lambda x: x.encode()),
-        'spoint':       ('s', 'A', 64, b'NULL',             lambda x: x.encode())
+        'array':        ('s', 'A', 64, b'',                 lambda x: x.encode()),
+        'spoint':       ('s', 'A', 64, b'',                 lambda x: x.encode()),
+        'unknown':      ('s', 'A', 8,  b'',                 lambda x: x.encode())
     }
 
     names = [d['name'] for d in fields]
@@ -130,8 +131,11 @@ def generate_fits(generator, fields, nrows, table_name=None):
     for i, d in enumerate(zip(datatypes, arraysizes)):
         if d[0] == 'timestamp':
             arraysizes[i] = formats_dict['timestamp'][2]
-        if d[0] in ('char', 'spoint', 'array') and d[1] == '':
+        elif d[0] in ('char', 'spoint', 'array') and d[1] == '':
             arraysizes[i] = formats_dict[d[0]][2] 
+        elif d[0] is None:
+            datatypes[i] = 'unknown'
+            arraysizes[i] = formats_dict['unknown'][2]
 
     naxis1 = sum([formats_dict[i[0]][2] if not i[1] else i[1]
                   for i in zip(datatypes, arraysizes)])
@@ -171,20 +175,21 @@ def generate_fits(generator, fields, nrows, table_name=None):
 
     h1 = ''.join(header1) % (naxis1, naxis2, tfields)
 
-    ttype = "TTYPE%s = '%s'"
-    tform = "TFORM%s = '%s'"
-    tnull = "TNULL%s = %s"
+    ttype = ("TTYPE%s", "= '%s'")
+    tform = ("TFORM%s", "= '%s'")
+    tnull = ("TNULL%s", "= %s")
 
     for i, d in enumerate(zip(names, datatypes, arraysizes)):
-        temp = (ttype % (str(i + 1).ljust(2),
-                d[0][:68].ljust(8)))[:80].ljust(30)
+        temp = "".join(((ttype[0] % str(i + 1)).ljust(8),
+                       ttype[1] % d[0][:68].ljust(8)))[:80].ljust(30)
         temp += ' / label for column %d' % (i + 1)
         temp = temp[:80]
         temp += ' ' * (80 - len(temp))
         h1 += temp
 
         ff = (str(d[2]) + formats_dict[d[1]][1]).ljust(8)
-        temp = (tform % (str(i + 1).ljust(2), ff))[:80].ljust(31)
+        temp = "".join(((tform[0] % str(i + 1)).ljust(8), 
+                       tform[1] % ff))[:80].ljust(31)
         temp += '/ format for column %d' % (i + 1)
         temp = temp[:80]
         temp += ' ' * (80 - len(temp))
@@ -192,8 +197,8 @@ def generate_fits(generator, fields, nrows, table_name=None):
 
         # NULL values only for int-like types
         if d[1] in ('short', 'int', 'long'):
-            temp = (tnull % (str(i + 1).ljust(2),
-                    formats_dict[d[1]][3]))[:80].ljust(31)
+            temp = "".join(((tnull[0] % str(i + 1)).ljust(8),
+                           tnull[1] % formats_dict[d[1]][3]))[:80].ljust(31)
             temp += '/ blank value for column %d' % (i + 1)
             temp = temp[:80]
             temp += ' ' * (80 - len(temp))
@@ -203,9 +208,9 @@ def generate_fits(generator, fields, nrows, table_name=None):
     site = Site.objects.get_current()
     h1 += ("DATE-HDU= '%s' / UTC date of HDU creation" % now).ljust(80)
     h1 += ("DAIQUIRI= '%s'%s / Daiquiri version" % (daiquiri_version,
-        ' ' * max(0, 18 - len(daiquiri_version)))).ljust(80)
+        ' ' * max(0, 18 - len(daiquiri_version))))[:80].ljust(80)
     h1 += ("SOURCE  = '%s'%s / table origin" % (site,
-        ' ' * max(0, 18 - len(str(site))))).ljust(80)
+        ' ' * max(0, 18 - len(str(site)))))[:80].ljust(80)
 
     h1 += 'END'.ljust(80)
     h1 += ' ' * (2880 * (len(h1) // 2880 + 1) - len(h1))

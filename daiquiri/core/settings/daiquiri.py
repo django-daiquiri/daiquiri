@@ -72,7 +72,7 @@ QUERY_ANONYMOUS = False
 QUERY_USER_SCHEMA_PREFIX = 'daiquiri_user_'
 QUERY_QUOTA = {
     'anonymous': '100Mb',
-    'user': '100Mb',
+    'user': '10000Mb',
     'users': {},
     'groups': {}
 }
