@@ -99,7 +99,8 @@ class QueryJobRetrieveSerializer(serializers.ModelSerializer):
 
 class QueryJobCreateSerializer(serializers.ModelSerializer):
 
-    table_name = serializers.CharField(required=False, allow_blank=True, validators=[TableNameValidator()])
+    table_name = serializers.CharField(required=False, allow_blank=True, max_length=256,
+                                       validators=[TableNameValidator()])
     queue = serializers.CharField(required=False)
     query_language = serializers.CharField(required=True)
     query = serializers.CharField(required=True)
@@ -176,7 +177,7 @@ class SyncQueryJobSerializer(SyncJobSerializer):
     RESPONSEFORMAT = serializers.CharField(required=False)
     FORMAT = serializers.CharField(required=False)
 
-    TABLE_NAME = serializers.CharField(required=False, validators=[TableNameValidator()])
+    TABLE_NAME = serializers.CharField(required=False, max_length=256, validators=[TableNameValidator()])
     LANG = serializers.CharField(required=True)
     QUERY = serializers.CharField(required=True)
 
@@ -186,7 +187,7 @@ class AsyncQueryJobSerializer(AsyncJobSerializer):
     RESPONSEFORMAT = serializers.CharField(required=False)
     FORMAT = serializers.CharField(required=False)
 
-    TABLE_NAME = serializers.CharField(required=False, validators=[TableNameValidator()])
+    TABLE_NAME = serializers.CharField(required=False, max_length=256, validators=[TableNameValidator()])
     QUEUE = serializers.CharField(required=False)
     LANG = serializers.CharField(required=True)
     QUERY = serializers.CharField(required=True)
