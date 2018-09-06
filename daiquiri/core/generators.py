@@ -136,7 +136,7 @@ def generate_fits(generator, fields, nrows, table_name=None):
         elif d[0] is None:
             datatypes[i] = 'unknown'
             arraysizes[i] = formats_dict['unknown'][2]
-    
+
     units = []
     ucds = []
     for d in fields:
@@ -212,7 +212,7 @@ def generate_fits(generator, fields, nrows, table_name=None):
 
     yield h0.encode()
 
-    # Main table content - required by some FITS viewers ###################### 
+    # Main table content - required by some FITS viewers ######################
 
     yield (content + '\x00' * (2880 - len(content))).encode()
 
@@ -249,7 +249,7 @@ def generate_fits(generator, fields, nrows, table_name=None):
         h1 += temp
 
         ff = (str(d[2]) + formats_dict[d[1]][1]).ljust(8)
-        temp = "".join(((tform[0] % str(i + 1)).ljust(8), 
+        temp = "".join(((tform[0] % str(i + 1)).ljust(8),
                        tform[1] % ff))[:80].ljust(31)
         temp += '/ format for column %d' % (i + 1)
         temp = temp[:80]
