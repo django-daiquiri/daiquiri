@@ -6,7 +6,7 @@ import re
 
 from django.conf import settings
 
-from daiquiri.core.generators import generate_csv, generate_votable
+from daiquiri.core.generators import generate_csv, generate_votable, generate_fits
 from daiquiri.core.utils import get_doi_url
 
 logger = logging.getLogger(__name__)
@@ -18,7 +18,7 @@ class BaseDownloadAdapter(object):
         self.database_key = database_key
         self.database_config = database_config
 
-    def generate(self, format_key, schema_name, table_name, columns, sources=None, status=None, empty=False):
+    def generate(self, format_key, schema_name, table_name, columns, sources=None, status=None, nrows=None):
         # create the final list of arguments subprocess.Popen
         if format_key == 'sql':
             # create the final list of arguments subprocess.Popen
@@ -54,7 +54,12 @@ class BaseDownloadAdapter(object):
 
                 return generate_votable(self.generate_rows(prepend=prepend), columns,
                                         resource_name=schema_name, table_name=table_name,
-                                        links=links, query_status=status, empty=empty)
+                                        links=links, query_status=status, empty=(nrows==0))
+
+            elif format_key == 'fits':
+                return generate_fits(self.generate_rows(prepend=prepend), columns,
+                                     nrows=nrows, table_name=table_name)
+
             else:
                 raise Exception('Not supported.')
 

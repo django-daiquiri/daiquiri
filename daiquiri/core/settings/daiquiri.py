@@ -72,7 +72,7 @@ QUERY_ANONYMOUS = False
 QUERY_USER_SCHEMA_PREFIX = 'daiquiri_user_'
 QUERY_QUOTA = {
     'anonymous': '100Mb',
-    'user': '100Mb',
+    'user': '10000Mb',
     'users': {},
     'groups': {}
 }
@@ -141,6 +141,13 @@ QUERY_DOWNLOAD_FORMATS = [
         'content_type': 'application/xml',
         'label': 'IVOA VOTable XML file - TABLEDATA serialization',
         'help': 'A XML file using the IVOA VOTable format. Use this option if you intend to use VO compatible software to further process the data.'
+    },
+    {
+        'key': 'fits',
+        'extension': 'fits',
+        'content_type': 'application/fits',
+        'label': 'FITS',
+        'help': 'Flexible Image Transport System (FITS) file format.'
     }
 ]
 

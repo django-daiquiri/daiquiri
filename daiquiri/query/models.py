@@ -366,7 +366,7 @@ class QueryJob(Job):
                 self.metadata.get('columns'),
                 self.metadata.get('sources'),
                 self.result_status,
-                (self.nrows == 0)
+                self.nrows
             )
         else:
             raise ValidationError({

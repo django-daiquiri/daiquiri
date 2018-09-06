@@ -232,8 +232,13 @@ def create_download_file(download_id):
         download_job.save()
 
         # write file using the generator in the adapter
+        if download_job.format_key == 'fits':
+            write_label = 'wb'
+        else:
+            write_label = 'w'
         try:
-            with open(download_job.file_path, 'w') as f:
+
+            with open(download_job.file_path, write_label) as f:
                 for line in download_job.job.stream(download_job.format_key):
                     f.write(line)
 
