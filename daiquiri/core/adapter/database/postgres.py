@@ -46,18 +46,6 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         'double precision': {
             'datatype': 'double',
             'arraysize': False
-        },
-        'timestamp': {
-            'datatype': 'timestamp',
-            'arraysize': False
-        },
-        'array': {
-            'datatype': 'array',
-            'arraysize': True
-        },
-        'spoint': {
-            'datatype': 'spoint',
-            'arraysize': False
         }
     }
 
@@ -421,8 +409,8 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
             else:
                 column['arraysize'] = None
         else:
-            column['datatype'] = None
-            column['arraysize'] = None
+            column['datatype'] = 'char'
+            column['arraysize'] = 32
 
         column['order'] = ordinal_position
 
