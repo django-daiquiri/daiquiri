@@ -269,8 +269,9 @@ def get_job_sources(job):
 
 def get_job_column(job, display_column_name):
     try:
-        schema_name, table_name, column_name = job.metadata['display_columns'][display_column_name]
-    except ValueError:
+        schema_name, table_name, column_name = \
+            job.metadata['display_columns'][display_column_name]
+    except (ValueError, KeyError):
         return {}
 
     try:

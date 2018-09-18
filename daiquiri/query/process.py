@@ -114,7 +114,9 @@ def process_display_columns(processor_display_columns):
         if display_column_name not in seen:
             seen.add(display_column_name)
         else:
-            errors.append(_('Duplicate column name %(column)s') % {'column': display_column_name})
+            errors.append(_('Duplicate column name %(column)s') % {
+                'column': display_column_name
+            })
 
     if errors:
         raise ValidationError({

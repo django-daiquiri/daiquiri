@@ -6,6 +6,7 @@ def get_job_url(request, kwargs):
     base_name = request.resolver_match.url_name.rsplit('-', 1)[0]
     return reverse('%s:%s-detail' % (namespace, base_name), request=request, kwargs=kwargs)
 
+
 def get_job_results(request, job):
     namespace = request.resolver_match.namespace
 
