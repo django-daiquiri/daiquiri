@@ -68,7 +68,7 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
             'schema': self.escape_identifier(schema_name),
             'table': self.escape_identifier(table_name),
             'query': query,
-            'timeout': timeout * 1000,
+            'timeout': int(timeout * 1000),
             'max_records': max_records
         }
 
@@ -76,6 +76,19 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
             return 'SET SESSION statement_timeout TO %(timeout)s; COMMIT; CREATE TABLE %(schema)s.%(table)s AS %(query)s LIMIT %(max_records)s;' % params
         else:
             return 'SET SESSION statement_timeout TO %(timeout)s; COMMIT; CREATE TABLE %(schema)s.%(table)s AS %(query)s;' % params
+
+    def build_sync_query(self, query, timeout, max_records):
+        # construct the actual query
+        params = {
+            'query': query,
+            'timeout': int(timeout * 1000),
+            'max_records': max_records
+        }
+
+        if max_records is not None:
+            return 'SET SESSION statement_timeout TO %(timeout)s; COMMIT; %(query)s LIMIT %(max_records)s;' % params
+        else:
+            return 'SET SESSION statement_timeout TO %(timeout)s; COMMIT; %(query)s;' % params
 
     def submit_query(self, sql):
         self.execute(sql)

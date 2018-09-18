@@ -40,21 +40,9 @@ class BaseDownloadAdapter(object):
                 return generate_csv(self.generate_rows(prepend=prepend), columns)
 
             elif format_key == 'votable':
-                # add links for source dois
-                if sources:
-                    links = []
-                    for source in sources:
-                        links.append({
-                            'content-role': 'source',
-                            'href': get_doi_url(source['doi']),
-                            'name': '%(schema_name)s.%(table_name)s' % source,
-                        })
-                else:
-                    links = None
-
                 return generate_votable(self.generate_rows(prepend=prepend), columns,
                                         resource_name=schema_name, table_name=table_name,
-                                        links=links, query_status=status, empty=(nrows==0))
+                                        sources=sources, query_status=status, empty=(nrows==0))
 
             elif format_key == 'fits':
                 return generate_fits(self.generate_rows(prepend=prepend), columns,
