@@ -45,23 +45,33 @@ class SyncJobViewSet(JobViewSet):
 
     renderer_classes = (UWSErrorRenderer, )
 
+    def list(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.GET)
+        serializer.is_valid(raise_exception=True)
+
+        return self.perform_sync_job(request, serializer.data)
+
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
+        return self.perform_sync_job(request, serializer.data)
+
+    def perform_sync_job(self, request, data):
 
         # create the job objects
         job = self.get_queryset().model(
             job_type=Job.JOB_TYPE_SYNC,
             owner=(None if self.request.user.is_anonymous() else self.request.user),
-            response_format=serializer.data.get('RESPONSEFORMAT'),
-            max_records=serializer.data.get('MAXREC'),
-            run_id=serializer.data.get('RUNID'),
+            response_format=data.get('RESPONSEFORMAT'),
+            max_records=data.get('MAXREC'),
+            run_id=data.get('RUNID'),
             client_ip=get_client_ip(self.request)
         )
 
         # add parameters to the job object
         for parameter, model_field in self.parameter_map.items():
-            value = serializer.data.get(parameter)
+            value = data.get(parameter)
             if value is not None:
                 setattr(job, model_field, value)
 
