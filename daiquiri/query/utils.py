@@ -1,10 +1,13 @@
 import sys
 
 from django.conf import settings
+from django.urls import reverse
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 
+
 from daiquiri.core.adapter import DatabaseAdapter
+
 from daiquiri.core.utils import human2bytes
 from daiquiri.metadata.models import Schema, Table, Column, Function
 
@@ -105,12 +108,6 @@ def fetch_user_schema_metadata(user, jobs):
             schema['tables'].append(table)
 
     return [schema]
-
-
-def get_asterisk_columns(display_column):
-    schema_name, table_name, _ = display_column[1]
-    column_names = DatabaseAdapter().fetch_column_names(schema_name, table_name)
-    return [(column_name, (schema_name, table_name, column_name)) for column_name in column_names]
 
 
 def get_indexed_objects():
@@ -234,3 +231,85 @@ def check_permissions(user, keywords, tables, columns, functions):
 
     # return the error stack
     return list(set(messages))
+
+
+def get_job_sources(job):
+    sources = []
+
+    if 'tables' in job.metadata:
+        for schema_name, table_name in job.metadata['tables']:
+            table = {
+                'schema_name': schema_name,
+                'table_name': table_name
+            }
+
+            # fetch additional metadata from the metadata store
+            try:
+                original_table = Table.objects.get(
+                    name=table_name,
+                    schema__name=schema_name
+                )
+
+                table.update({
+                    'title': original_table.title,
+                    'description': original_table.description,
+                    'attribution': original_table.attribution,
+                    'license': original_table.license,
+                    'doi': original_table.doi,
+                    'url': reverse('metadata:table', args=[schema_name, table_name])
+                })
+
+                sources.append(table)
+
+            except Table.DoesNotExist:
+                pass
+
+    return sources
+
+
+def get_job_column(job, display_column_name):
+    try:
+        schema_name, table_name, column_name = job.metadata['display_columns'][display_column_name]
+    except ValueError:
+        return {}
+
+    try:
+        column = Column.objects.get(
+            name=column_name,
+            table__name=table_name,
+            table__schema__name=schema_name
+        )
+
+        return {
+            'name': column.description,
+            'description': column.description,
+            'unit': column.unit,
+            'ucd': column.ucd,
+            'utype': column.utype,
+            'datatype': column.datatype,
+            'arraysize': column.arraysize,
+            'principal': column.principal,
+            'indexed': False,
+            'std': column.std
+        }
+
+    except Column.DoesNotExist:
+        return {}
+
+
+def get_job_columns(job):
+    columns = []
+
+    if job.phase == job.PHASE_COMPLETED:
+        database_columns = DatabaseAdapter().fetch_columns(job.schema_name, job.table_name)
+
+        for database_column in database_columns:
+            column = get_job_column(job, database_column['name'])
+            column.update(database_column)
+            columns.append(column)
+
+    else:
+        for display_column in job.metadata['display_columns']:
+            columns.append(get_job_column(job, display_column))
+
+    return columns

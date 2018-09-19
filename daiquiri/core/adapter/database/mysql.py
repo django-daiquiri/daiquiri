@@ -78,6 +78,19 @@ class MySQLAdapter(BaseDatabaseAdapter):
         else:
             return 'CREATE TABLE %(schema)s.%(table)s ENGINE=MyISAM ( %(query)s );' % params
 
+    def build_sync_query(self, query, timeout, max_records):
+        # construct the actual query
+        params = {
+            'query': query,
+            'timeout': timeout,
+            'max_records': max_records
+        }
+
+        if max_records is not None:
+            return '%(query)s LIMIT %(max_records)s;' % params
+        else:
+            return '%(query)s;' % params
+
     def submit_query(self, sql):
         self.execute(sql)
 

@@ -7,7 +7,6 @@ import zipfile
 from celery import shared_task
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
 from django.db.utils import OperationalError, ProgrammingError, InternalError
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
@@ -43,9 +42,8 @@ class RunQueryTask(Task):
 def run_query(job_id):
     # always import daiquiri packages inside the task
     from daiquiri.core.adapter import DatabaseAdapter
-    from daiquiri.metadata.models import Table, Column
     from daiquiri.query.models import QueryJob
-    from daiquiri.query.utils import get_quota
+    from daiquiri.query.utils import get_quota, get_job_sources, get_job_columns
     from daiquiri.stats.models import Record
 
     # get logger
@@ -121,67 +119,10 @@ def run_query(job_id):
                 job.size = adapter.fetch_size(job.schema_name, job.table_name)
 
                 # fetch the metadata for used tables
-                job.metadata['sources'] = []
+                job.metadata['sources'] = get_job_sources(job)
 
-                if 'sources' in job.metadata:
-                    for schema_name, table_name in job.metadata['tables']:
-                        table = {
-                            'schema_name': schema_name,
-                            'table_name': table_name
-                        }
-
-                        # fetch additional metadata from the metadata store
-                        try:
-                            original_table = Table.objects.get(
-                                name=table_name,
-                                schema__name=schema_name
-                            )
-
-                            table.update({
-                                'title': original_table.title,
-                                'description': original_table.description,
-                                'attribution': original_table.attribution,
-                                'license': original_table.license,
-                                'doi': original_table.doi,
-                                'url': reverse('metadata:table', args=[schema_name, table_name])
-                            })
-
-                            job.metadata['sources'].append(table)
-
-                        except Table.DoesNotExist:
-                            pass
-
-                # fetch the metadata for the columns
-                job.metadata['columns'] = adapter.fetch_columns(job.schema_name, job.table_name)
-
-                # fetch additional metadata from the metadata store
-                for column in job.metadata['columns']:
-                    if column['name'] in job.metadata['display_columns']:
-
-                        try:
-                            schema_name, table_name, column_name = job.metadata['display_columns'][column['name']]
-                        except ValueError:
-                            continue
-
-                        try:
-                            original_column = Column.objects.get(
-                                name=column_name,
-                                table__name=table_name,
-                                table__schema__name=schema_name
-                            )
-
-                            column.update({
-                                'description': original_column.description,
-                                'unit': original_column.unit,
-                                'ucd': original_column.ucd,
-                                'utype': original_column.utype,
-                                'principal': original_column.principal,
-                                'indexed': False,
-                                'std': original_column.std
-                            })
-
-                        except Column.DoesNotExist:
-                            pass
+                # fetch the metadata for the columns and fetch additional metadata from the metadata store
+                job.metadata['columns'] = get_job_columns(job)
 
             # remove unneeded metadata
             job.metadata.pop('display_columns', None)
@@ -208,7 +149,6 @@ def run_query(job_id):
 @shared_task(base=Task)
 def create_download_file(download_id):
     # always import daiquiri packages inside the task
-    from daiquiri.core.adapter import DownloadAdapter
     from daiquiri.query.models import DownloadJob
 
     # get logger

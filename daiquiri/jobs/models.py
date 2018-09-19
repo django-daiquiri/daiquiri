@@ -112,6 +112,9 @@ class Job(models.Model):
     def run(self):
         raise NotImplementedError
 
+    def run_sync(self):
+        raise NotImplementedError
+
     def abort(self):
         raise NotImplementedError
 

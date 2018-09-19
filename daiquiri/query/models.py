@@ -3,16 +3,13 @@ import logging
 import os
 import six
 
-from collections import OrderedDict
-
 from celery.task.control import revoke
 
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.core.cache import cache
 from django.db import models
-from django.db.utils import OperationalError, ProgrammingError
-from django.urls import reverse
+from django.db.utils import OperationalError, ProgrammingError, InternalError, DataError
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
@@ -27,28 +24,30 @@ from queryparser.adql import ADQLQueryTranslator
 from queryparser.exceptions import QueryError, QuerySyntaxError
 
 from daiquiri.core.adapter import DatabaseAdapter, DownloadAdapter
+from daiquiri.core.generators import generate_votable
 from daiquiri.core.constants import ACCESS_LEVEL_CHOICES
 from daiquiri.jobs.models import Job
 from daiquiri.jobs.managers import JobManager
+from daiquiri.jobs.exceptions import JobError
 from daiquiri.files.utils import check_file, search_file
 
 from .managers import QueryJobManager, ExampleManager
 from .utils import (
     get_quota,
     get_max_active_jobs,
-    get_default_table_name,
     get_format_config,
-    get_user_schema_name,
-    get_asterisk_columns,
     get_indexed_objects,
-    check_permissions
+    check_permissions,
+    get_job_sources,
+    get_job_columns
 )
 from .process import (
     process_schema_name,
     process_table_name,
     process_query_language,
     process_queue,
-    process_response_format
+    process_response_format,
+    process_display_columns
 )
 from .tasks import run_query, create_download_file, create_archive_file
 
@@ -245,40 +244,21 @@ class QueryJob(Job):
         logger.debug('processor.functions = %s', processor.functions)
 
         # check permissions
-        permission_messages = check_permissions(self.owner, processor.keywords, processor.tables, processor.columns, processor.functions)
+        permission_messages = check_permissions(
+            self.owner,
+            processor.keywords,
+            processor.tables,
+            processor.columns,
+            processor.functions
+        )
         if permission_messages:
             raise ValidationError({
                 'query': permission_messages
             })
 
-        # process display_columns to expand *
-        display_columns = []
-        for display_column in processor.display_columns:
-            if display_column[0] == '*':
-                display_columns += get_asterisk_columns(display_column)
-            else:
-                display_columns.append(display_column)
-
-        # check for duplicate columns in display_columns
-        display_column_names = [column_name for column_name, column in display_columns]
-        seen = set()
-        duplicate_columns = []
-        for column_name in display_column_names:
-            if column_name not in seen:
-                seen.add(column_name)
-            else:
-                duplicate_columns.append(column_name)
-
-        if duplicate_columns:
-            raise ValidationError({
-                'query': [_('Duplicate column name \'%(column)s\'') % {
-                    'column': duplicate_column
-                } for duplicate_column in duplicate_columns]
-            })
-
         # initialize metadata and store map of aliases
         self.metadata = {
-            'display_columns': OrderedDict(display_columns),
+            'display_columns': process_display_columns(processor.display_columns),
             'tables': processor.tables
         }
 
@@ -288,7 +268,7 @@ class QueryJob(Job):
         # set clean flag
         self.is_clean = True
 
-    def run(self, sync=False):
+    def run(self):
         if not self.is_clean:
             raise Exception('job.process() was not called.')
 
@@ -298,7 +278,7 @@ class QueryJob(Job):
 
             # start the submit_query task in a syncronous or asuncronous way
             job_id = str(self.id)
-            if not settings.ASYNC or sync:
+            if not settings.ASYNC:
                 logger.info('job %s submitted (sync)' % self.id)
                 run_query.apply((job_id, ), task_id=job_id, throw=True)
 
@@ -310,6 +290,27 @@ class QueryJob(Job):
             raise ValidationError({
                 'phase': ['Job is not PENDING.']
             })
+
+    def run_sync(self):
+        adapter = DatabaseAdapter()
+
+        self.actual_query = adapter.build_sync_query(
+            self.native_query,
+            settings.QUERY_SYNC_TIMEOUT,
+            self.max_records
+        )
+
+        try:
+            return generate_votable(
+                adapter.fetchall(self.actual_query),
+                get_job_columns(self),
+                table_name=self.table_name,
+                sources=get_job_sources(self),
+                query_status='OK'
+            )
+        except (OperationalError, ProgrammingError, InternalError, DataError) as e:
+            self.error_summary = str(e)
+            raise JobError(e)
 
     def abort(self):
         if settings.ASYNC:

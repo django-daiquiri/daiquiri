@@ -7,7 +7,7 @@ import struct
 from django.contrib.sites.models import Site
 
 from daiquiri import __version__ as daiquiri_version
-
+from daiquiri.core.utils import get_doi_url
 
 def generate_csv(generator, fields):
     if sys.version_info.major >= 3:
@@ -27,8 +27,7 @@ def generate_csv(generator, fields):
             yield f.getvalue()
 
 
-def generate_votable(generator, fields, resource_name=None, table_name=None, links=None, query_status=None, empty=None):
-
+def generate_votable(generator, fields, resource_name=None, table_name=None, sources=None, query_status=None, empty=None):
         yield '''<?xml version="1.0"?>
 <VOTABLE version="1.3"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -49,15 +48,14 @@ def generate_votable(generator, fields, resource_name=None, table_name=None, lin
             yield '''
         <INFO name="QUERY_STATUS" value="OVERFLOW" />'''
 
-        if links:
-            for link in links:
-                attrs = []
-                for key in ['name', 'href', 'content-type', 'content-role']:
-                    if key in link and link[key]:
-                        attrs.append('%s="%s"' % (key, link[key]))
-
+        if sources:
+            for source in sources:
                 yield '''
-        <LINK %s />''' % ' '.join(attrs)
+        <LINK name="%(schema_name)s.%(table_name)s" content-role="source" href="%(href)s"/>''' % {
+            'schema_name': source['schema_name'],
+            'table_name': source['table_name'],
+            'href': get_doi_url(source['doi']) or ''
+        }
 
         if table_name:
             yield '''

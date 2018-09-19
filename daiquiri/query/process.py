@@ -1,11 +1,14 @@
 import six
 
+from collections import OrderedDict
+
 from django.conf import settings
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext as _
 
 from rest_framework.exceptions import ValidationError
 
 from daiquiri.core.utils import filter_by_access_level
+from daiquiri.core.adapter import DatabaseAdapter
 
 from .utils import get_user_schema_name, get_default_table_name
 
@@ -90,3 +93,32 @@ def process_response_format(response_format):
     else:
         # return the default response_format
         return settings.QUERY_DEFAULT_DOWNLOAD_FORMAT
+
+
+def process_display_columns(processor_display_columns):
+    # process display_columns to expand *
+    display_columns = []
+    for processor_display_column, original_column in processor_display_columns:
+        if processor_display_column == '*':
+            schema_name, table_name, tmp = original_column
+            for column_name in DatabaseAdapter().fetch_column_names(schema_name, table_name):
+                display_columns.append((column_name, (schema_name, table_name, column_name)))
+
+        else:
+            display_columns.append((processor_display_column, original_column))
+
+    # check for duplicate columns in display_columns
+    seen = set()
+    errors = []
+    for display_column_name, display_column in display_columns:
+        if display_column_name not in seen:
+            seen.add(display_column_name)
+        else:
+            errors.append(_('Duplicate column name %(column)s') % {'column': display_column_name})
+
+    if errors:
+        raise ValidationError({
+            'query': [error for error in errors]
+        })
+
+    return OrderedDict(display_columns)

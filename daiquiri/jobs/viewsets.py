@@ -1,5 +1,4 @@
 from django.http import HttpResponse, FileResponse
-from django.urls import reverse
 
 from rest_framework import viewsets
 from rest_framework.response import Response
@@ -22,6 +21,7 @@ from .serializers import (
 from .renderers import UWSRenderer, UWSErrorRenderer
 from .filters import UWSFilterBackend
 from .utils import get_job_url, get_job_results
+from .exceptions import JobError
 
 
 class JobViewSet(viewsets.GenericViewSet):
@@ -70,15 +70,9 @@ class SyncJobViewSet(JobViewSet):
         except ValidationError as e:
             raise ValidationError(self.rewrite_exception(e))
 
-        job.save()
-        job.run(sync=True)
-
-        # reload the job from the database since job.run() doesn't work on the same job object
-        job = self.get_queryset().get(pk=job.pk)
-
-        if job.phase == job.PHASE_COMPLETED:
-            return FileResponse(job.stream(job.response_format), content_type=job.formats[job.response_format])
-        else:
+        try:
+            return FileResponse(job.run_sync(), content_type=job.formats[job.response_format])
+        except JobError:
             return Response(job.error_summary, content_type='application/xml')
 
 

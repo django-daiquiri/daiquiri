@@ -76,6 +76,7 @@ QUERY_QUOTA = {
     'users': {},
     'groups': {}
 }
+QUERY_SYNC_TIMEOUT = 5
 QUERY_MAX_ACTIVE_JOBS = {
     'anonymous': '1'
 }
