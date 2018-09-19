@@ -46,6 +46,7 @@ from .process import (
 from .tasks import run_query, create_download_file, create_archive_file
 
 logger = logging.getLogger(__name__)
+query_logger = logging.getLogger('query')
 
 
 class QueryJob(Job):
@@ -133,6 +134,8 @@ class QueryJob(Job):
         return [column['name'] for column in self.metadata['columns']]
 
     def process(self):
+        # log the query to the query log
+        query_logger.info('"%s" %s %s', self.query, self.query_language, self.owner or 'anonymous')
 
         # process all the things!
         self.schema_name = process_schema_name(self.owner, self.schema_name)
@@ -157,17 +160,18 @@ class QueryJob(Job):
                 'query': [_('Too many active jobs. Please abort some of your active jobs or wait until they are completed.')]
             })
 
-        # log the input query
+        # log the input query to the debug log
         logger.debug('query = "%s"', self.query)
 
+        # translate the query from adql
         translated_query = translate_query(self.query_language, self.query)
 
-        # log the translated query
+        # log the translated query to the debug log
         logger.debug('translated_query = "%s"', translated_query)
 
         processor = process_query(translated_query)
 
-        # log the processor output
+        # log the processor output to the debug log
         logger.debug('native_query = "%s"', processor.query)
         logger.debug('processor.keywords = %s', processor.keywords)
         logger.debug('processor.tables = %s', processor.tables)

@@ -40,6 +40,12 @@ LOGGING = {
             'filename': 'daiquiri.log',
             'formatter': 'name'
         },
+        'query_log': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'query.log',
+            'formatter': 'default'
+        },
         'sql_log': {
             'level': 'DEBUG',
             'filters': ['require_debug_true'],
@@ -79,6 +85,11 @@ LOGGING = {
         },
         'daiquiri': {
             'handlers': ['daiquiri_log'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            'propagate': False
+        },
+        'query': {
+            'handlers': ['query_log'],
             'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
             'propagate': False
         },
