@@ -1,16 +1,25 @@
 import six
+import json
 
 from collections import OrderedDict
 
 from django.conf import settings
+from django.core.cache import cache
 from django.utils.translation import ugettext as _
 
 from rest_framework.exceptions import ValidationError
 
+from queryparser.adql import ADQLQueryTranslator
+from queryparser.exceptions import QueryError, QuerySyntaxError
+
 from daiquiri.core.utils import filter_by_access_level
 from daiquiri.core.adapter import DatabaseAdapter
 
-from .utils import get_user_schema_name, get_default_table_name
+from .utils import (
+    get_user_schema_name,
+    get_default_table_name,
+    get_indexed_objects
+)
 
 
 def process_schema_name(user, schema_name):
@@ -95,6 +104,86 @@ def process_response_format(response_format):
         return settings.QUERY_DEFAULT_DOWNLOAD_FORMAT
 
 
+def translate_query(query_language, query):
+    # get the adapter
+    adapter = DatabaseAdapter()
+
+    # translate adql -> mysql string
+    if query_language == 'adql-2.0':
+        try:
+            translator = cache.get_or_set('translator', ADQLQueryTranslator(), 3600)
+            translator.set_query(query)
+
+            if adapter.database_config['ENGINE'] == 'django.db.backends.mysql':
+                return translator.to_mysql()
+            elif adapter.database_config['ENGINE'] == 'django.db.backends.postgresql':
+                return translator.to_postgresql()
+            else:
+                raise Exception('Unknown database engine')
+
+        except QuerySyntaxError as e:
+            raise ValidationError({
+                'query': {
+                    'messages': [_('There has been an error while translating your query.')],
+                    'positions': json.dumps(e.syntax_errors),
+                }
+            })
+
+        except QueryError as e:
+            raise ValidationError({
+                'query': {
+                    'messages': e.messages,
+                }
+            })
+
+    else:
+        return query
+
+
+def process_query(query):
+    # get the adapter
+    adapter = DatabaseAdapter()
+
+    try:
+        if adapter.database_config['ENGINE'] == 'django.db.backends.mysql':
+
+            from queryparser.mysql import MySQLQueryProcessor
+            processor = MySQLQueryProcessor(query)
+
+        elif adapter.database_config['ENGINE'] == 'django.db.backends.postgresql':
+
+            from queryparser.postgresql import PostgreSQLQueryProcessor
+            processor = cache.get_or_set('processor', PostgreSQLQueryProcessor(
+                indexed_objects=get_indexed_objects()
+            ), 3600)
+            processor.set_query(query)
+            processor.process_query()
+
+        else:
+            raise Exception('Unknown database engine')
+
+        processor.process_query(replace_schema_name={
+            'TAP_SCHEMA': settings.TAP_SCHEMA
+        })
+
+    except QuerySyntaxError as e:
+        raise ValidationError({
+            'query': {
+                'messages': [_('There has been an error while parsing your query.')],
+                'positions': json.dumps(e.syntax_errors),
+            }
+        })
+
+    except QueryError as e:
+        raise ValidationError({
+            'query': {
+                'messages': e.messages,
+            }
+        })
+
+    return processor
+
+
 def process_display_columns(processor_display_columns):
     # process display_columns to expand *
     display_columns = []
@@ -114,7 +203,9 @@ def process_display_columns(processor_display_columns):
         if display_column_name not in seen:
             seen.add(display_column_name)
         else:
-            errors.append(_('Duplicate column name %(column)s') % {'column': display_column_name})
+            errors.append(_('Duplicate column name %(column)s') % {
+                'column': display_column_name
+            })
 
     if errors:
         raise ValidationError({

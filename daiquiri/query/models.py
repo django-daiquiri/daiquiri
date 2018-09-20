@@ -1,4 +1,3 @@
-import json
 import logging
 import os
 import six
@@ -7,7 +6,6 @@ from celery.task.control import revoke
 
 from django.conf import settings
 from django.contrib.auth.models import Group
-from django.core.cache import cache
 from django.db import models
 from django.db.utils import OperationalError, ProgrammingError, InternalError, DataError
 from django.utils.encoding import python_2_unicode_compatible
@@ -17,11 +15,6 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework.exceptions import ValidationError
 
 from jsonfield import JSONField
-
-from queryparser.mysql import MySQLQueryProcessor
-from queryparser.postgresql import PostgreSQLQueryProcessor
-from queryparser.adql import ADQLQueryTranslator
-from queryparser.exceptions import QueryError, QuerySyntaxError
 
 from daiquiri.core.adapter import DatabaseAdapter, DownloadAdapter
 from daiquiri.core.generators import generate_votable
@@ -36,7 +29,6 @@ from .utils import (
     get_quota,
     get_max_active_jobs,
     get_format_config,
-    get_indexed_objects,
     check_permissions,
     get_job_sources,
     get_job_columns
@@ -47,11 +39,14 @@ from .process import (
     process_query_language,
     process_queue,
     process_response_format,
+    translate_query,
+    process_query,
     process_display_columns
 )
 from .tasks import run_query, create_download_file, create_archive_file
 
 logger = logging.getLogger(__name__)
+query_logger = logging.getLogger('query')
 
 
 class QueryJob(Job):
@@ -139,6 +134,8 @@ class QueryJob(Job):
         return [column['name'] for column in self.metadata['columns']]
 
     def process(self):
+        # log the query to the query log
+        query_logger.info('"%s" %s %s', self.query, self.query_language, self.owner or 'anonymous')
 
         # process all the things!
         self.schema_name = process_schema_name(self.owner, self.schema_name)
@@ -163,81 +160,19 @@ class QueryJob(Job):
                 'query': [_('Too many active jobs. Please abort some of your active jobs or wait until they are completed.')]
             })
 
-        # get the adapter
-        adapter = DatabaseAdapter()
-
-        # log the input query
+        # log the input query to the debug log
         logger.debug('query = "%s"', self.query)
 
-        # translate adql -> mysql string
-        if self.query_language == 'adql-2.0':
-            try:
-                translator = cache.get_or_set('translator', ADQLQueryTranslator(), 3600)
-                translator.set_query(self.query)
+        # translate the query from adql
+        translated_query = translate_query(self.query_language, self.query)
 
-                if adapter.database_config['ENGINE'] == 'django.db.backends.mysql':
-                    translated_query = translator.to_mysql()
-                elif adapter.database_config['ENGINE'] == 'django.db.backends.postgresql':
-                    translated_query = translator.to_postgresql()
-                else:
-                    raise Exception('Unknown database engine')
-
-            except QuerySyntaxError as e:
-                raise ValidationError({
-                    'query': {
-                        'messages': [_('There has been an error while translating your query.')],
-                        'positions': json.dumps(e.syntax_errors),
-                    }
-                })
-
-            except QueryError as e:
-                raise ValidationError({
-                    'query': {
-                        'messages': e.messages,
-                    }
-                })
-
-        else:
-            translated_query = self.query
-
-        # log the translated query
+        # log the translated query to the debug log
         logger.debug('translated_query = "%s"', translated_query)
 
-        # parse the query
-        try:
-            if adapter.database_config['ENGINE'] == 'django.db.backends.mysql':
-                processor = MySQLQueryProcessor(translated_query)
-            elif adapter.database_config['ENGINE'] == 'django.db.backends.postgresql':
+        processor = process_query(translated_query)
 
-                processor = cache.get_or_set('processor', PostgreSQLQueryProcessor(indexed_objects=get_indexed_objects()), 3600)
-                processor.set_query(translated_query)
-                processor.process_query()
-            else:
-                raise Exception('Unknown database engine')
-
-            processor.process_query(replace_schema_name={
-                'TAP_SCHEMA': settings.TAP_SCHEMA
-            })
-
-        except QuerySyntaxError as e:
-            raise ValidationError({
-                'query': {
-                    'messages': [_('There has been an error while parsing your query.')],
-                    'positions': json.dumps(e.syntax_errors),
-                }
-            })
-
-        except QueryError as e:
-            raise ValidationError({
-                'query': {
-                    'messages': e.messages,
-                }
-            })
-
-        # log the native query
+        # log the processor output to the debug log
         logger.debug('native_query = "%s"', processor.query)
-
-        # log the processor output
         logger.debug('processor.keywords = %s', processor.keywords)
         logger.debug('processor.tables = %s', processor.tables)
         logger.debug('processor.columns = %s', processor.columns)

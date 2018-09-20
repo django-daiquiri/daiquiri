@@ -11,19 +11,25 @@ from test_generator.core import TestMixin
 
 class SyncTestMixin(TestMixin):
 
-    def _test_get_job_list(self, username):
+    def _test_get_job_list_create(self, username):
         '''
-        GET /{jobs} returns 404.
+        GET /{jobs} with an ulrencodes set of KEY=VALUE as query params
+        creates a job with these parameters and returns a VOTable
         '''
-        url = reverse(self.url_names['list'])
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 405)
+        for new_job in self.get_parameter_for_new_jobs(username):
+            url = reverse(self.url_names['list']) + '?' + urlencode(new_job)
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200, msg=(
+                ('username', username),
+                ('url', url),
+                ('data', new_job),
+                ('status_code', response.status_code)
+            ))
 
     def _test_post_job_list_create(self, username):
         '''
         POST /{jobs} with an application/x-www-form-urlencoded set of KEY=VALUE
-        creates a job with these parameters and redirects to /{jobs}/{job-id}
-        as 303.
+        creates a job with these parameters and returns a VOTable
         '''
         for new_job in self.get_parameter_for_new_jobs(username):
             url = reverse(self.url_names['list'])
