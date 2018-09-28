@@ -8,6 +8,7 @@ import re
 import sys
 
 from datetime import datetime
+from xml.dom import minidom
 
 from django import forms
 from django.conf import settings
@@ -25,17 +26,17 @@ from ipware.ip import get_real_ip
 
 import xlsxwriter
 
-if sys.version_info.major >= 3:
-    long_type = int
-else:
-    long_type = long
-
 from daiquiri.core.constants import (
     GROUPS,
     ACCESS_LEVEL_PRIVATE,
     ACCESS_LEVEL_INTERNAL,
     ACCESS_LEVEL_PUBLIC
 )
+
+if sys.version_info.major >= 3:
+    long_type = int
+else:
+    long_type = long
 
 
 def import_class(string):
@@ -335,4 +336,17 @@ def render_to_xlsx(request, filename, columns, rows):
 
     workbook.close()
 
+    return response
+
+
+def render_to_xml(request, renderer, data, filename=None, content_type='application/xml'):
+    # crete xml structure
+    xml = renderer.render(data)
+
+    # prettify xml
+    pretty_xml = minidom.parseString(xml).toprettyxml()
+
+    response = HttpResponse(pretty_xml, content_type=content_type)
+    if filename:
+        response['Content-Disposition'] = 'filename="%s"' % filename
     return response

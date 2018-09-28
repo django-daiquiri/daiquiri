@@ -93,12 +93,10 @@ def to_safe_str(value):
 
 
 @register.filter()
-@stringfilter
 def default_blank(value):
     return value if value else ''
 
 
 @register.filter()
-@stringfilter
 def default_blank_unit(value, unit):
-    return value + ' ' + unit if value else ''
+    return str(value) + ' ' + unit if value else ''
