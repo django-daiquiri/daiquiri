@@ -173,8 +173,8 @@ STATS_RESOURCE_TYPES = [
         'label': 'File downloads'
     },
     {
-        'key': 'QUERY_JOB',
-        'label': 'Query jobs'
+        'key': 'QUERY',
+        'label': 'Queries'
     }
 ]
 

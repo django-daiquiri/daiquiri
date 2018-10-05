@@ -131,10 +131,12 @@ def run_query(job_id):
             # create a stats record for this job
             Record.objects.create(
                 time=job.end_time,
-                resource_type='QUERY_JOB',
+                resource_type='QUERY',
                 resource={
                     'job_id': job.id,
                     'job_type': job.job_type,
+                    'query': job.query,
+                    'query_language': job.query_language,
                     'sources': job.metadata.get('sources', [])
                 },
                 client_ip=job.client_ip,

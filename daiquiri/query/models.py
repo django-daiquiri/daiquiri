@@ -242,10 +242,12 @@ class QueryJob(Job):
         # create a stats record for this job
         Record.objects.create(
             time=now(),
-            resource_type='QUERY_JOB',
+            resource_type='QUERY',
             resource={
-                'job_id': self.id,
+                'job_id': None,
                 'job_type': self.job_type,
+                'query': self.query,
+                'query_language': self.query_language,
                 'sources': job_sources
             },
             client_ip=self.client_ip,
