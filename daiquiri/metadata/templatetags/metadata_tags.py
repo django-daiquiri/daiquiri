@@ -45,9 +45,10 @@ def doi_panel(doi, dataset=_('dataset')):
 
 
 @register.inclusion_tag('metadata/tags/license_panel.html')
-def license_panel(license):
+def license_panel(license, dataset=_('dataset')):
     return {
         'license': license,
         'license_url': LICENSE_URLS[license],
-        'license_label': dict(LICENSE_CHOICES)[license]
+        'license_label': dict(LICENSE_CHOICES)[license],
+        'dataset': dataset
     }

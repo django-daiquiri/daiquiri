@@ -1,7 +1,7 @@
 {% load static %}
 {% load i18n %}
 
-<div class="panel panel-default">
+<div class="panel panel-default panel-license">
     <div class="panel-heading">{% trans 'License' %}</div>
     <div class="panel-body">
         <p class="text-center">
@@ -9,7 +9,7 @@
         </p>
         <p>
             {% blocktrans %}
-            This schema is published under the <a href="{{ license_url }}" target="_blank">{{ license_label }}</a>.
+            This {{ dataset }} is published under the <a href="{{ license_url }}" target="_blank">{{ license_label }}</a>.
             {% endblocktrans %}
         </p>
     </div>
