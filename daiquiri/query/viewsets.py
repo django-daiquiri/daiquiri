@@ -140,7 +140,7 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
 
     @list_route(methods=['get'])
     def tables(self, request):
-        queryset = self.get_queryset().exclude(phase=QueryJob.PHASE_ARCHIVED)[:100]
+        queryset = self.get_queryset().filter(phase=QueryJob.PHASE_COMPLETED)[:100]
         return Response(fetch_user_schema_metadata(request.user, queryset))
 
     @detail_route(methods=['put'])

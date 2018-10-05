@@ -93,19 +93,18 @@ def fetch_user_schema_metadata(user, jobs):
     }
 
     for job in jobs:
-        if job.phase == job.PHASE_COMPLETED:
-            table = {
-                'name': job.table_name,
-                'query_strings': [schema_name, job.table_name]
-            }
+        table = {
+            'name': job.table_name,
+            'query_strings': [schema_name, job.table_name]
+        }
 
-            if job.metadata:
-                table['columns'] = job.metadata.get('columns', {})
+        if job.metadata:
+            table['columns'] = job.metadata.get('columns', {})
 
-                for column in table['columns']:
-                    column['query_strings'] = [column['name']]
+            for column in table['columns']:
+                column['query_strings'] = [column['name']]
 
-            schema['tables'].append(table)
+        schema['tables'].append(table)
 
     return [schema]
 
