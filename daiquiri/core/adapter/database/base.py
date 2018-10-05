@@ -25,7 +25,11 @@ class BaseDatabaseAdapter(object):
 
         if as_dict:
             columns = cursor.description
-            return {column.name: value for column, value in zip(columns, cursor.fetchone())}
+            row = cursor.fetchone()
+            if row:
+                return {column.name: value for column, value in zip(columns, row)}
+            else:
+                return None
         else:
             return cursor.fetchone()
 
