@@ -11,6 +11,7 @@ from django.db.utils import OperationalError, ProgrammingError, InternalError, D
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
+from django.utils.timezone import now
 
 from rest_framework.exceptions import ValidationError
 
@@ -23,6 +24,7 @@ from daiquiri.jobs.models import Job
 from daiquiri.jobs.managers import JobManager
 from daiquiri.jobs.exceptions import JobError
 from daiquiri.files.utils import check_file, search_file
+from daiquiri.stats.models import Record
 
 from .managers import QueryJobManager, ExampleManager
 from .utils import (
@@ -235,12 +237,27 @@ class QueryJob(Job):
             self.max_records
         )
 
+        job_sources = get_job_sources(self)
+
+        # create a stats record for this job
+        Record.objects.create(
+            time=now(),
+            resource_type='QUERY_JOB',
+            resource={
+                'job_id': self.id,
+                'job_type': self.job_type,
+                'sources': job_sources
+            },
+            client_ip=self.client_ip,
+            user=self.owner
+        )
+
         try:
             return generate_votable(
                 adapter.fetchall(self.actual_query),
                 get_job_columns(self),
                 table_name=self.table_name,
-                sources=get_job_sources(self),
+                sources=job_sources,
                 query_status='OK'
             )
         except (OperationalError, ProgrammingError, InternalError, DataError) as e:
