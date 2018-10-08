@@ -30,6 +30,8 @@ def search_file(search_path):
         normalized_file_path = normalize_file_path(directory_path, search_path)
         absolute_file_path = os.path.join(directory_path, normalized_file_path)
 
+        logger.debug('absolute_file_path = %s', absolute_file_path)
+
         if os.path.isfile(absolute_file_path):
             results.add(absolute_file_path)
 
