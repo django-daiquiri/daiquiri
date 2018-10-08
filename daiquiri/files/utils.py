@@ -24,6 +24,8 @@ def check_file(user, file_path):
 def search_file(search_path):
     base_path = os.path.normpath(settings.FILES_BASE_PATH)
 
+    logger.debug('base_path = %s', base_path)
+
     # look for the file in all directory below the base path
     results = set()
     for directory_path, _, _ in os.walk(base_path):
