@@ -16,25 +16,29 @@ class FileViewSet(viewsets.GenericViewSet):
     def list(self, request):
 
         search = request.GET.get('search', None)
+        path = request.GET.get('path', None)
 
         logger.debug('search = "%s"', search)
+        logger.debug('path = "%s"', path)
 
         if search:
-            file_path = search_file(search)
-            has_permission = check_file(request.user, file_path)
-
+            file_path = search_file(search, path)
             logger.debug('file_path = "%s"', file_path)
-            logger.debug('result = "%s"', has_permission)
 
-            if file_path and has_permission:
-
-                if request.GET.get('download', True):
-                    return send_file(request, file_path, search)
-                else:
-                    # send an empty response
-                    return Response()
-            else:
+            if file_path is None:
                 raise NotFound()
+
+            has_permission = check_file(request.user, file_path)
+            logger.debug('has_permission = "%s"', has_permission)
+
+            if has_permission is None:
+                raise NotFound()
+
+            if request.GET.get('download', True):
+                return send_file(request, file_path, search)
+            else:
+                # send an empty response
+                return Response()
 
         else:
             raise ValidationError({

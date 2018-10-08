@@ -1,5 +1,6 @@
 import logging
 import os
+import subprocess
 
 from sendfile import sendfile
 
@@ -14,6 +15,15 @@ from .models import Directory
 logger = logging.getLogger(__name__)
 
 
+def find_files(base_path, path, file_name):
+    args = ['find', path, '-type', 'f', '-name', file_name]
+    logger.debug('`%s`', ' '.join(args))
+
+    output = subprocess.check_output(args, cwd=base_path)
+    files = output.split()
+    return files
+
+
 def check_file(user, file_path):
     # loop over all directories beginning with the hights depth and return as soon as a directory matches
     for directory in Directory.objects.order_by('-depth'):
@@ -21,33 +31,32 @@ def check_file(user, file_path):
             return Directory.objects.filter_by_access_level(user).filter(pk=directory.pk).exists()
 
 
-def search_file(search_path):
+def search_file(file_name, directory_path=None):
     base_path = os.path.normpath(settings.FILES_BASE_PATH)
-
     logger.debug('base_path = %s', base_path)
 
-    # look for the file in all directory below the base path
-    results = set()
-    for directory_path, _, _ in os.walk(base_path):
-        normalized_file_path = normalize_file_path(directory_path, search_path)
-        absolute_file_path = os.path.join(directory_path, normalized_file_path)
+    if directory_path:
+        try:
+            directory = Directory.objects.get(path=directory_path)
+            files = find_files(base_path, directory.path, file_name)
+        except Directory.DoesNotExist:
+            return None
+    else:
+        files = []
+        for directory in Directory.objects.order_by('-depth'):
+            files += find_files(base_path, directory.path, file_name)
 
-        logger.debug('absolute_file_path = %s', absolute_file_path)
-
-        if os.path.isfile(absolute_file_path):
-            results.add(absolute_file_path)
-
-    if len(results) == 1:
+    if len(files) == 1:
         # subtract the base path and return
-        file_path = results.pop().split(base_path, 1)[1].lstrip('/')
+        file_path = files.pop()
 
-        logger.debug('%s => %s', search_path, file_path)
+        logger.debug('file_name = %s found at %s', file_name, file_path)
         return file_path
-    elif len(results) > 1:
-        logger.debug('search_path = %s found more than once', search_path)
+    elif len(files) > 1:
+        logger.debug('file_name = %s found more than once', file_name)
         return None
     else:
-        logger.debug('search_path = %s not found', search_path)
+        logger.debug('file_name = %s not found', file_name)
         return None
 
 
