@@ -12,7 +12,7 @@ class AccessLevelQuerySet(models.QuerySet):
             q = models.Q(access_level=ACCESS_LEVEL_PUBLIC) | \
                 models.Q(access_level=ACCESS_LEVEL_INTERNAL) | \
                 models.Q(groups__in=user.groups.all())
-            return self.filter(q)
+            return self.filter(q).distinct()
 
     def filter_by_metadata_access_level(self, user):
         if not user or user.is_anonymous():
@@ -21,7 +21,7 @@ class AccessLevelQuerySet(models.QuerySet):
             q = models.Q(metadata_access_level=ACCESS_LEVEL_PUBLIC) | \
                 models.Q(metadata_access_level=ACCESS_LEVEL_INTERNAL) | \
                 models.Q(groups__in=user.groups.all())
-            return self.filter(q)
+            return self.filter(q).distinct()
 
 
 class AccessLevelManager(models.Manager):
