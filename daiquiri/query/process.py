@@ -153,18 +153,21 @@ def process_query(query):
         elif adapter.database_config['ENGINE'] == 'django.db.backends.postgresql':
 
             from queryparser.postgresql import PostgreSQLQueryProcessor
-            processor = cache.get_or_set('processor', PostgreSQLQueryProcessor(
-                indexed_objects=get_indexed_objects()
-            ), 3600)
+
+            processor = cache.get_or_set('processor', PostgreSQLQueryProcessor(), 3600)
+
+            # first run to replace with get_indexed_objects
             processor.set_query(query)
+            processor.process_query(indexed_objects=get_indexed_objects(), replace_schema_name={
+                'TAP_SCHEMA': settings.TAP_SCHEMA
+            })
+
+            # second run
+            processor.set_query(processor.query)
             processor.process_query()
 
         else:
             raise Exception('Unknown database engine')
-
-        processor.process_query(replace_schema_name={
-            'TAP_SCHEMA': settings.TAP_SCHEMA
-        })
 
     except QuerySyntaxError as e:
         raise ValidationError({
