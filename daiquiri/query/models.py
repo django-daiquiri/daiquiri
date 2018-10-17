@@ -488,11 +488,6 @@ class QueryArchiveJob(Job):
         return os.path.join(directory_name, '%s.%s.zip' % (self.job.table_name, self.column_name))
 
     def process(self):
-        try:
-            get_format_config(self.format_key)
-        except IndexError:
-            raise ValidationError({'format_key': "Not supported."})
-
         if self.job.phase == self.PHASE_COMPLETED:
             self.owner = self.job.owner
         else:
@@ -515,7 +510,6 @@ class QueryArchiveJob(Job):
 
         # prepare list of files for this job
         files = []
-
         for row in rows:
             file_path = search_file(row[0])
 
