@@ -19,9 +19,12 @@ def find_files(base_path, path, file_name):
     args = ['find', path, '-type', 'f', '-name', file_name]
     logger.debug('`%s`', ' '.join(args))
 
-    output = subprocess.check_output(args, cwd=base_path)
-    files = output.split()
-    return files
+    try:
+        output = subprocess.check_output(args, cwd=base_path)
+        files = output.decode().split()
+        return files
+    except subprocess.CalledProcessError:
+        return []
 
 
 def check_file(user, file_path):
