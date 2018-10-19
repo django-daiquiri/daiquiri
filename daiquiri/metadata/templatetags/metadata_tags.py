@@ -1,5 +1,6 @@
 from django import template
 from django.utils.translation import ugettext_lazy as _
+from django.utils.html import format_html
 
 from daiquiri.core.constants import LICENSE_CHOICES, LICENSE_URLS
 from daiquiri.core.utils import get_doi_url
@@ -34,6 +35,12 @@ def access_panel(doi, dataset=_('dataset')):
     return {
         'dataset': dataset
     }
+
+
+@register.simple_tag()
+def doi_link(doi):
+    url = get_doi_url(doi)
+    return format_html('<a class="break" href="{}">{}</a>', url, url)
 
 
 @register.inclusion_tag('metadata/tags/doi_panel.html')
