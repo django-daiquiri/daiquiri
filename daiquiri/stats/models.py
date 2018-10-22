@@ -17,7 +17,7 @@ class Record(models.Model):
     resource = JSONField()
 
     client_ip = models.GenericIPAddressField(blank=True, null=True)
-    user = models.ForeignKey(User, blank=True, null=True)
+    user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
 
     class Meta:
         ordering = ('-time', )
