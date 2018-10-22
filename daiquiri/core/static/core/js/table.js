@@ -27,7 +27,7 @@ angular.module('core')
                 return JSON.stringify(row);
             },
             file_url: function(row, column_index) {
-                return service.files_url + '?search=' + window.encodeURIComponent(row[column_index]);
+                return service.files_url + row[column_index];
             },
             reference_url: function(row, column_index) {
                 var key = window.encodeURIComponent(service.columns[column_index].name),
@@ -100,37 +100,21 @@ angular.module('core')
                 // check column ucds for display mode
                 angular.forEach(service.columns, function(column) {
                     // the default display mode is 'text'
-                    column.display = 'text'
+                    column.meta = 'text'
 
                     if (column.ucd) {
-                        if (column.ucd.indexOf('meta.note') > -1) {
-                            if (service.files_url) {
-                                column.display = 'modal';
+                        if (column.ucd.indexOf('meta.ref') > -1) {
+                            if (column.ucd.indexOf('meta.note') > -1) {
+                                column.meta = 'note';
+                            } else if (column.ucd.indexOf('meta.image') > -1) {
+                                column.meta = 'image';
+                            } else if (column.ucd.indexOf('meta.file') > -1) {
+                                column.meta = 'file';
+                            } else if (column.ucd.indexOf('meta.ref.url') > -1) {
+                                column.meta = 'link';
                             } else {
-                                column.display = 'link';
+                                column.meta = 'reference';
                             }
-                        } else if (column.ucd.indexOf('meta.preview') > -1) {
-                            if (service.files_url) {
-                                column.display = 'modal';
-                            } else {
-                                column.display = 'link';
-                            }
-                        } else if (column.ucd.indexOf('meta.file') > -1) {
-                            if (service.files_url) {
-                                column.display = 'file';
-                            } else {
-                                column.display = 'link';
-                            }
-                        } else if (column.ucd.indexOf('meta.ref') > -1) {
-                            if (service.references_url) {
-                                column.display = 'reference';
-                            } else {
-                                column.display = 'link';
-                            }
-                        } else if (column.ucd.indexOf('meta.ref.uri') > -1) {
-                            column.display = 'link';
-                        } else if (column.ucd.indexOf('meta.ref.url') > -1) {
-                            column.display = 'link';
                         }
                     }
                 });
@@ -307,18 +291,17 @@ angular.module('core')
     };
 
     service.modal_update = function() {
-        var file_path = service.rows[service.active.row_index][service.active.column_index];
-        var url = service.files_url + '?search=' + file_path;
+        var url = service.getter.file_url(service.rows[service.active.row_index], service.active.column_index);
         var column = service.columns[service.active.column_index];
 
-        service.modal.title = file_path;
+        service.modal.title = service.rows[service.active.row_index][service.active.column_index];
 
-        if (column.ucd.indexOf('meta.note') > -1) {
+        if (column.meta == 'note') {
             return $http.get(url).then(function(result) {
                 service.modal.pre = result.data;
                 service.modal.src = null;
             });
-        } else if (column.ucd.indexOf('meta.preview') > -1) {
+        } else if (column.meta == 'image') {
             service.modal.pre = null;
             service.modal.src = url;
 
@@ -370,7 +353,7 @@ angular.module('core')
             }
 
             var column = service.columns[current_column_index];
-            if (column.ucd !== null && (column.ucd.indexOf('meta.note') > -1 || column.ucd.indexOf('meta.preview') > -1)) {
+            if (column.meta == 'note' || column.meta == 'image') {
                 next_column_index = current_column_index;
             }
         }
@@ -391,7 +374,7 @@ angular.module('core')
             }
 
             var column = service.columns[current_column_index];
-            if (column.ucd !== null && (column.ucd.indexOf('meta.note') > -1 || column.ucd.indexOf('meta.preview') > -1)) {
+            if (column.meta == 'note' || column.meta == 'image') {
                 next_column_index = current_column_index;
             }
         }

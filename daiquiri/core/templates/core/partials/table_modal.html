@@ -1,6 +1,6 @@
 {% load i18n %}
 
-<div class="modal" id="daiquiri-table-modal" tabindex="-1">
+<div class="modal daiquiri-table-modal" id="daiquiri-table-modal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -12,28 +12,26 @@
                 </h4>
             </div>
 
-            <div class="modal-body">
-                <pre ng-show="service.table.modal.pre">{$ service.table.modal.pre $}</pre>
-                <img class="center-block" ng-show="service.table.modal.src" ng-src="{$ service.table.modal.src $}" />
+            <div class="modal-pagination">
+                <a class="modal-pagination-left" href="" ng-click="service.table.modal_left()">
+                    <span class="fa fa-chevron-left fa-4x"></span>
+                </a>
+                <a class="modal-pagination-right" href="" ng-click="service.table.modal_right()">
+                    <span class="fa fa-chevron-right fa-4x"></span>
+                </a>
+                <a class="modal-pagination-up" href="" ng-click="service.table.modal_up()">
+                    <span class="fa fa-chevron-up fa-4x"></span>
+                </a>
+                <a class="modal-pagination-down" href="" ng-click="service.table.modal_down()">
+                    <span class="fa fa-chevron-down fa-4x"></span>
+                </a>
             </div>
 
-            <div class="modal-footer">
-                <div class="pull-left">
-                    <button type="button" class="btn btn-default" ng-click="service.table.modal_left()">
-                        {% trans 'Previous column' %}
-                    </button>
-                    <button type="button" class="btn btn-default" ng-click="service.table.modal_right()">
-                        {% trans 'Next column' %}
-                    </button>
-                </div>
-                <div>
-                    <button type="button" class="btn btn-default" ng-click="service.table.modal_up()">
-                        {% trans 'Previous row' %}
-                    </button>
-                    <button type="button" class="btn btn-default" ng-click="service.table.modal_down()">
-                        {% trans 'Next row' %}
-                    </button>
-                </div>
+            <div class="modal-body">
+                <pre ng-show="service.table.modal.pre">{$ service.table.modal.pre $}</pre>
+                <img class="center-block" ng-show="service.table.modal.src"
+                    ng-src="{$ service.table.modal.src $}" ng-attr-alt="{$ service.table.modal.title $}" />
+
             </div>
         </div>
     </div>

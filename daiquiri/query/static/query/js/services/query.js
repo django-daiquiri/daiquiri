@@ -308,7 +308,7 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
                     service.table.init({
                         rows_url: 'query/api/jobs/' + service.job.id +'/rows/',
                         columns_url: 'query/api/jobs/' + service.job.id +'/columns/',
-                        files_url: 'files/api/files/',
+                        files_url: 'files/',
                         references_url: 'serve/api/references/',
                         params: {
                             job: service.job.id

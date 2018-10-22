@@ -46,28 +46,34 @@
                     ng-class="{'selected': column_index == service.table.active.column_index}">
 
                     <div class="daiquiri-table-cell" ng-click="service.table.activate(column_index, row_index)">
-                        <div ng-if="column.display == 'modal'">
+                        <div ng-if="column.meta == 'note'">
                             <a href="{$ service.table.getter.file_url(row, column_index) $}"
                                 ng-click="service.table.modal_open($event, column_index, row_index)">
                                 {$ row[column_index] $}
                             </a>
                         </div>
-                        <div ng-if="column.display == 'file'">
+                        <div ng-if="column.meta == 'image'">
+                            <a href="{$ service.table.getter.file_url(row, column_index) $}"
+                                ng-click="service.table.modal_open($event, column_index, row_index)">
+                                {$ row[column_index] $}
+                            </a>
+                        </div>
+                        <div ng-if="column.meta == 'file'">
                             <a href="{$ service.table.getter.file_url(row, column_index) $}">
                                 {$ row[column_index] $}
                             </a>
                         </div>
-                        <div ng-if="column.display == 'reference'">
-                            <a href="{$ service.table.getter.reference_url(row, column_index) $}" target="_blank">
-                                {$ row[column_index] $}
-                            </a>
-                        </div>
-                        <div ng-if="column.display == 'link'">
+                        <div ng-if="column.meta == 'link'">
                             <a href="{$ service.table.getter.link_url(row, column_index) $}" target="_blank">
                                 {$ row[column_index] $}
                             </a>
                         </div>
-                        <div ng-if="column.display == 'text'">
+                        <div ng-if="column.meta == 'reference'">
+                            <a href="{$ service.table.getter.reference_url(row, column_index) $}" target="_blank">
+                                {$ row[column_index] $}
+                            </a>
+                        </div>
+                        <div ng-if="column.meta == 'text'">
                             <div ng-if="service.table.column_round[column_index]">
                                 {$ row[column_index] | number : service.table.column_round[column_index] $}
                             </div>

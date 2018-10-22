@@ -143,3 +143,50 @@
         }
     }
 }
+
+.daiquiri-table-modal {
+    .modal-pagination {
+        a {
+            position: absolute;
+            z-index: 1100;
+
+            display: block;
+            text-align: justify;
+
+            opacity: 0.1;
+
+            width: 60px;
+            height: 60px;
+
+            &:hover {
+                opacity: 1.0;
+            }
+        }
+
+        .modal-pagination-left,
+        .modal-pagination-right {
+            top: 50%;
+        }
+        .modal-pagination-left {
+            left: 5px;
+        }
+        .modal-pagination-right {
+            right: 5px;
+        }
+        .modal-pagination-up,
+        .modal-pagination-down {
+            left: 50%;
+            margin-left: -30px;
+        }
+        .modal-pagination-up {
+            top: 60px;
+        }
+        .modal-pagination-down {
+            bottom: 0px;
+        }
+    }
+
+    .modal-body {
+        min-height: 200px;
+    }
+}
