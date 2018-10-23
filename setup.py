@@ -45,7 +45,7 @@ setup(
         'typing',
         'mock',
         'coverage',
-        'queryparser_python%d>=0.3' % sys.version_info.major
+        'queryparser_python%d>=0.4.2' % sys.version_info.major
     ],
     classifiers=[
         'Development Status :: 1 - Planning',
