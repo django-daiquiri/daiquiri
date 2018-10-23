@@ -6,7 +6,7 @@ from .views import FileView
 from .viewsets import FileViewSet
 
 router = routers.DefaultRouter()
-router.register(r'files', FileViewSet, base_name='file')
+# router.register(r'files', FileViewSet, base_name='file')
 
 urlpatterns = [
     # rest api
