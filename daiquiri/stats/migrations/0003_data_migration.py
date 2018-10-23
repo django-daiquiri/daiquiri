@@ -27,6 +27,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('daiquiri_stats', '0002_data_migration'),
+        ('daiquiri_query', '0013_refactoring'),
     ]
 
     operations = [
