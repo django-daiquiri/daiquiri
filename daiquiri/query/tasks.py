@@ -224,8 +224,8 @@ def create_archive_file(archive_id):
 
         # create a zipfile with all files
         with zipfile.ZipFile(archive_job.file_path, 'w') as z:
+            os.chdir(settings.FILES_BASE_PATH)
             for file_path in archive_job.files:
-                os.chdir(settings.ARCHIVE_BASE_PATH)
                 z.write(file_path)
 
         archive_job.end_time = now()

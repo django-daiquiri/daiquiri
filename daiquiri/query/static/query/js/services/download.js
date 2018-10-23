@@ -18,11 +18,13 @@ app.factory('DownloadService', ['$http', 'PollingService', function($http, Polli
         service.archive_columns = [];
 
         angular.forEach(service.job.columns, function(column) {
-            angular.forEach(['meta.note', 'meta.preview', 'meta.file'], function(key) {
-                if (column.ucd && column.ucd.indexOf(key) > -1) {
-                    service.archive_columns.push(column.name);
-                }
-            });
+            if (column.ucd && column.ucd.indexOf('meta.ref') > -1) {
+                angular.forEach(['meta.note', 'meta.image', 'meta.file'], function(key) {
+                    if (column.ucd.indexOf(key) > -1) {
+                        service.archive_columns.push(column.name);
+                    }
+                });
+            }
         });
     }
 

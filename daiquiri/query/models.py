@@ -511,7 +511,7 @@ class QueryArchiveJob(Job):
         # prepare list of files for this job
         files = []
         for row in rows:
-            file_path = search_file(row[0])
+            file_path = row[0]
 
             # append the file to the list of files  if it exists
             if file_path and check_file(self.owner, file_path):
