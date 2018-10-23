@@ -7,7 +7,6 @@ import re
 from django.conf import settings
 
 from daiquiri.core.generators import generate_csv, generate_votable, generate_fits
-from daiquiri.core.utils import get_doi_url
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +32,7 @@ class BaseDownloadAdapter(object):
             prepend = {}
             for ucd, value in settings.DOWNLOAD_PREPEND.items():
                 for i, column in enumerate(columns):
-                    if ucd in column['ucd']:
+                    if column['ucd'] and ucd in column['ucd']:
                         prepend[i] = value
 
             if format_key == 'csv':
@@ -83,7 +82,7 @@ class BaseDownloadAdapter(object):
                     row = six.next(reader)
 
                     if prepend:
-                        yield [(prepend[i] + cell if i in prepend else cell) for i, cell in enumerate(row)]
+                        yield [(prepend[i] + cell if (i in prepend and cell != 'NULL') else cell) for i, cell in enumerate(row)]
                     else:
                         yield row
 
