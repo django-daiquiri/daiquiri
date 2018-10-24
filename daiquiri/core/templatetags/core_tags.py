@@ -1,3 +1,5 @@
+import os
+
 from markdown import markdown as markdown_function
 
 from django import template
@@ -100,3 +102,8 @@ def default_blank(value):
 @register.filter()
 def default_blank_unit(value, unit):
     return str(value) + ' ' + unit if value else ''
+
+
+@register.filter()
+def basename(value):
+    return os.path.basename(value)
