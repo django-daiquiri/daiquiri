@@ -49,18 +49,18 @@
                         <div ng-if="column.meta == 'note'">
                             <a href="{$ service.table.getter.file_url(row, column_index) $}"
                                 ng-click="service.table.modal_open($event, column_index, row_index)">
-                                {$ row[column_index] $}
+                                {$ row[column_index]|basename $}
                             </a>
                         </div>
                         <div ng-if="column.meta == 'image'">
                             <a href="{$ service.table.getter.file_url(row, column_index) $}"
                                 ng-click="service.table.modal_open($event, column_index, row_index)">
-                                {$ row[column_index] $}
+                                {$ row[column_index]|basename $}
                             </a>
                         </div>
                         <div ng-if="column.meta == 'file'">
                             <a href="{$ service.table.getter.file_url(row, column_index) $}">
-                                {$ row[column_index] $}
+                                {$ row[column_index]|basename $}
                             </a>
                         </div>
                         <div ng-if="column.meta == 'link'">

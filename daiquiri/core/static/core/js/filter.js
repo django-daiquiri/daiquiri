@@ -43,4 +43,10 @@ angular.module('core')
         return (bytes / Math.pow(1000, Math.floor(number))).toFixed(1) +  ' ' + units[number];
     };
 })
+
+.filter('basename', function() {
+    return function(input, arg) {
+        return input.split(/[\\/]/).pop();
+    };
+})
 ;
