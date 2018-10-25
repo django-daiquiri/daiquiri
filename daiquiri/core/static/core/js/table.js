@@ -291,9 +291,7 @@ angular.module('core')
     };
 
     service.modal_update = function() {
-        var url = service.getter.file_url(service.rows[service.active.row_index], service.active.column_index);
-        var column = service.columns[service.active.column_index];
-
+        service.modal.url = service.getter.file_url(service.rows[service.active.row_index], service.active.column_index);
         service.modal.title = service.rows[service.active.row_index][service.active.column_index];
 
         // compute up, down, left, right index
@@ -302,14 +300,15 @@ angular.module('core')
         service.modal.left_row_index = service.modal_left_row_index()
         service.modal.right_row_index = service.modal_right_row_index()
 
+        var column = service.columns[service.active.column_index];
         if (column.meta == 'note') {
-            return $http.get(url).then(function(result) {
+            return $http.get(service.modal.url).then(function(result) {
                 service.modal.pre = result.data;
                 service.modal.src = null;
             });
         } else if (column.meta == 'image') {
             service.modal.pre = null;
-            service.modal.src = url;
+            service.modal.src = service.modal.url;
 
             return $q.when();
         } else {
