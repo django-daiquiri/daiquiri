@@ -23,7 +23,7 @@ from daiquiri.core.constants import ACCESS_LEVEL_CHOICES
 from daiquiri.jobs.models import Job
 from daiquiri.jobs.managers import JobManager
 from daiquiri.jobs.exceptions import JobError
-from daiquiri.files.utils import check_file, search_file
+from daiquiri.files.utils import check_file
 from daiquiri.stats.models import Record
 
 from .managers import QueryJobManager, ExampleManager
