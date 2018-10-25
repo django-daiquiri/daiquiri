@@ -12,7 +12,7 @@ router.register(r'columns', ColumnViewSet, base_name='column')
 
 urlpatterns = [
     url(r'^table/(?P<schema_name>[A-Za-z0-9_]+)/(?P<table_name>[A-Za-z0-9_]+)/$', table, name='table'),
-    url(r'^references/(?P<key>[-\w]+)/(?P<value>[-\w]+)/$', reference, name='reference'),
+    url(r'^references/(?P<key>[-\w]+)/(?P<value>.+)/$', reference, name='reference'),
 
     # rest api
     url(r'^api/', include(router.urls)),
