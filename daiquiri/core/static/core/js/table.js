@@ -33,7 +33,7 @@ angular.module('core')
                 var key = window.encodeURIComponent(service.columns[column_index].name),
                     value = window.encodeURIComponent(row[column_index]);
 
-                return service.references_url + '?key=' + key + '&value=' + value;
+                return service.references_url + key + '/' + value + '/';
             },
             link_url: function(row, column_index) {
                 return row[column_index];

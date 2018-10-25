@@ -1,7 +1,5 @@
 from collections import OrderedDict
 
-from django.shortcuts import redirect
-
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
@@ -12,7 +10,6 @@ from daiquiri.core.utils import fix_for_json
 from daiquiri.metadata.utils import get_user_columns
 
 from .serializers import ColumnSerializer
-from .utils import get_resolver
 
 
 class RowViewSet(RowViewSetMixin, viewsets.GenericViewSet):
@@ -81,21 +78,3 @@ class ColumnViewSet(viewsets.ViewSet):
 
         # if nothing worked, return 404
         raise NotFound()
-
-
-class ReferenceViewSet(viewsets.ViewSet):
-
-    def list(self, request):
-
-        key = request.GET.get('key', None)
-        value = request.GET.get('value', None)
-
-        resolver = get_resolver()
-        if resolver is None:
-            raise NotFound()
-
-        url = resolver.resolve(key, value)
-        if url is None:
-            raise NotFound()
-
-        return redirect(url)
