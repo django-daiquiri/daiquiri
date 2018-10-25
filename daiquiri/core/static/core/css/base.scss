@@ -427,8 +427,6 @@ div.fieldset {
     }
 }
 
-
-
 /* misc */
 
 .expand {
@@ -505,4 +503,12 @@ div.fieldset {
     background-color: $navigation-dropdown-hover-background-color;
     text-decoration: none;
     outline: none;
+}
+.pager-vertical {
+    a {
+        margin-bottom: 10px;
+
+        display: block;
+        width: 100%;
+    }
 }
