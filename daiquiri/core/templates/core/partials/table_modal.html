@@ -9,21 +9,30 @@
                 </button>
                 <h4 class="modal-title">
                     {$ service.table.modal.title $}
+                    {$ service.table.modal_left_column_index() $}
                 </h4>
             </div>
 
             <div class="modal-pagination">
-                <a class="modal-pagination-left" href="" ng-click="service.table.modal_left()">
-                    <span class="fa fa-chevron-left fa-4x"></span>
-                </a>
-                <a class="modal-pagination-right" href="" ng-click="service.table.modal_right()">
-                    <span class="fa fa-chevron-right fa-4x"></span>
-                </a>
-                <a class="modal-pagination-up" href="" ng-click="service.table.modal_up()">
+                <a class="modal-pagination-up" href=""
+                    ng-hide="service.table.modal.up_row_index === false"
+                    ng-click="service.table.modal_up()">
                     <span class="fa fa-chevron-up fa-4x"></span>
                 </a>
-                <a class="modal-pagination-down" href="" ng-click="service.table.modal_down()">
+                <a class="modal-pagination-down" href=""
+                    ng-hide="service.table.modal.down_row_index === false"
+                    ng-click="service.table.modal_down()">
                     <span class="fa fa-chevron-down fa-4x"></span>
+                </a>
+                <a class="modal-pagination-left" href=""
+                    ng-hide="service.table.modal.left_row_index === false"
+                    ng-click="service.table.modal_left()">
+                    <span class="fa fa-chevron-left fa-4x">{$ service.table.modal.left_row_index $}</span>
+                </a>
+                <a class="modal-pagination-right" href=""
+                    ng-hide="service.table.modal.right_row_index === false"
+                    ng-click="service.table.modal_right()">
+                    <span class="fa fa-chevron-right fa-4x">{$ service.table.modal.right_row_index $}</span>
                 </a>
             </div>
 

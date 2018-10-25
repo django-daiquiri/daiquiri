@@ -296,6 +296,12 @@ angular.module('core')
 
         service.modal.title = service.rows[service.active.row_index][service.active.column_index];
 
+        // compute up, down, left, right index
+        service.modal.up_row_index = service.modal_up_row_index()
+        service.modal.down_row_index = service.modal_down_row_index()
+        service.modal.left_row_index = service.modal_left_row_index()
+        service.modal.right_row_index = service.modal_right_row_index()
+
         if (column.meta == 'note') {
             return $http.get(url).then(function(result) {
                 service.modal.pre = result.data;
@@ -311,75 +317,81 @@ angular.module('core')
         }
     };
 
-    service.modal_up = function() {
+    service.modal_up_row_index = function() {
         if (service.active.row_index > 0) {
-            // decrement the row_index and update modal
-            service.active.row_index -= 1;
-            service.modal_update();
-        } else if (!service.first_page) {
+            return service.active.row_index - 1;
+        } else if (service.first_page) {
+            return false;
+        } else {
+            return -1;
+        }
+    };
+
+    service.modal_down_row_index = function() {
+        if (service.active.row_index < service.rows.length - 1) {
+            return service.active.row_index + 1;
+        } else if (service.last_page) {
+            return false;
+        } else {
+            return -1;
+        }
+    };
+
+    service.modal_left_row_index = function() {
+        for (var index = service.active.column_index - 1; index >= 0; index--) {
+            if (service.columns[index].meta == 'note' || service.columns[index].meta == 'image') {
+                return index;
+            }
+        }
+        return false;
+    };
+
+    service.modal_right_row_index = function() {
+        for (var index = service.active.column_index + 1; index < service.columns.length; index++) {
+            if (service.columns[index].meta == 'note' || service.columns[index].meta == 'image') {
+                return index;
+            }
+        }
+        return false;
+    };
+
+    service.modal_up = function() {
+        if (service.modal.up_row_index == -1) {
             // first load previous page
             service.previous().then(function() {
                 // set row_index to the last row and update modal
                 service.active.row_index = service.rows.length - 1;
                 service.modal_update();
             });
+        } else if (service.modal.up_row_index !== false) {
+            // decrement the row_index and update modal
+            service.active.row_index = service.modal.up_row_index;
+            service.modal_update();
         }
     };
 
     service.modal_down = function() {
-        if (service.active.row_index < service.rows.length - 1) {
-            // increment the row_index and update modal
-            service.active.row_index += 1;
-            service.modal_update();
-        } else if (!service.last_page) {
+        if (service.modal.down_row_index == -1) {
             // first load next page
             service.next().then(function() {
                 // set row_index to 0 and update modal
                 service.active.row_index = 0;
                 service.modal_update();
             });
+        } else if (service.modal.down_row_index !== false) {
+            // increment the row_index and update modal
+            service.active.row_index = service.modal.down_row_index;
+            service.modal_update();
         }
     };
 
     service.modal_left = function() {
-        var next_column_index = null,
-            current_column_index = service.active.column_index;
-
-        while(next_column_index === null) {
-            if (current_column_index > 0) {
-                current_column_index -= 1;
-            } else {
-                current_column_index = service.columns.length - 1;
-            }
-
-            var column = service.columns[current_column_index];
-            if (column.meta == 'note' || column.meta == 'image') {
-                next_column_index = current_column_index;
-            }
-        }
-
-        service.active.column_index = current_column_index;
+        service.active.column_index = service.modal.left_row_index;
         service.modal_update();
     };
 
     service.modal_right = function() {
-        var next_column_index = null,
-            current_column_index = service.active.column_index;
-
-        while(next_column_index === null) {
-            if (current_column_index < service.columns.length - 1) {
-                current_column_index += 1;
-            } else {
-                current_column_index = 0;
-            }
-
-            var column = service.columns[current_column_index];
-            if (column.meta == 'note' || column.meta == 'image') {
-                next_column_index = current_column_index;
-            }
-        }
-
-        service.active.column_index = current_column_index;
+        service.active.column_index = service.modal.right_row_index;
         service.modal_update();
     };
 
