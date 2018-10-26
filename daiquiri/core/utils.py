@@ -22,7 +22,7 @@ from django.utils.six.moves.urllib.parse import urlparse
 from django.utils.timezone import localtime
 from django.utils.translation import ugettext_lazy as _
 
-from ipware.ip import get_real_ip
+from ipware import get_client_ip as ipware_get_client_ip
 
 import xlsxwriter
 
@@ -53,13 +53,13 @@ def get_referer(request, default=None):
 
 
 def get_client_ip(request):
-    ip = get_real_ip(request)
+    client_ip, is_routable = ipware_get_client_ip(request)
 
-    if ip:
+    if client_ip:
         try:
-            interface = ipaddress.IPv6Interface('%s/%i' % (ip, settings.IPV6_PRIVACY_MASK))
+            interface = ipaddress.IPv6Interface('%s/%i' % (client_ip, settings.IPV6_PRIVACY_MASK))
         except ipaddress.AddressValueError:
-            interface = ipaddress.IPv4Interface('%s/%i' % (ip, settings.IPV4_PRIVACY_MASK))
+            interface = ipaddress.IPv4Interface('%s/%i' % (client_ip, settings.IPV4_PRIVACY_MASK))
 
         return str(interface.network.network_address)
     else:
