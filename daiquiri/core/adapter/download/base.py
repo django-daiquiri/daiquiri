@@ -28,12 +28,8 @@ class BaseDownloadAdapter(object):
             # create the final list of arguments subprocess.Popen
             self.set_args(schema_name, table_name, data_only=True)
 
-            # prepend strings according to DOWNLOAD_PREPEND
-            prepend = {}
-            for ucd, value in settings.DOWNLOAD_PREPEND.items():
-                for i, column in enumerate(columns):
-                    if column['ucd'] and ucd in column['ucd']:
-                        prepend[i] = value
+            # prepend strings with settings.FILES_BASE_PATH if they refer to files
+            prepend = self.get_prepend(columns)
 
             if format_key == 'csv':
                 return generate_csv(self.generate_rows(prepend=prepend), columns)
@@ -88,3 +84,15 @@ class BaseDownloadAdapter(object):
 
         except subprocess.CalledProcessError as e:
             logger.error('Command PIPE returned non-zero exit status: %s' % e)
+
+    def get_prepend(self, columns):
+        # prepend strings with settings.FILES_BASE_PATH if they refer to files
+        prepend = {}
+
+        for i, column in enumerate(columns):
+            column_ucd = column.get('ucd')
+            if column_ucd and 'meta.ref' in column_ucd and \
+                ('meta.file' in column_ucd or 'meta.note' in column_ucd or 'meta.image' in column_ucd):
+                    prepend[i] = settings.FILES_BASE_PATH
+
+        return prepend
