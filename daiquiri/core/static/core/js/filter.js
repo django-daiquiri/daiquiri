@@ -45,8 +45,12 @@ angular.module('core')
 })
 
 .filter('basename', function() {
-    return function(input, arg) {
-        return input.split(/[\\/]/).pop();
+    return function(input) {
+        if (input != null) {
+            return input.split(/[\\/]/).pop();
+        } else {
+            return '';
+        }
     };
 })
 ;
