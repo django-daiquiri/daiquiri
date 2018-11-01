@@ -16,7 +16,6 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
         querylanguages: $resource(baseurl + 'query/api/querylanguages/'),
         phases: $resource(baseurl + 'query/api/phases/'),
         schemas: $resource(baseurl + 'metadata/api/schemas/user/'),
-        tap_schemas: $resource(baseurl + 'metadata/api/schemas/tap/'),
         functions: $resource(baseurl + 'metadata/api/functions/user/'),
     };
 
@@ -99,14 +98,6 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
                         service.columns.push(column_copy);
                     });
                 });
-            });
-
-            // load tab schema when schemas have been fetched
-            resources.tap_schemas.query(function(response) {
-                service.schemas = service.schemas.concat(response);
-
-                // load user schema when schemas have been fetched
-                service.fetch_user_schema();
             });
         });
 

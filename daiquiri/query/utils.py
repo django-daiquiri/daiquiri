@@ -143,7 +143,7 @@ def check_permissions(user, keywords, tables, columns, functions):
             # schema_name must not be null, move to next table
             messages.append(_('No schema given for table %s.') % table_name)
             continue
-        elif schema_name in [settings.TAP_SCHEMA, get_user_schema_name(user)]:
+        elif schema_name == get_user_schema_name(user):
             # all tables are allowed move to next table
             continue
         else:
@@ -174,7 +174,7 @@ def check_permissions(user, keywords, tables, columns, functions):
 
         for schema_name, table_name, column_name in columns:
 
-            if schema_name in [None, settings.TAP_SCHEMA, get_user_schema_name(user)] \
+            if schema_name in [None, get_user_schema_name(user)] \
                 or table_name is None \
                 or column_name is None:
                 # doesn't need to be checked, move to next column

@@ -1,5 +1,3 @@
-from django.apps import apps
-
 from rest_framework import viewsets, filters, status
 from rest_framework.response import Response
 from rest_framework.decorators import list_route, detail_route
@@ -12,8 +10,6 @@ from daiquiri.core.adapter import DatabaseAdapter
 from daiquiri.core.viewsets import ChoicesViewSet
 from daiquiri.core.permissions import HasModelPermission
 from daiquiri.core.constants import LICENSE_CHOICES, ACCESS_LEVEL_CHOICES
-
-from daiquiri.tap.constants import TAP_METADATA
 
 from .models import Schema, Table, Column, Function
 from .serializers import (
@@ -93,13 +89,6 @@ class SchemaViewSet(viewsets.ModelViewSet):
         queryset = Schema.objects.filter_by_access_level(self.request.user)
         serializer = UserSchemaSerializer(queryset, context={'request': request}, many=True)
         return Response(serializer.data)
-
-    @list_route(methods=['get'], permission_classes=[])
-    def tap(self, request):
-        if apps.is_installed('daiquiri.tap'):
-            return Response(TAP_METADATA)
-        else:
-            return Response([])
 
     @list_route(methods=['get'], url_path='export', url_name='export-detail')
     def export_list(self, request):
