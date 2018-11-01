@@ -17,12 +17,12 @@
         <strong>{% trans 'Array size' %}</strong> {$ column.arraysize $}
     </div>
     <div>
-        <strong ng-show="column.principal">{% trans 'Principal' %}</strong>
+        <span ng-show="column.principal">{% trans 'This column is considered a core part of the service.' %}</span>
     </div>
     <div>
-        <strong ng-show="column.indexed">{% trans 'Indexed' %}</strong>
+        <span ng-show="column.indexed">{% trans 'This column is indexed.' %}</span>
     </div>
     <div>
-        <strong ng-show="column.std">{% trans 'Std' %}</strong>
+        <span ng-show="column.std">{% trans 'This column is defined by a standard.' %}</span>
     </div>
 </script>
