@@ -45,7 +45,14 @@ from .process import (
     process_query,
     process_display_columns
 )
-from .tasks import run_query, create_download_file, create_archive_file
+from .tasks import (
+    run_query,
+    create_download_file,
+    create_archive_file,
+    rename_table,
+    drop_table,
+    abort_query
+)
 
 logger = logging.getLogger(__name__)
 query_logger = logging.getLogger('query')
@@ -292,25 +299,31 @@ class QueryJob(Job):
 
     def rename_table(self, new_table_name):
         if self.table_name != new_table_name:
-            DatabaseAdapter().rename_table(self.schema_name, self.table_name, new_table_name)
-
             self.metadata['name'] = new_table_name
             self.save()
 
+            task_args = (self.schema_name, self.table_name, new_table_name)
+
+            if not settings.ASYNC:
+                rename_table.apply(task_args, throw=True)
+            else:
+                rename_table.apply_async(task_args)
+
     def drop_table(self):
-        # drop the corresponding database table, but fail silently
-        try:
-            DatabaseAdapter().drop_table(self.schema_name, self.table_name)
-        except ProgrammingError:
-            pass
+        task_args = (self.schema_name, self.table_name)
+
+        if not settings.ASYNC:
+            drop_table.apply(task_args, throw=True)
+        else:
+            drop_table.apply_async(task_args)
 
     def abort_query(self):
-        # abort the job on the database
-        try:
-            DatabaseAdapter().abort_query(self.pid)
-        except OperationalError:
-            # the query was probably killed before
-            pass
+        task_args = (self.pid, )
+
+        if not settings.ASYNC:
+            abort_query.apply(task_args, throw=True)
+        else:
+            abort_query.apply_async(task_args)
 
     def stream(self, format_key):
         if self.phase == self.PHASE_COMPLETED:

@@ -234,3 +234,33 @@ def create_archive_file(archive_id):
 
         # log completion
         logger.info('create_archive_zip_file %s completed' % archive_job.file_path)
+
+
+@shared_task(base=Task)
+def rename_table(schema_name, table_name, new_table_name):
+    from daiquiri.core.adapter import DatabaseAdapter
+
+    DatabaseAdapter().rename_table(schema_name, table_name, new_table_name)
+
+
+@shared_task(base=Task)
+def drop_table(schema_name, table_name):
+    from daiquiri.core.adapter import DatabaseAdapter
+
+    # drop the corresponding database table, but fail silently
+    try:
+        DatabaseAdapter().drop_table(schema_name, table_name)
+    except ProgrammingError:
+        pass
+
+
+@shared_task(base=Task)
+def abort_query(pid):
+    from daiquiri.core.adapter import DatabaseAdapter
+
+    # abort the job on the database
+    try:
+        DatabaseAdapter().abort_query(pid)
+    except OperationalError:
+        # the query was probably killed before
+        pass
