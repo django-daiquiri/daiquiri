@@ -31,6 +31,7 @@ setup(
         'django-settings-export>=1.2.1',
         'django-sendfile>=0.3.11',
         'django-ipware>=1.1.6',
+        'django-vendor-files',
         'celery>=4.1.0',
         'redis>=2.10.5',
         'rules>=1.2',

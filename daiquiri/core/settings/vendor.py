@@ -1,5 +1,3 @@
-VENDOR_CDN = True
-
 VENDOR = {
     'jquery': {
         'url': 'https://code.jquery.com/',

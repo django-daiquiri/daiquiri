@@ -40,6 +40,7 @@ ADDITIONAL_APPS = [
     'rest_framework.authtoken',
     'django_filters',
     'django_extensions',
+    'vendor_files',
     'markdown',
     'compressor',
     'widget_tweaks',
