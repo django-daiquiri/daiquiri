@@ -51,6 +51,7 @@ ADDITIONAL_APPS = [
 ]
 
 MIDDLEWARE_CLASSES = [
+    'daiquiri.core.middleware.MultipleProxyMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
