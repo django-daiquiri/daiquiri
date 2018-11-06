@@ -62,7 +62,7 @@ class SyncJobViewSet(JobViewSet):
         # create the job objects
         job = self.get_queryset().model(
             job_type=Job.JOB_TYPE_SYNC,
-            owner=(None if self.request.user.is_anonymous() else self.request.user),
+            owner=(None if self.request.user.is_anonymous else self.request.user),
             response_format=data.get('RESPONSEFORMAT'),
             max_records=data.get('MAXREC'),
             run_id=data.get('RUNID'),
@@ -119,7 +119,7 @@ class AsyncJobViewSet(JobViewSet):
         # create the job objects
         job = self.get_queryset().model(
             job_type=Job.JOB_TYPE_ASYNC,
-            owner=(None if self.request.user.is_anonymous() else self.request.user),
+            owner=(None if self.request.user.is_anonymous else self.request.user),
             response_format=serializer.data.get('RESPONSEFORMAT'),
             max_records=serializer.data.get('MAXREC'),
             run_id=serializer.data.get('RUNID'),

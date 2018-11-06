@@ -6,7 +6,7 @@ from .constants import ACCESS_LEVEL_PUBLIC, ACCESS_LEVEL_INTERNAL
 class AccessLevelQuerySet(models.QuerySet):
 
     def filter_by_access_level(self, user):
-        if not user or user.is_anonymous():
+        if not user or user.is_anonymous:
             return self.filter(access_level=ACCESS_LEVEL_PUBLIC)
         else:
             q = models.Q(access_level=ACCESS_LEVEL_PUBLIC) | \
@@ -15,7 +15,7 @@ class AccessLevelQuerySet(models.QuerySet):
             return self.filter(q).distinct()
 
     def filter_by_metadata_access_level(self, user):
-        if not user or user.is_anonymous():
+        if not user or user.is_anonymous:
             return self.filter(metadata_access_level=ACCESS_LEVEL_PUBLIC)
         else:
             q = models.Q(metadata_access_level=ACCESS_LEVEL_PUBLIC) | \

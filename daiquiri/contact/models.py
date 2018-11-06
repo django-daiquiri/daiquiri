@@ -1,12 +1,8 @@
-from __future__ import unicode_literals
-
 from django.contrib.auth.models import User
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 
-@python_2_unicode_compatible
 class ContactMessage(models.Model):
 
     STATUS_ACTIVE = 'ACTIVE'
@@ -33,8 +29,6 @@ class ContactMessage(models.Model):
 
         verbose_name = _('Contact message')
         verbose_name_plural = _('Contact messages')
-
-        permissions = (('view_contactmessage', 'Can view ContactMessage'),)
 
     def __str__(self):
         return "created=%s; email=%s; subject=%s; status=%s" % (self.created, self.email, self.subject, self.status)

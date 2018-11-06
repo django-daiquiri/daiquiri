@@ -1,5 +1,3 @@
-import six
-
 from django.db import connections
 
 
@@ -122,7 +120,7 @@ class BaseDatabaseAdapter(object):
                 escaped_column_name = self.escape_identifier(column_name)
 
                 # check if the filter is a list or a string
-                if isinstance(column_filter, six.string_types):
+                if isinstance(column_filter, str):
                     filter_list = [column_filter]
                 elif isinstance(column_filter, list):
                     filter_list = column_filter

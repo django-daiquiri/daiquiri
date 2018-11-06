@@ -139,7 +139,7 @@ class ArchiveViewSet(viewsets.GenericViewSet):
 
         except ArchiveJob.DoesNotExist:
             archive_job = ArchiveJob(
-                owner=(None if self.request.user.is_anonymous() else self.request.user),
+                owner=(None if self.request.user.is_anonymous else self.request.user),
                 client_ip=get_client_ip(self.request),
                 data=request.data
             )

@@ -3,14 +3,12 @@ import os
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import Group
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 from daiquiri.core.constants import ACCESS_LEVEL_CHOICES
 from daiquiri.core.managers import AccessLevelManager
 
 
-@python_2_unicode_compatible
 class Directory(models.Model):
 
     objects = AccessLevelManager()
@@ -36,8 +34,6 @@ class Directory(models.Model):
 
         verbose_name = _('Directory')
         verbose_name_plural = _('Directory')
-
-        permissions = (('view_function', 'Can view Directory'),)
 
     def __str__(self):
         return self.absolute_path

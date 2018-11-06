@@ -10,14 +10,10 @@ Centos 7.3
 yum install -y epel-release git gcc gcc-c++ libxml2-devel libxslt-devel openssl-devel
 ```
 
-### Python >= 2.7 or >= 3.4
+### Python >= 3.4
 
 ```
-# for python2
-yum install -y python-devel python-virtualenv
-
-# for python3
-yum install -y python34-devel
+yum install -y python3-devel
 ```
 
 ### MariaDB >= 10.1
@@ -90,20 +86,10 @@ Centos 6
 yum install -y epel-release git gcc gcc-c++ libxml2-devel libxslt-devel openssl-devel
 ```
 
-### Python >= 2.7 or >= 3.4
+### Python >= 3.4
 
 ```
-# for python2
-yum install -y centos-release-scl
-yum install -y python27-python-devel python27-python-virtualenv
-
-# for python3
 yum install -y python34-devel
-```
-
-```
-# for python2, this needs to be done in every new shell
-scl enable python27 bash
 ```
 
 ### GCC >= 4.6
@@ -186,13 +172,9 @@ debian 9 (strech)
 apt-get install -y git build-essential libxml2-dev libxslt-dev zlib1g-dev libssl-dev
 ```
 
-### Python >= 2.7 or >= 3.4
+### Python >= 3.4
 
 ```
-# for python2
-apt-get install -y python-dev python-virtualenv
-
-# for python3
 apt-get install -y python3-dev
 ```
 
@@ -236,13 +218,9 @@ debian 8 (jessie)
 apt-get install -y git build-essential libxml2-dev libxslt-dev zlib1g-dev libssl-dev
 ```
 
-### Python >= 2.7 or >= 3.4
+### Python >= 3.4
 
 ```
-# for python2
-apt-get install -y python-dev python-virtualenv
-
-# for python3
 apt-get install -y python3-dev
 ```
 
@@ -292,13 +270,9 @@ Ubuntu 16.04 (Xenial Xerus)
 apt-get install -y git build-essential libxml2-dev libxslt-dev zlib1g-dev libssl-dev
 ```
 
-### Python >= 2.7 or >= 3.4
+### Python >= 3.4
 
 ```
-# for python2
-apt-get install -y python-dev python-virtualenv
-
-# for python3
 apt-get install -y python3-dev
 ```
 
@@ -344,13 +318,9 @@ Ubuntu 14.04 (Trusty Tahr)
 apt-get install -y git build-essential libxml2-dev libxslt-dev zlib1g-dev
 ```
 
-### Python >= 2.7 or >= 3.4
+### Python >= 3.4
 
 ```
-# for python2
-apt-get install -y python-dev python-virtualenv
-
-# for python3
 apt-get install -y python3-dev python3.4-venv
 ```
 

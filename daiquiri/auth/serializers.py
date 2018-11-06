@@ -65,7 +65,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         # update the user for this profile seperately
         obj.user.first_name = user['first_name']
         obj.user.last_name = user['last_name']
-        obj.user.groups = user['groups']
+        obj.user.groups.set(user['groups'])
         obj.user.save()
 
         return super(ProfileSerializer, self).update(obj, validated_data)

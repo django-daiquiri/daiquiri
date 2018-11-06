@@ -1,4 +1,3 @@
-import six
 import json
 
 from collections import OrderedDict
@@ -77,7 +76,7 @@ def process_queue(user, queue):
 
         # check if this queue is in the possible queues
         try:
-            six.next((item for item in queues if item['key'] == queue))
+            next((item for item in queues if item['key'] == queue))
         except StopIteration:
             raise ValidationError({
                 'queue': [_('This queue is not supported.')]

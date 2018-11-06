@@ -1,6 +1,5 @@
 import logging
 import csv
-import six
 import subprocess
 import re
 
@@ -75,7 +74,7 @@ class BaseDownloadAdapter(object):
                 if insert_result:
                     line = insert_result.group(1)
                     reader = csv.reader([line], quotechar="'", skipinitialspace=True)
-                    row = six.next(reader)
+                    row = next(reader)
 
                     if prepend:
                         yield [(prepend[i] + cell if (i in prepend and cell != 'NULL') else cell) for i, cell in enumerate(row)]

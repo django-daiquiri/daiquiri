@@ -1,6 +1,5 @@
 import logging
 import os
-import six
 
 from celery.task.control import revoke
 
@@ -8,7 +7,6 @@ from django.conf import settings
 from django.contrib.auth.models import Group
 from django.db import models
 from django.db.utils import OperationalError, ProgrammingError, InternalError, DataError
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from django.utils.timezone import now
@@ -85,8 +83,6 @@ class QueryJob(Job):
         verbose_name = _('QueryJob')
         verbose_name_plural = _('QueryJobs')
 
-        permissions = (('view_queryjob', 'Can view QueryJob'),)
-
     @property
     def parameters(self):
         return {
@@ -130,13 +126,13 @@ class QueryJob(Job):
     @property
     def timeout(self):
         if self.queue:
-            return six.next((queue['timeout'] for queue in settings.QUERY_QUEUES if queue['key'] == self.queue))
+            return next((queue['timeout'] for queue in settings.QUERY_QUEUES if queue['key'] == self.queue))
         else:
             return 10
 
     @property
     def priority(self):
-        return six.next((queue['priority'] for queue in settings.QUERY_QUEUES if queue['key'] == self.queue))
+        return next((queue['priority'] for queue in settings.QUERY_QUEUES if queue['key'] == self.queue))
 
     @cached_property
     def column_names(self):
@@ -389,7 +385,7 @@ class DownloadJob(Job):
     objects = JobManager()
 
     job = models.ForeignKey(
-        QueryJob, related_name='downloads',
+        QueryJob, related_name='downloads', on_delete=models.CASCADE,
         verbose_name=_('QueryJob'),
         help_text=_('QueryJob this DownloadJob belongs to.')
     )
@@ -404,8 +400,6 @@ class DownloadJob(Job):
 
         verbose_name = _('DownloadJob')
         verbose_name_plural = _('DownloadJobs')
-
-        permissions = (('view_downloadjob', 'Can view DownloadJob'),)
 
     @property
     def file_path(self):
@@ -468,7 +462,7 @@ class QueryArchiveJob(Job):
     objects = JobManager()
 
     job = models.ForeignKey(
-        QueryJob, related_name='archives',
+        QueryJob, related_name='archives', on_delete=models.CASCADE,
         verbose_name=_('QueryJob'),
         help_text=_('QueryJob this ArchiveJob belongs to.')
     )
@@ -487,8 +481,6 @@ class QueryArchiveJob(Job):
 
         verbose_name = _('QueryArchiveJob')
         verbose_name_plural = _('QueryArchiveJob')
-
-        permissions = (('view_queryarchivejob', 'Can view QueryArchiveJob'),)
 
     @property
     def file_path(self):
@@ -569,7 +561,6 @@ class QueryArchiveJob(Job):
             pass
 
 
-@python_2_unicode_compatible
 class Example(models.Model):
 
     objects = ExampleManager()
@@ -613,8 +604,6 @@ class Example(models.Model):
 
         verbose_name = _('Example')
         verbose_name_plural = _('Examples')
-
-        permissions = (('view_example', 'Can view Example'),)
 
     def __str__(self):
         return self.name

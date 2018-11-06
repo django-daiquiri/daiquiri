@@ -1,6 +1,4 @@
-from __future__ import unicode_literals
-
-import unicodecsv as csv
+import csv
 import ipaddress
 import importlib
 import math
@@ -8,6 +6,7 @@ import re
 import sys
 
 from datetime import datetime
+from urllib.parse import urlparse
 from xml.dom import minidom
 
 from django import forms
@@ -18,7 +17,7 @@ from django.core.mail import EmailMultiAlternatives, EmailMessage
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.template import TemplateDoesNotExist
-from django.utils.six.moves.urllib.parse import urlparse
+
 from django.utils.timezone import localtime
 from django.utils.translation import ugettext_lazy as _
 

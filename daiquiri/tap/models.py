@@ -1,8 +1,6 @@
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class Schema(models.Model):
 
     schema_name = models.CharField(max_length=256)
@@ -16,10 +14,9 @@ class Schema(models.Model):
         return self.schema_name
 
 
-@python_2_unicode_compatible
 class Table(models.Model):
 
-    schema = models.ForeignKey(Schema, related_name='tables')
+    schema = models.ForeignKey(Schema, related_name='tables', on_delete=models.CASCADE)
 
     schema_name = models.CharField(max_length=256)
     table_name = models.CharField(max_length=256)
@@ -35,10 +32,9 @@ class Table(models.Model):
         return '%s.%s' % (self.schema_name, self.table_name)
 
 
-@python_2_unicode_compatible
 class Column(models.Model):
 
-    table = models.ForeignKey(Table, related_name='columns')
+    table = models.ForeignKey(Table, related_name='columns', on_delete=models.CASCADE)
 
     table_name = models.CharField(max_length=256)
     column_name = models.CharField(max_length=256)

@@ -13,7 +13,7 @@ from rules.contrib.views import PermissionRequiredMixin as RulesPermissionRequir
 
 
 def home(request):
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         login_form = LoginForm()
         login_form.fields['login'].widget.attrs.pop("autofocus", None)
     else:
@@ -22,26 +22,26 @@ def home(request):
     return render(request, 'core/home.html', {'form': login_form})
 
 
-def bad_request(request):
+def bad_request(request, exception):
     return render(request, 'core/400.html', status=400)
 
 
-def forbidden(request):
+def forbidden(request, exception):
     return render(request, 'core/403.html', status=403)
 
 
-def not_found(request):
+def not_found(request, exception):
     return render(request, 'core/404.html', status=404)
 
 
-def internal_server_error(request):
+def internal_server_error(request, exception):
     return render(request, 'core/500.html', status=500)
 
 
 class PermissionRedirectMixin(object):
 
     def handle_no_permission(self):
-        if self.request.user.is_authenticated():
+        if self.request.user.is_authenticated:
             raise PermissionDenied(self.get_permission_denied_message())
 
         return redirect_to_login(self.request.get_full_path(), self.get_login_url(), self.get_redirect_field_name())

@@ -1,13 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import Group
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 from daiquiri.core.constants import LICENSE_CHOICES, LICENSE_URLS, ACCESS_LEVEL_CHOICES
 from daiquiri.core.managers import AccessLevelManager
 
 
-@python_2_unicode_compatible
 class Schema(models.Model):
 
     objects = AccessLevelManager()
@@ -74,8 +72,6 @@ class Schema(models.Model):
         verbose_name = _('Schema')
         verbose_name_plural = _('Schemas')
 
-        permissions = (('view_schema', 'Can view Schema'),)
-
     def __str__(self):
         return self.name
 
@@ -92,7 +88,6 @@ class Schema(models.Model):
         return LICENSE_URLS[self.license]
 
 
-@python_2_unicode_compatible
 class Table(models.Model):
 
     TYPE_TABLE = 'table'
@@ -105,7 +100,7 @@ class Table(models.Model):
     objects = AccessLevelManager()
 
     schema = models.ForeignKey(
-        Schema, related_name='tables',
+        Schema, related_name='tables', on_delete=models.CASCADE,
         verbose_name=_('Database'),
         help_text=_('Database the table belongs to.')
     )
@@ -183,8 +178,6 @@ class Table(models.Model):
         verbose_name = _('Table')
         verbose_name_plural = _('Tables')
 
-        permissions = (('view_table', 'Can view Table'),)
-
     def __str__(self):
         return self.schema.name + '.' + self.name
 
@@ -201,13 +194,12 @@ class Table(models.Model):
         return LICENSE_URLS[self.license]
 
 
-@python_2_unicode_compatible
 class Column(models.Model):
 
     objects = AccessLevelManager()
 
     table = models.ForeignKey(
-        Table, related_name='columns',
+        Table, related_name='columns', on_delete=models.CASCADE,
         help_text=_('Table the column belongs to.')
     )
     order = models.IntegerField(
@@ -287,8 +279,6 @@ class Column(models.Model):
         verbose_name = _('Column')
         verbose_name_plural = _('Columns')
 
-        permissions = (('view_column', 'Can view Column'),)
-
     def __str__(self):
         return self.table.schema.name + '.' + self.table.name + '.' + self.name
 
@@ -304,7 +294,6 @@ class Column(models.Model):
             return None
 
 
-@python_2_unicode_compatible
 class Function(models.Model):
 
     objects = AccessLevelManager()
@@ -348,8 +337,6 @@ class Function(models.Model):
 
         verbose_name = _('Function')
         verbose_name_plural = _('Functions')
-
-        permissions = (('view_function', 'Can view Function'),)
 
     def __str__(self):
         return self.name
