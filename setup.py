@@ -29,7 +29,7 @@ setup(
         'django-sendfile>=0.3.11',
         'django-ipware>=2.1.0',
         'django-vendor-files>=0.1.1',
-        'django-test-generator>=0.5.1',
+        'django-test-generator>=0.6.0',
         'celery>=4.2.1',
         'rules>=2.0',
         'jsonfield==2.0.2',
