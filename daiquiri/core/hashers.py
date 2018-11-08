@@ -12,7 +12,7 @@ class CrypdSHA512PasswordHasher(CryptPasswordHasher):
     algorithm = 'crypt_sha512'
 
     def salt(self):
-        return '$6$' + get_random_string(16)
+        return '$6$' + get_random_string(8)
 
     def encode(self, password, salt):
         crypt = self._load_library()
