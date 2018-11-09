@@ -1,8 +1,8 @@
 import logging
 
+from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
-from django.shortcuts import redirect
 from django.views.generic import View
 
 from .utils import file_exists, check_file, send_file
@@ -28,7 +28,7 @@ class FileView(View):
             if request.user.is_authenticated:
                 raise PermissionDenied
             else:
-                return redirect('account_login')
+                return redirect_to_login(request.path_info)
 
         # if nothing worked, return 404
         raise Http404
