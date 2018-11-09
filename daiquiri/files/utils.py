@@ -14,6 +14,11 @@ from .models import Directory
 logger = logging.getLogger(__name__)
 
 
+def file_exists(file_path):
+    absolute_file_path = os.path.join(settings.FILES_BASE_PATH, file_path)
+    return os.path.isfile(absolute_file_path)
+
+
 def check_file(user, file_path):
     # loop over all directories beginning with the hights depth and return as soon as a directory matches
     for directory in Directory.objects.order_by('-depth'):
