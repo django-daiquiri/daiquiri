@@ -134,6 +134,7 @@ AUTHENTICATION_BACKENDS = (
     'allauth.account.auth_backends.AuthenticationBackend',
 )
 
+ACCOUNT_LOGOUT_ON_GET = False
 ACCOUNT_ADAPTER = 'daiquiri.auth.adapter.DaiquiriAccountAdapter'
 ACCOUNT_SIGNUP_FORM_CLASS = 'daiquiri.auth.forms.SignupForm'
 ACCOUNT_USER_DISPLAY = 'daiquiri.auth.utils.get_full_name'
@@ -160,6 +161,7 @@ SETTINGS_EXPORT = [
     'LOGIN_URL',
     'LOGOUT_URL',
     'ARCHIVE_COLUMNS',
+    'ACCOUNT_LOGOUT_ON_GET',
     'AUTH_WORKFLOW',
     'AUTH_TERMS_OF_USE',
     'METADATA_COLUMN_PERMISSIONS',
