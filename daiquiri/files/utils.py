@@ -39,4 +39,4 @@ def send_file(request, file_path, search=None):
 
     # send the file to the client
     absolute_file_path = os.path.join(settings.FILES_BASE_PATH, file_path)
-    return sendfile(request, absolute_file_path, attachment=True)
+    return sendfile(request, absolute_file_path)
