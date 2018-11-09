@@ -86,6 +86,9 @@ class BaseDownloadAdapter(object):
             logger.error('Command PIPE returned non-zero exit status: %s' % e)
 
     def get_prepend(self, columns):
+        if not settings.FILES_BASE_URL:
+            return {}
+
         # prepend strings with settings.FILES_BASE_PATH if they refer to files
         prepend = {}
 
@@ -93,6 +96,6 @@ class BaseDownloadAdapter(object):
             column_ucd = column.get('ucd')
             if column_ucd and 'meta.ref' in column_ucd and \
                 ('meta.file' in column_ucd or 'meta.note' in column_ucd or 'meta.image' in column_ucd):
-                    prepend[i] = settings.FILES_BASE_PATH
+                    prepend[i] = settings.FILES_BASE_URL
 
         return prepend
