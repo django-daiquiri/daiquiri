@@ -30,7 +30,7 @@ setup(
         'django-libsass>=0.7',
         'django-settings-export>=1.2.1',
         'django-sendfile>=0.3.11',
-        'django-ipware>=1.1.6',
+        'django-ipware>=2.1.0',
         'django-vendor-files',
         'celery>=4.1.0',
         'redis>=2.10.5',
