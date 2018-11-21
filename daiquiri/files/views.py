@@ -29,7 +29,7 @@ class FileView(View):
             else:
                 return redirect_to_login(request.path_info)
 
-        if directory.layout:
+        if file_path.endswith('.html') and directory.layout:
             return render_with_layout(request, file_path)
         else:
             return send_file(request, file_path)
