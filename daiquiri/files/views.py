@@ -5,7 +5,7 @@ from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.views.generic import View
 
-from .utils import file_exists, check_file, send_file
+from .utils import file_exists, get_directory, render_with_layout, send_file
 
 logger = logging.getLogger(__name__)
 
@@ -21,14 +21,15 @@ class FileView(View):
             logger.debug('%s not found', file_path)
             raise Http404
 
-        if check_file(request.user, file_path):
-            return send_file(request, file_path)
-        else:
+        directory = get_directory(request.user, file_path)
+        if directory is None:
             logger.debug('%s if forbidden', file_path)
             if request.user.is_authenticated:
                 raise PermissionDenied
             else:
                 return redirect_to_login(request.path_info)
 
-        # if nothing worked, return 404
-        raise Http404
+        if directory.layout:
+            return render_with_layout(request, file_path)
+        else:
+            return send_file(request, file_path)
