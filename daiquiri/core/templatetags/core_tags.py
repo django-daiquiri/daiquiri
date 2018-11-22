@@ -3,7 +3,7 @@ import os
 from markdown import markdown as markdown_function
 
 from django import template
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.template.defaultfilters import stringfilter
 from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe

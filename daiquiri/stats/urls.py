@@ -1,8 +1,10 @@
-from django.conf.urls import url
+from django.urls import path
 
 from .views import ManagementView
 
 
+app_name = 'stats'
+
 urlpatterns = [
-    url(r'^management/$', ManagementView.as_view(), name='management'),
+    path('management/', ManagementView.as_view(), name='management'),
 ]

@@ -1,4 +1,4 @@
-from django.conf.urls import url, include
+from django.urls import include, path
 
 from rest_framework import routers
 
@@ -14,6 +14,9 @@ from .viewsets import (
     PhaseViewSet
 )
 
+
+app_name = 'query'
+
 router = routers.DefaultRouter()
 router.register(r'status', StatusViewSet, base_name='status')
 router.register(r'forms', FormViewSet, base_name='form')
@@ -25,10 +28,10 @@ router.register(r'querylanguages', QueryLanguageViewSet, base_name='querylanguag
 router.register(r'phases', PhaseViewSet, base_name='phase')
 
 urlpatterns = [
-    url(r'^$', QueryView.as_view(), name='query'),
-    url(r'^jobs/$', JobsView.as_view(), name='jobs'),
-    url(r'^examples/$', ExamplesView.as_view(), name='examples'),
+    path(r'', QueryView.as_view(), name='query'),
+    path(r'jobs/', JobsView.as_view(), name='jobs'),
+    path(r'examples/', ExamplesView.as_view(), name='examples'),
 
     # rest api
-    url(r'^api/', include(router.urls)),
+    path(r'api/', include(router.urls)),
 ]

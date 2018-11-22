@@ -1,12 +1,10 @@
 from django.conf import settings
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 from jsonfield import JSONField
 
 
-@python_2_unicode_compatible
 class Meeting(models.Model):
 
     title = models.CharField(
@@ -61,13 +59,10 @@ class Meeting(models.Model):
         verbose_name = _('Meeting')
         verbose_name_plural = _('Meetings')
 
-        permissions = (('view_meeting', 'Can view Meeting'),)
-
     def __str__(self):
         return self.title
 
 
-@python_2_unicode_compatible
 class Participant(models.Model):
 
     STATUS_ORGANIZER = 'ORGANIZER'
@@ -89,9 +84,9 @@ class Participant(models.Model):
     )
 
     meeting = models.ForeignKey(
-        Meeting, related_name='participants',
+        Meeting, related_name='participants', on_delete=models.CASCADE,
         verbose_name=_('Meeting'),
-        help_text=_('Meeting this participant has registered for')
+        help_text=_('Meeting this participant has registered for'),
     )
     first_name = models.CharField(
         max_length=256,
@@ -136,8 +131,6 @@ class Participant(models.Model):
         verbose_name = _('Participant')
         verbose_name_plural = _('Participants')
 
-        permissions = (('view_participant', 'Can view Participant'),)
-
     def __str__(self):
         return '%s (%s)' % (self.full_name, self.meeting)
 
@@ -164,11 +157,11 @@ class Participant(models.Model):
         except KeyError:
             return ''
 
-@python_2_unicode_compatible
+
 class Contribution(models.Model):
 
     participant = models.ForeignKey(
-        Participant, related_name='contributions',
+        Participant, related_name='contributions', on_delete=models.CASCADE,
         verbose_name=_('Participant'),
         help_text=_('Participant who submitted this contribution')
     )
@@ -195,8 +188,6 @@ class Contribution(models.Model):
 
         verbose_name = _('Contribution')
         verbose_name_plural = _('Contributions')
-
-        permissions = (('view_contribution', 'Can view Contribution'),)
 
     def __str__(self):
         return self.title

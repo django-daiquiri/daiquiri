@@ -26,7 +26,7 @@ def get_default_table_name():
 
 
 def get_user_schema_name(user):
-    if not user or user.is_anonymous():
+    if not user or user.is_anonymous:
         username = 'anonymous'
     else:
         username = user.username
@@ -35,7 +35,7 @@ def get_user_schema_name(user):
 
 
 def get_quota(user):
-    if not user or user.is_anonymous():
+    if not user or user.is_anonymous:
         quota = human2bytes(settings.QUERY_QUOTA.get('anonymous'))
 
     else:
@@ -58,7 +58,7 @@ def get_quota(user):
 
 
 def get_max_active_jobs(user):
-    if not user or user.is_anonymous():
+    if not user or user.is_anonymous:
         count = int(settings.QUERY_MAX_ACTIVE_JOBS.get('anonymous') or 0)
 
     else:

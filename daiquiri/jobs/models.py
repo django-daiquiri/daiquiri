@@ -1,15 +1,11 @@
-from __future__ import unicode_literals
-
 import uuid
 
 from django.db import models
 from django.contrib.auth.models import User
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 
 
-@python_2_unicode_compatible
 class Job(models.Model):
 
     PHASE_PENDING = 'PENDING'
@@ -52,7 +48,7 @@ class Job(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
-    owner = models.ForeignKey(User, blank=True, null=True)
+    owner = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE)
 
     client_ip = models.GenericIPAddressField(blank=True, null=True)
 
@@ -77,8 +73,6 @@ class Job(models.Model):
 
         verbose_name = _('Job')
         verbose_name_plural = _('Jobs')
-
-        permissions = (('view_job', 'Can view Job'),)
 
     def __str__(self):
         return str(self.id)

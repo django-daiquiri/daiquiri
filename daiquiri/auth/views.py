@@ -2,7 +2,7 @@ import json
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from daiquiri.core.utils import get_referer_path_info, get_next
 from django.views.generic import TemplateView
 from django.http import HttpResponseRedirect, JsonResponse

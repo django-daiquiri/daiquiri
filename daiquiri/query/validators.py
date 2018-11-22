@@ -11,7 +11,7 @@ class TableNameValidator(object):
 
     def set_context(self, serializer_field):
         request = serializer_field.parent.context['request']
-        self.user = None if request.user.is_anonymous() else request.user
+        self.user = None if request.user.is_anonymous else request.user
 
         if serializer_field.parent.instance:
             self.current_table_name = serializer_field.parent.instance.table_name

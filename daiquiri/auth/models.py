@@ -1,10 +1,7 @@
-from __future__ import unicode_literals
-
 import logging
 
 from django.contrib.auth.models import User
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 from jsonfield import JSONField
@@ -21,10 +18,10 @@ from .signals import (
 logger = logging.getLogger(__name__)
 
 
-@python_2_unicode_compatible
 class Profile(models.Model):
 
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+
     is_pending = models.BooleanField(
         default=False,
         help_text='Designates whether the user waiting on confirmation by a manager.')
@@ -44,8 +41,6 @@ class Profile(models.Model):
 
         verbose_name = _('Profile')
         verbose_name_plural = _('Profiles')
-
-        permissions = (('view_profile', 'Can view Profile'),)
 
     def __str__(self):
         return self.user.username

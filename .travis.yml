@@ -2,8 +2,6 @@ language: python
 cache: pip
 
 python:
-- 2.7
-- 3.4
 - 3.5
 - 3.6
 
@@ -20,6 +18,7 @@ before_install:
   - sudo apt-get install -y libmariadbd-dev libmariadbclient-dev
 
 install:
+- pip install --upgrade pip setuptools wheel
 - pip install -e .
 - pip install mysqlclient psycopg2-binary coveralls
 

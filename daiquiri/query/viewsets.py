@@ -49,7 +49,7 @@ class StatusViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
     def list(self, request):
         return Response([{
-            'guest': not request.user.is_authenticated(),
+            'guest': not request.user.is_authenticated,
             'queued_jobs': None,
             'size': QueryJob.objects.get_size(request.user),
             'quota': get_quota(request.user)
@@ -117,7 +117,7 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
     def perform_create(self, serializer):
         job = QueryJob(
             job_type=QueryJob.JOB_TYPE_INTERFACE,
-            owner=(None if self.request.user.is_anonymous() else self.request.user),
+            owner=(None if self.request.user.is_anonymous else self.request.user),
             run_id=serializer.data.get('run_id'),
             table_name=serializer.data.get('table_name'),
             query_language=serializer.data.get('query_language'),

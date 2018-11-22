@@ -1,9 +1,12 @@
-from django.conf.urls import url, include
+from django.urls import include, path
 
 from rest_framework import routers
 
 from .views import UsersView
 from .viewsets import ProfileViewSet, GroupViewSet
+
+
+app_name = 'auth'
 
 router = routers.DefaultRouter()
 router.register(r'profiles', ProfileViewSet)
@@ -11,8 +14,8 @@ router.register(r'groups', GroupViewSet)
 
 urlpatterns = [
     # user management
-    url(r'^users/', UsersView.as_view(), name='users'),
+    path('users/', UsersView.as_view(), name='users'),
 
     # rest api
-    url(r'^api/', include(router.urls)),
+    path('api/', include(router.urls)),
 ]

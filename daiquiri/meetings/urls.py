@@ -1,4 +1,4 @@
-from django.conf.urls import url, include
+from django.urls import include, path
 
 from rest_framework import routers
 
@@ -21,6 +21,9 @@ from .viewsets import (
     PaymentViewSet
 )
 
+
+app_name = 'meetings'
+
 router = routers.DefaultRouter()
 router.register(r'meetings', MeetingViewSet, base_name='meeting')
 router.register(r'participants', ParticipantViewSet, base_name='participant')
@@ -30,17 +33,13 @@ router.register(r'statuses', StatusViewSet, base_name='status')
 router.register(r'payments', PaymentViewSet, base_name='payment')
 
 urlpatterns = [
-    url(r'^api/', include(router.urls)),
-
-    url(r'^(?P<slug>[-\w]+)/registration/$', registration, name='registration'),
-    url(r'^(?P<slug>[-\w]+)/registration/done/$', registration_done, name='registration_done'),
-    url(r'^(?P<slug>[-\w]+)/participants/$', participants, name='participants'),
-    url(r'^(?P<slug>[-\w]+)/contributions/$', contributions, name='contributions'),
-    url(r'^(?P<slug>[-\w]+)/management/$', ManagementView.as_view(), name='management'),
-    url(r'^(?P<slug>[-\w]+)/export/participants/(?P<format>[a-z]+)/$',
-        ParticipantExportView.as_view(), name='export_participants'),
-    url(r'^(?P<slug>[-\w]+)/export/abstracts/$',
-        AbstractExportView.as_view(), name='export_abstracts'),
-    url(r'^(?P<slug>[-\w]+)/export/emails/$',
-        EmailExportView.as_view(), name='export_emails'),
+    path('api/', include(router.urls)),
+    path('<slug:slug>/registration/', registration, name='registration'),
+    path('<slug:slug>/registration/done/', registration_done, name='registration_done'),
+    path('<slug:slug>/participants/', participants, name='participants'),
+    path('<slug:slug>/contributions/', contributions, name='contributions'),
+    path('<slug:slug>/management/', ManagementView.as_view(), name='management'),
+    path('<slug:slug>/export/participants/<slug:format>/', ParticipantExportView.as_view(), name='export_participants'),
+    path('<slug:slug>/export/abstracts/', AbstractExportView.as_view(), name='export_abstracts'),
+    path('<slug:slug>/export/emails/', EmailExportView.as_view(), name='export_emails'),
 ]

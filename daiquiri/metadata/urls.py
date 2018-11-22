@@ -1,4 +1,4 @@
-from django.conf.urls import url, include
+from django.urls import include, path, re_path
 
 from rest_framework import routers
 
@@ -13,6 +13,9 @@ from .viewsets import (
     AccessLevelViewSet
 )
 
+
+app_name = 'metadata'
+
 router = routers.DefaultRouter()
 router.register(r'schemas', SchemaViewSet, base_name='schema')
 router.register(r'tables', TableViewSet, base_name='table')
@@ -23,10 +26,10 @@ router.register(r'licenses', LicenseViewSet, base_name='license')
 router.register(r'accesslevels', AccessLevelViewSet, base_name='accesslevel')
 
 urlpatterns = [
-    url(r'^api/', include(router.urls)),
+    path('api/', include(router.urls)),
 
-    url(r'^management/$', ManagementView.as_view(), name='management'),
+    path('management/', ManagementView.as_view(), name='management'),
 
-    url(r'^(?P<schema_name>\w+)/$', SchemaView.as_view(), name='schema'),
-    url(r'^(?P<schema_name>\w+)/(?P<table_name>\w+)/$', TableView.as_view(), name='table'),
+    re_path(r'^(?P<schema_name>\w+)/$', SchemaView.as_view(), name='schema'),
+    re_path(r'^(?P<schema_name>\w+)/(?P<table_name>\w+)/$', TableView.as_view(), name='table'),
 ]

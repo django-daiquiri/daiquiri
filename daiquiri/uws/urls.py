@@ -1,10 +1,12 @@
 from django.conf import settings
-from django.conf.urls import url, include
+from django.urls import include, re_path
 from django.views.generic import TemplateView
 
 from daiquiri.core.utils import import_class
 from daiquiri.jobs.routers import JobRouter
 
+
+app_name = 'uws'
 
 router = JobRouter(trailing_slash=False)
 
@@ -26,6 +28,6 @@ else:
         router.register(resource['prefix'], import_class(resource['viewset']), base_name=resource['base_name'])
 
 urlpatterns = [
-    url(r'^$', TemplateView.as_view(template_name='uws/root.html'), name='uws_root'),
-    url(r'', include(router.urls)),
+    re_path(r'^$', TemplateView.as_view(template_name='uws/root.html'), name='uws_root'),
+    re_path(r'', include(router.urls)),
 ]

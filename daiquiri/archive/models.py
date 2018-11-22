@@ -1,13 +1,11 @@
 import logging
 import os
-import six
 import uuid
 
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.db import models
 from django.http.request import QueryDict
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 from rest_framework.exceptions import ValidationError
@@ -25,7 +23,6 @@ from .tasks import create_archive_zip_file
 logger = logging.getLogger(__name__)
 
 
-@python_2_unicode_compatible
 class Collection(models.Model):
 
     objects = AccessLevelManager()
@@ -51,8 +48,6 @@ class Collection(models.Model):
         verbose_name = _('Collection')
         verbose_name_plural = _('Collections')
 
-        permissions = (('view_collection', 'Can view Collection'),)
-
     def __str__(self):
         return self.name
 
@@ -75,8 +70,6 @@ class ArchiveJob(Job):
 
         verbose_name = _('ArchiveJob')
         verbose_name_plural = _('ArchiveJobs')
-
-        permissions = (('view_archivejob', 'Can view ArchiveJob'),)
 
 
     @property
@@ -139,7 +132,7 @@ class ArchiveJob(Job):
             })
 
             # get the index of the path column in the row
-            path_index = six.next((i for i, column in enumerate(settings.ARCHIVE_COLUMNS) if column['name'] == 'path'))
+            path_index = next((i for i, column in enumerate(settings.ARCHIVE_COLUMNS) if column['name'] == 'path'))
 
             for row in rows:
                 # append the file to the list of files only if it exists on the filesystem
