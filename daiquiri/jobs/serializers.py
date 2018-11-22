@@ -8,9 +8,14 @@ from .utils import get_job_results
 
 class JobListSerializer(serializers.ModelSerializer):
 
+    creation_time = serializers.SerializerMethodField()
+
     class Meta:
         model = Job
         fields = ('id', 'phase', 'run_id', 'creation_time')
+
+    def get_creation_time(self, obj):
+        return obj.creation_time.strftime('%Y-%m-%dT%H:%M:%S.%fZ') if obj.creation_time else None
 
 
 class JobRetrieveSerializer(serializers.ModelSerializer):
@@ -19,6 +24,10 @@ class JobRetrieveSerializer(serializers.ModelSerializer):
     owner_id = serializers.SerializerMethodField()
     destruction = serializers.DateTimeField(source='destruction_time')
     results = serializers.SerializerMethodField()
+
+    creation_time = serializers.SerializerMethodField()
+    start_time = serializers.SerializerMethodField()
+    end_time = serializers.SerializerMethodField()
 
     class Meta:
         model = Job
@@ -45,6 +54,15 @@ class JobRetrieveSerializer(serializers.ModelSerializer):
 
     def get_results(self, obj):
         return get_job_results(self.context['request'], obj)
+
+    def get_creation_time(self, obj):
+        return obj.creation_time.strftime('%Y-%m-%dT%H:%M:%S.%fZ') if obj.creation_time else None
+
+    def get_start_time(self, obj):
+        return obj.start_time.strftime('%Y-%m-%dT%H:%M:%S.%fZ') if obj.start_time else None
+
+    def get_end_time(self, obj):
+        return obj.end_time.strftime('%Y-%m-%dT%H:%M:%S.%fZ') if obj.end_time else None
 
 
 class JobUpdateSerializer(CaseInsensitiveSerializer):
