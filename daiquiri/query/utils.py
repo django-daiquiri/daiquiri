@@ -288,7 +288,7 @@ def get_job_column(job, display_column_name):
         )
 
         return {
-            'name': column.description,
+            'name': column.name,
             'description': column.description,
             'unit': column.unit,
             'ucd': column.ucd,

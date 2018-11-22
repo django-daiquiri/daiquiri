@@ -6,7 +6,8 @@
       "path": "html",
       "access_level": "INTERNAL",
       "groups": [],
-      "depth": 1
+      "depth": 1,
+      "layout": true
     }
   },
     {
@@ -18,7 +19,8 @@
       "groups": [
         1
       ],
-      "depth": 3
+      "depth": 3,
+      "layout": true
     }
   },
   {
@@ -30,7 +32,8 @@
       "groups": [
         1
       ],
-      "depth": 1
+      "depth": 1,
+      "layout": false
     }
   }
 ]
