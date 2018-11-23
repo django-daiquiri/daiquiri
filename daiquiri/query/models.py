@@ -17,6 +17,7 @@ from jsonfield import JSONField
 
 from daiquiri.core.adapter import DatabaseAdapter, DownloadAdapter
 from daiquiri.core.constants import ACCESS_LEVEL_CHOICES
+from daiquiri.core.generators import generate_votable
 from daiquiri.jobs.models import Job
 from daiquiri.jobs.managers import JobManager
 from daiquiri.jobs.exceptions import JobError
@@ -257,16 +258,12 @@ class QueryJob(Job):
         )
 
         try:
-            return DownloadAdapter().generate(
-                'votable',
-                get_job_columns(self),
-                sources=job_sources,
-                schema_name=self.schema_name,
-                table_name=self.table_name,
-                query_status='OK',
-                query=self.query,
-                query_language=self.query_language
-            )
+            download_adapter = DownloadAdapter()
+            return generate_votable(adapter.fetchall(self.actual_query), get_job_columns(self),
+                table=download_adapter.get_table_name(schema_name, table_name),
+                infos=download_adapter.get_infos('OK', self.query, self.query_language, job_sources),
+                links=download_adapter.get_links(job_sources))
+
         except (OperationalError, ProgrammingError, InternalError, DataError) as e:
             self.error_summary = str(e)
             raise JobError(e)
@@ -330,7 +327,7 @@ class QueryJob(Job):
                 self.metadata.get('columns', []),
                 sources=self.metadata.get('sources', []),
                 schema_name=self.schema_name,
-                table_name=self.table_name,
+                table=self.table_name,
                 nrows=self.nrows,
                 query_status=self.result_status,
                 query=self.query,

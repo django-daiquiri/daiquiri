@@ -37,9 +37,10 @@ class BaseDownloadAdapter(object):
 
             elif format_key == 'votable':
                 return generate_votable(self.generate_rows(prepend=prepend), columns,
-                                        table_name=self.get_table_name(schema_name, table_name),
+                                        table=self.get_table_name(schema_name, table_name),
                                         infos=self.get_infos(query_status, query, query_language, sources),
-                                        links=self.get_links(sources), empty=(nrows==0))
+                                        links=self.get_links(sources),
+                                        empty=(nrows==0))
 
             elif format_key == 'fits':
                 return generate_fits(self.generate_rows(prepend=prepend), columns, nrows,
