@@ -256,13 +256,18 @@ def get_job_sources(job):
                     schema__name=schema_name
                 )
 
+                if settings.METADATA_BASE_URL:
+                    metadata_url = '%s/%s/%s' % (settings.METADATA_BASE_URL.strip('/'), schema_name, table_name)
+                else:
+                    metadata_url = ''
+
                 table.update({
                     'title': original_table.title,
                     'description': original_table.description,
                     'attribution': original_table.attribution,
                     'license': original_table.license,
                     'doi': original_table.doi,
-                    'url': reverse('metadata:table', args=[schema_name, table_name])
+                    'url': metadata_url
                 })
 
                 sources.append(table)

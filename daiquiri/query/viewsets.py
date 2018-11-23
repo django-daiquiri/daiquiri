@@ -313,14 +313,13 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
             # check if the file was lost
             if download_job.phase == download_job.PHASE_COMPLETED and os.path.isfile(download_job.file_path):
                 # stream the previously created file
-                return sendfile(request, download_job.file_path, attachment=True)
+                return sendfile(request, download_job.file_path)
         except DownloadJob.DoesNotExist:
             pass
 
         # stream the table directly from the database
         file_name = '%s.%s' % (job.table_name, format_config['extension'])
         response = FileResponse(job.stream(format_key), content_type=format_config['content_type'])
-        response['Content-Disposition'] = "attachment; filename=%s" % file_name
         return response
 
 

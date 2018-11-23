@@ -26,13 +26,13 @@ class FileTests(TestViewMixin, FilesViewTestCase):
 
     status_map = {
         'html': {
-            'admin': 200, 'manager': 200, 'user': 200, 'anonymous': 404
+            'admin': 200, 'manager': 200, 'user': 200, 'anonymous': 302
         },
         'html_a': {
-            'admin': 200, 'manager': 200, 'user': 200, 'anonymous': 404
+            'admin': 200, 'manager': 200, 'user': 200, 'anonymous': 302
         },
         'html_a_a': {
-            'admin': 404, 'manager': 200, 'user': 404, 'anonymous': 404
+            'admin': 403, 'manager': 200, 'user': 403, 'anonymous': 302
         },
         'html_a_b': {
             'admin': 404, 'manager': 404, 'user': 404, 'anonymous': 404

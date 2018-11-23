@@ -6,6 +6,7 @@ import re
 from django.conf import settings
 
 from daiquiri.core.generators import generate_csv, generate_votable, generate_fits
+from daiquiri.core.utils import get_doi_url
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +17,8 @@ class BaseDownloadAdapter(object):
         self.database_key = database_key
         self.database_config = database_config
 
-    def generate(self, format_key, schema_name, table_name, columns, sources=None, status=None, nrows=None):
+    def generate(self, format_key, columns, sources=[], schema_name=None, table_name=None, nrows=None,
+                 query_status=None, query=None, query_language=None):
         # create the final list of arguments subprocess.Popen
         if format_key == 'sql':
             # create the final list of arguments subprocess.Popen
@@ -35,12 +37,13 @@ class BaseDownloadAdapter(object):
 
             elif format_key == 'votable':
                 return generate_votable(self.generate_rows(prepend=prepend), columns,
-                                        resource_name=schema_name, table_name=table_name,
-                                        sources=sources, query_status=status, empty=(nrows==0))
+                                        table_name=self.get_table_name(schema_name, table_name),
+                                        infos=self.get_infos(query_status, query, query_language, sources),
+                                        links=self.get_links(sources), empty=(nrows==0))
 
             elif format_key == 'fits':
-                return generate_fits(self.generate_rows(prepend=prepend), columns,
-                                     nrows=nrows, table_name=table_name)
+                return generate_fits(self.generate_rows(prepend=prepend), columns, nrows,
+                                     table_name=self.get_table_name(schema_name, table_name))
 
             else:
                 raise Exception('Not supported.')
@@ -54,8 +57,8 @@ class BaseDownloadAdapter(object):
             process = subprocess.Popen(self.args, stdout=subprocess.PIPE)
 
             for line in process.stdout:
-                if not line.startswith(('\n', '\r\n', '--', 'SET', '/*!')):
-                    yield line
+                if not line.startswith((b'\n', b'\r\n', b'--', b'SET', b'/*!')):
+                    yield line.decode()
 
         except subprocess.CalledProcessError as e:
             logger.error('Command PIPE returned non-zero exit status: %s' % e)
@@ -98,3 +101,31 @@ class BaseDownloadAdapter(object):
                     prepend[i] = settings.FILES_BASE_URL
 
         return prepend
+
+    def get_table_name(self, schema_name, table_name):
+        return '%(schema_name)s.%(table_name)s' % {
+            'schema_name': schema_name,
+            'table_name': table_name
+        }
+
+    def get_infos(self, query_status, query, query_language, sources):
+        infos = [
+            {'key': 'QUERY_STATUS', 'value': query_status},
+            {'key': 'QUERY', 'value': query},
+            {'key': 'QUERY_LANGUAGE', 'value': query_language},
+        ]
+
+        for source in sources:
+            infos.append({
+                'key': 'SOURCE',
+                'value': '%(schema_name)s.%(table_name)s' % source
+            })
+
+        return infos
+
+    def get_links(self, sources):
+        return [{
+            'title': '%(schema_name)s.%(table_name)s' % source,
+            'content_role': 'doc',
+            'href': get_doi_url(source['doi']) if source['doi'] else source['url']
+        } for source in sources]

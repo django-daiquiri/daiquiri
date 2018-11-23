@@ -16,7 +16,6 @@ from rest_framework.exceptions import ValidationError
 from jsonfield import JSONField
 
 from daiquiri.core.adapter import DatabaseAdapter, DownloadAdapter
-from daiquiri.core.generators import generate_votable
 from daiquiri.core.constants import ACCESS_LEVEL_CHOICES
 from daiquiri.jobs.models import Job
 from daiquiri.jobs.managers import JobManager
@@ -258,12 +257,15 @@ class QueryJob(Job):
         )
 
         try:
-            return generate_votable(
-                adapter.fetchall(self.actual_query),
+            return DownloadAdapter().generate(
+                'votable',
                 get_job_columns(self),
-                table_name=self.table_name,
                 sources=job_sources,
-                query_status='OK'
+                schema_name=self.schema_name,
+                table_name=self.table_name,
+                query_status='OK',
+                query=self.query,
+                query_language=self.query_language
             )
         except (OperationalError, ProgrammingError, InternalError, DataError) as e:
             self.error_summary = str(e)
@@ -325,12 +327,14 @@ class QueryJob(Job):
         if self.phase == self.PHASE_COMPLETED:
             return DownloadAdapter().generate(
                 format_key,
-                self.schema_name,
-                self.table_name,
-                self.metadata.get('columns'),
-                self.metadata.get('sources'),
-                self.result_status,
-                self.nrows
+                self.metadata.get('columns', []),
+                sources=self.metadata.get('sources', []),
+                schema_name=self.schema_name,
+                table_name=self.table_name,
+                nrows=self.nrows,
+                query_status=self.result_status,
+                query=self.query,
+                query_language=self.query_language
             )
         else:
             raise ValidationError({

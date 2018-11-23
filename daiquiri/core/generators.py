@@ -27,39 +27,27 @@ def generate_csv(generator, fields):
             yield f.getvalue()
 
 
-def generate_votable(generator, fields, resource_name=None, table_name=None, sources=None, query_status=None, empty=None):
+def generate_votable(generator, fields, infos=[], links=[], table_name=None, empty=None):
         yield '''<?xml version="1.0"?>
 <VOTABLE version="1.3"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="http://www.ivoa.net/xml/VOTable/v1.3"
     xmlns:stc="http://www.ivoa.net/xml/STC/v1.30">'''
 
-        if resource_name:
-            yield '''
-    <RESOURCE name="%(name)s" type="results">''' % {'name': resource_name}
-        else:
-            yield '''
+        yield '''
     <RESOURCE type="results">'''
 
-        if query_status == 'OK':
+        for info in infos:
             yield '''
-        <INFO name="QUERY_STATUS" value="OK" />'''
-        elif query_status == 'OVERFLOW':
-            yield '''
-        <INFO name="QUERY_STATUS" value="OVERFLOW" />'''
+        <INFO name="%(key)s" value="%(value)s" />''' % info
 
-        if sources:
-            for source in sources:
-                yield '''
-        <LINK name="%(schema_name)s.%(table_name)s" content-role="source" href="%(href)s"/>''' % {
-            'schema_name': source['schema_name'],
-            'table_name': source['table_name'],
-            'href': get_doi_url(source['doi']) or ''
-        }
-
-        if table_name:
+        for link in links:
             yield '''
-        <TABLE name="%(table)s">''' % {'table': table_name}
+        <LINK title="%(title)s" content-role="%(content_role)s" href="%(href)s"/>''' % link
+
+        if table_name is not None:
+            yield '''
+        <TABLE name="%s">''' % table_name
         else:
             yield '''
         <TABLE>'''
@@ -72,7 +60,7 @@ def generate_votable(generator, fields, resource_name=None, table_name=None, sou
                     attrs.append('%s="%s"' % (key, value))
 
             if 'arraysize' in field and field['arraysize']:
-                attrs.append('arraysize="%d"' % field['arraysize'])
+                attrs.append('arraysize="%s"' % field['arraysize'])
 
             if field['datatype'] in ['char', 'unsignedByte', 'short', 'int', 'long', 'float', 'double']:
                 attrs.append('datatype="%s"' % field['datatype'])
