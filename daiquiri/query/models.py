@@ -260,7 +260,7 @@ class QueryJob(Job):
         try:
             download_adapter = DownloadAdapter()
             return generate_votable(adapter.fetchall(self.actual_query), get_job_columns(self),
-                table=download_adapter.get_table_name(schema_name, table_name),
+                table=download_adapter.get_table_name(self.schema_name, self.table_name),
                 infos=download_adapter.get_infos('OK', self.query, self.query_language, job_sources),
                 links=download_adapter.get_links(job_sources))
 

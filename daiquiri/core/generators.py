@@ -27,7 +27,7 @@ def generate_csv(generator, fields):
             yield f.getvalue()
 
 
-def generate_votable(generator, fields, infos=[], links=[], table_name=None, empty=None):
+def generate_votable(generator, fields, infos=[], links=[], table=None, empty=None):
     yield '''<?xml version="1.0"?>
 <VOTABLE version="1.3"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -45,9 +45,9 @@ def generate_votable(generator, fields, infos=[], links=[], table_name=None, emp
         yield '''
         <LINK title="%(title)s" content-role="%(content_role)s" href="%(href)s"/>''' % link
 
-    if table_name is not None:
+    if table is not None:
         yield '''
-        <TABLE name="%s">''' % table_name
+        <TABLE name="%s">''' % table
     else:
         yield '''
         <TABLE>'''
