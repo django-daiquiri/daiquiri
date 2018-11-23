@@ -327,7 +327,7 @@ class QueryJob(Job):
                 self.metadata.get('columns', []),
                 sources=self.metadata.get('sources', []),
                 schema_name=self.schema_name,
-                table=self.table_name,
+                table_name=self.table_name,
                 nrows=self.nrows,
                 query_status=self.result_status,
                 query=self.query,
