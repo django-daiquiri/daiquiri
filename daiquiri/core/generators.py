@@ -28,65 +28,67 @@ def generate_csv(generator, fields):
 
 
 def generate_votable(generator, fields, infos=[], links=[], table_name=None, empty=None):
-        yield '''<?xml version="1.0"?>
+    yield '''<?xml version="1.0"?>
 <VOTABLE version="1.3"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="http://www.ivoa.net/xml/VOTable/v1.3"
     xmlns:stc="http://www.ivoa.net/xml/STC/v1.30">'''
 
-        yield '''
+    yield '''
     <RESOURCE type="results">'''
 
-        for info in infos:
-            yield '''
+    for info in infos:
+        yield '''
         <INFO name="%(key)s" value="%(value)s" />''' % info
 
-        for link in links:
-            yield '''
+    for link in links:
+        yield '''
         <LINK title="%(title)s" content-role="%(content_role)s" href="%(href)s"/>''' % link
 
-        if table_name is not None:
-            yield '''
+    if table_name is not None:
+        yield '''
         <TABLE name="%s">''' % table_name
-        else:
-            yield '''
+    else:
+        yield '''
         <TABLE>'''
 
-        for field in fields:
-            attrs = []
-            for key in ['name', 'unit', 'ucd', 'utype']:
-                if key in field and field[key]:
-                    value = field[key].replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
-                    attrs.append('%s="%s"' % (key, value))
+    for field in fields:
+        attrs = []
+        for key in ['name', 'unit', 'ucd', 'utype']:
+            if key in field and field[key]:
+                value = field[key].replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+                attrs.append('%s="%s"' % (key, value))
 
-            if 'arraysize' in field and field['arraysize']:
-                attrs.append('arraysize="%s"' % field['arraysize'])
+        if 'arraysize' in field and field['arraysize']:
+            attrs.append('arraysize="%s"' % field['arraysize'])
 
+        if 'datatype' in field:
             if field['datatype'] in ['char', 'unsignedByte', 'short', 'int', 'long', 'float', 'double']:
                 attrs.append('datatype="%s"' % field['datatype'])
             else:
                 attrs.append('xtype="%s"' % field['datatype'])
 
+        if attrs:
             yield '''
             <FIELD %s />''' % ' '.join(attrs)
 
-        if not empty:
-            yield '''
+    if not empty:
+        yield '''
             <DATA>
                 <TABLEDATA>'''
 
-            # write rows of the table yielded by the generator
-            for row in generator:
-                yield '''
+        # write rows of the table yielded by the generator
+        for row in generator:
+            yield '''
                     <TR>
                         <TD>%s</TD>
                     </TR>''' % '''</TD>
                         <TD>'''.join([('' if cell == 'NULL' else str(cell)) for cell in row])
 
-            yield '''
+        yield '''
                 </TABLEDATA>
             </DATA>'''
-        yield '''
+    yield '''
         </TABLE>
     </RESOURCE>
 </VOTABLE>
