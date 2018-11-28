@@ -24,7 +24,7 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
             'arraysize': True
         },
         'boolean': {
-            'datatype': 'unsignedByte',
+            'datatype': 'boolean',
             'arraysize': False
         },
         'smallint': {
