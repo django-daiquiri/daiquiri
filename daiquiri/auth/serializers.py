@@ -53,20 +53,21 @@ class ProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer()
     emails = serializers.SerializerMethodField(read_only=True)
     details = JSONField(allow_null=True)
-    attributes = JSONField(allow_null=True, read_only=True)
+    attributes = JSONField(allow_null=True)
 
     class Meta:
         model = Profile
         fields = ('id', 'full_name', 'user', 'is_confirmed', 'is_pending', 'emails', 'details', 'attributes')
 
     def update(self, obj, validated_data):
-        user = validated_data.pop('user')
+        if 'user' in validated_data:
+            user = validated_data.pop('user')
 
-        # update the user for this profile seperately
-        obj.user.first_name = user['first_name']
-        obj.user.last_name = user['last_name']
-        obj.user.groups.set(user['groups'])
-        obj.user.save()
+            # update the user for this profile seperately
+            obj.user.first_name = user['first_name']
+            obj.user.last_name = user['last_name']
+            obj.user.groups.set(user['groups'])
+            obj.user.save()
 
         return super(ProfileSerializer, self).update(obj, validated_data)
 
