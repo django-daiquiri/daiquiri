@@ -39,7 +39,7 @@ class Command(BaseCommand):
             print('The following QueryJobs have no associated database table:')
 
             for job in stale_jobs:
-                username = owner.username if owner else 'anonymous'
+                username = job.owner.username if job.owner else 'anonymous'
                 print('%s by %s -> %s.%s' % (job.id, username, job.schema_name, job.table_name))
 
             if options['archive']:
