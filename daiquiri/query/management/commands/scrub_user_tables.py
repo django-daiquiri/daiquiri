@@ -36,17 +36,17 @@ class Command(BaseCommand):
                     table_name=table['name']
                 ).first()
 
-                if job and job.phase != QueryJob.PHASE_ARCHIVED:
-                    stale_tables.append((schema_name, table['name']))
+                if job and job.phase not in [QueryJob.PHASE_EXECUTING, QueryJob.PHASE_COMPLETED]:
+                    stale_tables.append((schema_name, table['name'], job.phase if job else None))
 
         if stale_tables:
             print('The following database tables have no associated QueryJob:')
 
             for stale_table in stale_tables:
-                print('* %s.%s' % stale_table)
+                print('%s.%s -> %s' % stale_table)
 
             if options['delete']:
-                for schema_name, table_name in stale_tables:
+                for schema_name, table_name, phase in stale_tables:
                     adapter.drop_table(schema_name, table_name)
 
                 print('The tables have been deleted.')
