@@ -80,6 +80,9 @@ GROUPS = {
         'daiquiri_metadata.change_function',
         'daiquiri_metadata.delete_function'
     ],
+    'stats_manager': [
+        'daiquiri_stats.view_record'
+    ],
     'query_manager': [
         'daiquiri_query.view_example',
         'daiquiri_query.add_example',
