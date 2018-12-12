@@ -15,22 +15,13 @@ body {
     }
 }
 
-.page,
-.wide,
-.sidebar {
-    margin-top: 100px;
-    margin-bottom: 100px;
+main {
+    padding-top: 70px;
+    padding-bottom: 20px;
 
-    @media (max-width: $screen-sm-max) {
-        margin-top: 20px;
-        margin-bottom: 20px;
-
-        &:first-child {
-            margin-top: 100px;
-        }
-        &:last-child {
-            margin-bottom: 40px;
-        }
+    @media (min-width: $screen-xs-max) {
+        padding-top: 100px;
+        padding-bottom: 100px;
     }
 }
 
@@ -328,17 +319,19 @@ footer {
 .modal-body {
     max-height: calc(100vh - 225px);
     overflow-y: auto;
+
+    img {
+        max-width: 100%;
+    }
+    dl {
+        margin-top: 5px;
+        margin-bottom: 0;
+    }
+    dl:first-child {
+        margin-top: 0;
+    }
 }
-.modal-body img {
-    max-width: 100%;
-}
-.modal-body dl {
-    margin-top: 5px;
-    margin-bottom: 0;
-}
-.modal-body dl:first-child {
-    margin-top: 0;
-}
+
 .modal-seperator {
     margin-left: -15px;
     margin-right: -15px;
@@ -409,7 +402,7 @@ div.control-label {
     font-weight: bold;
 }
 
-.daiquiri-multi-checkbox > :first-child {
+.daiquiri-multi-checkbox >:first-child {
     margin-top: 0;
 }
 .daiquiri-multi-checkbox > :last-child {
@@ -444,35 +437,39 @@ div.fieldset {
     text-overflow: ellipsis;
 }
 
-.email-form label,
-.connections-form label {
-    display: block;
-    margin: 0;
-    line-height: 40px;
-    border-bottom: 1px solid $modal-border-color;
-}
-.email-form label:first-child,
-.connections-form label:first-child {
-    border-top: 1px solid $modal-border-color;
-}
-.email-form label input,
-.connections-form label input {
-    margin-left: 5px;
-    margin-right: 5px;
+.email-form,
+.connections-form {
+    label {
+        display: block;
+        margin: 0;
+        line-height: 40px;
+        border-bottom: 1px solid $modal-border-color;
+
+        &:first-child {
+            border-top: 1px solid $modal-border-color;
+        }
+
+        input {
+            margin-left: 5px;
+            margin-right: 5px;
+        }
+    }
 }
 .email-form .email-form-buttons,
 .connections-form .connections-form-buttons {
     margin-top: 10px;
 }
+
 .socialaccount_providers {
     margin: 0;
     padding: 0;
     height: 42px;
-}
-.socialaccount_providers li {
-    float: left;
-    margin-right: 10px;
-    list-style: none;
+
+    li {
+        float: left;
+        margin-right: 10px;
+        list-style: none;
+    }
 }
 .socialaccount_provider_name {
     line-height: 29px;
@@ -481,29 +478,31 @@ div.fieldset {
 
 .logout-form {
     margin: 0;
+
+    .btn-link {
+        padding: 3px 20px;
+        display: block;
+        width: 100%;
+        text-align: left;
+        border: none;
+        clear: both;
+        font-weight: 400;
+        line-height: 1.42857143;
+        white-space: nowrap;
+    }
+    .btn-link:hover {
+        color: $navigation-dropdown-hover-color;
+        background-color: $navigation-dropdown-hover-background-color;
+        text-decoration: none;
+    }
+    .btn-link:focus {
+        color: $navigation-dropdown-hover-color;
+        background-color: $navigation-dropdown-hover-background-color;
+        text-decoration: none;
+        outline: none;
+    }
 }
-.logout-form .btn-link {
-    padding: 3px 20px;
-    display: block;
-    width: 100%;
-    text-align: left;
-    border: none;
-    clear: both;
-    font-weight: 400;
-    line-height: 1.42857143;
-    white-space: nowrap;
-}
-.logout-form .btn-link:hover {
-    color: $navigation-dropdown-hover-color;
-    background-color: $navigation-dropdown-hover-background-color;
-    text-decoration: none;
-}
-.logout-form .btn-link:focus {
-    color: $navigation-dropdown-hover-color;
-    background-color: $navigation-dropdown-hover-background-color;
-    text-decoration: none;
-    outline: none;
-}
+
 .pager-vertical {
     a {
         margin-bottom: 10px;
