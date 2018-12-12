@@ -134,6 +134,7 @@ AUTHENTICATION_BACKENDS = (
 )
 
 ACCOUNT_LOGOUT_ON_GET = False
+ACCOUNT_LOGOUT_REDIRECT_URL = '/'
 ACCOUNT_ADAPTER = 'daiquiri.auth.adapter.DaiquiriAccountAdapter'
 ACCOUNT_SIGNUP_FORM_CLASS = 'daiquiri.auth.forms.SignupForm'
 ACCOUNT_USER_DISPLAY = 'daiquiri.auth.utils.get_full_name'
