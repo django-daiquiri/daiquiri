@@ -62,3 +62,10 @@ def default_blank_unit(value, unit):
 @register.filter()
 def basename(value):
     return os.path.basename(value)
+
+
+@register.filter()
+def startswith(text, starts):
+    if isinstance(text, str):
+        return text.startswith(starts)
+    return False
