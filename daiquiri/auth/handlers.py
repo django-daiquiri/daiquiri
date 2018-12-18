@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.dispatch import receiver
 from django.db.models.signals import post_save, m2m_changed
 
-from allauth.account.signals import email_confirmed
+from allauth.account.signals import email_confirmed, password_changed, password_reset
 
 from .models import Profile
 
@@ -26,7 +26,8 @@ from .utils import (
     send_notify_confirmation,
     send_notify_rejection,
     send_notify_activation,
-    send_activation
+    send_activation,
+    send_notify_password_changed,
 )
 
 logger = logging.getLogger(__name__)
@@ -142,3 +143,17 @@ def user_enabled_handler(sender, **kwargs):
     user = kwargs['user']
 
     logger.info('user \'%s\' enabled by \'%s\'.' % (user.username, request.user.username))
+
+
+@receiver(password_changed)
+@receiver(password_reset)
+def password_changed_handler(sender, **kwargs):
+    '''
+    Gets notified when a user was disabled by a manager.
+    '''
+    request = kwargs['request']
+    user = kwargs['user']
+
+    logger.info('user \'%s\' changed his/her password.' % user.username)
+    if settings.AUTH_WORKFLOW == 'confirmation':
+        send_notify_password_changed(request, user)

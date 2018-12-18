@@ -87,3 +87,14 @@ def send_activation(request, user):
         'login_url': request.build_absolute_uri(reverse('account_login'))
     }
     send_mail(request, 'account/email/activation', context, [user.email])
+
+
+def send_notify_password_changed(request, user):
+    '''
+    Sends an email to the admins once a user updated his/her account.
+    '''
+    emails = get_admin_emails()
+    context = {
+        'user': user
+    }
+    send_mail(request, 'account/email/notify_password_changed', context, emails)
