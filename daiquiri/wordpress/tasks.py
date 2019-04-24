@@ -9,7 +9,6 @@ from daiquiri.core.tasks import Task
 
 @shared_task(base=Task)
 def update_wordpress_user(username, email, first_name, last_name):
-
     # check if the user already exists
     try:
         subprocess.check_output([
@@ -45,11 +44,15 @@ def update_wordpress_user(username, email, first_name, last_name):
 
 @shared_task(base=Task)
 def update_wordpress_role(username, role):
-    return subprocess.check_output([
-        settings.WORDPRESS_CLI,
-        'user',
-        'set-role',
-        username,
-        role,
-        '--path=%s' % settings.WORDPRESS_PATH
-    ], stderr=subprocess.STDOUT)
+    try:
+        return subprocess.check_output([
+            settings.WORDPRESS_CLI,
+            'user',
+            'set-role',
+            username,
+            role,
+            '--path=%s' % settings.WORDPRESS_PATH
+        ], stderr=subprocess.STDOUT)
+
+    except subprocess.CalledProcessError:
+        pass
