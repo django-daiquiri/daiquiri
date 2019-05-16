@@ -26,9 +26,9 @@ Obtain repositories
 Clone the repositories and call them `daiquiri`, `app`, and `queryparser`:
 
 ```
-git clone https://github.com/aipescience/django-daiquiri daiquiri
-git clone https://github.com/aipescience/django-daiquiri-app app
-git clone https://github.com/aipescience/queryparser queryparser
+git clone https://github.com/django-daiquiri/daiquiri daiquiri
+git clone https://github.com/django-daiquiri/app app
+git clone https://github.com/django-daiquiri/queryparser queryparser
 ```
 
 Build the queryparser
@@ -38,7 +38,7 @@ Change to the queryparser directory, fetch `antlr` and run `make`:
 
 ```
 cd queryparser
-wget http://www.antlr.org/download/antlr-4.7-complete.jar
+wget http://www.antlr.org/download/antlr-4.7.2-complete.jar
 make
 ```
 
