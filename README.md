@@ -20,7 +20,7 @@ Quick start
 
 ```bash
 apt-get install -y git build-essential libxml2-dev libxslt-dev zlib1g-dev libssl-dev
-apt-get install -y mariadb-client mariadb-server libmariadb-dev libmariadbclient-dev
+apt-get install -y mariadb-client mariadb-server libmariadb-dev libmariadbclient-dev libmariadb-dev-compat
 ```
 
 More about Daiquiri's prerequisites including different Linux distributions can be found [here](https://github.com/aipescience/django-daiquiri/tree/master/docs/prerequisites.md).
@@ -28,7 +28,7 @@ More about Daiquiri's prerequisites including different Linux distributions can 
 ### Fork the daiquiri-app
 
 ```bash
-git clone https://github.com/aipescience/django-daiquiri-app app
+git clone https://github.com/django-daiquiri/app app
 ```
 
 ### Set up the virtual enviroment and install dependencies
