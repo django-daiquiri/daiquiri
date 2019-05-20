@@ -104,6 +104,12 @@ QUERY_FORMS = [
         'label': 'SQL query',
         'service': 'query/js/forms/sql.js',
         'template': 'query/query_form_sql.html'
+    },
+    {
+        'key': 'upload',
+        'label': 'Upload VOTable',
+        'service': 'query/js/forms/upload.js',
+        'template': 'query/query_form_upload.html'
     }
 ]
 QUERY_DROPDOWNS = [

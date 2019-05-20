@@ -25,6 +25,7 @@ class Command(BaseCommand):
 
             config['PREFIX'] = settings.QUERY_USER_SCHEMA_PREFIX
             config['TAP_SCHEMA'] = settings.TAP_SCHEMA
+            config['TAP_UPLOAD'] = settings.TAP_UPLOAD
             config['TEST_NAME'] = 'test_%(NAME)s' % config
 
         return config
@@ -78,6 +79,7 @@ GRANT ALL PRIVILEGES ON `%(TEST_NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\';
 CREATE DATABASE %(TEST_NAME)s WITH OWNER %(USER)s;
 \c %(TEST_NAME)s
 CREATE SCHEMA %(TAP_SCHEMA)s AUTHORIZATION %(USER)s;
+CREATE SCHEMA %(TAP_UPLOAD)s AUTHORIZATION %(USER)s;
 ''' % config['data'])
 
         else:
@@ -100,6 +102,7 @@ CREATE DATABASE %(NAME)s WITH OWNER %(USER)s;
                     print('''-- Run the following commands on \'%(HOST)s\':
 CREATE USER \'%(USER)s\'@\'%(CLIENT)s\' identified by \'%(PASSWORD)s\';
 GRANT ALL PRIVILEGES ON `%(TAP_SCHEMA)s`.* to \'%(USER)s\'@\'%(CLIENT)s\';
+GRANT ALL PRIVILEGES ON `%(TAP_UPLOAD)s`.* to \'%(USER)s\'@\'%(CLIENT)s\';
 GRANT ALL PRIVILEGES ON `%(PREFIX)s%%`.* to \'%(USER)s\'@\'%(CLIENT)s\';
 ''' % config['data'])
 
@@ -110,4 +113,5 @@ CREATE DATABASE %(NAME)s;
 GRANT CREATE ON DATABASE %(NAME)s TO %(USER)s;
 \c %(NAME)s
 CREATE SCHEMA %(TAP_SCHEMA)s AUTHORIZATION %(USER)s;
+CREATE SCHEMA %(TAP_UPLOAD)s AUTHORIZATION %(USER)s;
 ''' % config['data'])

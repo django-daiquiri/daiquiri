@@ -361,8 +361,15 @@ footer {
 /* panel */
 
 .panel {
-    .panel-body p:last-child {
+    .panel-body p:last-child,
+    .panel-body dl:last-child {
         margin-bottom: 0;
+    }
+
+    .panel-footer {
+        ul, p {
+            margin: 0;
+        }
     }
 
     li {

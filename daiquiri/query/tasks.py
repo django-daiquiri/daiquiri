@@ -262,3 +262,8 @@ def abort_query(pid):
     except OperationalError:
         # the query was probably killed before
         pass
+
+
+@shared_task(base=Task)
+def ingest_table(job_id, file_path):
+    print(job_id, file_path)

@@ -133,12 +133,14 @@ class QueryJobUpdateSerializer(serializers.ModelSerializer):
 class QueryJobUploadSerializer(serializers.ModelSerializer):
 
     table_name = serializers.CharField(required=True, validators=[TableNameValidator()])
+    run_id = serializers.CharField(default='')
     file = serializers.FileField(max_length=None, allow_empty_file=False)
 
     class Meta:
         model = QueryJob
         fields = (
             'table_name',
+            'run_id',
             'file'
         )
 

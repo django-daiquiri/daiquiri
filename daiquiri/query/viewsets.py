@@ -40,7 +40,14 @@ from .serializers import (
     AsyncQueryJobSerializer
 )
 from .permissions import HasPermission
-from .utils import get_format_config, get_quota, fetch_user_schema_metadata, handle_table_upload
+from .utils import (
+    get_user_schema_name,
+    get_format_config,
+    get_quota,
+    fetch_user_schema_metadata,
+    handle_table_upload
+)
+
 from .filters import JobFilterBackend
 
 
@@ -156,8 +163,21 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
         })
         serializer.is_valid(raise_exception=True)
 
-        handle_table_upload(serializer.validated_data, request.user)
-        return Response()
+        file_name = handle_table_upload(serializer.validated_data, request.user)
+
+        job = QueryJob(
+            job_type=QueryJob.JOB_TYPE_INTERFACE,
+            owner=(None if self.request.user.is_anonymous else self.request.user),
+            run_id=serializer.validated_data.get('run_id'),
+            schema_name=get_user_schema_name(request.user),
+            table_name=serializer.validated_data.get('table_name'),
+            client_ip=get_client_ip(self.request)
+        )
+        job.save()
+        job.ingest(file_name)
+
+        serializer = QueryJobRetrieveSerializer(instance=job)
+        return Response(serializer.data)
 
     @detail_route(methods=['put'])
     def abort(self, request, pk=None):

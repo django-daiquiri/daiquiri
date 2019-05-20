@@ -214,6 +214,34 @@ app.factory('QueryService', ['$resource', '$http', '$injector', '$q', '$filter',
             });
     };
 
+    service.upload_job = function(values) {
+        // a special version of submit_job for the upload
+
+        // put the payload in a FormData object
+        var formdata = new FormData();
+        angular.forEach(values, function(value, key) {
+            if (angular.isDefined(value) && value) {
+                formdata.append(key, value);
+            }
+        });
+
+        service.submitting = true;
+        return $http({
+                method: 'POST',
+                url: upload_url,
+                headers: {
+                    'Content-Type': undefined
+                },
+                data: formdata
+            })
+            .then(function (response) {
+                service.fetch_status();
+                service.activate_job(response.data);
+            }).finally(function() {
+                service.submitting = false;
+            });
+    }
+
     service.activate_job = function(job) {
         service.form = null;
         service.fetch_job(job).then(function() {
@@ -241,16 +269,7 @@ app.factory('QueryService', ['$resource', '$http', '$injector', '$q', '$filter',
 
     service.modal = function(modal_id) {
         service.errors = {};
-
-        if (service.job) {
-            service.values = service.job;
-        } else {
-            // upload-table-modal
-            service.values = {};
-
-            // reset the input field
-            angular.element('#upload_table_file')[0].value = '';
-        }
+        service.values = service.job;
 
         $('#' + modal_id).modal('show');
     };
@@ -295,25 +314,6 @@ app.factory('QueryService', ['$resource', '$http', '$injector', '$q', '$filter',
             }
 
             $('.modal').modal('hide');
-        });
-    };
-
-    service.upload_table = function() {
-        var formdata = new FormData();
-        formdata.append('table_name', service.values.table_name);
-        formdata.append('file', service.values.file);
-
-        $http({
-            method: 'POST',
-            url: upload_url,
-            headers: {
-                'Content-Type': undefined
-            },
-            data: formdata
-        }).then(function (data) {
-            $('.modal').modal('hide');
-        }, function (response) {
-            service.errors = response.data;
         });
     };
 

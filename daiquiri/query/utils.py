@@ -5,9 +5,7 @@ from django.conf import settings
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 
-
 from daiquiri.core.adapter import DatabaseAdapter
-
 from daiquiri.core.utils import human2bytes
 from daiquiri.metadata.models import Schema, Table, Column, Function
 
@@ -341,3 +339,5 @@ def handle_table_upload(data, user):
     with open(file_path, 'wb+') as destination:
         for chunk in data['file'].chunks():
             destination.write(chunk)
+
+    return file_path

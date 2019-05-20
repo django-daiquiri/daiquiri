@@ -75,11 +75,6 @@
     </button>
 
     <div class="pull-right">
-        {% if settings.QUERY_UPLOAD %}
-        <button class="btn btn-default" ng-click="service.modal('upload-table-modal')">
-            {% trans 'Upload table' %}
-        </button>
-        {% endif %}
         <button class="btn btn-default" ng-click="service.forms.sql.clear_query()">
             {% trans 'Clear input window' %}
         </button>

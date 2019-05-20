@@ -49,7 +49,8 @@ from .tasks import (
     create_archive_file,
     rename_table,
     drop_table,
-    abort_query
+    abort_query,
+    ingest_table
 )
 
 logger = logging.getLogger(__name__)
@@ -260,9 +261,9 @@ class QueryJob(Job):
         try:
             download_adapter = DownloadAdapter()
             return generate_votable(adapter.fetchall(self.actual_query), get_job_columns(self),
-                table=download_adapter.get_table_name(self.schema_name, self.table_name),
-                infos=download_adapter.get_infos('OK', self.query, self.query_language, job_sources),
-                links=download_adapter.get_links(job_sources))
+                                    table=download_adapter.get_table_name(self.schema_name, self.table_name),
+                                    infos=download_adapter.get_infos('OK', self.query, self.query_language, job_sources),
+                                    links=download_adapter.get_links(job_sources))
 
         except (OperationalError, ProgrammingError, InternalError, DataError) as e:
             self.error_summary = str(e)
@@ -379,6 +380,12 @@ class QueryJob(Job):
             return self.metadata.get('columns', [])
         else:
             return []
+
+    def ingest(self, file_path):
+        if not settings.ASYNC:
+            ingest_table.apply((self.id, file_path), throw=True)
+        else:
+            ingest_table.apply_async((self.id, file_path))
 
 
 class DownloadJob(Job):
