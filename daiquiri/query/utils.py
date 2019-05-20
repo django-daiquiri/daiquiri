@@ -1,7 +1,7 @@
+import os
 import sys
 
 from django.conf import settings
-from django.urls import reverse
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 
@@ -325,3 +325,19 @@ def get_job_columns(job):
             columns.append(get_job_column(job, display_column))
 
     return columns
+
+
+def handle_table_upload(data, user):
+    if not user or user.is_anonymous:
+        username = 'anonymous'
+    else:
+        username = user.username
+
+    directory = os.path.join(settings.MEDIA_ROOT, 'query', username)
+    file_path = os.path.join(directory, data['table_name'])
+
+    os.makedirs(directory, exist_ok=True)
+
+    with open(file_path, 'wb+') as destination:
+        for chunk in data['file'].chunks():
+            destination.write(chunk)

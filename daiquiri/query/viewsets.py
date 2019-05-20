@@ -10,7 +10,7 @@ from django.http import Http404, FileResponse
 from rest_framework import viewsets, mixins, filters
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError, NotFound
-from rest_framework.decorators import list_route, detail_route
+from rest_framework.decorators import action, list_route, detail_route
 from rest_framework.authentication import (
     SessionAuthentication,
     BasicAuthentication,
@@ -32,6 +32,7 @@ from .serializers import (
     QueryJobRetrieveSerializer,
     QueryJobCreateSerializer,
     QueryJobUpdateSerializer,
+    QueryJobUploadSerializer,
     QueryLanguageSerializer,
     ExampleSerializer,
     UserExampleSerializer,
@@ -39,7 +40,7 @@ from .serializers import (
     AsyncQueryJobSerializer
 )
 from .permissions import HasPermission
-from .utils import get_format_config, get_quota, fetch_user_schema_metadata
+from .utils import get_format_config, get_quota, fetch_user_schema_metadata, handle_table_upload
 from .filters import JobFilterBackend
 
 
@@ -142,6 +143,21 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
     def tables(self, request):
         queryset = self.get_queryset().filter(phase=QueryJob.PHASE_COMPLETED)[:100]
         return Response(fetch_user_schema_metadata(request.user, queryset))
+
+    @action(detail=False, methods=['post'], url_path='upload', url_name='upload')
+    def upload(self, request):
+
+        if not settings.QUERY_UPLOAD:
+            raise Http404
+
+        serializer = QueryJobUploadSerializer(data=request.data, context={
+            'request': request,
+            'view': self
+        })
+        serializer.is_valid(raise_exception=True)
+
+        handle_table_upload(serializer.validated_data, request.user)
+        return Response()
 
     @detail_route(methods=['put'])
     def abort(self, request, pk=None):

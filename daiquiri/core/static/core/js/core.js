@@ -39,7 +39,7 @@ angular.module('core', ['ngResource', 'ngSanitize'])
                 ngModel.$setViewValue(cm.getValue());
             });
 
-            // // when the model is updated update codemirror
+            // when the model is updated update codemirror
             ngModel.$formatters.push(function(model_values) {
 
                 if (angular.isDefined(model_values) && model_values) {
@@ -76,4 +76,17 @@ angular.module('core', ['ngResource', 'ngSanitize'])
             });
         }
     };
-}]);
+}])
+
+.directive('upload', function() {
+    return {
+        restrict: 'A',
+        require: "ngModel",
+        link: function (scope, elem, attrs, ngModel) {
+            elem.on('change', function(e) {
+                var file = elem[0].files[0];
+                ngModel.$setViewValue(file);
+            })
+        }
+    }
+});

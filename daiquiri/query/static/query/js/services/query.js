@@ -1,4 +1,4 @@
-app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'PollingService', 'PlotService', 'DownloadService', 'TableService', 'BrowserService', function($resource, $injector, $q, $filter, PollingService, PlotService, DownloadService, TableService, BrowserService) {
+app.factory('QueryService', ['$resource', '$http', '$injector', '$q', '$filter', 'PollingService', 'PlotService', 'DownloadService', 'TableService', 'BrowserService', function($resource, $http, $injector, $q, $filter, PollingService, PlotService, DownloadService, TableService, BrowserService) {
 
     /* get the base url */
 
@@ -18,6 +18,8 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
         schemas: $resource(baseurl + 'metadata/api/schemas/user/'),
         functions: $resource(baseurl + 'metadata/api/functions/user/'),
     };
+
+    var upload_url = baseurl + 'query/api/jobs/upload/';
 
     /* initialise the browser service */
 
@@ -239,7 +241,16 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
 
     service.modal = function(modal_id) {
         service.errors = {};
-        service.values = service.job;
+
+        if (service.job) {
+            service.values = service.job;
+        } else {
+            // upload-table-modal
+            service.values = {};
+
+            // reset the input field
+            angular.element('#upload_table_file')[0].value = '';
+        }
 
         $('#' + modal_id).modal('show');
     };
@@ -284,6 +295,25 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
             }
 
             $('.modal').modal('hide');
+        });
+    };
+
+    service.upload_table = function() {
+        var formdata = new FormData();
+        formdata.append('table_name', service.values.table_name);
+        formdata.append('file', service.values.file);
+
+        $http({
+            method: 'POST',
+            url: upload_url,
+            headers: {
+                'Content-Type': undefined
+            },
+            data: formdata
+        }).then(function (data) {
+            $('.modal').modal('hide');
+        }, function (response) {
+            service.errors = response.data;
         });
     };
 

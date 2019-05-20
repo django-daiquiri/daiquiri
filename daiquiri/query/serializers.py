@@ -89,7 +89,6 @@ class QueryJobRetrieveSerializer(serializers.ModelSerializer):
         else:
             return []
 
-
     def get_columns(self, obj):
         if obj.metadata:
             return obj.metadata.get('columns', [])
@@ -128,6 +127,19 @@ class QueryJobUpdateSerializer(serializers.ModelSerializer):
             'id',
             'table_name',
             'run_id'
+        )
+
+
+class QueryJobUploadSerializer(serializers.ModelSerializer):
+
+    table_name = serializers.CharField(required=True, validators=[TableNameValidator()])
+    file = serializers.FileField(max_length=None, allow_empty_file=False)
+
+    class Meta:
+        model = QueryJob
+        fields = (
+            'table_name',
+            'file'
         )
 
 

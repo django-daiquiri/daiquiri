@@ -1,0 +1,43 @@
+{% load i18n %}
+
+<div class="modal" id="upload-table-modal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">
+                    {% trans 'Upload table' %}
+                </h4>
+            </div>
+
+            <div class="modal-body">
+                <formgroup
+                    data-id="upload_table_table_name"
+                    data-type="text"
+                    data-label="{% trans 'Table name' %}"
+                    data-model="service.values.table_name"
+                    data-errors="service.errors.table_name">
+                </formgroup>
+                <formgroup
+                    data-id="upload_table_file"
+                    data-type="file"
+                    data-label="{% trans 'File' %}"
+                    data-model="service.values.file"
+                    data-errors="service.errors.file">
+                </formgroup>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    {% trans 'Close' %}
+                </button>
+                <button type="button" class="btn btn-primary"
+                        ng-click="service.upload_table()">
+                    {% trans 'Upload' %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
