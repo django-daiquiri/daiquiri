@@ -20,7 +20,12 @@ from rest_framework.authentication import (
 from daiquiri.core.viewsets import ChoicesViewSet, RowViewSetMixin
 from daiquiri.core.permissions import HasModelPermission
 from daiquiri.core.paginations import ListPagination
-from daiquiri.core.utils import get_client_ip, fix_for_json, filter_by_access_level
+from daiquiri.core.utils import (
+    get_client_ip,
+    fix_for_json,
+    filter_by_access_level,
+    handle_file_upload
+)
 from daiquiri.jobs.viewsets import SyncJobViewSet, AsyncJobViewSet
 
 from .models import QueryJob, DownloadJob, QueryArchiveJob, Example
@@ -41,11 +46,9 @@ from .serializers import (
 )
 from .permissions import HasPermission
 from .utils import (
-    get_user_schema_name,
     get_format_config,
     get_quota,
-    fetch_user_schema_metadata,
-    handle_table_upload
+    fetch_user_schema_metadata
 )
 
 from .filters import JobFilterBackend
@@ -163,16 +166,16 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
         })
         serializer.is_valid(raise_exception=True)
 
-        file_name = handle_table_upload(serializer.validated_data, request.user)
+        file_name = handle_file_upload(serializer.validated_data['file'], 'query', request.user)
 
         job = QueryJob(
             job_type=QueryJob.JOB_TYPE_INTERFACE,
             owner=(None if self.request.user.is_anonymous else self.request.user),
             run_id=serializer.validated_data.get('run_id'),
-            schema_name=get_user_schema_name(request.user),
             table_name=serializer.validated_data.get('table_name'),
             client_ip=get_client_ip(self.request)
         )
+        job.process(upload=True)
         job.save()
         job.ingest(file_name)
 

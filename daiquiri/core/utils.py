@@ -2,6 +2,7 @@ import csv
 import ipaddress
 import importlib
 import math
+import os
 import re
 import sys
 
@@ -349,3 +350,21 @@ def render_to_xml(request, renderer, data, filename=None, content_type='applicat
     if filename:
         response['Content-Disposition'] = 'filename="%s"' % filename
     return response
+
+
+def handle_file_upload(file, directory, user):
+    if not user or user.is_anonymous:
+        username = 'anonymous'
+    else:
+        username = user.username
+
+    directory = os.path.join(settings.UPLOAD_ROOT, directory, username)
+    file_path = os.path.join(directory, file.name)
+
+    os.makedirs(directory, exist_ok=True)
+
+    with open(file_path, 'wb+') as destination:
+        for chunk in file.chunks():
+            destination.write(chunk)
+
+    return file_path

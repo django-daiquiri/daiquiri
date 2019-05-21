@@ -7,7 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from daiquiri.core.adapter import DatabaseAdapter
 from daiquiri.core.utils import human2bytes
-from daiquiri.metadata.models import Schema, Table, Column, Function
+from daiquiri.metadata.models import Table, Column
 
 
 def get_format_config(format_key):
@@ -126,117 +126,6 @@ def get_indexed_objects():
     return indexed_objects
 
 
-def check_permissions(user, keywords, tables, columns, functions):
-    messages = []
-
-    # check keywords against whitelist
-    for keywords in keywords:
-        pass
-
-    # loop over tables to check permissions on schemas/tables
-    for schema_name, table_name in tables:
-
-        # check permission on schema
-        if schema_name is None:
-            # schema_name must not be null, move to next table
-            messages.append(_('No schema given for table %s.') % table_name)
-            continue
-        elif schema_name == get_user_schema_name(user):
-            # all tables are allowed move to next table
-            continue
-        else:
-            # check permissions on the schema
-            try:
-                schema = Schema.objects.filter_by_access_level(user).get(name=schema_name)
-            except Schema.DoesNotExist:
-                # schema not found or not allowed, move to next table
-                messages.append(_('Schema %s not found.') % schema_name)
-                continue
-
-        # check permission on table
-        if table_name is None:
-            # table_name must not be null, move to next table
-            messages.append(_('No table given for schema %s.') % schema_name)
-            continue
-        else:
-            try:
-                Table.objects.filter_by_access_level(user).filter(schema=schema).get(name=table_name)
-            except Table.DoesNotExist:
-                # table not found or not allowed, move to next table
-                messages.append(_('Table %s not found.') % table_name)
-                continue
-
-    # loop over columns to check permissions or just to see if they are there,
-    # but only if no error messages where appended so far
-    if not messages:
-
-        for schema_name, table_name, column_name in columns:
-
-            if schema_name in [None, get_user_schema_name(user)] \
-                or table_name is None \
-                or column_name is None:
-                # doesn't need to be checked, move to next column
-                continue
-            else:
-                if not settings.METADATA_COLUMN_PERMISSIONS:
-                    # just check if the column exist
-                    if column_name == '*':
-                        # doesn't need to be checked, move to next table
-                        continue
-
-                    else:
-                        try:
-                            Column.objects.filter(table__schema__name=schema_name).filter(table__name=table_name).get(name=column_name)
-                        except Column.DoesNotExist:
-                            messages.append(_('Column %s not found.') % column_name)
-                            continue
-                else:
-                    try:
-                        schema = Schema.objects.filter_by_access_level(user).get(name=schema_name)
-                    except Schema.DoesNotExist:
-                        messages.append(_('Schema %s not found.') % schema_name)
-                        continue
-
-                    try:
-                        table = Table.objects.filter_by_access_level(user).filter(schema=schema).get(name=table_name)
-                    except Table.DoesNotExist:
-                        messages.append(_('Table %s not found.') % table_name)
-                        continue
-
-                    if column_name == '*':
-                        columns = Column.objects.filter_by_access_level(user).filter(table=table)
-                        actual_columns = DatabaseAdapter().fetch_columns(schema_name, table_name)
-
-                        column_names_set = set([column.name for column in columns])
-                        actual_column_names_set = set([column['name'] for column in actual_columns])
-
-                        if column_names_set != actual_column_names_set:
-                            messages.append(_('The asterisk (*) is not allowed for this table.'))
-                            continue
-
-                    else:
-                        try:
-                            column = Column.objects.filter_by_access_level(user).filter(table=table).get(name=column_name)
-                        except Column.DoesNotExist:
-                            messages.append(_('Column %s not found.') % column_name)
-                            continue
-
-    # check permissions on functions
-    for function_name in functions:
-
-        # check permission on function
-        queryset = Function.objects.filter(name=function_name)
-
-        # forbit the function if it is in metadata.functions, and the user doesn't have access.
-        if queryset and not queryset.filter_by_access_level(user):
-            messages.append(_('Function %s is not allowed.') % function_name)
-        else:
-            continue
-
-    # return the error stack
-    return list(set(messages))
-
-
 def get_job_sources(job):
     sources = []
 
@@ -323,21 +212,3 @@ def get_job_columns(job):
             columns.append(get_job_column(job, display_column))
 
     return columns
-
-
-def handle_table_upload(data, user):
-    if not user or user.is_anonymous:
-        username = 'anonymous'
-    else:
-        username = user.username
-
-    directory = os.path.join(settings.MEDIA_ROOT, 'query', username)
-    file_path = os.path.join(directory, data['table_name'])
-
-    os.makedirs(directory, exist_ok=True)
-
-    with open(file_path, 'wb+') as destination:
-        for chunk in data['file'].chunks():
-            destination.write(chunk)
-
-    return file_path

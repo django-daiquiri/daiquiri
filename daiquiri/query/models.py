@@ -26,14 +26,13 @@ from daiquiri.stats.models import Record
 
 from .managers import QueryJobManager, ExampleManager
 from .utils import (
-    get_quota,
-    get_max_active_jobs,
     get_format_config,
-    check_permissions,
     get_job_sources,
     get_job_columns
 )
 from .process import (
+    check_quota,
+    check_number_of_active_jobs,
     process_schema_name,
     process_table_name,
     process_query_language,
@@ -41,7 +40,8 @@ from .process import (
     process_response_format,
     translate_query,
     process_query,
-    process_display_columns
+    process_display_columns,
+    check_permissions,
 )
 from .tasks import (
     run_query,
@@ -139,75 +139,74 @@ class QueryJob(Job):
     def column_names(self):
         return [column['name'] for column in self.metadata['columns']]
 
-    def process(self):
+    def process(self, upload=False):
         # log the query to the query log
         query_logger.info('"%s" %s %s', self.query, self.query_language, self.owner or 'anonymous')
 
-        # process all the things!
+        # check quota and number of active jobs
+        check_quota(self)
+        check_number_of_active_jobs(self)
+
+        # process schema_name, table_name and response format
         self.schema_name = process_schema_name(self.owner, self.schema_name)
         self.table_name = process_table_name(self.table_name)
-        self.query_language = process_query_language(self.owner, self.query_language)
-        self.queue = process_queue(self.owner, self.queue)
         self.response_format = process_response_format(self.response_format)
 
-        # set the execution_duration to the queues timeout
-        self.execution_duration = self.timeout
+        if upload:
+            self.query = ''
+            self.query_language = ''
+            self.queue = ''
 
-        # check quota
-        if QueryJob.objects.get_size(self.owner) > get_quota(self.owner):
-            raise ValidationError({
-                'query': [_('Quota is exceeded. Please remove some of your jobs.')]
-            })
+        else:
+            self.query_language = process_query_language(self.owner, self.query_language)
+            self.queue = process_queue(self.owner, self.queue)
+            self.response_format = process_response_format(self.response_format)
 
-        # check number of active jobs
-        max_active_jobs = get_max_active_jobs(self.owner)
-        if max_active_jobs and max_active_jobs <= QueryJob.objects.get_active(self.owner).count():
-            raise ValidationError({
-                'query': [_('Too many active jobs. Please abort some of your active jobs or wait until they are completed.')]
-            })
+            # set the execution_duration to the queues timeout
+            self.execution_duration = self.timeout
 
-        # log the input query to the debug log
-        logger.debug('query = "%s"', self.query)
+            # log the input query to the debug log
+            logger.debug('query = "%s"', self.query)
 
-        # translate the query from adql
-        translated_query = translate_query(self.query_language, self.query)
+            # translate the query from adql
+            translated_query = translate_query(self.query_language, self.query)
 
-        # log the translated query to the debug log
-        logger.debug('translated_query = "%s"', translated_query)
+            # log the translated query to the debug log
+            logger.debug('translated_query = "%s"', translated_query)
 
-        processor = process_query(translated_query)
+            processor = process_query(translated_query)
 
-        # log the processor output to the debug log
-        logger.debug('native_query = "%s"', processor.query)
-        logger.debug('processor.keywords = %s', processor.keywords)
-        logger.debug('processor.tables = %s', processor.tables)
-        logger.debug('processor.columns = %s', processor.columns)
-        logger.debug('processor.functions = %s', processor.functions)
+            # log the processor output to the debug log
+            logger.debug('native_query = "%s"', processor.query)
+            logger.debug('processor.keywords = %s', processor.keywords)
+            logger.debug('processor.tables = %s', processor.tables)
+            logger.debug('processor.columns = %s', processor.columns)
+            logger.debug('processor.functions = %s', processor.functions)
 
-        # check permissions
-        permission_messages = check_permissions(
-            self.owner,
-            processor.keywords,
-            processor.tables,
-            processor.columns,
-            processor.functions
-        )
-        if permission_messages:
-            raise ValidationError({
-                'query': permission_messages
-            })
+            # check permissions
+            permission_messages = check_permissions(
+                self.owner,
+                processor.keywords,
+                processor.tables,
+                processor.columns,
+                processor.functions
+            )
+            if permission_messages:
+                raise ValidationError({
+                    'query': permission_messages
+                })
 
-        # initialize metadata and store map of aliases
-        self.metadata = {
-            'display_columns': process_display_columns(processor.display_columns),
-            'tables': processor.tables
-        }
+            # initialize metadata and store map of aliases
+            self.metadata = {
+                'display_columns': process_display_columns(processor.display_columns),
+                'tables': processor.tables
+            }
 
-        # get the native query from the processor (without trailing semicolon)
-        self.native_query = processor.query.rstrip(';')
+            # get the native query from the processor (without trailing semicolon)
+            self.native_query = processor.query.rstrip(';')
 
-        # set clean flag
-        self.is_clean = True
+            # set clean flag
+            self.is_clean = True
 
     def run(self):
         if not self.is_clean:
@@ -268,6 +267,21 @@ class QueryJob(Job):
         except (OperationalError, ProgrammingError, InternalError, DataError) as e:
             self.error_summary = str(e)
             raise JobError(e)
+
+    def ingest(self, file_path):
+        if self.phase == self.PHASE_PENDING:
+            self.phase = self.PHASE_EXECUTING
+            self.save()
+
+            if not settings.ASYNC:
+                ingest_table.apply((self.id, file_path), throw=True)
+            else:
+                ingest_table.apply_async((self.id, file_path))
+
+        else:
+            raise ValidationError({
+                'phase': ['Job is not PENDING.']
+            })
 
     def abort(self):
         if settings.ASYNC:
@@ -380,12 +394,6 @@ class QueryJob(Job):
             return self.metadata.get('columns', [])
         else:
             return []
-
-    def ingest(self, file_path):
-        if not settings.ASYNC:
-            ingest_table.apply((self.id, file_path), throw=True)
-        else:
-            ingest_table.apply_async((self.id, file_path))
 
 
 class DownloadJob(Job):
