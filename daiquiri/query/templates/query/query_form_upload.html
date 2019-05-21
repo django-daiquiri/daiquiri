@@ -36,9 +36,11 @@
     </formgroup>
 </div>
 
-<button class="btn btn-primary" ng-click="service.forms.upload.submit()">
-    {% trans 'Upload table' %} <submitting />
-</button>
+<div class="form-group">
+    <button class="btn btn-primary" ng-click="service.forms.upload.submit()">
+        {% trans 'Upload table' %} <submitting />
+    </button>
+</div>
 
 <p class="text-danger" ng-if="service.forms.upload.errors.detail">
     {$ service.forms.upload.errors.detail $}

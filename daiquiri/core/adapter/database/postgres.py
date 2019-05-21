@@ -49,6 +49,16 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         }
     }
 
+    COLUMNTYPES = {
+        'char': 'text',
+        'boolean': 'boolean',
+        'short': 'smallint',
+        'int': 'integer',
+        'long': 'bigint',
+        'float': 'real',
+        'double': 'double precision'
+    }
+
     search_stmt_template = '%s::text LIKE %%s'
     search_arg_template = '%%%s%%'
 
@@ -340,7 +350,6 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
                         column['indexed'] = True
             return columns
 
-
     def fetch_column(self, schema_name, table_name, column_name):
         # prepare sql string
         sql = 'SELECT column_name, data_type, udt_name, character_maximum_length, ordinal_position FROM information_schema.columns WHERE table_schema = %(schema)s AND table_name = %(table)s AND column_name = %(column)s' % {
@@ -384,7 +393,6 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
                 if str(rows).find(columnname) > -1:
                     column['indexed'] = True
             return column
-
 
     def fetch_column_names(self, schema_name, table_name):
         logger.debug('schema_name = "%s"', schema_name)
@@ -431,3 +439,42 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         logger.debug('row = %s', row)
         logger.debug('column = %s', column)
         return column
+
+    def create_table(self, schema_name, table_name, columns):
+        # prepare sql string
+        sql = 'CREATE TABLE %(schema)s.%(table)s (%(columns)s);' % {
+            'schema': self.escape_identifier(schema_name),
+            'table': self.escape_identifier(table_name),
+            'columns': ', '.join([
+                '%(column_name)s %(column_type)s' % {
+                    'column_name': self.escape_identifier(column['name']),
+                    'column_type': self.COLUMNTYPES[column['datatype']]
+                } for column in columns])
+        }
+
+        # log sql string and execute
+        logger.debug('sql = "%s"', sql)
+        self.execute(sql)
+
+    def insert_rows(self, schema_name, table_name, columns, rows):
+        # create a list of escaped columns
+        escaped_column_names = [self.escape_identifier(column['name']) for column in columns]
+
+        # create a list of escaped value tuples
+        escaped_rows = []
+        for row in rows:
+            # all values are escaped with quotes
+            escaped_row = ', '.join([self.escape_string(cell) for cell in row])
+            escaped_rows.append('(%s)' % escaped_row)
+
+        # prepare sql string
+        sql = 'INSERT INTO %(schema)s.%(table)s (%(columns)s) VALUES %(values)s' % {
+            'schema': self.escape_identifier(schema_name),
+            'table': self.escape_identifier(table_name),
+            'columns': ', '.join(escaped_column_names),
+            'values': ', '.join(escaped_rows)
+        }
+
+        # log sql string and execute
+        logger.debug('sql = "%s"', sql)
+        self.execute(sql)

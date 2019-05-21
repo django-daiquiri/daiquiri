@@ -2,6 +2,7 @@ import logging
 import os
 import zipfile
 
+from astropy.io.votable import parse_single_table
 from celery import shared_task
 
 from django.conf import settings
@@ -266,4 +267,58 @@ def abort_query(pid):
 
 @shared_task(base=Task)
 def ingest_table(job_id, file_path):
-    print(job_id, file_path)
+    from daiquiri.core.adapter import DatabaseAdapter
+    from daiquiri.query.models import QueryJob
+    from daiquiri.stats.models import Record
+
+    # get the job object from the database
+    job = QueryJob.objects.get(pk=job_id)
+
+    # parse the uploaded table
+    table = parse_single_table(file_path)
+
+    # obtain the column names and (vo) datatypes from the table
+    columns = []
+    for field in table.fields:
+        columns.append({
+            'name': field.name,
+            'datatype': field.datatype,
+            'ucd': field.ucd,
+            'unit': str(field.unit),
+        })
+
+    # get the adapter with the database specific functions
+    adapter = DatabaseAdapter()
+
+    # create the table and insert the data
+    adapter.create_table(job.schema_name, job.table_name, columns)
+    adapter.insert_rows(job.schema_name, job.table_name, columns, table.array)
+
+    job.phase = job.PHASE_COMPLETED
+
+    # get timing and save the job object
+    job.end_time = now()
+
+    # get additional information about the completed job
+    if job.phase == job.PHASE_COMPLETED:
+        job.nrows = adapter.count_rows(job.schema_name, job.table_name)
+        job.size = adapter.fetch_size(job.schema_name, job.table_name)
+
+        # fetch the metadata for the columns
+        job.metadata = {
+            'columns': columns
+        }
+
+    # create a stats record for this job
+    Record.objects.create(
+        time=job.end_time,
+        resource_type='UPLOAD',
+        resource={
+            'job_id': job.id,
+            'job_type': job.job_type,
+        },
+        client_ip=job.client_ip,
+        user=job.owner
+    )
+
+    job.save()
