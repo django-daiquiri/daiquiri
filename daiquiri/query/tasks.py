@@ -74,8 +74,6 @@ def run_query(job_id):
             return job.phase
 
         # set database and start time
-        job.start_time = now()
-
         job.pid = adapter.fetch_pid()
         job.actual_query = adapter.build_query(job.schema_name, job.table_name, job.native_query, job.timeout, job.max_records)
         job.phase = job.PHASE_EXECUTING
@@ -137,6 +135,124 @@ def run_query(job_id):
                     'query': job.query,
                     'query_language': job.query_language,
                     'sources': job.metadata.get('sources', [])
+                },
+                client_ip=job.client_ip,
+                user=job.owner
+            )
+
+            job.save()
+
+    return job.phase
+
+
+@shared_task(base=Task)
+def ingest_table(job_id, file_path):
+    from daiquiri.core.adapter import DatabaseAdapter
+    from daiquiri.query.models import QueryJob
+    from daiquiri.stats.models import Record
+    from daiquiri.query.utils import get_quota
+
+    # get logger
+    logger = logging.getLogger(__name__)
+
+    # get the job object from the database
+    job = QueryJob.objects.get(pk=job_id)
+
+    if job.phase == job.PHASE_QUEUED:
+        # get the adapter with the database specific functions
+        adapter = DatabaseAdapter()
+
+        # create the database of the user if it not already exists
+        try:
+            adapter.create_user_schema_if_not_exists(job.schema_name)
+        except OperationalError as e:
+            job.phase = job.PHASE_ERROR
+            job.error_summary = str(e)
+            job.save()
+
+            return job.phase
+
+        # check if the quota is exceeded
+        if QueryJob.objects.get_size(job.owner) > get_quota(job.owner):
+            job.phase = job.PHASE_ERROR
+            job.error_summary = str(_('Quota is exceeded. Please remove some of your jobs.'))
+            job.save()
+
+            return job.phase
+
+        # parse the uploaded table
+        try:
+            table = parse_single_table(file_path, pedantic=False)
+        except ValueError as e:
+            job.phase = job.PHASE_ERROR
+            job.error_summary = str(e)
+            job.save()
+
+            return job.phase
+
+        # obtain the column names and (vo) datatypes from the table
+        columns = []
+        for field in table.fields:
+            columns.append({
+                'name': field.name,
+                'datatype': field.datatype,
+                'ucd': field.ucd,
+                'unit': str(field.unit),
+            })
+
+        # set database and start time
+        job.pid = adapter.fetch_pid()
+        job.phase = job.PHASE_EXECUTING
+        job.start_time = now()
+        job.save()
+
+        logger.info('job %s started' % job.id)
+
+        # create the table and insert the data
+        try:
+            adapter.create_table(job.schema_name, job.table_name, columns)
+            adapter.insert_rows(job.schema_name, job.table_name, columns, table.array)
+
+        except (ProgrammingError, InternalError) as e:
+            job.phase = job.PHASE_ERROR
+            job.error_summary = str(e)
+            logger.info('job %s failed (%s)' % (job.id, job.error_summary))
+
+        except OperationalError as e:
+            # load the job again and check if the job was killed
+            job = QueryJob.objects.get(pk=job_id)
+
+            if job.phase != job.PHASE_ABORTED:
+                job.phase = job.PHASE_ERROR
+                job.error_summary = str(e)
+                logger.info('job %s failed (%s)' % (job.id, job.error_summary))
+
+        else:
+            # get additional information about the completed job
+            job.phase = job.PHASE_COMPLETED
+            logger.info('job %s completed' % job.id)
+
+        finally:
+            # get timing and save the job object
+            job.end_time = now()
+
+            # get additional information about the completed job
+            if job.phase == job.PHASE_COMPLETED:
+                job.nrows = adapter.count_rows(job.schema_name, job.table_name)
+                job.size = adapter.fetch_size(job.schema_name, job.table_name)
+
+                # store the metadata for the columns from the VOTable
+                job.metadata = {
+                    'columns': columns
+                }
+
+            # create a stats record for this job
+            Record.objects.create(
+                time=job.end_time,
+                resource_type='UPLOAD',
+                resource={
+                    'job_id': job.id,
+                    'job_type': job.job_type,
                 },
                 client_ip=job.client_ip,
                 user=job.owner
@@ -263,62 +379,3 @@ def abort_query(pid):
     except OperationalError:
         # the query was probably killed before
         pass
-
-
-@shared_task(base=Task)
-def ingest_table(job_id, file_path):
-    from daiquiri.core.adapter import DatabaseAdapter
-    from daiquiri.query.models import QueryJob
-    from daiquiri.stats.models import Record
-
-    # get the job object from the database
-    job = QueryJob.objects.get(pk=job_id)
-
-    # parse the uploaded table
-    table = parse_single_table(file_path, pedantic=False)
-
-    # obtain the column names and (vo) datatypes from the table
-    columns = []
-    for field in table.fields:
-        columns.append({
-            'name': field.name,
-            'datatype': field.datatype,
-            'ucd': field.ucd,
-            'unit': str(field.unit),
-        })
-
-    # get the adapter with the database specific functions
-    adapter = DatabaseAdapter()
-
-    # create the table and insert the data
-    adapter.create_table(job.schema_name, job.table_name, columns)
-    adapter.insert_rows(job.schema_name, job.table_name, columns, table.array)
-
-    job.phase = job.PHASE_COMPLETED
-
-    # get timing and save the job object
-    job.end_time = now()
-
-    # get additional information about the completed job
-    if job.phase == job.PHASE_COMPLETED:
-        job.nrows = adapter.count_rows(job.schema_name, job.table_name)
-        job.size = adapter.fetch_size(job.schema_name, job.table_name)
-
-        # fetch the metadata for the columns
-        job.metadata = {
-            'columns': columns
-        }
-
-    # create a stats record for this job
-    Record.objects.create(
-        time=job.end_time,
-        resource_type='UPLOAD',
-        resource={
-            'job_id': job.id,
-            'job_type': job.job_type,
-        },
-        client_ip=job.client_ip,
-        user=job.owner
-    )
-
-    job.save()

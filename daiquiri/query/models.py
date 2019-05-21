@@ -270,7 +270,7 @@ class QueryJob(Job):
 
     def ingest(self, file_path):
         if self.phase == self.PHASE_PENDING:
-            self.phase = self.PHASE_EXECUTING
+            self.phase = self.PHASE_QUEUED
             self.save()
 
             if not settings.ASYNC:
