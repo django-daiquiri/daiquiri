@@ -275,7 +275,7 @@ def ingest_table(job_id, file_path):
     job = QueryJob.objects.get(pk=job_id)
 
     # parse the uploaded table
-    table = parse_single_table(file_path)
+    table = parse_single_table(file_path, pedantic=False)
 
     # obtain the column names and (vo) datatypes from the table
     columns = []

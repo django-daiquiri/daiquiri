@@ -464,7 +464,14 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         escaped_rows = []
         for row in rows:
             # all values are escaped with quotes
-            escaped_row = ', '.join([self.escape_string(cell) for cell in row])
+            escaped_cells = []
+            for column, cell in zip(columns, row):
+                if column['datatype'] == 'char':
+                    escaped_cells.append(self.escape_string(cell.decode()))
+                else:
+                    escaped_cells.append(self.escape_string(cell))
+
+            escaped_row = ', '.join(escaped_cells)
             escaped_rows.append('(%s)' % escaped_row)
 
         # prepare sql string

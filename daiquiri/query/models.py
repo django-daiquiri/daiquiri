@@ -276,7 +276,7 @@ class QueryJob(Job):
             if not settings.ASYNC:
                 ingest_table.apply((self.id, file_path), throw=True)
             else:
-                ingest_table.apply_async((self.id, file_path))
+                ingest_table.apply_async((self.id, file_path), queue='download')
 
         else:
             raise ValidationError({
