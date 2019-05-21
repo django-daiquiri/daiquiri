@@ -4,10 +4,12 @@ import io
 import sys
 import struct
 
+from xml.sax.saxutils import quoteattr
+
 from django.contrib.sites.models import Site
 
 from daiquiri import __version__ as daiquiri_version
-from daiquiri.core.utils import get_doi_url
+
 
 def generate_csv(generator, fields):
     if sys.version_info.major >= 3:
@@ -37,13 +39,20 @@ def generate_votable(generator, fields, infos=[], links=[], table=None, empty=No
     yield '''
     <RESOURCE type="results">'''
 
-    for info in infos:
+    for key, value in infos:
         yield '''
-        <INFO name="%(key)s" value="%(value)s" />''' % info
+        <INFO name=%(key)s value=%(value)s />''' % {
+            'key': quoteattr(key),
+            'value': quoteattr(value)
+        }
 
-    for link in links:
+    for title, content_role, href in links:
         yield '''
-        <LINK title="%(title)s" content-role="%(content_role)s" href="%(href)s"/>''' % link
+        <LINK title=%(title)s content-role=%(content_role)s href=%(href)s/>''' % {
+            'title': quoteattr(title),
+            'content_role': quoteattr(content_role),
+            'href': quoteattr(href)
+        }
 
     if table is not None:
         yield '''

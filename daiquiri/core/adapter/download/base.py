@@ -98,8 +98,10 @@ class BaseDownloadAdapter(object):
         for i, column in enumerate(columns):
             column_ucd = column.get('ucd')
             if column_ucd and 'meta.ref' in column_ucd and \
-                ('meta.file' in column_ucd or 'meta.note' in column_ucd or 'meta.image' in column_ucd):
-                    prepend[i] = settings.FILES_BASE_URL
+                    ('meta.file' in column_ucd or
+                     'meta.note' in column_ucd or
+                     'meta.image' in column_ucd):
+                prepend[i] = settings.FILES_BASE_URL
 
         return prepend
 
@@ -111,22 +113,19 @@ class BaseDownloadAdapter(object):
 
     def get_infos(self, query_status, query, query_language, sources):
         infos = [
-            {'key': 'QUERY_STATUS', 'value': query_status},
-            {'key': 'QUERY', 'value': query},
-            {'key': 'QUERY_LANGUAGE', 'value': query_language},
+            ('QUERY_STATUS', query_status),
+            ('QUERY', query),
+            ('QUERY_LANGUAGE', query_language)
         ]
 
         for source in sources:
-            infos.append({
-                'key': 'SOURCE',
-                'value': '%(schema_name)s.%(table_name)s' % source
-            })
+            infos.append(('SOURCE', '%(schema_name)s.%(table_name)s' % source))
 
         return infos
 
     def get_links(self, sources):
-        return [{
-            'title': '%(schema_name)s.%(table_name)s' % source,
-            'content_role': 'doc',
-            'href': get_doi_url(source['doi']) if source['doi'] else source['url']
-        } for source in sources]
+        return [(
+            '%(schema_name)s.%(table_name)s' % source,
+            'doc',
+            get_doi_url(source['doi']) if source['doi'] else source['url']
+        ) for source in sources]
