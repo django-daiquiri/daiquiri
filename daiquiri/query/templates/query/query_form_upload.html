@@ -2,7 +2,7 @@
 
 <p>
     {% blocktrans %}
-    Please specify a local file to upload and ingest as a new job into your user database. The job's table can be used in together with other tables in subsequent queries using JOIN and similar SQL commands.
+    Please specify a local VOTable to upload and ingest as a new job into your user database. The job's table can be used in together with other tables in subsequent queries using JOIN and similar SQL commands. VOTables can be created using <a href="http://www.star.bris.ac.uk/~mbt/topcat/">TOPCAT</a> or <a href="http://docs.astropy.org/en/stable/io/votable/">astropy</a>.
     {% endblocktrans %}
 </p>
 
@@ -16,7 +16,8 @@
     data-type="file"
     data-label="{% trans 'File' %}"
     data-model="service.forms.upload.values.file"
-    data-errors="service.forms.upload.errors.file">
+    data-errors="service.forms.upload.errors.file"
+    data-help="{% trans 'Drag and drop file or click to open a file browser' %}">
 </formgroup>
 
 <div class="row">

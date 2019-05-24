@@ -1,7 +1,9 @@
 <div class="form-group" ng-class="{'has-error': errors }">
     <label class="control-label" for="{$ field $}" ng-bind-html="label"></label>
 
-    <input upload class="form-control" type="file" id="{$ id $}" name="file" ng-model="model" />
+    <div class="file">
+        <input upload class="form-control" type="file" id="{$ id $}" name="file" ng-model="model" />
+    </div>
 
     <p class="help-block" ng-show="help">{$ help $}</p>
 
