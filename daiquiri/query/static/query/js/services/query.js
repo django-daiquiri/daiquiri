@@ -101,6 +101,9 @@ app.factory('QueryService', ['$resource', '$http', '$injector', '$q', '$filter',
                     });
                 });
             });
+
+            // fetch user schema and init browser
+            service.fetch_user_schema();
         });
 
         // fetch joblist
