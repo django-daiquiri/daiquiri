@@ -101,6 +101,8 @@ CREATE DATABASE %(NAME)s WITH OWNER %(USER)s;
                 if config['data']['ENGINE'] == 'django.db.backends.mysql':
                     print('''-- Run the following commands on \'%(HOST)s\':
 CREATE USER \'%(USER)s\'@\'%(CLIENT)s\' identified by \'%(PASSWORD)s\';
+CREATE DATABASE `%(TAP_SCHEMA)s` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE `%(TAP_UPLOAD)s` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 GRANT ALL PRIVILEGES ON `%(TAP_SCHEMA)s`.* to \'%(USER)s\'@\'%(CLIENT)s\';
 GRANT ALL PRIVILEGES ON `%(TAP_UPLOAD)s`.* to \'%(USER)s\'@\'%(CLIENT)s\';
 GRANT ALL PRIVILEGES ON `%(PREFIX)s%%`.* to \'%(USER)s\'@\'%(CLIENT)s\';

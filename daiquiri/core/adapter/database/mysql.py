@@ -1,6 +1,5 @@
 import logging
 import re
-import warnings
 
 from django.db import OperationalError, ProgrammingError
 
@@ -20,8 +19,12 @@ class MySQLAdapter(BaseDatabaseAdapter):
             'datatype': 'char',
             'arraysize': True
         },
+        'text': {
+            'datatype': 'char',
+            'arraysize': True
+        },
         'tinyint': {
-            'datatype': 'unsignedByte',
+            'datatype': 'boolean',
             'arraysize': False
         },
         'smallint': {
@@ -48,6 +51,16 @@ class MySQLAdapter(BaseDatabaseAdapter):
             'datatype': 'timestamp',
             'arraysize': False
         }
+    }
+
+    COLUMNTYPES = {
+        'char': 'text',
+        'boolean': 'tinyint',
+        'short': 'smallint',
+        'int': 'int',
+        'long': 'bigint',
+        'float': 'float',
+        'double': 'double'
     }
 
     search_stmt_template = '%s LIKE %%s'
@@ -91,9 +104,6 @@ class MySQLAdapter(BaseDatabaseAdapter):
         else:
             return '%(query)s;' % params
 
-    def submit_query(self, sql):
-        self.execute(sql)
-
     def abort_query(self, pid):
         sql = 'KILL %(pid)i' % {'pid': pid}
         self.execute(sql)
@@ -113,108 +123,6 @@ class MySQLAdapter(BaseDatabaseAdapter):
         # log values and return
         logger.debug('size = %d', nrows)
         return nrows
-
-    def count_rows(self, schema_name, table_name, column_names=None, search=None, filters=None):
-        # if no column names are provided get all column_names from the table
-        if not column_names:
-            column_names = self.fetch_column_names(schema_name, table_name)
-
-        # create a list of escaped columns
-        escaped_column_names = [self.escape_identifier(column_name) for column_name in column_names]
-
-        # prepare sql string
-        sql = 'SELECT COUNT(*) FROM %(schema)s.%(table)s' % {
-            'schema': self.escape_identifier(schema_name),
-            'table': self.escape_identifier(table_name)
-        }
-        sql_args = []
-
-        # process filtering
-        sql, sql_args = self._process_filtering(sql, sql_args, search, filters, escaped_column_names)
-
-        return self.fetchone(sql, args=sql_args)[0]
-
-    def fetch_row(self, schema_name, table_name, column_names=None, search=None, filters=None):
-
-        # if no column names are provided get all column_names from the table
-        if not column_names:
-            column_names = self.fetch_column_names(schema_name, table_name)
-
-        # create a list of escaped columns
-        escaped_column_names = [self.escape_identifier(column_name) for column_name in column_names]
-
-        # prepare sql string
-        sql = 'SELECT %(columns)s FROM %(schema)s.%(table)s' % {
-            'schema': self.escape_identifier(schema_name),
-            'table': self.escape_identifier(table_name),
-            'columns': ', '.join(escaped_column_names)
-        }
-        sql_args = []
-
-        # process filtering
-        sql, sql_args = self._process_filtering(sql, sql_args, search, filters, escaped_column_names)
-
-        return self.fetchone(sql, args=sql_args)
-
-    def fetch_dict(self, schema_name, table_name, column_names=None, search=None, filters=None):
-
-        # if no column names are provided get all column_names from the table
-        if not column_names:
-            column_names = self.fetch_column_names(schema_name, table_name)
-
-        row = self.fetch_row(schema_name, table_name, column_names, search, filters)
-
-        if row:
-            return {
-                column_name: value for column_name, value in zip(column_names, row)
-            }
-        else:
-            return {}
-
-    def fetch_rows(self, schema_name, table_name, column_names=None, ordering=None, page=1, page_size=10, search=None, filters=None):
-
-        # if no column names are provided get all column_names from the table
-        if not column_names:
-            column_names = self.fetch_column_names(schema_name, table_name)
-
-        # create a list of escaped columns
-        escaped_column_names = [self.escape_identifier(column_name) for column_name in column_names]
-
-        # init sql string and sql_args list
-        sql = 'SELECT %(columns)s FROM %(schema)s.%(table)s' % {
-            'schema': self.escape_identifier(schema_name),
-            'table': self.escape_identifier(table_name),
-            'columns': ', '.join(escaped_column_names)
-        }
-        sql_args = []
-
-        # process filtering
-        sql, sql_args = self._process_filtering(sql, sql_args, search, filters, escaped_column_names)
-
-        # process ordering
-        sql = self._process_ordering(sql, ordering, escaped_column_names)
-
-        # process page and page_size
-        if page_size > 0:
-            sql += ' LIMIT %(limit)s OFFSET %(offset)s' % {
-                'limit': page_size,
-                'offset': (int(page) - 1) * int(page_size)
-            }
-
-        return self.fetchall(sql, args=sql_args)
-
-    def create_user_schema_if_not_exists(self, schema_name):
-        # escape input
-        escaped_schema_name = self.escape_identifier(schema_name)
-
-        # prepare sql string
-        sql = 'CREATE DATABASE IF NOT EXISTS %(schema)s' % {
-            'schema': escaped_schema_name
-        }
-
-        with warnings.catch_warnings():
-            warnings.simplefilter('ignore')
-            self.execute(sql)
 
     def fetch_tables(self, schema_name):
         # escape input
@@ -256,23 +164,6 @@ class MySQLAdapter(BaseDatabaseAdapter):
                 'type': 'view' if row[1] == 'VIEW' else 'table'
             }
 
-    def rename_table(self, schema_name, table_name, new_table_name):
-        sql = 'RENAME TABLE %(schema)s.%(table)s to %(schema)s.%(new_table)s;' % {
-            'schema': self.escape_identifier(schema_name),
-            'table': self.escape_identifier(table_name),
-            'new_table': self.escape_identifier(new_table_name)
-        }
-
-        self.execute(sql)
-
-    def drop_table(self, schema_name, table_name):
-        sql = 'DROP TABLE IF EXISTS %(schema)s.%(table)s;' % {
-            'schema': self.escape_identifier(schema_name),
-            'table': self.escape_identifier(table_name)
-        }
-
-        self.execute(sql)
-
     def fetch_columns(self, schema_name, table_name):
         # prepare sql string
         sql = 'SHOW FULL COLUMNS FROM %(schema)s.%(table)s;' % {
@@ -289,7 +180,7 @@ class MySQLAdapter(BaseDatabaseAdapter):
         else:
             columns = []
             for row in rows:
-                datatype, arraysize = self.convert_datatype(row[1])
+                datatype, arraysize = self._convert_datatype(row[1])
 
                 columns.append({
                     'name': row[0],
@@ -329,7 +220,16 @@ class MySQLAdapter(BaseDatabaseAdapter):
         }
         return [column[0] for column in self.fetchall(sql)]
 
-    def convert_datatype(self, datatype_string):
+    def rename_table(self, schema_name, table_name, new_table_name):
+        sql = 'RENAME TABLE %(schema)s.%(table)s to %(schema)s.%(new_table)s;' % {
+            'schema': self.escape_identifier(schema_name),
+            'table': self.escape_identifier(table_name),
+            'new_table': self.escape_identifier(new_table_name)
+        }
+
+        self.execute(sql)
+
+    def _convert_datatype(self, datatype_string):
         result = re.match('([a-z]+)\(*(\d*)\)*', datatype_string)
 
         if result:
