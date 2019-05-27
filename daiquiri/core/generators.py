@@ -108,7 +108,7 @@ def generate_fits(generator, fields, nrows, table_name=None):
 
     # VO format label, FITS format label, size, NULL value, encoded value
     formats_dict = {
-        'unsignedByte': ('s', 'L', 1,  b'\x00',             lambda x: b'T' if x == 'true' else b'F'),
+        'boolean':      ('s', 'L', 1,  b'\x00',             lambda x: b'T' if x == 'true' else b'F'),
         'short':        ('h', 'I', 2,  32767,               int),
         'int':          ('i', 'J', 4,  2147483647,          int),
         'long':         ('q', 'K', 8,  9223372036854775807, int),
@@ -121,15 +121,15 @@ def generate_fits(generator, fields, nrows, table_name=None):
         'unknown':      ('s', 'A', 8,  b'',                 lambda x: x.encode())
     }
 
-    names = [d['name'] for d in fields]
-    datatypes = [d['datatype'] for d in fields]
-    arraysizes = [d['arraysize'] if d['arraysize'] is not None else ''
-                  for d in fields]
+    names = [field['name'] for field in fields]
+    datatypes = [field['datatype'] for field in fields]
+    arraysizes = [field.get('arraysize') or '' for field in fields]
+
     for i, d in enumerate(zip(datatypes, arraysizes)):
         if d[0] == 'timestamp':
             arraysizes[i] = formats_dict['timestamp'][2]
         elif d[0] in ('char', 'spoint', 'array') and d[1] == '':
-            arraysizes[i] = formats_dict[d[0]][2] 
+            arraysizes[i] = formats_dict[d[0]][2]
         elif d[0] is None:
             datatypes[i] = 'unknown'
             arraysizes[i] = formats_dict['unknown'][2]

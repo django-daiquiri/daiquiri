@@ -304,6 +304,8 @@ def create_download_file(download_id):
             download_job.error_summary = str(e)
             download_job.save()
             logger.info('download_job %s failed (%s)' % (download_job.id, download_job.error_summary))
+
+            raise e
         else:
             download_job.phase = download_job.PHASE_COMPLETED
             logger.info('download_job %s completed' % download_job.file_path)
