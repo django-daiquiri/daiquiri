@@ -18,6 +18,7 @@ setup(
     long_description=open('README.md').read(),
     install_requires=[
         # in alphabetical order
+        'astropy>=3.1',
         'celery>=4.3',
         'coverage>=4.5',
         'Django>=2.2',
