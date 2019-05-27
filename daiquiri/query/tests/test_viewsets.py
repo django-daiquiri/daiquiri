@@ -18,6 +18,8 @@ from ..models import QueryJob, Example
 
 class QueryViewsetTestCase(TestCase):
 
+    databases = ('default', 'data')
+
     fixtures = (
         'auth.json',
         'metadata.json',
@@ -67,6 +69,7 @@ class DropdownTests(TestListViewsetMixin, QueryViewsetTestCase):
 @mock.patch(settings.ADAPTER_DATABASE + '.count_rows', mock.Mock(return_value=100))
 @mock.patch(settings.ADAPTER_DATABASE + '.rename_table', mock.Mock())
 @mock.patch(settings.ADAPTER_DATABASE + '.drop_table', mock.Mock())
+@mock.patch(settings.ADAPTER_DATABASE + '.create_user_schema_if_not_exists', mock.Mock())
 class JobTests(TestViewsetMixin, QueryViewsetTestCase):
 
     instances = QueryJob.objects.filter(owner__username='user')
@@ -263,6 +266,8 @@ class JobTests(TestViewsetMixin, QueryViewsetTestCase):
 
 
 class ExampleViewsetTestCase(TestCase):
+
+    databases = ('default', 'data')
 
     fixtures = (
         'auth.json',

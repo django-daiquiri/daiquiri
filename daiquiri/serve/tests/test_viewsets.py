@@ -5,6 +5,8 @@ from test_generator.viewsets import TestViewsetMixin
 
 class ServeTestCase(TestCase):
 
+    databases = ('default', 'data')
+
     fixtures = (
         'auth.json',
         'metadata.json',

@@ -1,10 +1,12 @@
 from django.contrib.auth.models import User
 from django.test import TestCase
 
-from daiquiri.query.utils import check_permissions
+from daiquiri.query.process import check_permissions
 
 
 class QueryPermissionsTestCase(TestCase):
+
+    databases = ('default', 'data')
 
     fixtures = (
         'auth.json',

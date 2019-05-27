@@ -9,6 +9,8 @@ from ..models import Schema, Table, Column, Function
 
 class MetadataViewsetTestCase(TestCase):
 
+    databases = ('default', 'data')
+
     fixtures = (
         'auth.json',
         'metadata.json'

@@ -13,6 +13,8 @@ from daiquiri.archive.models import Collection, ArchiveJob
 
 class ArchiveTestCase(TestCase):
 
+    databases = ('default', 'data')
+
     fixtures = (
         'auth.json',
         'archive.json',

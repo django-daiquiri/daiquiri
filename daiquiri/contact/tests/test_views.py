@@ -9,7 +9,6 @@ class ContactViewTestCase(TestCase):
 
     fixtures = (
         'auth.json',
-        'metadata.json',
         'contact.json'
     )
 

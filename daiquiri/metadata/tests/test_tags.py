@@ -5,6 +5,8 @@ from django.template import RequestContext, Template
 
 class MetadataTagsTestCase(TestCase):
 
+    databases = ('default', 'data')
+
     fixtures = (
         'auth.json',
         'metadata.json'
