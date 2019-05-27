@@ -55,7 +55,7 @@ class MySQLAdapter(BaseDatabaseAdapter):
 
     COLUMNTYPES = {
         'char': 'text',
-        'boolean': 'tinyint',
+        'boolean': 'boolean',
         'short': 'smallint',
         'int': 'int',
         'long': 'bigint',

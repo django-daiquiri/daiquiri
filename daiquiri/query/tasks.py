@@ -211,7 +211,7 @@ def ingest_table(job_id, file_path):
         # create the table and insert the data
         try:
             adapter.create_table(job.schema_name, job.table_name, columns)
-            adapter.insert_rows(job.schema_name, job.table_name, columns, table.array)
+            adapter.insert_rows(job.schema_name, job.table_name, columns, table.array, table.array.mask)
 
         except (ProgrammingError, InternalError) as e:
             job.phase = job.PHASE_ERROR

@@ -229,23 +229,31 @@ class BaseDatabaseAdapter(object):
         logger.debug('sql = "%s"', sql)
         self.execute(sql)
 
-    def insert_rows(self, schema_name, table_name, columns, rows):
+    def insert_rows(self, schema_name, table_name, columns, rows, mask=None):
         # create a list of escaped columns
         escaped_column_names = [self.escape_identifier(column['name']) for column in columns]
 
         # create a list of escaped value tuples
         escaped_rows = []
-        for row in rows:
-            # all values are escaped with quotes
-            escaped_cells = []
-            for column, cell in zip(columns, row):
-                if column['datatype'] == 'char':
-                    escaped_cells.append(self.escape_string(cell.decode()))
-                else:
-                    escaped_cells.append(self.escape_string(cell))
+        if mask is None:
+            for row in rows:
+                # all values are escaped with quotes
+                escaped_cells = []
+                for cell in row:
+                    escaped_cells.append(self._escape_cell(cell))
 
-            escaped_row = ', '.join(escaped_cells)
-            escaped_rows.append('(%s)' % escaped_row)
+                escaped_row = ', '.join(escaped_cells)
+                escaped_rows.append('(%s)' % escaped_row)
+
+        else:
+            for row, mask_row in zip(rows, mask):
+                # all values are escaped with quotes
+                escaped_cells = []
+                for cell, mask_cell in zip(row, mask_row):
+                    escaped_cells.append(self._escape_cell(cell, mask_cell))
+
+                escaped_row = ', '.join(escaped_cells)
+                escaped_rows.append('(%s)' % escaped_row)
 
         # prepare sql string
         sql = 'INSERT INTO %(schema)s.%(table)s (%(columns)s) VALUES %(values)s' % {
@@ -322,3 +330,18 @@ class BaseDatabaseAdapter(object):
                 }
 
         return sql
+
+    def _escape_cell(self, cell, mask_cell=None):
+        if mask_cell:
+            return 'NULL'
+        else:
+            if cell.dtype.char == 'S':
+                # chars need to be decoded
+                value = cell.decode()
+            elif cell.dtype.char == '?':
+                # booleans need to be converted to 0 or 1, or quoting will fail
+                value = 1 if cell else 0
+            else:
+                value = cell
+
+            return self.escape_string(value)
