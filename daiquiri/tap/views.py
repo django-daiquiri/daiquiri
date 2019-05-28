@@ -68,10 +68,10 @@ def capabilities(request):
         {
             'schemaID': 'ivo://ivoa.net/std/TAP#sync-1.1',
             'interface': {
-            'attrs': {
-                'xsi:type': 'vs:ParamHTTP',
-                'role': 'std',
-                'version': '1.1'
+                'attrs': {
+                    'xsi:type': 'vs:ParamHTTP',
+                    'role': 'std',
+                    'version': '1.1'
                 },
                 'accessURL': {
                     'attrs': {
@@ -84,8 +84,8 @@ def capabilities(request):
         {
             'schemaID': 'ivo://ivoa.net/std/VOSI#capabilities',
             'interface': {
-            'attrs': {
-                'xsi:type': 'vs:ParamHTTP',
+                'attrs': {
+                    'xsi:type': 'vs:ParamHTTP',
                 },
                 'accessURL': {
                     'attrs': {
@@ -98,8 +98,8 @@ def capabilities(request):
         {
             'schemaID': 'ivo://ivoa.net/std/VOSI#tables',
             'interface': {
-            'attrs': {
-                'xsi:type': 'vs:ParamHTTP',
+                'attrs': {
+                    'xsi:type': 'vs:ParamHTTP',
                 },
                 'accessURL': {
                     'attrs': {
@@ -112,8 +112,8 @@ def capabilities(request):
         {
             'schemaID': 'ivo://ivoa.net/std/DALI#examples',
             'interface': {
-            'attrs': {
-                'xsi:type': 'vr:WebBrowser',
+                'attrs': {
+                    'xsi:type': 'vr:WebBrowser',
                 },
                 'accessURL': {
                     'attrs': {
@@ -126,6 +126,7 @@ def capabilities(request):
     ]
 
     return HttpResponse(CapabilitiesRenderer().render(data), content_type="application/xml")
+
 
 def tables(request):
     queryset = Schema.objects.filter_by_access_level(request.user)

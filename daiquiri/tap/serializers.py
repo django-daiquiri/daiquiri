@@ -21,8 +21,6 @@ class ColumnSerializer(serializers.ModelSerializer):
         )
 
 
-
-
 class TableSerializer(serializers.ModelSerializer):
 
     columns = serializers.SerializerMethodField()
