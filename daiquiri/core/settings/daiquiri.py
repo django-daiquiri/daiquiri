@@ -197,4 +197,5 @@ TAP_UPLOAD = 'TAP_UPLOAD'
 
 WORDPRESS_URL = '/cms/'
 WORDPRESS_CLI = '/opt/wp-cli/wp'
-WORDPRESS_PATH = '/opt/wordpress'
+WORDPRESS_PATH = None
+WORDPRESS_SSH = None
