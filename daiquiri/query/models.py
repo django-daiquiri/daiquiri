@@ -63,14 +63,14 @@ class QueryJob(Job):
 
     schema_name = models.CharField(max_length=256)
     table_name = models.CharField(max_length=256)
-    queue = models.CharField(max_length=16)
+    queue = models.CharField(max_length=16, blank=True)
 
-    query_language = models.CharField(max_length=16)
-    query = models.TextField()
-    native_query = models.TextField(null=True, blank=True)
-    actual_query = models.TextField(null=True, blank=True)
+    query_language = models.CharField(max_length=16, blank=True)
+    query = models.TextField(blank=True)
+    native_query = models.TextField(blank=True)
+    actual_query = models.TextField(blank=True)
 
-    queue = models.CharField(max_length=16, null=True, blank=True)
+    queue = models.CharField(max_length=16, blank=True)
     nrows = models.BigIntegerField(null=True, blank=True)
     size = models.BigIntegerField(null=True, blank=True)
 
