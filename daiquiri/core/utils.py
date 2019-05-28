@@ -15,10 +15,10 @@ from django.conf import settings
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMultiAlternatives, EmailMessage
+from django.db.models import Q
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.template import TemplateDoesNotExist
-
 from django.utils.timezone import localtime
 from django.utils.translation import ugettext_lazy as _
 
@@ -140,6 +140,21 @@ def get_detail_fields(detail_keys):
 
 def get_admin_emails():
     return [user.email for user in User.objects.filter(is_superuser=True)]
+
+
+def get_permission_emails(permissions):
+    permissions_queryset = Permission.objects
+    for permission in permissions:
+        app_label, codename = permission.split('.')
+        print(app_label, codename)
+        permissions_queryset = permissions_queryset.filter(content_type__app_label=app_label, codename=codename)
+
+    users = User.objects.filter(
+        Q(groups__permissions__in=permissions_queryset) |
+        Q(user_permissions__in=permissions_queryset)
+    ).distinct()
+
+    return [user.email for user in users]
 
 
 def get_doi_url(doi):
