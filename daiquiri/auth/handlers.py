@@ -3,7 +3,7 @@ import logging
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.dispatch import receiver
-from django.db.models.signals import post_save, m2m_changed
+from django.db.models.signals import post_save, post_delete, m2m_changed
 
 from allauth.account.signals import email_confirmed, password_changed, password_reset
 
@@ -12,6 +12,7 @@ from .models import Profile
 from .signals import (
     user_created,
     user_updated,
+    user_deleted,
     user_groups_updated,
     user_confirmed,
     user_rejected,
@@ -50,6 +51,14 @@ def post_save_user(sender, **kwargs):
             # a login triggers this handler with update_fields=last_login
             user_updated.send(sender=User, user=user)
             logger.info('user \'%s\' updated.' % user.username)
+
+
+@receiver(post_delete, sender=User)
+def post_delete_user(sender, **kwargs):
+    if not kwargs.get('raw', False):
+        user = kwargs['instance']
+        user_deleted.send(sender=User, user=user)
+        logger.info('user \'%s\' deleted.' % user.username)
 
 
 @receiver(m2m_changed, sender=User.groups.through)

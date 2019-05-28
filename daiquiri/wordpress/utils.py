@@ -5,7 +5,8 @@ from django.conf import settings
 
 from .tasks import (
     update_wordpress_user as update_wordpress_user_task,
-    update_wordpress_role as update_wordpress_role_task
+    update_wordpress_role as update_wordpress_role_task,
+    delete_wordpress_user as delete_wordpress_user_task
 )
 
 
@@ -20,6 +21,13 @@ def update_wordpress_user(user):
         update_wordpress_user_task.apply((user.username, email, user.first_name, user.last_name), throw=True)
     else:
         update_wordpress_user_task.apply_async((user.username, email, user.first_name, user.last_name))
+
+
+def delete_wordpress_user(user):
+    if not settings.ASYNC:
+        delete_wordpress_user_task.apply((user.username, ), throw=True)
+    else:
+        delete_wordpress_user_task.apply_async((user.username, ))
 
 
 def update_wordpress_role(user):

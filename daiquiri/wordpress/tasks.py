@@ -43,6 +43,24 @@ def update_wordpress_user(username, email, first_name, last_name):
 
 
 @shared_task(base=Task)
+def delete_wordpress_user(username):
+    try:
+        # delete the user
+        subprocess.check_output([
+            settings.WORDPRESS_CLI,
+            'user',
+            'delete',
+            username,
+            '--reassign=-1',
+            '--yes',
+            '--path=%s' % settings.WORDPRESS_PATH
+        ], stderr=subprocess.STDOUT)
+
+    except subprocess.CalledProcessError:
+        pass
+
+
+@shared_task(base=Task)
 def update_wordpress_role(username, role):
     try:
         return subprocess.check_output([
