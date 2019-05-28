@@ -157,6 +157,12 @@ QUERY_DOWNLOAD_FORMATS = [
     }
 ]
 QUERY_UPLOAD = True
+QUERY_UPLOAD_LIMIT = {
+    'anonymous': '10Mb',
+    'user': '100Mb',
+    'users': {},
+    'groups': {}
+}
 
 SERVE_DOWNLOAD_DIR = os.path.join(BASE_DIR, 'download')
 SERVE_RESOLVER = None

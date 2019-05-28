@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework.exceptions import ValidationError
 
 from .models import QueryJob
-
+from .utils import get_quota
 
 class TableNameValidator(object):
 
@@ -28,3 +28,18 @@ class TableNameValidator(object):
                     raise ValidationError([self.message])
                 except QueryJob.DoesNotExist:
                     pass
+
+
+class UploadFileValidator(object):
+
+    message = _("The maximum file size that can be uploaded is %s.")
+
+    def set_context(self, serializer_field):
+        request = serializer_field.parent.context['request']
+        self.user = None if request.user.is_anonymous else request.user
+
+    def __call__(self, file):
+        if file.size > get_quota(self.user, quota_settings='QUERY_UPLOAD_LIMIT'):
+            raise ValidationError({
+                'file': self.message % get_quota(self.user, quota_settings='QUERY_UPLOAD_LIMIT', human=True)
+            })
