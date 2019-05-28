@@ -1,7 +1,11 @@
+import os
 import random
 import string
 
+import requests
+
 from django.conf import settings
+from django.core.files import File
 
 from .tasks import (
     update_wordpress_user as update_wordpress_user_task,
@@ -44,3 +48,20 @@ def update_wordpress_role(user):
         update_wordpress_role_task.apply((user.username, wordpress_role), throw=True)
     else:
         update_wordpress_role_task.apply_async((user.username, wordpress_role))
+
+
+def get_menu(request, menu_name):
+
+    if settings.WORDPRESS_PATH:
+        menu_path = os.path.join(settings.WORDPRESS_PATH, 'wp-content', 'menus', menu_name + '.html')
+        try:
+            with open(menu_path) as f:
+                return File(f).read()
+        except IOError:
+            return ''
+    else:
+        menu_url = settings.WORDPRESS_URL + 'wp-content/menus/%s.html' % menu_name
+        absolute_menu_url = request.build_absolute_uri(menu_url)
+
+        response = requests.get(absolute_menu_url)
+        return response.text
