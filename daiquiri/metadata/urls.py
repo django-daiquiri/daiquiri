@@ -2,7 +2,12 @@ from django.urls import include, path, re_path
 
 from rest_framework import routers
 
-from .views import ManagementView, SchemaView, TableView
+from .views import (
+    ManagementView,
+    SchemaView,
+    SchemaDataciteView,
+    TableView
+)
 from .viewsets import (
     SchemaViewSet,
     TableViewSet,
@@ -31,5 +36,7 @@ urlpatterns = [
     path('management/', ManagementView.as_view(), name='management'),
 
     re_path(r'^(?P<schema_name>\w+)/$', SchemaView.as_view(), name='schema'),
+    re_path(r'^(?P<schema_name>\w+)/datacite/$', SchemaDataciteView.as_view(), name='schema_datacite'),
+
     re_path(r'^(?P<schema_name>\w+)/(?P<table_name>\w+)/$', TableView.as_view(), name='table'),
 ]

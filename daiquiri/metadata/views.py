@@ -1,10 +1,13 @@
 from django.http import Http404
-from django.views.generic import TemplateView
+from django.views.generic import View, TemplateView
 
 from daiquiri.core.views import ModelPermissionMixin
 from daiquiri.core.utils import get_model_field_meta
 
 from .models import Schema, Table, Column, Function
+from .mixins import DataciteMixin
+from .serializers.datacite import SchemaSerializer as SchemaDataciteSerializer
+from .renderers import SchemaRenderer as SchemaDataciteRenderer
 
 
 class ManagementView(ModelPermissionMixin, TemplateView):
@@ -38,6 +41,16 @@ class SchemaView(TemplateView):
         context['schema'] = schema
         context['tables'] = schema.tables.filter_by_metadata_access_level(self.request.user)
         return context
+
+
+class SchemaDataciteView(DataciteMixin, View):
+
+    renderer_class = SchemaDataciteRenderer
+    serializer_class = SchemaDataciteSerializer
+
+    def get_object(self):
+        schema_name = self.kwargs.get('schema_name')
+        return Schema.objects.filter_by_metadata_access_level(self.request.user).get(name=schema_name)
 
 
 class TableView(TemplateView):

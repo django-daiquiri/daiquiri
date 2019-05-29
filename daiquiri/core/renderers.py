@@ -33,10 +33,11 @@ class XMLRenderer(BaseRenderer):
     def end(self, tag):
         self.xml.endElement(tag)
 
-    def node(self, tag, attr, text):
+    def node(self, tag, attrs, text):
         if not text:
-            attr.update({'xsi:nil': 'true'})
-        self.xml.startElement(tag, attr)
+            attrs.update({'xsi:nil': 'true'})
+
+        self.xml.startElement(tag, {k: v for k, v in attrs.items() if v is not None})
         if text:
             self.xml.characters(smart_text(text))
         self.xml.endElement(tag)
