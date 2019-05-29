@@ -2,6 +2,7 @@ from django.conf import settings
 
 from rest_framework import serializers
 
+from daiquiri.core.serializers import JSONField
 from daiquiri.core.constants import LICENSE_URLS
 
 from ..models import Schema, Table
@@ -17,6 +18,9 @@ class SchemaSerializer(serializers.ModelSerializer):
     publisher = serializers.ReadOnlyField(default=settings.METADATA_PUBLISHER)
     resource_type = serializers.ReadOnlyField(default='Database schema')
 
+    creators = JSONField(allow_null=True)
+    contributors = JSONField(allow_null=True)
+
     class Meta:
         model = Schema
         fields = (
@@ -26,6 +30,8 @@ class SchemaSerializer(serializers.ModelSerializer):
             'long_description',
             'license',
             'doi',
+            'creators',
+            'contributors',
             'published',
             'updated',
             'license_url',

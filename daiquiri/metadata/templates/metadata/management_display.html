@@ -32,7 +32,7 @@
 
             <dl class="dl-horizontal">
                 <div ng-repeat="(key, value) in service.active"
-                    ng-hide="['resource', 'groups', 'schema', 'table'].indexOf(key) != -1">
+                    ng-hide="['resource', 'groups', 'schema', 'table', 'creators', 'contributors'].indexOf(key) != -1">
 
                     <dt>{$ key | ucfirst | removeUnderscores $}</dt>
                     <dd>{$ value $}&nbsp;</dd>

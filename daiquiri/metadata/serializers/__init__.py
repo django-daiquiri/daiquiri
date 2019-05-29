@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.contrib.auth.models import Group
 
+from daiquiri.core.serializers import JSONField
+
 from rest_framework import serializers
 
 from ..models import Schema, Table, Column, Function
@@ -65,6 +67,9 @@ class TableSerializer(serializers.ModelSerializer):
 class SchemaSerializer(serializers.ModelSerializer):
 
     label = serializers.CharField(source='__str__', read_only=True)
+
+    creators = JSONField(allow_null=True)
+    contributors = JSONField(allow_null=True)
 
     class Meta:
         model = Schema

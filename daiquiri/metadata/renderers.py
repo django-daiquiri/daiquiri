@@ -13,17 +13,10 @@ class DataCiteRenderer(XMLRenderer):
         self.node('identifier', {'identifierType': 'DOI'}, data.get('doi'))
 
         self.start('creators')
-        for creator in data.get('creator', []):
-            self.start('creator')
-            self.node('creatorName', {}, data.get('name'))
-            self.node('givenName', {}, data.get('first_name'))
-            self.node('familyName', {}, data.get('last_name'))
-            self.node('nameIdentifier', {
-                'schemeURI': 'http://orcid.org/',
-                'nameIdentifierScheme': 'ORCID'
-            }, data.get('orcid'))
-            self.node('affiliation', {}, creator.get('affiliation'))
-            self.end('creator')
+        creators = data.get('creators')
+        if isinstance(creators, list):
+            for creator in creators:
+                self.render_person('creator', creator)
         self.end('creators')
 
         self.start('titles')
@@ -43,6 +36,13 @@ class DataCiteRenderer(XMLRenderer):
                     'subjectScheme': subject.get('subject_scheme')
                 }, subject.get('subject'))
             self.end('subjects')
+
+        contributors = data.get('contributors')
+        if isinstance(contributors, list):
+            self.start('contributors')
+            for contributor in contributors:
+                self.render_person('contributor', contributor)
+            self.end('contributors')
 
         updated = data.get('updated')
         if updated is not None:
@@ -99,3 +99,31 @@ class DataCiteRenderer(XMLRenderer):
             self.end('descriptions')
 
         self.end('resource')
+
+    def render_person(self, person_type, person):
+        if isinstance(person, dict):
+            self.start(person_type)
+
+            name = person.get('name')
+            if name is not None:
+                self.node(person_type + 'Name', {}, name)
+
+            first_name = person.get('first_name')
+            if first_name is not None:
+                self.node('first_name', {}, first_name)
+
+            last_name = person.get('last_name')
+            if last_name is not None:
+                self.node('last_name', {}, last_name)
+
+            orcid = person.get('orcid')
+            if orcid is not None:
+                self.node('nameIdentifier', {
+                    'schemeURI': 'http://orcid.org/',
+                    'nameIdentifierScheme': 'ORCID'
+                }, orcid)
+
+            for affiliation in person.get('affiliations', []):
+                self.node('affiliation', {}, affiliation)
+
+            self.end(person_type)
