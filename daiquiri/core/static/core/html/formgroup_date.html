@@ -1,9 +1,7 @@
 <div class="form-group" ng-class="{'has-error': errors }">
     <label class="control-label" for="{$ field $}" ng-bind-html="label"></label>
 
-    <div class="file">
-        <input type="file" class="form-control file-input" id="{$ id $}" name="file" ng-model="model" />
-    </div>
+    <input type="date" class="form-control date-input" id="{$ id $}" ng-model="model" />
 
     <p class="help-block" ng-show="help">{$ help $}</p>
 

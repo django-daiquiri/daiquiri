@@ -1,7 +1,7 @@
 from daiquiri.jobs.renderers import XMLRenderer
 
 
-class SchemaRenderer(XMLRenderer):
+class DataCiteRenderer(XMLRenderer):
 
     def render_document(self, data, accepted_media_type=None, renderer_context=None):
 
@@ -31,7 +31,7 @@ class SchemaRenderer(XMLRenderer):
         self.end('titles')
 
         self.node('publisher', {}, data.get('publisher'))
-        self.node('publicationYear', {}, data.get('published'))
+        self.node('publicationYear', {}, data.get('publication_year'))
 
         subjects = data.get('subjects')
         if subjects is not None:
@@ -50,7 +50,7 @@ class SchemaRenderer(XMLRenderer):
             self.node('data', {'dateType': 'Updated'}, updated)
             self.end('dates')
 
-        language = data.get('issued')
+        language = data.get('language')
         if language is not None:
             self.node('language', {}, language)
 

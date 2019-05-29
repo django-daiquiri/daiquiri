@@ -11,6 +11,9 @@ class SchemaSerializer(serializers.ModelSerializer):
 
     license_url = serializers.SerializerMethodField()
     size = serializers.SerializerMethodField()
+    publication_year = serializers.SerializerMethodField()
+
+    language = serializers.ReadOnlyField(default=settings.METADATA_LANGUAGE)
     publisher = serializers.ReadOnlyField(default=settings.METADATA_PUBLISHER)
     resource_type = serializers.ReadOnlyField(default='Database schema')
 
@@ -22,11 +25,15 @@ class SchemaSerializer(serializers.ModelSerializer):
             'description',
             'long_description',
             'license',
-            'license_url',
             'doi',
+            'published',
+            'updated',
+            'license_url',
             'size',
+            'publication_year',
+            'language',
             'publisher',
-            'resource_type'
+            'resource_type',
         )
 
     def get_license_url(self, obj):
@@ -35,5 +42,5 @@ class SchemaSerializer(serializers.ModelSerializer):
     def get_size(self, obj):
         return '%i tables' % obj.tables.count()
 
-    def get_publisher(self, obj):
-        return settings.METADATA_PUBLISHER
+    def get_publication_year(self, obj):
+        return obj.published.year if obj.published else None

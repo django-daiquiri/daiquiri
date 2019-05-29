@@ -78,10 +78,10 @@ angular.module('core', ['ngResource', 'ngSanitize'])
     };
 }])
 
-.directive('upload', function() {
+.directive('fileInput', function() {
     return {
-        restrict: 'A',
-        require: "ngModel",
+        restrict: 'C',
+        require: 'ngModel',
         link: function (scope, elem, attrs, ngModel) {
             elem.on('change', function(e) {
                 var file = elem[0].files[0];
@@ -89,4 +89,33 @@ angular.module('core', ['ngResource', 'ngSanitize'])
             })
         }
     }
-});
+})
+
+.directive('dateInput', ['$timeout', function($timeout) {
+    return {
+        restrict: 'C',
+        require: 'ngModel',
+        link: function(scope, element, attrs, ngModelController) {
+            ngModelController.$parsers.push(function(view_value) {
+                console.log(view_value);
+                if (view_value === null) {
+                    return null
+                } else {
+                    return [
+                        view_value.getFullYear(),
+                        ('0' + (view_value.getMonth() + 1)).slice(-2),
+                        ('0' + view_value.getDate()).slice(-2)
+                    ].join('-');
+                }
+            });
+
+            ngModelController.$formatters.push(function(model_value) {
+                if (model_value === null) {
+                    return null
+                } else {
+                    return new Date(model_value);
+                }
+            });
+        }
+    };
+}]);

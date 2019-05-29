@@ -7,7 +7,7 @@ from daiquiri.core.utils import get_model_field_meta
 from .models import Schema, Table, Column, Function
 from .mixins import DataciteMixin
 from .serializers.datacite import SchemaSerializer as SchemaDataciteSerializer
-from .renderers import SchemaRenderer as SchemaDataciteRenderer
+from .renderers import DataCiteRenderer
 
 
 class ManagementView(ModelPermissionMixin, TemplateView):
@@ -45,7 +45,7 @@ class SchemaView(TemplateView):
 
 class SchemaDataciteView(DataciteMixin, View):
 
-    renderer_class = SchemaDataciteRenderer
+    renderer_class = DataCiteRenderer
     serializer_class = SchemaDataciteSerializer
 
     def get_object(self):

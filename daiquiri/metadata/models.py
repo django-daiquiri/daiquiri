@@ -52,6 +52,14 @@ class Schema(models.Model):
         max_length=256, null=True, blank=True,
         verbose_name=_('IVOA Utype'),
     )
+    published = models.DateField(
+        null=True, blank=True,
+        verbose_name=_('Published'),
+    )
+    updated = models.DateField(
+        null=True, blank=True,
+        verbose_name=_('Updated'),
+    )
     access_level = models.CharField(
         max_length=8, choices=ACCESS_LEVEL_CHOICES,
         verbose_name=_('Access level')
@@ -157,6 +165,14 @@ class Table(models.Model):
     utype = models.CharField(
         max_length=256, null=True, blank=True,
         verbose_name=_('IVOA Utype')
+    )
+    published = models.DateField(
+        null=True, blank=True,
+        verbose_name=_('Published'),
+    )
+    updated = models.DateField(
+        null=True, blank=True,
+        verbose_name=_('Updated'),
     )
     access_level = models.CharField(
         max_length=8, choices=ACCESS_LEVEL_CHOICES,

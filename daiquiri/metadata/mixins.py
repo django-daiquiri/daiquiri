@@ -10,7 +10,7 @@ class DataciteMixin(View):
 
         serializer = self.serializer_class(self.object)
         renderer = self.renderer_class()
-        print(serializer.data)
+
         return render_to_xml(request, renderer, serializer.data)
 
     def get_object(self):
