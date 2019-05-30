@@ -3,13 +3,22 @@ from rest_framework import serializers
 from .utils import make_query_dict_upper_case
 
 
-class JSONField(serializers.JSONField):
+class JSONDictField(serializers.JSONField):
 
     def to_internal_value(self, data):
         if not isinstance(data, dict):
             self.fail('invalid')
 
-        return super(JSONField, self).to_internal_value(data)
+        return super().to_internal_value(data)
+
+
+class JSONListField(serializers.JSONField):
+
+    def to_internal_value(self, data):
+        if not isinstance(data, list):
+            self.fail('invalid')
+
+        return super().to_internal_value(data)
 
 
 class ChoicesSerializer(serializers.Serializer):

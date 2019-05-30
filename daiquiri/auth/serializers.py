@@ -4,7 +4,7 @@ from rest_framework import serializers
 
 from allauth.account.models import EmailAddress
 
-from daiquiri.core.serializers import JSONField
+from daiquiri.core.serializers import JSONDictField
 
 from .models import Profile
 
@@ -52,8 +52,8 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     user = UserSerializer()
     emails = serializers.SerializerMethodField(read_only=True)
-    details = JSONField(allow_null=True)
-    attributes = JSONField(allow_null=True)
+    details = JSONDictField(allow_null=True)
+    attributes = JSONDictField(allow_null=True)
 
     class Meta:
         model = Profile

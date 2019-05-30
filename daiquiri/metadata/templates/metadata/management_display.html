@@ -17,6 +17,14 @@
                     ng-show="service.active.resource === 'schemas' || service.active.resource === 'tables'"
                     ng-click="service.openFormModal(service.active.resource, false, 'attribution')">
                 </a>
+                <a href="" class="fa fa-user" title="{% trans 'Update creators' %}"
+                    ng-show="service.active.resource === 'schemas' || service.active.resource === 'tables'"
+                    ng-click="service.openFormModal(service.active.resource, false, 'creators')">
+                </a>
+                <a href="" class="fa fa-user-plus" title="{% trans 'Update contributors' %}"
+                    ng-show="service.active.resource === 'schemas' || service.active.resource === 'tables'"
+                    ng-click="service.openFormModal(service.active.resource, false, 'contributors')">
+                </a>
                 <a href="" class="fa fa-trash" title="{% trans 'Delete' %}"
                     ng-click="service.openDeleteModal(service.active.resource, false)">
                 </a>

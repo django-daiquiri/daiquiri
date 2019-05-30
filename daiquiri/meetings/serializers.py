@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from daiquiri.core.serializers import JSONField
+from daiquiri.core.serializers import JSONDictField
 
 from .models import Meeting, Participant, Contribution
 
@@ -38,7 +38,7 @@ class ContributionSerializer(serializers.ModelSerializer):
 
 class ParticipantSerializer(serializers.ModelSerializer):
 
-    details = JSONField(allow_null=True)
+    details = JSONDictField(allow_null=True)
     contributions = ContributionSerializer(many=True, read_only=True)
 
     class Meta:

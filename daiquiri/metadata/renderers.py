@@ -105,25 +105,27 @@ class DataCiteRenderer(XMLRenderer):
             self.start(person_type)
 
             name = person.get('name')
-            if name is not None:
+            if name:
                 self.node(person_type + 'Name', {}, name)
 
             first_name = person.get('first_name')
-            if first_name is not None:
+            if first_name:
                 self.node('first_name', {}, first_name)
 
             last_name = person.get('last_name')
-            if last_name is not None:
+            if last_name:
                 self.node('last_name', {}, last_name)
 
             orcid = person.get('orcid')
-            if orcid is not None:
+            if orcid:
                 self.node('nameIdentifier', {
                     'schemeURI': 'http://orcid.org/',
                     'nameIdentifierScheme': 'ORCID'
                 }, orcid)
 
-            for affiliation in person.get('affiliations', []):
-                self.node('affiliation', {}, affiliation)
+            affiliations = person.get('affiliations')
+            if affiliations:
+                for affiliation in affiliations.splitlines():
+                    self.node('affiliation', {}, affiliation)
 
             self.end(person_type)

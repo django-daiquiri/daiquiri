@@ -60,6 +60,15 @@ angular.module('metadata', ['core'])
                 metadata_access_level: 'PRIVATE',
                 groups: []
             };
+        },
+        persons: function() {
+            return {
+                name: '',
+                first_name: '',
+                last_name: '',
+                orcid: '',
+                affiliations: ''
+            }
         }
     };
 
@@ -216,6 +225,17 @@ angular.module('metadata', ['core'])
         return resources[resource].query(parameters, function(response) {
             angular.extend(service.values, response[0]);
         });
+    };
+
+    service.addPerson = function(person_type) {
+        if (service.values[person_type] === null) {
+            service.values[person_type] = []
+        }
+        service.values[person_type].push(service.factory.persons());
+    };
+
+    service.removePerson = function(person_type, index) {
+        service.values[person_type].splice(index, 1);
     };
 
     return service;

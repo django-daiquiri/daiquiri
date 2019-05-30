@@ -1,0 +1,80 @@
+{% load i18n %}
+
+    <div class="modal" id="tables-creators-form-modal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" tabindex="-1">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">
+                        {% trans 'Update table creators' %}
+                    </h4>
+                </div>
+
+                <div class="modal-body">
+                    <div class="daiquiri-metadata-modal-person"
+                        ng-repeat="creator in service.values.creators">
+
+                        <div class="row">
+                            <formgroup
+                                class="col-md-3"
+                                data-type="text"
+                                data-label="{% trans 'Name' %}"
+                                data-model="creator.name">
+                            </formgroup>
+                            <formgroup
+                                class="col-md-3"
+                                data-type="text"
+                                data-label="{% trans 'First name' %}"
+                                data-model="creator.first_name">
+                            </formgroup>
+                            <formgroup
+                                class="col-md-3"
+                                data-type="text"
+                                data-label="{% trans 'Last name' %}"
+                                data-model="creator.last_name">
+                            </formgroup>
+                            <formgroup
+                                class="col-md-3"
+                                data-type="text"
+                                data-label="{% trans 'ORCID' %}"
+                                data-model="creator.orcid">
+                            </formgroup>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-9">
+                               <formgroup
+                                    data-type="textarea"
+                                    data-label="{% trans 'Affiliations' %}"
+                                    data-help="{% trans 'Seperate multiple affiliations by newlines' %}"
+                                    data-model="creator.affiliations">
+                                </formgroup>
+                            </div>
+                            <div class="col-md-3">
+                                <button type="button" class="btn btn-danger form-inline-button"
+                                    ng-click="service.removePerson('creators', $index)">
+
+                                    {% trans 'Remove creator' %}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn btn-success" ng-click="service.addPerson('creators')">
+                        {% trans 'Add creator' %}
+                    </button>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                        {% trans 'Close' %}
+                    </button>
+                    <button type="button" class="btn btn-primary"
+                            ng-click="service.submitFormModal('tables')">
+                        {% trans 'Save' %}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
