@@ -4,6 +4,7 @@ from django.dispatch import receiver
 
 from .models import Column
 
+
 @receiver(post_save, sender=Column)
 def column_updated_handler(sender, **kwargs):
     cache.delete('processor')

@@ -4,8 +4,7 @@ from rest_framework import serializers
 
 from daiquiri.core.serializers import JSONListField
 from daiquiri.core.constants import LICENSE_URLS
-
-from ..models import Schema, Table
+from daiquiri.metadata.models import Schema, Table
 
 
 class SchemaSerializer(serializers.ModelSerializer):
