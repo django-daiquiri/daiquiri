@@ -10,14 +10,14 @@ class OAIPMHRenderer(XMLRenderer):
             'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
             'xsi:schemaLocation': 'http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd'
         })
-        self.node('responseDate', {}, data['response_date'])
+        self.node('responseDate', {}, data['responseDate'])
 
         if data['errors']:
             request_args = {}
         else:
             request_args = {k: v for k, v in data['params'].items() if k != 'verb'}
 
-        self.node('request', request_args, data['request'])
+        self.node('request', request_args, data['baseUrl'])
 
         if data['errors']:
             self.render_errors(data)
@@ -47,7 +47,14 @@ class OAIPMHRenderer(XMLRenderer):
 
     def render_identify(self, data):
         self.start('Identify')
-
+        self.node('repositoryName', {}, data['response']['repositoryName'])
+        self.node('baseUrl', {}, data['baseUrl'])
+        self.node('protocolVersion', {}, '2.0')
+        for email in data['response']['adminEmails']:
+            self.node('adminEmail', {}, email)
+        self.node('earliestDatestamp', {}, data['response']['earliestDatestamp'])
+        self.node('deletedRecord', {}, 'transient')
+        self.node('granularity', {}, 'YYYY-MM-DD')
         self.end('Identify')
 
     def render_list_identifiers(self, data):

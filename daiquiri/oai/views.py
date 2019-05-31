@@ -1,5 +1,8 @@
 from datetime import datetime
 
+from django.conf import settings
+from django.contrib.sites.models import Site
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
@@ -49,8 +52,8 @@ class OAIPMHView(APIView):
             self.errors.append(('badVerb', 'Illegal OAI verb'))
 
         return Response({
-            'response_date': datetime.utcnow().replace(microsecond=0).isoformat() + 'Z',
-            'request': request.build_absolute_uri(request.path),
+            'responseDate': datetime.utcnow().replace(microsecond=0).isoformat() + 'Z',
+            'baseUrl': request.build_absolute_uri(request.path),
             'params': params,
             'errors': self.errors,
             'response': self.response
@@ -60,7 +63,11 @@ class OAIPMHView(APIView):
         pass
 
     def identify(self, params):
-        pass
+        self.response = {
+            'repositoryName': Site.objects.get_current(),
+            'adminEmails': settings.OAI_ADMIN_EMAILS,
+            'earliestDatestamp': None,
+        }
 
     def list_identifiers(self, params):
         if 'metadataPrefix' not in params:
