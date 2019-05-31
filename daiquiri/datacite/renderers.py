@@ -1,4 +1,4 @@
-from daiquiri.jobs.renderers import XMLRenderer
+from daiquiri.core.renderers import XMLRenderer
 
 
 class DataCiteRenderer(XMLRenderer):
