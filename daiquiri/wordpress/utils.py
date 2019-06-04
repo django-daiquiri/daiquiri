@@ -64,4 +64,8 @@ def get_menu(request, menu_name):
         absolute_menu_url = request.build_absolute_uri(menu_url)
 
         response = requests.get(absolute_menu_url)
-        return response.text
+
+        if response.status_code == requests.codes.ok:
+            return response.text
+        else:
+            return ''
