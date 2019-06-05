@@ -32,33 +32,30 @@ def get_user_schema_name(user):
     return settings.QUERY_USER_SCHEMA_PREFIX + username
 
 
-def get_quota(user, quota_settings='QUERY_QUOTA', human=False):
+def get_quota(user, quota_settings='QUERY_QUOTA'):
 
     quota_config = getattr(settings, quota_settings)
 
     if not user or user.is_anonymous:
-        quota = quota_config.get('anonymous')
+        quota = human2bytes(quota_config.get('anonymous'))
 
     else:
-        quota = quota_config.get('user')
+        quota = human2bytes(quota_config.get('user'))
 
         # apply quota for user
         users = quota_config.get('users')
         if users:
-            user_quota = users.get(user.username)
+            user_quota = human2bytes(users.get(user.username))
             quota = user_quota if user_quota > quota else quota
 
         # apply quota for group
         groups = quota_config.get('groups')
         if groups:
             for group in user.groups.all():
-                group_quota = groups.get(group.name)
+                group_quota = human2bytes(groups.get(group.name))
                 quota = group_quota if group_quota > quota else quota
 
-    if human:
-        return quota
-    else:
-        return human2bytes(quota)
+    return quota
 
 
 def get_max_active_jobs(user):

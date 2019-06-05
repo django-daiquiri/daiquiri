@@ -39,7 +39,8 @@ class UploadFileValidator(object):
         self.user = None if request.user.is_anonymous else request.user
 
     def __call__(self, file):
-        if file.size > get_quota(self.user, quota_settings='QUERY_UPLOAD_LIMIT'):
+        quota = get_quota(self.user, quota_settings='QUERY_UPLOAD_LIMIT')
+        if file.size > quota:
             raise ValidationError({
-                'file': self.message % get_quota(self.user, quota_settings='QUERY_UPLOAD_LIMIT', human=True)
+                'file': self.message % quota
             })
