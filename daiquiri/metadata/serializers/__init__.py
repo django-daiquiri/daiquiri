@@ -59,8 +59,8 @@ class TableSerializer(serializers.ModelSerializer):
 
     label = serializers.CharField(source='__str__', read_only=True)
 
-    creators = JSONListField(allow_null=True)
-    contributors = JSONListField(allow_null=True)
+    creators = JSONListField(default=[])
+    contributors = JSONListField(default=[])
 
     class Meta:
         model = Table
@@ -71,8 +71,8 @@ class SchemaSerializer(serializers.ModelSerializer):
 
     label = serializers.CharField(source='__str__', read_only=True)
 
-    creators = JSONListField(allow_null=True)
-    contributors = JSONListField(allow_null=True)
+    creators = JSONListField(default=[])
+    contributors = JSONListField(default=[])
 
     class Meta:
         model = Schema

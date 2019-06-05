@@ -17,8 +17,8 @@ class DataCiteSerializer(serializers.ModelSerializer):
     language = serializers.ReadOnlyField(default=settings.METADATA_LANGUAGE)
     publisher = serializers.ReadOnlyField(default=settings.METADATA_PUBLISHER)
 
-    creators = JSONListField(allow_null=True)
-    contributors = JSONListField(allow_null=True)
+    creators = JSONListField(default=[])
+    contributors = JSONListField(default=[])
 
     def get_license_url(self, obj):
         return LICENSE_URLS.get(obj.license)
