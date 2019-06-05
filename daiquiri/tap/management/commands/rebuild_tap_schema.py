@@ -8,6 +8,7 @@ from daiquiri.tap.models import (
 )
 from daiquiri.tap.utils import update_schema
 
+
 class Command(BaseCommand):
 
     def handle(self, *args, **options):

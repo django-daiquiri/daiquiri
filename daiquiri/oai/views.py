@@ -6,12 +6,12 @@ from django.contrib.sites.models import Site
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from .renderers import OAIPMHRenderer
+from .renderers import OaiRenderer
 
 
-class OAIPMHView(APIView):
+class OaiView(APIView):
 
-    renderer_classes = (OAIPMHRenderer, )
+    renderer_classes = (OaiRenderer, )
 
     def get(self, request):
         return self.get_response(request, request.GET)

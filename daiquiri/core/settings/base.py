@@ -23,7 +23,11 @@ ROOT_URLCONF = 'config.urls'
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-DATABASE_ROUTERS = ['daiquiri.tap.routers.TapRouter', 'daiquiri.core.routers.DataRouter']
+DATABASE_ROUTERS = [
+    'daiquiri.oai.routers.OaiRouter',
+    'daiquiri.tap.routers.TapRouter',
+    'daiquiri.core.routers.DataRouter'
+]
 
 DJANGO_APPS = [
     'django.contrib.admin',

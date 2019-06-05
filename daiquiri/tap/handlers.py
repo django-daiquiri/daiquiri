@@ -12,6 +12,7 @@ from .utils import (
     delete_column
 )
 
+
 @receiver(post_save, sender=Schema)
 def schema_updated_handler(sender, **kwargs):
     update_schema(kwargs['instance'])

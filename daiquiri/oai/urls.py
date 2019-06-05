@@ -1,10 +1,10 @@
 from django.urls import path
 
-from .views import OAIPMHView
+from .views import OaiView
 
 
 app_name = 'oai'
 
 urlpatterns = [
-    path('', OAIPMHView.as_view(), name='oai-pmh'),
+    path('', OaiView.as_view(), name='oai-pmh'),
 ]

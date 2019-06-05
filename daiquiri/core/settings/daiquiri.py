@@ -69,7 +69,10 @@ METADATA_BASE_URL = None
 METADATA_PUBLISHER = None
 METADATA_LANGUAGE = 'en'
 
+OAI_SCHEMA = 'oai'
 OAI_ADMIN_EMAILS = []
+OAI_METADATA_PREFIX = ['dc']
+OAI_ADAPTER = 'daiquiri.oai.adapter.SimpleOaiAdapter'
 
 QUERY_ANONYMOUS = False
 QUERY_USER_SCHEMA_PREFIX = 'daiquiri_user_'

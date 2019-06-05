@@ -1,7 +1,7 @@
 from daiquiri.core.renderers import XMLRenderer
 
 
-class OAIPMHRenderer(XMLRenderer):
+class OaiRenderer(XMLRenderer):
 
     def render_document(self, data, accepted_media_type=None, renderer_context=None):
 
