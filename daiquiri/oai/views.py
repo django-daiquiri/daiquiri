@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import datetime
 
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -6,13 +6,13 @@ from django.contrib.sites.models import Site
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
+from .adapter import OaiAdapter
 from .models import Record
 from .renderers import OaiRenderer
+from .utils import get_metadata_format, get_renderer
 
 
 class OaiView(APIView):
-
-    renderer_classes = (OaiRenderer, )
 
     def get(self, request):
         return self.get_response(request, request.GET)
@@ -43,6 +43,14 @@ class OaiView(APIView):
             self.list_sets(arguments)
         else:
             self.errors.append(('badVerb', 'Illegal OAI verb'))
+
+        if 'metadataPrefix' in arguments:
+            renderer = get_renderer(arguments['metadataPrefix'])
+        else:
+            renderer = OaiRenderer()
+
+        request.accepted_renderer = renderer
+        request.accepted_media_type = renderer.media_type
 
         return Response({
             'responseDate': datetime.utcnow().replace(microsecond=0).isoformat() + 'Z',
@@ -92,7 +100,7 @@ class OaiView(APIView):
         self.response = {
             'identifier': record.identifier,
             'datestamp': record.datestamp,
-            'metadata': None
+            'metadata': self.get_metadata(record)
         }
 
     def identify(self, arguments):
@@ -152,16 +160,8 @@ class OaiView(APIView):
                 self.errors.append(('idDoesNotExist', 'No item found with this identifier'))
                 return
 
-                self.response = [{
-                    'metadataPrefix': record.metadata_prefix
-                } for record in records]
-
             else:
-                self.response = [
-                    next(metadata_format for metadata_format in settings.OAI_METADATA_FORMATS
-                         if metadata_format['prefix'] == record.metadata_prefix)
-                    for record in records
-                ]
+                self.response = [get_metadata_format(record.metadata_prefix) for record in records]
 
         else:
             self.response = settings.OAI_METADATA_FORMATS
@@ -192,7 +192,7 @@ class OaiView(APIView):
         self.response = [{
             'identifier': record.identifier,
             'datestamp': record.datestamp,
-            'metadata': None
+            'metadata': self.get_metadata(record)
         } for record in records]
 
     def list_sets(self, arguments):
@@ -236,3 +236,12 @@ class OaiView(APIView):
             self.errors.append((
                 'cannotDisseminateFormat', 'The metadataPrefix \'%s\' is not supported by this repository.' % arguments['metadataPrefix']
             ))
+
+    def get_metadata(self, record):
+        adapter = OaiAdapter()
+        resource = adapter.get_resource(record.identifier)
+        serializer_class = adapter.get_serializer_class(resource, record.metadata_prefix)
+        serializer = serializer_class(instance=resource, context={
+            'request': self.request
+        })
+        return serializer.data

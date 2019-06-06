@@ -68,16 +68,30 @@ METADATA_COLUMN_PERMISSIONS = False
 METADATA_BASE_URL = None
 METADATA_PUBLISHER = None
 METADATA_LANGUAGE = 'en'
+METADATA_SUBJECTS = [
+    {
+        'subject': 'Astronomy',
+        'schemeURI': 'http://id.loc.gov/authorities/subjects',
+        'valueURI': 'http://id.loc.gov/authorities/subjects/sh85009003'
+    }
+]
 
 OAI_SCHEMA = 'oai'
-OAI_ADAPTER = 'daiquiri.oai.adapter.SimpleOaiAdapter'
+OAI_ADAPTER = 'daiquiri.metadata.adapter.MetadataOaiAdapter'
 OAI_ADMIN_EMAILS = ['admin@example.com']
 OAI_IDENTIFIER_PREFIX = 'oai:'
 OAI_METADATA_FORMATS = [
     {
         'prefix': 'oai_dc',
         'schema': 'http://www.openarchives.org/OAI/2.0/oai_dc.xsd',
-        'namespace': 'http://www.openarchives.org/OAI/2.0/oai_dc/'
+        'namespace': 'http://www.openarchives.org/OAI/2.0/oai_dc/',
+        'renderer_class': 'daiquiri.oai.renderers.dublincore.DublincoreOaiRenderer'
+    },
+    {
+        'prefix': 'oai_datacite',
+        'schema': 'http://schema.datacite.org/oai/oai-1.1/oai.xsd',
+        'namespace': '  http://schema.datacite.org/oai/oai-1.1/',
+        'renderer_class': 'daiquiri.oai.renderers.datacite.DataciteOaiRenderer'
     }
 ]
 OAI_DELETED_RECORD = 'transient'

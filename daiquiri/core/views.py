@@ -6,6 +6,9 @@ from django.contrib.auth.mixins import (
 from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
+from django.views.generic import View
+
+from daiquiri.core.utils import render_to_xml
 
 from allauth.account.forms import LoginForm
 
@@ -62,3 +65,20 @@ class AnonymousAccessMixin(AccessMixin):
         if not getattr(settings, self.anonymous_setting) and not request.user.is_authenticated:
             return self.handle_no_permission()
         return super(AnonymousAccessMixin, self).dispatch(request, *args, **kwargs)
+
+
+class SingleObjectXMLMixin(View):
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        context = self.get_context_data()
+        renderer = self.renderer_class()
+
+        return render_to_xml(request, renderer, context)
+
+    def get_object(self):
+        raise NotImplementedError()
+
+    def get_context_data(self):
+        raise NotImplementedError()

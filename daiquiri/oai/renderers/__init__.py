@@ -97,4 +97,4 @@ class OaiRenderer(XMLRenderer):
         self.end('record')
 
     def render_metadata(self, metadata):
-        pass
+        raise NotImplementedError()
