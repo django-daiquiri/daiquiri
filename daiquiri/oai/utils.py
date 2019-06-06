@@ -11,11 +11,11 @@ def update_records(resource):
 
         identifier = OaiAdapter().get_identifier(resource)
 
-        for metadata_prefix in settings.OAI_METADATA_PREFIX:
+        for metadata_format in settings.OAI_METADATA_FORMATS:
             try:
-                record = Record.objects.get(identifier=identifier, metadata_prefix=metadata_prefix)
+                record = Record.objects.get(identifier=identifier, metadata_prefix=metadata_format['prefix'])
             except Record.DoesNotExist:
-                record = Record(identifier=identifier, metadata_prefix=metadata_prefix)
+                record = Record(identifier=identifier, metadata_prefix=metadata_format['prefix'])
 
             record.datestamp = resource.updated or resource.published
             record.deleted = False
@@ -28,9 +28,9 @@ def update_records(resource):
 def delete_records(resource):
     identifier = OaiAdapter().get_identifier(resource)
 
-    for metadata_prefix in settings.OAI_METADATA_PREFIX:
+    for metadata_format in settings.OAI_METADATA_FORMATS:
         try:
-            record = Record.objects.get(identifier=identifier, metadata_prefix=metadata_prefix)
+            record = Record.objects.get(identifier=identifier, metadata_prefix=metadata_format['prefix'])
             record.deleted = True
             record.save()
         except Record.DoesNotExist:

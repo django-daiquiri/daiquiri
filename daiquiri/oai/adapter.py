@@ -19,6 +19,9 @@ class BaseOaiAdapter(object):
 
 class SimpleOaiAdapter(object):
 
+    def get_prefix(self):
+        return settings.OAI_IDENTIFIER_PREFIX
+
     def get_resource(self, identifier):
         resource_type, resource_id = identifier.split('/')
 
@@ -34,10 +37,10 @@ class SimpleOaiAdapter(object):
     def get_identifier(self, resource):
 
         if isinstance(resource, Schema):
-            return 'schemas/%i' % resource.pk
+            return self.get_prefix() + 'schemas/%i' % resource.pk
 
         elif isinstance(resource, Table):
-            return 'tables/%i' % resource.pk
+            return self.get_prefix() + 'tables/%i' % resource.pk
 
         else:
             return None

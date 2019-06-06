@@ -70,9 +70,18 @@ METADATA_PUBLISHER = None
 METADATA_LANGUAGE = 'en'
 
 OAI_SCHEMA = 'oai'
-OAI_ADMIN_EMAILS = []
-OAI_METADATA_PREFIX = ['dc']
 OAI_ADAPTER = 'daiquiri.oai.adapter.SimpleOaiAdapter'
+OAI_ADMIN_EMAILS = ['admin@example.com']
+OAI_IDENTIFIER_PREFIX = 'oai:'
+OAI_METADATA_FORMATS = [
+    {
+        'prefix': 'oai_dc',
+        'schema': 'http://www.openarchives.org/OAI/2.0/oai_dc.xsd',
+        'namespace': 'http://www.openarchives.org/OAI/2.0/oai_dc/'
+    }
+]
+OAI_DELETED_RECORD = 'transient'
+OAI_GRANULARITY = 'YYYY-MM-DD'
 
 QUERY_ANONYMOUS = False
 QUERY_USER_SCHEMA_PREFIX = 'daiquiri_user_'
