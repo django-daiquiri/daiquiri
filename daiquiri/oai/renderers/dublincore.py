@@ -29,6 +29,7 @@ class DublincoreOaiRenderer(OaiRenderer):
         self.node('dc:description', {}, metadata['description'])
         self.node('dc:date', {}, metadata['date'])
         self.node('dc:publisher', {}, metadata['publisher'])
+        self.node('dc:type', {}, metadata['type'])
         self.node('dc:identifier', {}, metadata['identifier'])
 
         self.end('oai_dc:dc')

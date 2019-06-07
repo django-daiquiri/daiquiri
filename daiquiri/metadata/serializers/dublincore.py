@@ -16,6 +16,7 @@ class DublincoreSerializer(serializers.ModelSerializer):
     subjects = serializers.ReadOnlyField(default=settings.METADATA_SUBJECTS)
     publisher = serializers.ReadOnlyField(default=settings.METADATA_PUBLISHER)
     date = serializers.SerializerMethodField()
+    type = serializers.SerializerMethodField()
     identifier = serializers.SerializerMethodField()
     rights = serializers.SerializerMethodField()
 
@@ -44,9 +45,13 @@ class SchemaDublincoreSerializer(DublincoreSerializer):
             'subjects',
             'publisher',
             'date',
+            'type',
             'identifier',
             'rights'
         )
+
+    def get_type(self, obj):
+        return 'Database schema'
 
     def get_identifier(self, obj):
         return obj.doi or 'schemas/%i' % obj.pk
@@ -64,9 +69,13 @@ class TableDublincoreSerializer(DublincoreSerializer):
             'subjects',
             'publisher',
             'date',
+            'type',
             'identifier',
             'rights'
         )
+
+    def get_type(self, obj):
+        return 'Database table'
 
     def get_identifier(self, obj):
         return obj.doi or 'tables/%i' % obj.pk
