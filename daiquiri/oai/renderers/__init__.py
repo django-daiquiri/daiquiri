@@ -70,10 +70,7 @@ class OaiRenderer(XMLRenderer):
     def render_list_identifiers(self, items):
         self.start('ListIdentifiers')
         for item in items:
-            self.start('header')
-            self.node('identifier', {}, item['identifier'])
-            self.node('datestamp', {}, item['datestamp'])
-            self.end('header')
+            self.render_header(item['header'])
         self.end('ListIdentifiers')
 
     def render_list_metadata_formats(self, metadata_formats):
