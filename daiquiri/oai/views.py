@@ -116,7 +116,12 @@ class OaiView(APIView):
             'adminEmails': settings.OAI_ADMIN_EMAILS,
             'earliestDatestamp': earliest_record.datestamp if earliest_record else None,
             'deletedRecord': settings.OAI_DELETED_RECORD,
-            'granularity': settings.OAI_GRANULARITY
+            'granularity': settings.OAI_GRANULARITY,
+            'identifier': {
+                'scheme': settings.OAI_IDENTIFIER_SCHEMA,
+                'repositoryIdentifier': settings.OAI_IDENTIFIER_REPOSITORY,
+                'delimiter': settings.OAI_IDENTIFIER_DELIMITER
+            }
         }
 
     def list_identifiers(self, arguments):

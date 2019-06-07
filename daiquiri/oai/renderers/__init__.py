@@ -54,6 +54,17 @@ class OaiRenderer(XMLRenderer):
         self.node('earliestDatestamp', {}, repository_metadata['earliestDatestamp'])
         self.node('deletedRecord', {}, repository_metadata['deletedRecord'])
         self.node('granularity', {}, repository_metadata['granularity'])
+        self.start('description')
+        self.start('oai-identifier', {
+            'xmlns': 'http://www.openarchives.org/OAI/2.0/oai-identifier',
+            'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+            'xsi:schemaLocation': 'http://www.openarchives.org/OAI/2.0/oai-identifier http://www.openarchives.org/OAI/2.0/oai-identifier.xsd'
+        })
+        self.node('scheme', {}, repository_metadata['identifier']['scheme'])
+        self.node('repositoryIdentifier', {}, repository_metadata['identifier']['repositoryIdentifier'])
+        self.node('delimiter', {}, repository_metadata['identifier']['delimiter'])
+        self.end('oai-identifier')
+        self.end('description')
         self.end('Identify')
 
     def render_list_identifiers(self, items):

@@ -79,7 +79,6 @@ METADATA_SUBJECTS = [
 OAI_SCHEMA = 'oai'
 OAI_ADAPTER = 'daiquiri.metadata.adapter.MetadataOaiAdapter'
 OAI_ADMIN_EMAILS = ['admin@example.com']
-OAI_IDENTIFIER_PREFIX = 'oai:'
 OAI_METADATA_FORMATS = [
     {
         'prefix': 'oai_dc',
@@ -96,6 +95,9 @@ OAI_METADATA_FORMATS = [
 ]
 OAI_DELETED_RECORD = 'transient'
 OAI_GRANULARITY = 'YYYY-MM-DD'
+OAI_IDENTIFIER_SCHEMA = 'oai'
+OAI_IDENTIFIER_REPOSITORY = 'daiquiri'
+OAI_IDENTIFIER_DELIMITER = ':'
 
 QUERY_ANONYMOUS = False
 QUERY_USER_SCHEMA_PREFIX = 'daiquiri_user_'

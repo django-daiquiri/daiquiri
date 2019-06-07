@@ -9,6 +9,10 @@ def OaiAdapter():
 
 class BaseOaiAdapter(object):
 
+    def get_identifier_prefix(self):
+        return settings.OAI_IDENTIFIER_SCHEMA + settings.OAI_IDENTIFIER_DELIMITER \
+            + settings.OAI_IDENTIFIER_REPOSITORY + settings.OAI_IDENTIFIER_DELIMITER
+
     def get_identifier(self, resource):
         raise NotImplementedError
 

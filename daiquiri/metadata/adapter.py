@@ -1,5 +1,3 @@
-from django.conf import settings
-
 from daiquiri.oai.adapter import BaseOaiAdapter
 
 from .models import Schema, Table
@@ -9,18 +7,14 @@ from .serializers.dublincore import SchemaDublincoreSerializer, TableDublincoreS
 
 class MetadataOaiAdapter(BaseOaiAdapter):
 
-    prefix = settings.OAI_IDENTIFIER_PREFIX
-
-    def get_prefix(self):
-        return settings.OAI_IDENTIFIER_PREFIX
-
     def get_identifier(self, resource):
+        prefix = self.get_identifier_prefix()
 
         if isinstance(resource, Schema):
-            return self.prefix + 'schemas/%i' % resource.pk
+            return prefix + 'schemas/%i' % resource.pk
 
         elif isinstance(resource, Table):
-            return self.prefix + 'tables/%i' % resource.pk
+            return prefix + 'tables/%i' % resource.pk
 
         else:
             return None
@@ -28,8 +22,10 @@ class MetadataOaiAdapter(BaseOaiAdapter):
         raise NotImplementedError
 
     def get_resource(self, identifier):
-        if identifier.startswith(self.prefix):
-            resource_type, resource_id = identifier[len(self.prefix):].split('/')
+        prefix = self.get_identifier_prefix()
+
+        if identifier.startswith(prefix):
+            resource_type, resource_id = identifier[len(prefix):].split('/')
 
             if resource_type == 'schemas':
                 return Schema.objects.get(pk=resource_id)
