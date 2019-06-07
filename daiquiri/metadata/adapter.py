@@ -42,7 +42,7 @@ class MetadataOaiAdapter(BaseOaiAdapter):
         if isinstance(resource, Schema):
             if metadata_prefix == 'oai_dc':
                 return SchemaDublincoreSerializer
-            elif metadata_prefix == 'oai_datacite':
+            elif metadata_prefix in ['oai_datacite', 'datacite']:
                 return SchemaDataciteSerializer
             else:
                 raise RuntimeError('metadata_prefix not supported')
@@ -50,7 +50,7 @@ class MetadataOaiAdapter(BaseOaiAdapter):
         elif isinstance(resource, Table):
             if metadata_prefix == 'oai_dc':
                 return TableDublincoreSerializer
-            elif metadata_prefix == 'oai_datacite':
+            elif metadata_prefix in ['oai_datacite', 'datacite']:
                 return TableDataciteSerializer
             else:
                 raise RuntimeError('metadata_prefix not supported')

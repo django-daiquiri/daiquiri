@@ -1,7 +1,7 @@
 from daiquiri.oai.renderers import OaiRenderer
 
 
-class DublincoreOaiRenderer(OaiRenderer):
+class DublincoreRenderer(OaiRenderer):
 
     def render_metadata(self, metadata):
         self.start('oai_dc:dc', {

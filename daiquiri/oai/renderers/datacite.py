@@ -1,9 +1,12 @@
 from daiquiri.oai.renderers import OaiRenderer
 
 
-class DataciteOaiRenderer(OaiRenderer):
+class DataciteRenderer(OaiRenderer):
 
     def render_metadata(self, metadata):
+        self.render_resource(metadata)
+
+    def render_resource(self, metadata):
         self.start('resource', {
             'xmlns': 'http://datacite.org/schema/kernel-4',
             'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
@@ -123,3 +126,17 @@ class DataciteOaiRenderer(OaiRenderer):
                     self.node('affiliation', {}, affiliation)
 
             self.end(person_type)
+
+
+class OaiDataciteRenderer(DataciteRenderer):
+
+    def render_metadata(self, metadata):
+        self.start('oai_datacite', {
+            'xmlns': 'http://schema.datacite.org/oai/oai-1.0/',
+            'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+            'xsi:schemaLocation': 'http://schema.datacite.org/oai/oai-1.0/ oai_datacite.xsd'
+        })
+        self.start('payload')
+        self.render_resource(metadata)
+        self.end('payload')
+        self.end('oai_datacite')

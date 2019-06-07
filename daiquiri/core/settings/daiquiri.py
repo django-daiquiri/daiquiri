@@ -84,13 +84,19 @@ OAI_METADATA_FORMATS = [
         'prefix': 'oai_dc',
         'schema': 'http://www.openarchives.org/OAI/2.0/oai_dc.xsd',
         'namespace': 'http://www.openarchives.org/OAI/2.0/oai_dc/',
-        'renderer_class': 'daiquiri.oai.renderers.dublincore.DublincoreOaiRenderer'
+        'renderer_class': 'daiquiri.oai.renderers.dublincore.DublincoreRenderer'
     },
     {
         'prefix': 'oai_datacite',
         'schema': 'http://schema.datacite.org/oai/oai-1.1/oai.xsd',
-        'namespace': '  http://schema.datacite.org/oai/oai-1.1/',
-        'renderer_class': 'daiquiri.oai.renderers.datacite.DataciteOaiRenderer'
+        'namespace': 'http://schema.datacite.org/oai/oai-1.1/',
+        'renderer_class': 'daiquiri.oai.renderers.datacite.OaiDataciteRenderer'
+    },
+    {
+        'prefix': 'datacite',
+        'schema': 'http://schema.datacite.org/meta/nonexistant/nonexistant.xsd',
+        'namespace': 'http://datacite.org/schema/nonexistant',
+        'renderer_class': 'daiquiri.oai.renderers.datacite.DataciteRenderer'
     }
 ]
 OAI_DELETED_RECORD = 'transient'
