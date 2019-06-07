@@ -17,21 +17,29 @@ class MetadataOaiAdapter(BaseOaiAdapter):
             raise RuntimeError('Unsupported resource')
 
     def get_resource(self, record):
-        prefix = self.get_identifier_prefix()
+        resource_identifier = self.strip_identifier_prefix(record.identifier)
+        resource_type, resource_id = resource_identifier.split('/')
 
-        if record.identifier.startswith(prefix):
-            resource_type, resource_id = record.identifier[len(prefix):].split('/')
+        if resource_type == 'schemas':
+            try:
+                return Schema.objects.filter(
+                    metadata_access_level=ACCESS_LEVEL_PUBLIC,
+                    published__isnull=False).get(pk=resource_id)
+            except Schema.DoesNotExist:
+                return None
 
-            if resource_type == 'schemas':
-                return self.get_schema(resource_id)
+        elif resource_type == 'tables':
+            try:
+                return Table.objects.filter(
+                    schema__metadata_access_level=ACCESS_LEVEL_PUBLIC,
+                    schema__published__isnull=False,
+                    metadata_access_level=ACCESS_LEVEL_PUBLIC,
+                    published__isnull=False).get(pk=resource_id)
+            except Table.DoesNotExist:
+                return None
 
-            elif resource_type == 'tables':
-                return self.get_table(resource_id)
-
-            else:
-                raise RuntimeError()
         else:
-            raise RuntimeError('Wrong prefix')
+            raise RuntimeError()
 
     def get_resources(self):
         yield Schema.objects.all()
@@ -78,26 +86,27 @@ class MetadataOaiAdapter(BaseOaiAdapter):
 
         return identifier, datestamp, public
 
-    def get_schema(self, schema_id):
+
+class DoiMetadataOaiAdapter(MetadataOaiAdapter):
+
+    def get_resource(self, record):
+        doi = self.strip_identifier_prefix(record.identifier)
+
         try:
             return Schema.objects.filter(
                 metadata_access_level=ACCESS_LEVEL_PUBLIC,
-                published__isnull=False).get(pk=schema_id)
+                published__isnull=False
+            ).get(doi=doi)
         except Schema.DoesNotExist:
-            return None
-
-    def get_table(self, table_id):
-        try:
-            return Table.objects.filter(
-                schema__metadata_access_level=ACCESS_LEVEL_PUBLIC,
-                schema__published__isnull=False,
-                metadata_access_level=ACCESS_LEVEL_PUBLIC,
-                published__isnull=False).get(pk=table_id)
-        except Table.DoesNotExist:
-            return None
-
-
-class DoiMetadataOaiAdapter(MetadataOaiAdapter):
+            try:
+                return Table.objects.filter(
+                    schema__metadata_access_level=ACCESS_LEVEL_PUBLIC,
+                    schema__published__isnull=False,
+                    metadata_access_level=ACCESS_LEVEL_PUBLIC,
+                    published__isnull=False,
+                ).get(doi=doi)
+            except Schema.DoesNotExist:
+                return None
 
     def get_schema_record(self, schema):
         identifier = (self.get_identifier_prefix() + schema.doi) if schema.doi else None
@@ -118,26 +127,3 @@ class DoiMetadataOaiAdapter(MetadataOaiAdapter):
             and (table.schema.published is not None)
 
         return identifier, datestamp, public
-
-    def get_schema(self, schema_id):
-        try:
-            return Schema.objects.filter(
-                metadata_access_level=ACCESS_LEVEL_PUBLIC,
-                published__isnull=False,
-                doi__isnull=False,
-            ).get(pk=schema_id)
-        except Schema.DoesNotExist:
-            return None
-
-    def get_table(self, table_id):
-        try:
-            return Table.objects.filter(
-                schema__metadata_access_level=ACCESS_LEVEL_PUBLIC,
-                schema__published__isnull=False,
-                schema__doi__isnull=False,
-                metadata_access_level=ACCESS_LEVEL_PUBLIC,
-                published__isnull=False,
-                doi__isnull=False
-            ).get(pk=table_id)
-        except Table.DoesNotExist:
-            return None

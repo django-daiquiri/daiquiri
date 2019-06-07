@@ -13,11 +13,13 @@ class BaseOaiAdapter(object):
         return settings.OAI_IDENTIFIER_SCHEMA + settings.OAI_IDENTIFIER_DELIMITER \
             + settings.OAI_IDENTIFIER_REPOSITORY + settings.OAI_IDENTIFIER_DELIMITER
 
-    def get_identifier(self, resource):
-        raise NotImplementedError
+    def strip_identifier_prefix(self, identifier):
+        prefix = self.get_identifier_prefix()
 
-    def get_timestamp(self, resource):
-        raise NotImplementedError
+        if identifier.startswith(prefix):
+            return identifier[len(prefix):]
+        else:
+            raise RuntimeError('Wrong prefix')
 
     def get_resource(self, identifier):
         raise NotImplementedError
