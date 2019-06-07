@@ -1,9 +1,11 @@
-from django.core.management.base import BaseCommand
+from datetime import datetime
 
-from daiquiri.metadata.models import Schema, Table
+from django.core.management.base import BaseCommand
 
 from daiquiri.oai.models import Record
 from daiquiri.oai.utils import update_records
+
+from daiquiri.oai.adapter import OaiAdapter
 
 
 class Command(BaseCommand):
@@ -13,11 +15,19 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
+        adapter = OaiAdapter()
+
         if options['delete']:
             Record.objects.all().delete()
+        else:
+            # mark deleted or unpublished records as deleted
+            for record in Record.objects.all():
+                ressource = adapter.get_resource(record)
+                if ressource is None:
+                    record.datestamp = datetime.today()
+                    record.deleted = True
+                    record.save()
 
-        for schema in Schema.objects.all():
-            update_records(schema)
-
-        for table in Table.objects.all():
-            update_records(table)
+        for ressources in OaiAdapter().get_resources():
+            for ressource in ressources:
+                update_records(ressource)

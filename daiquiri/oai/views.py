@@ -98,8 +98,7 @@ class OaiView(APIView):
             return
 
         self.response = {
-            'identifier': record.identifier,
-            'datestamp': record.datestamp,
+            'header': self.get_header(record),
             'metadata': self.get_metadata(record)
         }
 
@@ -148,8 +147,7 @@ class OaiView(APIView):
             return
 
         self.response = [{
-            'identifier': record.identifier,
-            'datestamp': record.datestamp,
+            'header': self.get_header(record),
         } for record in records]
 
     def list_metadata_formats(self, arguments):
@@ -195,8 +193,7 @@ class OaiView(APIView):
             return
 
         self.response = [{
-            'identifier': record.identifier,
-            'datestamp': record.datestamp,
+            'header': self.get_header(record),
             'metadata': self.get_metadata(record)
         } for record in records]
 
@@ -242,11 +239,21 @@ class OaiView(APIView):
                 'cannotDisseminateFormat', 'The metadataPrefix \'%s\' is not supported by this repository.' % arguments['metadataPrefix']
             ))
 
+    def get_header(self, record):
+        return {
+            'identifier': record.identifier,
+            'datestamp': record.datestamp,
+            'deleted': record.deleted
+        }
+
     def get_metadata(self, record):
-        adapter = OaiAdapter()
-        resource = adapter.get_resource(record.identifier)
-        serializer_class = adapter.get_serializer_class(resource, record.metadata_prefix)
-        serializer = serializer_class(instance=resource, context={
-            'request': self.request
-        })
-        return serializer.data
+        if record.deleted:
+            return None
+        else:
+            adapter = OaiAdapter()
+            resource = adapter.get_resource(record)
+            serializer_class = adapter.get_serializer_class(resource, record.metadata_prefix)
+            serializer = serializer_class(instance=resource, context={
+                'request': self.request
+            })
+            return serializer.data

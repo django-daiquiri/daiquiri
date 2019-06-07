@@ -98,14 +98,18 @@ class OaiRenderer(XMLRenderer):
 
     def render_record(self, record):
         self.start('record')
-        self.start('header')
-        self.node('identifier', {}, record['identifier'])
-        self.node('datestamp', {}, record['datestamp'])
-        self.end('header')
-        self.start('metadata')
-        self.render_metadata(record['metadata'])
-        self.end('metadata')
+        self.render_header(record['header'])
+        if record['metadata'] is not None:
+            self.start('metadata')
+            self.render_metadata(record['metadata'])
+            self.end('metadata')
         self.end('record')
+
+    def render_header(self, header):
+        self.start('header', {'status': 'deleted'} if header['deleted'] else {})
+        self.node('identifier', {}, header['identifier'])
+        self.node('datestamp', {}, header['datestamp'])
+        self.end('header')
 
     def render_metadata(self, metadata):
         raise NotImplementedError()

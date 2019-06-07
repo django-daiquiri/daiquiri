@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from daiquiri.metadata.models import Schema, Table, Column
+from .models import Schema, Table, Column
 
 
 def get_user_columns(user, schema_name, table_name):

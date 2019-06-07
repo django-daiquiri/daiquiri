@@ -16,7 +16,13 @@ class BaseOaiAdapter(object):
     def get_identifier(self, resource):
         raise NotImplementedError
 
+    def get_timestamp(self, resource):
+        raise NotImplementedError
+
     def get_resource(self, identifier):
+        raise NotImplementedError
+
+    def get_resources(self):
         raise NotImplementedError
 
     def get_serializer_class(self, identifier):

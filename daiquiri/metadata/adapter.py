@@ -1,3 +1,4 @@
+from daiquiri.core.constants import ACCESS_LEVEL_PUBLIC
 from daiquiri.oai.adapter import BaseOaiAdapter
 
 from .models import Schema, Table
@@ -7,36 +8,59 @@ from .serializers.dublincore import SchemaDublincoreSerializer, TableDublincoreS
 
 class MetadataOaiAdapter(BaseOaiAdapter):
 
-    def get_identifier(self, resource):
+    def get_record(self, resource):
         prefix = self.get_identifier_prefix()
 
         if isinstance(resource, Schema):
-            return prefix + 'schemas/%i' % resource.pk
-
+            identifier = prefix + 'schemas/%i' % resource.pk
+            datestamp = resource.updated or resource.published
+            public = (resource.metadata_access_level == ACCESS_LEVEL_PUBLIC) \
+                and (resource.published is not None)
         elif isinstance(resource, Table):
-            return prefix + 'tables/%i' % resource.pk
+            identifier = prefix + 'tables/%i' % resource.pk
+            datestamp = resource.updated or resource.published
+            public = (resource.metadata_access_level == ACCESS_LEVEL_PUBLIC) \
+                and (resource.published is not None) \
+                and (resource.schema.metadata_access_level == ACCESS_LEVEL_PUBLIC) \
+                and (resource.schema.published is not None)
 
         else:
-            return None
+            raise RuntimeError('Unsupported resource')
 
-        raise NotImplementedError
+        return identifier, datestamp, public
 
-    def get_resource(self, identifier):
+    def get_resource(self, record):
         prefix = self.get_identifier_prefix()
 
-        if identifier.startswith(prefix):
-            resource_type, resource_id = identifier[len(prefix):].split('/')
+        if record.identifier.startswith(prefix):
+            resource_type, resource_id = record.identifier[len(prefix):].split('/')
 
             if resource_type == 'schemas':
-                return Schema.objects.get(pk=resource_id)
+                try:
+                    return Schema.objects.filter(
+                        metadata_access_level=ACCESS_LEVEL_PUBLIC,
+                        published__isnull=False).get(pk=resource_id)
+                except Schema.DoesNotExist:
+                    return None
 
             elif resource_type == 'tables':
-                return Table.objects.get(pk=resource_id)
+                try:
+                    return Table.objects.filter(
+                        schema__metadata_access_level=ACCESS_LEVEL_PUBLIC,
+                        schema__published__isnull=False,
+                        metadata_access_level=ACCESS_LEVEL_PUBLIC,
+                        published__isnull=False).get(pk=resource_id)
+                except Table.DoesNotExist:
+                    return None
 
             else:
                 raise RuntimeError()
         else:
-            return None
+            raise RuntimeError('Wrong prefix')
+
+    def get_resources(self):
+        yield Schema.objects.all()
+        yield Table.objects.all()
 
     def get_serializer_class(self, resource, metadata_prefix):
         if isinstance(resource, Schema):
@@ -55,5 +79,8 @@ class MetadataOaiAdapter(BaseOaiAdapter):
             else:
                 raise RuntimeError('metadata_prefix not supported')
 
+        elif resource is None:
+            raise RuntimeError('resource is None')
+
         else:
-            raise RuntimeError('resource_type not supported')
+            raise RuntimeError('resource_type \'%s\' not supported')
