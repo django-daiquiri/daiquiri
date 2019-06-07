@@ -99,5 +99,9 @@ class TableDataciteSerializer(DataciteSerializer):
         return 'Database table'
 
     def get_size(self, obj):
-        columns = obj.columns.filter_by_metadata_access_level(self.context['request'].user)
+        # filter the columns which are published for the groups of the user
+        if not settings.METADATA_COLUMN_PERMISSIONS:
+            columns = obj.columns.all()
+        else:
+            columns = obj.columns.filter_by_access_level(self.context['request'].user)
         return '%i columns' % columns.count()
