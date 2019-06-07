@@ -26,6 +26,7 @@ class Command(BaseCommand):
             config['PREFIX'] = settings.QUERY_USER_SCHEMA_PREFIX
             config['TAP_SCHEMA'] = settings.TAP_SCHEMA
             config['TAP_UPLOAD'] = settings.TAP_UPLOAD
+            config['OAI_SCHEMA'] = settings.OAI_SCHEMA
             config['TEST_NAME'] = 'test_%(NAME)s' % config
 
         return config
@@ -80,6 +81,7 @@ CREATE DATABASE %(TEST_NAME)s WITH OWNER %(USER)s;
 \c %(TEST_NAME)s
 CREATE SCHEMA %(TAP_SCHEMA)s AUTHORIZATION %(USER)s;
 CREATE SCHEMA %(TAP_UPLOAD)s AUTHORIZATION %(USER)s;
+CREATE SCHEMA %(OAI_SCHEMA)s AUTHORIZATION %(USER)s;
 ''' % config['data'])
 
         else:
@@ -116,4 +118,5 @@ GRANT CREATE ON DATABASE %(NAME)s TO %(USER)s;
 \c %(NAME)s
 CREATE SCHEMA %(TAP_SCHEMA)s AUTHORIZATION %(USER)s;
 CREATE SCHEMA %(TAP_UPLOAD)s AUTHORIZATION %(USER)s;
+CREATE SCHEMA %(OAI_SCHEMA)s AUTHORIZATION %(USER)s;
 ''' % config['data'])
