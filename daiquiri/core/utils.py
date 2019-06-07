@@ -146,7 +146,6 @@ def get_permission_emails(permissions):
     permissions_queryset = Permission.objects
     for permission in permissions:
         app_label, codename = permission.split('.')
-        print(app_label, codename)
         permissions_queryset = permissions_queryset.filter(content_type__app_label=app_label, codename=codename)
 
     users = User.objects.filter(

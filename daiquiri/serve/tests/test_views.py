@@ -5,7 +5,7 @@ from test_generator.views import TestViewMixin
 
 class ServeViewTestCase(TestCase):
 
-    databases = ('default', 'data')
+    databases = ('default', 'data', 'tap', 'oai')
 
     fixtures = (
         'auth.json',

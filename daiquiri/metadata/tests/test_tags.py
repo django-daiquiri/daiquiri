@@ -5,7 +5,7 @@ from django.template import RequestContext, Template
 
 class MetadataTagsTestCase(TestCase):
 
-    databases = ('default', 'data')
+    databases = ('default', 'data', 'tap', 'oai')
 
     fixtures = (
         'auth.json',

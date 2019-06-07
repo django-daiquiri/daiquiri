@@ -7,7 +7,7 @@ from daiquiri.core.utils import setup_group
 
 class QueryViewTestCase(TestCase):
 
-    databases = ('default', 'data')
+    databases = ('default', 'data', 'tap', 'oai')
 
     fixtures = (
         'auth.json',

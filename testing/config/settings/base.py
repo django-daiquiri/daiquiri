@@ -10,6 +10,7 @@ DAIQUIRI_APPS = [
     'daiquiri.jobs',
     'daiquiri.meetings',
     'daiquiri.metadata',
+    'daiquiri.oai',
     'daiquiri.query',
     'daiquiri.serve',
     'daiquiri.stats',

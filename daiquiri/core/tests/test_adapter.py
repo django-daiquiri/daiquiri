@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 class CoreAdapterTestCase(TestCase):
 
-    databases = ('default', 'data')
+    databases = ('default', 'data', 'tap', 'oai')
 
     def test_fetch_table(self):
         rows = DatabaseAdapter().fetch_table('daiquiri_data_obs', 'stars')

@@ -76,7 +76,7 @@ METADATA_SUBJECTS = [
     }
 ]
 
-OAI_SCHEMA = 'oai'
+OAI_SCHEMA = 'OAI'
 OAI_ADAPTER = 'daiquiri.metadata.adapter.MetadataOaiAdapter'
 OAI_ADMIN_EMAILS = ['admin@example.com']
 OAI_METADATA_FORMATS = [

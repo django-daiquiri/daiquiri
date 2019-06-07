@@ -9,7 +9,7 @@ from ..models import Schema, Table, Column, Function
 
 class MetadataViewsetTestCase(TestCase):
 
-    databases = ('default', 'data')
+    databases = ('default', 'data', 'tap', 'oai')
 
     fixtures = (
         'auth.json',

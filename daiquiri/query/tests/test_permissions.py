@@ -6,7 +6,7 @@ from daiquiri.query.process import check_permissions
 
 class QueryPermissionsTestCase(TestCase):
 
-    databases = ('default', 'data')
+    databases = ('default', 'data', 'tap', 'oai')
 
     fixtures = (
         'auth.json',

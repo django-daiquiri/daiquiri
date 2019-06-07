@@ -17,7 +17,7 @@ from daiquiri.query.models import QueryJob, Example
 @mock.patch(settings.ADAPTER_DATABASE + '.create_user_schema_if_not_exists', mock.Mock())
 class AsyncTestCase(AsyncTestMixin, TestCase):
 
-    databases = ('default', 'data')
+    databases = ('default', 'data', 'tap', 'oai')
 
     fixtures = (
         'auth.json',

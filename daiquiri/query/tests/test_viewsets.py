@@ -18,7 +18,7 @@ from ..models import QueryJob, Example
 
 class QueryViewsetTestCase(TestCase):
 
-    databases = ('default', 'data')
+    databases = ('default', 'data', 'tap', 'oai')
 
     fixtures = (
         'auth.json',
@@ -267,7 +267,7 @@ class JobTests(TestViewsetMixin, QueryViewsetTestCase):
 
 class ExampleViewsetTestCase(TestCase):
 
-    databases = ('default', 'data')
+    databases = ('default', 'data', 'tap', 'oai')
 
     fixtures = (
         'auth.json',

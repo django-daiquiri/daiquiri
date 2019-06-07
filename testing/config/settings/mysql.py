@@ -10,11 +10,27 @@ DATABASES = {
     },
     'data': {
         'ENGINE': 'django.db.backends.mysql',
+        'USER': 'daiquiri_data',
+        'PASSWORD': 'daiquiri_data',
+        'HOST': '127.0.0.1',
+        'TEST': {
+            'NAME': 'test_daiquiri_data'
+        }
+    },
+    'tap': {
+        'ENGINE': 'django.db.backends.mysql',
         'NAME': 'TAP_SCHEMA',
         'USER': 'daiquiri_data',
         'PASSWORD': 'daiquiri_data',
         'HOST': '127.0.0.1'
-    }
+    },
+    'oai': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'OAI',
+        'USER': 'daiquiri_data',
+        'PASSWORD': 'daiquiri_data',
+        'HOST': '127.0.0.1'
+    },
 }
 
 ADAPTER_DATABASE = 'daiquiri.core.adapter.database.mysql.MySQLAdapter'
