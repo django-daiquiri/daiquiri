@@ -33,9 +33,11 @@ before_script:
 - psql -U postgres -c "CREATE USER daiquiri_data WITH PASSWORD 'daiquiri_data';"
 - psql -U postgres -c "CREATE DATABASE test_daiquiri_app OWNER daiquiri_app;"
 - psql -U postgres -c "CREATE DATABASE test_daiquiri_data OWNER daiquiri_data;"
+- psql -U postgres -c "CREATE DATABASE test_daiquiri_tap OWNER daiquiri_data;"
+- psql -U postgres -c "CREATE DATABASE test_daiquiri_oai OWNER daiquiri_data;"
+- psql -U postgres -c "CREATE SCHEMA TAP_SCHEMA AUTHORIZATION daiquiri_data;" test_daiquiri_tap
+- psql -U postgres -c "CREATE SCHEMA OAI AUTHORIZATION daiquiri_data;" test_daiquiri_oai
 - psql -U postgres -f testing/sql/postgres.sql test_daiquiri_data
-- psql -U postgres -f testing/sql/postgres.sql test_daiquiri_data
-- psql -U postgres -c "VACUUM ANALYZE;" test_daiquiri_data
 
 script:
 - coverage run testing/runtests.py -k

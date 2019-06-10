@@ -4,4 +4,4 @@ from daiquiri.core.routers import DaiquiriRouter
 class TapRouter(DaiquiriRouter):
 
     db = 'tap'
-    label = 'daiquiri_tap'
+    app_label = 'daiquiri_tap'

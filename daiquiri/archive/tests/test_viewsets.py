@@ -21,6 +21,7 @@ class ArchiveTestCase(TestCase):
         'jobs.json'
     )
 
+
 class RowTests(TestViewsetMixin, ArchiveTestCase):
 
     users = (

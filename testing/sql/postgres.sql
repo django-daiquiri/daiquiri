@@ -1,9 +1,5 @@
 -- drop and create schemas
 
-CREATE SCHEMA IF NOT EXISTS TAP_SCHEMA;
-CREATE SCHEMA IF NOT EXISTS TAP_UPLOAD;
-CREATE SCHEMA IF NOT EXISTS OAI;
-
 DROP SCHEMA IF EXISTS daiquiri_archive CASCADE;
 CREATE SCHEMA daiquiri_archive;
 
@@ -64,10 +60,6 @@ CREATE TABLE "daiquiri_user_user"."test" (
 );
 
 -- create permissions
-
-ALTER SCHEMA TAP_SCHEMA OWNER TO daiquiri_data;
-ALTER SCHEMA TAP_UPLOAD OWNER TO daiquiri_data;
-ALTER SCHEMA OAI OWNER TO daiquiri_data;
 
 ALTER SCHEMA daiquiri_user_user OWNER TO daiquiri_data;
 ALTER TABLE daiquiri_user_user.test OWNER TO daiquiri_data;

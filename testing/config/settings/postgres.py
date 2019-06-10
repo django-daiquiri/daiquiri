@@ -1,3 +1,5 @@
+from . import TAP_SCHEMA, OAI_SCHEMA
+
 SECRET_KEY = 'this is a not very secret key'
 
 DATABASES = {
@@ -10,30 +12,42 @@ DATABASES = {
     },
     'data': {
         'ENGINE': 'django.db.backends.postgresql',
+        'OPTIONS': {
+            'options': '-c search_path=public'
+        },
         'NAME': 'daiquiri_data',
         'USER': 'daiquiri_data',
         'PASSWORD': 'daiquiri_data',
-        'HOST': '127.0.0.1'
+        'HOST': '127.0.0.1',
+        'TEST': {
+            'NAME': 'test_daiquiri_data',
+        },
     },
     'tap': {
         'ENGINE': 'django.db.backends.postgresql',
         'OPTIONS': {
-            'options': '-c search_path=TAP_SCHEMA'
+            'options': '-c search_path=%s' % TAP_SCHEMA
         },
         'NAME': 'daiquiri_data',
         'USER': 'daiquiri_data',
         'PASSWORD': 'daiquiri_data',
-        'HOST': '127.0.0.1'
+        'HOST': '127.0.0.1',
+        'TEST': {
+            'NAME': 'test_daiquiri_tap',
+        },
     },
     'oai': {
         'ENGINE': 'django.db.backends.postgresql',
         'OPTIONS': {
-            'options': '-c search_path=OAI'
+            'options': '-c search_path=%s' % OAI_SCHEMA
         },
         'NAME': 'daiquiri_data',
         'USER': 'daiquiri_data',
         'PASSWORD': 'daiquiri_data',
-        'HOST': '127.0.0.1'
+        'HOST': '127.0.0.1',
+        'TEST': {
+            'NAME': 'test_daiquiri_oai',
+        },
     },
 }
 
