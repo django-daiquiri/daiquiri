@@ -2,7 +2,7 @@ from django.http import HttpResponse, FileResponse
 
 from rest_framework import viewsets
 from rest_framework.response import Response
-from rest_framework.parsers import FormParser
+from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.exceptions import ValidationError
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
 from rest_framework.decorators import detail_route
@@ -20,14 +20,14 @@ from .serializers import (
 )
 from .renderers import UWSRenderer, UWSErrorRenderer
 from .filters import UWSFilterBackend
-from .utils import get_job_url, get_job_results
+from .utils import get_job_url, get_job_results, handle_upload
 from .exceptions import JobError
 
 
 class JobViewSet(viewsets.GenericViewSet):
 
     authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
-    parser_classes = (FormParser, )
+    parser_classes = (FormParser, MultiPartParser)
 
     parameter_map = {}
 
@@ -55,10 +55,12 @@ class SyncJobViewSet(JobViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        return self.perform_sync_job(request, serializer.data)
+        # check if the file is in the body of the post request
+        handle_upload(request, serializer.validated_data)
+
+        return self.perform_sync_job(request, serializer.validated_data)
 
     def perform_sync_job(self, request, data):
-
         # create the job objects
         job = self.get_queryset().model(
             job_type=Job.JOB_TYPE_SYNC,
@@ -115,6 +117,8 @@ class AsyncJobViewSet(JobViewSet):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
+        handle_upload(request, serializer.validated_data)
 
         # create the job objects
         job = self.get_queryset().model(

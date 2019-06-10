@@ -5,6 +5,7 @@ from rest_framework.exceptions import ValidationError
 from .models import QueryJob
 from .utils import get_quota
 
+
 class TableNameValidator(object):
 
     message = _('A job with this table name aready exists.')

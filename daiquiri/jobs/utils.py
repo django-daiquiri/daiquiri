@@ -1,5 +1,7 @@
 from rest_framework.reverse import reverse
 
+from daiquiri.core.utils import handle_file_upload
+
 
 def get_job_url(request, kwargs):
     namespace = request.resolver_match.namespace
@@ -20,3 +22,21 @@ def get_job_results(request, job):
         })
 
     return results
+
+
+def parse_upload(upload):
+    resource_name, uri = upload.split(',')
+
+    if uri.startswith('param:'):
+        return {
+            'resource_name': resource_name,
+            'file_name': uri[len('param:'):]
+        }
+    else:
+        return None
+
+
+def handle_upload(request, data):
+    file_name = parse_upload(data['UPLOAD']).get('file_name')
+    if file_name is not None:
+        handle_file_upload(request.data[file_name], 'query', request.user)

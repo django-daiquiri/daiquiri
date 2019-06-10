@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from daiquiri.jobs.serializers import SyncJobSerializer, AsyncJobSerializer
+from daiquiri.jobs.validators import UploadValidator
 
 from .models import QueryJob, Example
 from .validators import TableNameValidator, UploadFileValidator
@@ -194,6 +195,8 @@ class SyncQueryJobSerializer(SyncJobSerializer):
     TABLE_NAME = serializers.CharField(required=False, max_length=256, validators=[TableNameValidator()])
     LANG = serializers.CharField(required=True)
     QUERY = serializers.CharField(required=True)
+
+    UPLOAD = serializers.CharField(required=False, validators=[UploadValidator()])
 
 
 class AsyncQueryJobSerializer(AsyncJobSerializer):
