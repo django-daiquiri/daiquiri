@@ -253,7 +253,10 @@ class OaiView(APIView):
             adapter = OaiAdapter()
             resource = adapter.get_resource(record)
             serializer_class = adapter.get_serializer_class(resource, record.metadata_prefix)
-            serializer = serializer_class(instance=resource, context={
-                'request': self.request
-            })
+            if serializer_class is not None:
+                serializer = serializer_class(instance=resource, context={
+                    'request': self.request
+                })
+            else:
+                raise RuntimeError('Could not determine serializer_class for record %s' % record.identifier)
             return serializer.data

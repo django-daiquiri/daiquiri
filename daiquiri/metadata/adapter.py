@@ -14,7 +14,7 @@ class MetadataOaiAdapter(BaseOaiAdapter):
         elif isinstance(resource, Table):
             return self.get_table_record(resource)
         else:
-            raise RuntimeError('Unsupported resource')
+            return None
 
     def get_resource(self, record):
         resource_identifier = self.strip_identifier_prefix(record.identifier)
@@ -39,7 +39,7 @@ class MetadataOaiAdapter(BaseOaiAdapter):
                 return None
 
         else:
-            raise RuntimeError()
+            return None
 
     def get_resources(self):
         yield Schema.objects.all()
@@ -52,7 +52,7 @@ class MetadataOaiAdapter(BaseOaiAdapter):
             elif metadata_prefix in ['oai_datacite', 'datacite']:
                 return SchemaDataciteSerializer
             else:
-                raise RuntimeError('metadata_prefix not supported')
+                return None
 
         elif isinstance(resource, Table):
             if metadata_prefix == 'oai_dc':
@@ -60,13 +60,10 @@ class MetadataOaiAdapter(BaseOaiAdapter):
             elif metadata_prefix in ['oai_datacite', 'datacite']:
                 return TableDataciteSerializer
             else:
-                raise RuntimeError('metadata_prefix not supported')
-
-        elif resource is None:
-            raise RuntimeError('resource is None')
+                return None
 
         else:
-            raise RuntimeError('resource_type \'%s\' not supported')
+            return None
 
     def get_schema_record(self, schema):
         identifier = self.get_identifier_prefix() + 'schemas/%i' % schema.pk

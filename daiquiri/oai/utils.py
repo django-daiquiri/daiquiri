@@ -17,7 +17,10 @@ def get_renderer(metadata_prefix):
 
 
 def update_records(resource):
-    identifier, datestamp, public = OaiAdapter().get_record(resource)
+    try:
+        identifier, datestamp, public = OaiAdapter().get_record(resource)
+    except TypeError:
+        raise RuntimeError('Could not obtain record for resource %s' % str(resource))
 
     if public is True:
         for metadata_format in settings.OAI_METADATA_FORMATS:
@@ -34,7 +37,10 @@ def update_records(resource):
 
 
 def delete_records(resource):
-    identifier, datestamp, public = OaiAdapter().get_record(resource)
+    try:
+        identifier, datestamp, public = OaiAdapter().get_record(resource)
+    except TypeError:
+        raise RuntimeError('Could not obtain record for resource %s' % str(resource))
 
     for metadata_format in settings.OAI_METADATA_FORMATS:
         try:
