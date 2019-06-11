@@ -4,6 +4,7 @@ from daiquiri.core.serializers import CaseInsensitiveSerializer
 from daiquiri.jobs.models import Job
 
 from .utils import get_job_results
+from .validators import UploadValidator
 
 
 class JobListSerializer(serializers.ModelSerializer):
@@ -78,6 +79,7 @@ class SyncJobSerializer(CaseInsensitiveSerializer):
     RESPONSEFORMAT = serializers.CharField(required=False)
     MAXREC = serializers.IntegerField(required=False)
     RUNID = serializers.CharField(required=False, default='')
+    UPLOAD = serializers.CharField(required=False, validators=[UploadValidator()])
 
 
 class AsyncJobSerializer(CaseInsensitiveSerializer):
@@ -86,3 +88,5 @@ class AsyncJobSerializer(CaseInsensitiveSerializer):
     RESPONSEFORMAT = serializers.CharField(required=False)
     MAXREC = serializers.IntegerField(required=False)
     RUNID = serializers.CharField(required=False, default='')
+    UPLOAD = serializers.CharField(required=False, validators=[UploadValidator()])
+

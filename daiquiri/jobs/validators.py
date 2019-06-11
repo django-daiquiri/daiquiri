@@ -27,8 +27,8 @@ class UploadValidator(object):
             # check if the file is in the body of the post request
             if file_name not in self.request.data:
                 raise ValidationError({
-                    'UPLOAD': 'UPLOAD URI contains does not match uploaded file'
+                    'UPLOAD': 'UPLOAD URI "%s" contains does not match uploaded file' % uri
                 })
 
         else:
-            raise ValidationError('UPLOAD URI is not supported')
+            raise ValidationError('UPLOAD URI "%s" is not supported' % uri)

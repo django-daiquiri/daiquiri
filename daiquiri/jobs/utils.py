@@ -37,6 +37,7 @@ def parse_upload(upload):
 
 
 def handle_upload(request, data):
-    file_name = parse_upload(data['UPLOAD']).get('file_name')
-    if file_name is not None:
-        handle_file_upload(request.data[file_name], 'query', request.user)
+    if 'UPLOAD' in data:
+        file_name = parse_upload(data['UPLOAD']).get('file_name')
+        if file_name is not None:
+            handle_file_upload(request.data[file_name], 'query', request.user)
