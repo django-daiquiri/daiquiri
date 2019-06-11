@@ -105,7 +105,7 @@ class DoiMetadataOaiAdapter(MetadataOaiAdapter):
                     metadata_access_level=ACCESS_LEVEL_PUBLIC,
                     published__isnull=False,
                 ).get(doi=doi)
-            except Schema.DoesNotExist:
+            except Table.DoesNotExist:
                 return None
 
     def get_schema_record(self, schema):
