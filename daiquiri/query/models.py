@@ -1,6 +1,8 @@
 import logging
 import os
 
+from collections import OrderedDict
+
 from celery.task.control import revoke
 
 from django.conf import settings
@@ -102,7 +104,7 @@ class QueryJob(Job):
 
     @property
     def formats(self):
-        return {item['key']: item['content_type'] for item in settings.QUERY_DOWNLOAD_FORMATS}
+        return OrderedDict((item['key'], item['content_type']) for item in settings.QUERY_DOWNLOAD_FORMATS)
 
     @property
     def result_status(self):
@@ -308,6 +310,7 @@ class QueryJob(Job):
     def archive(self):
         self.abort()
         self.drop_table()
+        self.drop_uploads()
         self.phase = self.PHASE_ARCHIVED
         self.nrows = None
         self.size = None
@@ -332,6 +335,16 @@ class QueryJob(Job):
             drop_table.apply(task_args, throw=True)
         else:
             drop_table.apply_async(task_args)
+
+    def drop_uploads(self):
+        print(self.uploads)
+
+        # task_args = (self.schema_name, self.table_name)
+
+        # if not settings.ASYNC:
+        #     drop_table.apply(task_args, throw=True)
+        # else:
+        #     drop_table.apply_async(task_args)
 
     def abort_query(self):
         task_args = (self.pid, )
