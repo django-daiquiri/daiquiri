@@ -201,6 +201,7 @@ QUERY_UPLOAD_LIMIT = {
     'users': {},
     'groups': {}
 }
+QUERY_UPLOAD_DIR = os.path.join(BASE_DIR, 'upload')
 
 SERVE_DOWNLOAD_DIR = os.path.join(BASE_DIR, 'download')
 SERVE_RESOLVER = None
@@ -230,8 +231,8 @@ STATS_RESOURCE_TYPES = [
 
 UWS_RESOURCES = []
 
-TAP_SCHEMA = 'TAP_SCHEMA'
-TAP_UPLOAD = 'TAP_UPLOAD'
+TAP_SCHEMA = 'tap_schema'
+TAP_UPLOAD = 'tap_upload'
 
 WORDPRESS_URL = '/cms/'
 WORDPRESS_CLI = '/opt/wp-cli/wp'

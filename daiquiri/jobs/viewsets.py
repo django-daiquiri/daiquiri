@@ -20,7 +20,7 @@ from .serializers import (
 )
 from .renderers import UWSRenderer, UWSErrorRenderer
 from .filters import UWSFilterBackend
-from .utils import get_job_url, get_job_results, handle_upload
+from .utils import get_job_url, get_job_results
 from .exceptions import JobError
 
 
@@ -38,6 +38,9 @@ class JobViewSet(viewsets.GenericViewSet):
             detail[parameter] = field_errors
         return detail
 
+    def handle_upload(self, job, upload_string):
+        pass
+
 
 class SyncJobViewSet(JobViewSet):
 
@@ -54,9 +57,6 @@ class SyncJobViewSet(JobViewSet):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
-        # check if the file is in the body of the post request
-        handle_upload(request, serializer.validated_data)
 
         return self.perform_sync_job(request, serializer.validated_data)
 
@@ -76,6 +76,9 @@ class SyncJobViewSet(JobViewSet):
             value = data.get(parameter)
             if value is not None:
                 setattr(job, model_field, value)
+
+        # handle possible uploads
+        self.handle_upload(job, data.get('UPLOAD'))
 
         try:
             job.process()
@@ -118,23 +121,25 @@ class AsyncJobViewSet(JobViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        handle_upload(request, serializer.validated_data)
-
         # create the job objects
         job = self.get_queryset().model(
             job_type=Job.JOB_TYPE_ASYNC,
             owner=(None if self.request.user.is_anonymous else self.request.user),
-            response_format=serializer.data.get('RESPONSEFORMAT'),
-            max_records=serializer.data.get('MAXREC'),
-            run_id=serializer.data.get('RUNID'),
+            response_format=serializer.validated_data.get('RESPONSEFORMAT'),
+            max_records=serializer.validated_data.get('MAXREC'),
+            # uploads=handle_uploads(request, serializer.validated_data.get('UPLOAD'), self.get_upload_directory()),
+            run_id=serializer.validated_data.get('RUNID'),
             client_ip=get_client_ip(self.request)
         )
 
         # add parameters to the job object
         for parameter, model_field in self.parameter_map.items():
-            value = serializer.data.get(parameter)
+            value = serializer.validated_data.get(parameter)
             if value is not None:
                 setattr(job, model_field, value)
+
+        # handle possible uploads
+        self.handle_upload(job, serializer.validated_data.get('UPLOAD'))
 
         try:
             job.process()
@@ -143,7 +148,7 @@ class AsyncJobViewSet(JobViewSet):
 
         job.save()
 
-        if serializer.data.get('PHASE') == job.PHASE_RUN:
+        if serializer.validated_data.get('PHASE') == job.PHASE_RUN:
             job.run()
 
         return HttpResponseSeeOther(self.get_success_url(job))

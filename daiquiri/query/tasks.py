@@ -2,7 +2,6 @@ import logging
 import os
 import zipfile
 
-from astropy.io.votable import parse_single_table
 from celery import shared_task
 
 from django.conf import settings
@@ -42,7 +41,7 @@ def run_query(job_id):
     # always import daiquiri packages inside the task
     from daiquiri.core.adapter import DatabaseAdapter
     from daiquiri.query.models import QueryJob
-    from daiquiri.query.utils import get_quota, get_job_sources, get_job_columns
+    from daiquiri.query.utils import get_quota, get_job_sources, get_job_columns, ingest_table
     from daiquiri.stats.models import Record
 
     # get logger
@@ -84,10 +83,14 @@ def run_query(job_id):
 
         # get the actual query and submit the job to the database
         try:
+            if job.uploads:
+                for table_name, file_path in job.uploads.items():
+                    ingest_table(settings.TAP_UPLOAD, table_name, file_path, drop_table=True)
+
             # this is where the work ist done (and the time is spend)
             adapter.submit_query(job.actual_query)
 
-        except (ProgrammingError, InternalError) as e:
+        except (ProgrammingError, InternalError, ValueError) as e:
             job.phase = job.PHASE_ERROR
             job.error_summary = str(e)
             logger.info('job %s failed (%s)' % (job.id, job.error_summary))
@@ -146,11 +149,11 @@ def run_query(job_id):
 
 
 @shared_task(base=Task)
-def ingest_table(job_id, file_path):
+def run_ingest(job_id, file_path):
     from daiquiri.core.adapter import DatabaseAdapter
     from daiquiri.query.models import QueryJob
     from daiquiri.stats.models import Record
-    from daiquiri.query.utils import get_quota
+    from daiquiri.query.utils import get_quota, ingest_table
 
     # get logger
     logger = logging.getLogger(__name__)
@@ -180,26 +183,6 @@ def ingest_table(job_id, file_path):
 
             return job.phase
 
-        # parse the uploaded table
-        try:
-            table = parse_single_table(file_path, pedantic=False)
-        except ValueError as e:
-            job.phase = job.PHASE_ERROR
-            job.error_summary = str(e)
-            job.save()
-
-            return job.phase
-
-        # obtain the column names and (vo) datatypes from the table
-        columns = []
-        for field in table.fields:
-            columns.append({
-                'name': field.name,
-                'datatype': field.datatype,
-                'ucd': field.ucd,
-                'unit': str(field.unit),
-            })
-
         # set database and start time
         job.pid = adapter.fetch_pid()
         job.phase = job.PHASE_EXECUTING
@@ -210,10 +193,9 @@ def ingest_table(job_id, file_path):
 
         # create the table and insert the data
         try:
-            adapter.create_table(job.schema_name, job.table_name, columns)
-            adapter.insert_rows(job.schema_name, job.table_name, columns, table.array, table.array.mask)
+            columns = ingest_table(job.schema_name, job.table_name, file_path)
 
-        except (ProgrammingError, InternalError) as e:
+        except (ProgrammingError, InternalError, ValueError) as e:
             job.phase = job.PHASE_ERROR
             job.error_summary = str(e)
             logger.info('job %s failed (%s)' % (job.id, job.error_summary))

@@ -28,7 +28,8 @@ from .managers import QueryJobManager, ExampleManager
 from .utils import (
     get_format_config,
     get_job_sources,
-    get_job_columns
+    get_job_columns,
+    ingest_table
 )
 from .process import (
     check_quota,
@@ -45,12 +46,12 @@ from .process import (
 )
 from .tasks import (
     run_query,
+    run_ingest,
     create_download_file,
     create_archive_file,
     rename_table,
     drop_table,
-    abort_query,
-    ingest_table
+    abort_query
 )
 
 logger = logging.getLogger(__name__)
@@ -75,6 +76,7 @@ class QueryJob(Job):
     size = models.BigIntegerField(null=True, blank=True)
 
     metadata = JSONField(blank=True)
+    uploads = JSONField(blank=True)
 
     pid = models.IntegerField(null=True, blank=True)
 
@@ -234,6 +236,10 @@ class QueryJob(Job):
     def run_sync(self):
         adapter = DatabaseAdapter()
 
+        if self.uploads:
+            for table_name, file_path in self.uploads.items():
+                ingest_table(settings.TAP_UPLOAD, table_name, file_path, drop_table=True)
+
         self.actual_query = adapter.build_sync_query(
             self.native_query,
             settings.QUERY_SYNC_TIMEOUT,
@@ -274,9 +280,9 @@ class QueryJob(Job):
             self.save()
 
             if not settings.ASYNC:
-                ingest_table.apply((self.id, file_path), throw=True)
+                run_ingest.apply((self.id, file_path), throw=True)
             else:
-                ingest_table.apply_async((self.id, file_path), queue='download')
+                run_ingest.apply_async((self.id, file_path), queue='download')
 
         else:
             raise ValidationError({

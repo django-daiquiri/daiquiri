@@ -48,7 +48,9 @@ from .permissions import HasPermission
 from .utils import (
     get_format_config,
     get_quota,
-    fetch_user_schema_metadata
+    get_user_upload_directory,
+    fetch_user_schema_metadata,
+    handle_upload_param
 )
 
 from .filters import JobFilterBackend
@@ -166,7 +168,7 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
         })
         serializer.is_valid(raise_exception=True)
 
-        file_name = handle_file_upload(serializer.validated_data['file'], 'query', request.user)
+        file_name = handle_file_upload(get_user_upload_directory(self.request.user), serializer.validated_data['file'])
 
         job = QueryJob(
             job_type=QueryJob.JOB_TYPE_INTERFACE,
@@ -417,6 +419,9 @@ class SyncQueryJobViewSet(SyncJobViewSet):
     def get_queryset(self):
         return QueryJob.objects.filter_by_owner(self.request.user)
 
+    def handle_upload(self, job, upload_string):
+        job.uploads = handle_upload_param(self.request, upload_string)
+
 
 class AsyncQueryJobViewSet(AsyncJobViewSet):
     permission_classes = (HasPermission, )
@@ -432,3 +437,6 @@ class AsyncQueryJobViewSet(AsyncJobViewSet):
 
     def get_queryset(self):
         return QueryJob.objects.filter_by_owner(self.request.user)
+
+    def handle_upload(self, job, upload_string):
+        job.uploads = handle_upload_param(self.request, upload_string)

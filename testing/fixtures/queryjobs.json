@@ -13,7 +13,8 @@
       "nrows": 10000,
       "size": 450560,
       "metadata": "{\"type\":\"table\",\"display_columns\":{\"ra\":[\"daiquiri_data_obs\",\"stars\",\"ra\"],\"dec\":[\"daiquiri_data_obs\",\"stars\",\"dec\"],\"parallax\":[\"daiquiri_data_obs\",\"stars\",\"parallax\"],\"id\":[\"daiquiri_data_obs\",\"stars\",\"id\"]},\"columns\":[{\"std\":false,\"name\":\"id\",\"datatype\":\"int\",\"description\":\"unique identifier\",\"utype\":null,\"ucd\":\"meta.id; meta.main\",\"arraysize\":null,\"indexed\":false,\"unit\":null,\"principal\":false},{\"std\":false,\"name\":\"ra\",\"datatype\":\"int\",\"description\":\"Right ascension\",\"utype\":null,\"ucd\":\"pos.eq.ra; meta.main\",\"arraysize\":null,\"indexed\":false,\"unit\":\"Angle[deg]\",\"principal\":false},{\"std\":false,\"name\":\"dec\",\"datatype\":\"double\",\"description\":\"Declination\",\"utype\":null,\"ucd\":\"pos.eq.de; meta.main\",\"arraysize\":null,\"indexed\":false,\"unit\":\"Angle[deg]\",\"principal\":false},{\"std\":false,\"name\":\"parallax\",\"datatype\":\"double\",\"description\":\"Parallax\",\"utype\":null,\"ucd\":\"pos.parallax\",\"arraysize\":null,\"indexed\":false,\"unit\":\"Angle[mas]\",\"principal\":false}],\"name\":\"test\"}",
-      "pid": 950
+      "pid": 950,
+      "uploads": {}
     }
   },
   {
@@ -30,7 +31,8 @@
       "nrows": 10000,
       "size": 450560,
       "metadata": "{\"display_columns\":{\"ra\":[\"daiquiri_data_obs\",\"stars\",\"ra\"],\"dec\":[\"daiquiri_data_obs\",\"stars\",\"dec\"],\"parallax\":[\"daiquiri_data_obs\",\"stars\",\"parallax\"],\"id\":[\"daiquiri_data_obs\",\"stars\",\"id\"]}}",
-      "pid": 950
+      "pid": 950,
+      "uploads": {}
     }
   },
   {
@@ -47,7 +49,8 @@
       "nrows": 10000,
       "size": 450560,
       "metadata": "{}",
-      "pid": 950
+      "pid": 950,
+      "uploads": {}
     }
   },
   {
@@ -64,7 +67,8 @@
       "nrows": 10000,
       "size": 450560,
       "metadata": "{}",
-      "pid": 950
+      "pid": 950,
+      "uploads": {}
     }
   }
 ]

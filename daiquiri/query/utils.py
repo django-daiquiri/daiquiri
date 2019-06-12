@@ -1,12 +1,14 @@
 import os
 import sys
 
+from astropy.io.votable import parse_single_table
+
 from django.conf import settings
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 
 from daiquiri.core.adapter import DatabaseAdapter
-from daiquiri.core.utils import human2bytes
+from daiquiri.core.utils import human2bytes, handle_file_upload
 from daiquiri.metadata.models import Table, Column
 
 
@@ -30,6 +32,15 @@ def get_user_schema_name(user):
         username = user.username
 
     return settings.QUERY_USER_SCHEMA_PREFIX + username
+
+
+def get_user_upload_directory(user):
+    if not user or user.is_anonymous:
+        username = 'anonymous'
+    else:
+        username = user.username
+
+    return os.path.join(settings.QUERY_UPLOAD_DIR, username)
 
 
 def get_quota(user, quota_settings='QUERY_QUOTA'):
@@ -175,28 +186,34 @@ def get_job_column(job, display_column_name):
     except (ValueError, KeyError):
         return {}
 
-    try:
-        column = Column.objects.get(
-            name=column_name,
-            table__name=table_name,
-            table__schema__name=schema_name
-        )
+    if schema_name == settings.TAP_UPLOAD:
+        # for TAP_UPLOAD get the information directly from the database
+        return DatabaseAdapter().fetch_column(schema_name, table_name, column_name)
 
-        return {
-            'name': column.name,
-            'description': column.description,
-            'unit': column.unit,
-            'ucd': column.ucd,
-            'utype': column.utype,
-            'datatype': column.datatype,
-            'arraysize': column.arraysize,
-            'principal': column.principal,
-            'indexed': False,
-            'std': column.std
-        }
+    else:
+        # for regular schemas consult the metadata store
+        try:
+            column = Column.objects.get(
+                name=column_name,
+                table__name=table_name,
+                table__schema__name=schema_name
+            )
 
-    except Column.DoesNotExist:
-        return {}
+            return {
+                'name': column.name,
+                'description': column.description,
+                'unit': column.unit,
+                'ucd': column.ucd,
+                'utype': column.utype,
+                'datatype': column.datatype,
+                'arraysize': column.arraysize,
+                'principal': column.principal,
+                'indexed': False,
+                'std': column.std
+            }
+
+        except Column.DoesNotExist:
+            return {}
 
 
 def get_job_columns(job):
@@ -215,3 +232,42 @@ def get_job_columns(job):
             columns.append(get_job_column(job, display_column))
 
     return columns
+
+
+def ingest_table(schema_name, table_name, file_path, drop_table=False):
+    adapter = DatabaseAdapter()
+
+    table = parse_single_table(file_path, pedantic=False)
+
+    columns = []
+    for field in table.fields:
+        columns.append({
+            'name': field.name,
+            'datatype': field.datatype,
+            'ucd': field.ucd,
+            'unit': str(field.unit),
+        })
+
+    if drop_table:
+        adapter.drop_table(schema_name, table_name)
+
+    adapter.create_table(schema_name, table_name, columns)
+    adapter.insert_rows(schema_name, table_name, columns, table.array, table.array.mask)
+
+    return columns
+
+
+def handle_upload_param(request, upload_param):
+    if upload_param:
+        uploads = {}
+        for upload in upload_param.split(';'):
+            resource_name, uri = upload.split(',')
+
+            if uri.startswith('param:'):
+                file_field = uri[len('param:'):]
+                file_path = handle_file_upload(settings.QUERY_UPLOAD_DIR, request.data[file_field])
+                uploads[resource_name] = file_path
+
+        return uploads
+    else:
+        return {}

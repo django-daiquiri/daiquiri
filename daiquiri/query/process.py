@@ -182,7 +182,8 @@ def process_query(query):
             # first run to replace with get_indexed_objects
             processor.set_query(query)
             processor.process_query(indexed_objects=get_indexed_objects(), replace_schema_name={
-                'TAP_SCHEMA': settings.TAP_SCHEMA
+                'TAP_SCHEMA': settings.TAP_SCHEMA,
+                'TAP_UPLOAD': settings.TAP_UPLOAD,
             })
 
             # second run
@@ -259,6 +260,9 @@ def check_permissions(user, keywords, tables, columns, functions):
         elif schema_name == get_user_schema_name(user):
             # all tables are allowed move to next table
             continue
+        elif schema_name == settings.TAP_UPLOAD:
+            # all tables are allowed move to next table
+            continue
         else:
             # check permissions on the schema
             try:
@@ -287,7 +291,7 @@ def check_permissions(user, keywords, tables, columns, functions):
 
         for schema_name, table_name, column_name in columns:
 
-            if schema_name in [None, get_user_schema_name(user)] \
+            if schema_name in [None, get_user_schema_name(user), settings.TAP_UPLOAD] \
                     or table_name is None \
                     or column_name is None:
                 # doesn't need to be checked, move to next column
