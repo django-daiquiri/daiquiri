@@ -254,6 +254,8 @@ def ingest_table(schema_name, table_name, file_path, drop_table=False):
     adapter.create_table(schema_name, table_name, columns)
     adapter.insert_rows(schema_name, table_name, columns, table.array, table.array.mask)
 
+    os.remove(file_path)
+
     return columns
 
 
@@ -265,7 +267,7 @@ def handle_upload_param(request, upload_param):
 
             if uri.startswith('param:'):
                 file_field = uri[len('param:'):]
-                file_path = handle_file_upload(settings.QUERY_UPLOAD_DIR, request.data[file_field])
+                file_path = handle_file_upload(get_user_upload_directory(request.user), request.data[file_field])
                 uploads[resource_name] = file_path
 
         return uploads

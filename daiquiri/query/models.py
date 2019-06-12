@@ -337,14 +337,14 @@ class QueryJob(Job):
             drop_table.apply_async(task_args)
 
     def drop_uploads(self):
-        print(self.uploads)
+        if self.uploads:
+            for table_name, file_path in self.uploads.items():
+                task_args = (settings.TAP_UPLOAD, table_name)
 
-        # task_args = (self.schema_name, self.table_name)
-
-        # if not settings.ASYNC:
-        #     drop_table.apply(task_args, throw=True)
-        # else:
-        #     drop_table.apply_async(task_args)
+                if not settings.ASYNC:
+                    drop_table.apply(task_args, throw=True)
+                else:
+                    drop_table.apply_async(task_args)
 
     def abort_query(self):
         task_args = (self.pid, )
