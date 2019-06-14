@@ -41,7 +41,7 @@ def run_query(job_id):
     # always import daiquiri packages inside the task
     from daiquiri.core.adapter import DatabaseAdapter
     from daiquiri.query.models import QueryJob
-    from daiquiri.query.utils import get_quota, get_job_sources, get_job_columns, ingest_table
+    from daiquiri.query.utils import get_quota, get_job_sources, get_job_columns, ingest_uploads
     from daiquiri.stats.models import Record
 
     # get logger
@@ -83,9 +83,7 @@ def run_query(job_id):
 
         # get the actual query and submit the job to the database
         try:
-            if job.uploads:
-                for table_name, file_path in job.uploads.items():
-                    ingest_table(settings.TAP_UPLOAD, table_name, file_path, drop_table=True)
+            ingest_uploads(job.uploads, job.owner)
 
             # this is where the work ist done (and the time is spend)
             adapter.submit_query(job.actual_query)

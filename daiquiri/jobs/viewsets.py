@@ -21,7 +21,6 @@ from .serializers import (
 from .renderers import UWSRenderer, UWSErrorRenderer
 from .filters import UWSFilterBackend
 from .utils import get_job_url, get_job_results
-from .exceptions import JobError
 
 
 class JobViewSet(viewsets.GenericViewSet):
@@ -78,17 +77,17 @@ class SyncJobViewSet(JobViewSet):
                 setattr(job, model_field, value)
 
         # handle possible uploads
-        self.handle_upload(job, data.get('UPLOAD'))
+        try:
+            self.handle_upload(job, data.get('UPLOAD'))
+        except ValueError:
+            raise ValidationError('Could not parse VOTable')
 
         try:
             job.process()
         except ValidationError as e:
             raise ValidationError(self.rewrite_exception(e))
 
-        try:
-            return FileResponse(job.run_sync(), content_type=job.formats[job.response_format])
-        except JobError:
-            return Response(job.error_summary, content_type='application/xml')
+        return FileResponse(job.run_sync(), content_type=job.formats[job.response_format])
 
 
 class AsyncJobViewSet(JobViewSet):

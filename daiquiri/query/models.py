@@ -30,8 +30,7 @@ from .managers import QueryJobManager, ExampleManager
 from .utils import (
     get_format_config,
     get_job_sources,
-    get_job_columns,
-    ingest_table
+    get_job_columns
 )
 from .process import (
     check_quota,
@@ -238,10 +237,6 @@ class QueryJob(Job):
     def run_sync(self):
         adapter = DatabaseAdapter()
 
-        if self.uploads:
-            for table_name, file_path in self.uploads.items():
-                ingest_table(settings.TAP_UPLOAD, table_name, file_path, drop_table=True)
-
         self.actual_query = adapter.build_sync_query(
             self.native_query,
             settings.QUERY_SYNC_TIMEOUT,
@@ -275,8 +270,7 @@ class QueryJob(Job):
             self.drop_uploads()
 
         except (OperationalError, ProgrammingError, InternalError, DataError) as e:
-            self.error_summary = str(e)
-            raise JobError(e)
+            raise StopIteration()
 
     def ingest(self, file_path):
         if self.phase == self.PHASE_PENDING:

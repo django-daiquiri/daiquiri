@@ -1,3 +1,4 @@
+from django.core.validators import URLValidator
 from django.utils.translation import ugettext_lazy as _
 
 from rest_framework.exceptions import ValidationError
@@ -77,6 +78,9 @@ class UploadParamValidator(object):
                     raise ValidationError({
                         'UPLOAD': 'UPLOAD URI "%s" contains does not match uploaded file' % uri
                     })
+
+            elif uri.startswith('http:') or uri.startswith('https:'):
+                URLValidator()(uri)
 
             else:
                 raise ValidationError('UPLOAD URI "%s" is not supported' % uri)

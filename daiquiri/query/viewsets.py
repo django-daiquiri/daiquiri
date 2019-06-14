@@ -50,7 +50,8 @@ from .utils import (
     get_quota,
     get_user_upload_directory,
     fetch_user_schema_metadata,
-    handle_upload_param
+    handle_upload_param,
+    ingest_uploads
 )
 
 from .filters import JobFilterBackend
@@ -421,6 +422,7 @@ class SyncQueryJobViewSet(SyncJobViewSet):
 
     def handle_upload(self, job, upload_string):
         job.uploads = handle_upload_param(self.request, upload_string)
+        ingest_uploads(job.uploads, job.owner)
 
 
 class AsyncQueryJobViewSet(AsyncJobViewSet):

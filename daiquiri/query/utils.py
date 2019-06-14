@@ -1,6 +1,8 @@
 import os
 import sys
 
+import requests
+
 from astropy.io.votable import parse_single_table
 
 from django.conf import settings
@@ -234,6 +236,46 @@ def get_job_columns(job):
     return columns
 
 
+def handle_upload_param(request, upload_param):
+    if upload_param:
+        uploads = {}
+        for upload in upload_param.split(';'):
+            resource_name, uri = upload.split(',')
+
+            if uri.startswith('param:'):
+                file_field = uri[len('param:'):]
+                file_path = handle_file_upload(get_user_upload_directory(request.user), request.data[file_field])
+                uploads[resource_name] = file_path
+
+            else:
+                uploads[resource_name] = uri
+
+        return uploads
+    else:
+        return {}
+
+
+def ingest_uploads(uploads, user):
+    if uploads:
+        for table_name, location in uploads.items():
+            if location.startswith('http:') or location.startswith('https:'):
+                file_path = fetch_file(user, location)
+            else:
+                file_path = location
+
+            ingest_table(settings.TAP_UPLOAD, table_name, file_path, drop_table=True)
+
+
+def fetch_file(user, url):
+    response = requests.get(url, allow_redirects=True)
+
+    file_path = os.path.join(get_user_upload_directory(user), url.split('/')[-1])
+    with open(file_path, 'wb') as f:
+        f.write(response.content)
+
+    return file_path
+
+
 def ingest_table(schema_name, table_name, file_path, drop_table=False):
     adapter = DatabaseAdapter()
 
@@ -257,19 +299,3 @@ def ingest_table(schema_name, table_name, file_path, drop_table=False):
     os.remove(file_path)
 
     return columns
-
-
-def handle_upload_param(request, upload_param):
-    if upload_param:
-        uploads = {}
-        for upload in upload_param.split(';'):
-            resource_name, uri = upload.split(',')
-
-            if uri.startswith('param:'):
-                file_field = uri[len('param:'):]
-                file_path = handle_file_upload(get_user_upload_directory(request.user), request.data[file_field])
-                uploads[resource_name] = file_path
-
-        return uploads
-    else:
-        return {}
