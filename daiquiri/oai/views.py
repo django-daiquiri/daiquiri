@@ -1,7 +1,10 @@
 from datetime import datetime
+from urllib.parse import quote
 
 from django.conf import settings
 from django.contrib.sites.models import Site
+from django.http.request import QueryDict
+from django.utils.http import urlencode
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -34,7 +37,7 @@ class OaiView(APIView):
         elif verb == 'Identify':
             self.identify(arguments)
         elif verb == 'ListIdentifiers':
-            self.list_identifiers(arguments)
+            self.list_records(arguments, metadata=False)
         elif verb == 'ListMetadataFormats':
             self.list_metadata_formats(arguments)
         elif verb == 'ListRecords':
@@ -44,8 +47,8 @@ class OaiView(APIView):
         else:
             self.errors.append(('badVerb', 'Illegal OAI verb'))
 
-        if 'metadataPrefix' in arguments:
-            renderer = get_renderer(arguments['metadataPrefix'])
+        if 'metadataPrefix' in self.response:
+            renderer = get_renderer(self.response['metadataPrefix'])
         else:
             renderer = OaiRenderer()
 
@@ -77,6 +80,27 @@ class OaiView(APIView):
 
         return verb, arguments
 
+    def identify(self, arguments):
+        self.validate_illegal_arguments(arguments, [])
+
+        if self.errors:
+            return
+
+        earliest_record = Record.objects.order_by('datestamp').first()
+
+        self.response = {
+            'repositoryName': Site.objects.get_current(),
+            'adminEmails': settings.OAI_ADMIN_EMAILS,
+            'earliestDatestamp': earliest_record.datestamp if earliest_record else None,
+            'deletedRecord': settings.OAI_DELETED_RECORD,
+            'granularity': settings.OAI_GRANULARITY,
+            'identifier': {
+                'scheme': settings.OAI_IDENTIFIER_SCHEMA,
+                'repositoryIdentifier': settings.OAI_IDENTIFIER_REPOSITORY,
+                'delimiter': settings.OAI_IDENTIFIER_DELIMITER
+            }
+        }
+
     def get_record(self, arguments):
         self.validate_illegal_arguments(arguments, ['identifier', 'metadataPrefix'])
         self.validate_identifier(arguments)
@@ -99,56 +123,9 @@ class OaiView(APIView):
 
         self.response = {
             'header': self.get_header(record),
-            'metadata': self.get_metadata(record)
+            'metadata': self.get_metadata(record),
+            'metadataPrefix': arguments['metadataPrefix']
         }
-
-    def identify(self, arguments):
-        self.validate_illegal_arguments(arguments, [])
-
-        if self.errors:
-            return
-
-        earliest_record = Record.objects.order_by('datestamp').first()
-
-        self.response = {
-            'repositoryName': Site.objects.get_current(),
-            'adminEmails': settings.OAI_ADMIN_EMAILS,
-            'earliestDatestamp': earliest_record.datestamp if earliest_record else None,
-            'deletedRecord': settings.OAI_DELETED_RECORD,
-            'granularity': settings.OAI_GRANULARITY,
-            'identifier': {
-                'scheme': settings.OAI_IDENTIFIER_SCHEMA,
-                'repositoryIdentifier': settings.OAI_IDENTIFIER_REPOSITORY,
-                'delimiter': settings.OAI_IDENTIFIER_DELIMITER
-            }
-        }
-
-    def list_identifiers(self, arguments):
-        self.validate_illegal_arguments(arguments, ['from', 'until', 'metadataPrefix', 'set', 'resumptionToken'])
-        from_date = self.validate_date('from', arguments)
-        until_date = self.validate_date('until', arguments)
-        self.validate_metadata_prefix(arguments)
-        self.validate_resumption_token(arguments)
-        self.validate_set(arguments)
-
-        if self.errors:
-            return
-
-        records = Record.objects.filter(metadata_prefix=arguments['metadataPrefix'])
-
-        if from_date:
-            records = records.filter(datestamp__gte=from_date)
-
-        if until_date:
-            records = records.filter(datestamp__lte=until_date)
-
-        if not records.exists():
-            self.errors.append(('noRecordsMatch', 'No items found'))
-            return
-
-        self.response = [{
-            'header': self.get_header(record),
-        } for record in records]
 
     def list_metadata_formats(self, arguments):
         self.validate_illegal_arguments(arguments, ['identifier'])
@@ -169,12 +146,16 @@ class OaiView(APIView):
         else:
             self.response = settings.OAI_METADATA_FORMATS
 
-    def list_records(self, arguments):
+    def list_records(self, arguments, metadata=True):
         self.validate_illegal_arguments(arguments, ['from', 'until', 'metadataPrefix', 'set', 'resumptionToken'])
+        arguments = self.validate_resumption_token(arguments)
+
+        if self.errors:
+            return
+
         from_date = self.validate_date('from', arguments)
         until_date = self.validate_date('until', arguments)
         self.validate_metadata_prefix(arguments)
-        self.validate_resumption_token(arguments)
         self.validate_set(arguments)
 
         if self.errors:
@@ -188,14 +169,40 @@ class OaiView(APIView):
         if until_date:
             records = records.filter(datestamp__lte=until_date)
 
+        count = records.count()
+        if count >= settings.OAI_PAGE_SIZE:
+            start = int(arguments.pop('start', '0'))
+            stop = start + settings.OAI_PAGE_SIZE
+
+            records = records[start:stop]
+
+            if records.count() == settings.OAI_PAGE_SIZE:
+                token = quote(urlencode(dict(start=stop, **arguments)))
+            else:
+                token = ''
+
+            resumption_token = {
+                'completeListSize': count,
+                'cursor': start,
+                'token': token
+            }
+        else:
+            resumption_token = False
+
         if not records.exists():
             self.errors.append(('noRecordsMatch', 'No items found'))
             return
 
-        self.response = [{
-            'header': self.get_header(record),
-            'metadata': self.get_metadata(record)
-        } for record in records]
+        self.response = {
+            'items': [
+                {
+                    'header': self.get_header(record),
+                    'metadata': self.get_metadata(record) if metadata else None
+                } for record in records
+            ],
+            'resumptionToken': resumption_token,
+            'metadataPrefix': arguments['metadataPrefix']
+        }
 
     def list_sets(self, arguments):
         self.validate_illegal_arguments(arguments, ['resumptionToken'])
@@ -219,7 +226,14 @@ class OaiView(APIView):
 
     def validate_resumption_token(self, arguments):
         if 'resumptionToken' in arguments:
-            self.errors.append(('badResumptionToken', 'This repository does not support resumption tokens'))
+            resumption_token = arguments.pop('resumptionToken')
+            if arguments:
+                self.errors.append(('badArgument', 'resumptionToken is an exclusive argument.'))
+
+            query_dict = QueryDict(query_string=resumption_token, mutable=False)
+            verb, arguments = self.get_verb_and_arguments(query_dict)
+
+        return arguments
 
     def validate_set(self, arguments):
         if 'set' in arguments:

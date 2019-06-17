@@ -25,11 +25,11 @@ class OaiRenderer(XMLRenderer):
         elif data['verb'] == 'Identify':
             self.render_identify(data['response'], data['baseUrl'])
         elif data['verb'] == 'ListIdentifiers':
-            self.render_list_identifiers(data['response'])
+            self.render_list_identifiers(data['response']['items'], data['response']['resumptionToken'])
         elif data['verb'] == 'ListMetadataFormats':
             self.render_list_metadata_formats(data['response'])
         elif data['verb'] == 'ListRecords':
-            self.render_list_records(data['response'])
+            self.render_list_records(data['response']['items'], data['response']['resumptionToken'])
         elif data['verb'] == 'ListSets':
             self.render_list_sets(data['response'])
 
@@ -67,10 +67,18 @@ class OaiRenderer(XMLRenderer):
         self.end('description')
         self.end('Identify')
 
-    def render_list_identifiers(self, items):
+    def render_list_identifiers(self, items, resumption_token):
         self.start('ListIdentifiers')
         for item in items:
             self.render_header(item['header'])
+
+        if resumption_token:
+            self.node('resumptionToken', {
+                'expirationDate': resumption_token.get('expirationDate'),
+                'completeListSize': resumption_token.get('completeListSize'),
+                'cursor': resumption_token.get('cursor')
+            }, resumption_token['token'])
+
         self.end('ListIdentifiers')
 
     def render_list_metadata_formats(self, metadata_formats):
@@ -83,10 +91,18 @@ class OaiRenderer(XMLRenderer):
             self.end('metadataFormat')
         self.end('ListMetadataFormats')
 
-    def render_list_records(self, items):
+    def render_list_records(self, items, resumption_token):
         self.start('ListRecords')
         for item in items:
             self.render_record(item)
+
+        if resumption_token:
+            self.node('resumptionToken', {
+                'expirationDate': resumption_token.get('expirationDate'),
+                'completeListSize': resumption_token.get('completeListSize'),
+                'cursor': resumption_token.get('cursor')
+            }, resumption_token['token'])
+
         self.end('ListRecords')
 
     def render_list_sets(self, data):
