@@ -47,7 +47,7 @@ class OaiView(APIView):
         else:
             self.errors.append(('badVerb', 'Illegal OAI verb'))
 
-        if 'metadataPrefix' in self.response:
+        if self.response is not None and 'metadataPrefix' in self.response:
             renderer = get_renderer(self.response['metadataPrefix'])
         else:
             renderer = OaiRenderer()
