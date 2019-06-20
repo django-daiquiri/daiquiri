@@ -55,17 +55,67 @@ class OaiRenderer(XMLRenderer):
         self.node('deletedRecord', {}, repository_metadata['deletedRecord'])
         self.node('granularity', {}, repository_metadata['granularity'])
         self.start('description')
+        self.render_voresource(repository_metadata['voresource'])
+        self.render_oai_identifier(repository_metadata['identifier'])
+        self.end('description')
+        self.end('Identify')
+
+    def render_voresource(self, voresource_metadata):
+        self.start('ri:Resource', {
+            'created': voresource_metadata.get('created'),
+            'updated': voresource_metadata.get('updated'),
+            'status': 'active',
+            'xmlns': '',
+            'xmlns:ri': 'http://www.ivoa.net/xml/RegistryInterface/v1.0',
+            'xmlns:vg': 'http://www.ivoa.net/xml/VORegistry/v1.0',
+            'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+            'xsi:schemaLocation': 'http://www.ivoa.net/xml/RegistryInterface/v1.0 http://www.ivoa.net/xml/RegistryInterface/v1.0 http://www.ivoa.net/xml/VORegistry/v1.0 http://www.ivoa.net/xml/VORegistry/v1.0',
+            'xsi:type': voresource_metadata.get('type')
+        })
+        # self.node('validationLevel', {
+        #     'validatedBy': voresource_metadata.get('validatedBy')
+        # }, voresource_metadata.get('validationLevel'))
+        # self.node('title', {}, voresource_metadata.get('title'))
+        # self.node('shortName', {}, voresource_metadata.get('shortName'))
+        # self.node('identifier', {}, voresource_metadata.get('identifier'))
+
+        curation = voresource_metadata.get('curation', {})
+        self.start('curation')
+        self.node('publisher', {'ivo-id': curation.get('ivo-id')}, curation.get('publisher'))
+        self.start('creator')
+        self.node('name', {}, curation.get('creator'))
+        self.end('creator')
+        self.node('contributor', {}, curation.get('contributor'))
+        self.start('contact')
+        self.node('name', {}, curation.get('name'))
+        self.node('address', {}, curation.get('address'))
+        self.node('email', {}, curation.get('email'))
+        self.node('telephone', {}, curation.get('telephone'))
+        self.end('contact')
+        self.end('curation')
+
+        content = voresource_metadata.get('content', {})
+        self.start('content')
+        for subject in content.get('subjects', []):
+            self.node('subject', {}, subject)
+        self.node('description', {}, content.get('description'))
+        self.node('referenceURL', {}, content.get('referenceURL'))
+        self.node('type', {}, content.get('type'))
+        self.node('contentLevel', {}, content.get('contentLevel'))
+        self.end('content')
+
+        self.end('ri:Resource')
+
+    def render_oai_identifier(self, identifier_metadata):
         self.start('oai-identifier', {
             'xmlns': 'http://www.openarchives.org/OAI/2.0/oai-identifier',
             'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
             'xsi:schemaLocation': 'http://www.openarchives.org/OAI/2.0/oai-identifier http://www.openarchives.org/OAI/2.0/oai-identifier.xsd'
         })
-        self.node('scheme', {}, repository_metadata['identifier']['scheme'])
-        self.node('repositoryIdentifier', {}, repository_metadata['identifier']['repositoryIdentifier'])
-        self.node('delimiter', {}, repository_metadata['identifier']['delimiter'])
+        self.node('scheme', {}, identifier_metadata['scheme'])
+        self.node('repositoryIdentifier', {}, identifier_metadata['repositoryIdentifier'])
+        self.node('delimiter', {}, identifier_metadata['delimiter'])
         self.end('oai-identifier')
-        self.end('description')
-        self.end('Identify')
 
     def render_list_identifiers(self, items, resumption_token):
         self.start('ListIdentifiers')

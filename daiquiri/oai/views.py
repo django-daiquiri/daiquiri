@@ -94,6 +94,14 @@ class OaiView(APIView):
             'earliestDatestamp': earliest_record.datestamp if earliest_record else None,
             'deletedRecord': settings.OAI_DELETED_RECORD,
             'granularity': settings.OAI_GRANULARITY,
+            'voresource': {
+                'created': settings.OAI_VO_RESOURCE_CREATED,
+                'updated': settings.OAI_VO_RESOURCE_UPDATED,
+                'type': settings.OAI_VO_RESOURCE_TYPE,
+                'curation': {
+                    'publisher': settings.METADATA_PUBLISHER
+                }
+            },
             'identifier': {
                 'scheme': settings.OAI_IDENTIFIER_SCHEMA,
                 'repositoryIdentifier': settings.OAI_IDENTIFIER_REPOSITORY,

@@ -97,6 +97,12 @@ OAI_METADATA_FORMATS = [
         'schema': 'http://schema.datacite.org/meta/nonexistant/nonexistant.xsd',
         'namespace': 'http://datacite.org/schema/nonexistant',
         'renderer_class': 'daiquiri.oai.renderers.datacite.DataciteRenderer'
+    },
+    {
+        'prefix': 'ivo_vor',
+        'schema': 'http://www.ivoa.net/xml/RegistryInterface/v1.0',
+        'namespace': 'http://www.ivoa.net/xml/RegistryInterface/v1.0',
+        'renderer_class': 'daiquiri.oai.renderers.datacite.RegistryInterfaceRenderer'
     }
 ]
 OAI_DELETED_RECORD = 'transient'
@@ -105,6 +111,10 @@ OAI_IDENTIFIER_SCHEMA = 'oai'
 OAI_IDENTIFIER_REPOSITORY = 'daiquiri'
 OAI_IDENTIFIER_DELIMITER = ':'
 OAI_PAGE_SIZE = 1000
+
+OAI_VO_RESOURCE_CREATED = '2019-07-01T00:00:00Z'
+OAI_VO_RESOURCE_UPDATED = '2019-07-01T00:00:00Z'
+OAI_VO_RESOURCE_TYPE = 'vs:CatalogResource'
 
 QUERY_ANONYMOUS = False
 QUERY_USER_SCHEMA_PREFIX = 'daiquiri_user_'
