@@ -274,7 +274,7 @@ class OaiView(APIView):
         else:
             adapter = OaiAdapter()
             resource = adapter.get_resource(record)
-            serializer_class = adapter.get_serializer_class(resource, record.metadata_prefix)
+            serializer_class = adapter.get_serializer_class(record.metadata_prefix, record.resource_type)
             if serializer_class is not None:
                 serializer = serializer_class(instance=resource, context={
                     'request': self.request

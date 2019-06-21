@@ -10,28 +10,28 @@ from .models import Schema, Table, Column
 def schema_updated_handler(sender, **kwargs):
     if apps.is_installed('daiquiri.oai'):
         from daiquiri.oai.utils import update_records
-        update_records(kwargs['instance'])
+        update_records('schema', kwargs['instance'])
 
 
 @receiver(post_delete, sender=Schema)
 def schema_deleted_handler(sender, **kwargs):
     if apps.is_installed('daiquiri.oai'):
         from daiquiri.oai.utils import delete_records
-        delete_records(kwargs['instance'])
+        delete_records('schema', kwargs['instance'])
 
 
 @receiver(post_save, sender=Table)
 def table_updated_handler(sender, **kwargs):
     if apps.is_installed('daiquiri.oai'):
         from daiquiri.oai.utils import update_records
-        update_records(kwargs['instance'])
+        update_records('table', kwargs['instance'])
 
 
 @receiver(post_delete, sender=Table)
 def table_deleted_handler(sender, **kwargs):
     if apps.is_installed('daiquiri.oai'):
         from daiquiri.oai.utils import delete_records
-        delete_records(kwargs['instance'])
+        delete_records('table', kwargs['instance'])
 
 
 @receiver(post_save, sender=Column)

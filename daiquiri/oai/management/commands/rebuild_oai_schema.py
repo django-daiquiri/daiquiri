@@ -22,12 +22,11 @@ class Command(BaseCommand):
         else:
             # mark deleted or unpublished records as deleted
             for record in Record.objects.all():
-                ressource = adapter.get_resource(record)
-                if ressource is None:
+                resource = adapter.get_resource(record)
+                if resource is None:
                     record.datestamp = datetime.today()
                     record.deleted = True
                     record.save()
 
-        for ressources in OaiAdapter().get_resources():
-            for ressource in ressources:
-                update_records(ressource)
+        for resource_type, resource in OaiAdapter().get_resource_list():
+            update_records(resource_type, resource)

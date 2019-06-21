@@ -33,7 +33,7 @@ class DublincoreSerializer(serializers.ModelSerializer):
         return LICENSE_URLS.get(obj.license)
 
 
-class SchemaDublincoreSerializer(DublincoreSerializer):
+class DublincoreSchemaSerializer(DublincoreSerializer):
 
     class Meta:
         model = Schema
@@ -57,7 +57,7 @@ class SchemaDublincoreSerializer(DublincoreSerializer):
         return obj.doi or 'schemas/%i' % obj.pk
 
 
-class TableDublincoreSerializer(DublincoreSerializer):
+class DublincoreTableSerializer(DublincoreSerializer):
 
     class Meta:
         model = Table

@@ -21,6 +21,14 @@ class Record(models.Model):
         default=False, db_index=True,
         verbose_name=_('Deleted'),
     )
+    resource_type = models.CharField(
+        max_length=32, db_index=True,
+        verbose_name=_('Resource type'),
+    )
+    resource_id = models.PositiveIntegerField(
+        db_index=True, null=True,
+        verbose_name=_('Resource id'),
+    )
 
     def __str__(self):
         return self.identifier

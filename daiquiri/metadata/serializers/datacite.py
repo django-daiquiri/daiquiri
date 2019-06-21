@@ -38,7 +38,7 @@ class DataciteSerializer(serializers.ModelSerializer):
         return obj.long_description or obj.description
 
 
-class SchemaDataciteSerializer(DataciteSerializer):
+class DataciteSchemaSerializer(DataciteSerializer):
 
     class Meta:
         model = Schema
@@ -70,7 +70,7 @@ class SchemaDataciteSerializer(DataciteSerializer):
         return '%i tables' % tables.count()
 
 
-class TableDataciteSerializer(DataciteSerializer):
+class DataciteTableSerializer(DataciteSerializer):
 
     class Meta:
         model = Table

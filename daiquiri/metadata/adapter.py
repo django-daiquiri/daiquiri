@@ -2,67 +2,30 @@ from daiquiri.core.constants import ACCESS_LEVEL_PUBLIC
 from daiquiri.oai.adapter import BaseOaiAdapter
 
 from .models import Schema, Table
-from .serializers.datacite import SchemaDataciteSerializer, TableDataciteSerializer
-from .serializers.dublincore import SchemaDublincoreSerializer, TableDublincoreSerializer
+from .serializers.datacite import DataciteSchemaSerializer, DataciteTableSerializer
+from .serializers.dublincore import DublincoreSchemaSerializer, DublincoreTableSerializer
 
 
-class MetadataOaiAdapter(BaseOaiAdapter):
+class MetadataOaiAdapterMixin(object):
 
-    def get_record(self, resource):
-        if isinstance(resource, Schema):
-            return self.get_schema_record(resource)
-        elif isinstance(resource, Table):
-            return self.get_table_record(resource)
-        else:
+    def get_schema_list(self):
+        for schema in Schema.objects.iterator():
+            yield 'schema', schema
+
+    def get_table_list(self):
+        for table in Table.objects.iterator():
+            yield 'table', table
+
+    def get_schema(self, pk):
+        try:
+            return Schema.objects.get(pk=pk)
+        except Schema.DoesNotExist:
             return None
 
-    def get_resource(self, record):
-        resource_identifier = self.strip_identifier_prefix(record.identifier)
-        resource_type, resource_id = resource_identifier.split('/')
-
-        if resource_type == 'schemas':
-            try:
-                return Schema.objects.filter(
-                    metadata_access_level=ACCESS_LEVEL_PUBLIC,
-                    published__isnull=False).get(pk=resource_id)
-            except Schema.DoesNotExist:
-                return None
-
-        elif resource_type == 'tables':
-            try:
-                return Table.objects.filter(
-                    schema__metadata_access_level=ACCESS_LEVEL_PUBLIC,
-                    schema__published__isnull=False,
-                    metadata_access_level=ACCESS_LEVEL_PUBLIC,
-                    published__isnull=False).get(pk=resource_id)
-            except Table.DoesNotExist:
-                return None
-
-        else:
-            return None
-
-    def get_resources(self):
-        yield Schema.objects.all()
-        yield Table.objects.all()
-
-    def get_serializer_class(self, resource, metadata_prefix):
-        if isinstance(resource, Schema):
-            if metadata_prefix == 'oai_dc':
-                return SchemaDublincoreSerializer
-            elif metadata_prefix in ['oai_datacite', 'datacite']:
-                return SchemaDataciteSerializer
-            else:
-                return None
-
-        elif isinstance(resource, Table):
-            if metadata_prefix == 'oai_dc':
-                return TableDublincoreSerializer
-            elif metadata_prefix in ['oai_datacite', 'datacite']:
-                return TableDataciteSerializer
-            else:
-                return None
-
-        else:
+    def get_table(self, pk):
+        try:
+            return Table.objects.get(pk=pk)
+        except Table.DoesNotExist:
             return None
 
     def get_schema_record(self, schema):
@@ -71,7 +34,7 @@ class MetadataOaiAdapter(BaseOaiAdapter):
         public = (schema.metadata_access_level == ACCESS_LEVEL_PUBLIC) \
             and (schema.published is not None)
 
-        return identifier, datestamp, public
+        return schema.pk, identifier, datestamp, public
 
     def get_table_record(self, table):
         identifier = self.get_identifier_prefix() + 'tables/%i' % table.pk
@@ -81,29 +44,28 @@ class MetadataOaiAdapter(BaseOaiAdapter):
             and (table.schema.metadata_access_level == ACCESS_LEVEL_PUBLIC) \
             and (table.schema.published is not None)
 
-        return identifier, datestamp, public
+        return table.pk, identifier, datestamp, public
+
+    def get_oai_dc_schema_serializer_class(self):
+        return DublincoreSchemaSerializer
+
+    def get_oai_datacite_schema_serializer_class(self):
+        return DataciteSchemaSerializer
+
+    def get_datacite_schema_serializer_class(self):
+        return DataciteSchemaSerializer
+
+    def get_oai_dc_table_serializer_class(self):
+        return DublincoreTableSerializer
+
+    def get_oai_datacite_table_serializer_class(self):
+        return DataciteTableSerializer
+
+    def get_datacite_table_serializer_class(self):
+        return DataciteTableSerializer
 
 
-class DoiMetadataOaiAdapter(MetadataOaiAdapter):
-
-    def get_resource(self, record):
-        doi = self.strip_identifier_prefix(record.identifier)
-
-        try:
-            return Schema.objects.filter(
-                metadata_access_level=ACCESS_LEVEL_PUBLIC,
-                published__isnull=False
-            ).get(doi=doi)
-        except Schema.DoesNotExist:
-            try:
-                return Table.objects.filter(
-                    schema__metadata_access_level=ACCESS_LEVEL_PUBLIC,
-                    schema__published__isnull=False,
-                    metadata_access_level=ACCESS_LEVEL_PUBLIC,
-                    published__isnull=False,
-                ).get(doi=doi)
-            except Table.DoesNotExist:
-                return None
+class DoiMetadataOaiAdapterMixin(MetadataOaiAdapterMixin):
 
     def get_schema_record(self, schema):
         identifier = (self.get_identifier_prefix() + schema.doi) if schema.doi else None
@@ -112,7 +74,7 @@ class DoiMetadataOaiAdapter(MetadataOaiAdapter):
             and (schema.published is not None) \
             and (schema.doi is not None)
 
-        return identifier, datestamp, public
+        return schema.pk, identifier, datestamp, public
 
     def get_table_record(self, table):
         identifier = (self.get_identifier_prefix() + table.doi) if table.doi else None
@@ -123,4 +85,20 @@ class DoiMetadataOaiAdapter(MetadataOaiAdapter):
             and (table.schema.metadata_access_level == ACCESS_LEVEL_PUBLIC) \
             and (table.schema.published is not None)
 
-        return identifier, datestamp, public
+        return table.pk, identifier, datestamp, public
+
+
+class MetadataOaiAdapter(MetadataOaiAdapterMixin, BaseOaiAdapter):
+
+    resource_types = {
+        'schema': ('oai_dc', 'oai_datacite', 'datacite'),
+        'table': ('oai_dc', 'oai_datacite', 'datacite'),
+    }
+
+
+class DoiMetadataOaiAdapter(DoiMetadataOaiAdapterMixin, BaseOaiAdapter):
+
+    resource_types = {
+        'schema': ('oai_dc', 'oai_datacite', 'datacite'),
+        'table': ('oai_dc', 'oai_datacite', 'datacite'),
+    }
