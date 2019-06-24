@@ -33,7 +33,11 @@ class BaseConeSearchAdapter(BaseServiceAdapter):
         }
     }
 
-    defaults = {}
+    defaults = {
+        'RA': 20,
+        'DEC': 20,
+        'SR': 10,
+    }
 
     columns = [
         {
@@ -54,11 +58,15 @@ class BaseConeSearchAdapter(BaseServiceAdapter):
         }
     ]
 
+    max_records = 10000
+
     def stream(self):
         return FileResponse(generate_votable(DatabaseAdapter().fetchall(self.sql, self.args), self.columns), content_type='application/xml')
 
 
 class SimpleConeSearchAdapter(BaseConeSearchAdapter):
+
+    resources = [settings.CONESEARCH_TABLE]
 
     def clean(self, request, resource):
         if resource != settings.CONESEARCH_TABLE:
@@ -73,12 +81,14 @@ WHERE
     %(ra_field)s BETWEEN (%%(RA)s - 0.5 * %%(SR)s) AND (%%(RA)s + 0.5 * %%(SR)s)
 AND
     %(dec_field)s BETWEEN (%%(DEC)s - 0.5 * %%(SR)s) AND (%%(DEC)s + 0.5 * %%(SR)s)
+LIMIT %(limit)s
 ''' % {
             'id_field': adapter.escape_identifier('id'),
             'ra_field': adapter.escape_identifier('ra'),
             'dec_field': adapter.escape_identifier('dec'),
             'schema': settings.CONESEARCH_SCHEMA,
-            'table': settings.CONESEARCH_TABLE
+            'table': settings.CONESEARCH_TABLE,
+            'limit': self.max_records
         }
 
         self.args, errors = self.parse_query_dict(request)

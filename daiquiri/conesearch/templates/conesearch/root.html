@@ -1,0 +1,20 @@
+{% extends 'core/wide.html' %}
+{% load i18n %}
+
+{% block wide %}
+
+    <h1>{% trans 'Cone Search service' %}</h1>
+
+    <ul>
+        <li>
+            <a href="{% url 'conesearch:resource' %}">{% trans 'VOResource Record' %}</a>
+        </li>
+        <li>
+            <a href="{% url 'conesearch:availability' %}">{% trans 'VOSI availability' %}</a>
+        </li>
+        <li>
+            <a href="{% url 'conesearch:capabilities' %}">{% trans 'VOSI capabilities' %}</a>
+        </li>
+    </ul>
+
+{% endblock %}

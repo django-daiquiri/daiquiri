@@ -1,7 +1,6 @@
-from django.conf import settings
-
 from rest_framework import serializers
 
+from daiquiri.core.constants import ACCESS_LEVEL_PUBLIC
 from daiquiri.metadata.models import Schema, Table, Column
 
 
@@ -23,7 +22,7 @@ class ColumnSerializer(serializers.ModelSerializer):
 
 class TableSerializer(serializers.ModelSerializer):
 
-    columns = serializers.SerializerMethodField()
+    columns = ColumnSerializer(many=True)
 
     class Meta:
         model = Table
@@ -34,15 +33,6 @@ class TableSerializer(serializers.ModelSerializer):
             'doi',
             'nrows'
         )
-
-    def get_columns(self, obj):
-        # filter the columns which are published for the groups of the user
-        if settings.METADATA_COLUMN_PERMISSIONS:
-            queryset = obj.columns.filter_by_access_level(self.context['request'].user)
-        else:
-            queryset = obj.columns.all()
-
-        return ColumnSerializer(queryset, context=self.context, many=True).data
 
 
 class SchemaSerializer(serializers.ModelSerializer):
@@ -59,5 +49,5 @@ class SchemaSerializer(serializers.ModelSerializer):
 
     def get_tables(self, obj):
         # filter the tables which are published for the groups of the user
-        queryset = obj.tables.filter_by_access_level(self.context['request'].user)
-        return TableSerializer(queryset, context=self.context, many=True).data
+        queryset = obj.tables.filter(metadata_access_level=ACCESS_LEVEL_PUBLIC, published__isnull=False)
+        return TableSerializer(queryset, many=True).data

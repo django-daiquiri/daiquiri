@@ -6,5 +6,5 @@ from .views import OaiView
 app_name = 'oai'
 
 urlpatterns = [
-    path('', OaiView.as_view(), name='oai'),
+    path('', OaiView.as_view(), name='root'),
 ]

@@ -1,8 +1,8 @@
 from datetime import datetime
 from urllib.parse import quote
 
+from django.apps import apps
 from django.conf import settings
-from django.contrib.sites.models import Site
 from django.http.request import QueryDict
 from django.utils.http import urlencode
 
@@ -89,24 +89,17 @@ class OaiView(APIView):
         earliest_record = Record.objects.order_by('datestamp').first()
 
         self.response = {
-            'repositoryName': Site.objects.get_current(),
+            'repositoryName': settings.SITE_IDENTIFIER,
             'adminEmails': settings.OAI_ADMIN_EMAILS,
             'earliestDatestamp': earliest_record.datestamp if earliest_record else None,
             'deletedRecord': settings.OAI_DELETED_RECORD,
             'granularity': settings.OAI_GRANULARITY,
-            'voresource': {
-                'created': settings.OAI_VO_RESOURCE_CREATED,
-                'updated': settings.OAI_VO_RESOURCE_UPDATED,
-                'type': settings.OAI_VO_RESOURCE_TYPE,
-                'curation': {
-                    'publisher': settings.METADATA_PUBLISHER
-                }
-            },
             'identifier': {
                 'scheme': settings.OAI_IDENTIFIER_SCHEMA,
-                'repositoryIdentifier': settings.OAI_IDENTIFIER_REPOSITORY,
+                'repositoryIdentifier': settings.SITE_IDENTIFIER,
                 'delimiter': settings.OAI_IDENTIFIER_DELIMITER
-            }
+            },
+            'registry': self.get_registry()
         }
 
     def get_record(self, arguments):
@@ -282,3 +275,8 @@ class OaiView(APIView):
             else:
                 raise RuntimeError('Could not determine serializer_class for record %s' % record.identifier)
             return serializer.data
+
+    def get_registry(self):
+        if apps.is_installed('daiquiri.registry'):
+            from daiquiri.registry.vo import get_resource
+            return get_resource()

@@ -12,12 +12,19 @@
         <li>
             <a href="{% url 'tap:async-list' %}">{% trans 'async' %}</a>
         </li>
+    </ul>
+    <ul>
         <li>
-            <a href="{% url 'tap:capabilities' %}">{% trans 'capabilities' %}</a>
+            <a href="{% url 'tap:resource' %}">{% trans 'VOResource Record' %}</a>
         </li>
         <li>
-            <a href="{% url 'tap:tables' %}">{% trans 'tables' %}</a>
+            <a href="{% url 'tap:capabilities' %}">{% trans 'VOSI capabilities' %}</a>
         </li>
+        <li>
+            <a href="{% url 'tap:tables' %}">{% trans 'VOSI tableset' %}</a>
+        </li>
+    </ul>
+    <ul>
         <li>
             <a href="{% url 'tap:examples' %}">{% trans 'examples' %}</a>
         </li>

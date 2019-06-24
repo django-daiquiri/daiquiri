@@ -9,6 +9,26 @@ ASYNC = False
 IPV4_PRIVACY_MASK = 16
 IPV6_PRIVACY_MASK = 32
 
+SITE_URL = None
+SITE_IDENTIFIER = None
+SITE_TITLE = None
+SITE_DESCRIPTION = None
+SITE_LICENSE = None
+SITE_CREATOR = None
+SITE_CONTACT = None
+SITE_PUBLISHER = None
+SITE_CREATED = None
+SITE_UPDATED = None
+SITE_LANGUAGE = 'en'
+SITE_SUBJECTS = [
+    {
+        'subject': 'Astronomy',
+        'schemeURI': 'http://id.loc.gov/authorities/subjects',
+        'valueURI': 'http://id.loc.gov/authorities/subjects/sh85009003'
+    }
+]
+SITE_TYPE = 'service'
+
 ARCHIVE_ANONYMOUS = False
 ARCHIVE_SCHEMA = 'daiquiri_archive'
 ARCHIVE_TABLE = 'files'
@@ -66,55 +86,39 @@ MEETINGS_ABSTRACT_MAX_LENGTH = 2000
 
 METADATA_COLUMN_PERMISSIONS = False
 METADATA_BASE_URL = None
-METADATA_PUBLISHER = None
-METADATA_LANGUAGE = 'en'
-METADATA_SUBJECTS = [
-    {
-        'subject': 'Astronomy',
-        'schemeURI': 'http://id.loc.gov/authorities/subjects',
-        'valueURI': 'http://id.loc.gov/authorities/subjects/sh85009003'
-    }
-]
 
-OAI_SCHEMA = 'OAI'
-OAI_ADAPTER = 'daiquiri.metadata.adapter.MetadataOaiAdapter'
+OAI_SCHEMA = 'oai'
+OAI_ADAPTER = 'daiquiri.metadata.adapter.RegistryDoiMetadataOaiAdapter'
 OAI_ADMIN_EMAILS = ['admin@example.com']
 OAI_METADATA_FORMATS = [
     {
         'prefix': 'oai_dc',
         'schema': 'http://www.openarchives.org/OAI/2.0/oai_dc.xsd',
         'namespace': 'http://www.openarchives.org/OAI/2.0/oai_dc/',
-        'renderer_class': 'daiquiri.oai.renderers.dublincore.DublincoreRenderer'
+        'renderer_class': 'daiquiri.oai.renderers.DublincoreRenderer'
     },
     {
         'prefix': 'oai_datacite',
         'schema': 'http://schema.datacite.org/oai/oai-1.1/oai.xsd',
         'namespace': 'http://schema.datacite.org/oai/oai-1.1/',
-        'renderer_class': 'daiquiri.oai.renderers.datacite.OaiDataciteRenderer'
+        'renderer_class': 'daiquiri.oai.renderers.OaiDataciteRenderer'
     },
     {
         'prefix': 'datacite',
         'schema': 'http://schema.datacite.org/meta/nonexistant/nonexistant.xsd',
         'namespace': 'http://datacite.org/schema/nonexistant',
-        'renderer_class': 'daiquiri.oai.renderers.datacite.DataciteRenderer'
+        'renderer_class': 'daiquiri.oai.renderers.DataciteRenderer'
     },
     {
         'prefix': 'ivo_vor',
         'schema': 'http://www.ivoa.net/xml/RegistryInterface/v1.0',
         'namespace': 'http://www.ivoa.net/xml/RegistryInterface/v1.0',
-        'renderer_class': 'daiquiri.oai.renderers.datacite.RegistryInterfaceRenderer'
+        'renderer_class': 'daiquiri.oai.renderers.VoresourceRenderer'
     }
 ]
 OAI_DELETED_RECORD = 'transient'
 OAI_GRANULARITY = 'YYYY-MM-DD'
-OAI_IDENTIFIER_SCHEMA = 'oai'
-OAI_IDENTIFIER_REPOSITORY = 'daiquiri'
-OAI_IDENTIFIER_DELIMITER = ':'
 OAI_PAGE_SIZE = 1000
-
-OAI_VO_RESOURCE_CREATED = '2019-07-01T00:00:00Z'
-OAI_VO_RESOURCE_UPDATED = '2019-07-01T00:00:00Z'
-OAI_VO_RESOURCE_TYPE = 'vs:CatalogResource'
 
 QUERY_ANONYMOUS = False
 QUERY_USER_SCHEMA_PREFIX = 'daiquiri_user_'

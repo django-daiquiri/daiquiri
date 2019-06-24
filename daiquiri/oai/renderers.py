@@ -1,7 +1,10 @@
 from daiquiri.core.renderers import XMLRenderer
+from daiquiri.core.renderers.dublincore import DublincoreRendererMixin
+from daiquiri.core.renderers.datacite import DataciteRendererMixin
+from daiquiri.core.renderers.voresource import VoresourceRendererMixin
 
 
-class OaiRenderer(XMLRenderer):
+class OaiRenderer(DublincoreRendererMixin, DataciteRendererMixin, VoresourceRendererMixin, XMLRenderer):
 
     def render_document(self, data, accepted_media_type=None, renderer_context=None):
         self.start('OAI-PMH', {
@@ -54,57 +57,14 @@ class OaiRenderer(XMLRenderer):
         self.node('earliestDatestamp', {}, repository_metadata['earliestDatestamp'])
         self.node('deletedRecord', {}, repository_metadata['deletedRecord'])
         self.node('granularity', {}, repository_metadata['granularity'])
-        self.start('description')
-        self.render_voresource(repository_metadata['voresource'])
-        self.render_oai_identifier(repository_metadata['identifier'])
-        self.end('description')
+        self.render_identify_description(repository_metadata)
         self.end('Identify')
 
-    def render_voresource(self, voresource_metadata):
-        self.start('ri:Resource', {
-            'created': voresource_metadata.get('created'),
-            'updated': voresource_metadata.get('updated'),
-            'status': 'active',
-            'xmlns': '',
-            'xmlns:ri': 'http://www.ivoa.net/xml/RegistryInterface/v1.0',
-            'xmlns:vg': 'http://www.ivoa.net/xml/VORegistry/v1.0',
-            'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
-            'xsi:schemaLocation': 'http://www.ivoa.net/xml/RegistryInterface/v1.0 http://www.ivoa.net/xml/RegistryInterface/v1.0 http://www.ivoa.net/xml/VORegistry/v1.0 http://www.ivoa.net/xml/VORegistry/v1.0',
-            'xsi:type': voresource_metadata.get('type')
-        })
-        # self.node('validationLevel', {
-        #     'validatedBy': voresource_metadata.get('validatedBy')
-        # }, voresource_metadata.get('validationLevel'))
-        # self.node('title', {}, voresource_metadata.get('title'))
-        # self.node('shortName', {}, voresource_metadata.get('shortName'))
-        # self.node('identifier', {}, voresource_metadata.get('identifier'))
-
-        curation = voresource_metadata.get('curation', {})
-        self.start('curation')
-        self.node('publisher', {'ivo-id': curation.get('ivo-id')}, curation.get('publisher'))
-        self.start('creator')
-        self.node('name', {}, curation.get('creator'))
-        self.end('creator')
-        self.node('contributor', {}, curation.get('contributor'))
-        self.start('contact')
-        self.node('name', {}, curation.get('name'))
-        self.node('address', {}, curation.get('address'))
-        self.node('email', {}, curation.get('email'))
-        self.node('telephone', {}, curation.get('telephone'))
-        self.end('contact')
-        self.end('curation')
-
-        content = voresource_metadata.get('content', {})
-        self.start('content')
-        for subject in content.get('subjects', []):
-            self.node('subject', {}, subject)
-        self.node('description', {}, content.get('description'))
-        self.node('referenceURL', {}, content.get('referenceURL'))
-        self.node('type', {}, content.get('type'))
-        self.node('contentLevel', {}, content.get('contentLevel'))
-        self.end('content')
-
-        self.end('ri:Resource')
+    def render_identify_description(self, repository_metadata):
+        self.start('description')
+        self.render_oai_identifier(repository_metadata['identifier'])
+        self.render_voresource(repository_metadata['registry'])
+        self.end('description')
 
     def render_oai_identifier(self, identifier_metadata):
         self.start('oai-identifier', {
@@ -176,3 +136,35 @@ class OaiRenderer(XMLRenderer):
 
     def render_metadata(self, metadata):
         raise NotImplementedError()
+
+
+class DublincoreRenderer(OaiRenderer):
+
+    def render_metadata(self, metadata):
+        self.render_dublincore(metadata)
+
+
+class OaiDataciteRenderer(OaiRenderer):
+
+    def render_metadata(self, metadata):
+        self.start('oai_datacite', {
+            'xmlns': 'http://schema.datacite.org/oai/oai-1.0/',
+            'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+            'xsi:schemaLocation': 'http://schema.datacite.org/oai/oai-1.0/ oai_datacite.xsd'
+        })
+        self.start('payload')
+        self.render_datacite(metadata)
+        self.end('payload')
+        self.end('oai_datacite')
+
+
+class DataciteRenderer(OaiRenderer):
+
+    def render_metadata(self, metadata):
+        self.render_datacite(metadata)
+
+
+class VoresourceRenderer(OaiRenderer):
+
+    def render_metadata(self, metadata):
+        self.render_voresource(metadata)

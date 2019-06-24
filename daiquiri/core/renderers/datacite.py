@@ -1,35 +1,29 @@
-from daiquiri.oai.renderers import OaiRenderer
+class DataciteRendererMixin(object):
 
-
-class DataciteRenderer(OaiRenderer):
-
-    def render_metadata(self, metadata):
-        self.render_resource(metadata)
-
-    def render_resource(self, metadata):
+    def render_datacite(self, metadata):
         self.start('resource', {
             'xmlns': 'http://datacite.org/schema/kernel-4',
             'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
             'xsi:schemaLocation': 'http://datacite.org/schema/kernel-4 http://schema.datacite.org/meta/kernel-4.1/metadata.xsd'
         })
-        self.node('identifier', {'identifierType': 'DOI'}, metadata['identifier'])
+        self.node('identifier', {'identifierType': 'DOI'}, metadata.get('identifier'))
 
         self.start('creators')
-        creators = metadata['creators']
+        creators = metadata.get('creators', [])
         if isinstance(creators, list):
             for creator in creators:
                 self.render_person('creator', creator)
         self.end('creators')
 
         self.start('titles')
-        self.node('title', {'xml:lang': 'en'}, metadata['title'])
+        self.node('title', {'xml:lang': 'en'}, metadata.get('title'))
         self.end('titles')
 
-        self.node('publisher', {}, metadata['publisher'])
-        self.node('publicationYear', {}, metadata['publication_year'])
+        self.node('publisher', {}, metadata.get('publisher'))
+        self.node('publicationYear', {}, metadata.get('publication_year'))
 
         self.start('subjects')
-        for subject in metadata['subjects']:
+        for subject in metadata.get('subjects', []):
             self.node('subject', {
                 'xml:lang': 'en',
                 'schemeURI': subject.get('scheme_uri'),
@@ -38,20 +32,20 @@ class DataciteRenderer(OaiRenderer):
         self.end('subjects')
 
         self.start('contributors')
-        contributors = metadata['contributors']
+        contributors = metadata.get('contributors', [])
         if isinstance(contributors, list):
             for contributor in contributors:
                 self.render_person('contributor', contributor)
         self.end('contributors')
 
-        updated = metadata['updated']
+        updated = metadata.get('updated')
         if updated is not None:
             self.start('dates')
             self.node('data', {'dateType': 'Updated'}, updated)
             self.end('dates')
 
-        self.node('language', {}, metadata['language'])
-        self.node('resourceType', {'resourceTypeGeneral': 'Dataset'}, metadata['resource_type'])
+        self.node('language', {}, metadata.get('language'))
+        self.node('resourceType', {'resourceTypeGeneral': 'Dataset'}, metadata.get('resource_type'))
 
         related_identifiers = metadata.get('related_identifiers')
         if related_identifiers is not None:
@@ -126,17 +120,3 @@ class DataciteRenderer(OaiRenderer):
                     self.node('affiliation', {}, affiliation)
 
             self.end(person_type)
-
-
-class OaiDataciteRenderer(DataciteRenderer):
-
-    def render_metadata(self, metadata):
-        self.start('oai_datacite', {
-            'xmlns': 'http://schema.datacite.org/oai/oai-1.0/',
-            'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
-            'xsi:schemaLocation': 'http://schema.datacite.org/oai/oai-1.0/ oai_datacite.xsd'
-        })
-        self.start('payload')
-        self.render_resource(metadata)
-        self.end('payload')
-        self.end('oai_datacite')

@@ -4,7 +4,7 @@ from django.views.generic import TemplateView
 from daiquiri.jobs.routers import JobRouter
 from daiquiri.query.viewsets import SyncQueryJobViewSet, AsyncQueryJobViewSet
 
-from .views import availability, capabilities, tables, examples
+from .views import resource, availability, capabilities, tables, examples
 
 
 app_name = 'tap'
@@ -15,6 +15,7 @@ router.register(r'async', AsyncQueryJobViewSet, base_name='async')
 
 urlpatterns = [
     path('', TemplateView.as_view(template_name='tap/root.html'), name='root'),
+    path('resource', resource, name='resource'),
     path('availability', availability, name='availability'),
     path('capabilities', capabilities, name='capabilities'),
     path('tables', tables, name='tables'),

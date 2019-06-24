@@ -27,8 +27,8 @@ class XMLRenderer(BaseRenderer):
     def render_document(self, data, accepted_media_type=None, renderer_context=None):
         raise NotImplementedError()
 
-    def start(self, tag, attr={}):
-        self.xml.startElement(tag, attr)
+    def start(self, tag, attrs={}):
+        self.xml.startElement(tag, {k: v for k, v in attrs.items() if v is not None})
 
     def end(self, tag):
         self.xml.endElement(tag)

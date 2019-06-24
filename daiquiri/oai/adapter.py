@@ -9,6 +9,10 @@ def OaiAdapter():
 
 class BaseOaiAdapter(object):
 
+    identifier_schema = 'oai'
+    identifier_repository = settings.SITE_IDENTIFIER
+    identifier_delimiter = ':'
+
     resource_types = {}
 
     def get_resource_list(self):
@@ -22,7 +26,7 @@ class BaseOaiAdapter(object):
         return getattr(self, 'get_%s_record' % resource_type)(resource)
 
     def get_serializer_class(self, metadata_prefix, resource_type):
-        return getattr(self, 'get_%s_%s_serializer_class' % (metadata_prefix, resource_type))()
+        return getattr(self, '%s_%s_serializer_class' % (metadata_prefix, resource_type))
 
     def get_renderer(self, metadata_prefix):
         renderer_class = next(metadata_format['renderer_class']
@@ -30,14 +34,11 @@ class BaseOaiAdapter(object):
                               if metadata_format['prefix'] == metadata_prefix)
         return import_class(renderer_class)()
 
-    def get_identifier_prefix(self):
-        return settings.OAI_IDENTIFIER_SCHEMA + settings.OAI_IDENTIFIER_DELIMITER \
-            + settings.OAI_IDENTIFIER_REPOSITORY + settings.OAI_IDENTIFIER_DELIMITER
+    def get_identifier(self, identifier):
+        if identifier is None:
+            return None
 
-    def strip_identifier_prefix(self, identifier):
-        prefix = self.get_identifier_prefix()
-
-        if identifier.startswith(prefix):
-            return identifier[len(prefix):]
+        if self.identifier_repository:
+            return self.identifier_delimiter.join([self.identifier_schema, self.identifier_repository, identifier])
         else:
-            raise RuntimeError('Wrong prefix')
+            return self.identifier_delimiter.join([self.identifier_schema, identifier])
