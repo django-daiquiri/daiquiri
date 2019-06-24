@@ -49,13 +49,13 @@ class OaiRenderer(DublincoreRendererMixin, DataciteRendererMixin, VoresourceRend
 
     def render_identify(self, repository_metadata, base_url):
         self.start('Identify')
-        self.node('repositoryName', {}, repository_metadata['repositoryName'])
+        self.node('repositoryName', {}, repository_metadata['repository_name'])
         self.node('baseUrl', {}, base_url)
         self.node('protocolVersion', {}, '2.0')
-        for email in repository_metadata['adminEmails']:
+        for email in repository_metadata['admin_emails']:
             self.node('adminEmail', {}, email)
-        self.node('earliestDatestamp', {}, repository_metadata['earliestDatestamp'])
-        self.node('deletedRecord', {}, repository_metadata['deletedRecord'])
+        self.node('earliestDatestamp', {}, repository_metadata['earliest_datestamp'])
+        self.node('deletedRecord', {}, repository_metadata['deleted_record'])
         self.node('granularity', {}, repository_metadata['granularity'])
         self.render_identify_description(repository_metadata)
         self.end('Identify')
@@ -72,9 +72,10 @@ class OaiRenderer(DublincoreRendererMixin, DataciteRendererMixin, VoresourceRend
             'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
             'xsi:schemaLocation': 'http://www.openarchives.org/OAI/2.0/oai-identifier http://www.openarchives.org/OAI/2.0/oai-identifier.xsd'
         })
-        self.node('scheme', {}, identifier_metadata['scheme'])
-        self.node('repositoryIdentifier', {}, identifier_metadata['repositoryIdentifier'])
-        self.node('delimiter', {}, identifier_metadata['delimiter'])
+        self.node('scheme', {}, identifier_metadata.get('scheme'))
+        if identifier_metadata.get('repository_identifier'):
+            self.node('repositoryIdentifier', {}, identifier_metadata.get('repository_identifier'))
+        self.node('delimiter', {}, identifier_metadata.get('delimiter'))
         self.end('oai-identifier')
 
     def render_list_identifiers(self, items, resumption_token):

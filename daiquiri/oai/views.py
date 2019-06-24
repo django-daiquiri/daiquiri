@@ -86,18 +86,20 @@ class OaiView(APIView):
         if self.errors:
             return
 
+        adapter = OaiAdapter()
+
         earliest_record = Record.objects.order_by('datestamp').first()
 
         self.response = {
-            'repositoryName': settings.SITE_IDENTIFIER,
-            'adminEmails': settings.OAI_ADMIN_EMAILS,
-            'earliestDatestamp': earliest_record.datestamp if earliest_record else None,
-            'deletedRecord': settings.OAI_DELETED_RECORD,
+            'repository_name': settings.SITE_IDENTIFIER,
+            'admin_emails': settings.OAI_ADMIN_EMAILS,
+            'earliest_datestamp': earliest_record.datestamp if earliest_record else None,
+            'deleted_record': settings.OAI_DELETED_RECORD,
             'granularity': settings.OAI_GRANULARITY,
             'identifier': {
-                'scheme': settings.OAI_IDENTIFIER_SCHEMA,
-                'repositoryIdentifier': settings.SITE_IDENTIFIER,
-                'delimiter': settings.OAI_IDENTIFIER_DELIMITER
+                'scheme': adapter.identifier_schema,
+                'repository_identifier': None, # adapter.identifier_repository,
+                'delimiter': adapter.identifier_delimiter
             },
             'registry': self.get_registry()
         }
