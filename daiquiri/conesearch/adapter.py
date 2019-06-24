@@ -60,16 +60,41 @@ class BaseConeSearchAdapter(BaseServiceAdapter):
 
     max_records = 10000
 
+    def get_resources(self):
+        raise NotImplementedError()
+
+    def clean(self, request, resource):
+        raise NotImplementedError()
+
+    def clean_args(self, data, errors):
+        # parse RA, DEC, and SR arguments
+        self.args = {}
+        for key in ['RA', 'DEC', 'SR']:
+            try:
+                value = float(data[key])
+
+                if self.ranges[key]['min'] <= value <= self.ranges[key]['max']:
+                    self.args[key] = value
+                else:
+                    errors[key] = [_('This value must be between %(min)g and %(max)g.' % self.ranges[key])]
+
+            except KeyError:
+                errors[key] = [_('This field may not be blank.')]
+
+            except ValueError:
+                errors[key] = [_('This field must be a float.')]
+
     def stream(self):
         return FileResponse(generate_votable(DatabaseAdapter().fetchall(self.sql, self.args), self.columns), content_type='application/xml')
 
 
 class SimpleConeSearchAdapter(BaseConeSearchAdapter):
 
-    resources = [settings.CONESEARCH_TABLE]
+    def get_resources(self):
+        return [settings.CONESEARCH_TABLE]
 
     def clean(self, request, resource):
-        if resource != settings.CONESEARCH_TABLE:
+        if resource not in self.get_resources():
             raise NotFound()
 
         adapter = DatabaseAdapter()
@@ -102,11 +127,13 @@ class TableConeSearchAdapter(BaseConeSearchAdapter):
     def clean(self, request, resource):
         from daiquiri.metadata.models import Schema, Table
 
-        if resource not in self.resources:
+        resources = self.get_resources()
+
+        if resource not in resources:
             raise NotFound
 
-        schema_name = self.resources[resource]['schema_name']
-        table_name = self.resources[resource]['table_name']
+        schema_name = resources[resource]['schema_name']
+        table_name = resources[resource]['table_name']
 
         data = make_query_dict_upper_case(request.GET)
         errors = {}
@@ -127,7 +154,7 @@ class TableConeSearchAdapter(BaseConeSearchAdapter):
         verb = data.get('VERB', '2')
 
         if verb == '1':
-            self.columns = table.columns.filter(name__in=self.resources[resource]['column_names']).values()
+            self.columns = table.columns.filter(name__in=resources[resource]['column_names']).values()
         elif verb == '2':
             self.columns = table.columns.filter(principal=True).values()
         elif verb == '3':

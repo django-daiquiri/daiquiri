@@ -84,5 +84,5 @@ def get_capabilities():
                 'dec': adapter.defaults.get('DEC'),
                 'sr': adapter.defaults.get('SR')
             }
-        } for resource in adapter.resources
+        } for resource in adapter.get_resources()
     ]
