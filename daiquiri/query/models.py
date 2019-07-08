@@ -76,8 +76,8 @@ class QueryJob(Job):
     nrows = models.BigIntegerField(null=True, blank=True)
     size = models.BigIntegerField(null=True, blank=True)
 
-    metadata = JSONField(blank=True)
-    uploads = JSONField(blank=True)
+    metadata = JSONField(null=True, blank=True)
+    uploads = JSONField(null=True, blank=True)
 
     pid = models.IntegerField(null=True, blank=True)
 

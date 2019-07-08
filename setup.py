@@ -37,7 +37,7 @@ setup(
         'drf-extensions>=0.4.0',
         'ipaddress>=1.0',
         'iso8601>=0.1',
-        'jsonfield==2.0',
+        'jsonfield>=2.0',
         'Markdown>=3.1',
         'queryparser_python3>=0.4.2',
         'rules>=2.0',
