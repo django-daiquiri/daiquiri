@@ -1,6 +1,6 @@
 from rest_framework import viewsets, filters, status
 from rest_framework.response import Response
-from rest_framework.decorators import list_route, detail_route
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 
@@ -77,26 +77,26 @@ class SchemaViewSet(viewsets.ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-    @list_route()
+    @action(detail=False)
     def management(self, request):
         queryset = Schema.objects.all()
         serializer = ManagementSchemaSerializer(queryset, many=True)
         return Response(serializer.data)
 
-    @list_route(methods=['get'], permission_classes=[])
+    @action(detail=False, methods=['get'], permission_classes=[])
     def user(self, request):
         # filter the schemas which are published for the groups of the user
         queryset = Schema.objects.filter_by_access_level(self.request.user)
         serializer = UserSchemaSerializer(queryset, context={'request': request}, many=True)
         return Response(serializer.data)
 
-    @list_route(methods=['get'], url_path='export', url_name='export-detail')
+    @action(detail=False, methods=['get'], url_path='export', url_name='export-detail')
     def export_list(self, request):
         queryset = Schema.objects.all()
         serializer = ExportSchemaSerializer(queryset, many=True)
         return Response(serializer.data)
 
-    @detail_route(methods=['get'], url_path='export', url_name='export-detail')
+    @action(detail=True, methods=['get'], url_path='export', url_name='export-detail')
     def export_detail(self, request, pk=None):
         queryset = Schema.objects.get(pk=pk)
         serializer = ExportSchemaSerializer(queryset)
@@ -138,7 +138,7 @@ class TableViewSet(viewsets.ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-    @list_route(methods=['get'])
+    @action(detail=False, methods=['get'])
     def discover(self, request):
         schema_name = request.GET.get('schema')
         table_name = request.GET.get('table')
@@ -165,7 +165,7 @@ class ColumnViewSet(viewsets.ModelViewSet):
     search_fields = ('name', 'description')
     ordering_fields = ('name', 'access_level', 'metadata_access_level')
 
-    @list_route(methods=['get'])
+    @action(detail=False, methods=['get'])
     def discover(self, request):
         schema_name = request.GET.get('schema')
         table_name = request.GET.get('table')
@@ -189,19 +189,19 @@ class FunctionViewSet(viewsets.ModelViewSet):
     search_fields = ('name', 'description')
     ordering_fields = ('name', 'access_level', 'metadata_access_level')
 
-    @list_route(methods=['get'])
+    @action(detail=False, methods=['get'])
     def management(self, request):
         queryset = Function.objects.all()
         serializer = ManagementFunctionSerializer(queryset, many=True)
         return Response(serializer.data)
 
-    @list_route(methods=['get'])
+    @action(detail=False, methods=['get'])
     def export(self, request):
         queryset = Function.objects.all()
         serializer = ExportFunctionSerializer(queryset, many=True)
         return Response(serializer.data)
 
-    @list_route(methods=['get'], permission_classes=[])
+    @action(detail=False, methods=['get'], permission_classes=[])
     def user(self, request):
         queryset = Function.objects.filter_by_access_level(self.request.user)
         serializer = UserFunctionSerializer(queryset, many=True)

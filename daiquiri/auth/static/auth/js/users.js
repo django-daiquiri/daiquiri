@@ -9,7 +9,7 @@ app.factory('UsersService', ['$resource', '$timeout', 'ListService', function($r
     /* configure resources */
 
     var resources = {
-        profiles: $resource(baseurl + 'auth/api/profiles/:id/:detail_route/'),
+        profiles: $resource(baseurl + 'auth/api/profiles/:id/:detail_action/'),
         groups: $resource(baseurl + 'auth/api/groups/:id/')
     }
 
@@ -42,7 +42,7 @@ app.factory('UsersService', ['$resource', '$timeout', 'ListService', function($r
 
         resources.profiles.update({
             id: service.current_row.id,
-            detail_route: action
+            detail_action: action
         }, service.current_row, function(response) {
             // copy the data back to the rows array and close the modal
             service.list.rows[service.current_index] = response;

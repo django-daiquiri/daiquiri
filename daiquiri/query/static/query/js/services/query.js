@@ -10,7 +10,7 @@ app.factory('QueryService', ['$resource', '$http', '$injector', '$q', '$filter',
         status: $resource(baseurl + 'query/api/status/'),
         forms: $resource(baseurl + 'query/api/forms/'),
         dropdowns: $resource(baseurl + 'query/api/dropdowns/'),
-        jobs: $resource(baseurl + 'query/api/jobs/:id/:detail_route/'),
+        jobs: $resource(baseurl + 'query/api/jobs/:id/:detail_action/'),
         examples: $resource(baseurl + 'query/api/examples/user/'),
         queues: $resource(baseurl + 'query/api/queues/'),
         querylanguages: $resource(baseurl + 'query/api/querylanguages/'),
@@ -133,7 +133,7 @@ app.factory('QueryService', ['$resource', '$http', '$injector', '$q', '$filter',
 
     service.fetch_user_schema = function() {
         return resources.jobs.query({
-            'detail_route': 'tables'
+            'detail_action': 'tables'
         }, function(response) {
             var user_schema = response[0];
 
@@ -287,7 +287,7 @@ app.factory('QueryService', ['$resource', '$http', '$injector', '$q', '$filter',
     };
 
     service.abort_job = function() {
-        resources.jobs.update({id: service.values.id, detail_route: 'abort'}, {}, function() {
+        resources.jobs.update({id: service.values.id, detail_action: 'abort'}, {}, function() {
             service.fetch_status();
             service.fetch_jobs();
             $('.modal').modal('hide');

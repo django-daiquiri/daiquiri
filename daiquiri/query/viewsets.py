@@ -10,7 +10,7 @@ from django.http import Http404, FileResponse
 from rest_framework import viewsets, mixins, filters
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError, NotFound
-from rest_framework.decorators import action, list_route, detail_route
+from rest_framework.decorators import action
 from rest_framework.authentication import (
     SessionAuthentication,
     BasicAuthentication,
@@ -152,7 +152,7 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
     def perform_destroy(self, instance):
         instance.archive()
 
-    @list_route(methods=['get'])
+    @action(detail=False, methods=['get'])
     def tables(self, request):
         queryset = self.get_queryset().filter(phase=QueryJob.PHASE_COMPLETED)[:100]
         return Response(fetch_user_schema_metadata(request.user, queryset))
@@ -185,7 +185,7 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
         serializer = QueryJobRetrieveSerializer(instance=job)
         return Response(serializer.data)
 
-    @detail_route(methods=['put'])
+    @action(detail=True, methods=['put'])
     def abort(self, request, pk=None):
         try:
             job = self.get_queryset().get(pk=pk)
@@ -196,7 +196,7 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
         except QueryJob.DoesNotExist:
             raise Http404
 
-    @detail_route(methods=['get'])
+    @action(detail=True, methods=['get'])
     def rows(self, request, pk=None):
         try:
             job = self.get_queryset().get(pk=pk)
@@ -220,7 +220,7 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
             ('previous', self._get_previous_url(page))
         )))
 
-    @detail_route(methods=['get'])
+    @action(detail=True, methods=['get'])
     def columns(self, request, pk=None, format_key=None):
         try:
             job = self.get_queryset().get(pk=pk)
@@ -229,7 +229,7 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
 
         return Response(job.columns())
 
-    @detail_route(methods=['get'], url_path='download/(?P<download_id>[A-Za-z0-9\-]+)', url_name='download')
+    @action(detail=True, methods=['get'], url_path='download/(?P<download_id>[A-Za-z0-9\-]+)', url_name='download')
     def download(self, request, pk=None, download_id=None):
         try:
             job = self.get_queryset().get(pk=pk)
@@ -246,7 +246,7 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
         else:
             return Response(download_job.phase)
 
-    @detail_route(methods=['post'], url_path='download', url_name='create-download')
+    @action(detail=True, methods=['post'], url_path='download', url_name='create-download')
     def create_download(self, request, pk=None):
         try:
             job = self.get_queryset().get(pk=pk)
@@ -283,7 +283,7 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
             'id': download_job.id
         })
 
-    @detail_route(methods=['get'], url_path='archive/(?P<archive_id>[A-Za-z0-9\-]+)', url_name='archive')
+    @action(detail=True, methods=['get'], url_path='archive/(?P<archive_id>[A-Za-z0-9\-]+)', url_name='archive')
     def archive(self, request, pk=None, archive_id=None):
         try:
             job = self.get_queryset().get(pk=pk)
@@ -300,7 +300,7 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
         else:
             return Response(archive_job.phase)
 
-    @detail_route(methods=['post'], url_path='archive', url_name='create-archive')
+    @action(detail=True, methods=['post'], url_path='archive', url_name='create-archive')
     def create_archive(self, request, pk=None):
         try:
             job = self.get_queryset().get(pk=pk)
@@ -337,7 +337,7 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
             'id': archive_job.id
         })
 
-    @detail_route(methods=['get'], url_path='stream/(?P<format_key>[A-Za-z0-9\-]+)', url_name='stream')
+    @action(detail=True, methods=['get'], url_path='stream/(?P<format_key>[A-Za-z0-9\-]+)', url_name='stream')
     def stream(self, request, pk=None, format_key=None):
         try:
             job = self.get_queryset().get(pk=pk)
@@ -377,7 +377,7 @@ class ExampleViewSet(viewsets.ModelViewSet):
     )
     search_fields = ('name', 'description', 'query_string')
 
-    @list_route(methods=['get'], permission_classes=(HasPermission, ))
+    @action(detail=False, methods=['get'], permission_classes=(HasPermission, ))
     def user(self, request):
         examples = Example.objects.filter_by_access_level(self.request.user)
         serializer = UserExampleSerializer(examples, many=True)

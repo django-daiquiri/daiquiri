@@ -59,3 +59,5 @@ MEETINGS_PARTICIPANT_DETAIL_KEYS = [
 ]
 
 SERVE_DOWNLOAD_DIR = os.path.join(BASE_DIR, 'files')
+
+SITE_URL = 'http://testserver'

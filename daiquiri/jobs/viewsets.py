@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.exceptions import ValidationError
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
-from rest_framework.decorators import detail_route
+from rest_framework.decorators import action
 
 from daiquiri.core.responses import HttpResponseSeeOther
 from daiquiri.core.utils import get_client_ip
@@ -175,7 +175,7 @@ class AsyncJobViewSet(JobViewSet):
         job.archive()
         return HttpResponseSeeOther(self.get_success_url())
 
-    @detail_route(methods=['get'])
+    @action(detail=True, methods=['get'])
     def results(self, request, pk, key=None):
         job = self.get_object()
 
@@ -184,7 +184,7 @@ class AsyncJobViewSet(JobViewSet):
         }, renderer_context=self.get_renderer_context())
         return HttpResponse(renderered_data, content_type=UWSRenderer.media_type)
 
-    @detail_route(methods=['get'], url_path='results/(?P<result>[A-Za-z0-9\-]+)', url_name='result')
+    @action(detail=True, methods=['get'], url_path='results/(?P<result>[A-Za-z0-9\-]+)', url_name='result')
     def result(self, request, pk, result):
         job = self.get_object()
 
@@ -197,14 +197,14 @@ class AsyncJobViewSet(JobViewSet):
                 'result': 'Unsupported value.'
             })
 
-    @detail_route(methods=['get'])
+    @action(detail=True, methods=['get'])
     def parameters(self, request, pk):
         renderered_data = UWSRenderer().render({
             'parameters': self.get_object().parameters
         }, renderer_context=self.get_renderer_context())
         return HttpResponse(renderered_data, content_type=UWSRenderer.media_type)
 
-    @detail_route(methods=['get', 'post'])
+    @action(detail=True, methods=['get', 'post'])
     def destruction(self, request, pk):
         job = self.get_object()
 
@@ -231,7 +231,7 @@ class AsyncJobViewSet(JobViewSet):
                     'DESTRUCTION': 'Parameter not found.'
                 })
 
-    @detail_route(methods=['get', 'post'])
+    @action(detail=True, methods=['get', 'post'])
     def executionduration(self, request, pk):
         job = self.get_object()
 
@@ -250,7 +250,7 @@ class AsyncJobViewSet(JobViewSet):
                     'EXECUTIONDURATION': 'Parameter not found.'
                 })
 
-    @detail_route(methods=['get', 'post'])
+    @action(detail=True, methods=['get', 'post'])
     def phase(self, request, pk):
         job = self.get_object()
 
@@ -284,17 +284,17 @@ class AsyncJobViewSet(JobViewSet):
                     'PHASE': 'Parameter not found.'
                 })
 
-    @detail_route(methods=['get'])
+    @action(detail=True, methods=['get'])
     def error(self, request, pk):
         job = self.get_object()
         return Response(job.error_summary, content_type='application/xml') if job.error_summary else HttpResponse()
 
-    @detail_route(methods=['get'])
+    @action(detail=True, methods=['get'])
     def quote(self, request, pk):
         job = self.get_object()
         return HttpResponse(job.quote) if job.quote else HttpResponse()
 
-    @detail_route(methods=['get'])
+    @action(detail=True, methods=['get'])
     def owner(self, request, pk):
         job = self.get_object()
         return HttpResponse(job.owner) if job.owner else HttpResponse()
