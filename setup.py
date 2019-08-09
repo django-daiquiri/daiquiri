@@ -33,7 +33,7 @@ setup(
         'django-test-generator>=0.6',
         'django-vendor-files>=0.1',
         'django-widget-tweaks>=1.4',
-        'djangorestframework>=3.9',
+        'djangorestframework==3.9.3',
         'drf-extensions>=0.4.0',
         'ipaddress>=1.0',
         'iso8601>=0.1',
