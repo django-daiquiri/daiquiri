@@ -14,6 +14,11 @@
         {% endif %}
     </h1>
 
+    {% if table.nrows %}
+
+    <p>The table has {{ table.nrows }} rows, {{ table.columns.all | length }} columns.</p>
+    {% endif %}
+
     {% if table.long_description %}
 
     <h2>Description</h2>
