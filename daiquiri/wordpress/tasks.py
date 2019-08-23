@@ -10,7 +10,7 @@ from daiquiri.core.tasks import Task
 
 def wordpress_cli(*args):
     if settings.WORDPRESS_PATH:
-        args = [settings.WORDPRESS_CLI, '--path=%s' % settings.WORDPRESS_PATH] + list(args)
+        args = [settings.WORDPRESS_CLI, '--allow-root', '--path=%s' % settings.WORDPRESS_PATH] + list(args)
         subprocess.check_output(args, stderr=subprocess.STDOUT)
     elif settings.WORDPRESS_SSH:
         args = [settings.WORDPRESS_CLI, '--ssh=%s' % settings.WORDPRESS_SSH] + list(args)
