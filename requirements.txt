@@ -1,0 +1,25 @@
+# in alphabetical order
+astropy>=3.1
+celery>=4.3
+coverage>=4.5
+Django>=2.2
+django-allauth>=0.39
+django-compressor>=2.2
+django-extensions>=2.1
+django-filter>=2.1
+django-ipware>=2.1
+django-libsass>=0.7
+django-sendfile>=0.3
+django-settings-export>=1.2
+django-test-generator>=0.6
+django-vendor-files>=0.1
+django-widget-tweaks>=1.4
+djangorestframework>=3.9
+drf-extensions>=0.4
+ipaddress>=1.0
+iso8601>=0.1
+jsonfield>=2.0
+Markdown>=3.1
+queryparser_python3>=0.4
+rules>=2.0
+XlsxWriter>=1.1
