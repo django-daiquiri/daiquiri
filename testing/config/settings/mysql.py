@@ -23,22 +23,22 @@ DATABASES = {
     },
     'tap': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'TAP_SCHEMA',
+        'NAME': 'tap_schema',
         'USER': 'daiquiri_data',
         'PASSWORD': 'daiquiri_data',
         'HOST': '127.0.0.1',
         'TEST': {
-            'NAME': 'test_daiquiri_tap',
+            'NAME': 'test_tap_schema',
         },
     },
     'oai': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'OAI',
+        'NAME': 'oai_schema',
         'USER': 'daiquiri_data',
         'PASSWORD': 'daiquiri_data',
         'HOST': '127.0.0.1',
         'TEST': {
-            'NAME': 'test_daiquiri_oai',
+            'NAME': 'test_oai_schema',
         },
     },
 }

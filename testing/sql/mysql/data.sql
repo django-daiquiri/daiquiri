@@ -1,8 +1,5 @@
 -- drop and create databases
 
-DROP DATABASE IF EXISTS `daiquiri_data`;
-CREATE DATABASE `daiquiri_data`;
-
 DROP DATABASE IF EXISTS `daiquiri_archive`;
 CREATE DATABASE `daiquiri_archive`;
 
@@ -68,17 +65,6 @@ GRANT SELECT ON `daiquiri_archive`.* TO 'daiquiri_data'@'localhost';
 GRANT SELECT ON `daiquiri_data_test`.* TO 'daiquiri_data'@'localhost';
 GRANT SELECT ON `daiquiri_data_obs`.* TO 'daiquiri_data'@'localhost';
 GRANT SELECT ON `daiquiri_data_sim`.* TO 'daiquiri_data'@'localhost';
-
-GRANT ALL PRIVILEGES ON `daiquiri_data`.* TO 'daiquiri_data'@'localhost';
-
-GRANT ALL PRIVILEGES ON `TAP_SCHEMA`.* TO 'daiquiri_data'@'localhost';
-GRANT ALL PRIVILEGES ON `test_TAP_SCHEMA`.* TO 'daiquiri_data'@'localhost';
-
-GRANT ALL PRIVILEGES ON `TAP_UPLOAD`.* TO 'daiquiri_data'@'localhost';
-GRANT ALL PRIVILEGES ON `test_TAP_UPLOAD`.* TO 'daiquiri_data'@'localhost';
-
-GRANT ALL PRIVILEGES ON `OAI`.* TO 'daiquiri_data'@'localhost';
-GRANT ALL PRIVILEGES ON `test_OAI`.* TO 'daiquiri_data'@'localhost';
 
 GRANT ALL PRIVILEGES ON `daiquiri_user_%`.* TO 'daiquiri_data'@'localhost';
 
