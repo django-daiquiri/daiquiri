@@ -1,3 +1,6 @@
+import daiquiri.core.env as env
+
+VENDOR_CDN = env.get_bool('VENDOR_CDN')
 VENDOR = {
     'jquery': {
         'url': 'https://code.jquery.com/',

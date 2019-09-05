@@ -4,4 +4,4 @@ from django.apps import AppConfig
 class CutoutConfig(AppConfig):
     name = 'daiquiri.cutout'
     label = 'daiquiri_cutout'
-    verbose_name = 'Daiquiri Cutout'
+    verbose_name = 'Cutout'

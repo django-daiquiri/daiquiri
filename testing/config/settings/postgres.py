@@ -1,7 +1,6 @@
-from . import TAP_SCHEMA, OAI_SCHEMA
-
 SECRET_KEY = 'this is a not very secret key'
 
+# all test databases need to have different name or they will not be picked up by django
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -15,9 +14,6 @@ DATABASES = {
     },
     'data': {
         'ENGINE': 'django.db.backends.postgresql',
-        'OPTIONS': {
-            'options': '-c search_path=public'
-        },
         'NAME': 'daiquiri_data',
         'USER': 'daiquiri_data',
         'PASSWORD': 'daiquiri_data',
@@ -28,9 +24,6 @@ DATABASES = {
     },
     'tap': {
         'ENGINE': 'django.db.backends.postgresql',
-        'OPTIONS': {
-            'options': '-c search_path=%s' % TAP_SCHEMA
-        },
         'NAME': 'daiquiri_data',
         'USER': 'daiquiri_data',
         'PASSWORD': 'daiquiri_data',
@@ -41,9 +34,6 @@ DATABASES = {
     },
     'oai': {
         'ENGINE': 'django.db.backends.postgresql',
-        'OPTIONS': {
-            'options': '-c search_path=%s' % OAI_SCHEMA
-        },
         'NAME': 'daiquiri_data',
         'USER': 'daiquiri_data',
         'PASSWORD': 'daiquiri_data',
@@ -56,3 +46,6 @@ DATABASES = {
 
 ADAPTER_DATABASE = 'daiquiri.core.adapter.database.postgres.PostgreSQLAdapter'
 ADAPTER_DOWNLOAD = 'daiquiri.core.adapter.download.pgdump.PgDumpAdapter'
+
+TAP_SCHEMA = 'public'
+OAI_SCHEMA = 'public'

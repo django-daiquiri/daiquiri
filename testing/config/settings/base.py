@@ -1,9 +1,12 @@
 import os
+from . import BASE_DIR, DJANGO_APPS, ADDITIONAL_APPS
 
-from daiquiri.core.settings.base import BASE_DIR
-DAIQUIRI_APPS = [
+SITE_URL = 'http://testserver'
+
+INSTALLED_APPS = DJANGO_APPS + [
     'daiquiri.archive',
     'daiquiri.auth',
+    'daiquiri.conesearch',
     'daiquiri.contact',
     'daiquiri.core',
     'daiquiri.files',
@@ -12,17 +15,12 @@ DAIQUIRI_APPS = [
     'daiquiri.metadata',
     'daiquiri.oai',
     'daiquiri.query',
+    'daiquiri.registry',
     'daiquiri.serve',
     'daiquiri.stats',
     'daiquiri.tap',
     'daiquiri.uws'
-]
-
-INSTALLED_APPS = []
-
-FIXTURE_DIRS = (
-    os.path.join(BASE_DIR, 'fixtures'),
-)
+] + ADDITIONAL_APPS
 
 REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_CLASSES': (
@@ -33,11 +31,15 @@ REST_FRAMEWORK = {
     }
 }
 
+ARCHIVE_DOWNLOAD_DIR = os.path.join(BASE_DIR, 'download')
+
 AUTH_SIGNUP = True
 AUTH_WORKFLOW = 'confirmation'
 
 ARCHIVE_ANONYMOUS = False
 ARCHIVE_BASE_PATH = os.path.join(BASE_DIR, 'files')
+
+FILES_BASE_PATH = os.path.join(BASE_DIR, 'files')
 
 MEETINGS_PARTICIPANT_DETAIL_KEYS = [
     {
@@ -58,6 +60,7 @@ MEETINGS_PARTICIPANT_DETAIL_KEYS = [
     }
 ]
 
-SERVE_DOWNLOAD_DIR = os.path.join(BASE_DIR, 'files')
+QUERY_DOWNLOAD_DIR = os.path.join(BASE_DIR, 'download')
+QUERY_UPLOAD_DIR = os.path.join(BASE_DIR, 'upload')
 
-SITE_URL = 'http://testserver'
+SERVE_DOWNLOAD_DIR = os.path.join(BASE_DIR, 'files')

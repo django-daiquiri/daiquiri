@@ -1,34 +1,32 @@
-import os
-
 # include settimgs from daiquiri
-from daiquiri.core.settings import *
+from daiquiri.core.settings.django import *
+from daiquiri.core.settings.celery import *
+from daiquiri.core.settings.daiquiri import *
+from daiquiri.core.settings.logging import *
+from daiquiri.core.settings.vendor import *
 
-# include settings from base.py
-from .base import *
+from daiquiri.archive.settings import *
+from daiquiri.auth.settings import *
+from daiquiri.conesearch.settings import *
+from daiquiri.cutout.settings import *
+from daiquiri.files.settings import *
+from daiquiri.meetings.settings import *
+from daiquiri.metadata.settings import *
+from daiquiri.oai.settings import *
+from daiquiri.query.settings import *
+from daiquiri.serve.settings import *
+from daiquiri.stats.settings import *
+from daiquiri.tap.settings import *
+from daiquiri.wordpress.settings import *
 
-# include settings from local.py
-from .local import *
-
-# include 3rd party apps after the daiquiri apps from base.py
-INSTALLED_APPS = DJANGO_APPS + DAIQUIRI_APPS + ADDITIONAL_APPS + INSTALLED_APPS
-
-# prepend the local.BASE_URL to the different URL settings
+# override settings from base.py (which is checked in to git)
 try:
-    LOGIN_URL = BASE_URL + LOGIN_URL
-    LOGIN_REDIRECT_URL = BASE_URL + LOGIN_REDIRECT_URL
-    LOGOUT_URL = BASE_URL + LOGOUT_URL
-    ACCOUNT_LOGOUT_REDIRECT_URL = BASE_URL
-    MEDIA_URL = BASE_URL + MEDIA_URL
-    STATIC_URL = BASE_URL + STATIC_URL
-
-    CSRF_COOKIE_PATH = BASE_URL + '/'
-    LANGUAGE_COOKIE_PATH = BASE_URL + '/'
-    SESSION_COOKIE_PATH = BASE_URL + '/'
-except NameError:
+    from .base import *
+except ImportError:
     pass
 
-# prepend the LOGGING_DIR to the filenames in LOGGING
-for handler in LOGGING['handlers'].values():
-    if 'filename' in handler:
-        handler['filename'] = os.path.join(LOGGING_DIR, handler['filename'])
-
+# override settings from local.py (which is not checked in to git)
+try:
+    from .local import *
+except ImportError:
+    pass

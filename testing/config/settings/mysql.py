@@ -1,5 +1,6 @@
 SECRET_KEY = 'this is a not very secret key'
 
+# all test databases need to have different name or they will not be picked up by django
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
