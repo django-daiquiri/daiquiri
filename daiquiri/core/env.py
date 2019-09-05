@@ -53,7 +53,7 @@ def get_database(key):
         # patch bug in dj_database_url
         if database_type in ['postgres', 'postgresql', 'pgsql']:
             database_config['ENGINE'] = 'django.db.backends.postgresql'
-        print(database_config)
+
         return database_config
 
     else:
