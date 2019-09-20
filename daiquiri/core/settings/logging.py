@@ -3,7 +3,7 @@ import os
 import daiquiri.core.env as env
 
 LOG_LEVEL = env.get('LOG_LEVEL')
-LOG_DIR = env.get_abspath('LOG_DIR')
+LOG_DIR = env.get('LOG_DIR')
 
 if LOG_DIR:
     LOGGING = {
