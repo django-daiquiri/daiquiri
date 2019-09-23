@@ -1,8 +1,9 @@
 import os
 
-import dj_database_url
-
+from email.utils import getaddresses
 from urllib.parse import urlparse
+
+import dj_database_url
 
 from django.core.exceptions import ImproperlyConfigured
 
@@ -32,6 +33,10 @@ def get_list(key, default=[]):
         return [value.strip() for value in value.split(',')]
     else:
         return default
+
+
+def get_email_list(key, default=[]):
+    return getaddresses(get_list(key, default))
 
 
 def get_url(key, default=None):

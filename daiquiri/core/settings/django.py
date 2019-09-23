@@ -1,6 +1,7 @@
 import imp
 import os
 
+
 from django.utils.translation import ugettext_lazy as _
 
 import daiquiri.core.env as env
@@ -18,6 +19,8 @@ SECRET_KEY = env.get('SECRET_KEY')
 ALLOWED_HOSTS = env.get_list('ALLOWED_HOSTS', ['localhost', '127.0.0.1', '::1'])
 
 INTERNAL_IPS = env.get_list('INTERNAL_IPS', ['127.0.0.1'])
+
+ADMINS = env.get_email_list('ADMINS')
 
 SITE_ID = 1
 
