@@ -17,20 +17,12 @@ class Migration(migrations.Migration):
         for job in QueryJob.objects.all():
             if job.metadata in ['', '""']:
                 job.metadata = None
-            if job.uploads in ['', '""']:
-                job.uploads = None
-
             job.save()
 
     operations = [
         migrations.AlterField(
             model_name='queryjob',
             name='metadata',
-            field=jsonfield.fields.JSONField(blank=True, null=True),
-        ),
-        migrations.AlterField(
-            model_name='queryjob',
-            name='uploads',
             field=jsonfield.fields.JSONField(blank=True, null=True),
         ),
         migrations.RunPython(migrate_data),

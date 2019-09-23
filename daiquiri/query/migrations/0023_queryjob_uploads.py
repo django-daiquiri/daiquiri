@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='queryjob',
             name='uploads',
-            field=jsonfield.fields.JSONField(blank=True),
+            field=jsonfield.fields.JSONField(blank=True, null=True),
         ),
     ]
