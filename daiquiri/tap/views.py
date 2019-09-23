@@ -1,133 +1,30 @@
-from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import render
-from django.urls import reverse
 
-from daiquiri.metadata.models import Schema
+from daiquiri.core.renderers.voresource import VoresourceRenderer
+from daiquiri.core.renderers.vosi import AvailabilityRenderer, CapabilitiesRenderer, TablesetRenderer
 from daiquiri.query.models import Example
 
-from .serializers import SchemaSerializer
-from .renderers import (
-    AvailabilityRenderer,
-    CapabilitiesRenderer,
-    TablesetRenderer
-)
+from .vo import get_resource, get_availability, get_capabilities, get_tableset
+
+
+def resource(request):
+    return HttpResponse(VoresourceRenderer().render(get_resource()), content_type="application/xml")
+
+
+def availability(request):
+    return HttpResponse(AvailabilityRenderer().render(get_availability()), content_type="application/xml")
+
+
+def capabilities(request):
+    return HttpResponse(CapabilitiesRenderer().render(get_capabilities()), content_type="application/xml")
+
+
+def tables(request):
+    return HttpResponse(TablesetRenderer().render(get_tableset()), content_type="application/xml")
 
 
 def examples(request):
     return render(request, 'tap/examples.html', {
         'examples': Example.objects.filter_by_access_level(request.user)
     })
-
-
-def availability(request):
-    data = {
-        'available': 'true',
-        'note': 'service is accepting queries'
-    }
-    return HttpResponse(AvailabilityRenderer().render(data), content_type="application/xml")
-
-
-def capabilities(request):
-    data = [
-        {
-            'schemaID': 'ivo://ivoa.net/std/TAP',
-            'interface': {
-                'attrs': {
-                    'xsi:type': 'vs:ParamHTTP',
-                    'role': 'std'
-                },
-                'accessURL': {
-                    'attrs': {},
-                    'text': request.build_absolute_uri(reverse('tap:root'))
-                }
-            },
-            'languages': [{
-                'name': language['key'],
-                'version': language['version'],
-                'description': language['description'],
-            } for language in settings.QUERY_LANGUAGES]
-
-        },
-        {
-            'schemaID': 'ivo://ivoa.net/std/TAP#async-1.1',
-            'interface': {
-                'attrs': {
-                    'xsi:type': 'vs:ParamHTTP',
-                    'role': 'std',
-                    'version': '1.1'
-                },
-                'accessURL': {
-                    'attrs': {
-                        'use': 'base'
-                    },
-                    'text': request.build_absolute_uri(reverse('tap:async-list'))
-                }
-            }
-        },
-        {
-            'schemaID': 'ivo://ivoa.net/std/TAP#sync-1.1',
-            'interface': {
-            'attrs': {
-                'xsi:type': 'vs:ParamHTTP',
-                'role': 'std',
-                'version': '1.1'
-                },
-                'accessURL': {
-                    'attrs': {
-                        'use': 'base'
-                    },
-                    'text': request.build_absolute_uri(reverse('tap:sync-list'))
-                }
-            }
-        },
-        {
-            'schemaID': 'ivo://ivoa.net/std/VOSI#capabilities',
-            'interface': {
-            'attrs': {
-                'xsi:type': 'vs:ParamHTTP',
-                },
-                'accessURL': {
-                    'attrs': {
-                        'use': 'full'
-                    },
-                    'text': request.build_absolute_uri(reverse('tap:capabilities'))
-                }
-            }
-        },
-        {
-            'schemaID': 'ivo://ivoa.net/std/VOSI#tables',
-            'interface': {
-            'attrs': {
-                'xsi:type': 'vs:ParamHTTP',
-                },
-                'accessURL': {
-                    'attrs': {
-                        'use': 'full'
-                    },
-                    'text': request.build_absolute_uri(reverse('tap:tables'))
-                }
-            }
-        },
-        {
-            'schemaID': 'ivo://ivoa.net/std/DALI#examples',
-            'interface': {
-            'attrs': {
-                'xsi:type': 'vr:WebBrowser',
-                },
-                'accessURL': {
-                    'attrs': {
-                        'use': 'full'
-                    },
-                    'text': request.build_absolute_uri(reverse('tap:examples'))
-                }
-            }
-        }
-    ]
-
-    return HttpResponse(CapabilitiesRenderer().render(data), content_type="application/xml")
-
-def tables(request):
-    queryset = Schema.objects.filter_by_access_level(request.user)
-    serializer = SchemaSerializer(queryset, context={'request': request}, many=True)
-    return HttpResponse(TablesetRenderer().render(serializer.data), content_type="application/xml")

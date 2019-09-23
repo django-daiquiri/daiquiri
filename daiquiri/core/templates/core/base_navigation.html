@@ -23,33 +23,16 @@
 
                 {% if user.is_authenticated %}
 
-                {% if request.user.is_staff %}
-                <li>
-                    <a href="{% url 'admin:index' %}">{% trans 'Admin' %}</a>
-                </li>
-                {% endif %}
-
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                         {{ user.profile.full_name }}<span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li>
-                            <a href="{% url 'account_profile' %}">{% trans 'Update profile' %}</a>
-                        </li>
-                        <li>
-                            <a href="{% url 'account_email' %}">{% trans 'Update email' %}</a>
-                        </li>
-                        <li>
-                            <a href="{% url 'account_change_password' %}">{% trans 'Change password' %}</a>
-                        </li>
-                        <li>
-                            <a href="{% url 'socialaccount_connections' %}">{% trans 'Account connections' %}</a>
-                        </li>
-                        <li>
-                            <a href="{% url 'account_token' %}">{% trans 'API token' %}</a>
-                        </li>
-                        <li role="separator" class="divider"></li>
+                        {% include 'core/base_navigation_account.html' %}
+                        {% include 'core/base_navigation_management.html' %}
+                        {# include 'core/base_navigation_wordpress.html' #}
+                        {% include 'core/base_navigation_admin.html' %}
+
                         <li>
                             {% include 'account/logout_form.html' %}
                         </li>

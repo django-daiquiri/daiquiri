@@ -6,6 +6,7 @@ from django.test import TestCase, override_settings
 from daiquiri.jobs.tests.mixins import AsyncTestMixin
 from daiquiri.query.models import QueryJob, Example
 
+
 @override_settings(QUERY_ANONYMOUS=True)
 @mock.patch(settings.ADAPTER_DATABASE + '.submit_query', mock.Mock())
 @mock.patch(settings.ADAPTER_DATABASE + '.fetch_nrows', mock.Mock(return_value=100))
@@ -13,7 +14,10 @@ from daiquiri.query.models import QueryJob, Example
 @mock.patch(settings.ADAPTER_DATABASE + '.count_rows', mock.Mock(return_value=100))
 @mock.patch(settings.ADAPTER_DATABASE + '.rename_table', mock.Mock())
 @mock.patch(settings.ADAPTER_DATABASE + '.drop_table', mock.Mock())
+@mock.patch(settings.ADAPTER_DATABASE + '.create_user_schema_if_not_exists', mock.Mock())
 class AsyncTestCase(AsyncTestMixin, TestCase):
+
+    databases = ('default', 'data', 'tap', 'oai')
 
     fixtures = (
         'auth.json',

@@ -9,6 +9,8 @@ from ..models import Schema, Table, Column, Function
 
 class MetadataViewsetTestCase(TestCase):
 
+    databases = ('default', 'data', 'tap', 'oai')
+
     fixtures = (
         'auth.json',
         'metadata.json'
@@ -64,7 +66,17 @@ class SchemaTests(TestModelViewsetMixin, MetadataViewsetTestCase):
         for instance in self.instances:
             data = self.get_instance_as_dict(instance)
             data['discover'] = True
+            if 'published' in data: data['published'] = data['published'].strftime('%Y-%m-%d')
+            if 'updated' in data: data['updated'] = data['updated'].strftime('%Y-%m-%d')
             self.assert_create_viewset(username, data=data)
+
+    def _test_update_viewset(self, username):
+        for instance in self.instances:
+            data = self.get_instance_as_dict(instance)
+            if 'published' in data: data['published'] = data['published'].strftime('%Y-%m-%d')
+            if 'updated' in data: data['updated'] = data['updated'].strftime('%Y-%m-%d')
+            self.assert_update_viewset(username, kwargs={'pk': instance.pk}, data=data)
+
 
     def _test_management_viewset(self, username):
         self.assert_viewset('management_viewset', 'get', 'management', username)
@@ -84,7 +96,16 @@ class TableTests(TestModelViewsetMixin, MetadataViewsetTestCase):
         for instance in self.instances:
             data = self.get_instance_as_dict(instance)
             data['discover'] = True
+            if 'published' in data: data['published'] = data['published'].strftime('%Y-%m-%d')
+            if 'updated' in data: data['updated'] = data['updated'].strftime('%Y-%m-%d')
             self.assert_create_viewset(username, data=data)
+
+    def _test_update_viewset(self, username):
+        for instance in self.instances:
+            data = self.get_instance_as_dict(instance)
+            if 'published' in data: data['published'] = data['published'].strftime('%Y-%m-%d')
+            if 'updated' in data: data['updated'] = data['updated'].strftime('%Y-%m-%d')
+            self.assert_update_viewset(username, kwargs={'pk': instance.pk}, data=data)
 
     def _test_discover_viewset(self, username):
         for instance in self.instances:

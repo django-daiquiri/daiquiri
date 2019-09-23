@@ -8,7 +8,7 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                     <h4 class="modal-title">
-                        {% trans 'Tables' %}
+                        {% trans 'Update table' %}
                     </h4>
                 </div>
 
@@ -119,6 +119,26 @@
                             data-help="{{ meta.Table.utype.help_text }}"
                             data-model="service.values.utype"
                             data-errors="service.errors.utype">
+                        </formgroup>
+                    </div>
+                    <div class="row">
+                        <formgroup
+                            class="col-md-6"
+                            data-id="published"
+                            data-type="date"
+                            data-label="{{ meta.Table.published.verbose_name }}"
+                            data-help="{{ meta.Table.published.help_text }}"
+                            data-model="service.values.published"
+                            data-errors="service.errors.published">
+                        </formgroup>
+                        <formgroup
+                            class="col-md-6"
+                            data-id="updated"
+                            data-type="date"
+                            data-label="{{ meta.Table.updated.verbose_name }}"
+                            data-help="{{ meta.Table.updated.help_text }}"
+                            data-model="service.values.updated"
+                            data-errors="service.errors.updated">
                         </formgroup>
                     </div>
                     <div class="row">

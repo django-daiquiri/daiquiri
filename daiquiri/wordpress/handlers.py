@@ -3,11 +3,13 @@ from django.dispatch import receiver
 from daiquiri.auth.signals import (
     user_created,
     user_updated,
+    user_deleted,
     user_groups_updated
 )
 
 from .utils import (
     update_wordpress_user,
+    delete_wordpress_user,
     update_wordpress_role
 )
 
@@ -20,6 +22,11 @@ def user_created_handler(sender, **kwargs):
 @receiver(user_updated)
 def user_updated_handler(sender, **kwargs):
     update_wordpress_user(kwargs['user'])
+
+
+@receiver(user_deleted)
+def user_deleted_handler(sender, **kwargs):
+    delete_wordpress_user(kwargs['user'])
 
 
 @receiver(user_groups_updated)

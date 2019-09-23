@@ -41,7 +41,7 @@ def run_query(job_id):
     # always import daiquiri packages inside the task
     from daiquiri.core.adapter import DatabaseAdapter
     from daiquiri.query.models import QueryJob
-    from daiquiri.query.utils import get_quota, get_job_sources, get_job_columns
+    from daiquiri.query.utils import get_quota, get_job_sources, get_job_columns, ingest_uploads
     from daiquiri.stats.models import Record
 
     # get logger
@@ -73,8 +73,6 @@ def run_query(job_id):
             return job.phase
 
         # set database and start time
-        job.start_time = now()
-
         job.pid = adapter.fetch_pid()
         job.actual_query = adapter.build_query(job.schema_name, job.table_name, job.native_query, job.timeout, job.max_records)
         job.phase = job.PHASE_EXECUTING
@@ -85,10 +83,12 @@ def run_query(job_id):
 
         # get the actual query and submit the job to the database
         try:
+            ingest_uploads(job.uploads, job.owner)
+
             # this is where the work ist done (and the time is spend)
             adapter.submit_query(job.actual_query)
 
-        except (ProgrammingError, InternalError) as e:
+        except (ProgrammingError, InternalError, ValueError) as e:
             job.phase = job.PHASE_ERROR
             job.error_summary = str(e)
             logger.info('job %s failed (%s)' % (job.id, job.error_summary))
@@ -147,6 +147,103 @@ def run_query(job_id):
 
 
 @shared_task(base=Task)
+def run_ingest(job_id, file_path):
+    from daiquiri.core.adapter import DatabaseAdapter
+    from daiquiri.query.models import QueryJob
+    from daiquiri.stats.models import Record
+    from daiquiri.query.utils import get_quota, ingest_table
+
+    # get logger
+    logger = logging.getLogger(__name__)
+
+    # get the job object from the database
+    job = QueryJob.objects.get(pk=job_id)
+
+    if job.phase == job.PHASE_QUEUED:
+        # get the adapter with the database specific functions
+        adapter = DatabaseAdapter()
+
+        # create the database of the user if it not already exists
+        try:
+            adapter.create_user_schema_if_not_exists(job.schema_name)
+        except OperationalError as e:
+            job.phase = job.PHASE_ERROR
+            job.error_summary = str(e)
+            job.save()
+
+            return job.phase
+
+        # check if the quota is exceeded
+        if QueryJob.objects.get_size(job.owner) > get_quota(job.owner):
+            job.phase = job.PHASE_ERROR
+            job.error_summary = str(_('Quota is exceeded. Please remove some of your jobs.'))
+            job.save()
+
+            return job.phase
+
+        # set database and start time
+        job.pid = adapter.fetch_pid()
+        job.phase = job.PHASE_EXECUTING
+        job.start_time = now()
+        job.save()
+
+        logger.info('job %s started' % job.id)
+
+        # create the table and insert the data
+        try:
+            columns = ingest_table(job.schema_name, job.table_name, file_path)
+
+        except (ProgrammingError, InternalError, ValueError) as e:
+            job.phase = job.PHASE_ERROR
+            job.error_summary = str(e)
+            logger.info('job %s failed (%s)' % (job.id, job.error_summary))
+
+        except OperationalError as e:
+            # load the job again and check if the job was killed
+            job = QueryJob.objects.get(pk=job_id)
+
+            if job.phase != job.PHASE_ABORTED:
+                job.phase = job.PHASE_ERROR
+                job.error_summary = str(e)
+                logger.info('job %s failed (%s)' % (job.id, job.error_summary))
+
+        else:
+            # get additional information about the completed job
+            job.phase = job.PHASE_COMPLETED
+            logger.info('job %s completed' % job.id)
+
+        finally:
+            # get timing and save the job object
+            job.end_time = now()
+
+            # get additional information about the completed job
+            if job.phase == job.PHASE_COMPLETED:
+                job.nrows = adapter.count_rows(job.schema_name, job.table_name)
+                job.size = adapter.fetch_size(job.schema_name, job.table_name)
+
+                # store the metadata for the columns from the VOTable
+                job.metadata = {
+                    'columns': columns
+                }
+
+            # create a stats record for this job
+            Record.objects.create(
+                time=job.end_time,
+                resource_type='UPLOAD',
+                resource={
+                    'job_id': job.id,
+                    'job_type': job.job_type,
+                },
+                client_ip=job.client_ip,
+                user=job.owner
+            )
+
+            job.save()
+
+    return job.phase
+
+
+@shared_task(base=Task)
 def create_download_file(download_id):
     # always import daiquiri packages inside the task
     from daiquiri.query.models import DownloadJob
@@ -187,6 +284,8 @@ def create_download_file(download_id):
             download_job.error_summary = str(e)
             download_job.save()
             logger.info('download_job %s failed (%s)' % (download_job.id, download_job.error_summary))
+
+            raise e
         else:
             download_job.phase = download_job.PHASE_COMPLETED
             logger.info('download_job %s completed' % download_job.file_path)

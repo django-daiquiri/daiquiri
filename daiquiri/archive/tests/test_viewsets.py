@@ -13,11 +13,14 @@ from daiquiri.archive.models import Collection, ArchiveJob
 
 class ArchiveTestCase(TestCase):
 
+    databases = ('default', 'data', 'tap', 'oai')
+
     fixtures = (
         'auth.json',
         'archive.json',
         'jobs.json'
     )
+
 
 class RowTests(TestViewsetMixin, ArchiveTestCase):
 

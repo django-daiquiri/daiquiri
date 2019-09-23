@@ -2,10 +2,10 @@ from django.http import HttpResponse, FileResponse
 
 from rest_framework import viewsets
 from rest_framework.response import Response
-from rest_framework.parsers import FormParser
+from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.exceptions import ValidationError
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
-from rest_framework.decorators import detail_route
+from rest_framework.decorators import action
 
 from daiquiri.core.responses import HttpResponseSeeOther
 from daiquiri.core.utils import get_client_ip
@@ -21,13 +21,12 @@ from .serializers import (
 from .renderers import UWSRenderer, UWSErrorRenderer
 from .filters import UWSFilterBackend
 from .utils import get_job_url, get_job_results
-from .exceptions import JobError
 
 
 class JobViewSet(viewsets.GenericViewSet):
 
     authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
-    parser_classes = (FormParser, )
+    parser_classes = (FormParser, MultiPartParser)
 
     parameter_map = {}
 
@@ -37,6 +36,9 @@ class JobViewSet(viewsets.GenericViewSet):
             parameter = dict(map(reversed, self.parameter_map.items()))[field]
             detail[parameter] = field_errors
         return detail
+
+    def handle_upload(self, job, upload_string):
+        pass
 
 
 class SyncJobViewSet(JobViewSet):
@@ -55,10 +57,9 @@ class SyncJobViewSet(JobViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        return self.perform_sync_job(request, serializer.data)
+        return self.perform_sync_job(request, serializer.validated_data)
 
     def perform_sync_job(self, request, data):
-
         # create the job objects
         job = self.get_queryset().model(
             job_type=Job.JOB_TYPE_SYNC,
@@ -75,15 +76,18 @@ class SyncJobViewSet(JobViewSet):
             if value is not None:
                 setattr(job, model_field, value)
 
+        # handle possible uploads
+        try:
+            self.handle_upload(job, data.get('UPLOAD'))
+        except ValueError:
+            raise ValidationError('Could not parse VOTable')
+
         try:
             job.process()
         except ValidationError as e:
             raise ValidationError(self.rewrite_exception(e))
 
-        try:
-            return FileResponse(job.run_sync(), content_type=job.formats[job.response_format])
-        except JobError:
-            return Response(job.error_summary, content_type='application/xml')
+        return FileResponse(job.run_sync(), content_type=job.formats[job.response_format])
 
 
 class AsyncJobViewSet(JobViewSet):
@@ -120,17 +124,21 @@ class AsyncJobViewSet(JobViewSet):
         job = self.get_queryset().model(
             job_type=Job.JOB_TYPE_ASYNC,
             owner=(None if self.request.user.is_anonymous else self.request.user),
-            response_format=serializer.data.get('RESPONSEFORMAT'),
-            max_records=serializer.data.get('MAXREC'),
-            run_id=serializer.data.get('RUNID'),
+            response_format=serializer.validated_data.get('RESPONSEFORMAT'),
+            max_records=serializer.validated_data.get('MAXREC'),
+            # uploads=handle_uploads(request, serializer.validated_data.get('UPLOAD'), self.get_upload_directory()),
+            run_id=serializer.validated_data.get('RUNID'),
             client_ip=get_client_ip(self.request)
         )
 
         # add parameters to the job object
         for parameter, model_field in self.parameter_map.items():
-            value = serializer.data.get(parameter)
+            value = serializer.validated_data.get(parameter)
             if value is not None:
                 setattr(job, model_field, value)
+
+        # handle possible uploads
+        self.handle_upload(job, serializer.validated_data.get('UPLOAD'))
 
         try:
             job.process()
@@ -139,7 +147,7 @@ class AsyncJobViewSet(JobViewSet):
 
         job.save()
 
-        if serializer.data.get('PHASE') == job.PHASE_RUN:
+        if serializer.validated_data.get('PHASE') == job.PHASE_RUN:
             job.run()
 
         return HttpResponseSeeOther(self.get_success_url(job))
@@ -167,7 +175,7 @@ class AsyncJobViewSet(JobViewSet):
         job.archive()
         return HttpResponseSeeOther(self.get_success_url())
 
-    @detail_route(methods=['get'])
+    @action(detail=True, methods=['get'])
     def results(self, request, pk, key=None):
         job = self.get_object()
 
@@ -176,7 +184,7 @@ class AsyncJobViewSet(JobViewSet):
         }, renderer_context=self.get_renderer_context())
         return HttpResponse(renderered_data, content_type=UWSRenderer.media_type)
 
-    @detail_route(methods=['get'], url_path='results/(?P<result>[A-Za-z0-9\-]+)', url_name='result')
+    @action(detail=True, methods=['get'], url_path='results/(?P<result>[A-Za-z0-9\-]+)', url_name='result')
     def result(self, request, pk, result):
         job = self.get_object()
 
@@ -189,14 +197,14 @@ class AsyncJobViewSet(JobViewSet):
                 'result': 'Unsupported value.'
             })
 
-    @detail_route(methods=['get'])
+    @action(detail=True, methods=['get'])
     def parameters(self, request, pk):
         renderered_data = UWSRenderer().render({
             'parameters': self.get_object().parameters
         }, renderer_context=self.get_renderer_context())
         return HttpResponse(renderered_data, content_type=UWSRenderer.media_type)
 
-    @detail_route(methods=['get', 'post'])
+    @action(detail=True, methods=['get', 'post'])
     def destruction(self, request, pk):
         job = self.get_object()
 
@@ -223,7 +231,7 @@ class AsyncJobViewSet(JobViewSet):
                     'DESTRUCTION': 'Parameter not found.'
                 })
 
-    @detail_route(methods=['get', 'post'])
+    @action(detail=True, methods=['get', 'post'])
     def executionduration(self, request, pk):
         job = self.get_object()
 
@@ -242,7 +250,7 @@ class AsyncJobViewSet(JobViewSet):
                     'EXECUTIONDURATION': 'Parameter not found.'
                 })
 
-    @detail_route(methods=['get', 'post'])
+    @action(detail=True, methods=['get', 'post'])
     def phase(self, request, pk):
         job = self.get_object()
 
@@ -276,17 +284,17 @@ class AsyncJobViewSet(JobViewSet):
                     'PHASE': 'Parameter not found.'
                 })
 
-    @detail_route(methods=['get'])
+    @action(detail=True, methods=['get'])
     def error(self, request, pk):
         job = self.get_object()
         return Response(job.error_summary, content_type='application/xml') if job.error_summary else HttpResponse()
 
-    @detail_route(methods=['get'])
+    @action(detail=True, methods=['get'])
     def quote(self, request, pk):
         job = self.get_object()
         return HttpResponse(job.quote) if job.quote else HttpResponse()
 
-    @detail_route(methods=['get'])
+    @action(detail=True, methods=['get'])
     def owner(self, request, pk):
         job = self.get_object()
         return HttpResponse(job.owner) if job.owner else HttpResponse()

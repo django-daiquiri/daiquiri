@@ -1,24 +1,22 @@
-testing/config/settings/local.py
-testing/log
-testing/download
-testing/media_root
-testing/static_root
+__pycache__/
+*.py[cod]
 
-*-
 *~
-*.pyc
+*-
 *.swp
 .DS_Store
 
-*.sqlite3
-
-env
-env3
+/testing/config/settings/local.py
+/testing/download
+/testing/upload
+/testing/log
+/testing/media_root
+/testing/static_root
+/.coverage
+/htmlcov
+/env
+/venv
 
 build
 dist
 *.egg-info
-
-.coverage
-htmlcov
-

@@ -3,7 +3,7 @@ from rest_framework import serializers
 from daiquiri.jobs.serializers import SyncJobSerializer, AsyncJobSerializer
 
 from .models import QueryJob, Example
-from .validators import TableNameValidator
+from .validators import TableNameValidator, UploadFileValidator, UploadParamValidator
 
 
 class FormSerializer(serializers.Serializer):
@@ -89,7 +89,6 @@ class QueryJobRetrieveSerializer(serializers.ModelSerializer):
         else:
             return []
 
-
     def get_columns(self, obj):
         if obj.metadata:
             return obj.metadata.get('columns', [])
@@ -128,6 +127,21 @@ class QueryJobUpdateSerializer(serializers.ModelSerializer):
             'id',
             'table_name',
             'run_id'
+        )
+
+
+class QueryJobUploadSerializer(serializers.ModelSerializer):
+
+    table_name = serializers.CharField(required=False, validators=[TableNameValidator()])
+    run_id = serializers.CharField(default='')
+    file = serializers.FileField(max_length=None, allow_empty_file=False, validators=[UploadFileValidator()])
+
+    class Meta:
+        model = QueryJob
+        fields = (
+            'table_name',
+            'run_id',
+            'file'
         )
 
 
@@ -181,6 +195,8 @@ class SyncQueryJobSerializer(SyncJobSerializer):
     LANG = serializers.CharField(required=True)
     QUERY = serializers.CharField(required=True)
 
+    UPLOAD = serializers.CharField(required=False, default='', validators=[UploadParamValidator()])
+
 
 class AsyncQueryJobSerializer(AsyncJobSerializer):
 
@@ -191,3 +207,5 @@ class AsyncQueryJobSerializer(AsyncJobSerializer):
     QUEUE = serializers.CharField(required=False)
     LANG = serializers.CharField(required=True)
     QUERY = serializers.CharField(required=True)
+
+    UPLOAD = serializers.CharField(required=False, default='', validators=[UploadParamValidator()])

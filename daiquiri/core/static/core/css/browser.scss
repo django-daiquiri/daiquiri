@@ -66,6 +66,11 @@
     overflow: hidden;
 }
 
+.daiquiri-browser .nav-pills > li.active > a {
+    color: $panel-active-color;
+    background-color: $panel-active-background-color;
+}
+
 .daiquiri-browser .nav-header {
     padding: 5px 15px;
 }

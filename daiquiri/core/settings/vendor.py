@@ -1,3 +1,6 @@
+import daiquiri.core.env as env
+
+VENDOR_CDN = env.get_bool('VENDOR_CDN')
 VENDOR = {
     'jquery': {
         'url': 'https://code.jquery.com/',
@@ -102,7 +105,7 @@ VENDOR = {
                 'path': 'addon/mode/overlay.min.js',
                 'sri': 'sha256-ffWkw3Pn4ieMygm1vwdRKcMtBJ6E6kuBi8GlVVPXWEs='
             },
-                        {
+            {
                 'path': 'mode/sql/sql.min.js',
                 'sri': 'sha256-AYn1SMwJJCzQwlDkZLt7gAA3v8M14QZ7X5fGnJ2juYU='
             },
@@ -129,7 +132,7 @@ VENDOR = {
                 'path': 'bokeh.min.js',
                 'sri': 'sha256-gm+i+GziZJeKlRYH8akT+7hC0yT0tK+VCoxApQ/uU1A='
             },
-                        {
+            {
                 'path': 'bokeh-gl.min.js',
                 'sri': 'sha256-lle0sk6DP7Leca/0dBodUdbkGTqtqNUTLkbVZa1PceE='
             },

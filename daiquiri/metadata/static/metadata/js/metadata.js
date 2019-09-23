@@ -16,10 +16,10 @@ angular.module('metadata', ['core'])
     /* configure the resources */
 
     var resources = {
-        'schemas': $resource(baseurl + 'metadata/api/schemas/:list_route/:id/'),
-        'tables': $resource(baseurl + 'metadata/api/tables/:list_route/:id/'),
-        'columns': $resource(baseurl + 'metadata/api/columns/:list_route/:id/'),
-        'functions': $resource(baseurl + 'metadata/api/functions/:list_route/:id/'),
+        'schemas': $resource(baseurl + 'metadata/api/schemas/:list_action/:id/'),
+        'tables': $resource(baseurl + 'metadata/api/tables/:list_action/:id/'),
+        'columns': $resource(baseurl + 'metadata/api/columns/:list_action/:id/'),
+        'functions': $resource(baseurl + 'metadata/api/functions/:list_action/:id/'),
         'tabletypes': $resource(baseurl + 'metadata/api/tabletypes/:id/'),
         'licenses': $resource(baseurl + 'metadata/api/licenses/:id/'),
         'accesslevels': $resource(baseurl + 'metadata/api/accesslevels/:id/'),
@@ -60,6 +60,15 @@ angular.module('metadata', ['core'])
                 metadata_access_level: 'PRIVATE',
                 groups: []
             };
+        },
+        persons: function() {
+            return {
+                name: '',
+                first_name: '',
+                last_name: '',
+                orcid: '',
+                affiliations: ''
+            }
         }
     };
 
@@ -83,7 +92,7 @@ angular.module('metadata', ['core'])
     };
 
     service.initSchemasBrowser = function() {
-        return resources.schemas.query({'list_route': 'management'}, function(response) {
+        return resources.schemas.query({'list_action': 'management'}, function(response) {
             service.schemas = response;
 
             service.tables = [];
@@ -100,7 +109,7 @@ angular.module('metadata', ['core'])
     };
 
     service.initFunctionsBrowser = function() {
-        return resources.functions.query({'list_route': 'management'}, function(response) {
+        return resources.functions.query({'list_action': 'management'}, function(response) {
             service.functions = response;
 
             BrowserService.render('functions', service.functions, service.active);
@@ -199,7 +208,7 @@ angular.module('metadata', ['core'])
 
     service.discoverItem = function(resource) {
         var parameters = {
-            list_route: 'discover'
+            list_action: 'discover'
         };
 
         if (resource === 'tables') {
@@ -216,6 +225,17 @@ angular.module('metadata', ['core'])
         return resources[resource].query(parameters, function(response) {
             angular.extend(service.values, response[0]);
         });
+    };
+
+    service.addPerson = function(person_type) {
+        if (service.values[person_type] === null) {
+            service.values[person_type] = []
+        }
+        service.values[person_type].push(service.factory.persons());
+    };
+
+    service.removePerson = function(person_type, index) {
+        service.values[person_type].splice(index, 1);
     };
 
     return service;

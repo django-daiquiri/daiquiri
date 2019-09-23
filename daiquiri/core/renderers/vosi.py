@@ -1,0 +1,143 @@
+from daiquiri.core.utils import get_doi_url
+from daiquiri.core.renderers import XMLRenderer
+
+
+class AvailabilityRenderer(XMLRenderer):
+
+    def render_document(self, data, accepted_media_type=None, renderer_context=None):
+        self.start('vosi:availability', {
+            'xmlns:vosi': 'http://www.ivoa.net/xml/VOSITables/v1.0',
+            'xmlns:vs': 'http://www.ivoa.net/xml/VODataService/v1.0',
+            'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+            'xsi:schemaLocation': 'http://www.ivoa.net/xml/VOSI/v1.0 http://www.ivoa.net/xml/VOSI/v1.0 http://www.ivoa.net/xml/VODataService/v1.0 http://www.ivoa.net/xml/VODataService/v1.0'
+        })
+        self.node('available', {}, data.get('available'))
+        self.node('note', {}, data.get('note'))
+        self.end('vosi:availability')
+
+
+class CapabilitiesRendererMixin(object):
+
+    def render_capability(self, capability):
+        self.start('capability', {
+            'standardID': capability.get('id'),
+            'xsi:type': capability.get('type')
+        })
+
+        interface = capability.get('interface')
+        if interface:
+            self.start('interface', {
+                'role': interface.get('role'),
+                'version': interface.get('version'),
+                'xsi:type': interface.get('type')
+            })
+            access_url = interface.get('access_url')
+            if access_url:
+                self.node('accessURL', {
+                    'use': access_url.get('use'),
+                }, access_url.get('url'))
+
+            if interface.get('query_type'):
+                self.node('queryType', {}, interface.get('query_type'))
+
+            if interface.get('result_type'):
+                self.node('resultType', {}, interface.get('result_type'))
+
+            params = interface.get('params', [])
+            for param in params:
+                self.start('param', {
+                    'std': param.get('std')
+                })
+                self.node('name', {}, param.get('name'))
+                self.node('description', {}, param.get('description'))
+
+                if param.get('unit'):
+                    self.node('unit', {}, param.get('unit'))
+                if param.get('ucd'):
+                    self.node('ucd', {}, param.get('ucd'))
+                self.node('dataType', {}, param.get('datatype'))
+                self.end('param')
+            self.end('interface')
+
+        if capability.get('max_sr'):
+            self.node('maxSR', {}, capability.get('max_sr'))
+
+        if capability.get('max_records'):
+            self.node('maxRecords', {}, capability.get('max_records'))
+
+        if capability.get('verbosity'):
+            self.node('verbosity', {}, capability.get('verbosity'))
+
+        test_query = capability.get('test_query')
+        if test_query:
+            self.start('testQuery')
+            self.node('ra', {}, test_query.get('ra'))
+            self.node('dec', {}, test_query.get('dec'))
+            self.node('sr', {}, test_query.get('sr'))
+            self.end('testQuery')
+
+        self.end('capability')
+
+
+class CapabilitiesRenderer(CapabilitiesRendererMixin, XMLRenderer):
+
+    def render_document(self, data, accepted_media_type=None, renderer_context=None):
+        self.start('vosi:capabilities', {
+            'xmlns:vosi': 'http://www.ivoa.net/xml/VOSITables/v1.0',
+            'xmlns:vs': 'http://www.ivoa.net/xml/VODataService/v1.0',
+            'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+            'xsi:schemaLocation': 'http://www.ivoa.net/xml/VOSI/v1.0 http://www.ivoa.net/xml/VOSI/v1.0 http://www.ivoa.net/xml/VODataService/v1.0 http://www.ivoa.net/xml/VODataService/v1.0'
+        })
+
+        for capability in data:
+            self.render_capability(capability)
+
+        self.end('vosi:capabilities')
+
+
+class TablesetRendererMixin(object):
+
+    def render_tableset(self, tableset):
+        for schema in tableset:
+            self.start('schema')
+            self.node('name', {}, schema.get('name'))
+            self.node('description', {}, schema.get('description'))
+
+            for table in schema.get('tables'):
+                self.start('table', {
+                    'doi': get_doi_url(table.get('doi')),
+                    'size': str(table.get('nrows'))
+                })
+                self.node('name', {}, table.get('name'))
+                self.node('description', {}, table.get('description'))
+
+                for column in table['columns']:
+                    self.start('column', {'std': 'true'} if column['std'] else {})
+                    self.node('name', {}, column['name'])
+                    self.node('description', {}, column.get('description'))
+                    self.node('unit', {}, column.get('unit'))
+                    self.node('ucd', {}, column.get('ucd'))
+
+                    self.node('dataType', {'xsi:type': 'vs:VOTableType'}, column.get('datatype'))
+                    for key in ['indexed', 'principal']:
+                        if key in column and column.get('key'):
+                            self.node('flag', {}, key)
+
+                    self.end('column')
+
+                self.end('table')
+
+            self.end('schema')
+
+
+class TablesetRenderer(TablesetRendererMixin, XMLRenderer):
+
+    def render_document(self, data, accepted_media_type=None, renderer_context=None):
+        self.start('vosi:tableset', {
+            'xmlns:vosi': 'http://www.ivoa.net/xml/VOSITables/v1.0',
+            'xmlns:vs': 'http://www.ivoa.net/xml/VODataService/v1.1',
+            'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+            'xsi:schemaLocation': 'http://www.ivoa.net/xml/VODataService/v1.1 http://www.ivoa.net/xml/VOSITables/v1.0'
+        })
+        self.render_tableset(data)
+        self.end('vosi:tableset')

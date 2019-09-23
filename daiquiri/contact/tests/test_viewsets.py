@@ -11,7 +11,6 @@ class ContactTestCase(TestCase):
 
     fixtures = (
         'auth.json',
-        'metadata.json',
         'contact.json'
     )
 

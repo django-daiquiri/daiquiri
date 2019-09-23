@@ -7,7 +7,7 @@ app.factory('JobsService', ['$resource', '$timeout', 'ListService', function($re
     /* configure resources */
 
     var resources = {
-        jobs: $resource(baseurl + 'query/api/jobs/:id/:detail_route/'),
+        jobs: $resource(baseurl + 'query/api/jobs/:id/:detail_action/'),
         queues: $resource(baseurl + 'query/api/queues/:id/'),
         phases: $resource(baseurl + 'query/api/phases/:id/')
     }

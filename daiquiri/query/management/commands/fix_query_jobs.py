@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db.utils import ProgrammingError
 
@@ -9,7 +8,6 @@ from daiquiri.query.models import QueryJob
 
 
 class Command(BaseCommand):
-
 
     def add_arguments(self, parser):
         parser.add_argument('--user', help='Only fix jobs for this user.')

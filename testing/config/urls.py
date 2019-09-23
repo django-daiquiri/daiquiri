@@ -15,6 +15,7 @@ urlpatterns = [
     path('files/', include('daiquiri.files.urls', namespace='files')),
     path('meetings/', include('daiquiri.meetings.urls', namespace='meetings')),
     path('metadata/', include('daiquiri.metadata.urls', namespace='metadata')),
+    path('oai/', include('daiquiri.oai.urls', namespace='oai')),
     path('serve/', include('daiquiri.serve.urls', namespace='serve')),
     path('stats/', include('daiquiri.stats.urls', namespace='stats')),
     path('query/', include('daiquiri.query.urls', namespace='query')),

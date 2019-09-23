@@ -39,7 +39,7 @@ angular.module('core', ['ngResource', 'ngSanitize'])
                 ngModel.$setViewValue(cm.getValue());
             });
 
-            // // when the model is updated update codemirror
+            // when the model is updated update codemirror
             ngModel.$formatters.push(function(model_values) {
 
                 if (angular.isDefined(model_values) && model_values) {
@@ -72,6 +72,48 @@ angular.module('core', ['ngResource', 'ngSanitize'])
                     $timeout.cancel(scope.promise);
                     scope.pending = null;
                     element.addClass('ng-hide');
+                }
+            });
+        }
+    };
+}])
+
+.directive('fileInput', function() {
+    return {
+        restrict: 'C',
+        require: 'ngModel',
+        link: function (scope, elem, attrs, ngModel) {
+            elem.on('change', function(e) {
+                var file = elem[0].files[0];
+                ngModel.$setViewValue(file);
+            })
+        }
+    }
+})
+
+.directive('dateInput', ['$timeout', function($timeout) {
+    return {
+        restrict: 'C',
+        require: 'ngModel',
+        link: function(scope, element, attrs, ngModelController) {
+            ngModelController.$parsers.push(function(view_value) {
+                console.log(view_value);
+                if (view_value === null) {
+                    return null
+                } else {
+                    return [
+                        view_value.getFullYear(),
+                        ('0' + (view_value.getMonth() + 1)).slice(-2),
+                        ('0' + view_value.getDate()).slice(-2)
+                    ].join('-');
+                }
+            });
+
+            ngModelController.$formatters.push(function(model_value) {
+                if (model_value === null) {
+                    return null
+                } else {
+                    return new Date(model_value);
                 }
             });
         }

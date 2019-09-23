@@ -1,7 +1,5 @@
 -- drop and create schemas
 
-CREATE SCHEMA IF NOT EXISTS TAP_SCHEMA;
-
 DROP SCHEMA IF EXISTS daiquiri_archive CASCADE;
 CREATE SCHEMA daiquiri_archive;
 
@@ -62,8 +60,6 @@ CREATE TABLE "daiquiri_user_user"."test" (
 );
 
 -- create permissions
-
-ALTER SCHEMA TAP_SCHEMA OWNER TO daiquiri_data;
 
 ALTER SCHEMA daiquiri_user_user OWNER TO daiquiri_data;
 ALTER TABLE daiquiri_user_user.test OWNER TO daiquiri_data;
@@ -30138,3 +30134,4 @@ INSERT INTO daiquiri_user_user.test VALUES
 (5796416738028030848, 214.54199920880234, -74.47272993235876, 1.15355251157372)
 ;
 
+VACUUM ANALYSE;

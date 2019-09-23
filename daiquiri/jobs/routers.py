@@ -4,7 +4,7 @@ from rest_framework.routers import Route, DynamicRoute, SimpleRouter
 class JobRouter(SimpleRouter):
     '''
     A dedicated router for UWS services. The main difference is that a POST on an instance
-    maps to update, not PUT. Also list_routes are removed.
+    maps to update, not PUT. Also actions are removed.
     '''
 
     routes = [

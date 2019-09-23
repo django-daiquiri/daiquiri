@@ -4,7 +4,7 @@
     On this page, you can find an overview about a submitted query job. For a table view of the results, the plotting tool, and to access the download form, please use the tabs at the top of the page.
 </p>
 
-<div class="panel panel-default">
+<div class="panel panel-default" ng-show="service.job.query">
     <div class="panel-heading">
         {% trans 'Query' %}
     </div>
@@ -49,8 +49,10 @@
             <dt>{% trans 'Time submitted' %}</dt>
             <dd>{$ service.job.creation_time $}</dd>
 
-            <dt>{% trans 'Queue' %}</dt>
-            <dd>{$ (service.queues|filter: {'id': service.job.queue})[0].text $}</dd>
+            <div ng-show="service.job.queue">
+                <dt>{% trans 'Queue' %}</dt>
+                <dd>{$ (service.queues|filter: {'id': service.job.queue})[0].text $}</dd>
+            </div>
 
             <div ng-show="service.job.start_time && service.job.creation_time">
                 <dt>{% trans 'Time in queue' %}</dt>
@@ -72,7 +74,7 @@
                 <dd>{$ service.job.size | bytes $}</dd>
             </div>
 
-            <div ng-show="service.job.sources">
+            <div ng-show="service.job.sources.length">
                 <dt>{% trans 'Source tables' %}</dt>
                 <dd ng-repeat="source in service.job.sources">
                     <a href="{$ source.url $}" target="blank">

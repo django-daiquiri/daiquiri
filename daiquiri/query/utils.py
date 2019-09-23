@@ -1,15 +1,17 @@
+import os
 import sys
 
+import requests
+
+from astropy.io.votable import parse_single_table
+
 from django.conf import settings
-from django.urls import reverse
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 
-
 from daiquiri.core.adapter import DatabaseAdapter
-
-from daiquiri.core.utils import human2bytes
-from daiquiri.metadata.models import Schema, Table, Column, Function
+from daiquiri.core.utils import human2bytes, handle_file_upload
+from daiquiri.metadata.models import Table, Column
 
 
 def get_format_config(format_key):
@@ -34,21 +36,33 @@ def get_user_schema_name(user):
     return settings.QUERY_USER_SCHEMA_PREFIX + username
 
 
-def get_quota(user):
+def get_user_upload_directory(user):
     if not user or user.is_anonymous:
-        quota = human2bytes(settings.QUERY_QUOTA.get('anonymous'))
+        username = 'anonymous'
+    else:
+        username = user.username
+
+    return os.path.join(settings.QUERY_UPLOAD_DIR, username)
+
+
+def get_quota(user, quota_settings='QUERY_QUOTA'):
+
+    quota_config = getattr(settings, quota_settings)
+
+    if not user or user.is_anonymous:
+        quota = human2bytes(quota_config.get('anonymous'))
 
     else:
-        quota = human2bytes(settings.QUERY_QUOTA.get('user'))
+        quota = human2bytes(quota_config.get('user'))
 
         # apply quota for user
-        users = settings.QUERY_QUOTA.get('users')
+        users = quota_config.get('users')
         if users:
             user_quota = human2bytes(users.get(user.username))
             quota = user_quota if user_quota > quota else quota
 
         # apply quota for group
-        groups = settings.QUERY_QUOTA.get('groups')
+        groups = quota_config.get('groups')
         if groups:
             for group in user.groups.all():
                 group_quota = human2bytes(groups.get(group.name))
@@ -128,117 +142,6 @@ def get_indexed_objects():
     return indexed_objects
 
 
-def check_permissions(user, keywords, tables, columns, functions):
-    messages = []
-
-    # check keywords against whitelist
-    for keywords in keywords:
-        pass
-
-    # loop over tables to check permissions on schemas/tables
-    for schema_name, table_name in tables:
-
-        # check permission on schema
-        if schema_name is None:
-            # schema_name must not be null, move to next table
-            messages.append(_('No schema given for table %s.') % table_name)
-            continue
-        elif schema_name == get_user_schema_name(user):
-            # all tables are allowed move to next table
-            continue
-        else:
-            # check permissions on the schema
-            try:
-                schema = Schema.objects.filter_by_access_level(user).get(name=schema_name)
-            except Schema.DoesNotExist:
-                # schema not found or not allowed, move to next table
-                messages.append(_('Schema %s not found.') % schema_name)
-                continue
-
-        # check permission on table
-        if table_name is None:
-            # table_name must not be null, move to next table
-            messages.append(_('No table given for schema %s.') % schema_name)
-            continue
-        else:
-            try:
-                Table.objects.filter_by_access_level(user).filter(schema=schema).get(name=table_name)
-            except Table.DoesNotExist:
-                # table not found or not allowed, move to next table
-                messages.append(_('Table %s not found.') % table_name)
-                continue
-
-    # loop over columns to check permissions or just to see if they are there,
-    # but only if no error messages where appended so far
-    if not messages:
-
-        for schema_name, table_name, column_name in columns:
-
-            if schema_name in [None, get_user_schema_name(user)] \
-                or table_name is None \
-                or column_name is None:
-                # doesn't need to be checked, move to next column
-                continue
-            else:
-                if not settings.METADATA_COLUMN_PERMISSIONS:
-                    # just check if the column exist
-                    if column_name == '*':
-                        # doesn't need to be checked, move to next table
-                        continue
-
-                    else:
-                        try:
-                            Column.objects.filter(table__schema__name=schema_name).filter(table__name=table_name).get(name=column_name)
-                        except Column.DoesNotExist:
-                            messages.append(_('Column %s not found.') % column_name)
-                            continue
-                else:
-                    try:
-                        schema = Schema.objects.filter_by_access_level(user).get(name=schema_name)
-                    except Schema.DoesNotExist:
-                        messages.append(_('Schema %s not found.') % schema_name)
-                        continue
-
-                    try:
-                        table = Table.objects.filter_by_access_level(user).filter(schema=schema).get(name=table_name)
-                    except Table.DoesNotExist:
-                        messages.append(_('Table %s not found.') % table_name)
-                        continue
-
-                    if column_name == '*':
-                        columns = Column.objects.filter_by_access_level(user).filter(table=table)
-                        actual_columns = DatabaseAdapter().fetch_columns(schema_name, table_name)
-
-                        column_names_set = set([column.name for column in columns])
-                        actual_column_names_set = set([column['name'] for column in actual_columns])
-
-                        if column_names_set != actual_column_names_set:
-                            messages.append(_('The asterisk (*) is not allowed for this table.'))
-                            continue
-
-                    else:
-                        try:
-                            column = Column.objects.filter_by_access_level(user).filter(table=table).get(name=column_name)
-                        except Column.DoesNotExist:
-                            messages.append(_('Column %s not found.') % column_name)
-                            continue
-
-    # check permissions on functions
-    for function_name in functions:
-
-        # check permission on function
-        queryset = Function.objects.filter(name=function_name)
-
-        # forbit the function if it is in metadata.functions, and the user doesn't have access.
-        if queryset and not queryset.filter_by_access_level(user):
-            messages.append(_('Function %s is not allowed.') % function_name)
-        else:
-            continue
-
-    # return the error stack
-    return list(set(messages))
-
-
 def get_job_sources(job):
     sources = []
 
@@ -285,28 +188,34 @@ def get_job_column(job, display_column_name):
     except (ValueError, KeyError):
         return {}
 
-    try:
-        column = Column.objects.get(
-            name=column_name,
-            table__name=table_name,
-            table__schema__name=schema_name
-        )
+    if schema_name == settings.TAP_UPLOAD:
+        # for TAP_UPLOAD get the information directly from the database
+        return DatabaseAdapter().fetch_column(schema_name, table_name, column_name)
 
-        return {
-            'name': column.name,
-            'description': column.description,
-            'unit': column.unit,
-            'ucd': column.ucd,
-            'utype': column.utype,
-            'datatype': column.datatype,
-            'arraysize': column.arraysize,
-            'principal': column.principal,
-            'indexed': False,
-            'std': column.std
-        }
+    else:
+        # for regular schemas consult the metadata store
+        try:
+            column = Column.objects.get(
+                name=column_name,
+                table__name=table_name,
+                table__schema__name=schema_name
+            )
 
-    except Column.DoesNotExist:
-        return {}
+            return {
+                'name': column.name,
+                'description': column.description,
+                'unit': column.unit,
+                'ucd': column.ucd,
+                'utype': column.utype,
+                'datatype': column.datatype,
+                'arraysize': column.arraysize,
+                'principal': column.principal,
+                'indexed': False,
+                'std': column.std
+            }
+
+        except Column.DoesNotExist:
+            return {}
 
 
 def get_job_columns(job):
@@ -323,5 +232,70 @@ def get_job_columns(job):
     else:
         for display_column in job.metadata['display_columns']:
             columns.append(get_job_column(job, display_column))
+
+    return columns
+
+
+def handle_upload_param(request, upload_param):
+    if upload_param:
+        uploads = {}
+        for upload in upload_param.split(';'):
+            resource_name, uri = upload.split(',')
+
+            if uri.startswith('param:'):
+                file_field = uri[len('param:'):]
+                file_path = handle_file_upload(get_user_upload_directory(request.user), request.data[file_field])
+                uploads[resource_name] = file_path
+
+            else:
+                uploads[resource_name] = uri
+
+        return uploads
+    else:
+        return {}
+
+
+def ingest_uploads(uploads, user):
+    if uploads:
+        for table_name, location in uploads.items():
+            if location.startswith('http:') or location.startswith('https:'):
+                file_path = fetch_file(user, location)
+            else:
+                file_path = location
+
+            ingest_table(settings.TAP_UPLOAD, table_name, file_path, drop_table=True)
+
+
+def fetch_file(user, url):
+    response = requests.get(url, allow_redirects=True)
+
+    file_path = os.path.join(get_user_upload_directory(user), url.split('/')[-1])
+    with open(file_path, 'wb') as f:
+        f.write(response.content)
+
+    return file_path
+
+
+def ingest_table(schema_name, table_name, file_path, drop_table=False):
+    adapter = DatabaseAdapter()
+
+    table = parse_single_table(file_path, pedantic=False)
+
+    columns = []
+    for field in table.fields:
+        columns.append({
+            'name': field.name,
+            'datatype': field.datatype,
+            'ucd': field.ucd,
+            'unit': str(field.unit),
+        })
+
+    if drop_table:
+        adapter.drop_table(schema_name, table_name)
+
+    adapter.create_table(schema_name, table_name, columns)
+    adapter.insert_rows(schema_name, table_name, columns, table.array, table.array.mask)
+
+    os.remove(file_path)
 
     return columns

@@ -361,8 +361,15 @@ footer {
 /* panel */
 
 .panel {
-    .panel-body p:last-child {
+    .panel-body p:last-child,
+    .panel-body dl:last-child {
         margin-bottom: 0;
+    }
+
+    .panel-footer {
+        ul, p {
+            margin: 0;
+        }
     }
 
     li {
@@ -418,6 +425,16 @@ div.fieldset {
         margin-top: 0px;
         margin-bottom: 5px;
     }
+
+    .file {
+        input {
+            padding-bottom: 100px;
+        }
+    }
+}
+
+.form-inline-button {
+    margin-top: 25px;
 }
 
 /* misc */

@@ -2,7 +2,11 @@ from django.urls import include, path, re_path
 
 from rest_framework import routers
 
-from .views import ManagementView, SchemaView, TableView
+from .views import (
+    ManagementView,
+    SchemaView,
+    TableView
+)
 from .viewsets import (
     SchemaViewSet,
     TableViewSet,

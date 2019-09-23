@@ -13,12 +13,36 @@ from queryparser.exceptions import QueryError, QuerySyntaxError
 
 from daiquiri.core.utils import filter_by_access_level
 from daiquiri.core.adapter import DatabaseAdapter
+from daiquiri.metadata.models import Schema, Table, Column, Function
 
 from .utils import (
     get_user_schema_name,
     get_default_table_name,
-    get_indexed_objects
+    get_indexed_objects,
+    get_quota,
+    get_max_active_jobs
 )
+
+
+def check_quota(job):
+    # get the model from the instance to prevent circular inclusion
+    QueryJob = type(job)
+
+    if QueryJob.objects.get_size(job.owner) > get_quota(job.owner):
+        raise ValidationError({
+            'query': [_('Quota is exceeded. Please remove some of your jobs.')]
+        })
+
+
+def check_number_of_active_jobs(job):
+    # get the model from the instance to prevent circular inclusion
+    QueryJob = type(job)
+
+    max_active_jobs = get_max_active_jobs(job.owner)
+    if max_active_jobs and max_active_jobs <= QueryJob.objects.get_active(job.owner).count():
+        raise ValidationError({
+            'query': [_('Too many active jobs. Please abort some of your active jobs or wait until they are completed.')]
+        })
 
 
 def process_schema_name(user, schema_name):
@@ -158,7 +182,8 @@ def process_query(query):
             # first run to replace with get_indexed_objects
             processor.set_query(query)
             processor.process_query(indexed_objects=get_indexed_objects(), replace_schema_name={
-                'TAP_SCHEMA': settings.TAP_SCHEMA
+                'TAP_SCHEMA': settings.TAP_SCHEMA,
+                'TAP_UPLOAD': settings.TAP_UPLOAD,
             })
 
             # second run
@@ -215,3 +240,117 @@ def process_display_columns(processor_display_columns):
         })
 
     return OrderedDict(display_columns)
+
+
+def check_permissions(user, keywords, tables, columns, functions):
+    messages = []
+
+    # check keywords against whitelist
+    for keywords in keywords:
+        pass
+
+    # loop over tables to check permissions on schemas/tables
+    for schema_name, table_name in tables:
+
+        # check permission on schema
+        if schema_name is None:
+            # schema_name must not be null, move to next table
+            messages.append(_('No schema given for table %s.') % table_name)
+            continue
+        elif schema_name == get_user_schema_name(user):
+            # all tables are allowed move to next table
+            continue
+        elif schema_name == settings.TAP_UPLOAD:
+            # all tables are allowed move to next table
+            continue
+        else:
+            # check permissions on the schema
+            try:
+                schema = Schema.objects.filter_by_access_level(user).get(name=schema_name)
+            except Schema.DoesNotExist:
+                # schema not found or not allowed, move to next table
+                messages.append(_('Schema %s not found.') % schema_name)
+                continue
+
+        # check permission on table
+        if table_name is None:
+            # table_name must not be null, move to next table
+            messages.append(_('No table given for schema %s.') % schema_name)
+            continue
+        else:
+            try:
+                Table.objects.filter_by_access_level(user).filter(schema=schema).get(name=table_name)
+            except Table.DoesNotExist:
+                # table not found or not allowed, move to next table
+                messages.append(_('Table %s not found.') % table_name)
+                continue
+
+    # loop over columns to check permissions or just to see if they are there,
+    # but only if no error messages where appended so far
+    if not messages:
+
+        for schema_name, table_name, column_name in columns:
+
+            if schema_name in [None, get_user_schema_name(user), settings.TAP_UPLOAD] \
+                    or table_name is None \
+                    or column_name is None:
+                # doesn't need to be checked, move to next column
+                continue
+            else:
+                if not settings.METADATA_COLUMN_PERMISSIONS:
+                    # just check if the column exist
+                    if column_name == '*':
+                        # doesn't need to be checked, move to next table
+                        continue
+
+                    else:
+                        try:
+                            Column.objects.filter(table__schema__name=schema_name).filter(table__name=table_name).get(name=column_name)
+                        except Column.DoesNotExist:
+                            messages.append(_('Column %s not found.') % column_name)
+                            continue
+                else:
+                    try:
+                        schema = Schema.objects.filter_by_access_level(user).get(name=schema_name)
+                    except Schema.DoesNotExist:
+                        messages.append(_('Schema %s not found.') % schema_name)
+                        continue
+
+                    try:
+                        table = Table.objects.filter_by_access_level(user).filter(schema=schema).get(name=table_name)
+                    except Table.DoesNotExist:
+                        messages.append(_('Table %s not found.') % table_name)
+                        continue
+
+                    if column_name == '*':
+                        columns = Column.objects.filter_by_access_level(user).filter(table=table)
+                        actual_columns = DatabaseAdapter().fetch_columns(schema_name, table_name)
+
+                        column_names_set = set([column.name for column in columns])
+                        actual_column_names_set = set([column['name'] for column in actual_columns])
+
+                        if column_names_set != actual_column_names_set:
+                            messages.append(_('The asterisk (*) is not allowed for this table.'))
+                            continue
+
+                    else:
+                        try:
+                            column = Column.objects.filter_by_access_level(user).filter(table=table).get(name=column_name)
+                        except Column.DoesNotExist:
+                            messages.append(_('Column %s not found.') % column_name)
+                            continue
+
+    # check permissions on functions
+    for function_name in functions:
+
+        # check permission on function
+        queryset = Function.objects.filter(name=function_name)
+
+        # forbit the function if it is in metadata.functions, and the user doesn't have access.
+        if queryset and not queryset.filter_by_access_level(user):
+            messages.append(_('Function %s is not allowed.') % function_name)
+        else:
+            continue
+
+    # return the error stack
+    return list(set(messages))

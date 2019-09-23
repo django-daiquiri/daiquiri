@@ -7,6 +7,8 @@ from daiquiri.core.utils import setup_group
 
 class MetadataViewTestCase(TestViewMixin, TestCase):
 
+    databases = ('default', 'data', 'tap', 'oai')
+
     fixtures = (
         'auth.json',
         'metadata.json'

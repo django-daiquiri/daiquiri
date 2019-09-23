@@ -1,10 +1,12 @@
-from django.contrib.auth.models import User
-
-from daiquiri.core.utils import send_mail
+from daiquiri.core.utils import send_mail, get_admin_emails, get_permission_emails
 
 
 def get_manager_emails():
-    return [user.email for user in User.objects.filter(groups__name='meetings_manager')]
+    return get_permission_emails((
+        'daiquiri_meetings.view_meeting',
+        'daiquiri_meetings.view_participant',
+        'daiquiri_meetings.view_contribution',
+    )) + get_admin_emails()
 
 
 def send_registration_mails(request, meeting, participant, contribution=None):

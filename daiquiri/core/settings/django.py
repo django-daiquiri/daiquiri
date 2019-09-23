@@ -3,27 +3,57 @@ import os
 
 from django.utils.translation import ugettext_lazy as _
 
+import daiquiri.core.env as env
+
 CONFIG_DIR = imp.find_module('config')[1]
 BASE_DIR = os.path.dirname(CONFIG_DIR)
 DAIQUIRI_APP = os.path.basename(BASE_DIR).replace('-', '_')
 
-DEBUG = False
+BASE_URL = env.get_url('BASE_URL', '/')
+
+DEBUG = env.get_bool('DEBUG')
+
+SECRET_KEY = env.get('SECRET_KEY')
+
+ALLOWED_HOSTS = env.get_list('ALLOWED_HOSTS', ['localhost', '127.0.0.1', '::1'])
+
+INTERNAL_IPS = env.get_list('INTERNAL_IPS', ['127.0.0.1'])
 
 SITE_ID = 1
-
-HTTPS = False
-
-SECRET_KEY = 'this is not a very secret key'
-
-ALLOWED_HOSTS = ['localhost']
-
-INTERNAL_IPS = ('127.0.0.1',)
 
 ROOT_URLCONF = 'config.urls'
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-DATABASE_ROUTERS = ['daiquiri.tap.routers.TapRouter', 'daiquiri.core.routers.DataRouter']
+DATABASES = {
+    'default': env.get_database('app'),
+    'data': env.get_database('data'),
+    'tap': env.get_database('data'),
+    'oai': env.get_database('data'),
+}
+
+if DATABASES['tap'].get('ENGINE') == 'django.db.backends.postgresql':
+    DATABASES['tap']['OPTIONS'] = {
+        'options': '-c search_path=%s' % env.get('TAP_SCHEMA', 'tap_schema')
+    }
+elif DATABASES['tap'].get('ENGINE') == 'django.db.backends.mysql':
+    DATABASES['tap']['NAME'] = env.get('TAP_SCHEMA', 'tap_schema')
+
+if DATABASES['oai'].get('ENGINE') == 'django.db.backends.postgresql':
+    DATABASES['oai']['OPTIONS'] = {
+        'options': '-c search_path=%s' % env.get('OAI_SCHEMA', 'oai_schema')
+    }
+elif DATABASES['oai'].get('ENGINE') == 'django.db.backends.mysql':
+    DATABASES['oai']['NAME'] = env.get('OAI_SCHEMA', 'oai_schema')
+
+ADAPTER_DATABASE = env.get_database_adapter()
+ADAPTER_DOWNLOAD = env.get_download_adapter()
+
+DATABASE_ROUTERS = [
+    'daiquiri.oai.routers.OaiRouter',
+    'daiquiri.tap.routers.TapRouter',
+    'daiquiri.core.routers.DataRouter'
+]
 
 DJANGO_APPS = [
     'django.contrib.admin',
@@ -63,10 +93,11 @@ MIDDLEWARE = [
     'django.contrib.sites.middleware.CurrentSiteMiddleware'
 ]
 
+TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates/')
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates/')],
+        'DIRS': [TEMPLATES_DIR] if os.path.exists(TEMPLATES_DIR) else [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -102,20 +133,25 @@ USE_L10N = True
 
 USE_TZ = True
 
-LOGIN_URL = '/accounts/login/'
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_URL = '/accounts/logout/'
-LOGOUT_REDIRECT_URL = '/'
+LOGIN_URL = BASE_URL + 'accounts/login/'
+LOGIN_REDIRECT_URL = BASE_URL
+LOGOUT_URL = BASE_URL + 'accounts/logout/'
+LOGOUT_REDIRECT_URL = BASE_URL
 
-MEDIA_URL = '/media/'
+CSRF_COOKIE_PATH = BASE_URL
+LANGUAGE_COOKIE_PATH = BASE_URL
+SESSION_COOKIE_PATH = BASE_URL
+
+MEDIA_URL = BASE_URL + 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media_root/')
 
-STATIC_URL = '/static/'
+STATIC_URL = BASE_URL + 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static_root/')
 
-STATICFILES_DIRS = (
+STATICFILES_DIR = os.path.join(BASE_DIR, 'static/')
+STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'vendor/'),
-)
+] + [STATICFILES_DIR] if os.path.exists(STATICFILES_DIR) else []
 
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
@@ -134,7 +170,7 @@ AUTHENTICATION_BACKENDS = (
 )
 
 ACCOUNT_LOGOUT_ON_GET = False
-ACCOUNT_LOGOUT_REDIRECT_URL = '/'
+ACCOUNT_LOGOUT_REDIRECT_URL = BASE_URL
 ACCOUNT_ADAPTER = 'daiquiri.auth.adapter.DaiquiriAccountAdapter'
 ACCOUNT_SIGNUP_FORM_CLASS = 'daiquiri.auth.forms.SignupForm'
 ACCOUNT_USER_DISPLAY = 'daiquiri.auth.utils.get_full_name'
@@ -143,7 +179,8 @@ ACCOUNT_PASSWORD_MIN_LENGTH = 4
 ACCOUNT_EMAIL_MAX_LENGTH = 190
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 7
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+# 'mandatory' or 'optional'
+ACCOUNT_EMAIL_VERIFICATION = env.get('ACCOUNT_EMAIL_VERIFICATION', 'mandatory')
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 
 SOCIALACCOUNT_ADAPTER = 'daiquiri.auth.adapter.DaiquiriSocialAccountAdapter'
@@ -168,13 +205,17 @@ SETTINGS_EXPORT = [
     'QUERY_DROPDOWNS',
     'QUERY_FORMS',
     'QUERY_DOWNLOAD_FORMATS',
+    'QUERY_UPLOAD',
     'STATS_RESOURCE_TYPES'
 ]
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-EMAIL_FROM = 'info@example.com'
-EMAIL_REPLY_TO = None
+EMAIL_BACKEND = env.get('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+EMAIL_FROM = env.get('EMAIL_FROM', 'info@example.com')
+EMAIL_REPLY_TO = env.get('EMAIL_REPLY_TO')
+EMAIL_HOST = env.get('EMAIL_HOST')
+EMAIL_PORT = env.get('EMAIL_PORT', '25')
+EMAIL_HOST_USER = env.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env.get('EMAIL_HOST_PASSWORD')
+EMAIL_USE_TLS = env.get_bool('EMAIL_USE_TLS')
 
-SENDFILE_BACKEND = 'sendfile.backends.simple'
-
-LOGGING_DIR = os.path.join(BASE_DIR, 'log')
+SENDFILE_BACKEND = env.get('SENDFILE_BACKEND', 'sendfile.backends.simple')

@@ -66,9 +66,6 @@ GRANT SELECT ON `daiquiri_data_test`.* TO 'daiquiri_data'@'localhost';
 GRANT SELECT ON `daiquiri_data_obs`.* TO 'daiquiri_data'@'localhost';
 GRANT SELECT ON `daiquiri_data_sim`.* TO 'daiquiri_data'@'localhost';
 
-GRANT ALL PRIVILEGES ON `TAP_SCHEMA`.* TO 'daiquiri_data'@'localhost';
-GRANT ALL PRIVILEGES ON `test_TAP_SCHEMA`.* TO 'daiquiri_data'@'localhost';
-
 GRANT ALL PRIVILEGES ON `daiquiri_user_%`.* TO 'daiquiri_data'@'localhost';
 
 -- insert data

@@ -74,9 +74,11 @@
         {% trans 'Submit new SQL Query' %} <submitting />
     </button>
 
-    <button class="btn btn-default pull-right" ng-click="service.forms.sql.clear_query()">
-        {% trans 'Clear input window' %}
-    </button>
+    <div class="pull-right">
+        <button class="btn btn-default" ng-click="service.forms.sql.clear_query()">
+            {% trans 'Clear input window' %}
+        </button>
+    </div>
 </div>
 
 <p class="text-danger" ng-show="service.forms.sql.errors.detail">

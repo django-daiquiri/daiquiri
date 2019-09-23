@@ -1,3 +1,5 @@
+@import 'core/css/variables';
+
 .daiquiri-metadata-browser .daiquiri-browser-body {
     height: 400px;
 }
@@ -27,6 +29,11 @@
         height: 20px;
         margin-bottom: 10px;
     }
+}
+
+.daiquiri-metadata-modal-person {
+    border-bottom: 1px solid $modal-border-color;
+    margin-bottom: 15px;
 }
 
 .CodeMirror {

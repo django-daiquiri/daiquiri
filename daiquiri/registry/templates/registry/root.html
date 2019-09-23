@@ -1,0 +1,35 @@
+{% extends 'core/wide.html' %}
+{% load i18n %}
+
+{% block wide %}
+
+    <h1>{% trans 'Registry service' %}</h1>
+
+    <ul>
+        <li>
+            <a href="{% url 'oai:root' %}">{% trans 'OAI endpoint' %}</a>
+        </li>
+    </ul>
+
+    <ul>
+        <li>
+            <a href="{% url 'registry:resource' %}">{% trans 'VOResource Registry Record' %}</a>
+        </li>
+        <li>
+            <a href="{% url 'registry:availability' %}">{% trans 'VOSI Availability' %}</a>
+        </li>
+        <li>
+            <a href="{% url 'registry:capabilities' %}">{% trans 'VOSI Capabilities' %}</a>
+        </li>
+    </ul>
+
+    <ul>
+        <li>
+            <a href="{% url 'registry:authority' %}">{% trans 'VOResource Authority Record' %}</a>
+        </li>
+        <li>
+            <a href="{% url 'registry:web' %}">{% trans 'VOResource Web Record' %}</a>
+        </li>
+    </ul>
+
+{% endblock %}

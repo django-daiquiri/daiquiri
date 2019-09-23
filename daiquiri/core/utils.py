@@ -2,6 +2,7 @@ import csv
 import ipaddress
 import importlib
 import math
+import os
 import re
 import sys
 
@@ -14,10 +15,10 @@ from django.conf import settings
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMultiAlternatives, EmailMessage
+from django.db.models import Q
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.template import TemplateDoesNotExist
-
 from django.utils.timezone import localtime
 from django.utils.translation import ugettext_lazy as _
 
@@ -139,6 +140,20 @@ def get_detail_fields(detail_keys):
 
 def get_admin_emails():
     return [user.email for user in User.objects.filter(is_superuser=True)]
+
+
+def get_permission_emails(permissions):
+    permissions_queryset = Permission.objects
+    for permission in permissions:
+        app_label, codename = permission.split('.')
+        permissions_queryset = permissions_queryset.filter(content_type__app_label=app_label, codename=codename)
+
+    users = User.objects.filter(
+        Q(groups__permissions__in=permissions_queryset) |
+        Q(user_permissions__in=permissions_queryset)
+    ).distinct()
+
+    return [user.email for user in users]
 
 
 def get_doi_url(doi):
@@ -349,3 +364,15 @@ def render_to_xml(request, renderer, data, filename=None, content_type='applicat
     if filename:
         response['Content-Disposition'] = 'filename="%s"' % filename
     return response
+
+
+def handle_file_upload(directory, file):
+    file_path = os.path.join(directory, file.name)
+
+    os.makedirs(directory, exist_ok=True)
+
+    with open(file_path, 'wb+') as destination:
+        for chunk in file.chunks():
+            destination.write(chunk)
+
+    return file_path

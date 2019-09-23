@@ -5,6 +5,8 @@ from test_generator.views import TestListViewMixin
 
 class TapViewTestCase(TestCase):
 
+    databases = ('default', 'data', 'tap', 'oai')
+
     fixtures = (
         'auth.json',
         'metadata.json',

@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import Group
 from django.utils.translation import ugettext_lazy as _
 
+from jsonfield import JSONField
+
 from daiquiri.core.constants import LICENSE_CHOICES, LICENSE_URLS, ACCESS_LEVEL_CHOICES
 from daiquiri.core.managers import AccessLevelManager
 
@@ -51,6 +53,22 @@ class Schema(models.Model):
     utype = models.CharField(
         max_length=256, null=True, blank=True,
         verbose_name=_('IVOA Utype'),
+    )
+    creators = JSONField(
+        null=True, blank=True,
+        verbose_name=_('Creators'),
+    )
+    contributors = JSONField(
+        null=True, blank=True,
+        verbose_name=_('Contributors'),
+    )
+    published = models.DateField(
+        null=True, blank=True,
+        verbose_name=_('Published'),
+    )
+    updated = models.DateField(
+        null=True, blank=True,
+        verbose_name=_('Updated'),
     )
     access_level = models.CharField(
         max_length=8, choices=ACCESS_LEVEL_CHOICES,
@@ -157,6 +175,22 @@ class Table(models.Model):
     utype = models.CharField(
         max_length=256, null=True, blank=True,
         verbose_name=_('IVOA Utype')
+    )
+    creators = JSONField(
+        null=True, blank=True,
+        verbose_name=_('Creators'),
+    )
+    contributors = JSONField(
+        null=True, blank=True,
+        verbose_name=_('Contributors'),
+    )
+    published = models.DateField(
+        null=True, blank=True,
+        verbose_name=_('Published'),
+    )
+    updated = models.DateField(
+        null=True, blank=True,
+        verbose_name=_('Updated'),
     )
     access_level = models.CharField(
         max_length=8, choices=ACCESS_LEVEL_CHOICES,

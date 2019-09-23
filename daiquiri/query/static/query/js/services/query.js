@@ -1,4 +1,4 @@
-app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'PollingService', 'PlotService', 'DownloadService', 'TableService', 'BrowserService', function($resource, $injector, $q, $filter, PollingService, PlotService, DownloadService, TableService, BrowserService) {
+app.factory('QueryService', ['$resource', '$http', '$injector', '$q', '$filter', 'PollingService', 'PlotService', 'DownloadService', 'TableService', 'BrowserService', function($resource, $http, $injector, $q, $filter, PollingService, PlotService, DownloadService, TableService, BrowserService) {
 
     /* get the base url */
 
@@ -10,7 +10,7 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
         status: $resource(baseurl + 'query/api/status/'),
         forms: $resource(baseurl + 'query/api/forms/'),
         dropdowns: $resource(baseurl + 'query/api/dropdowns/'),
-        jobs: $resource(baseurl + 'query/api/jobs/:id/:detail_route/'),
+        jobs: $resource(baseurl + 'query/api/jobs/:id/:detail_action/'),
         examples: $resource(baseurl + 'query/api/examples/user/'),
         queues: $resource(baseurl + 'query/api/queues/'),
         querylanguages: $resource(baseurl + 'query/api/querylanguages/'),
@@ -18,6 +18,8 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
         schemas: $resource(baseurl + 'metadata/api/schemas/user/'),
         functions: $resource(baseurl + 'metadata/api/functions/user/'),
     };
+
+    var upload_url = baseurl + 'query/api/jobs/upload/';
 
     /* initialise the browser service */
 
@@ -99,6 +101,9 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
                     });
                 });
             });
+
+            // fetch user schema and init browser
+            service.fetch_user_schema();
         });
 
         // fetch joblist
@@ -128,7 +133,7 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
 
     service.fetch_user_schema = function() {
         return resources.jobs.query({
-            'detail_route': 'tables'
+            'detail_action': 'tables'
         }, function(response) {
             var user_schema = response[0];
 
@@ -212,6 +217,34 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
             });
     };
 
+    service.upload_job = function(values) {
+        // a special version of submit_job for the upload
+
+        // put the payload in a FormData object
+        var formdata = new FormData();
+        angular.forEach(values, function(value, key) {
+            if (angular.isDefined(value) && value) {
+                formdata.append(key, value);
+            }
+        });
+
+        service.submitting = true;
+        return $http({
+                method: 'POST',
+                url: upload_url,
+                headers: {
+                    'Content-Type': undefined
+                },
+                data: formdata
+            })
+            .then(function (response) {
+                service.fetch_status();
+                service.activate_job(response.data);
+            }).finally(function() {
+                service.submitting = false;
+            });
+    }
+
     service.activate_job = function(job) {
         service.form = null;
         service.fetch_job(job).then(function() {
@@ -254,7 +287,7 @@ app.factory('QueryService', ['$resource', '$injector', '$q', '$filter', 'Polling
     };
 
     service.abort_job = function() {
-        resources.jobs.update({id: service.values.id, detail_route: 'abort'}, {}, function() {
+        resources.jobs.update({id: service.values.id, detail_action: 'abort'}, {}, function() {
             service.fetch_status();
             service.fetch_jobs();
             $('.modal').modal('hide');

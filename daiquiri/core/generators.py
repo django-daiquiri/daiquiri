@@ -4,10 +4,12 @@ import io
 import sys
 import struct
 
+from xml.sax.saxutils import quoteattr
+
 from django.contrib.sites.models import Site
 
 from daiquiri import __version__ as daiquiri_version
-from daiquiri.core.utils import get_doi_url
+
 
 def generate_csv(generator, fields):
     if sys.version_info.major >= 3:
@@ -37,13 +39,20 @@ def generate_votable(generator, fields, infos=[], links=[], table=None, empty=No
     yield '''
     <RESOURCE type="results">'''
 
-    for info in infos:
+    for key, value in infos:
         yield '''
-        <INFO name="%(key)s" value="%(value)s" />''' % info
+        <INFO name=%(key)s value=%(value)s />''' % {
+            'key': quoteattr(key),
+            'value': quoteattr(value)
+        }
 
-    for link in links:
+    for title, content_role, href in links:
         yield '''
-        <LINK title="%(title)s" content-role="%(content_role)s" href="%(href)s"/>''' % link
+        <LINK title=%(title)s content-role=%(content_role)s href=%(href)s/>''' % {
+            'title': quoteattr(title),
+            'content_role': quoteattr(content_role),
+            'href': quoteattr(href)
+        }
 
     if table is not None:
         yield '''
@@ -99,7 +108,7 @@ def generate_fits(generator, fields, nrows, table_name=None):
 
     # VO format label, FITS format label, size, NULL value, encoded value
     formats_dict = {
-        'unsignedByte': ('s', 'L', 1,  b'\x00',             lambda x: b'T' if x == 'true' else b'F'),
+        'boolean':      ('s', 'L', 1,  b'\x00',             lambda x: b'T' if x == 'true' else b'F'),
         'short':        ('h', 'I', 2,  32767,               int),
         'int':          ('i', 'J', 4,  2147483647,          int),
         'long':         ('q', 'K', 8,  9223372036854775807, int),
@@ -112,15 +121,15 @@ def generate_fits(generator, fields, nrows, table_name=None):
         'unknown':      ('s', 'A', 8,  b'',                 lambda x: x.encode())
     }
 
-    names = [d['name'] for d in fields]
-    datatypes = [d['datatype'] for d in fields]
-    arraysizes = [d['arraysize'] if d['arraysize'] is not None else ''
-                  for d in fields]
+    names = [field['name'] for field in fields]
+    datatypes = [field['datatype'] for field in fields]
+    arraysizes = [field.get('arraysize') or '' for field in fields]
+
     for i, d in enumerate(zip(datatypes, arraysizes)):
         if d[0] == 'timestamp':
             arraysizes[i] = formats_dict['timestamp'][2]
         elif d[0] in ('char', 'spoint', 'array') and d[1] == '':
-            arraysizes[i] = formats_dict[d[0]][2] 
+            arraysizes[i] = formats_dict[d[0]][2]
         elif d[0] is None:
             datatypes[i] = 'unknown'
             arraysizes[i] = formats_dict['unknown'][2]
