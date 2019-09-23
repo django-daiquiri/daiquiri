@@ -149,9 +149,8 @@ STATIC_URL = BASE_URL + 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static_root/')
 
 STATICFILES_DIR = os.path.join(BASE_DIR, 'static/')
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'vendor/'),
-] + [STATICFILES_DIR] if os.path.exists(STATICFILES_DIR) else []
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'vendor/')]
+STATICFILES_DIRS += [STATICFILES_DIR] if os.path.exists(STATICFILES_DIR) else []
 
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
