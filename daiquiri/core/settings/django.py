@@ -208,13 +208,13 @@ SETTINGS_EXPORT = [
     'STATS_RESOURCE_TYPES'
 ]
 
+DEFAULT_FROM_EMAIL = env.get_bool('DEFAULT_FROM_EMAIL', 'info@example.com')
 EMAIL_BACKEND = env.get('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
-EMAIL_FROM = env.get('EMAIL_FROM', 'info@example.com')
 EMAIL_REPLY_TO = env.get('EMAIL_REPLY_TO')
 EMAIL_HOST = env.get('EMAIL_HOST')
-EMAIL_PORT = env.get('EMAIL_PORT', '25')
 EMAIL_HOST_USER = env.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = env.get('EMAIL_HOST_PASSWORD')
+EMAIL_PORT = env.get('EMAIL_PORT', '25')
 EMAIL_USE_TLS = env.get_bool('EMAIL_USE_TLS')
 
 SENDFILE_BACKEND = env.get('SENDFILE_BACKEND', 'sendfile.backends.simple')
