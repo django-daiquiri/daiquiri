@@ -208,7 +208,7 @@ SETTINGS_EXPORT = [
     'STATS_RESOURCE_TYPES'
 ]
 
-DEFAULT_FROM_EMAIL = env.get_bool('DEFAULT_FROM_EMAIL', 'info@example.com')
+DEFAULT_FROM_EMAIL = env.get('DEFAULT_FROM_EMAIL', 'info@example.com')
 EMAIL_BACKEND = env.get('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
 EMAIL_REPLY_TO = env.get('EMAIL_REPLY_TO')
 EMAIL_HOST = env.get('EMAIL_HOST')
