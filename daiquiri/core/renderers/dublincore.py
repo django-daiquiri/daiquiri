@@ -8,8 +8,6 @@ class DublincoreRendererMixin(object):
             'xsi:schemaLocation': 'http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd'
         })
 
-        print(metadata.get('publisher'))
-
         self.node('dc:identifier', {}, metadata.get('identifier'))
         self.node('dc:title', {}, metadata.get('title'))
         self.node('dc:description', {}, metadata.get('description'))

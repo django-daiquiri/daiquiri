@@ -1,5 +1,5 @@
 from datetime import datetime
-from urllib.parse import quote
+from urllib.parse import quote, unquote
 
 from django.apps import apps
 from django.conf import settings
@@ -233,7 +233,7 @@ class OaiView(APIView):
             if arguments:
                 self.errors.append(('badArgument', 'resumptionToken is an exclusive argument.'))
 
-            query_dict = QueryDict(query_string=resumption_token, mutable=False)
+            query_dict = QueryDict(query_string=unquote(resumption_token), mutable=False)
             verb, arguments = self.get_verb_and_arguments(query_dict)
 
         return arguments
