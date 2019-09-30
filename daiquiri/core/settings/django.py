@@ -221,3 +221,13 @@ EMAIL_PORT = env.get('EMAIL_PORT', '25')
 EMAIL_USE_TLS = env.get_bool('EMAIL_USE_TLS')
 
 SENDFILE_BACKEND = env.get('SENDFILE_BACKEND', 'sendfile.backends.simple')
+
+MEMCACHE_KEY_PREFIX = env.get('MEMCACHE_KEY_PREFIX')
+if MEMCACHE_KEY_PREFIX:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+            'LOCATION': '127.0.0.1:11211',
+            'KEY_PREFIX': MEMCACHE_KEY_PREFIX
+        }
+    }
