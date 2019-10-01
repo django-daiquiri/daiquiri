@@ -64,8 +64,7 @@ class DoiMetadataOaiAdapterMixin(MetadataOaiAdapterMixin):
         identifier = self.get_identifier(schema.doi)
         datestamp = schema.updated or schema.published
         public = (schema.metadata_access_level == ACCESS_LEVEL_PUBLIC) \
-            and (schema.published is not None) \
-            and (schema.doi is not None)
+            and schema.published and schema.doi
 
         return schema.pk, identifier, datestamp, public
 
@@ -73,10 +72,9 @@ class DoiMetadataOaiAdapterMixin(MetadataOaiAdapterMixin):
         identifier = self.get_identifier(table.doi)
         datestamp = table.updated or table.published
         public = (table.metadata_access_level == ACCESS_LEVEL_PUBLIC) \
-            and (table.published is not None) \
-            and (table.doi is not None) \
+            and table.published and table.doi \
             and (table.schema.metadata_access_level == ACCESS_LEVEL_PUBLIC) \
-            and (table.schema.published is not None)
+            and table.schema.published
 
         return table.pk, identifier, datestamp, public
 
