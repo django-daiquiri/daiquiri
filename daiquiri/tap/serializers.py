@@ -22,6 +22,7 @@ class ColumnSerializer(serializers.ModelSerializer):
 
 class TableSerializer(serializers.ModelSerializer):
 
+    name = serializers.SerializerMethodField()
     columns = ColumnSerializer(many=True)
 
     class Meta:
@@ -33,6 +34,9 @@ class TableSerializer(serializers.ModelSerializer):
             'doi',
             'nrows'
         )
+
+    def get_name(self, obj):
+        return str(obj)
 
 
 class SchemaSerializer(serializers.ModelSerializer):
