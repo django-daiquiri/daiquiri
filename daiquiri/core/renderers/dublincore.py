@@ -10,7 +10,6 @@ class DublincoreRendererMixin(object):
 
         self.node('dc:identifier', {}, metadata.get('identifier'))
         self.node('dc:title', {}, metadata.get('title'))
-        self.node('dc:description', {}, metadata.get('description'))
 
         creators = metadata.get('creators')
         if isinstance(creators, list):
@@ -27,6 +26,8 @@ class DublincoreRendererMixin(object):
 
         self.node('dc:publisher', {}, metadata.get('publisher'))
 
+        if metadata.get('description'):
+            self.node('dc:description', {}, metadata.get('description'))
         if metadata.get('date'):
             self.node('dc:date', {}, metadata.get('date'))
         if metadata.get('rights'):

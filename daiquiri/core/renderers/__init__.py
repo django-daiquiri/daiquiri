@@ -33,7 +33,7 @@ class XMLRenderer(BaseRenderer):
     def end(self, tag):
         self.xml.endElement(tag)
 
-    def node(self, tag, attrs, text):
+    def node(self, tag, attrs, text=''):
         if text is None:
             attrs.update({'xsi:nil': 'true'})
 

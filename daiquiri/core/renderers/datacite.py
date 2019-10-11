@@ -54,7 +54,7 @@ class DataciteRendererMixin(object):
                 self.node('relatedIdentifier', {
                     'relatedIdentifierType': related_identifier.get('related_identifier_type'),
                     'relationType': related_identifier.get('relation_type')
-                }, subject.get('related_identifier'))
+                }, related_identifier.get('related_identifier'))
             self.end('relatedIdentifiers')
 
         size = metadata.get('size')
