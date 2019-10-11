@@ -4,7 +4,7 @@ import io
 import sys
 import struct
 
-from xml.sax.saxutils import quoteattr
+from xml.sax.saxutils import quoteattr, escape
 
 from django.contrib.sites.models import Site
 
@@ -92,7 +92,7 @@ def generate_votable(generator, fields, infos=[], links=[], table=None, empty=No
                     <TR>
                         <TD>%s</TD>
                     </TR>''' % '''</TD>
-                        <TD>'''.join([('' if cell == 'NULL' else str(cell)) for cell in row])
+                        <TD>'''.join([('' if cell == 'NULL' else escape(str(cell))) for cell in row])
 
         yield '''
                 </TABLEDATA>
