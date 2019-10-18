@@ -1,7 +1,6 @@
 import imp
 import os
 
-
 from django.utils.translation import ugettext_lazy as _
 
 import daiquiri.core.env as env
@@ -17,6 +16,10 @@ DEBUG = env.get_bool('DEBUG')
 SECRET_KEY = env.get('SECRET_KEY')
 
 ALLOWED_HOSTS = env.get_list('ALLOWED_HOSTS', ['localhost', '127.0.0.1', '::1'])
+
+if env.get_bool('PROXY'):
+    USE_X_FORWARDED_HOST = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 INTERNAL_IPS = env.get_list('INTERNAL_IPS', ['127.0.0.1'])
 
