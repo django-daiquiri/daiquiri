@@ -92,13 +92,13 @@ class OaiView(APIView):
 
         self.response = {
             'repository_name': settings.SITE_IDENTIFIER,
-            'admin_emails': settings.OAI_ADMIN_EMAILS,
+            'admin_emails': settings.SITE_CONTACT,
             'earliest_datestamp': earliest_record.datestamp if earliest_record else None,
             'deleted_record': settings.OAI_DELETED_RECORD,
             'granularity': settings.OAI_GRANULARITY,
             'identifier': {
                 'scheme': adapter.identifier_schema,
-                'repository_identifier': None, # adapter.identifier_repository,
+                'repository_identifier': None,  # adapter.identifier_repository,
                 'delimiter': adapter.identifier_delimiter
             },
             'registry': self.get_registry()

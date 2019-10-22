@@ -2,6 +2,9 @@ import daiquiri.core.env as env
 
 ASYNC = env.get_bool('ASYNC')
 
+IPV4_PRIVACY_MASK = 16
+IPV6_PRIVACY_MASK = 32
+
 SITE_URL = env.get('SITE_URL')
 
 SITE_IDENTIFIER = None
@@ -22,6 +25,3 @@ SITE_SUBJECTS = [
     }
 ]
 SITE_TYPE = 'service'
-
-IPV4_PRIVACY_MASK = 16
-IPV6_PRIVACY_MASK = 32
