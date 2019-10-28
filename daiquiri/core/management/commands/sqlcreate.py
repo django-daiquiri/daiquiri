@@ -86,4 +86,5 @@ class Command(BaseCommand):
         else:
             for key in ['default', 'data']:
                 config = self.get_config(key)
-                print(COMMANDS[config['ENGINE']][key] % config)
+                if config:
+                    print(COMMANDS[config['ENGINE']][key] % config)
