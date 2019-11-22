@@ -5,9 +5,8 @@ from django.apps import apps
 from django.conf import settings
 from django.http.request import QueryDict
 from django.utils.http import urlencode
-
-from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from .adapter import OaiAdapter
 from .models import Record
@@ -92,7 +91,7 @@ class OaiView(APIView):
 
         self.response = {
             'repository_name': settings.SITE_IDENTIFIER,
-            'admin_emails': settings.SITE_CONTACT,
+            'admin_email': settings.SITE_CONTACT['email'],
             'earliest_datestamp': earliest_record.datestamp if earliest_record else None,
             'deleted_record': settings.OAI_DELETED_RECORD,
             'granularity': settings.OAI_GRANULARITY,

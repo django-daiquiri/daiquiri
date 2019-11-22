@@ -1,6 +1,6 @@
 from daiquiri.core.renderers import XMLRenderer
-from daiquiri.core.renderers.dublincore import DublincoreRendererMixin
 from daiquiri.core.renderers.datacite import DataciteRendererMixin
+from daiquiri.core.renderers.dublincore import DublincoreRendererMixin
 from daiquiri.core.renderers.voresource import VoresourceRendererMixin
 
 
@@ -49,23 +49,22 @@ class OaiRenderer(DublincoreRendererMixin, DataciteRendererMixin, VoresourceRend
 
     def render_identify(self, repository_metadata, base_url):
         self.start('Identify')
-        self.node('repositoryName', {}, repository_metadata['repository_name'])
+        self.node('repositoryName', {}, repository_metadata.get('repository_name'))
         self.node('baseUrl', {}, base_url)
         self.node('protocolVersion', {}, '2.0')
-        for email in repository_metadata['admin_emails']:
-            self.node('adminEmail', {}, email)
-        self.node('earliestDatestamp', {}, repository_metadata['earliest_datestamp'])
-        self.node('deletedRecord', {}, repository_metadata['deleted_record'])
-        self.node('granularity', {}, repository_metadata['granularity'])
+        self.node('adminEmail', {}, repository_metadata['admin_email'])
+        self.node('earliestDatestamp', {}, repository_metadata.get('earliest_datestamp'))
+        self.node('deletedRecord', {}, repository_metadata.get('deleted_record'))
+        self.node('granularity', {}, repository_metadata.get('granularity'))
         self.render_identify_description(repository_metadata)
         self.end('Identify')
 
     def render_identify_description(self, repository_metadata):
         self.start('description')
         if repository_metadata['identifier'] is not None:
-            self.render_oai_identifier(repository_metadata['identifier'])
+            self.render_oai_identifier(repository_metadata.get('identifier'))
         if repository_metadata['registry'] is not None:
-            self.render_voresource(repository_metadata['registry'])
+            self.render_voresource(repository_metadata.get('registry'))
         self.end('description')
 
     def render_oai_identifier(self, identifier_metadata):
