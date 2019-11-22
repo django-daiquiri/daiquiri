@@ -7,7 +7,7 @@ python:
 - 3.7
 
 addons:
-  mariadb: '10.1'
+  mariadb: '10.3'
   postgresql: '10'
 
 env:
@@ -15,8 +15,7 @@ env:
 - DB=postgres
 
 before_install:
-  - sudo apt-get -qq update
-  - sudo apt-get install -y libmariadbd-dev libmariadbclient-dev
+- sudo apt-get -qq update
 
 install:
 - pip install --upgrade pip setuptools wheel
