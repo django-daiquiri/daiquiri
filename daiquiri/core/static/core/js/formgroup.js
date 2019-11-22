@@ -22,7 +22,7 @@ angular.module('core')
             var staticurl = angular.element('meta[name="staticurl"]').attr('content');
             return staticurl + 'core/html/formgroup_' + attrs.type + '.html';
         },
-        link: function(scope, element, attrs) {
+        link: function(scope, element, attrs, ngModelController) {
             if (!attrs.optionsId) {
                 attrs.optionsId = 'id';
             }

@@ -97,7 +97,6 @@ angular.module('core', ['ngResource', 'ngSanitize'])
         require: 'ngModel',
         link: function(scope, element, attrs, ngModelController) {
             ngModelController.$parsers.push(function(view_value) {
-                console.log(view_value);
                 if (view_value === null) {
                     return null
                 } else {
@@ -118,4 +117,29 @@ angular.module('core', ['ngResource', 'ngSanitize'])
             });
         }
     };
-}]);
+}])
+
+.directive('splitLines', function() {
+    return {
+        restrict: 'A',
+        require: 'ngModel',
+        link: function(scope, element, attrs, ngModelController) {
+            ngModelController.$parsers.push(function(view_value) {
+                if (view_value === null) {
+                    return null
+                } else {
+                    return view_value.split("\n")
+                }
+            });
+
+            ngModelController.$formatters.push(function(model_value) {
+                if (model_value === null) {
+                    return null
+                } else {
+                    return model_value.join("\n");
+                }
+            });
+        }
+    };
+})
+;

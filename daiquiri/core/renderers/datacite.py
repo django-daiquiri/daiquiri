@@ -116,7 +116,7 @@ class DataciteRendererMixin(object):
 
             affiliations = person.get('affiliations')
             if affiliations:
-                for affiliation in affiliations.splitlines():
+                for affiliation in affiliations:
                     self.node('affiliation', {}, affiliation)
 
             self.end(person_type)
