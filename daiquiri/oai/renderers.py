@@ -50,7 +50,7 @@ class OaiRenderer(DublincoreRendererMixin, DataciteRendererMixin, VoresourceRend
     def render_identify(self, repository_metadata, base_url):
         self.start('Identify')
         self.node('repositoryName', {}, repository_metadata.get('repository_name'))
-        self.node('baseUrl', {}, base_url)
+        self.node('baseURL', {}, base_url)
         self.node('protocolVersion', {}, '2.0')
         self.node('adminEmail', {}, repository_metadata['admin_email'])
         self.node('earliestDatestamp', {}, repository_metadata.get('earliest_datestamp'))
