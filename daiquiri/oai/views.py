@@ -98,7 +98,8 @@ class OaiView(APIView):
             'identifier': {
                 'scheme': adapter.identifier_schema,
                 'repository_identifier': adapter.identifier_repository,
-                'delimiter': adapter.identifier_delimiter
+                'delimiter': adapter.identifier_delimiter,
+                'sample_identifier': adapter.get_sample_identifier()
             },
             'registry': self.get_registry()
         }

@@ -1,6 +1,5 @@
-from django.conf import settings
-
 from daiquiri.core.utils import import_class
+from django.conf import settings
 
 
 def OaiAdapter():
@@ -42,3 +41,9 @@ class BaseOaiAdapter(object):
             return self.identifier_delimiter.join([self.identifier_schema, self.identifier_repository, identifier])
         else:
             return self.identifier_delimiter.join([self.identifier_schema, identifier])
+
+    def get_sample_identifier(self):
+        if self.identifier_repository:
+            return self.identifier_delimiter.join([self.identifier_schema, self.identifier_repository, 'example'])
+        else:
+            return self.identifier_delimiter.join([self.identifier_schema, 'example'])

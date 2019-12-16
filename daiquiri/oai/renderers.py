@@ -77,9 +77,9 @@ class OaiRenderer(DublincoreRendererMixin, DataciteRendererMixin, VoresourceRend
             'xsi:schemaLocation': 'http://www.openarchives.org/OAI/2.0/oai-identifier http://www.openarchives.org/OAI/2.0/oai-identifier.xsd'
         })
         self.node('scheme', {}, identifier_metadata.get('scheme'))
-        if identifier_metadata.get('repository_identifier'):
-            self.node('repositoryIdentifier', {}, identifier_metadata.get('repository_identifier'))
+        self.node('repositoryIdentifier', {}, identifier_metadata.get('repository_identifier'))
         self.node('delimiter', {}, identifier_metadata.get('delimiter'))
+        self.node('sampleIdentifier', {}, identifier_metadata.get('sample_identifier'))
         self.end('oai-identifier')
 
     def render_list_identifiers(self, items, resumption_token):
