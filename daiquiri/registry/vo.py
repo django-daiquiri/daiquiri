@@ -29,6 +29,7 @@ def get_resource():
         'type': 'vg:Registry',
         'created': settings.SITE_CREATED,
         'updated': settings.SITE_UPDATED,
+        'vodataservice_type': 'vg:Registry',
         'voresource_status': 'active'
     }
 
