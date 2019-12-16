@@ -14,8 +14,8 @@ class VoresourceRendererMixin(CapabilitiesRendererMixin, TablesetRendererMixin):
             'xmlns:ri': 'http://www.ivoa.net/xml/RegistryInterface/v1.0',
             'xmlns:vg': 'http://www.ivoa.net/xml/VORegistry/v1.0',
             'xmlns:vr': 'http://www.ivoa.net/xml/VOResource/v1.0',
-            'xmlns:vs': 'http://www.ivoa.net/xml/VODataService/v1.2',
-            'xsi:schemaLocation': 'http://www.ivoa.net/xml/RegistryInterface/v1.0 http://www.ivoa.net/xml/VORegistry/v1.0 http://www.ivoa.net/xml/VOResource/v1.0 http://www.ivoa.net/xml/VODataService/v1.2'
+            'xmlns:vs': 'http://www.ivoa.net/xml/VODataService/v1.1',
+            'xsi:schemaLocation': 'http://www.ivoa.net/xml/RegistryInterface/v1.0 http://www.ivoa.net/xml/VORegistry/v1.0 http://www.ivoa.net/xml/VOResource/v1.0 http://www.ivoa.net/xml/VODataService/v1.1'
         })
 
         self.node('title', {}, metadata.get('title'))
