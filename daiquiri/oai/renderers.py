@@ -63,6 +63,9 @@ class OaiRenderer(DublincoreRendererMixin, DataciteRendererMixin, VoresourceRend
         self.start('description')
         if repository_metadata['identifier'] is not None:
             self.render_oai_identifier(repository_metadata.get('identifier'))
+        self.end('description')
+
+        self.start('description')
         if repository_metadata['registry'] is not None:
             self.render_voresource(repository_metadata.get('registry'))
         self.end('description')
