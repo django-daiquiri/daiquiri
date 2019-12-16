@@ -1,31 +1,22 @@
 from django.urls import include, path
-
 from rest_framework import routers
 
-from .views import QueryView, JobsView, ExamplesView
-from .viewsets import (
-    StatusViewSet,
-    FormViewSet,
-    DropdownViewSet,
-    QueryJobViewSet,
-    ExampleViewSet,
-    QueueViewSet,
-    QueryLanguageViewSet,
-    PhaseViewSet
-)
-
+from .views import ExamplesView, JobsView, QueryView
+from .viewsets import (DropdownViewSet, ExampleViewSet, FormViewSet,
+                       PhaseViewSet, QueryJobViewSet, QueryLanguageViewSet,
+                       QueueViewSet, StatusViewSet)
 
 app_name = 'query'
 
 router = routers.DefaultRouter()
-router.register(r'status', StatusViewSet, base_name='status')
-router.register(r'forms', FormViewSet, base_name='form')
-router.register(r'dropdowns', DropdownViewSet, base_name='dropdown')
-router.register(r'jobs', QueryJobViewSet, base_name='job')
-router.register(r'examples', ExampleViewSet, base_name='example')
-router.register(r'queues', QueueViewSet, base_name='queue')
-router.register(r'querylanguages', QueryLanguageViewSet, base_name='querylanguage')
-router.register(r'phases', PhaseViewSet, base_name='phase')
+router.register(r'status', StatusViewSet, basename='status')
+router.register(r'forms', FormViewSet, basename='form')
+router.register(r'dropdowns', DropdownViewSet, basename='dropdown')
+router.register(r'jobs', QueryJobViewSet, basename='job')
+router.register(r'examples', ExampleViewSet, basename='example')
+router.register(r'queues', QueueViewSet, basename='queue')
+router.register(r'querylanguages', QueryLanguageViewSet, basename='querylanguage')
+router.register(r'phases', PhaseViewSet, basename='phase')
 
 urlpatterns = [
     path(r'', QueryView.as_view(), name='query'),

@@ -1,33 +1,21 @@
 from django.urls import include, path, re_path
-
 from rest_framework import routers
 
-from .views import (
-    ManagementView,
-    SchemaView,
-    TableView
-)
-from .viewsets import (
-    SchemaViewSet,
-    TableViewSet,
-    ColumnViewSet,
-    FunctionViewSet,
-    TableTypeViewSet,
-    LicenseViewSet,
-    AccessLevelViewSet
-)
-
+from .views import ManagementView, SchemaView, TableView
+from .viewsets import (AccessLevelViewSet, ColumnViewSet, FunctionViewSet,
+                       LicenseViewSet, SchemaViewSet, TableTypeViewSet,
+                       TableViewSet)
 
 app_name = 'metadata'
 
 router = routers.DefaultRouter()
-router.register(r'schemas', SchemaViewSet, base_name='schema')
-router.register(r'tables', TableViewSet, base_name='table')
-router.register(r'columns', ColumnViewSet, base_name='column')
-router.register(r'functions', FunctionViewSet, base_name='function')
-router.register(r'tabletypes', TableTypeViewSet, base_name='tabletype')
-router.register(r'licenses', LicenseViewSet, base_name='license')
-router.register(r'accesslevels', AccessLevelViewSet, base_name='accesslevel')
+router.register(r'schemas', SchemaViewSet, basename='schema')
+router.register(r'tables', TableViewSet, basename='table')
+router.register(r'columns', ColumnViewSet, basename='column')
+router.register(r'functions', FunctionViewSet, basename='function')
+router.register(r'tabletypes', TableTypeViewSet, basename='tabletype')
+router.register(r'licenses', LicenseViewSet, basename='license')
+router.register(r'accesslevels', AccessLevelViewSet, basename='accesslevel')
 
 urlpatterns = [
     path('api/', include(router.urls)),

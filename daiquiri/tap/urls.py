@@ -1,17 +1,15 @@
+from daiquiri.jobs.routers import JobRouter
+from daiquiri.query.viewsets import AsyncQueryJobViewSet, SyncQueryJobViewSet
 from django.urls import include, path, re_path
 from django.views.generic import TemplateView
 
-from daiquiri.jobs.routers import JobRouter
-from daiquiri.query.viewsets import SyncQueryJobViewSet, AsyncQueryJobViewSet
-
-from .views import resource, availability, capabilities, tables, examples
-
+from .views import availability, capabilities, examples, resource, tables
 
 app_name = 'tap'
 
 router = JobRouter(trailing_slash=False)
-router.register(r'sync', SyncQueryJobViewSet, base_name='sync')
-router.register(r'async', AsyncQueryJobViewSet, base_name='async')
+router.register(r'sync', SyncQueryJobViewSet, basename='sync')
+router.register(r'async', AsyncQueryJobViewSet, basename='async')
 
 urlpatterns = [
     path('', TemplateView.as_view(template_name='tap/root.html'), name='root'),

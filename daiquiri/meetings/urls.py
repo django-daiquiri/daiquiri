@@ -1,36 +1,22 @@
 from django.urls import include, path
-
 from rest_framework import routers
 
-from .views import (
-    registration,
-    registration_done,
-    participants,
-    contributions,
-    ManagementView,
-    ParticipantExportView,
-    AbstractExportView,
-    EmailExportView
-)
-from .viewsets import (
-    MeetingViewSet,
-    ParticipantViewSet,
-    ContributionViewSet,
-    ContributionTypeViewSet,
-    StatusViewSet,
-    PaymentViewSet
-)
-
+from .views import (AbstractExportView, EmailExportView, ManagementView,
+                    ParticipantExportView, contributions, participants,
+                    registration, registration_done)
+from .viewsets import (ContributionTypeViewSet, ContributionViewSet,
+                       MeetingViewSet, ParticipantViewSet, PaymentViewSet,
+                       StatusViewSet)
 
 app_name = 'meetings'
 
 router = routers.DefaultRouter()
-router.register(r'meetings', MeetingViewSet, base_name='meeting')
-router.register(r'participants', ParticipantViewSet, base_name='participant')
-router.register(r'contributions', ContributionViewSet, base_name='contribution')
-router.register(r'contributiontypes', ContributionTypeViewSet, base_name='contributiontype')
-router.register(r'statuses', StatusViewSet, base_name='status')
-router.register(r'payments', PaymentViewSet, base_name='payment')
+router.register(r'meetings', MeetingViewSet, basename='meeting')
+router.register(r'participants', ParticipantViewSet, basename='participant')
+router.register(r'contributions', ContributionViewSet, basename='contribution')
+router.register(r'contributiontypes', ContributionTypeViewSet, basename='contributiontype')
+router.register(r'statuses', StatusViewSet, basename='status')
+router.register(r'payments', PaymentViewSet, basename='payment')
 
 urlpatterns = [
     path('api/', include(router.urls)),
