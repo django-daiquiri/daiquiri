@@ -97,7 +97,7 @@ class OaiView(APIView):
             'granularity': settings.OAI_GRANULARITY,
             'identifier': {
                 'scheme': adapter.identifier_schema,
-                'repository_identifier': None,  # adapter.identifier_repository,
+                'repository_identifier': adapter.identifier_repository,
                 'delimiter': adapter.identifier_delimiter
             },
             'registry': self.get_registry()
