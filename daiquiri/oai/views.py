@@ -234,7 +234,7 @@ class OaiView(APIView):
 
             query_dict = QueryDict(query_string=unquote(resumption_token), mutable=False)
             verb, arguments = self.get_verb_and_arguments(query_dict)
-            if verb is None:
+            if 'start' not in arguments:
                 self.errors.append(('badResumptionToken', 'The value of the resumptionToken argument is invalid.'))
 
         return arguments
