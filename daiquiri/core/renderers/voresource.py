@@ -18,8 +18,8 @@ class VoresourceRendererMixin(CapabilitiesRendererMixin, TablesetRendererMixin):
             'xsi:schemaLocation': 'http://www.ivoa.net/xml/RegistryInterface/v1.0 http://www.ivoa.net/xml/VORegistry/v1.0 http://www.ivoa.net/xml/VOResource/v1.0 http://www.ivoa.net/xml/VODataService/v1.2'
         })
 
-        self.node('identifier', {}, metadata.get('identifier'))
         self.node('title', {}, metadata.get('title'))
+        self.node('identifier', {}, metadata.get('identifier'))
 
         if metadata.get('short_name'):
             self.node('shortName', {}, metadata.get('short_name'))
