@@ -1,3 +1,4 @@
+from django.apps import apps
 from django.conf import settings
 from django.urls import reverse
 
@@ -32,7 +33,8 @@ def get_resource():
         'created': settings.SITE_CREATED,
         'updated': settings.SITE_UPDATED,
         'type': 'vg:Registry',
-        'status': 'active'
+        'status': 'active',
+        'tableset': get_tap_tableset()
     }
 
 
@@ -133,3 +135,9 @@ def get_capabilities():
             }
         }
     ]
+
+
+def get_tap_tableset():
+    if apps.is_installed('daiquiri.tap'):
+        from daiquiri.tap.vo import get_tableset
+        return get_tableset()

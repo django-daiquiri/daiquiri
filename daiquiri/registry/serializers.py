@@ -32,5 +32,6 @@ class VoresourceSerializer(serializers.Serializer):
     capabilities = JSONListField(default=[])
     tableset = JSONListField(default=[])
 
+    full = serializers.ReadOnlyField(default=None)
     managed_authority = serializers.ReadOnlyField(default=None)
     managing_org = serializers.ReadOnlyField(default=None)

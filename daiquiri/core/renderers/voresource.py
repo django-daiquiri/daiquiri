@@ -29,20 +29,16 @@ class VoresourceRendererMixin(CapabilitiesRendererMixin, TablesetRendererMixin):
         self.render_curation(metadata.get('curation', {}))
         self.render_content(metadata.get('content', {}))
 
-        for capability in metadata.get('capabilities', []):
-            self.render_capability(capability)
-
-        tableset = metadata.get('tableset', [])
-        if tableset:
-            self.start('tableset')
-            self.render_tableset(tableset)
-            self.end('tableset')
-
         rights = metadata.get('rights')
         if rights:
             self.node('rights', {}, metadata.get('rights'))
 
-        self.node('full', {}, metadata.get('full', 'false'))
+        for capability in metadata.get('capabilities', []):
+            self.render_capability(capability)
+
+        full = metadata.get('full')
+        if full:
+            self.node('full', {}, full)
 
         managed_authority = metadata.get('managed_authority')
         if managed_authority:
@@ -51,6 +47,12 @@ class VoresourceRendererMixin(CapabilitiesRendererMixin, TablesetRendererMixin):
         managing_org = metadata.get('managing_org')
         if managing_org:
             self.node('managingOrg', {}, managing_org)
+
+        tableset = metadata.get('tableset', [])
+        if tableset:
+            self.start('tableset')
+            self.render_tableset(tableset)
+            self.end('tableset')
 
         self.end('ri:Resource')
 
