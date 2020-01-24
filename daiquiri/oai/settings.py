@@ -29,6 +29,11 @@ OAI_METADATA_FORMATS = [
         'renderer_class': 'daiquiri.oai.renderers.VoresourceRenderer'
     }
 ]
+OAI_SETS = [
+    {
+        'spec': 'ivo_managed'
+    }
+]
 OAI_DELETED_RECORD = 'transient'
 OAI_GRANULARITY = 'YYYY-MM-DD'
 OAI_PAGE_SIZE = 500

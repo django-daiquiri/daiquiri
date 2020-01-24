@@ -122,6 +122,13 @@ class OaiRenderer(DublincoreRendererMixin, DataciteRendererMixin, VoresourceRend
 
     def render_list_sets(self, data):
         self.start('ListSets')
+        self.start('set')
+        for oai_set in data['oai_sets']:
+            self.node('setSpec', {}, oai_set['setSpec'])
+            self.node('setName', {}, oai_set['setName'])
+            if oai_set['setDescription'] is not None:
+                self.node('setDescription', {}, oai_set['setDescription'])
+        self.end('set')
         self.end('ListSets')
 
     def render_record(self, record):

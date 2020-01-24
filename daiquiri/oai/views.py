@@ -208,7 +208,18 @@ class OaiView(APIView):
 
     def list_sets(self, arguments):
         self.validate_illegal_arguments(arguments, ['resumptionToken'])
-        self.errors.append(('noSetHierarchy', 'This repository does not support sets'))
+        if settings.OAI_SETS:
+            self.response = {
+                'oai_sets': [
+                    {
+                        'setSpec': oai_set.get('spec'),
+                        'setName': oai_set.get('name', oai_set.get('spec')),
+                        'setDescription': oai_set.get('description')
+                    } for oai_set in settings.OAI_SETS
+                ]
+            }
+        else:
+            self.errors.append(('noSetHierarchy', 'This repository does not support sets'))
 
     def validate_illegal_arguments(self, arguments, valid_keys):
         for key in arguments:
