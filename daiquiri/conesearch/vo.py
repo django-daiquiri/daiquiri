@@ -20,7 +20,7 @@ def get_resource():
         'capabilities': get_capabilities(),
         'created': settings.SITE_CREATED,
         'updated': settings.SITE_UPDATED,
-        'type': 'vg:CatalogResource',
+        'type': 'vg:CatalogService',
         'status': 'active'
     }
 
