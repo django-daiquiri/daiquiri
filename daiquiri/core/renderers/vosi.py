@@ -1,5 +1,5 @@
-from daiquiri.core.utils import get_doi_url
 from daiquiri.core.renderers import XMLRenderer
+from daiquiri.core.utils import get_doi_url
 
 
 class AvailabilityRenderer(XMLRenderer):
@@ -97,17 +97,20 @@ class CapabilitiesRenderer(CapabilitiesRendererMixin, XMLRenderer):
 
 class TablesetRendererMixin(object):
 
-    def render_tableset(self, tableset):
+    def render_tableset(self, tableset, strict=False):
         for schema in tableset:
             self.start('schema')
             self.node('name', {}, schema.get('name'))
             self.node('description', {}, schema.get('description'))
 
             for table in schema.get('tables'):
-                self.start('table', {
-                    'doi': get_doi_url(table.get('doi')),
-                    'size': str(table.get('nrows'))
-                })
+                if strict:
+                    self.start('table')
+                else:
+                    self.start('table', {
+                        'doi': get_doi_url(table.get('doi')),
+                        'size': str(table.get('nrows'))
+                    })
                 self.node('name', {}, table.get('name'))
                 self.node('description', {}, table.get('description'))
 

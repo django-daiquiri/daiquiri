@@ -51,7 +51,7 @@ class VoresourceRendererMixin(CapabilitiesRendererMixin, TablesetRendererMixin):
         tableset = metadata.get('tableset', [])
         if tableset:
             self.start('tableset')
-            self.render_tableset(tableset)
+            self.render_tableset(tableset, strict=True)
             self.end('tableset')
 
         self.end('ri:Resource')
