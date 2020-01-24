@@ -53,7 +53,7 @@ class VoresourceRendererMixin(CapabilitiesRendererMixin, TablesetRendererMixin):
     def render_curation(self, curation_metadata):
         self.start('curation')
         self.node('publisher', {}, curation_metadata.get('publisher'))
-        self.node('date', {'role': 'updated'}, curation_metadata.get('date'))
+        self.node('date', {'role': 'updated'}, curation_metadata.get('date') + 'T00:00:00Z')
 
         creator = curation_metadata.get('creator')
         if creator:
