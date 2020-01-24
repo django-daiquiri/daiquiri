@@ -251,7 +251,7 @@ class OaiView(APIView):
         return arguments
 
     def validate_set(self, arguments):
-        if 'set' in arguments:
+        if 'set' in arguments and not settings.OAI_SETS:
             self.errors.append(('noSetHierarchy', 'This repository does not support sets'))
 
     def validate_identifier(self, arguments):
