@@ -117,9 +117,9 @@ class TablesetRendererMixin(object):
                 for column in table['columns']:
                     self.start('column', {'std': 'true'} if column['std'] else {})
                     self.node('name', {}, column['name'])
-                    self.node('description', {}, column.get('description', ''))
-                    self.node('unit', {}, column.get('unit', ''))
-                    self.node('ucd', {}, column.get('ucd', ''))
+                    self.node('description', {}, column.get('description') or '')
+                    self.node('unit', {}, column.get('unit') or '')
+                    self.node('ucd', {}, column.get('ucd') or '')
 
                     self.node('dataType', {'xsi:type': 'vs:VOTableType'}, column.get('datatype'))
                     for key in ['indexed', 'principal']:
