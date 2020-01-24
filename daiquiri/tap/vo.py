@@ -24,7 +24,7 @@ def get_resource():
         'tableset': get_tableset(),
         'created': settings.SITE_CREATED,
         'updated': settings.SITE_UPDATED,
-        'type': 'vg:CatalogResource',
+        'type': 'vs:CatalogResource',
         'status': 'active'
     }
 

@@ -1,5 +1,6 @@
-from daiquiri.core.utils import import_class
 from django.conf import settings
+
+from daiquiri.core.utils import import_class
 
 
 def OaiAdapter():

@@ -83,7 +83,7 @@ def get_web_resource():
         ],
         'created': settings.SITE_CREATED,
         'updated': settings.SITE_UPDATED,
-        'type': 'vg:CatalogResource',
+        'type': 'vs:CatalogResource',
         'status': 'active'
     }
 
