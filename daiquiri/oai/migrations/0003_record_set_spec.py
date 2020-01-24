@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='record',
             name='set_spec',
-            field=models.CharField(blank=True, db_index=True, max_length=16, verbose_name='OAI set spec'),
+            field=models.CharField(blank=True, db_index=True, max_length=256, verbose_name='OAI set spec'),
         ),
     ]

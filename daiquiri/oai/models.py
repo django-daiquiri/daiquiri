@@ -18,7 +18,7 @@ class Record(models.Model):
         verbose_name=_('OAI metadataPrefix'),
     )
     set_spec = models.CharField(
-        max_length=16, db_index=True, blank=True,
+        max_length=256, db_index=True, blank=True,
         verbose_name=_('OAI set spec'),
     )
     deleted = models.BooleanField(
