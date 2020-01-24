@@ -55,20 +55,20 @@ def get_capabilities():
                         'name': 'RA',
                         'description': 'Right Ascension (ICRS decimal)',
                         'ucd': 'pos.eq.ra',
-                        'datatype': 'double'
+                        'datatype': 'real'
                     },
                     {
                         'std': 'true',
                         'name': 'DEC',
                         'description': 'Declination (ICRS decimal)',
                         'ucd': 'pos.eq.dec',
-                        'datatype': 'double'
+                        'datatype': 'real'
                     },
                     {
                         'std': 'true',
                         'name': 'SR',
                         'description': 'Search radius',
-                        'datatype': 'double'
+                        'datatype': 'real'
                     },
                     {
                         'std': 'true',
