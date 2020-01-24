@@ -9,7 +9,7 @@ class Record(models.Model):
         db_index=True,
         verbose_name=_('OAI identifier'),
     )
-    datestamp = models.DateField(
+    datestamp = models.DateTimeField(
         db_index=True,
         verbose_name=_('OAI datestamp'),
     )
