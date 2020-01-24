@@ -7,7 +7,8 @@ def get_curation():
         'publisher': settings.SITE_PUBLISHER,
         'date': settings.SITE_UPDATED,
         'creator': {
-            'name': settings.SITE_CREATOR
+            'name': settings.SITE_CREATOR,
+            'logo': settings.SITE_LOGO_URL,
         },
         'contact': settings.SITE_CONTACT
     }
@@ -20,13 +21,14 @@ def get_resource():
         'title': '%s Registry' % settings.SITE_TITLE,
         'curation': get_curation(),
         'content': {
+            'subjects': settings.REGISTRY_SUBJECTS,
             'type': 'Registry',
             'description': 'The publishing registry for %s.' % settings.SITE_IDENTIFIER,
             'referenceURL': settings.SITE_URL.rstrip('/') + reverse('registry:root')
         },
         'capabilities': get_capabilities(),
+        'full': 'false',
         'managed_authority': settings.SITE_IDENTIFIER,
-        'type': 'vg:Registry',
         'created': settings.SITE_CREATED,
         'updated': settings.SITE_UPDATED,
         'type': 'vg:Registry',

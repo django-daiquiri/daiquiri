@@ -42,6 +42,10 @@ class VoresourceRendererMixin(CapabilitiesRendererMixin, TablesetRendererMixin):
         if rights:
             self.node('rights', {}, metadata.get('rights'))
 
+        full = metadata.get('full')
+        if full:
+            self.node('full', {}, metadata.get('full'))
+
         managed_authority = metadata.get('managed_authority')
         if managed_authority:
             self.node('managedAuthority', {}, managed_authority)
@@ -55,7 +59,6 @@ class VoresourceRendererMixin(CapabilitiesRendererMixin, TablesetRendererMixin):
     def render_curation(self, curation_metadata):
         self.start('curation')
         self.node('publisher', {}, curation_metadata.get('publisher'))
-        self.node('date', {'role': 'updated'}, self.render_date(curation_metadata.get('date')))
 
         creator = curation_metadata.get('creator')
         if creator:
@@ -63,6 +66,8 @@ class VoresourceRendererMixin(CapabilitiesRendererMixin, TablesetRendererMixin):
             self.node('name', {}, creator.get('name'))
             self.node('logo', {}, creator.get('logo'))
             self.end('creator')
+
+        self.node('date', {'role': 'updated'}, self.render_date(curation_metadata.get('date')))
 
         contact = curation_metadata.get('contact')
         if contact:
@@ -77,9 +82,11 @@ class VoresourceRendererMixin(CapabilitiesRendererMixin, TablesetRendererMixin):
 
     def render_content(self, content_metadata):
         self.start('content')
-        self.node('type', {}, content_metadata.get('type'))
+        for subject in content_metadata.get('subjects', []):
+            self.node('subject', {}, subject)
         self.node('description', {}, content_metadata.get('description'))
         self.node('referenceURL', {}, content_metadata.get('referenceURL'))
+        self.node('type', {}, content_metadata.get('type'))
         self.end('content')
 
     def render_date(self, date):
