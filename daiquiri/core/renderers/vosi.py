@@ -121,7 +121,7 @@ class TablesetRendererMixin(object):
                     self.node('unit', {}, column.get('unit') or '')
                     self.node('ucd', {}, column.get('ucd') or '')
 
-                    self.node('dataType', {'xsi:type': 'vs:VOTableType'}, column.get('datatype'))
+                    self.render_datatype(column.get('datatype'))
                     for key in ['indexed', 'principal']:
                         if key in column and column.get('key'):
                             self.node('flag', {}, key)
@@ -131,6 +131,14 @@ class TablesetRendererMixin(object):
                 self.end('table')
 
             self.end('schema')
+
+    def render_datatype(self, datatype):
+        if datatype in ['boolean', 'bit', 'unsignedByte', 'short', 'int', 'long', 'char', 'unicodeChar', 'float', 'double', 'floatComplex', 'doubleComplex']:
+            self.node('dataType', {'xsi:type': 'vs:VOTableType'}, datatype)
+        elif datatype == 'timestamp':
+            self.node('dataType', {'xsi:type': 'vs:VOTableType', 'extendedType': 'timestamp'}, 'char')
+        else:
+            self.node('dataType', {'xsi:type': 'vs:VOTableType'}, 'char')
 
 
 class TablesetRenderer(TablesetRendererMixin, XMLRenderer):
