@@ -42,9 +42,7 @@ class VoresourceRendererMixin(CapabilitiesRendererMixin, TablesetRendererMixin):
         if rights:
             self.node('rights', {}, metadata.get('rights'))
 
-        full = metadata.get('full')
-        if full:
-            self.node('full', {}, metadata.get('full'))
+        self.node('full', {}, metadata.get('full', 'false'))
 
         managed_authority = metadata.get('managed_authority')
         if managed_authority:
