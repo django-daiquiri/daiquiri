@@ -157,13 +157,16 @@ class OaiView(APIView):
 
         from_date = self.validate_date('from', arguments)
         until_date = self.validate_date('until', arguments)
+        set_spec = self.validate_set(arguments)
         self.validate_metadata_prefix(arguments)
-        self.validate_set(arguments)
 
         if self.errors:
             return
 
         records = Record.objects.filter(metadata_prefix=arguments['metadataPrefix'])
+
+        if set_spec:
+            records = records.filter(set_spec=set_spec)
 
         if from_date:
             records = records.filter(datestamp__gte=from_date)
@@ -251,8 +254,13 @@ class OaiView(APIView):
         return arguments
 
     def validate_set(self, arguments):
-        if 'set' in arguments and not settings.OAI_SETS:
-            self.errors.append(('noSetHierarchy', 'This repository does not support sets'))
+        if 'set' in arguments:
+            if not settings.OAI_SETS:
+                self.errors.append(('noSetHierarchy', 'This repository does not support sets'))
+            else:
+                return arguments['set']
+        else:
+            return None
 
     def validate_identifier(self, arguments):
         if 'identifier' not in arguments:
