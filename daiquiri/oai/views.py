@@ -179,16 +179,15 @@ class OaiView(APIView):
 
             records = records[start:stop]
 
-            if records.count() == settings.OAI_PAGE_SIZE:
-                token = quote(urlencode(dict(start=stop, **arguments)))
+            if stop < count:
+                resumption_token = {
+                    'completeListSize': count,
+                    'cursor': start,
+                    'token': quote(urlencode(dict(start=stop, **arguments)))
+                }
             else:
-                token = ''
+                resumption_token = False
 
-            resumption_token = {
-                'completeListSize': count,
-                'cursor': start,
-                'token': token
-            }
         else:
             resumption_token = False
 
