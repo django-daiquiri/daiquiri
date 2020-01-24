@@ -15,6 +15,7 @@ def get_resource():
         'title': '%s TAP Service' % settings.SITE_TITLE,
         'curation': get_curation(),
         'content': {
+            'subjects': settings.TAP_SUBJECTS,
             'type': 'Catalog',
             'description': 'The TAP Service registry for %s.' % settings.SITE_IDENTIFIER,
             'referenceURL': settings.SITE_URL.rstrip('/') + reverse('tap:root')

@@ -13,6 +13,7 @@ def get_resource():
         'title': '%s Cone Search Service' % settings.SITE_TITLE,
         'curation': get_curation(),
         'content': {
+            'subjects': settings.CONESEARCH_SUBJECTS,
             'type': 'Catalog',
             'description': 'The Cone Search Service for %s.' % settings.SITE_IDENTIFIER,
             'referenceURL': settings.SITE_URL.rstrip('/')  # + reverse('conesearch:root')

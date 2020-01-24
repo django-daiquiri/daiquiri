@@ -43,6 +43,7 @@ def get_authority_resource():
         'title': settings.SITE_IDENTIFIER,
         'curation': get_curation(),
         'content': {
+            'subjects': settings.REGISTRY_AUTHORITY_SUBJECTS,
             'type': 'Authority',
             'description': 'The authority for %s.' % settings.SITE_IDENTIFIER,
             'referenceURL': settings.SITE_URL.rstrip('/')
@@ -63,6 +64,7 @@ def get_web_resource():
         'title': settings.SITE_IDENTIFIER,
         'curation': get_curation(),
         'content': {
+            'subjects': settings.REGISTRY_WEB_SUBJECTS,
             'type': 'Catalog',
             'description': 'The main web service for %s.' % settings.SITE_IDENTIFIER,
             'referenceURL': settings.SITE_URL.rstrip('/')
@@ -70,6 +72,7 @@ def get_web_resource():
         'capabilities': [
             {
                 'interface': {
+                    'subjects': ['Web browser'],
                     'type': 'vr:WebBrowser',
                     'access_url': {
                         'use': 'full',

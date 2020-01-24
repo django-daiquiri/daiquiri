@@ -1,3 +1,9 @@
 REGISTRY_SUBJECTS = [
-    'data repositories'
+    'registry'
+]
+REGISTRY_AUTHORITY_SUBJECTS = [
+    'authority'
+]
+REGISTRY_WEB_SUBJECTS = [
+    'web service'
 ]
