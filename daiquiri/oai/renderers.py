@@ -7,19 +7,19 @@ from daiquiri.core.renderers.voresource import VoresourceRendererMixin
 class OaiRenderer(DublincoreRendererMixin, DataciteRendererMixin, VoresourceRendererMixin, XMLRenderer):
 
     def render_document(self, data, accepted_media_type=None, renderer_context=None):
-        self.start('OAI-PMH', {
-            'xmlns': 'http://www.openarchives.org/OAI/2.0/',
+        self.start('oai:OAI-PMH', {
+            'xmlns:oai': 'http://www.openarchives.org/OAI/2.0/',
             'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
             'xsi:schemaLocation': 'http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd'
         })
-        self.node('responseDate', {}, data['responseDate'])
+        self.node('oai:responseDate', {}, data['responseDate'])
 
         request_arguments = data['arguments']
         for error_code, _ in data['errors']:
             if error_code in ['badVerb', 'badArgument']:
                 request_arguments = {}
 
-        self.node('request', request_arguments, data['baseUrl'])
+        self.node('oai:request', request_arguments, data['baseUrl'])
 
         if data['errors']:
             self.render_errors(data['errors'])
@@ -36,39 +36,39 @@ class OaiRenderer(DublincoreRendererMixin, DataciteRendererMixin, VoresourceRend
         elif data['verb'] == 'ListSets':
             self.render_list_sets(data['response'])
 
-        self.end('OAI-PMH')
+        self.end('oai:OAI-PMH')
 
     def render_errors(self, errors):
         for error_code, error_message in errors:
             self.node('error', {'code': error_code}, error_message)
 
     def render_get_record(self, item):
-        self.start('GetRecord')
+        self.start('oai:GetRecord')
         self.render_record(item)
-        self.end('GetRecord')
+        self.end('oai:GetRecord')
 
     def render_identify(self, repository_metadata, base_url):
-        self.start('Identify')
-        self.node('repositoryName', {}, repository_metadata.get('repository_name'))
-        self.node('baseURL', {}, base_url)
-        self.node('protocolVersion', {}, '2.0')
-        self.node('adminEmail', {}, repository_metadata['admin_email'])
-        self.node('earliestDatestamp', {}, repository_metadata.get('earliest_datestamp'))
-        self.node('deletedRecord', {}, repository_metadata.get('deleted_record'))
-        self.node('granularity', {}, repository_metadata.get('granularity'))
+        self.start('oai:Identify')
+        self.node('oai:repositoryName', {}, repository_metadata.get('repository_name'))
+        self.node('oai:baseURL', {}, base_url)
+        self.node('oai:protocolVersion', {}, '2.0')
+        self.node('oai:adminEmail', {}, repository_metadata['admin_email'])
+        self.node('oai:earliestDatestamp', {}, repository_metadata.get('earliest_datestamp'))
+        self.node('oai:deletedRecord', {}, repository_metadata.get('deleted_record'))
+        self.node('oai:granularity', {}, repository_metadata.get('granularity'))
         self.render_identify_description(repository_metadata)
-        self.end('Identify')
+        self.end('oai:Identify')
 
     def render_identify_description(self, repository_metadata):
-        self.start('description')
+        self.start('oai:description')
         if repository_metadata['identifier'] is not None:
             self.render_oai_identifier(repository_metadata.get('identifier'))
-        self.end('description')
+        self.end('oai:description')
 
-        self.start('description')
+        self.start('oai:description')
         if repository_metadata['registry'] is not None:
             self.render_voresource(repository_metadata.get('registry'))
-        self.end('description')
+        self.end('oai:description')
 
     def render_oai_identifier(self, identifier_metadata):
         self.start('oai-identifier', {
@@ -83,70 +83,70 @@ class OaiRenderer(DublincoreRendererMixin, DataciteRendererMixin, VoresourceRend
         self.end('oai-identifier')
 
     def render_list_identifiers(self, items, resumption_token):
-        self.start('ListIdentifiers')
+        self.start('oai:ListIdentifiers')
         for item in items:
             self.render_header(item['header'])
 
         if resumption_token:
-            self.node('resumptionToken', {
-                'expirationDate': resumption_token.get('expirationDate'),
-                'completeListSize': resumption_token.get('completeListSize'),
-                'cursor': resumption_token.get('cursor')
+            self.node('oai:resumptionToken', {
+                'oai:expirationDate': resumption_token.get('expirationDate'),
+                'oai:completeListSize': resumption_token.get('completeListSize'),
+                'oai:cursor': resumption_token.get('cursor')
             }, resumption_token['token'])
 
-        self.end('ListIdentifiers')
+        self.end('oai:ListIdentifiers')
 
     def render_list_metadata_formats(self, metadata_formats):
-        self.start('ListMetadataFormats')
+        self.start('oai:ListMetadataFormats')
         for metadata_format in metadata_formats:
-            self.start('metadataFormat')
-            self.node('metadataPrefix', {}, metadata_format['prefix'])
-            self.node('schema', {}, metadata_format.get('schema'))
-            self.node('metadataNamespace', {}, metadata_format.get('namespace'))
-            self.end('metadataFormat')
-        self.end('ListMetadataFormats')
+            self.start('oai:metadataFormat')
+            self.node('oai:metadataPrefix', {}, metadata_format['prefix'])
+            self.node('oai:schema', {}, metadata_format.get('schema'))
+            self.node('oai:metadataNamespace', {}, metadata_format.get('namespace'))
+            self.end('oai:metadataFormat')
+        self.end('oai:ListMetadataFormats')
 
     def render_list_records(self, items, resumption_token):
-        self.start('ListRecords')
+        self.start('oai:ListRecords')
         for item in items:
             self.render_record(item)
 
         if resumption_token:
-            self.node('resumptionToken', {
-                'expirationDate': resumption_token.get('expirationDate'),
-                'completeListSize': resumption_token.get('completeListSize'),
-                'cursor': resumption_token.get('cursor')
+            self.node('oai:resumptionToken', {
+                'oai:expirationDate': resumption_token.get('expirationDate'),
+                'oai:completeListSize': resumption_token.get('completeListSize'),
+                'oai:cursor': resumption_token.get('cursor')
             }, resumption_token['token'])
 
-        self.end('ListRecords')
+        self.end('oai:ListRecords')
 
     def render_list_sets(self, data):
-        self.start('ListSets')
+        self.start('oai:ListSets')
         for oai_set in data['oai_sets']:
-            self.start('set')
-            self.node('setSpec', {}, oai_set['setSpec'])
-            self.node('setName', {}, oai_set['setName'])
+            self.start('oai:set')
+            self.node('oai:setSpec', {}, oai_set['setSpec'])
+            self.node('oai:setName', {}, oai_set['setName'])
             if oai_set['setDescription'] is not None:
-                self.node('setDescription', {}, oai_set['setDescription'])
-            self.end('set')
-        self.end('ListSets')
+                self.node('oai:setDescription', {}, oai_set['setDescription'])
+            self.end('oai:set')
+        self.end('oai:ListSets')
 
     def render_record(self, record):
-        self.start('record')
+        self.start('oai:record')
         self.render_header(record['header'])
         if record['metadata'] is not None:
-            self.start('metadata')
+            self.start('oai:metadata')
             self.render_metadata(record['metadata'])
-            self.end('metadata')
-        self.end('record')
+            self.end('oai:metadata')
+        self.end('oai:record')
 
     def render_header(self, header):
-        self.start('header', {'status': 'deleted'} if header['deleted'] else {})
-        self.node('identifier', {}, header['identifier'])
-        self.node('datestamp', {}, header['datestamp'])
+        self.start('oai:header', {'status': 'deleted'} if header['deleted'] else {})
+        self.node('oai:identifier', {}, header['identifier'])
+        self.node('oai:datestamp', {}, header['datestamp'])
         for spec in header.get('setSpec', []):
-            self.node('setSpec', {}, spec)
-        self.end('header')
+            self.node('oai:setSpec', {}, spec)
+        self.end('oai:header')
 
     def render_metadata(self, metadata):
         raise NotImplementedError()

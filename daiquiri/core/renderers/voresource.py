@@ -6,8 +6,8 @@ class VoresourceRendererMixin(CapabilitiesRendererMixin, TablesetRendererMixin):
 
     def render_voresource(self, metadata):
         self.start('ri:Resource', {
-            'created': metadata.get('created') + 'T00:00:00',
-            'updated': metadata.get('updated') + 'T00:00:00',
+            'created': metadata.get('created') + 'T00:00:00Z',
+            'updated': metadata.get('updated') + 'T00:00:00Z',
             'status': metadata.get('status'),
             'xsi:type': metadata.get('type'),
             'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
