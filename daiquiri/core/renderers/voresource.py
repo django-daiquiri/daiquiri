@@ -17,6 +17,7 @@ class VoresourceRendererMixin(CapabilitiesRendererMixin, TablesetRendererMixin):
             'xmlns:vg': 'http://www.ivoa.net/xml/VORegistry/v1.0',
             'xmlns:vr': 'http://www.ivoa.net/xml/VOResource/v1.0',
             'xmlns:vs': 'http://www.ivoa.net/xml/VODataService/v1.1',
+            'xmlns:cs': 'http://www.ivoa.net/xml/ConeSearch/v1.0',
             'xsi:schemaLocation': 'http://www.ivoa.net/xml/RegistryInterface/v1.0 http://www.ivoa.net/xml/VORegistry/v1.0 http://www.ivoa.net/xml/VOResource/v1.0 http://www.ivoa.net/xml/VODataService/v1.1'
         })
 
