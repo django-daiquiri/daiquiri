@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from . import XMLRenderer
 from .vosi import CapabilitiesRendererMixin, TablesetRendererMixin
 
@@ -6,8 +8,8 @@ class VoresourceRendererMixin(CapabilitiesRendererMixin, TablesetRendererMixin):
 
     def render_voresource(self, metadata):
         self.start('ri:Resource', {
-            'created': metadata.get('created') + 'T00:00:00Z',
-            'updated': metadata.get('updated') + 'T00:00:00Z',
+            'created': self.render_date(metadata.get('created')),
+            'updated': self.render_date(metadata.get('updated')),
             'status': metadata.get('status'),
             'xsi:type': metadata.get('type'),
             'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
@@ -53,7 +55,7 @@ class VoresourceRendererMixin(CapabilitiesRendererMixin, TablesetRendererMixin):
     def render_curation(self, curation_metadata):
         self.start('curation')
         self.node('publisher', {}, curation_metadata.get('publisher'))
-        self.node('date', {'role': 'updated'}, curation_metadata.get('date') + 'T00:00:00Z')
+        self.node('date', {'role': 'updated'}, self.render_date(curation_metadata.get('date')))
 
         creator = curation_metadata.get('creator')
         if creator:
@@ -79,6 +81,9 @@ class VoresourceRendererMixin(CapabilitiesRendererMixin, TablesetRendererMixin):
         self.node('description', {}, content_metadata.get('description'))
         self.node('referenceURL', {}, content_metadata.get('referenceURL'))
         self.end('content')
+
+    def render_date(self, date):
+        return datetime.strptime(date, '%Y-%m-%d').strftime('%Y-%m-%dT%H:%M:%SZ')
 
 
 class VoresourceRenderer(VoresourceRendererMixin, XMLRenderer):

@@ -94,7 +94,6 @@ class OaiView(APIView):
             'admin_email': settings.SITE_CONTACT['email'],
             'earliest_datestamp': earliest_record.datestamp if earliest_record else None,
             'deleted_record': settings.OAI_DELETED_RECORD,
-            'granularity': settings.OAI_GRANULARITY,
             'identifier': {
                 'scheme': adapter.identifier_schema,
                 'repository_identifier': adapter.identifier_repository,
