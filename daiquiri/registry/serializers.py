@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from daiquiri.core.serializers import JSONListField, JSONDictField
+from daiquiri.core.serializers import JSONDictField, JSONListField
 
 
 class DublincoreSerializer(serializers.Serializer):
@@ -24,7 +24,8 @@ class VoresourceSerializer(serializers.Serializer):
     title = serializers.ReadOnlyField()
     created = serializers.ReadOnlyField()
     updated = serializers.ReadOnlyField()
-    voresource_status = serializers.ReadOnlyField(default='active')
+    type = serializers.ReadOnlyField()
+    status = serializers.ReadOnlyField()
 
     curation = JSONDictField(default={})
     content = JSONDictField(default={})
@@ -33,4 +34,3 @@ class VoresourceSerializer(serializers.Serializer):
 
     managed_authority = serializers.ReadOnlyField(default=None)
     managing_org = serializers.ReadOnlyField(default=None)
-    type = serializers.ReadOnlyField()
