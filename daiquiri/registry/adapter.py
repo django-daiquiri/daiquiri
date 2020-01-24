@@ -36,7 +36,7 @@ class RegistryOaiAdapterMixin(object):
 
     def get_service_record(self, service):
         index = self.services.index(service['service']) + 1
-        identifier = self.get_identifier(service['service'])
+        identifier = service['identifier']
         datestamp = settings.SITE_UPDATED
         set_spec = 'ivo_managed'
         public = True
