@@ -14,6 +14,7 @@ from daiquiri.meetings.settings import *
 from daiquiri.metadata.settings import *
 from daiquiri.oai.settings import *
 from daiquiri.query.settings import *
+from daiquiri.registry.settings import *
 from daiquiri.serve.settings import *
 from daiquiri.stats.settings import *
 from daiquiri.tap.settings import *
