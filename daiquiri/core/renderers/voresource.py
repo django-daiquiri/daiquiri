@@ -8,8 +8,8 @@ class VoresourceRendererMixin(CapabilitiesRendererMixin, TablesetRendererMixin):
         self.start('ri:Resource', {
             'created': metadata.get('created') + 'T00:00:00',
             'updated': metadata.get('updated') + 'T00:00:00',
-            'status': metadata.get('voresource_status'),
-            'xsi:type': metadata.get('vodataservice_type'),
+            'status': metadata.get('status'),
+            'xsi:type': metadata.get('type'),
             'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
             'xmlns:ri': 'http://www.ivoa.net/xml/RegistryInterface/v1.0',
             'xmlns:vg': 'http://www.ivoa.net/xml/VORegistry/v1.0',

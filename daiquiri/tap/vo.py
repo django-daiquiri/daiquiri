@@ -21,9 +21,10 @@ def get_resource():
         },
         'capabilities': get_capabilities(),
         'tableset': get_tableset(),
-        'type': 'vg:CatalogResource',
         'created': settings.SITE_CREATED,
         'updated': settings.SITE_UPDATED,
+        'type': 'vg:CatalogResource',
+        'status': 'active'
     }
 
 

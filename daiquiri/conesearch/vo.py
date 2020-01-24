@@ -18,9 +18,10 @@ def get_resource():
             'referenceURL': settings.SITE_URL.rstrip('/')  # + reverse('conesearch:root')
         },
         'capabilities': get_capabilities(),
-        'type': 'vg:CatalogResource',
         'created': settings.SITE_CREATED,
         'updated': settings.SITE_UPDATED,
+        'type': 'vg:CatalogResource',
+        'status': 'active'
     }
 
 

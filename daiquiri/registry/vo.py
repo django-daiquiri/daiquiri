@@ -29,8 +29,8 @@ def get_resource():
         'type': 'vg:Registry',
         'created': settings.SITE_CREATED,
         'updated': settings.SITE_UPDATED,
-        'vodataservice_type': 'vg:Registry',
-        'voresource_status': 'active'
+        'type': 'vg:Registry',
+        'status': 'active'
     }
 
 
@@ -47,9 +47,10 @@ def get_authority_resource():
         },
         'capabilities': [],
         'managing_org': settings.SITE_PUBLISHER,
-        'type': 'vg:Authority',
         'created': settings.SITE_CREATED,
         'updated': settings.SITE_UPDATED,
+        'type': 'vg:Authority',
+        'status': 'active'
     }
 
 
@@ -75,9 +76,10 @@ def get_web_resource():
                 }
             }
         ],
-        'type': 'vg:CatalogResource',
         'created': settings.SITE_CREATED,
         'updated': settings.SITE_UPDATED,
+        'type': 'vg:CatalogResource',
+        'status': 'active'
     }
 
 
