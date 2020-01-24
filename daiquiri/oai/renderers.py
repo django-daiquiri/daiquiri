@@ -122,13 +122,13 @@ class OaiRenderer(DublincoreRendererMixin, DataciteRendererMixin, VoresourceRend
 
     def render_list_sets(self, data):
         self.start('ListSets')
-        self.start('set')
         for oai_set in data['oai_sets']:
+            self.start('set')
             self.node('setSpec', {}, oai_set['setSpec'])
             self.node('setName', {}, oai_set['setName'])
             if oai_set['setDescription'] is not None:
                 self.node('setDescription', {}, oai_set['setDescription'])
-        self.end('set')
+            self.end('set')
         self.end('ListSets')
 
     def render_record(self, record):
@@ -144,6 +144,8 @@ class OaiRenderer(DublincoreRendererMixin, DataciteRendererMixin, VoresourceRend
         self.start('header', {'status': 'deleted'} if header['deleted'] else {})
         self.node('identifier', {}, header['identifier'])
         self.node('datestamp', {}, header['datestamp'])
+        for spec in header.get('setSpec', []):
+            self.node('setSpec', {}, spec)
         self.end('header')
 
     def render_metadata(self, metadata):

@@ -4,8 +4,8 @@ from django.conf import settings
 
 from daiquiri.core.utils import import_class
 
-from .models import Record
 from .adapter import OaiAdapter
+from .models import Record
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +26,7 @@ def update_records(resource_type, resource):
     adapter = OaiAdapter()
 
     try:
-        resource_id, identifier, datestamp, public = adapter.get_record(resource_type, resource)
+        resource_id, identifier, datestamp, set_spec, public = adapter.get_record(resource_type, resource)
     except TypeError:
         raise RuntimeError('Could not obtain record for %s %s' % (resource_type, resource))
 
@@ -38,6 +38,7 @@ def update_records(resource_type, resource):
                 record = Record(identifier=identifier, metadata_prefix=metadata_prefix)
 
             record.datestamp = datestamp
+            record.set_spec = set_spec
             record.deleted = False
             record.resource_type = resource_type
             record.resource_id = resource_id
@@ -52,7 +53,7 @@ def delete_records(resource_type, resource):
     adapter = OaiAdapter()
 
     try:
-        resource_id, identifier, datestamp, public = adapter.get_record(resource_type, resource)
+        resource_id, identifier, datestamp, set_spec, public = adapter.get_record(resource_type, resource)
     except TypeError:
         raise RuntimeError('Could not obtain record for %s %s' % (resource_type, resource))
 
@@ -60,6 +61,7 @@ def delete_records(resource_type, resource):
         try:
             record = Record.objects.get(identifier=identifier, metadata_prefix=metadata_prefix)
             record.datestamp = datestamp
+            record.set_spec = set_spec
             record.deleted = True
             record.save()
         except Record.DoesNotExist:

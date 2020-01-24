@@ -4,8 +4,10 @@ from daiquiri.oai.adapter import BaseOaiAdapter
 from daiquiri.registry.adapter import RegistryOaiAdapterMixin
 
 from .models import Schema, Table
-from .serializers.datacite import DataciteSchemaSerializer, DataciteTableSerializer
-from .serializers.dublincore import DublincoreSchemaSerializer, DublincoreTableSerializer
+from .serializers.datacite import (DataciteSchemaSerializer,
+                                   DataciteTableSerializer)
+from .serializers.dublincore import (DublincoreSchemaSerializer,
+                                     DublincoreTableSerializer)
 
 
 class MetadataOaiAdapterMixin(object):
@@ -42,20 +44,22 @@ class MetadataOaiAdapterMixin(object):
     def get_schema_record(self, schema):
         identifier = self.get_identifier('schemas/%i' % schema.pk)
         datestamp = schema.updated or schema.published
+        set_spec = 'table'
         public = (schema.metadata_access_level == ACCESS_LEVEL_PUBLIC) \
             and (schema.published is not None)
 
-        return schema.pk, identifier, datestamp, public
+        return schema.pk, identifier, datestamp, set_spec, public
 
     def get_table_record(self, table):
         identifier = self.get_identifier('tables/%i' % table.pk)
         datestamp = table.updated or table.published
+        set_spec = 'table'
         public = (table.metadata_access_level == ACCESS_LEVEL_PUBLIC) \
             and (table.published is not None) \
             and (table.schema.metadata_access_level == ACCESS_LEVEL_PUBLIC) \
             and (table.schema.published is not None)
 
-        return table.pk, identifier, datestamp, public
+        return table.pk, identifier, datestamp, set_spec, public
 
 
 class DoiMetadataOaiAdapterMixin(MetadataOaiAdapterMixin):
@@ -63,22 +67,24 @@ class DoiMetadataOaiAdapterMixin(MetadataOaiAdapterMixin):
     def get_schema_record(self, schema):
         identifier = self.get_identifier(schema.doi)
         datestamp = schema.updated or schema.published
+        set_spec = 'table'
         public = (schema.metadata_access_level == ACCESS_LEVEL_PUBLIC) \
             and bool(schema.published) \
             and bool(schema.doi)
 
-        return schema.pk, identifier, datestamp, public
+        return schema.pk, identifier, datestamp, set_spec, public
 
     def get_table_record(self, table):
         identifier = self.get_identifier(table.doi)
         datestamp = table.updated or table.published
+        set_spec = 'table'
         public = (table.metadata_access_level == ACCESS_LEVEL_PUBLIC) \
             and bool(table.published) \
             and bool(table.doi) \
             and (table.schema.metadata_access_level == ACCESS_LEVEL_PUBLIC) \
             and bool(table.schema.published)
 
-        return table.pk, identifier, datestamp, public
+        return table.pk, identifier, datestamp, set_spec, public
 
 
 class MetadataOaiAdapter(MetadataOaiAdapterMixin, BaseOaiAdapter):

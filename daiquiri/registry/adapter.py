@@ -38,6 +38,7 @@ class RegistryOaiAdapterMixin(object):
         index = self.services.index(service['service']) + 1
         identifier = self.get_identifier(service['service'])
         datestamp = settings.SITE_UPDATED
+        set_spec = 'ivo_managed'
         public = True
 
-        return index, identifier, datestamp, public
+        return index, identifier, datestamp, set_spec, public

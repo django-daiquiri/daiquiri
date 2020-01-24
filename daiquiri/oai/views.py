@@ -209,13 +209,14 @@ class OaiView(APIView):
     def list_sets(self, arguments):
         self.validate_illegal_arguments(arguments, ['resumptionToken'])
         if settings.OAI_SETS:
+            oai_sets = Record.objects.values('set_spec').distinct()
             self.response = {
                 'oai_sets': [
                     {
-                        'setSpec': oai_set.get('spec'),
-                        'setName': oai_set.get('name', oai_set.get('spec')),
-                        'setDescription': oai_set.get('description')
-                    } for oai_set in settings.OAI_SETS
+                        'setSpec': oai_set['set_spec'],
+                        'setName': oai_set['set_spec'],
+                        'setDescription': None
+                    } for oai_set in oai_sets
                 ]
             }
         else:
@@ -272,7 +273,8 @@ class OaiView(APIView):
         return {
             'identifier': record.identifier,
             'datestamp': record.datestamp,
-            'deleted': record.deleted
+            'deleted': record.deleted,
+            'setSpec': [record.set_spec]
         }
 
     def get_metadata(self, record):
