@@ -25,4 +25,4 @@ SITE_SUBJECTS = [
     }
 ]
 SITE_TYPE = 'service'
-SITE_LOGO_URL = SITE_URL + '/static/core/img/favicon.png'
+SITE_LOGO_URL = None
