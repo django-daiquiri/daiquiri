@@ -44,7 +44,7 @@ class MetadataOaiAdapterMixin(object):
     def get_schema_record(self, schema):
         identifier = self.get_identifier('schemas/%i' % schema.pk)
         datestamp = schema.updated or schema.published
-        set_spec = 'table'
+        set_spec = 'schema'
         public = (schema.metadata_access_level == ACCESS_LEVEL_PUBLIC) \
             and (schema.published is not None)
 
