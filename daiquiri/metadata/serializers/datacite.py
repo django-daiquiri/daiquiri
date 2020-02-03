@@ -1,9 +1,8 @@
 from django.conf import settings
-
 from rest_framework import serializers
 
-from daiquiri.core.serializers import JSONListField
 from daiquiri.core.constants import LICENSE_URLS
+from daiquiri.core.serializers import JSONListField
 from daiquiri.metadata.models import Schema, Table
 
 
@@ -21,9 +20,6 @@ class DataciteSerializer(serializers.ModelSerializer):
     size = serializers.SerializerMethodField()
     license_url = serializers.SerializerMethodField()
     description = serializers.SerializerMethodField()
-
-    def get_title(self, obj):
-        return obj.title or obj.name
 
     def get_publication_year(self, obj):
         return obj.published.year if obj.published else None
@@ -59,6 +55,9 @@ class DataciteSchemaSerializer(DataciteSerializer):
             'description',
         )
 
+    def get_title(self, obj):
+        return obj.title or obj.name
+
     def get_identifier(self, obj):
         return obj.doi or 'schemas/%i' % obj.pk
 
@@ -91,6 +90,9 @@ class DataciteTableSerializer(DataciteSerializer):
             'license_url',
             'description',
         )
+
+    def get_title(self, obj):
+        return obj.title or '%s.%s' % (obj.schema.name, obj.name)
 
     def get_identifier(self, obj):
         return obj.doi or 'tables/%i' % obj.pk
