@@ -67,7 +67,7 @@ class DoiMetadataOaiAdapterMixin(MetadataOaiAdapterMixin):
     def get_schema_record(self, schema):
         identifier = self.get_identifier(schema.doi)
         datestamp = schema.updated or schema.published
-        set_spec = 'table'
+        set_spec = 'schema'
         public = (schema.metadata_access_level == ACCESS_LEVEL_PUBLIC) \
             and bool(schema.published) \
             and bool(schema.doi)
