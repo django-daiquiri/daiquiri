@@ -5,18 +5,22 @@
 
     <h1>{% trans "Contact Form" %}</h1>
 
-    <p>
-        {% trans "Please enter your contact details and your message." %}
-    </p>
+    {% if user.is_authenticated %}
+        <p>
+            {% trans "Please enter your contact details and your message." %}
+        </p>
 
-    <form method="post" action="{% url 'contact:contact' %}" novalidate>
-        {% csrf_token %}
-        <input type="hidden" name="next" value="{{ next }}" />
+        <form method="post" action="{% url 'contact:contact' %}" novalidate>
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ next }}" />
 
-        {% include 'core/partials/form_fields.html' %}
+            {% include 'core/partials/form_fields.html' %}
 
-        <input type="submit" value="{% trans 'Send message' %}" class="btn {{ submit_danger|yesno:'btn-danger,btn-primary' }}" />
-        <input type="submit" name="cancel" value="{% trans 'Cancel' %}" class="btn btn-default" />
-    </form>
+            <input type="submit" value="{% trans 'Send message' %}" class="btn {{ submit_danger|yesno:'btn-danger,btn-primary' }}" />
+            <input type="submit" name="cancel" value="{% trans 'Cancel' %}" class="btn btn-default" />
+        </form>
+    {% else %}
+        {% trans "Please log in to be able to fill the contact form." %}
+    {% endif %}
 
 {% endblock %}
