@@ -3,15 +3,12 @@ import random
 import string
 
 import requests
-
 from django.conf import settings
 from django.core.files import File
 
-from .tasks import (
-    update_wordpress_user as update_wordpress_user_task,
-    update_wordpress_role as update_wordpress_role_task,
-    delete_wordpress_user as delete_wordpress_user_task
-)
+from .tasks import delete_wordpress_user as delete_wordpress_user_task
+from .tasks import update_wordpress_role as update_wordpress_role_task
+from .tasks import update_wordpress_user as update_wordpress_user_task
 
 
 def update_wordpress_user(user):
@@ -60,7 +57,7 @@ def get_menu(request, menu_name):
         except IOError:
             return ''
     else:
-        menu_url = settings.WORDPRESS_URL + 'wp-content/menus/%s.html' % menu_name
+        menu_url = settings.BASE_URL + settings.WORDPRESS_URL + 'wp-content/menus/%s.html' % menu_name
         absolute_menu_url = request.build_absolute_uri(menu_url)
 
         response = requests.get(absolute_menu_url)
