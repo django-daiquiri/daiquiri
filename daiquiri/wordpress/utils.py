@@ -57,7 +57,7 @@ def get_menu(request, menu_name):
         except IOError:
             return ''
     else:
-        menu_url = settings.BASE_URL + settings.WORDPRESS_URL + 'wp-content/menus/%s.html' % menu_name
+        menu_url = settings.BASE_URL.rstrip('/') + settings.WORDPRESS_URL + 'wp-content/menus/%s.html' % menu_name
         absolute_menu_url = request.build_absolute_uri(menu_url)
 
         response = requests.get(absolute_menu_url)
