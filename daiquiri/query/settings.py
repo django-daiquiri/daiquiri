@@ -98,3 +98,4 @@ QUERY_UPLOAD_LIMIT = {
     'users': {},
     'groups': {}
 }
+QUERY_PROCESSOR_CACHE = True

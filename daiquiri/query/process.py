@@ -1,27 +1,18 @@
 import json
-
 from collections import OrderedDict
 
+from daiquiri.core.adapter import DatabaseAdapter
+from daiquiri.core.utils import filter_by_access_level
+from daiquiri.metadata.models import Column, Function, Schema, Table
 from django.conf import settings
 from django.core.cache import cache
 from django.utils.translation import ugettext as _
-
-from rest_framework.exceptions import ValidationError
-
 from queryparser.adql import ADQLQueryTranslator
 from queryparser.exceptions import QueryError, QuerySyntaxError
+from rest_framework.exceptions import ValidationError
 
-from daiquiri.core.utils import filter_by_access_level
-from daiquiri.core.adapter import DatabaseAdapter
-from daiquiri.metadata.models import Schema, Table, Column, Function
-
-from .utils import (
-    get_user_schema_name,
-    get_default_table_name,
-    get_indexed_objects,
-    get_quota,
-    get_max_active_jobs
-)
+from .utils import (get_default_table_name, get_indexed_objects,
+                    get_max_active_jobs, get_quota, get_user_schema_name)
 
 
 def check_quota(job):
@@ -177,13 +168,18 @@ def process_query(query):
 
             from queryparser.postgresql import PostgreSQLQueryProcessor
 
-            processor = cache.get_or_set('processor', PostgreSQLQueryProcessor(), 3600)
+            if settings.QUERY_PROCESSOR_CACHE:
+                processor = cache.get_or_set('processor', PostgreSQLQueryProcessor(), 3600)
+            else:
+                processor = PostgreSQLQueryProcessor()
 
             # first run to replace with get_indexed_objects
             processor.set_query(query)
             processor.process_query(indexed_objects=get_indexed_objects(), replace_schema_name={
                 'TAP_SCHEMA': settings.TAP_SCHEMA,
+                'tap_schema': settings.TAP_SCHEMA,
                 'TAP_UPLOAD': settings.TAP_UPLOAD,
+                'tap_upload': settings.TAP_UPLOAD,
             })
 
             # second run
