@@ -18,7 +18,7 @@ def get_resource():
             'subjects': settings.TAP_SUBJECTS,
             'type': 'Catalog',
             'description': 'The TAP Service registry for %s.' % settings.SITE_IDENTIFIER,
-            'referenceURL': settings.SITE_URL.rstrip('/') + reverse('tap:root')
+            'referenceURL': settings.SITE_URL.rstrip('/') + reverse('tap:root').rstrip('/')
         },
         'capabilities': get_capabilities(),
         'tableset': get_tableset(),
@@ -45,7 +45,7 @@ def get_capabilities():
                 'role': 'std',
                 'access_url': {
                     'use': 'base',
-                    'url': settings.SITE_URL.rstrip('/') + reverse('tap:root')
+                    'url': settings.SITE_URL.rstrip('/') + reverse('tap:root').rstrip('/')
                 }
             },
             'languages': [{
@@ -62,7 +62,7 @@ def get_capabilities():
                 'version': '1.1',
                 'access_url': {
                     'use': 'base',
-                    'url': settings.SITE_URL.rstrip('/') + reverse('tap:async-list')
+                    'url': settings.SITE_URL.rstrip('/') + reverse('tap:async-list').rstrip('/')
                 }
             }
         },
@@ -74,7 +74,7 @@ def get_capabilities():
                 'version': '1.1',
                 'access_url': {
                     'use': 'base',
-                    'url': settings.SITE_URL.rstrip('/') + reverse('tap:sync-list')
+                    'url': settings.SITE_URL.rstrip('/') + reverse('tap:sync-list').rstrip('/')
                 }
             }
         },
@@ -84,7 +84,7 @@ def get_capabilities():
                 'type': 'vs:ParamHTTP',
                 'access_url': {
                     'use': 'full',
-                    'url': settings.SITE_URL.rstrip('/') + reverse('tap:capabilities')
+                    'url': settings.SITE_URL.rstrip('/') + reverse('tap:capabilities').rstrip('/')
                 }
             }
         },
@@ -94,7 +94,7 @@ def get_capabilities():
                 'type': 'vs:ParamHTTP',
                 'access_url': {
                     'use': 'full',
-                    'url': settings.SITE_URL.rstrip('/') + reverse('tap:tables')
+                    'url': settings.SITE_URL.rstrip('/') + reverse('tap:tables').rstrip('/')
                 }
             }
         },
@@ -104,7 +104,7 @@ def get_capabilities():
                 'type': 'vr:WebBrowser',
                 'access_url': {
                     'use': 'full',
-                    'url': settings.SITE_URL.rstrip('/') + reverse('tap:examples')
+                    'url': settings.SITE_URL.rstrip('/') + reverse('tap:examples').rstrip('/')
                 }
             }
         }
