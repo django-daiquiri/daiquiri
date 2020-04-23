@@ -234,9 +234,9 @@ class OaiView(APIView):
     def validate_date(self, key, arguments):
         if key in arguments:
             try:
-                return datetime.strptime(arguments[key], '%Y-%m-%d').date()
+                return datetime.strptime(arguments[key], '%Y-%m-%dT%H:%M:%SZ').date()
             except ValueError:
-                self.errors.append(('badArgument', 'Argument \'%s\' does not match format YYYY-MM-DD' % key))
+                self.errors.append(('badArgument', 'Argument \'%s\' does not match format YYYY-MM-DDThh:mm:ssZ' % key))
         else:
             return None
 
