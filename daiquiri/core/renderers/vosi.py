@@ -101,7 +101,7 @@ class TablesetRendererMixin(object):
         for schema in tableset:
             self.start('schema')
             self.node('name', {}, schema.get('name'))
-            self.node('description', {}, schema.get('description'))
+            self.node('description', {}, schema.get('description') or '')
 
             for table in schema.get('tables'):
                 if strict:
@@ -112,7 +112,7 @@ class TablesetRendererMixin(object):
                         'size': str(table.get('nrows'))
                     })
                 self.node('name', {}, table.get('name'))
-                self.node('description', {}, table.get('description'))
+                self.node('description', {}, table.get('description') or '')
 
                 for column in table['columns']:
                     self.start('column', {'std': 'true'} if column['std'] else {})
