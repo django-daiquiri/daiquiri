@@ -59,6 +59,13 @@ class CapabilitiesRendererMixin(object):
                 self.end('param')
             self.end('interface')
 
+        for language in capability.get('languages', []):
+            self.start('language')
+            self.node('name', {}, language.get('name'))
+            self.node('version', {}, language.get('version'))
+            self.node('description', {}, language.get('description'))
+            self.end('language')
+
         if capability.get('max_sr'):
             self.node('maxSR', {}, capability.get('max_sr'))
 
