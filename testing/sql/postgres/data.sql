@@ -29,9 +29,11 @@ CREATE TABLE "daiquiri_archive"."files" (
 
 CREATE TABLE "daiquiri_data_test"."test" (
   "id" bigint primary key not null,
-  "bool" boolean not null,
-  "array" double precision[3] not null,
-  "matrix" double precision[2][2] not null
+  "bool" boolean,
+  "bigint" bigint,
+  "double" double precision,
+  "array" double precision[3],
+  "matrix" double precision[2][2]
 );
 
 CREATE TABLE "daiquiri_data_obs"."stars" (
@@ -79,9 +81,10 @@ GRANT SELECT ON ALL TABLES IN SCHEMA daiquiri_data_obs TO daiquiri_data;
 -- insert data
 
 INSERT INTO daiquiri_data_test.test VALUES
-(1, TRUE, '{1, 2, 3, 4, 5}', '{{1, 10}, {0, 0.1}}'),
-(2, TRUE, '{2, 4, 6, 8, 10}', '{{2, 20}, {0, 0.2}}'),
-(3, FALSE, '{3, 6, Nan, 12, 15}', '{{3, 30}, {0, 0.3}}');
+(1, TRUE, 10, 10.0, '{1, 2, 3, 4, 5}', '{{1, 10}, {0, 0.1}}'),
+(2, TRUE, 20, 20.0, '{2, 4, 6, 8, 10}', '{{2, 20}, {0, 0.2}}'),
+(3, FALSE, 30, 30.0, '{3, 6, Nan, 12, 15}', '{{3, 30}, {0, 0.3}}'),
+(4, NULL, NULL, NULL, NULL, NULL);
 
 INSERT INTO daiquiri_archive.files VALUES 
 ('074fec76-6143-4d58-a1f6-a7e8c23af15e', '2017-10-01 00:00:00', 'image_01.jpg', 'c01', 'images/image_01.jpg', 5.810915172365783, -27.665464907831577),

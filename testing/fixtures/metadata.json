@@ -457,12 +457,54 @@
       "groups": []
     }
   },
-  {
+    {
     "model": "daiquiri_metadata.column",
     "pk": 33,
     "fields": {
       "table": 3,
       "order": 3,
+      "name": "bigint",
+      "description": null,
+      "unit": null,
+      "ucd": null,
+      "utype": null,
+      "datatype": "long",
+      "arraysize": null,
+      "principal": false,
+      "indexed": false,
+      "std": false,
+      "access_level": "",
+      "metadata_access_level": "",
+      "groups": []
+    }
+  },
+    {
+    "model": "daiquiri_metadata.column",
+    "pk": 34,
+    "fields": {
+      "table": 3,
+      "order": 4,
+      "name": "double",
+      "description": null,
+      "unit": null,
+      "ucd": null,
+      "utype": null,
+      "datatype": "double",
+      "arraysize": null,
+      "principal": false,
+      "indexed": false,
+      "std": false,
+      "access_level": "",
+      "metadata_access_level": "",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_metadata.column",
+    "pk": 35,
+    "fields": {
+      "table": 3,
+      "order": 5,
       "name": "array",
       "description": null,
       "unit": null,
@@ -480,10 +522,10 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 34,
+    "pk": 36,
     "fields": {
       "table": 3,
-      "order": 4,
+      "order": 6,
       "name": "matrix",
       "description": null,
       "unit": null,
