@@ -1,14 +1,12 @@
 import csv
 import datetime
 import io
-import sys
 import struct
-
-from xml.sax.saxutils import quoteattr, escape
-
-from django.contrib.sites.models import Site
+import sys
+from xml.sax.saxutils import escape, quoteattr
 
 from daiquiri import __version__ as daiquiri_version
+from django.contrib.sites.models import Site
 
 
 def generate_csv(generator, fields):
@@ -92,7 +90,7 @@ def generate_votable(generator, fields, infos=[], links=[], table=None, empty=No
                     <TR>
                         <TD>%s</TD>
                     </TR>''' % '''</TD>
-                        <TD>'''.join([('' if cell == 'NULL' else escape(str(cell))) for cell in row])
+                        <TD>'''.join([('' if cell in ['NULL', None] else escape(str(cell))) for cell in row])
 
         yield '''
                 </TABLEDATA>
