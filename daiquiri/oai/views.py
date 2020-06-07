@@ -211,7 +211,9 @@ class OaiView(APIView):
     def list_sets(self, arguments):
         self.validate_illegal_arguments(arguments, ['resumptionToken'])
         if settings.OAI_SETS:
-            oai_sets = Record.objects.values('set_spec').distinct()
+            # need to be ordered, see note in
+            # https://docs.djangoproject.com/en/3.0/ref/models/querysets/#django.db.models.query.QuerySet.distinct
+            oai_sets = Record.objects.order_by('set_spec').values('set_spec').distinct('set_spec')
             self.response = {
                 'oai_sets': [
                     {
