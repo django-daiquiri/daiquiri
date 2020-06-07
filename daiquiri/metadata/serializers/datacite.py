@@ -115,4 +115,4 @@ class DataciteTableSerializer(DataciteSerializer):
         else:
             columns = obj.columns.filter_by_access_level(self.context['request'].user)
 
-        return ['%i columns' % columns.count(), '%i rows' % obj.nrows]
+        return ['%i columns' % columns.count(), '%i rows' % obj.nrows or 0]
