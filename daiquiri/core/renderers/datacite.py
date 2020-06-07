@@ -57,10 +57,11 @@ class DataciteRendererMixin(object):
                 }, related_identifier.get('related_identifier'))
             self.end('relatedIdentifiers')
 
-        size = metadata.get('size')
-        if size is not None:
+        sizes = metadata.get('sizes')
+        if sizes is not None:
             self.start('sizes')
-            self.node('size', {}, size)
+            for size in sizes:
+                self.node('size', {}, size)
             self.end('sizes')
 
         formats = metadata.get('formats')

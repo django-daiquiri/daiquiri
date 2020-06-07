@@ -1,9 +1,8 @@
-from django.conf import settings
-from rest_framework import serializers
-
 from daiquiri.core.constants import LICENSE_URLS
 from daiquiri.core.serializers import JSONListField
 from daiquiri.metadata.models import Schema, Table
+from django.conf import settings
+from rest_framework import serializers
 
 
 class DataciteSerializer(serializers.ModelSerializer):
@@ -17,14 +16,21 @@ class DataciteSerializer(serializers.ModelSerializer):
     contributors = JSONListField(default=[])
     language = serializers.ReadOnlyField(default=settings.SITE_LANGUAGE)
     resource_type = serializers.SerializerMethodField()
-    size = serializers.SerializerMethodField()
+    formats = serializers.SerializerMethodField()
+    sizes = serializers.SerializerMethodField()
     license_url = serializers.SerializerMethodField()
     description = serializers.SerializerMethodField()
 
     def get_publication_year(self, obj):
         return obj.published.year if obj.published else None
 
-    def get_size(self, obj):
+    def get_formats(self, obj):
+        if hasattr(settings, 'QUERY_DOWNLOAD_FORMATS'):
+            return [f['content_type'] for f in settings.QUERY_DOWNLOAD_FORMATS]
+        else:
+            return []
+
+    def get_sizes(self, obj):
         raise NotImplementedError()
 
     def get_license_url(self, obj):
@@ -49,7 +55,8 @@ class DataciteSchemaSerializer(DataciteSerializer):
             'updated',
             'language',
             'resource_type',
-            'size',
+            'formats',
+            'sizes',
             'license',
             'license_url',
             'description',
@@ -64,9 +71,9 @@ class DataciteSchemaSerializer(DataciteSerializer):
     def get_resource_type(self, obj):
         return 'Database schema'
 
-    def get_size(self, obj):
+    def get_sizes(self, obj):
         tables = obj.tables.filter_by_metadata_access_level(self.context['request'].user)
-        return '%i tables' % tables.count()
+        return ['%i tables' % tables.count()]
 
 
 class DataciteTableSerializer(DataciteSerializer):
@@ -85,7 +92,8 @@ class DataciteTableSerializer(DataciteSerializer):
             'updated',
             'language',
             'resource_type',
-            'size',
+            'formats',
+            'sizes',
             'license',
             'license_url',
             'description',
@@ -100,10 +108,11 @@ class DataciteTableSerializer(DataciteSerializer):
     def get_resource_type(self, obj):
         return 'Database table'
 
-    def get_size(self, obj):
+    def get_sizes(self, obj):
         # filter the columns which are published for the groups of the user
         if not settings.METADATA_COLUMN_PERMISSIONS:
             columns = obj.columns.all()
         else:
             columns = obj.columns.filter_by_access_level(self.context['request'].user)
-        return '%i columns' % columns.count()
+
+        return ['%i columns' % columns.count(), '%i rows' % obj.nrows]
