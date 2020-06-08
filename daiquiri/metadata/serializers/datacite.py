@@ -2,6 +2,7 @@ from daiquiri.core.constants import LICENSE_URLS
 from daiquiri.core.serializers import JSONListField
 from daiquiri.metadata.models import Schema, Table
 from django.conf import settings
+from django.urls import reverse
 from rest_framework import serializers
 
 
@@ -15,6 +16,7 @@ class DataciteSerializer(serializers.ModelSerializer):
     subjects = serializers.ReadOnlyField(default=settings.SITE_SUBJECTS)
     contributors = JSONListField(default=[])
     language = serializers.ReadOnlyField(default=settings.SITE_LANGUAGE)
+    alternate_identifiers = serializers.SerializerMethodField()
     resource_type = serializers.SerializerMethodField()
     formats = serializers.SerializerMethodField()
     sizes = serializers.SerializerMethodField()
@@ -23,6 +25,9 @@ class DataciteSerializer(serializers.ModelSerializer):
 
     def get_publication_year(self, obj):
         return obj.published.year if obj.published else None
+
+    def get_alternate_identifiers(self, obj):
+        raise NotImplementedError()
 
     def get_formats(self, obj):
         if hasattr(settings, 'QUERY_DOWNLOAD_FORMATS'):
@@ -55,8 +60,9 @@ class DataciteSchemaSerializer(DataciteSerializer):
             'updated',
             'language',
             'resource_type',
-            'formats',
+            'alternate_identifiers',
             'sizes',
+            'formats',
             'license',
             'license_url',
             'description',
@@ -67,6 +73,13 @@ class DataciteSchemaSerializer(DataciteSerializer):
 
     def get_identifier(self, obj):
         return obj.doi or 'schemas/%i' % obj.pk
+
+    def get_alternate_identifiers(self, obj):
+        url = self.context['request'].build_absolute_uri(reverse('metadata:schema', args=[obj.name]))
+        return [{
+            'alternate_identifier': url,
+            'alternate_identifier_type': 'URL'
+        }]
 
     def get_resource_type(self, obj):
         return 'Database schema'
@@ -92,8 +105,9 @@ class DataciteTableSerializer(DataciteSerializer):
             'updated',
             'language',
             'resource_type',
-            'formats',
+            'alternate_identifiers',
             'sizes',
+            'formats',
             'license',
             'license_url',
             'description',
@@ -107,6 +121,13 @@ class DataciteTableSerializer(DataciteSerializer):
 
     def get_resource_type(self, obj):
         return 'Database table'
+
+    def get_alternate_identifiers(self, obj):
+        url = self.context['request'].build_absolute_uri(reverse('metadata:table', args=[obj.schema.name, obj.name]))
+        return [{
+            'alternate_identifier': url,
+            'alternate_identifier_type': 'URL'
+        }]
 
     def get_sizes(self, obj):
         # filter the columns which are published for the groups of the user

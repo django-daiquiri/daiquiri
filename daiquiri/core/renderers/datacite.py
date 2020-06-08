@@ -57,6 +57,15 @@ class DataciteRendererMixin(object):
                 }, related_identifier.get('related_identifier'))
             self.end('relatedIdentifiers')
 
+        alternate_identifiers = metadata.get('alternate_identifiers')
+        if alternate_identifiers is not None:
+            self.start('alternateIdentifiers')
+            for alternate_identifier in alternate_identifiers:
+                self.node('alternativeIdentifier', {
+                    'alternateIdentifierType': alternate_identifier.get('alternate_identifier_type')
+                }, alternate_identifier.get('alternate_identifier'))
+            self.end('alternateIdentifiers')
+
         sizes = metadata.get('sizes')
         if sizes is not None:
             self.start('sizes')
