@@ -35,7 +35,7 @@ class DataciteRendererMixin(object):
         contributors = metadata.get('contributors', [])
         if isinstance(contributors, list):
             for contributor in contributors:
-                self.render_person('contributor', contributor)
+                self.render_person('contributor', contributor, contributor.get('contributor_type', 'DataManager'))
         self.end('contributors')
 
         updated = metadata.get('updated')
@@ -101,21 +101,27 @@ class DataciteRendererMixin(object):
 
         self.end('resource')
 
-    def render_person(self, person_type, person):
+    def render_person(self, person_type, person, contributor_type=None):
         if isinstance(person, dict):
             self.start(person_type)
 
             name = person.get('name')
-            if name:
-                self.node(person_type + 'Name', {}, name)
-
             first_name = person.get('first_name')
-            if first_name:
-                self.node('first_name', {}, first_name)
-
             last_name = person.get('last_name')
+
+            if not name:
+                name = '{}, {}'.format(last_name, first_name)
+
+            self.node(person_type + 'Name', {}, name)
+
+            if first_name:
+                self.node('givenName', {}, first_name)
+
             if last_name:
-                self.node('last_name', {}, last_name)
+                self.node('familyName', {}, last_name)
+
+            if contributor_type:
+                self.node('contributorType', {}, contributor_type)
 
             orcid = person.get('orcid')
             if orcid:
