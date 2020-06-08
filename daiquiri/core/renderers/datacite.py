@@ -103,7 +103,9 @@ class DataciteRendererMixin(object):
 
     def render_person(self, person_type, person, contributor_type=None):
         if isinstance(person, dict):
-            self.start(person_type)
+            self.start(person_type, {
+                'contributorType': contributor_type
+            })
 
             name = person.get('name')
             first_name = person.get('first_name')
@@ -119,9 +121,6 @@ class DataciteRendererMixin(object):
 
             if last_name:
                 self.node('familyName', {}, last_name)
-
-            if contributor_type:
-                self.node('contributorType', {}, contributor_type)
 
             orcid = person.get('orcid')
             if orcid:
