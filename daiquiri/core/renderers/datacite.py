@@ -61,7 +61,7 @@ class DataciteRendererMixin(object):
         if alternate_identifiers is not None:
             self.start('alternateIdentifiers')
             for alternate_identifier in alternate_identifiers:
-                self.node('alternativeIdentifier', {
+                self.node('alternateIdentifier', {
                     'alternateIdentifierType': alternate_identifier.get('alternate_identifier_type')
                 }, alternate_identifier.get('alternate_identifier'))
             self.end('alternateIdentifiers')
