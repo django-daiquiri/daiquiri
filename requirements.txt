@@ -1,4 +1,5 @@
 # in alphabetical order
+vine==1.3.0
 astropy~=3.2.1
 celery~=4.3.0
 coverage~=4.5.4
