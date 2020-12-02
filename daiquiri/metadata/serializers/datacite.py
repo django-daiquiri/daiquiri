@@ -1,4 +1,3 @@
-from daiquiri.core.constants import LICENSE_URLS
 from daiquiri.core.serializers import JSONListField
 from daiquiri.metadata.models import Schema, Table
 from django.conf import settings
@@ -39,7 +38,7 @@ class DataciteSerializer(serializers.ModelSerializer):
         raise NotImplementedError()
 
     def get_license_url(self, obj):
-        return LICENSE_URLS.get(obj.license)
+        return settings.LICENSE_URLS.get(obj.license)
 
     def get_description(self, obj):
         return obj.long_description or obj.description
