@@ -9,9 +9,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from daiquiri.core.adapter import DatabaseAdapter
 from daiquiri.core.viewsets import ChoicesViewSet
 from daiquiri.core.permissions import HasModelPermission
-from daiquiri.core.constants import ACCESS_LEVEL_CHOICES
-
-from django.conf import settings
+from daiquiri.core.constants import LICENSE_CHOICES, ACCESS_LEVEL_CHOICES
 
 from .models import Schema, Table, Column, Function
 from .serializers import (
@@ -221,7 +219,7 @@ class LicenseViewSet(ChoicesViewSet):
     permission_classes = (IsAuthenticated, )
     authentication_classes = (SessionAuthentication, TokenAuthentication)
 
-    queryset = settings.LICENSE_CHOICES
+    queryset = LICENSE_CHOICES
 
 
 class AccessLevelViewSet(ChoicesViewSet):
