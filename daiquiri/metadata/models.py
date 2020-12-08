@@ -4,8 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from jsonfield import JSONField
 
-from django.conf import settings
-from daiquiri.core.constants import ACCESS_LEVEL_CHOICES
+from daiquiri.core.constants import LICENSE_CHOICES, LICENSE_URLS, ACCESS_LEVEL_CHOICES
 from daiquiri.core.managers import AccessLevelManager
 
 
@@ -44,7 +43,7 @@ class Schema(models.Model):
         help_text=_('The desired attribution for the schema.')
     )
     license = models.CharField(
-        max_length=8, choices=settings.LICENSE_CHOICES, null=True, blank=True,
+        max_length=8, choices=LICENSE_CHOICES, null=True, blank=True,
         verbose_name=_('License')
     )
     doi = models.CharField(
@@ -72,11 +71,11 @@ class Schema(models.Model):
         verbose_name=_('Updated'),
     )
     access_level = models.CharField(
-        max_length=8, choices=settings.ACCESS_LEVEL_CHOICES,
+        max_length=8, choices=ACCESS_LEVEL_CHOICES,
         verbose_name=_('Access level')
     )
     metadata_access_level = models.CharField(
-        max_length=8, choices=settings.ACCESS_LEVEL_CHOICES,
+        max_length=8, choices=ACCESS_LEVEL_CHOICES,
         verbose_name=_('Metadata access level')
     )
     groups = models.ManyToManyField(
@@ -100,11 +99,11 @@ class Schema(models.Model):
 
     @property
     def license_label(self):
-        return dict(settings.LICENSE_CHOICES)[self.license]
+        return dict(LICENSE_CHOICES)[self.license]
 
     @property
     def license_url(self):
-        return settings.LICENSE_URLS[self.license]
+        return LICENSE_URLS[self.license]
 
 
 class Table(models.Model):
@@ -154,7 +153,7 @@ class Table(models.Model):
         help_text=_('The desired attribution for the table.')
     )
     license = models.CharField(
-        max_length=8, choices=settings.LICENSE_CHOICES, null=True, blank=True,
+        max_length=8, choices=LICENSE_CHOICES, null=True, blank=True,
         verbose_name=_('License')
     )
     doi = models.CharField(
@@ -194,11 +193,11 @@ class Table(models.Model):
         verbose_name=_('Updated'),
     )
     access_level = models.CharField(
-        max_length=8, choices=settings.ACCESS_LEVEL_CHOICES,
+        max_length=8, choices=ACCESS_LEVEL_CHOICES,
         verbose_name=_('Access level')
     )
     metadata_access_level = models.CharField(
-        max_length=8, choices=settings.ACCESS_LEVEL_CHOICES,
+        max_length=8, choices=ACCESS_LEVEL_CHOICES,
         verbose_name=_('Metadata access level')
     )
     groups = models.ManyToManyField(
@@ -222,11 +221,11 @@ class Table(models.Model):
 
     @property
     def license_label(self):
-        return dict(settings.LICENSE_CHOICES)[self.license]
+        return dict(LICENSE_CHOICES)[self.license]
 
     @property
     def license_url(self):
-        return settings.LICENSE_URLS[self.license]
+        return LICENSE_URLS[self.license]
 
 
 class Column(models.Model):
@@ -295,11 +294,11 @@ class Column(models.Model):
         help_text=_('The columns which this column is an index for (e.g. for pgSphere).')
     )
     access_level = models.CharField(
-        max_length=8, choices=settings.ACCESS_LEVEL_CHOICES,
+        max_length=8, choices=ACCESS_LEVEL_CHOICES,
         verbose_name=_('Access level')
     )
     metadata_access_level = models.CharField(
-        max_length=8, choices=settings.ACCESS_LEVEL_CHOICES,
+        max_length=8, choices=ACCESS_LEVEL_CHOICES,
         verbose_name=_('Metadata access level')
     )
     groups = models.ManyToManyField(
@@ -354,11 +353,11 @@ class Function(models.Model):
         help_text=_('Prototype of this function in a SQL query.')
     )
     access_level = models.CharField(
-        max_length=8, choices=settings.ACCESS_LEVEL_CHOICES,
+        max_length=8, choices=ACCESS_LEVEL_CHOICES,
         verbose_name=_('Access level')
     )
     metadata_access_level = models.CharField(
-        max_length=8, choices=settings.ACCESS_LEVEL_CHOICES,
+        max_length=8, choices=ACCESS_LEVEL_CHOICES,
         verbose_name=_('Metadata access level')
     )
     groups = models.ManyToManyField(

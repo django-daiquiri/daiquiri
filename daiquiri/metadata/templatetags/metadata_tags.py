@@ -2,7 +2,7 @@ from django import template
 from django.utils.translation import ugettext_lazy as _
 from django.utils.html import format_html
 
-from django.conf import settings
+from daiquiri.core.constants import LICENSE_CHOICES, LICENSE_URLS
 from daiquiri.core.utils import get_doi_url
 
 from ..models import Schema
@@ -55,7 +55,7 @@ def doi_panel(doi, dataset=_('dataset')):
 def license_panel(license, dataset=_('dataset')):
     return {
         'license': license,
-        'license_url': settings.LICENSE_URLS[license],
-        'license_label': dict(settings.LICENSE_CHOICES)[license],
+        'license_url': LICENSE_URLS[license],
+        'license_label': dict(LICENSE_CHOICES)[license],
         'dataset': dataset
     }
