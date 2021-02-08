@@ -75,7 +75,7 @@ def update_table(table):
             tap_table = TapTable.objects.create(pk=table.id, schema=tap_schema)
 
         tap_table.schema_name = str(table.schema)
-        tap_table.table_name = table.name
+        tap_table.table_name = str(table.schema) + '.' + str(table.name)
         tap_table.table_type = table.type
         tap_table.utype = table.utype
         if table.description:
