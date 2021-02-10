@@ -55,8 +55,7 @@ mkdir log download
 
 Navigate to http://localhost:8000 in your browser.
 
-More detailed installation instructions can be found [here](https://github.com/aipescience/django-daiquiri/tree/master/docs/installation.md).
+### Documentation
 
-Our development setup is documented [here](https://github.com/aipescience/django-daiquiri/tree/master/docs/development.md).
+* **Main documenation**:  [django-daiquiri.github.io](https://django-daiquiri.github.io)
 
-More documentation will be added soon.
