@@ -75,7 +75,7 @@ GRANT ALL PRIVILEGES ON `daiquiri_user_%`.* TO 'daiquiri_data'@'localhost';
 INSERT INTO daiquiri_data_test.test VALUES
 (1, 1, 10, 10.0, '{1, 2, 3, 4, 5}', '{{1, 10}, {0, 0.1}}'),
 (2, 1, 20, 20.0, '{2, 4, 6, 8, 10}', '{{2, 20}, {0, 0.2}}'),
-(3, 0, 30, 30.0, '{3, 6, 9, 12, 15}', '{{3, 30}, {0, 0.3}}');
+(3, 0, 30, 30.0, '{3, 6, 9, 12, 15}', '{{3, 30}, {0, 0.3}}'),
 (4, NULL, NULL, NULL, NULL, NULL);
 
 INSERT INTO daiquiri_archive.files VALUES
