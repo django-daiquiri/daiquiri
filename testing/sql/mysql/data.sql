@@ -30,8 +30,8 @@ CREATE TABLE `daiquiri_archive`.`files` (
 CREATE TABLE `daiquiri_data_test`.`test` (
   `id` BIGINT primary key not null,
   `bool` TINYINT,
-  "bigint" bigint,
-  "double" double,
+  `bigint` bigint,
+  `double` double,
   `array` varchar(32),
   `matrix` varchar(32)
 );
@@ -78,7 +78,7 @@ INSERT INTO daiquiri_data_test.test VALUES
 (3, 0, 30, 30.0, '{3, 6, 9, 12, 15}', '{{3, 30}, {0, 0.3}}');
 (4, NULL, NULL, NULL, NULL, NULL);
 
-INSERT INTO daiquiri_archive.files VALUES 
+INSERT INTO daiquiri_archive.files VALUES
 ('074fec76-6143-4d58-a1f6-a7e8c23af15e', '2017-10-01 00:00:00', 'image_01.jpg', 'c01', 'images/image_01.jpg', 5.810915172365783, -27.665464907831577),
 ('c5e61e94-767d-4a44-9fea-1f1f36318fbe', '2017-10-02 00:00:00', 'image_02.jpg', 'c02', 'images/image_02.jpg', 70.38985348435354, 43.43851902099498),
 ('03a4b87f-77dc-4004-903b-6726f4f18059', '2017-10-03 00:00:00', 'image_03.jpg', 'c03', 'images/image_03.jpg', -51.20680382696266, 10.389770122481512),
