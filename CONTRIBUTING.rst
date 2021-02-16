@@ -9,3 +9,15 @@ You are welcome to contribute to Daiquiri by improving and changing it! However,
 * Please use the `coding standards from the Django project <https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/coding-style/>`_ and try to follow our conventions as close as possible.
 * Afterwards, check if your branch is still up to date. If yes, merge your branch into the ``dev`` branch of your fork. If not perform a rebase first.
 * Create a new pull request and the project team will review your pull request.
+
+Maintaining Daiquiri
+====================
+
+If you are a maintainer and you want to review a Pull-Request please follow the following instructions:
+* Identify the PR you want to review with the following command: `git ls-remote --refs origin`
+* Fetch the PR in your local-repository with: `git fetch origin pull/<PR-ID>/head:pr/<PR-ID> && git checkout pr/<PR-ID>`
+* Perform the unit-tests of daiquiri
+* Perform the instance-tests on the test-instance (dq-dev + test-app)
+* Perform the instance-tests on the conserned services (dq-dev + service-app)
+* Report any failure to the author of the pull-request
+
