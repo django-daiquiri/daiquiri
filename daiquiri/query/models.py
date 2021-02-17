@@ -159,6 +159,7 @@ class QueryJob(Job):
             self.query = ''
             self.query_language = ''
             self.queue = ''
+            self.execution_duration = 0.0
 
         else:
             self.query_language = process_query_language(self.owner, self.query_language)
