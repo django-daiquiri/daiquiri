@@ -55,7 +55,8 @@ mkdir log download
 
 Navigate to http://localhost:8000 in your browser.
 
-### Documentation
+Documentation
+-------------
 
 * **Main documenation**:  [django-daiquiri.github.io](https://django-daiquiri.github.io)
 
