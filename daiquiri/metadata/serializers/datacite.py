@@ -16,7 +16,7 @@ class DataciteSerializer(serializers.ModelSerializer):
     contributors = JSONListField(default=[])
     language = serializers.ReadOnlyField(default=settings.SITE_LANGUAGE)
     alternate_identifiers = serializers.SerializerMethodField()
-    related_identifiers = serializers.SerializerMethodField() 
+    related_identifiers = JSONListField(default=[]) 
     resource_type = serializers.SerializerMethodField()
     formats = serializers.SerializerMethodField()
     sizes = serializers.SerializerMethodField()
@@ -27,11 +27,6 @@ class DataciteSerializer(serializers.ModelSerializer):
         return obj.published.year if obj.published else None
 
     def get_alternate_identifiers(self, obj):
-        raise NotImplementedError()
-
-    def get_related_identifiers(self, obj):
-        '''Abstract method (should be overwritten by child class)
-        '''
         raise NotImplementedError()
 
     def get_formats(self, obj):
@@ -66,6 +61,7 @@ class DataciteSchemaSerializer(DataciteSerializer):
             'language',
             'resource_type',
             'alternate_identifiers',
+            'related_identifiers',            
             'sizes',
             'formats',
             'license',
@@ -134,14 +130,6 @@ class DataciteTableSerializer(DataciteSerializer):
             'alternate_identifier': url,
             'alternate_identifier_type': 'URL'
         }]
-
-    def get_related_identifiers(self, obj):
-        '''Returns an array of json-like dict with the related_identifiers and their parameters.
-        '''
-        schema_doi = obj.schema.doi
-        return [{'related_identifier': schema_doi,
-                 'related_identifier_type': 'DOI',
-                 'relation_type': 'IsPartOf'}]
 
     def get_sizes(self, obj):
         # filter the columns which are published for the groups of the user
