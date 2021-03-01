@@ -112,8 +112,8 @@ class Table(models.Model):
     TYPE_TABLE = 'table'
     TYPE_VIEW = 'view'
     TYPE_CHOICES = (
-        (TYPE_TABLE, _('Table')),
-        (TYPE_VIEW, _('View'))
+        (TYPE_TABLE, _('table')),
+        (TYPE_VIEW, _('view'))
     )
 
     objects = AccessLevelManager()
