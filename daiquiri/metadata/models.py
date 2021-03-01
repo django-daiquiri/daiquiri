@@ -51,6 +51,10 @@ class Schema(models.Model):
         max_length=256, null=True, blank=True,
         verbose_name=_('Digital object identifier')
     )
+    related_identifiers = JSONField(
+        null=True, blank=True,
+        verbose_name=_('Related Identifiers'),
+    )
     utype = models.CharField(
         max_length=256, null=True, blank=True,
         verbose_name=_('IVOA Utype'),
@@ -160,6 +164,10 @@ class Table(models.Model):
     doi = models.CharField(
         max_length=256, null=True, blank=True,
         verbose_name=_('Digital object identifier')
+    )
+    related_identifiers = JSONField(
+        null=True, blank=True,
+        verbose_name=_('Related Identifiers'),
     )
     type = models.CharField(
         max_length=8, choices=TYPE_CHOICES,
