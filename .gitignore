@@ -20,3 +20,6 @@ __pycache__/
 build
 dist
 *.egg-info
+
+.imdone/
+.on-save.json
