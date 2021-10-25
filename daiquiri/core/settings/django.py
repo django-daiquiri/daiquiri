@@ -38,6 +38,8 @@ DATABASES = {
     'oai': env.get_database('data'),
 }
 
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 if DATABASES['tap'].get('ENGINE') == 'django.db.backends.postgresql':
     DATABASES['tap']['OPTIONS'] = {
         'options': '-c search_path=%s' % env.get('TAP_SCHEMA', 'tap_schema')
