@@ -23,6 +23,7 @@ from django.utils.timezone import localtime
 from django.utils.translation import ugettext_lazy as _
 
 from ipware import get_client_ip as ipware_get_client_ip
+from markdown import markdown as markdown_function
 
 import xlsxwriter
 
@@ -204,6 +205,13 @@ def human2bytes(string):
         return number * 1024**4
     elif unit == 'pib':
         return number * 1024**5
+
+
+def markdown(md):
+    return markdown_function(md, extensions=[
+        'fenced_code',
+        'attr_list'
+    ])
 
 
 def make_query_dict_upper_case(input_dict):
