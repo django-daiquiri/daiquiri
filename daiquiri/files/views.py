@@ -5,7 +5,7 @@ from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.views.generic import View
 
-from .utils import get_file_path, get_directory, render_with_layout, send_file
+from .utils import get_directory, get_file_path, render_with_layout, send_file
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +32,7 @@ class FileView(View):
             else:
                 return redirect_to_login(request.path_info)
 
-        if file_path.endswith('.html') or file_path.endswith('.md') and directory.layout:
+        if file_path.endswith('.html') or file_path.endswith('.md'):
             return render_with_layout(request, file_path)
         else:
             return send_file(request, file_path)
