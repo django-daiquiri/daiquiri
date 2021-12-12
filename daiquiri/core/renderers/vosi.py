@@ -37,8 +37,10 @@ class CapabilitiesRendererMixin(object):
                     'use': access_url.get('use'),
                 }, access_url.get('url'))
 
-            if interface.get('query_type'):
-                self.node('queryType', {}, interface.get('query_type'))
+            query_types = interface.get('query_types')
+            if query_types:
+                for query_type in query_types:
+                    self.node('queryType', {}, query_type)
 
             if interface.get('result_type'):
                 self.node('resultType', {}, interface.get('result_type'))
@@ -46,7 +48,8 @@ class CapabilitiesRendererMixin(object):
             params = interface.get('params', [])
             for param in params:
                 self.start('param', {
-                    'std': param.get('std')
+                    'std': param.get('std'),
+                    'use': param.get('use')
                 })
                 self.node('name', {}, param.get('name'))
                 self.node('description', {}, param.get('description'))
