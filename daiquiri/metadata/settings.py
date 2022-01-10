@@ -1,6 +1,5 @@
 from django.utils.translation import ugettext_lazy as _
 import daiquiri.core.env as env
-from daiquiri.core.constants import ACCESS_LEVEL_CHOICES
 
 METADATA_COLUMN_PERMISSIONS = False
 METADATA_BASE_URL = None

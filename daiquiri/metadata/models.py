@@ -76,11 +76,11 @@ class Schema(models.Model):
         verbose_name=_('Updated'),
     )
     access_level = models.CharField(
-        max_length=8, choices=settings.ACCESS_LEVEL_CHOICES,
+        max_length=8, choices=ACCESS_LEVEL_CHOICES,
         verbose_name=_('Access level')
     )
     metadata_access_level = models.CharField(
-        max_length=8, choices=settings.ACCESS_LEVEL_CHOICES,
+        max_length=8, choices=ACCESS_LEVEL_CHOICES,
         verbose_name=_('Metadata access level')
     )
     groups = models.ManyToManyField(
@@ -202,11 +202,11 @@ class Table(models.Model):
         verbose_name=_('Updated'),
     )
     access_level = models.CharField(
-        max_length=8, choices=settings.ACCESS_LEVEL_CHOICES,
+        max_length=8, choices=ACCESS_LEVEL_CHOICES,
         verbose_name=_('Access level')
     )
     metadata_access_level = models.CharField(
-        max_length=8, choices=settings.ACCESS_LEVEL_CHOICES,
+        max_length=8, choices=ACCESS_LEVEL_CHOICES,
         verbose_name=_('Metadata access level')
     )
     groups = models.ManyToManyField(
@@ -303,11 +303,11 @@ class Column(models.Model):
         help_text=_('The columns which this column is an index for (e.g. for pgSphere).')
     )
     access_level = models.CharField(
-        max_length=8, choices=settings.ACCESS_LEVEL_CHOICES,
+        max_length=8, choices=ACCESS_LEVEL_CHOICES,
         verbose_name=_('Access level')
     )
     metadata_access_level = models.CharField(
-        max_length=8, choices=settings.ACCESS_LEVEL_CHOICES,
+        max_length=8, choices=ACCESS_LEVEL_CHOICES,
         verbose_name=_('Metadata access level')
     )
     groups = models.ManyToManyField(
@@ -362,11 +362,11 @@ class Function(models.Model):
         help_text=_('Prototype of this function in a SQL query.')
     )
     access_level = models.CharField(
-        max_length=8, choices=settings.ACCESS_LEVEL_CHOICES,
+        max_length=8, choices=ACCESS_LEVEL_CHOICES,
         verbose_name=_('Access level')
     )
     metadata_access_level = models.CharField(
-        max_length=8, choices=settings.ACCESS_LEVEL_CHOICES,
+        max_length=8, choices=ACCESS_LEVEL_CHOICES,
         verbose_name=_('Metadata access level')
     )
     groups = models.ManyToManyField(
