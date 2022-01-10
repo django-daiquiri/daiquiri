@@ -97,7 +97,7 @@ def update_table(table):
 
             # remove columns
             tap_table.columns.all().delete()
-        except TapSchema.DoesNotExist:
+        except TapTable.DoesNotExist:
             pass
 
 
