@@ -62,6 +62,7 @@ class TableSerializer(serializers.ModelSerializer):
     related_identifiers = JSONListField(allow_null=True, default=[])
     creators = JSONListField(allow_null=True, default=[])
     contributors = JSONListField(allow_null=True, default=[])
+    license = serializers.ChoiceField(choices=settings.LICENSE_CHOICES)
 
     class Meta:
         model = Table
@@ -75,6 +76,7 @@ class SchemaSerializer(serializers.ModelSerializer):
     related_identifiers = JSONListField(allow_null=True, default=[])
     creators = JSONListField(allow_null=True, default=[])
     contributors = JSONListField(allow_null=True, default=[])
+    license = serializers.ChoiceField(choices=settings.LICENSE_CHOICES)
 
     class Meta:
         model = Schema

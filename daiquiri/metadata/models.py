@@ -44,7 +44,7 @@ class Schema(models.Model):
         help_text=_('The desired attribution for the schema.')
     )
     license = models.CharField(
-        max_length=8, choices=settings.LICENSE_CHOICES, null=True, blank=True,
+        max_length=8, null=True, blank=True,
         verbose_name=_('License')
     )
     doi = models.CharField(
@@ -158,7 +158,7 @@ class Table(models.Model):
         help_text=_('The desired attribution for the table.')
     )
     license = models.CharField(
-        max_length=8, choices=settings.LICENSE_CHOICES, null=True, blank=True,
+        max_length=8, null=True, blank=True,
         verbose_name=_('License')
     )
     doi = models.CharField(
