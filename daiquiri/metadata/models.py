@@ -90,7 +90,7 @@ class Schema(models.Model):
     )
 
     class Meta:
-        ordering = ('order', )
+        ordering = ('order', 'name')
 
         verbose_name = _('Schema')
         verbose_name_plural = _('Schemas')
@@ -216,7 +216,7 @@ class Table(models.Model):
     )
 
     class Meta:
-        ordering = ('schema__order', 'order', )
+        ordering = ('schema__order', 'order', 'name')
 
         verbose_name = _('Table')
         verbose_name_plural = _('Tables')
@@ -317,7 +317,7 @@ class Column(models.Model):
     )
 
     class Meta:
-        ordering = ('table__schema__order', 'table__order', 'order', )
+        ordering = ('table__schema__order', 'table__order', 'order', 'name')
 
         verbose_name = _('Column')
         verbose_name_plural = _('Columns')
@@ -376,7 +376,7 @@ class Function(models.Model):
     )
 
     class Meta:
-        ordering = ('order', )
+        ordering = ('order', 'name')
 
         verbose_name = _('Function')
         verbose_name_plural = _('Functions')
