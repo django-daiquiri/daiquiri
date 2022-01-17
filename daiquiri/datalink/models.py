@@ -35,6 +35,7 @@ class Datalink(models.Model):
         verbose_name=_('Content type'),
     )
     content_length = models.IntegerField(
+        null=True,
         verbose_name=_('Content length'),
     )
 

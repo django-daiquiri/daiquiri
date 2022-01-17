@@ -1,5 +1,8 @@
+from django.conf import settings
+from django.urls import reverse
 
 from daiquiri.core.constants import ACCESS_LEVEL_PUBLIC
+from daiquiri.datalink.adapter import BaseDatalinkAdapter, TablesDatalinkAdapterMixin
 from daiquiri.oai.adapter import BaseOaiAdapter
 from daiquiri.registry.adapter import RegistryOaiAdapterMixin
 
@@ -119,3 +122,52 @@ class RegistryDoiMetadataOaiAdapter(RegistryOaiAdapterMixin, DoiMetadataOaiAdapt
         'schema': ('oai_dc', 'oai_datacite', 'datacite'),
         'table': ('oai_dc', 'oai_datacite', 'datacite'),
     }
+
+
+class MetadataDatalinkAdapterMixin(object):
+
+    def fetch_metadata_rows(self):
+        for schema in Schema.objects.all():
+            if schema.metadata_access_level == ACCESS_LEVEL_PUBLIC:
+                path = reverse('metadata:schema', args=[schema.name])
+                identifier = path.lstrip('/') if schema.doi is None else 'doi:{}'.format(schema.doi)
+                access_url = settings.SITE_URL.rstrip('/') + path
+
+                yield {
+                   'ID': identifier,
+                   'access_url': access_url,
+                   'service_def': '',
+                   'error_message': '',
+                   'description': 'Database schema documentation',
+                   'semantics': 'https://www.ivoa.net/rdf/datalink/core#documentation',
+                   'content_type': 'application/html',
+                   'content_length': None
+                }
+
+        for table in Table.objects.select_related('schema'):
+            if table.metadata_access_level == ACCESS_LEVEL_PUBLIC and \
+                    table.schema.metadata_access_level == ACCESS_LEVEL_PUBLIC:
+                path = reverse('metadata:table', args=[table.schema.name, table.name])
+                identifier = path.lstrip('/') if table.doi is None else 'doi:{}'.format(table.doi)
+                access_url = settings.SITE_URL.rstrip('/') + path
+
+                yield {
+                   'ID': identifier,
+                   'access_url': access_url,
+                   'service_def': '',
+                   'error_message': '',
+                   'description': 'Database table documentation',
+                   'semantics': 'https://www.ivoa.net/rdf/datalink/core#documentation',
+                   'content_type': 'application/html',
+                   'content_length': None
+                }
+
+
+class MetadataDatalinkAdapter(MetadataDatalinkAdapterMixin, TablesDatalinkAdapterMixin, BaseDatalinkAdapter):
+
+    def fetch_rows(self):
+        for row in self.fetch_tables_rows():
+            yield row
+
+        for row in self.fetch_metadata_rows():
+            yield row
