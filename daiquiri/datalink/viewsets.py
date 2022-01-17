@@ -27,7 +27,7 @@ class SyncDatalinkJobViewSet(SyncJobViewSet):
             # check for missing IDs
             for identifier in identifiers:
                 if not any(filter(lambda row: row[0] == identifier, rows)):
-                    rows.append((identifier, None, None, 'Not found: {}'.format(identifier), None, None, None, None))
+                    rows.append((identifier, None, None, 'NotFoundFault: {}'.format(identifier), None, None, None, None))
 
         datalink_table = generate_votable(rows, DATALINK_FIELDS)
         return FileResponse(datalink_table, content_type=DATALINK_CONTENT_TYPE)
