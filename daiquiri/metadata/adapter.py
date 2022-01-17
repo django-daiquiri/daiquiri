@@ -2,6 +2,7 @@ from django.conf import settings
 from django.urls import reverse
 
 from daiquiri.core.constants import ACCESS_LEVEL_PUBLIC
+from daiquiri.core.utils import get_doi_url
 from daiquiri.datalink.adapter import BaseDatalinkAdapter, TablesDatalinkAdapterMixin
 from daiquiri.oai.adapter import BaseOaiAdapter
 from daiquiri.registry.adapter import RegistryOaiAdapterMixin
@@ -130,7 +131,7 @@ class MetadataDatalinkAdapterMixin(object):
         for schema in Schema.objects.all():
             if schema.metadata_access_level == ACCESS_LEVEL_PUBLIC:
                 path = reverse('metadata:schema', args=[schema.name])
-                identifier = path.lstrip('/') if schema.doi is None else 'doi:{}'.format(schema.doi)
+                identifier = schema.name
                 access_url = settings.SITE_URL.rstrip('/') + path
 
                 yield {
@@ -139,16 +140,28 @@ class MetadataDatalinkAdapterMixin(object):
                    'service_def': '',
                    'error_message': '',
                    'description': 'Database schema documentation',
-                   'semantics': 'https://www.ivoa.net/rdf/datalink/core#documentation',
+                   'semantics': '#documentation',
                    'content_type': 'application/html',
                    'content_length': None
                 }
+
+                if schema.doi:
+                    yield {
+                       'ID': identifier,
+                       'access_url': get_doi_url(schema.doi_url),
+                       'service_def': '',
+                       'error_message': '',
+                       'description': 'Digital object identifier',
+                       'semantics': '#doi',
+                       'content_type': 'application/html',
+                       'content_length': None
+                    }
 
         for table in Table.objects.select_related('schema'):
             if table.metadata_access_level == ACCESS_LEVEL_PUBLIC and \
                     table.schema.metadata_access_level == ACCESS_LEVEL_PUBLIC:
                 path = reverse('metadata:table', args=[table.schema.name, table.name])
-                identifier = path.lstrip('/') if table.doi is None else 'doi:{}'.format(table.doi)
+                identifier = '{}.{}'.format(table.schema.name, table.name)
                 access_url = settings.SITE_URL.rstrip('/') + path
 
                 yield {
@@ -157,10 +170,22 @@ class MetadataDatalinkAdapterMixin(object):
                    'service_def': '',
                    'error_message': '',
                    'description': 'Database table documentation',
-                   'semantics': 'https://www.ivoa.net/rdf/datalink/core#documentation',
+                   'semantics': '#documentation',
                    'content_type': 'application/html',
                    'content_length': None
                 }
+
+                if table.doi:
+                    yield {
+                       'ID': identifier,
+                       'access_url': get_doi_url(table.doi),
+                       'service_def': '',
+                       'error_message': '',
+                       'description': 'Digital object identifier',
+                       'semantics': '#doi',
+                       'content_type': 'application/html',
+                       'content_length': None
+                    }
 
 
 class MetadataDatalinkAdapter(MetadataDatalinkAdapterMixin, TablesDatalinkAdapterMixin, BaseDatalinkAdapter):
