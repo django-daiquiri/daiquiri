@@ -15,9 +15,11 @@ GRANT ALL PRIVILEGES ON `%(NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\';
         'data': '''
 -- Run the following commands on \'%(HOST)s\':
 CREATE USER \'%(USER)s\'@\'%(CLIENT)s\' identified by \'%(PASSWORD)s\';
+CREATE DATABASE `%(NAME)s` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE DATABASE `%(TAP_SCHEMA)s` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE DATABASE `%(TAP_UPLOAD)s` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE DATABASE `%(OAI_SCHEMA)s` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+GRANT SELECT ON `%(NAME)s`.* to \'%(USER)s\'@\'%(CLIENT)s\';
 GRANT ALL PRIVILEGES ON `%(TAP_SCHEMA)s`.* to \'%(USER)s\'@\'%(CLIENT)s\';
 GRANT ALL PRIVILEGES ON `%(TAP_UPLOAD)s`.* to \'%(USER)s\'@\'%(CLIENT)s\';
 GRANT ALL PRIVILEGES ON `%(OAI_SCHEMA)s`.* to \'%(USER)s\'@\'%(CLIENT)s\';
@@ -30,7 +32,7 @@ GRANT SELECT ON `%(SCHEMA_NAME)s`.* TO \'%(USER)s\'@\'%(CLIENT)s\';
         'datalink': '''
 -- Run the following commands on %(HOST)s:
 CREATE TABLE %(TABLE_NAME)s (
-  `link_id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `datalink_id` bigint(20) NOT NULL AUTO_INCREMENT,
   `ID` varchar(256) NOT NULL,
   `access_url` varchar(256),
   `service_def` varchar(80),
