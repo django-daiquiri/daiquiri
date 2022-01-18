@@ -40,7 +40,7 @@ class Datalink(models.Model):
     )
 
     def __str__(self):
-        return self.identifier
+        return self.ID
 
     class Meta:
         db_table = 'datalink'

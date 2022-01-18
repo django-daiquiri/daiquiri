@@ -127,72 +127,90 @@ class RegistryDoiMetadataOaiAdapter(RegistryOaiAdapterMixin, DoiMetadataOaiAdapt
 
 class MetadataDatalinkAdapterMixin(object):
 
-    def fetch_metadata_rows(self):
-        for schema in Schema.objects.all():
-            if schema.metadata_access_level == ACCESS_LEVEL_PUBLIC:
-                path = reverse('metadata:schema', args=[schema.name])
-                identifier = schema.name
-                access_url = settings.SITE_URL.rstrip('/') + path
+    def get_schema_list(self):
+        for schema in Schema.objects.iterator():
+            yield 'schema', schema
 
-                yield {
+    def get_schema_identifier(self, schema):
+        return schema.name
+
+    def get_schema_links(self, schema):
+        schema_links = []
+
+        if schema.metadata_access_level == ACCESS_LEVEL_PUBLIC:
+            identifier = self.get_schema_identifier(schema)
+
+            path = reverse('metadata:schema', args=[schema.name])
+            access_url = settings.SITE_URL.rstrip('/') + path
+
+            schema_links = [{
+               'ID': identifier,
+               'access_url': access_url,
+               'service_def': '',
+               'error_message': '',
+               'description': 'Database schema documentation',
+               'semantics': '#documentation',
+               'content_type': 'application/html',
+               'content_length': None
+            }]
+
+            if schema.doi:
+                schema_links.append({
                    'ID': identifier,
-                   'access_url': access_url,
+                   'access_url': get_doi_url(schema.doi),
                    'service_def': '',
                    'error_message': '',
-                   'description': 'Database schema documentation',
-                   'semantics': '#documentation',
+                   'description': 'Digital object identifier',
+                   'semantics': '#doi',
                    'content_type': 'application/html',
                    'content_length': None
-                }
+                })
 
-                if schema.doi:
-                    yield {
-                       'ID': identifier,
-                       'access_url': get_doi_url(schema.doi),
-                       'service_def': '',
-                       'error_message': '',
-                       'description': 'Digital object identifier',
-                       'semantics': '#doi',
-                       'content_type': 'application/html',
-                       'content_length': None
-                    }
+        return schema_links
 
-        for table in Table.objects.select_related('schema'):
-            if table.metadata_access_level == ACCESS_LEVEL_PUBLIC and \
-                    table.schema.metadata_access_level == ACCESS_LEVEL_PUBLIC:
-                path = reverse('metadata:table', args=[table.schema.name, table.name])
-                identifier = '{}.{}'.format(table.schema.name, table.name)
-                access_url = settings.SITE_URL.rstrip('/') + path
+    def get_table_list(self):
+        for table in Table.objects.iterator():
+            yield 'table', table
 
-                yield {
+    def get_table_identifier(self, table):
+        return '{}.{}'.format(table.schema.name, table.name)
+
+    def get_table_links(self, table):
+        table_links = []
+
+        if table.metadata_access_level == ACCESS_LEVEL_PUBLIC and \
+                table.schema.metadata_access_level == ACCESS_LEVEL_PUBLIC:
+            identifier = self.get_table_identifier(table)
+
+            path = reverse('metadata:table', args=[table.schema.name, table.name])
+            access_url = settings.SITE_URL.rstrip('/') + path
+
+            table_links.append({
+               'ID': identifier,
+               'access_url': access_url,
+               'service_def': '',
+               'error_message': '',
+               'description': 'Database table documentation',
+               'semantics': '#documentation',
+               'content_type': 'application/html',
+               'content_length': None
+            })
+
+            if table.doi:
+                table_links.append({
                    'ID': identifier,
-                   'access_url': access_url,
+                   'access_url': get_doi_url(table.doi),
                    'service_def': '',
                    'error_message': '',
-                   'description': 'Database table documentation',
-                   'semantics': '#documentation',
+                   'description': 'Digital object identifier',
+                   'semantics': '#doi',
                    'content_type': 'application/html',
                    'content_length': None
-                }
+                })
 
-                if table.doi:
-                    yield {
-                       'ID': identifier,
-                       'access_url': get_doi_url(table.doi),
-                       'service_def': '',
-                       'error_message': '',
-                       'description': 'Digital object identifier',
-                       'semantics': '#doi',
-                       'content_type': 'application/html',
-                       'content_length': None
-                    }
+        return table_links
 
 
 class MetadataDatalinkAdapter(MetadataDatalinkAdapterMixin, TablesDatalinkAdapterMixin, BaseDatalinkAdapter):
 
-    def fetch_rows(self):
-        for row in self.fetch_tables_rows():
-            yield row
-
-        for row in self.fetch_metadata_rows():
-            yield row
+    resource_types = ['datalink', 'schema', 'table']
