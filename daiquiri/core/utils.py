@@ -217,7 +217,7 @@ def markdown(md):
 def make_query_dict_upper_case(input_dict):
     output_dict = input_dict.copy()
 
-    for key in output_dict.keys():
+    for key in input_dict.keys():
         if key.upper() != key:
             values = output_dict.getlist(key)
 
