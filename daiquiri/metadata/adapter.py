@@ -148,7 +148,7 @@ class MetadataDatalinkAdapterMixin(object):
                 if schema.doi:
                     yield {
                        'ID': identifier,
-                       'access_url': get_doi_url(schema.doi_url),
+                       'access_url': get_doi_url(schema.doi),
                        'service_def': '',
                        'error_message': '',
                        'description': 'Digital object identifier',

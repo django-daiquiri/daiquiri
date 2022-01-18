@@ -1,4 +1,4 @@
-DATALINK_CONTENT_TYPE = 'application/x-votable+xml;content=datalink'
+DATALINK_CONTENT_TYPE = 'application/xml'
 DATALINK_FIELDS = [
     {
         'name': 'ID',
