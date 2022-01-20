@@ -11,11 +11,8 @@ def update_links(resource_type, resource):
 
     adapter = DatalinkAdapter()
 
-    try:
-        identifier = adapter.get_identifier(resource_type, resource)
-        links = adapter.get_links(resource_type, resource)
-    except TypeError:
-        raise RuntimeError('Could not obtain identifier or links for %s %s' % (resource_type, resource))
+    identifier = adapter.get_identifier(resource_type, resource)
+    links = adapter.get_links(resource_type, resource)
 
     datalinks = []
     for link in links:
@@ -30,9 +27,6 @@ def delete_links(resource_type, resource):
 
     adapter = DatalinkAdapter()
 
-    try:
-        identifier = adapter.get_identifier(resource_type, resource)
-    except TypeError:
-        raise RuntimeError('Could not obtain identifier for %s %s' % (resource_type, resource))
+    identifier = adapter.get_identifier(resource_type, resource)
 
     Datalink.objects.filter(ID=identifier).delete()
