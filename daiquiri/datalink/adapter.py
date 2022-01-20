@@ -9,6 +9,21 @@ def DatalinkAdapter():
 
 
 class BaseDatalinkAdapter(object):
+    """
+    Each datalink adapter needs to configure a set of resource types.
+
+    For each resource type, the following methods need to be implemented:
+
+    * get_<resource_type>_list(self): returns a list of all resources for the resource_type
+
+    * get_<resource_type>_identifier(self, resource): returns the identifier for
+      a resource into a list (string)
+
+    * get_<resource_type>_links(self, resource): returns a resource into a list
+      of rows of the datalink table (list of python dicts)
+
+    See TablesDatalinkAdapterMixin below for an example.
+    """
 
     resource_types = []
 

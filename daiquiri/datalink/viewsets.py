@@ -24,7 +24,7 @@ class SyncDatalinkJobViewSet(SyncJobViewSet):
             field_names = [field['name'] for field in DATALINK_FIELDS]
             rows = list(Datalink.objects.filter(ID__in=identifiers).values_list(*field_names))
 
-            # check for missing IDs
+            # check for missing IDs and return error message
             for identifier in identifiers:
                 if not any(filter(lambda row: row[0] == identifier, rows)):
                     rows.append((identifier, None, None, 'NotFoundFault: {}'.format(identifier), None, None, None, None))
