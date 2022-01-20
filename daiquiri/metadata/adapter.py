@@ -148,7 +148,7 @@ class MetadataDatalinkAdapterMixin(object):
                'access_url': access_url,
                'service_def': '',
                'error_message': '',
-               'description': 'Database schema documentation',
+               'description': 'Documentation for the {} schema'.format(schema.name),
                'semantics': '#documentation',
                'content_type': 'application/html',
                'content_length': None
@@ -190,7 +190,7 @@ class MetadataDatalinkAdapterMixin(object):
                'access_url': access_url,
                'service_def': '',
                'error_message': '',
-               'description': 'Database table documentation',
+               'description': 'Documentation for the {} table'.format(table.name),
                'semantics': '#documentation',
                'content_type': 'application/html',
                'content_length': None
