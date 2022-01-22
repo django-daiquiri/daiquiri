@@ -1,7 +1,9 @@
 from django.conf import settings
+from django.urls import reverse
 
+from daiquiri.core.constants import ACCESS_LEVEL_PUBLIC
 from daiquiri.core.adapter import DatabaseAdapter
-from daiquiri.core.utils import import_class
+from daiquiri.core.utils import import_class, get_doi_url
 
 
 def DatalinkAdapter():
@@ -22,7 +24,7 @@ class BaseDatalinkAdapter(object):
     * get_<resource_type>_links(self, resource): returns a resource into a list
       of rows of the datalink table (list of python dicts)
 
-    See TablesDatalinkAdapterMixin below for an example.
+    See the mixins below for an example.
     """
 
     resource_types = []
@@ -64,3 +66,100 @@ class TablesDatalinkAdapterMixin(object):
                'content_length': row[8] or 0
             }
         ]
+
+
+class MetadataDatalinkAdapterMixin(object):
+
+    def get_schema_list(self):
+        from daiquiri.metadata.models import Schema
+
+        for schema in Schema.objects.iterator():
+            yield 'schema', schema
+
+    def get_schema_identifier(self, schema):
+        return schema.name
+
+    def get_schema_links(self, schema):
+        schema_links = []
+
+        if schema.metadata_access_level == ACCESS_LEVEL_PUBLIC:
+            identifier = self.get_schema_identifier(schema)
+
+            path = reverse('metadata:schema', args=[schema.name])
+            access_url = settings.SITE_URL.rstrip('/') + path
+
+            schema_links = [{
+               'ID': identifier,
+               'access_url': access_url,
+               'service_def': '',
+               'error_message': '',
+               'description': 'Documentation for the {} schema'.format(schema.name),
+               'semantics': '#documentation',
+               'content_type': 'application/html',
+               'content_length': None
+            }]
+
+            if schema.doi:
+                schema_links.append({
+                   'ID': identifier,
+                   'access_url': get_doi_url(schema.doi),
+                   'service_def': '',
+                   'error_message': '',
+                   'description': 'Digital object identifier',
+                   'semantics': '#doi',
+                   'content_type': 'application/html',
+                   'content_length': None
+                })
+
+        return schema_links
+
+    def get_table_list(self):
+        from daiquiri.metadata.models import Table
+
+        for table in Table.objects.iterator():
+            yield 'table', table
+
+    def get_table_identifier(self, table):
+        return '{}.{}'.format(table.schema.name, table.name)
+
+    def get_table_links(self, table):
+        table_links = []
+
+        if table.metadata_access_level == ACCESS_LEVEL_PUBLIC and \
+                table.schema.metadata_access_level == ACCESS_LEVEL_PUBLIC:
+            identifier = self.get_table_identifier(table)
+
+            path = reverse('metadata:table', args=[table.schema.name, table.name])
+            access_url = settings.SITE_URL.rstrip('/') + path
+
+            table_links.append({
+               'ID': identifier,
+               'access_url': access_url,
+               'service_def': '',
+               'error_message': '',
+               'description': 'Documentation for the {} table'.format(table.name),
+               'semantics': '#documentation',
+               'content_type': 'application/html',
+               'content_length': None
+            })
+
+            if table.doi:
+                table_links.append({
+                   'ID': identifier,
+                   'access_url': get_doi_url(table.doi),
+                   'service_def': '',
+                   'error_message': '',
+                   'description': 'Digital object identifier',
+                   'semantics': '#doi',
+                   'content_type': 'application/html',
+                   'content_length': None
+                })
+
+        return table_links
+
+
+class DefaultDatalinkAdapter(MetadataDatalinkAdapterMixin,
+                             TablesDatalinkAdapterMixin,
+                             BaseDatalinkAdapter):
+
+    resource_types = ['datalink', 'schema', 'table']

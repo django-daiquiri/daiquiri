@@ -1,2 +1,2 @@
-DATALINK_ADAPTER = 'daiquiri.metadata.adapter.MetadataDatalinkAdapter'
+DATALINK_ADAPTER = 'daiquiri.datalink.adapter.DefaultDatalinkAdapter'
 DATALINK_TABLES = []
