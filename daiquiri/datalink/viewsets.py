@@ -1,14 +1,15 @@
 from django.http import FileResponse
 
+from rest_framework import viewsets
+
 from daiquiri.core.generators import generate_votable
-from daiquiri.jobs.viewsets import SyncJobViewSet
 
 from .constants import DATALINK_FIELDS, DATALINK_CONTENT_TYPE
 
 from .models import Datalink
 
 
-class SyncDatalinkJobViewSet(SyncJobViewSet):
+class SyncDatalinkJobViewSet(viewsets.GenericViewSet):
 
     def list(self, request):
         return self.perform_sync_job(request, request.GET)
