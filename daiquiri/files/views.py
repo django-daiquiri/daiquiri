@@ -32,7 +32,7 @@ class FileView(View):
             else:
                 return redirect_to_login(request.path_info)
 
-        if file_path.endswith('.html') or file_path.endswith('.md'):
+        if file_path.endswith('.html') or file_path.endswith('.md') and directory.layout:
             return render_with_layout(request, file_path)
         else:
             return send_file(request, file_path)
