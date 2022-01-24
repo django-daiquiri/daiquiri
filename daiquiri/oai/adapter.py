@@ -40,6 +40,22 @@ class BaseOaiAdapter(object):
 
     resource_types = []
 
+    def __init__(self):
+        for resource_type in self.resource_types:
+            for method in ['get_%s_list' % resource_type,
+                           'get_%s' % resource_type,
+                           'get_%s_record' % resource_type]:
+                if not hasattr(self, method):
+                    message = '\'%s\' is declared as resource_type, but \'%s\' object has no attribute \'%s\'' % (
+                        resource_type, self.__class__.__name__, method)
+                    raise NotImplementedError(message)
+
+            try:
+                for metadata_prefix in self.get_metadata_prefixes(resource_type):
+                    self.get_serializer_class(metadata_prefix, resource_type)
+            except AttributeError as e:
+                raise NotImplementedError('"%s" is declared as resource_type, but %s' % (resource_type, e))
+
     def get_resource_list(self):
         for resource_type in self.resource_types:
             yield from getattr(self, 'get_%s_list' % resource_type)()
