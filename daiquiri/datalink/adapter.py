@@ -5,6 +5,8 @@ from daiquiri.core.constants import ACCESS_LEVEL_PUBLIC
 from daiquiri.core.adapter import DatabaseAdapter
 from daiquiri.core.utils import import_class, get_doi_url
 
+from .constants import DATALINK_RELATION_TYPES
+
 
 def DatalinkAdapter():
     return import_class(settings.DATALINK_ADAPTER)()
@@ -110,7 +112,7 @@ class MetadataDatalinkAdapterMixin(object):
                'access_url': access_url,
                'service_def': '',
                'error_message': '',
-               'description': 'Documentation for the {} schema'.format(schema.name),
+               'description': 'Documentation for the {} schema'.format(schema),
                'semantics': '#documentation',
                'content_type': 'application/html',
                'content_length': None
@@ -122,11 +124,27 @@ class MetadataDatalinkAdapterMixin(object):
                    'access_url': get_doi_url(schema.doi),
                    'service_def': '',
                    'error_message': '',
-                   'description': 'Digital object identifier',
+                   'description': 'Digital object identifier (DOI) for the {} schema'.format(schema),
                    'semantics': '#doi',
                    'content_type': 'application/html',
                    'content_length': None
                 })
+
+            if schema.related_identifiers:
+                for related_identifier in schema.related_identifiers:
+                    description = DATALINK_RELATION_TYPES.get(related_identifier.get('relation_type'), '') \
+                                                         .format('the {} schema'.format(schema)) \
+                                                         .capitalize()
+                    schema_links.append({
+                       'ID': identifier,
+                       'access_url': related_identifier.get('related_identifier'),
+                       'service_def': '',
+                       'error_message': '',
+                       'description': description,
+                       'semantics': '#auxiliary',
+                       'content_type': 'application/html',
+                       'content_length': None
+                    })
 
         return schema_links
 
@@ -154,7 +172,7 @@ class MetadataDatalinkAdapterMixin(object):
                'access_url': access_url,
                'service_def': '',
                'error_message': '',
-               'description': 'Documentation for the {} table'.format(table.name),
+               'description': 'Documentation for the {} table'.format(table),
                'semantics': '#documentation',
                'content_type': 'application/html',
                'content_length': None
@@ -166,11 +184,28 @@ class MetadataDatalinkAdapterMixin(object):
                    'access_url': get_doi_url(table.doi),
                    'service_def': '',
                    'error_message': '',
-                   'description': 'Digital object identifier',
+                   'description': 'Digital object identifier (DOI) for the {} table'.format(table),
                    'semantics': '#doi',
                    'content_type': 'application/html',
                    'content_length': None
                 })
+
+            if table.related_identifiers:
+                for related_identifier in table.related_identifiers:
+                    description = DATALINK_RELATION_TYPES.get(related_identifier.get('relation_type'), '') \
+                                                         .format('the {} table'.format(table)) \
+                                                         .capitalize()
+
+                    table_links.append({
+                       'ID': identifier,
+                       'access_url': related_identifier.get('related_identifier'),
+                       'service_def': '',
+                       'error_message': '',
+                       'description': description,
+                       'semantics': '#auxiliary',
+                       'content_type': 'application/html',
+                       'content_length': None
+                    })
 
         return table_links
 
