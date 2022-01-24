@@ -11,15 +11,25 @@ def OaiAdapter():
 
 class BaseOaiAdapter(object):
     """
-    Each OAI adapter needs to configure a set of resource types.
+    Each OAI adapter needs to configure a list of resource_types.
 
-    For each resource type, the following methods need to be implemented:
+    For each resource_type, the following methods need to be implemented:
 
-    * get_<resource_type>_list(self): returns a list of all resources for the resource_type
+    * get_<resource_type>_list(self): returns a list of all resources for this resource_type
 
-    * get_<resource_type>(self, resource_id):
+    * get_<resource_type>(self, resource_id): returns a resources for a given pk
 
-    * get_<resource_type>_record(self, resource):
+    * get_<resource_type>_record(self, resource): returns the oai record for a given resource
+
+    In addition the following attributes need to be set:
+
+    * <resource_type>_metadata_prefixes: a list of metadata prefixes for this resource_type
+
+    * <metadata_prefix>_<resource_type>_serializer_class: a serializer class for each
+      metadata prefix and resource_type
+
+    Instead of these attributes, getter functions can be implemented,
+    e.g. get_<resource_type>_metadata_prefixes(self)
 
     See the mixins below for an example.
     """
@@ -28,7 +38,7 @@ class BaseOaiAdapter(object):
     identifier_repository = settings.SITE_IDENTIFIER
     identifier_delimiter = ':'
 
-    resource_types = {}
+    resource_types = []
 
     def get_resource_list(self):
         for resource_type in self.resource_types:
@@ -39,6 +49,14 @@ class BaseOaiAdapter(object):
 
     def get_record(self, resource_type, resource):
         return getattr(self, 'get_%s_record' % resource_type)(resource)
+
+    def get_metadata_prefixes(self, resource_type):
+        metadata_prefixes_attribute = '%s_metadata_prefixes' % resource_type
+
+        if hasattr(self, metadata_prefixes_attribute):
+            return getattr(self, metadata_prefixes_attribute)
+        else:
+            return getattr(self, 'get_%s' % metadata_prefixes_attribute)()
 
     def get_serializer_class(self, metadata_prefix, resource_type):
         serializer_class_attribute = '%s_%s_serializer_class' % (metadata_prefix, resource_type)
@@ -71,6 +89,9 @@ class BaseOaiAdapter(object):
 
 
 class MetadataOaiAdapterMixin(object):
+
+    schema_metadata_prefixes = ('oai_dc', 'oai_datacite', 'datacite')
+    table_metadata_prefixes = ('oai_dc', 'oai_datacite', 'datacite')
 
     def get_oai_dc_schema_serializer_class(self):
         return import_class('daiquiri.metadata.serializers.dublincore.DublincoreSchemaSerializer')
@@ -177,6 +198,8 @@ class RegistryOaiAdapterMixin(object):
         6: 'datalink'
     }
 
+    service_metadata_prefixes = ['oai_dc', 'ivo_vor']
+
     def get_oai_dc_service_serializer_class(self):
         return import_class('daiquiri.registry.serializers.DublincoreSerializer')
 
@@ -234,8 +257,4 @@ class RegistryOaiAdapterMixin(object):
 
 class DefaultOaiAdapter(RegistryOaiAdapterMixin, DoiMetadataOaiAdapterMixin, BaseOaiAdapter):
 
-    resource_types = {
-        'service': ('oai_dc', 'ivo_vor'),
-        'schema': ('oai_dc', 'oai_datacite', 'datacite'),
-        'table': ('oai_dc', 'oai_datacite', 'datacite'),
-    }
+    resource_types = ['service', 'schema', 'table']

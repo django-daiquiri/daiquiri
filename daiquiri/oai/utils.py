@@ -31,7 +31,7 @@ def update_records(resource_type, resource):
         raise RuntimeError('Could not obtain record for %s %s' % (resource_type, resource))
 
     if public is True:
-        for metadata_prefix in adapter.resource_types[resource_type]:
+        for metadata_prefix in adapter.get_metadata_prefixes(resource_type):
             try:
                 record = Record.objects.get(identifier=identifier, metadata_prefix=metadata_prefix)
             except Record.DoesNotExist:
@@ -57,7 +57,7 @@ def delete_records(resource_type, resource):
     except TypeError:
         raise RuntimeError('Could not obtain record for %s %s' % (resource_type, resource))
 
-    for metadata_prefix in adapter.resource_types[resource_type]:
+    for metadata_prefix in adapter.get_metadata_prefixes(resource_type):
         try:
             record = Record.objects.get(identifier=identifier, metadata_prefix=metadata_prefix)
             record.datestamp = datestamp
