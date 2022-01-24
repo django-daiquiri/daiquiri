@@ -13,7 +13,7 @@ def DatalinkAdapter():
 class BaseDatalinkAdapter(object):
     """
     Each datalink adapter needs to configure a set of resource types.
-
+resource_types are declare as a list(string), i.e.: [table, schema,...]
     For each resource type, the following methods need to be implemented:
 
     * get_<resource_type>_list(self): returns a list of all resources for the resource_type
@@ -41,7 +41,9 @@ class BaseDatalinkAdapter(object):
 
 
 class TablesDatalinkAdapterMixin(object):
-
+'''
+Gather the datalink entries from Release related Datalink tables (declared in settings.DATALINK_TABLES)
+'''
     tables = settings.DATALINK_TABLES
 
     def get_datalink_list(self):
@@ -69,7 +71,9 @@ class TablesDatalinkAdapterMixin(object):
 
 
 class MetadataDatalinkAdapterMixin(object):
-
+'''
+Gather the documentation (metadata-page) and doi datalink entries from the metadata for each PUBLIC schemas and tables
+'''
     def get_schema_list(self):
         from daiquiri.metadata.models import Schema
 
