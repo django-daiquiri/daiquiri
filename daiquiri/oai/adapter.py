@@ -166,7 +166,16 @@ class DoiMetadataOaiAdapterMixin(MetadataOaiAdapterMixin):
 
 class RegistryOaiAdapterMixin(object):
 
-    services = ['registry', 'authority', 'web', 'tap', 'conesearch']
+    # services to apear in the registry oai records
+    # does not need to be customized, active apps will be discovered automatically
+    services = {
+        1: 'registry',
+        2: 'authority',
+        3: 'web',
+        4: 'tap',
+        5: 'conesearch',
+        6: 'datalink'
+    }
 
     def get_oai_dc_service_serializer_class(self):
         return import_class('daiquiri.registry.serializers.DublincoreSerializer')
@@ -175,36 +184,52 @@ class RegistryOaiAdapterMixin(object):
         return import_class('daiquiri.registry.serializers.VoresourceSerializer')
 
     def get_service_list(self):
-        for i, service in enumerate(self.services):
-            yield 'service', self.get_service(i + 1)
+        for pk in self.services:
+            service = self.get_service(pk)
+            if service is not None:
+                yield 'service', service
 
     def get_service(self, pk):
-        index = pk - 1
-
-        if self.services[index] == 'registry':
-            from daiquiri.registry.vo import get_resource
-            return get_resource()
-        elif self.services[index] == 'authority':
-            from daiquiri.registry.vo import get_authority_resource
-            return get_authority_resource()
-        elif self.services[index] == 'web':
-            from daiquiri.registry.vo import get_web_resource
-            return get_web_resource()
-        elif self.services[index] == 'tap' and apps.is_installed('daiquiri.tap'):
-            from daiquiri.tap.vo import get_resource
-            return get_resource()
-        elif self.services[index] == 'conesearch' and apps.is_installed('daiquiri.conesearch'):
-            from daiquiri.conesearch.vo import get_resource
-            return get_resource()
+        return getattr(self, 'get_%s_service' % self.services[pk])()
 
     def get_service_record(self, service):
-        index = self.services.index(service['service']) + 1
+        index = next(k for k, v in self.services.items() if v == service['service'])
         identifier = service['identifier']
         datestamp = settings.SITE_UPDATED
         set_spec = 'ivo_managed'
         public = True
 
         return index, identifier, datestamp, set_spec, public
+
+    def get_registry_service(self):
+        if apps.is_installed('daiquiri.registry'):
+            from daiquiri.registry.vo import get_resource
+            return get_resource()
+
+    def get_authority_service(self):
+        if apps.is_installed('daiquiri.registry'):
+            from daiquiri.registry.vo import get_authority_resource
+            return get_authority_resource()
+
+    def get_web_service(self):
+        if apps.is_installed('daiquiri.registry'):
+            from daiquiri.registry.vo import get_web_resource
+            return get_web_resource()
+
+    def get_tap_service(self):
+        if apps.is_installed('daiquiri.tap'):
+            from daiquiri.tap.vo import get_resource
+            return get_resource()
+
+    def get_conesearch_service(self):
+        if apps.is_installed('daiquiri.conesearch'):
+            from daiquiri.conesearch.vo import get_resource
+            return get_resource()
+
+    def get_datalink_service(self):
+        if apps.is_installed('daiquiri.datalink'):
+            from daiquiri.datalink.vo import get_resource
+            return get_resource()
 
 
 class DefaultOaiAdapter(RegistryOaiAdapterMixin, DoiMetadataOaiAdapterMixin, BaseOaiAdapter):

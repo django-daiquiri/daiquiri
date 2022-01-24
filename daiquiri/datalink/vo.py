@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.urls import reverse
 
+from daiquiri.core.vo import get_curation
+
 from .constants import DATALINK_CONTENT_TYPE
 
 
@@ -38,3 +40,23 @@ def get_capabilities():
             }
         }
     ]
+
+
+def get_resource():
+    return {
+        'service': 'datalink',
+        'identifier': 'ivo://%s/datalink' % settings.SITE_IDENTIFIER,
+        'title': '%s Datalink Service' % settings.SITE_TITLE,
+        'curation': get_curation(),
+        'content': {
+            'subjects': [],
+            'type': '',
+            'description': 'The Datalink Service for %s.' % settings.SITE_IDENTIFIER,
+            'referenceURL': settings.SITE_URL.rstrip('/') + reverse('datalink:root').rstrip('/')
+        },
+        'capabilities': get_capabilities(),
+        'created': settings.SITE_CREATED,
+        'updated': settings.SITE_UPDATED,
+        'type': '',
+        'status': 'active'
+    }
