@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.urls import reverse
 
-from daiquiri.registry.vo import get_curation
+from daiquiri.core.vo import get_curation
 
 from .adapter import ConeSearchAdapter
 
