@@ -70,7 +70,7 @@ def table_deleted_handler(sender, **kwargs):
             delete_links('table', table)
 
         if apps.is_installed('daiquiri.tap'):
-            from daiquiri.datalink.utils import delete_table
+            from daiquiri.tap.utils import delete_table
             delete_table(table)
 
 
@@ -82,8 +82,9 @@ def column_updated_handler(sender, **kwargs):
     cache.delete('processor')
 
     if not kwargs.get('raw'):
-        from daiquiri.datalink.utils import update_column
-        update_column(column)
+        if apps.is_installed('daiquiri.tap'):
+            from daiquiri.tap.utils import update_column
+            update_column(column)
 
 
 @receiver(post_delete, sender=Column)
@@ -91,5 +92,6 @@ def column_deleted_handler(sender, **kwargs):
     column = kwargs['instance']
 
     if not kwargs.get('raw'):
-        from daiquiri.datalink.utils import delete_column
-        delete_column(column)
+        if apps.is_installed('daiquiri.tap'):
+            from daiquiri.tap.utils import delete_column
+            delete_column(column)
