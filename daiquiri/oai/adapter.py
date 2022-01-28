@@ -1,8 +1,11 @@
+from datetime import datetime
+
 from django.apps import apps
 from django.conf import settings
 
+from daiquiri.core.adapter import DatabaseAdapter
 from daiquiri.core.constants import ACCESS_LEVEL_PUBLIC
-from daiquiri.core.utils import import_class
+from daiquiri.core.utils import import_class, get_doi
 
 
 def OaiAdapter():
@@ -201,6 +204,89 @@ class DoiMetadataOaiAdapterMixin(MetadataOaiAdapterMixin):
         return table.pk, identifier, datestamp, set_spec, public
 
 
+class DatalinkOAIAdapter(object):
+
+    tables = settings.DATALINK_TABLES
+
+    datalink_metadata_prefixes = ('oai_dc', 'oai_datacite', 'datacite')
+
+    def get_oai_dc_datalink_serializer_class(self):
+        return import_class('daiquiri.datalink.serializers.DublincoreSerializer')
+
+    def get_oai_datacite_datalink_serializer_class(self):
+        return import_class('daiquiri.datalink.serializers.DataciteSerializer')
+
+    def get_datacite_datalink_serializer_class(self):
+        return import_class('daiquiri.datalink.serializers.DataciteSerializer')
+
+    def get_datalink_list(self):
+        for table in self.tables:
+            schema_name, table_name = table.split('.')
+            rows = DatabaseAdapter().fetch_rows(schema_name, table_name, column_names=['ID', 'access_url'],
+                                                page_size=0, filters={'semantics': '#doi'})
+
+            for ID, access_url in rows:
+                doi = access_url.replace('https://doi.org/', '')
+                yield 'datalink', {'id': int(ID), 'doi': get_doi(access_url)}
+
+    def get_datalink(self, pk):
+        rows = []
+        for table in self.tables:
+            schema_name, table_name = table.split('.')
+            rows += DatabaseAdapter().fetch_rows(schema_name, table_name, column_names=[
+                'access_url', 'description', 'semantics', 'content_type', 'content_length'
+            ], filters={'ID': str(pk)})
+
+        datalink = {
+            'formats': [],
+            'alternate_identifiers': [],
+            'related_identifiers': []
+        }
+        for access_url, description, semantics, content_type, content_length in rows:
+            print(semantics)
+            if semantics == '#doi':
+                datalink['doi'] = get_doi(access_url)
+                datalink['title'] = description
+
+            elif semantics == '#this':
+                datalink['formats'].append(content_type)
+                datalink['related_identifiers'].append({
+                    'related_identifier': access_url,
+                    'related_identifier_type': 'URL',
+                    'relation_type': 'IsDescribedBy'
+                })
+
+            elif semantics == '#documentation':
+                datalink['alternate_identifiers'].append({
+                    'alternate_identifier': access_url,
+                    'alternate_identifier_type': 'URL'
+                })
+
+            elif semantics == '#preview':
+                datalink['related_identifiers'].append({
+                    'related_identifier': access_url,
+                    'related_identifier_type': 'URL',
+                    'relation_type': 'IsSupplementedBy'
+                })
+
+            elif semantics == '#auxiliary':
+                datalink['related_identifiers'].append({
+                    'related_identifier': access_url,
+                    'related_identifier_type': 'URL',
+                    'relation_type': 'References'
+                })
+
+        return datalink
+
+    def get_datalink_record(self, datalink):
+        identifier = self.get_identifier(datalink['doi'])
+        datestamp = datetime.strptime(settings.SITE_CREATED, '%Y-%m-%d').date()
+        set_spec = 'datalink'
+        public = True
+
+        return datalink['id'], identifier, datestamp, set_spec, public
+
+
 class RegistryOaiAdapterMixin(object):
 
     # services to apear in the registry oai records
@@ -271,6 +357,9 @@ class RegistryOaiAdapterMixin(object):
             return get_resource()
 
 
-class DefaultOaiAdapter(RegistryOaiAdapterMixin, DoiMetadataOaiAdapterMixin, BaseOaiAdapter):
+class DefaultOaiAdapter(RegistryOaiAdapterMixin,
+                        DoiMetadataOaiAdapterMixin,
+                        DatalinkOAIAdapter,
+                        BaseOaiAdapter):
 
-    resource_types = ['service', 'schema', 'table']
+    resource_types = ['service', 'schema', 'table', 'datalink']

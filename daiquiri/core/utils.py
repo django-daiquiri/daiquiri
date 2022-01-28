@@ -161,6 +161,10 @@ def get_doi_url(doi):
     return 'https://doi.org/%s' % doi.rstrip('/') if doi else None
 
 
+def get_doi(doi_url):
+    return urlparse(doi_url).path.lstrip('/') if doi_url else None
+
+
 def filter_by_access_level(user, items):
     filtered_items = []
 
