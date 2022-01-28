@@ -29,7 +29,7 @@ class Record(models.Model):
         max_length=32, db_index=True,
         verbose_name=_('Resource type'),
     )
-    resource_id = models.PositiveIntegerField(
+    resource_id = models.BigIntegerField(
         db_index=True, null=True,
         verbose_name=_('Resource id'),
     )
