@@ -60,3 +60,36 @@ def get_resource():
         'type': '',
         'status': 'active'
     }
+
+
+def get_service():
+    return {
+        'params': [
+            {
+                'name': 'standardID',
+                'datatype': 'char',
+                'arraysize': '*',
+                'value': 'ivo://ivoa.net/std/DataLink#links-1.0'
+            },
+                                {
+                'name': 'accessURL',
+                'datatype': 'char',
+                'arraysize': '*',
+                'value': settings.SITE_URL.rstrip('/') + '/datalink/links'
+            }
+        ],
+        'groups': [
+            {
+                'name': 'inputParams',
+                'params': [
+                    {
+                        'name': 'ID',
+                        'datatype': 'char',
+                        'arraysize': '*',
+                        'value': '',
+                        'ref': 'mainID'
+                    }
+                ]
+            }
+        ]
+    }

@@ -3,6 +3,7 @@ import csv
 import subprocess
 import re
 
+from django.apps import apps
 from django.conf import settings
 
 from daiquiri.core.generators import generate_csv, generate_votable, generate_fits
@@ -40,6 +41,7 @@ class BaseDownloadAdapter(object):
                                         table=self.get_table_name(schema_name, table_name),
                                         infos=self.get_infos(query_status, query, query_language, sources),
                                         links=self.get_links(sources),
+                                        services=self.get_services(),
                                         empty=(nrows==0))
 
             elif format_key == 'fits':
@@ -129,3 +131,10 @@ class BaseDownloadAdapter(object):
             'doc',
             get_doi_url(source['doi']) if source['doi'] else source['url']
         ) for source in sources]
+
+    def get_services(self):
+        services = []
+        if apps.is_installed('daiquiri.datalink'):
+            from daiquiri.datalink.vo import get_service
+            services.append(get_service())
+        return services

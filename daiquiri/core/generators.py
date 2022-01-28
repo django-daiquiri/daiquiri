@@ -27,7 +27,7 @@ def generate_csv(generator, fields):
             yield f.getvalue()
 
 
-def generate_votable(generator, fields, infos=[], links=[], table=None, empty=None):
+def generate_votable(generator, fields, infos=[], links=[], services=[], table=None, empty=None):
     yield '''<?xml version="1.0"?>
 <VOTABLE version="1.3"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -66,6 +66,9 @@ def generate_votable(generator, fields, infos=[], links=[], table=None, empty=No
                 value = field[key].replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
                 attrs.append('%s="%s"' % (key, value))
 
+        if field['ucd'] == 'meta.id;meta.main':
+            attrs.append('ID="mainID"')
+
         if 'arraysize' in field and field['arraysize']:
             attrs.append('arraysize="%s"' % field['arraysize'])
 
@@ -97,7 +100,26 @@ def generate_votable(generator, fields, infos=[], links=[], table=None, empty=No
             </DATA>'''
     yield '''
         </TABLE>
-    </RESOURCE>
+    </RESOURCE>'''
+
+    for service in services:
+        yield '''
+    <RESOURCE type="meta" utype="adhoc:service">'''
+        for param in service.get('params', []):
+            yield '''
+        <PARAM name="{name}" datatype="{datatype}" arraysize="{arraysize}" value="{value}" />'''.format(**param)
+
+        for group in service.get('groups', []):
+            yield '''
+        <GROUP name="{name}">'''.format(**group)
+            for param in group.get('params', []):
+                yield '''
+            <PARAM name="{name}" datatype="{datatype}" arraysize="{arraysize}" value="{value}" ref="{ref}"/>'''.format(**param)
+            yield '''
+        </GROUP>'''
+        yield '''
+    </RESOURCE>'''
+    yield '''
 </VOTABLE>
 '''
 
