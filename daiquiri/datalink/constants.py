@@ -1,44 +1,60 @@
-DATALINK_CONTENT_TYPE = 'application/xml'
+DATALINK_CONTENT_TYPE = 'application/x-votable+xml;content=datalink'
 DATALINK_FIELDS = [
     {
         'name': 'ID',
         'description': 'Input identifier.',
-        'ucd': 'meta.id;meta.ref.url;meta.main'
+        'ucd': 'meta.id;meta.main',
+        'datatype': 'char',
+        'arraysize': '*'
     },
     {
         'name': 'access_url',
         'description': 'Link to data or service.',
-        'ucd': 'meta.ref.url;meta.main'
+        'ucd': 'meta.ref.url',
+        'datatype': 'char',
+        'arraysize': '*'
     },
     {
         'name': 'service_def',
         'description': 'Reference to a service descriptor resource.',
-        'ucd': 'meta.ref'
+        'ucd': 'meta.ref',
+        'datatype': 'char',
+        'arraysize': '*'
     },
     {
         'name': 'error_message',
         'description': 'Error if an access_url cannot be created.',
-        'ucd': 'meta.code.error'
+        'ucd': 'meta.code.error',
+        'datatype': 'char',
+        'arraysize': '*'
     },
     {
         'name': 'description',
         'description': 'Human-readable text describing this link.',
-        'ucd': 'meta.note;meta.main'
+        'ucd': 'meta.note',
+        'datatype': 'char',
+        'arraysize': '*'
     },
     {
         'name': 'semantics',
         'description': 'Term from a controlled vocabulary describing the link.',
-        'ucd': 'meta.code;meta.main'
+        'ucd': 'meta.code',
+        'datatype': 'char',
+        'arraysize': '*'
     },
     {
         'name': 'content_type',
         'description': 'Mime-type of the content the link returns.',
-        'ucd': 'meta.code.mime'
+        'ucd': 'meta.code.mime',
+        'datatype': 'char',
+        'arraysize': '*'
     },
     {
         'name': 'content_length',
         'description': 'Size of the download the link returns.',
-        'ucd': 'phys.size;meta.file'
+        'ucd': 'phys.size;meta.file',
+        'datatype': 'long',
+        'unit': 'byte'
     }
 ]
 
