@@ -2,10 +2,8 @@ from django.db import models
 from django.contrib.auth.models import Group
 from django.utils.translation import ugettext_lazy as _
 
-from jsonfield import JSONField
-
 from django.conf import settings
-from daiquiri.core.constants import ACCESS_LEVEL_CHOICES
+from daiquiri.core.constants import ACCESS_LEVEL_CHOICES, ACCESS_LEVEL_PRIVATE
 from daiquiri.core.managers import AccessLevelManager
 
 
@@ -24,47 +22,47 @@ class Schema(models.Model):
         help_text=_('Name of the schema on the database server.')
     )
     title = models.CharField(
-        max_length=256, null=True, blank=True,
+        max_length=256, blank=True, default='',
         verbose_name=_('Title'),
         help_text=_('Human readable title of the schema.')
     )
     description = models.TextField(
-        null=True, blank=True,
+        blank=True, default='',
         verbose_name=_('Description'),
         help_text=_('A brief description of the schema to be displayed in the user interface.')
     )
     long_description = models.TextField(
-        null=True, blank=True,
+        blank=True, default='',
         verbose_name=_('Long description'),
         help_text=_('A more extensive description of the schema to be displayed on the public schema page.')
     )
     attribution = models.TextField(
-        null=True, blank=True,
+        blank=True, default='',
         verbose_name=_('Attribution'),
         help_text=_('The desired attribution for the schema.')
     )
     license = models.CharField(
-        max_length=8, null=True, blank=True,
+        max_length=8, blank=True, default='',
         verbose_name=_('License')
     )
     doi = models.CharField(
-        max_length=256, null=True, blank=True,
+        max_length=256, blank=True, default='',
         verbose_name=_('Digital object identifier')
     )
-    related_identifiers = JSONField(
-        null=True, blank=True,
+    related_identifiers = models.JSONField(
+        blank=True, default=list,
         verbose_name=_('Related Identifiers'),
     )
     utype = models.CharField(
-        max_length=256, null=True, blank=True,
+        max_length=256, blank=True, default='',
         verbose_name=_('IVOA Utype'),
     )
-    creators = JSONField(
-        null=True, blank=True,
+    creators = models.JSONField(
+        blank=True, default=list,
         verbose_name=_('Creators'),
     )
-    contributors = JSONField(
-        null=True, blank=True,
+    contributors = models.JSONField(
+        blank=True, default=list,
         verbose_name=_('Contributors'),
     )
     published = models.DateField(
@@ -76,11 +74,11 @@ class Schema(models.Model):
         verbose_name=_('Updated'),
     )
     access_level = models.CharField(
-        max_length=8, choices=ACCESS_LEVEL_CHOICES,
+        max_length=8, choices=ACCESS_LEVEL_CHOICES, default=ACCESS_LEVEL_PRIVATE,
         verbose_name=_('Access level')
     )
     metadata_access_level = models.CharField(
-        max_length=8, choices=ACCESS_LEVEL_CHOICES,
+        max_length=8, choices=ACCESS_LEVEL_CHOICES, default=ACCESS_LEVEL_PRIVATE,
         verbose_name=_('Metadata access level')
     )
     groups = models.ManyToManyField(
@@ -138,39 +136,39 @@ class Table(models.Model):
         help_text=_('Identifier of the table on the database server.')
     )
     title = models.CharField(
-        max_length=256, null=True, blank=True,
+        max_length=256, blank=True, default='',
         verbose_name=_('Title'),
         help_text=_('Human readable title of the table.')
     )
     description = models.TextField(
-        null=True, blank=True,
+        blank=True, default='',
         verbose_name=_('Description'),
         help_text=_('A brief description of the table to be displayed in the user interface.')
     )
     long_description = models.TextField(
-        null=True, blank=True,
+        blank=True, default='',
         verbose_name=_('Long description'),
         help_text=_('A more extensive description of the table to be displayed on the public database page.')
     )
     attribution = models.TextField(
-        null=True, blank=True,
+        blank=True, default='',
         verbose_name=_('Attribution'),
         help_text=_('The desired attribution for the table.')
     )
     license = models.CharField(
-        max_length=8, null=True, blank=True,
+        max_length=8, blank=True, default='',
         verbose_name=_('License')
     )
     doi = models.CharField(
-        max_length=256, null=True, blank=True,
+        max_length=256, blank=True, default='',
         verbose_name=_('Digital object identifier')
     )
-    related_identifiers = JSONField(
-        null=True, blank=True,
+    related_identifiers = models.JSONField(
+        blank=True, default=list,
         verbose_name=_('Related Identifiers'),
     )
     type = models.CharField(
-        max_length=8, choices=TYPE_CHOICES,
+        max_length=8, choices=TYPE_CHOICES, default=TYPE_TABLE,
         verbose_name=_('Type of table')
     )
     nrows = models.BigIntegerField(
@@ -182,15 +180,15 @@ class Table(models.Model):
         verbose_name=_('Size of the table in bytes')
     )
     utype = models.CharField(
-        max_length=256, null=True, blank=True,
+        max_length=256, blank=True, default='',
         verbose_name=_('IVOA Utype')
     )
-    creators = JSONField(
-        null=True, blank=True,
+    creators = models.JSONField(
+        blank=True, default=list,
         verbose_name=_('Creators'),
     )
-    contributors = JSONField(
-        null=True, blank=True,
+    contributors = models.JSONField(
+        blank=True, default=list,
         verbose_name=_('Contributors'),
     )
     published = models.DateField(
@@ -202,11 +200,11 @@ class Table(models.Model):
         verbose_name=_('Updated'),
     )
     access_level = models.CharField(
-        max_length=8, choices=ACCESS_LEVEL_CHOICES,
+        max_length=8, choices=ACCESS_LEVEL_CHOICES, default=ACCESS_LEVEL_PRIVATE,
         verbose_name=_('Access level')
     )
     metadata_access_level = models.CharField(
-        max_length=8, choices=ACCESS_LEVEL_CHOICES,
+        max_length=8, choices=ACCESS_LEVEL_CHOICES, default=ACCESS_LEVEL_PRIVATE,
         verbose_name=_('Metadata access level')
     )
     groups = models.ManyToManyField(
@@ -256,24 +254,24 @@ class Column(models.Model):
         help_text=_('Identifier of the column on the database server.')
     )
     description = models.TextField(
-        null=True, blank=True,
+        blank=True, default='',
         verbose_name=_('Description'),
         help_text=_('A brief description of the column to be displayed in the user interface.')
     )
     unit = models.CharField(
-        max_length=256, null=True, blank=True,
+        max_length=256, blank=True, default='',
         verbose_name=_('Unit')
     )
     ucd = models.CharField(
-        max_length=256, null=True, blank=True,
+        max_length=256, blank=True, default='',
         verbose_name=_('IVOA UCDs')
     )
     utype = models.CharField(
-        max_length=256, null=True, blank=True,
+        max_length=256, blank=True, default='',
         verbose_name=_('IVOA Utype')
     )
     datatype = models.CharField(
-        max_length=256, null=True, blank=True,
+        max_length=256, blank=True, default='',
         verbose_name=_('Datatype'),
         help_text=_('The datatype of the column on the database server.')
     )
@@ -303,11 +301,11 @@ class Column(models.Model):
         help_text=_('The columns which this column is an index for (e.g. for pgSphere).')
     )
     access_level = models.CharField(
-        max_length=8, choices=ACCESS_LEVEL_CHOICES,
+        max_length=8, choices=ACCESS_LEVEL_CHOICES, default=ACCESS_LEVEL_PRIVATE,
         verbose_name=_('Access level')
     )
     metadata_access_level = models.CharField(
-        max_length=8, choices=ACCESS_LEVEL_CHOICES,
+        max_length=8, choices=ACCESS_LEVEL_CHOICES, default=ACCESS_LEVEL_PRIVATE,
         verbose_name=_('Metadata access level')
     )
     groups = models.ManyToManyField(
@@ -352,7 +350,7 @@ class Function(models.Model):
         help_text=_('Identifier of the function on the server.')
     )
     description = models.TextField(
-        null=True, blank=True,
+        blank=True, default='',
         verbose_name=_('Description'),
         help_text=_('A brief description of the function to be displayed in the user interface.')
     )
@@ -362,11 +360,11 @@ class Function(models.Model):
         help_text=_('Prototype of this function in a SQL query.')
     )
     access_level = models.CharField(
-        max_length=8, choices=ACCESS_LEVEL_CHOICES,
+        max_length=8, choices=ACCESS_LEVEL_CHOICES, default=ACCESS_LEVEL_PRIVATE,
         verbose_name=_('Access level')
     )
     metadata_access_level = models.CharField(
-        max_length=8, choices=ACCESS_LEVEL_CHOICES,
+        max_length=8, choices=ACCESS_LEVEL_CHOICES, default=ACCESS_LEVEL_PRIVATE,
         verbose_name=_('Metadata access level')
     )
     groups = models.ManyToManyField(

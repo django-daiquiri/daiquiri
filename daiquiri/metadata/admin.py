@@ -6,11 +6,11 @@ from .models import Schema, Table, Column, Function
 
 
 class SchemaAdminForm(forms.ModelForm):
-    license = forms.ChoiceField(choices=settings.LICENSE_CHOICES)
+    license = forms.ChoiceField(choices=settings.LICENSE_CHOICES, required=False)
 
 
 class TableAdminForm(forms.ModelForm):
-    license = forms.ChoiceField(choices=settings.LICENSE_CHOICES)
+    license = forms.ChoiceField(choices=settings.LICENSE_CHOICES, required=False)
 
 
 class SchemaAdmin(admin.ModelAdmin):
