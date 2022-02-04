@@ -15,8 +15,6 @@ from django.utils.timezone import now
 
 from rest_framework.exceptions import ValidationError
 
-from jsonfield import JSONField
-
 from daiquiri.core.adapter import DatabaseAdapter, DownloadAdapter
 from daiquiri.core.constants import ACCESS_LEVEL_CHOICES
 from daiquiri.core.generators import generate_votable
@@ -76,8 +74,8 @@ class QueryJob(Job):
     nrows = models.BigIntegerField(null=True, blank=True)
     size = models.BigIntegerField(null=True, blank=True)
 
-    metadata = JSONField(null=True, blank=True)
-    uploads = JSONField(null=True, blank=True)
+    metadata = models.JSONField(null=True, blank=True)
+    uploads = models.JSONField(null=True, blank=True)
 
     pid = models.IntegerField(null=True, blank=True)
 
@@ -503,7 +501,7 @@ class QueryArchiveJob(Job):
         verbose_name=_('Column name'),
         help_text=_('Column name for this download.')
     )
-    files = JSONField(
+    files = models.JSONField(
         verbose_name=_('Files'),
         help_text=_('List of files in the archive.')
     )
