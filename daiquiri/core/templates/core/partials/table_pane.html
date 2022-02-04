@@ -73,6 +73,12 @@
                                 {$ row[column_index] $}
                             </a>
                         </div>
+                        <div ng-if="column.meta == 'datalink'">
+                            <a href="#"
+                                ng-click="service.table.modal_open($event, column_index, row_index)">
+                                {$ row[column_index] $}
+                            </a>
+                        </div>
                         <div ng-if="column.meta == 'text'">
                             <div ng-if="service.table.column_round[column_index]">
                                 {$ row[column_index] | number : service.table.column_round[column_index] $}

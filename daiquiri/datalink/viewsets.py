@@ -1,6 +1,7 @@
-from django.http import FileResponse
+from django.http import FileResponse, JsonResponse
 
 from rest_framework import viewsets
+from rest_framework.response import Response
 
 from daiquiri.core.generators import generate_votable
 
@@ -30,5 +31,12 @@ class SyncDatalinkJobViewSet(viewsets.GenericViewSet):
                 if not any(filter(lambda row: row[0] == identifier, rows)):
                     rows.append((identifier, None, None, 'NotFoundFault: {}'.format(identifier), None, None, None, None))
 
-        datalink_table = generate_votable(rows, DATALINK_FIELDS)
-        return FileResponse(datalink_table, content_type=DATALINK_CONTENT_TYPE)
+        if data.get('RESPONSEFORMAT') == 'application/json':
+            return JsonResponse({ 'links': [{
+                    'href': row[1],
+                    'text': row[4]
+                } for row in rows ]
+            })
+        else:
+            datalink_table = generate_votable(rows, DATALINK_FIELDS)
+            return FileResponse(datalink_table, content_type=DATALINK_CONTENT_TYPE)
