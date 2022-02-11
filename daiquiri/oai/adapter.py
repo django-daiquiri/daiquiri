@@ -226,7 +226,6 @@ class DatalinkOAIAdapter(object):
                                                 page_size=0, filters={'semantics': '#doi'})
 
             for ID, access_url in rows:
-                doi = access_url.replace('https://doi.org/', '')
                 yield 'datalink', {'id': int(ID), 'doi': get_doi(access_url)}
 
     def get_datalink(self, pk):
@@ -243,7 +242,6 @@ class DatalinkOAIAdapter(object):
             'related_identifiers': []
         }
         for access_url, description, semantics, content_type, content_length in rows:
-            print(semantics)
             if semantics == '#doi':
                 datalink['doi'] = get_doi(access_url)
                 datalink['title'] = description
