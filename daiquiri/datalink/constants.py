@@ -1,60 +1,100 @@
 DATALINK_CONTENT_TYPE = 'application/x-votable+xml;content=datalink'
+DATALINK_TABLE = {
+    'name': 'datalink',
+    'description': 'The table of datalinks for the service',
+    'order': 4,
+    'access_level': 'PUBLIC',
+    'metadata_access_level': 'PUBLIC'
+}
 DATALINK_FIELDS = [
     {
         'name': 'ID',
+        'order': 1,
         'description': 'Input identifier.',
         'ucd': 'meta.id;meta.main',
         'datatype': 'char',
-        'arraysize': '*'
+        'arraysize': None,
+        'std': True,
+        'access_level': 'PUBLIC',
+        'metadata_access_level': 'PUBLIC'
     },
     {
         'name': 'access_url',
+        'order': 2,
         'description': 'Link to data or service.',
         'ucd': 'meta.ref.url',
         'datatype': 'char',
-        'arraysize': '*'
+        'arraysize': None,
+        'std': True,
+        'access_level': 'PUBLIC',
+        'metadata_access_level': 'PUBLIC'
     },
     {
         'name': 'service_def',
+        'order': 3,
         'description': 'Reference to a service descriptor resource.',
         'ucd': 'meta.ref',
         'datatype': 'char',
-        'arraysize': '*'
+        'arraysize': None,
+        'std': True,
+        'access_level': 'PUBLIC',
+        'metadata_access_level': 'PUBLIC'
     },
     {
         'name': 'error_message',
+        'order': 4,
         'description': 'Error if an access_url cannot be created.',
         'ucd': 'meta.code.error',
         'datatype': 'char',
-        'arraysize': '*'
+        'arraysize': None,
+        'std': True,
+        'access_level': 'PUBLIC',
+        'metadata_access_level': 'PUBLIC'
     },
     {
         'name': 'description',
+        'order': 5,
         'description': 'Human-readable text describing this link.',
         'ucd': 'meta.note',
         'datatype': 'char',
-        'arraysize': '*'
+        'arraysize': None,
+        'std': True,
+        'access_level': 'PUBLIC',
+        'metadata_access_level': 'PUBLIC'
     },
     {
         'name': 'semantics',
+        'order': 6,
         'description': 'Term from a controlled vocabulary describing the link.',
         'ucd': 'meta.code',
         'datatype': 'char',
-        'arraysize': '*'
+        'arraysize': None,
+        'std': True,
+        'access_level': 'PUBLIC',
+        'metadata_access_level': 'PUBLIC'
     },
     {
         'name': 'content_type',
+        'order': 7,
         'description': 'Mime-type of the content the link returns.',
         'ucd': 'meta.code.mime',
         'datatype': 'char',
-        'arraysize': '*'
+        'arraysize': None,
+        'std': True,
+        'access_level': 'PUBLIC',
+        'metadata_access_level': 'PUBLIC'
     },
     {
         'name': 'content_length',
+        'order': 8,
         'description': 'Size of the download the link returns.',
         'ucd': 'phys.size;meta.file',
         'datatype': 'long',
-        'unit': 'byte'
+        'arraysize': None,
+        'unit': 'byte',
+        'std': True,
+        'access_level': 'PUBLIC',
+        'metadata_access_level': 'PUBLIC'
     }
 ]
 

@@ -69,8 +69,11 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
         if field['ucd'] == 'meta.id;meta.main':
             attrs.append('ID="mainID"')
 
-        if 'arraysize' in field and field['arraysize']:
-            attrs.append('arraysize="%s"' % field['arraysize'])
+        if 'arraysize' in field:
+            if field.get('datatype') == 'char' and field['arraysize'] is None:
+                attrs.append('arraysize="*"')
+            elif field['arraysize']:
+                attrs.append('arraysize="%s"' % field['arraysize'])
 
         if 'datatype' in field:
             if field['datatype'] in ['boolean', 'char', 'unsignedByte', 'short', 'int', 'long', 'float', 'double']:
