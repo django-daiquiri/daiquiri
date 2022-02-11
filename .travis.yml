@@ -28,9 +28,9 @@ before_script:
 - sh -c "cp testing/config/settings/$DB.py testing/config/settings/local.py; fi"
 - mkdir testing/log testing/download
 - mysql < testing/sql/mysql/test.sql
-- mysql < testing/sql/mysql/data.sql
 - psql -U postgres -f testing/sql/postgres/test.sql
-- psql -U postgres -f testing/sql/postgres/data.sql test_daiquiri_data
+- cat ../daiquiri/testing/sql/mysql/data/* | mysql
+- cat ../daiquiri/testing/sql/postgres/data/* | psql -U postgres test_daiquiri_data
 
 script:
 - coverage run testing/runtests.py
