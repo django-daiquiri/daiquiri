@@ -119,12 +119,11 @@ angular.module('core')
                                 column.meta = 'file';
                             } else if (column.ucd.indexOf('meta.ref.url') > -1) {
                                 column.meta = 'link';
+                            } else if (column.ucd.indexOf('meta.id') > -1) {
+                                column.meta = 'datalink'
                             } else {
                                 column.meta = 'reference';
                             }
-                        }
-                        if (column.ucd.indexOf('meta.id;meta.main') > -1) {
-                            column.meta = 'datalink'
                         }
                     }
                 });

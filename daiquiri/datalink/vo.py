@@ -87,7 +87,7 @@ def get_service():
                         'datatype': 'char',
                         'arraysize': '*',
                         'value': '',
-                        'ref': 'mainID'
+                        'ref': 'datalinkID'
                     }
                 ]
             }

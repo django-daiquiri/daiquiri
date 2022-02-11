@@ -5,8 +5,9 @@ import struct
 import sys
 from xml.sax.saxutils import escape, quoteattr
 
-from daiquiri import __version__ as daiquiri_version
 from django.contrib.sites.models import Site
+
+from daiquiri import __version__ as daiquiri_version
 
 
 def generate_csv(generator, fields):
@@ -66,8 +67,8 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
                 value = field[key].replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
                 attrs.append('%s="%s"' % (key, value))
 
-        if field['ucd'] == 'meta.id;meta.main':
-            attrs.append('ID="mainID"')
+        if 'meta.id' in field['ucd'] and 'meta.ref' in field['ucd']:
+            attrs.append('ID="datalinkID"')
 
         if 'arraysize' in field:
             if field.get('datatype') == 'char' and field['arraysize'] is None:
