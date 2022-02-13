@@ -204,7 +204,7 @@ class DoiMetadataOaiAdapterMixin(MetadataOaiAdapterMixin):
         return table.pk, identifier, datestamp, set_spec, public
 
 
-class DatalinkOAIAdapter(object):
+class DatalinkOAIAdapterMixin(object):
 
     tables = settings.DATALINK_TABLES
 
@@ -226,7 +226,7 @@ class DatalinkOAIAdapter(object):
                                                 page_size=0, filters={'semantics': '#doi'})
 
             for ID, access_url in rows:
-                yield 'datalink', {'id': int(ID), 'doi': get_doi(access_url)}
+                yield 'datalink', {'id': str(ID), 'doi': get_doi(access_url)}
 
     def get_datalink(self, pk):
         rows = []
@@ -357,7 +357,7 @@ class RegistryOaiAdapterMixin(object):
 
 class DefaultOaiAdapter(RegistryOaiAdapterMixin,
                         DoiMetadataOaiAdapterMixin,
-                        DatalinkOAIAdapter,
+                        DatalinkOAIAdapterMixin,
                         BaseOaiAdapter):
 
     resource_types = ['service', 'schema', 'table', 'datalink']

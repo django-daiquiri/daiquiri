@@ -29,8 +29,8 @@ class Record(models.Model):
         max_length=32, db_index=True,
         verbose_name=_('Resource type'),
     )
-    resource_id = models.BigIntegerField(
-        db_index=True, null=True,
+    resource_id = models.CharField(
+        max_length=256, db_index=True, blank=True,
         verbose_name=_('Resource id'),
     )
 
