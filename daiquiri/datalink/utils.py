@@ -11,15 +11,16 @@ def update_links(resource_type, resource):
 
     adapter = DatalinkAdapter()
 
-    identifier = adapter.get_identifier(resource_type, resource)
-    links = adapter.get_links(resource_type, resource)
+    if resource_type in adapter.resource_types:
+        identifier = adapter.get_identifier(resource_type, resource)
+        links = adapter.get_links(resource_type, resource)
 
-    datalinks = []
-    for link in links:
-        datalinks.append(Datalink(**link))
+        datalinks = []
+        for link in links:
+            datalinks.append(Datalink(**link))
 
-    Datalink.objects.filter(ID=identifier).delete()
-    Datalink.objects.bulk_create(datalinks)
+        Datalink.objects.filter(ID=identifier).delete()
+        Datalink.objects.bulk_create(datalinks)
 
 
 def delete_links(resource_type, resource):
@@ -27,6 +28,7 @@ def delete_links(resource_type, resource):
 
     adapter = DatalinkAdapter()
 
-    identifier = adapter.get_identifier(resource_type, resource)
+    if resource_type in adapter.resource_types:
+        identifier = adapter.get_identifier(resource_type, resource)
 
-    Datalink.objects.filter(ID=identifier).delete()
+        Datalink.objects.filter(ID=identifier).delete()
