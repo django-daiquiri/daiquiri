@@ -146,7 +146,8 @@ class MetadataOaiAdapterMixin(object):
         from daiquiri.metadata.models import Schema
 
         try:
-            return Schema.objects.get(pk=pk)
+            schema = Schema.objects.get(pk=pk)
+            return self.update_metadata(schema)
         except Schema.DoesNotExist:
             return None
 
@@ -154,9 +155,29 @@ class MetadataOaiAdapterMixin(object):
         from daiquiri.metadata.models import Table
 
         try:
-            return Table.objects.get(pk=pk)
+            table = Table.objects.get(pk=pk)
+            return self.update_metadata(table)
         except Table.DoesNotExist:
             return None
+
+    def update_metadata(self, instance):
+        if hasattr(self, 'get_datalink'):
+            for key, values in self.get_datalink(str(instance)).items():
+                try:
+                    attr = getattr(instance, key)
+                    if isinstance(key, list):
+                        attr.update(values)
+                    elif isinstance(key, list):
+                        attr += values
+                    else:
+                        attr = values
+                except AttributeError:
+                    attr = values
+
+            # update the instance
+            setattr(instance, key, values)
+
+        return instance
 
     def get_schema_record(self, schema):
         identifier = self.get_identifier('schemas/%i' % schema.pk)
