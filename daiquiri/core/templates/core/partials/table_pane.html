@@ -74,8 +74,7 @@
                             </a>
                         </div>
                         <div ng-if="column.meta == 'datalink'">
-                            <a href="#"
-                                ng-click="service.table.modal_open($event, column_index, row_index)">
+                            <a href="{$ service.table.getter.datalink_url(row, column_index) $}" target="_blank">
                                 {$ row[column_index] $}
                             </a>
                         </div>

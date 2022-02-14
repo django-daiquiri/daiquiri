@@ -39,7 +39,7 @@ angular.module('core')
                 return row[column_index];
             },
             datalink_url: function(row, column_index) {
-                return service.datalink_url + '?ID=' + row[column_index];
+                return service.datalink_url + row[column_index];
             }
         }
     };

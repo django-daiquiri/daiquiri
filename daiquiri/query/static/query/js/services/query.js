@@ -335,7 +335,7 @@ app.factory('QueryService', ['$resource', '$http', '$injector', '$q', '$filter',
                         columns_url: 'query/api/jobs/' + service.job.id +'/columns/',
                         files_url: 'files/',
                         references_url: 'serve/references/',
-                        datalink_url: 'datalink/links',
+                        datalink_url: 'datalink/',
                         params: {
                             job: service.job.id
                         }
