@@ -310,14 +310,14 @@ class RegistryOaiAdapterMixin(object):
 
     # services to apear in the registry oai records
     # does not need to be customized, active apps will be discovered automatically
-    services = {
-        1: 'registry',
-        2: 'authority',
-        3: 'web',
-        4: 'tap',
-        5: 'conesearch',
-        6: 'datalink'
-    }
+    services = [
+        'registry',
+        'authority',
+        'web',
+        'tap',
+        'conesearch',
+        'datalink'
+    ]
 
     service_metadata_prefixes = ['oai_dc', 'ivo_vor']
 
@@ -334,16 +334,16 @@ class RegistryOaiAdapterMixin(object):
                 yield 'service', service
 
     def get_service(self, pk):
-        return getattr(self, 'get_%s_service' % self.services[pk])()
+        if pk in self.services:
+            return getattr(self, 'get_%s_service' % pk)()
 
     def get_service_record(self, service):
-        index = next(k for k, v in self.services.items() if v == service['service'])
         identifier = service['identifier']
         datestamp = settings.SITE_UPDATED
         set_spec = 'ivo_managed'
         public = True
 
-        return index, identifier, datestamp, set_spec, public
+        return service['service'], identifier, datestamp, set_spec, public
 
     def get_registry_service(self):
         if apps.is_installed('daiquiri.registry'):
