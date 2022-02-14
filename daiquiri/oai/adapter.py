@@ -180,7 +180,7 @@ class MetadataOaiAdapterMixin(object):
         return instance
 
     def get_schema_record(self, schema):
-        identifier = self.get_identifier('schemas/%i' % schema.pk)
+        identifier = self.get_identifier('schemas/{}'.format(schema))
         datestamp = schema.updated or schema.published
         set_spec = 'schema'
         public = (schema.metadata_access_level == ACCESS_LEVEL_PUBLIC) \
@@ -189,38 +189,13 @@ class MetadataOaiAdapterMixin(object):
         return schema.pk, identifier, datestamp, set_spec, public
 
     def get_table_record(self, table):
-        identifier = self.get_identifier('tables/%i' % table.pk)
+        identifier = self.get_identifier('tables/{}'.format(table))
         datestamp = table.updated or table.published
         set_spec = 'table'
         public = (table.metadata_access_level == ACCESS_LEVEL_PUBLIC) \
             and (table.published is not None) \
             and (table.schema.metadata_access_level == ACCESS_LEVEL_PUBLIC) \
             and (table.schema.published is not None)
-
-        return table.pk, identifier, datestamp, set_spec, public
-
-
-class DoiMetadataOaiAdapterMixin(MetadataOaiAdapterMixin):
-
-    def get_schema_record(self, schema):
-        identifier = self.get_identifier(schema.doi)
-        datestamp = schema.updated or schema.published
-        set_spec = 'schema'
-        public = (schema.metadata_access_level == ACCESS_LEVEL_PUBLIC) \
-            and bool(schema.published) \
-            and bool(schema.doi)
-
-        return schema.pk, identifier, datestamp, set_spec, public
-
-    def get_table_record(self, table):
-        identifier = self.get_identifier(table.doi)
-        datestamp = table.updated or table.published
-        set_spec = 'table'
-        public = (table.metadata_access_level == ACCESS_LEVEL_PUBLIC) \
-            and bool(table.published) \
-            and bool(table.doi) \
-            and (table.schema.metadata_access_level == ACCESS_LEVEL_PUBLIC) \
-            and bool(table.schema.published)
 
         return table.pk, identifier, datestamp, set_spec, public
 
@@ -298,7 +273,7 @@ class DatalinkOAIAdapterMixin(object):
         return datalink
 
     def get_datalink_record(self, datalink):
-        identifier = self.get_identifier(datalink['doi'])
+        identifier = self.get_identifier('datalinks/{}'.format(datalink['id']))
         datestamp = datetime.strptime(settings.SITE_CREATED, '%Y-%m-%d').date()
         set_spec = 'datalink'
         public = True
@@ -377,7 +352,7 @@ class RegistryOaiAdapterMixin(object):
 
 
 class DefaultOaiAdapter(RegistryOaiAdapterMixin,
-                        DoiMetadataOaiAdapterMixin,
+                        MetadataOaiAdapterMixin,
                         DatalinkOAIAdapterMixin,
                         BaseOaiAdapter):
 
