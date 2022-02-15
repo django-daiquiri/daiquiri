@@ -3,8 +3,6 @@ import os
 
 from collections import OrderedDict
 
-from celery.task.control import revoke
-
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.db import models
@@ -290,12 +288,7 @@ class QueryJob(Job):
             })
 
     def abort(self):
-        if settings.ASYNC:
-            # first, revoke the task in celery, regardless the phase
-            revoke(str(self.id))
-
         current_phase = self.phase
-
         if current_phase in self.PHASE_ACTIVE:
             # next, set the phase to ABORTED
             self.phase = self.PHASE_ABORTED
