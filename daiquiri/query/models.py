@@ -227,8 +227,9 @@ class QueryJob(Job):
                 run_query.apply((job_id, ), task_id=job_id, throw=True)
 
             else:
-                logger.info('job %s submitted (async, queue=query, priority=%s)' % (self.id, self.priority))
-                run_query.apply_async((job_id, ), task_id=job_id, queue='query', priority=self.priority)
+                queue = 'query.{}'.format(self.queue)
+                logger.info('job %s submitted (async, queue=%s, priority=%s)' % (self.id, queue, self.priority))
+                run_query.apply_async((job_id, ), task_id=job_id, queue=queue, priority=self.priority)
 
         else:
             raise ValidationError({
