@@ -73,6 +73,11 @@
                                 {$ row[column_index] $}
                             </a>
                         </div>
+                        <div ng-if="column.meta == 'datalink'">
+                            <a href="{$ service.table.getter.datalink_url(row, column_index) $}" target="_blank">
+                                {$ row[column_index] $}
+                            </a>
+                        </div>
                         <div ng-if="column.meta == 'text'">
                             <div ng-if="service.table.column_round[column_index]">
                                 {$ row[column_index] | number : service.table.column_round[column_index] $}

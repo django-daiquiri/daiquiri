@@ -37,6 +37,11 @@
             </div>
 
             <div class="modal-body">
+                <ul ng-show="service.table.modal.links">
+                    <li ng-repeat="link in service.table.modal.links">
+                        <a href="{$ link.href $}" target="_blank">{$ link.text $}</a>
+                    </li>
+                </ul>
                 <pre ng-show="service.table.modal.pre">{$ service.table.modal.pre $}</pre>
                 <img class="center-block" ng-show="service.table.modal.src"
                     ng-src="{$ service.table.modal.src $}" ng-attr-alt="{$ service.table.modal.title $}" />

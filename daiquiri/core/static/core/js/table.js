@@ -37,6 +37,9 @@ angular.module('core')
             },
             link_url: function(row, column_index) {
                 return row[column_index];
+            },
+            datalink_url: function(row, column_index) {
+                return service.datalink_url + row[column_index];
             }
         }
     };
@@ -56,6 +59,9 @@ angular.module('core')
         }
         if (angular.isDefined(opt.references_url)) {
             service.references_url = baseurl + opt.references_url;
+        }
+        if (angular.isDefined(opt.datalink_url)) {
+            service.datalink_url = baseurl + opt.datalink_url;
         }
 
         // update params
@@ -83,6 +89,7 @@ angular.module('core')
                 'columns_url',
                 'files_url',
                 'references_url',
+                'datalink_url',
                 'params',
                 'page_sizes',
                 'getter'
@@ -112,6 +119,8 @@ angular.module('core')
                                 column.meta = 'file';
                             } else if (column.ucd.indexOf('meta.ref.url') > -1) {
                                 column.meta = 'link';
+                            } else if (column.ucd.indexOf('meta.id') > -1) {
+                                column.meta = 'datalink'
                             } else {
                                 column.meta = 'reference';
                             }
@@ -291,7 +300,12 @@ angular.module('core')
     };
 
     service.modal_update = function() {
-        service.modal.url = service.getter.file_url(service.rows[service.active.row_index], service.active.column_index);
+        var column = service.columns[service.active.column_index];
+        if (column.meta == 'datalink') {
+            service.modal.url = service.getter.datalink_url(service.rows[service.active.row_index], service.active.column_index);
+        } else {
+            service.modal.url = service.getter.file_url(service.rows[service.active.row_index], service.active.column_index);
+        }
         service.modal.title = service.rows[service.active.row_index][service.active.column_index];
 
         // compute up, down, left, right index
@@ -300,17 +314,24 @@ angular.module('core')
         service.modal.left_row_index = service.modal_left_row_index()
         service.modal.right_row_index = service.modal_right_row_index()
 
-        var column = service.columns[service.active.column_index];
         if (column.meta == 'note') {
             return $http.get(service.modal.url).then(function(result) {
+                service.modal.rows = null;
                 service.modal.pre = result.data;
                 service.modal.src = null;
             });
         } else if (column.meta == 'image') {
+            service.modal.rows = null;
             service.modal.pre = null;
             service.modal.src = service.modal.url;
 
             return $q.when();
+        } else if (column.meta == 'datalink') {
+            return $http.get(service.modal.url + '&RESPONSEFORMAT=application/json').then(function(result) {
+                service.modal.links = result.data.links;
+                service.modal.pre = null;
+                service.modal.src = null;
+            });
         } else {
             return $q.when();
         }

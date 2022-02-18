@@ -10,6 +10,14 @@
             <a href="{% url 'oai:root' %}">{% trans 'OAI endpoint' %}</a>
         </li>
     </ul>
+    <ul>
+        <li>
+            <a href="{% url 'oai:root' %}?verb=ListIdentifiers&metadataPrefix=ivo_vor">{% trans 'ListIdentifiers' %}</a>
+        </li>
+        <li>
+            <a href="{% url 'oai:root' %}?verb=ListRecords&metadataPrefix=ivo_vor">{% trans 'ListRecords' %}</a>
+        </li>
+    </ul>
 
     <ul>
         <li>

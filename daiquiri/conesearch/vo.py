@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.urls import reverse
 
-from daiquiri.registry.vo import get_curation
+from daiquiri.core.vo import get_curation
 
 from .adapter import ConeSearchAdapter
 
@@ -47,7 +47,7 @@ def get_capabilities():
                     'use': 'base',
                     'url': settings.SITE_URL.rstrip('/') + reverse('conesearch:search', args=[resource])
                 },
-                'query_type': 'GET',
+                'query_types': ['GET'],
                 'result_type': 'application/x-votable+xml',
                 'params': [
                     {
