@@ -4,8 +4,6 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from jsonfield import JSONField
-
 from .utils import get_full_name
 from .signals import (
     user_confirmed,
@@ -28,8 +26,8 @@ class Profile(models.Model):
     is_confirmed = models.BooleanField(
         default=False,
         help_text='Designates whether the user was confirmed by a manager.')
-    details = JSONField(null=True, blank=True)
-    attributes = JSONField(null=True, blank=True)
+    details = models.JSONField(null=True, blank=True)
+    attributes = models.JSONField(null=True, blank=True)
     consent = models.BooleanField(
         default=False,
         help_text='Designates whether the user has agreed to the terms of use.',

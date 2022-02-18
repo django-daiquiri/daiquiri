@@ -19,7 +19,7 @@ class Directory(models.Model):
         help_text=_('Path of the directory.')
     )
     layout = models.BooleanField(
-        verbose_name=_('Layout'),
+        verbose_name=_('Layout'), default=True,
         help_text=_('Use the page layout with the content.')
     )
     access_level = models.CharField(
