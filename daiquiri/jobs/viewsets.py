@@ -1,5 +1,4 @@
 from django.http import HttpResponse, FileResponse
-
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.parsers import FormParser, MultiPartParser
@@ -20,7 +19,7 @@ from .serializers import (
 )
 from .renderers import UWSRenderer, UWSErrorRenderer
 from .filters import UWSFilterBackend
-from .utils import get_job_url, get_job_results
+from .utils import get_job_url, get_job_results, get_content_type
 
 
 class JobViewSet(viewsets.GenericViewSet):
@@ -108,13 +107,13 @@ class AsyncJobViewSet(JobViewSet):
         queryset = self.filter_queryset(self.get_queryset())
         serializer = JobListSerializer(queryset, many=True)
         renderered_data = UWSRenderer().render(serializer.data, renderer_context=self.get_renderer_context())
-        return HttpResponse(renderered_data, content_type=UWSRenderer.media_type)
+        return HttpResponse(renderered_data, content_type=get_content_type(request, UWSRenderer))
 
     def retrieve(self, request, *args, **kwargs):
         job = self.get_object()
         serializer = JobRetrieveSerializer(job, context={'request': request})
         renderered_data = UWSRenderer().render(serializer.data, renderer_context=self.get_renderer_context())
-        return HttpResponse(renderered_data, content_type=UWSRenderer.media_type)
+        return HttpResponse(renderered_data, content_type=get_content_type(request, UWSRenderer))
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -182,7 +181,7 @@ class AsyncJobViewSet(JobViewSet):
         renderered_data = UWSRenderer().render({
             'results': get_job_results(request, job)
         }, renderer_context=self.get_renderer_context())
-        return HttpResponse(renderered_data, content_type=UWSRenderer.media_type)
+        return HttpResponse(renderered_data, content_type=get_content_type(request, UWSRenderer))
 
     @action(detail=True, methods=['get'], url_path='results/(?P<result>[A-Za-z0-9\-]+)', url_name='result')
     def result(self, request, pk, result):
@@ -202,7 +201,7 @@ class AsyncJobViewSet(JobViewSet):
         renderered_data = UWSRenderer().render({
             'parameters': self.get_object().parameters
         }, renderer_context=self.get_renderer_context())
-        return HttpResponse(renderered_data, content_type=UWSRenderer.media_type)
+        return HttpResponse(renderered_data, content_type=get_content_type(request, UWSRenderer))
 
     @action(detail=True, methods=['get', 'post'])
     def destruction(self, request, pk):

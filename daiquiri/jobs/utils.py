@@ -1,3 +1,5 @@
+from django_user_agents.utils import get_user_agent
+
 from rest_framework.reverse import reverse
 
 
@@ -20,3 +22,8 @@ def get_job_results(request, job):
         })
 
     return results
+
+
+def get_content_type(request, renderer):
+    user_agent = get_user_agent(request)
+    return 'application/xml' if user_agent.is_pc else renderer.media_type
