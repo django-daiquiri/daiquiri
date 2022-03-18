@@ -37,7 +37,10 @@
       "first_name": "Tanja",
       "last_name": "Testuser",
       "email": "test@example.com",
-      "details": "{\"affiliation\":\"Test\",\"dinner\":\"yes\"}",
+      "details": {
+        "affiliation": "Test",
+        "dinner": "yes"
+      },
       "registered": "2018-02-22T13:51:52Z",
       "status": "ACCEPTED"
     }
@@ -50,7 +53,10 @@
       "first_name": "Ernie",
       "last_name": "Evil",
       "email": "evil@example.com",
-      "details": "{\"affiliation\":\"Evil\",\"dinner\":\"no\"}",
+      "details": {
+        "affiliation": "Evil",
+        "dinner": "no"
+      },
       "registered": "2018-02-22T14:39:21Z",
       "status": "REGISTERED"
     }
