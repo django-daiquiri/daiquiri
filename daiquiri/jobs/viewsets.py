@@ -32,7 +32,7 @@ class JobViewSet(viewsets.GenericViewSet):
     def rewrite_exception(self, exception):
         detail = {}
         for field, field_errors in exception.detail.items():
-            parameter = dict(map(reversed, self.parameter_map.items()))[field]
+            parameter = dict(map(reversed, self.parameter_map.items())).get(field, field.upper())
             detail[parameter] = field_errors
         return detail
 
