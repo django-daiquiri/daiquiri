@@ -11,10 +11,11 @@ def get_job_url(request, kwargs):
 
 def get_job_results(request, job):
     namespace = request.resolver_match.namespace
+    base_name = request.resolver_match.url_name.rsplit('-', 1)[0]
 
     results = []
     for key in job.formats:
-        url = reverse(namespace + ':async-result', args=[job.id, key])
+        url = reverse('%s:%s-result' % (namespace, base_name), args=[job.id, key])
 
         results.append({
             'result_type': key,
