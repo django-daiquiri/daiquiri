@@ -42,6 +42,7 @@ class JobRetrieveSerializer(serializers.ModelSerializer):
             'end_time',
             'execution_duration',
             'destruction',
+            'error_summary',
             'results',
             'parameters'
         )
