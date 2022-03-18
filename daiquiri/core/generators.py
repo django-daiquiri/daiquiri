@@ -39,11 +39,12 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
     <RESOURCE type="results">'''
 
     for key, value in infos:
-        yield '''
-        <INFO name=%(key)s value=%(value)s />''' % {
-            'key': quoteattr(key),
-            'value': quoteattr(value)
-        }
+        if value is not None:
+            yield '''
+            <INFO name=%(key)s value=%(value)s />''' % {
+                'key': quoteattr(key),
+                'value': quoteattr(value)
+            }
 
     for title, content_role, href in links:
         yield '''
