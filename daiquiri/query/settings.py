@@ -67,6 +67,20 @@ QUERY_DROPDOWNS = [
         }
     }
 ]
+QUERY_DOWNLOADS = [
+    {
+        'key': 'table',
+        'model': 'daiquiri.query.models.DownloadJob',
+        'template': 'query/query_download_table.html',
+        'params': ['format_key']
+    },
+    {
+        'key': 'archive',
+        'model': 'daiquiri.query.models.QueryArchiveJob',
+        'template': 'query/query_download_archive.html',
+        'params': ['column_name']
+    }
+]
 QUERY_DEFAULT_DOWNLOAD_FORMAT = 'votable'
 QUERY_DOWNLOAD_FORMATS = [
     {

@@ -276,7 +276,7 @@ def create_download_file(download_id):
         try:
 
             with open(download_job.file_path, write_label) as f:
-                for line in download_job.job.stream(download_job.format_key):
+                for line in download_job.query_job.stream(download_job.format_key):
                     f.write(line)
 
         except Exception as e:

@@ -24,11 +24,12 @@ from daiquiri.core.utils import (
     get_client_ip,
     fix_for_json,
     filter_by_access_level,
-    handle_file_upload
+    handle_file_upload,
+    import_class
 )
 from daiquiri.jobs.viewsets import SyncJobViewSet, AsyncJobViewSet
 
-from .models import QueryJob, DownloadJob, QueryArchiveJob, Example
+from .models import QueryJob, DownloadJob, Example
 from .serializers import (
     FormSerializer,
     DropdownSerializer,
@@ -46,6 +47,7 @@ from .serializers import (
 )
 from .permissions import HasPermission
 from .utils import (
+    get_download_config,
     get_format_config,
     get_quota,
     get_user_upload_directory,
@@ -229,16 +231,25 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
 
         return Response(job.columns())
 
-    @action(detail=True, methods=['get'], url_path='download/(?P<download_id>[A-Za-z0-9\-]+)', url_name='download')
-    def download(self, request, pk=None, download_id=None):
+    @action(detail=True, methods=['get'], url_name='download',
+            url_path=r'download/(?P<download_key>[a-z\-]+)/(?P<download_job_id>[A-Za-z0-9\-]+)')
+    def download(self, request, pk=None, download_key=None, download_job_id=None):
+        print(pk, download_key)
+
         try:
-            job = self.get_queryset().get(pk=pk)
+            self.get_queryset().get(pk=pk)
         except QueryJob.DoesNotExist:
             raise NotFound
 
+        download_config = get_download_config(download_key)
+        if download_config is None:
+            raise ValidationError({'download': "Not supported."})
+
+        download_job_model = import_class(download_config['model'])
+
         try:
-            download_job = job.downloads.get(pk=download_id)
-        except DownloadJob.DoesNotExist:
+            download_job = download_job_model.objects.get(query_job=pk, pk=download_job_id)
+        except download_job_model.DoesNotExist:
             raise NotFound
 
         if download_job.phase == download_job.PHASE_COMPLETED and request.GET.get('download', True):
@@ -246,17 +257,24 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
         else:
             return Response(download_job.phase)
 
-    @action(detail=True, methods=['post'], url_path='download', url_name='create-download')
-    def create_download(self, request, pk=None):
+    @action(detail=True, methods=['post'], url_name='create-download',
+            url_path=r'download/(?P<download_key>[a-z\-]+)')
+    def create_download(self, request, pk=None, download_key=None):
         try:
             job = self.get_queryset().get(pk=pk)
         except QueryJob.DoesNotExist:
             raise NotFound
 
-        format_key = request.data.get('format_key')
+        download_config = get_download_config(download_key)
+        if download_config is None:
+            raise ValidationError({'download': "Not supported."})
+
+        download_job_model = import_class(download_config['model'])
+
+        params = {param: request.data.get(param) for param in download_config['params']}
 
         try:
-            download_job = DownloadJob.objects.get(job=job, format_key=format_key)
+            download_job = download_job_model.objects.get(query_job=job, **params)
 
             # check if the file was lost
             if download_job.phase == download_job.PHASE_COMPLETED and \
@@ -268,12 +286,13 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
                 download_job.save()
                 download_job.run()
 
-        except DownloadJob.DoesNotExist:
-            download_job = DownloadJob(
+        except download_job_model.DoesNotExist:
+            download_job = download_job_model(
                 job_type=QueryJob.JOB_TYPE_INTERFACE,
+                owner=(None if self.request.user.is_anonymous else self.request.user),
                 client_ip=get_client_ip(self.request),
-                job=job,
-                format_key=format_key
+                query_job=job,
+                **params
             )
             download_job.process()
             download_job.save()
@@ -283,61 +302,7 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
             'id': download_job.id
         })
 
-    @action(detail=True, methods=['get'], url_path='archive/(?P<archive_id>[A-Za-z0-9\-]+)', url_name='archive')
-    def archive(self, request, pk=None, archive_id=None):
-        try:
-            job = self.get_queryset().get(pk=pk)
-        except QueryJob.DoesNotExist:
-            raise NotFound
-
-        try:
-            archive_job = job.archives.get(pk=archive_id)
-        except QueryArchiveJob.DoesNotExist:
-            raise NotFound
-
-        if archive_job.phase == archive_job.PHASE_COMPLETED and request.GET.get('download', True):
-            return sendfile(request, archive_job.file_path, attachment=True)
-        else:
-            return Response(archive_job.phase)
-
-    @action(detail=True, methods=['post'], url_path='archive', url_name='create-archive')
-    def create_archive(self, request, pk=None):
-        try:
-            job = self.get_queryset().get(pk=pk)
-        except QueryJob.DoesNotExist:
-            raise NotFound
-
-        column_name = request.data.get('column_name')
-
-        try:
-            archive_job = QueryArchiveJob.objects.get(job=job, column_name=column_name)
-
-            # check if the file was lost
-            if archive_job.phase == archive_job.PHASE_COMPLETED and \
-                    not os.path.isfile(archive_job.file_path):
-
-                # set the phase back to pending so that the file is recreated
-                archive_job.phase = archive_job.PHASE_PENDING
-                archive_job.process()
-                archive_job.save()
-                archive_job.run()
-
-        except QueryArchiveJob.DoesNotExist:
-            archive_job = QueryArchiveJob(
-                job_type=QueryJob.JOB_TYPE_INTERFACE,
-                client_ip=get_client_ip(self.request),
-                job=job,
-                column_name=column_name
-            )
-            archive_job.process()
-            archive_job.save()
-            archive_job.run()
-
-        return Response({
-            'id': archive_job.id
-        })
-
-    @action(detail=True, methods=['get'], url_path='stream/(?P<format_key>[A-Za-z0-9\-]+)', url_name='stream')
+    @action(detail=True, methods=['get'], url_path=r'stream/(?P<format_key>[A-Za-z0-9\-]+)', url_name='stream')
     def stream(self, request, pk=None, format_key=None):
         try:
             job = self.get_queryset().get(pk=pk)
@@ -360,7 +325,6 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
             pass
 
         # stream the table directly from the database
-        file_name = '%s.%s' % (job.table_name, format_config['extension'])
         response = FileResponse(job.stream(format_key), content_type=format_config['content_type'])
         return response
 

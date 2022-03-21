@@ -18,7 +18,6 @@ from daiquiri.core.constants import ACCESS_LEVEL_CHOICES
 from daiquiri.core.generators import generate_votable
 from daiquiri.jobs.models import Job
 from daiquiri.jobs.managers import JobManager
-from daiquiri.jobs.exceptions import JobError
 from daiquiri.files.utils import check_file
 from daiquiri.stats.models import Record
 
@@ -409,7 +408,7 @@ class DownloadJob(Job):
 
     objects = JobManager()
 
-    job = models.ForeignKey(
+    query_job = models.ForeignKey(
         QueryJob, related_name='downloads', on_delete=models.CASCADE,
         verbose_name=_('QueryJob'),
         help_text=_('QueryJob this DownloadJob belongs to.')
@@ -437,13 +436,13 @@ class DownloadJob(Job):
 
         if format_config:
             directory_name = os.path.join(settings.QUERY_DOWNLOAD_DIR, username)
-            return os.path.join(directory_name, '%s.%s' % (self.job.table_name, format_config['extension']))
+            return os.path.join(directory_name, '%s.%s' % (self.query_job.table_name, format_config['extension']))
         else:
             return None
 
     def process(self):
-        if self.job.phase == self.PHASE_COMPLETED:
-            self.owner = self.job.owner
+        if self.query_job.phase == self.PHASE_COMPLETED:
+            self.owner = self.query_job.owner
         else:
             raise ValidationError({
                 'phase': ['Job is not COMPLETED.']
@@ -486,7 +485,7 @@ class QueryArchiveJob(Job):
 
     objects = JobManager()
 
-    job = models.ForeignKey(
+    query_job = models.ForeignKey(
         QueryJob, related_name='archives', on_delete=models.CASCADE,
         verbose_name=_('QueryJob'),
         help_text=_('QueryJob this ArchiveJob belongs to.')
@@ -515,11 +514,11 @@ class QueryArchiveJob(Job):
             username = self.owner.username
 
         directory_name = os.path.join(settings.QUERY_DOWNLOAD_DIR, username)
-        return os.path.join(directory_name, '%s.%s.zip' % (self.job.table_name, self.column_name))
+        return os.path.join(directory_name, '%s.%s.zip' % (self.query_job.table_name, self.column_name))
 
     def process(self):
-        if self.job.phase == self.PHASE_COMPLETED:
-            self.owner = self.job.owner
+        if self.query_job.phase == self.PHASE_COMPLETED:
+            self.owner = self.query_job.owner
         else:
             raise ValidationError({
                 'phase': ['Job is not COMPLETED.']
@@ -530,13 +529,13 @@ class QueryArchiveJob(Job):
                 'column_name': [_('This field may not be blank.')]
             })
 
-        if self.column_name not in self.job.column_names:
+        if self.column_name not in self.query_job.column_names:
             raise ValidationError({
                 'column_name': [_('Unknown column "%s".') % self.column_name]
             })
 
         # get database adapter and query the paginated rowset
-        rows = DatabaseAdapter().fetch_rows(self.job.schema_name, self.job.table_name, [self.column_name], page_size=0)
+        rows = DatabaseAdapter().fetch_rows(self.query_job.schema_name, self.query_job.table_name, [self.column_name], page_size=0)
 
         # prepare list of files for this job
         files = []
