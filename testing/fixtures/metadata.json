@@ -764,7 +764,7 @@
       "name": "file",
       "description": "",
       "unit": "",
-      "ucd": "meta.file",
+      "ucd": "meta.ref;meta.file",
       "utype": "",
       "datatype": "char",
       "arraysize": 32,
