@@ -78,6 +78,7 @@ QUERY_DOWNLOADS = [
         'key': 'archive',
         'model': 'daiquiri.query.models.QueryArchiveJob',
         'template': 'query/query_download_archive.html',
+        'service': 'query/js/downloads/archive.js',
         'params': ['column_name']
     }
 ]

@@ -33,6 +33,7 @@ from .models import QueryJob, DownloadJob, Example
 from .serializers import (
     FormSerializer,
     DropdownSerializer,
+    DownloadSerializer,
     QueryJobSerializer,
     QueryJobListSerializer,
     QueryJobRetrieveSerializer,
@@ -88,6 +89,15 @@ class DropdownViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
     def get_queryset(self):
         return settings.QUERY_DROPDOWNS
+
+
+class DownloadViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    permission_classes = (HasPermission, )
+
+    serializer_class = DownloadSerializer
+
+    def get_queryset(self):
+        return settings.QUERY_DOWNLOADS
 
 
 class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
@@ -234,8 +244,6 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
     @action(detail=True, methods=['get'], url_name='download',
             url_path=r'download/(?P<download_key>[a-z\-]+)/(?P<download_job_id>[A-Za-z0-9\-]+)')
     def download(self, request, pk=None, download_key=None, download_job_id=None):
-        print(pk, download_key)
-
         try:
             self.get_queryset().get(pk=pk)
         except QueryJob.DoesNotExist:
@@ -271,7 +279,7 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
 
         download_job_model = import_class(download_config['model'])
 
-        params = {param: request.data.get(param) for param in download_config['params']}
+        params = {param: request.data.get(param) for param in download_config.get('params', [])}
 
         try:
             download_job = download_job_model.objects.get(query_job=job, **params)

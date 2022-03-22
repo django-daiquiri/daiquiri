@@ -1,8 +1,14 @@
-app.factory('DownloadService', ['$http', 'PollingService', function($http, PollingService) {
+app.factory('DownloadService', ['$http', '$resource', '$injector', 'PollingService', function($http, $resource, $injector, PollingService) {
 
     /* get the base url */
 
     var baseurl = angular.element('meta[name="baseurl"]').attr('content');
+
+    /* configure resources */
+
+    var resources = {
+        downloads: $resource(baseurl + 'query/api/downloads/')
+    };
 
     /* configure urls */
 
@@ -15,15 +21,13 @@ app.factory('DownloadService', ['$http', 'PollingService', function($http, Polli
     service.init = function(opt) {
         service.job = opt.job;
 
-        service.archive_columns = [];
-        angular.forEach(service.job.columns, function(column) {
-            if (column.ucd && column.ucd.indexOf('meta.ref') > -1) {
-                angular.forEach(['meta.note', 'meta.image', 'meta.file'], function(key) {
-                    if (column.ucd.indexOf(key) > -1) {
-                        service.archive_columns.push(column.name);
-                    }
-                });
-            }
+        // inject download services
+        resources.downloads.query(function(response) {
+            angular.forEach(response, function(download) {
+                if (download.download_service) {
+                    service[download.key] = $injector.get(download.download_service);
+                }
+            });
         });
     }
 
