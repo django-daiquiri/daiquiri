@@ -251,7 +251,7 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
 
         download_config = get_download_config(download_key)
         if download_config is None:
-            raise ValidationError({'download': "Not supported."})
+            raise ValidationError({'download': 'Download key "{}" is not supported.'.format(download_key)})
 
         download_job_model = import_class(download_config['model'])
 
@@ -275,7 +275,7 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
 
         download_config = get_download_config(download_key)
         if download_config is None:
-            raise ValidationError({'download': "Not supported."})
+            raise ValidationError({'download': 'Download key "{}" is not supported.'.format(download_key)})
 
         download_job_model = import_class(download_config['model'])
 
