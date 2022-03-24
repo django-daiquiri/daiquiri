@@ -236,3 +236,5 @@ if MEMCACHE_KEY_PREFIX:
             'KEY_PREFIX': MEMCACHE_KEY_PREFIX
         }
     }
+
+CELERY_BROKER_URL = env.get('CELERY_BROKER_URL', 'amqp://')
