@@ -10,8 +10,6 @@ from django.utils.translation import ugettext_lazy as _
 
 from rest_framework.exceptions import ValidationError
 
-from jsonfield import JSONField
-
 from daiquiri.core.constants import ACCESS_LEVEL_CHOICES
 from daiquiri.core.managers import AccessLevelManager
 from daiquiri.core.adapter import DatabaseAdapter
@@ -56,11 +54,11 @@ class ArchiveJob(Job):
 
     objects = JobManager()
 
-    data = JSONField(
+    data = models.JSONField(
         verbose_name=_('Data'),
         help_text=_('Input data for archive creation.')
     )
-    files = JSONField(
+    files = models.JSONField(
         verbose_name=_('Files'),
         help_text=_('List of files in the archive.')
     )

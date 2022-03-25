@@ -6,9 +6,10 @@ from sendfile import sendfile
 from django.conf import settings
 from django.utils.timezone import now
 from django.shortcuts import render
+from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
 
-from daiquiri.core.utils import get_client_ip
+from daiquiri.core.utils import get_client_ip, markdown
 from daiquiri.stats.models import Record
 
 from .models import Directory
@@ -19,6 +20,22 @@ logger = logging.getLogger(__name__)
 def file_exists(file_path):
     absolute_file_path = os.path.join(settings.FILES_BASE_PATH, file_path)
     return os.path.isfile(absolute_file_path)
+
+
+def get_file_path(file_path):
+    if file_exists(file_path):
+        return file_path
+    elif not file_path or file_path.endswith('/'):
+        # try different paths
+        for path in [file_path.rstrip('/') + '.html',
+                     file_path.rstrip('/') + '.md',
+                     file_path + 'index.html',
+                     file_path + 'index.md']:
+            if file_exists(path):
+                return path
+
+    # return None if no file was found
+    return None
 
 
 def get_directory(user, file_path):
@@ -39,9 +56,13 @@ def render_with_layout(request, file_path):
     absolute_file_path = os.path.join(settings.FILES_BASE_PATH, file_path)
 
     context = {}
-
     with open(absolute_file_path) as f:
-        context['content'] = mark_safe(f.read())
+        file_content = f.read()
+
+        if file_path.endswith('.html'):
+            context['content'] = mark_safe(file_content)
+        elif file_path.endswith('.md'):
+            context['content'] = mark_safe(force_text(markdown(file_content)))
 
     return render(request, 'files/layout.html', context)
 

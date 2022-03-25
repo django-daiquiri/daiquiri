@@ -1,12 +1,12 @@
 from django.utils.translation import ugettext_lazy as _
 import daiquiri.core.env as env
-from daiquiri.core.constants import ACCESS_LEVEL_CHOICES
 
 METADATA_COLUMN_PERMISSIONS = False
 METADATA_BASE_URL = None
 
 ARCHIVE_BASE_PATH = env.get_abspath('ARCHIVE_BASE_PATH')
 
+LICENSE_NONE = ''
 LICENSE_CC0 = 'CC0'
 LICENSE_PD = 'PD'
 LICENSE_BY = 'BY'
@@ -17,6 +17,7 @@ LICENSE_BY_NC_SA = 'BY_NC_SA'
 LICENSE_BY_NC_ND = 'BY_NC_ND'
 
 LICENSE_CHOICES = (
+    (LICENSE_NONE, _('---')),
     (LICENSE_CC0, _('CC0 1.0 Universal (CC0 1.0)')),
     (LICENSE_PD, _('Public Domain Mark')),
     (LICENSE_BY, _('Attribution 4.0 International (CC BY 4.0)')),

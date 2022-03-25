@@ -1,0 +1,22 @@
+{% extends 'core/wide.html' %}
+{% load i18n %}
+
+{% block wide %}
+
+    <h1>{% trans 'DATALINK service' %}</h1>
+
+    <ul>
+        <li>
+            <a href="{% url 'datalink:link-list' %}">{% trans 'links' %}</a>
+        </li>
+    </ul>
+    <ul>
+        <li>
+            <a href="{% url 'datalink:capabilities' %}">{% trans 'VOSI capabilities' %}</a>
+        </li>
+        <li>
+            <a href="{% url 'datalink:availability' %}">{% trans 'VOSI availability' %}</a>
+        </li>
+    </ul>
+
+{% endblock %}

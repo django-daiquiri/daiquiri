@@ -35,8 +35,10 @@ DATABASES = {
     'default': env.get_database('app'),
     'data': env.get_database('data'),
     'tap': env.get_database('data'),
-    'oai': env.get_database('data'),
+    'oai': env.get_database('data')
 }
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 if DATABASES['tap'].get('ENGINE') == 'django.db.backends.postgresql':
     DATABASES['tap']['OPTIONS'] = {
@@ -56,8 +58,8 @@ ADAPTER_DATABASE = env.get_database_adapter()
 ADAPTER_DOWNLOAD = env.get_download_adapter()
 
 DATABASE_ROUTERS = [
-    'daiquiri.oai.routers.OaiRouter',
-    'daiquiri.tap.routers.TapRouter',
+    'daiquiri.core.routers.TapRouter',
+    'daiquiri.core.routers.OaiRouter',
     'daiquiri.core.routers.DataRouter'
 ]
 
@@ -234,3 +236,5 @@ if MEMCACHE_KEY_PREFIX:
             'KEY_PREFIX': MEMCACHE_KEY_PREFIX
         }
     }
+
+CELERY_BROKER_URL = env.get('CELERY_BROKER_URL', 'amqp://')

@@ -1,0 +1,45 @@
+{% extends 'core/wide.html' %}
+{% load i18n %}
+
+{% block wide %}
+
+    <h1>{% blocktrans %}Datalinks for {{ ID }}{% endblocktrans %}</h1>
+
+    {% if datalinks %}
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <td>ID</td>
+                <td>access_url</td>
+                <td>service_def</td>
+                <td>error_message</td>
+                <td>description</td>
+                <td>semantics</td>
+                <td>content_type</td>
+                <td>content_length</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for datalink in datalinks %}
+            <tr>
+                <td>{{ datalink.ID }}</td>
+                <td>{{ datalink.access_url }}</td>
+                <td>{{ datalink.service_def }}</td>
+                <td>{{ datalink.error_message }}</td>
+                <td>{{ datalink.description }}</td>
+                <td>{{ datalink.semantics }}</td>
+                <td>{{ datalink.content_type }}</td>
+                <td>{{ datalink.content_length }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% else %}
+
+    <p>No datalinks could be found for this ID.</p>
+
+    {% endif %}
+
+{% endblock %}

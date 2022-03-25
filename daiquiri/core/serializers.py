@@ -5,20 +5,28 @@ from .utils import make_query_dict_upper_case
 
 class JSONDictField(serializers.JSONField):
 
+    initial = dict
+
     def to_internal_value(self, data):
+        data = super().to_internal_value(data)
+
         if not isinstance(data, dict):
             self.fail('invalid')
 
-        return super().to_internal_value(data)
+        return data
 
 
 class JSONListField(serializers.JSONField):
 
+    initial = list
+
     def to_internal_value(self, data):
+        data = super().to_internal_value(data)
+
         if not isinstance(data, list):
             self.fail('invalid')
 
-        return super().to_internal_value(data)
+        return data
 
 
 class ChoicesSerializer(serializers.Serializer):

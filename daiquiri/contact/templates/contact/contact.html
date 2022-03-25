@@ -20,7 +20,9 @@
             <input type="submit" name="cancel" value="{% trans 'Cancel' %}" class="btn btn-default" />
         </form>
     {% else %}
-        {% trans "Please log in to be able to fill the contact form." %}
+        <p>
+            {% trans "Please log in to be able to fill the contact form." %}
+        </p>
     {% endif %}
 
 {% endblock %}

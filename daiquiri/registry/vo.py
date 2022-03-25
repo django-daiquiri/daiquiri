@@ -2,17 +2,7 @@ from django.apps import apps
 from django.conf import settings
 from django.urls import reverse
 
-
-def get_curation():
-    return {
-        'publisher': settings.SITE_PUBLISHER,
-        'date': settings.SITE_UPDATED,
-        'creator': {
-            'name': settings.SITE_CREATOR,
-            'logo': settings.SITE_LOGO_URL,
-        },
-        'contact': settings.SITE_CONTACT
-    }
+from daiquiri.core.vo import get_curation
 
 
 def get_resource():

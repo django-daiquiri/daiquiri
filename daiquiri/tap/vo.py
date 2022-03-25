@@ -2,8 +2,8 @@ from django.conf import settings
 from django.urls import reverse
 
 from daiquiri.core.constants import ACCESS_LEVEL_PUBLIC
+from daiquiri.core.vo import get_curation
 from daiquiri.metadata.models import Schema
-from daiquiri.registry.vo import get_curation
 
 from .serializers import SchemaSerializer
 

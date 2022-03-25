@@ -2,7 +2,7 @@ import daiquiri.core.env as env
 
 OAI_SCHEMA = env.get('OAI_SCHEMA', 'oai_schema')
 
-OAI_ADAPTER = 'daiquiri.metadata.adapter.RegistryDoiMetadataOaiAdapter'
+OAI_ADAPTER = 'daiquiri.oai.adapter.DefaultOaiAdapter'
 OAI_METADATA_FORMATS = [
     {
         'prefix': 'oai_dc',

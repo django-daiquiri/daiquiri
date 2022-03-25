@@ -3,8 +3,6 @@ import os
 
 from collections import OrderedDict
 
-from celery.task.control import revoke
-
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.db import models
@@ -14,8 +12,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.timezone import now
 
 from rest_framework.exceptions import ValidationError
-
-from jsonfield import JSONField
 
 from daiquiri.core.adapter import DatabaseAdapter, DownloadAdapter
 from daiquiri.core.constants import ACCESS_LEVEL_CHOICES
@@ -76,8 +72,8 @@ class QueryJob(Job):
     nrows = models.BigIntegerField(null=True, blank=True)
     size = models.BigIntegerField(null=True, blank=True)
 
-    metadata = JSONField(null=True, blank=True)
-    uploads = JSONField(null=True, blank=True)
+    metadata = models.JSONField(null=True, blank=True)
+    uploads = models.JSONField(null=True, blank=True)
 
     pid = models.IntegerField(null=True, blank=True)
 
@@ -227,8 +223,9 @@ class QueryJob(Job):
                 run_query.apply((job_id, ), task_id=job_id, throw=True)
 
             else:
-                logger.info('job %s submitted (async, queue=query, priority=%s)' % (self.id, self.priority))
-                run_query.apply_async((job_id, ), task_id=job_id, queue='query', priority=self.priority)
+                queue = 'query.{}'.format(self.queue)
+                logger.info('job %s submitted (async, queue=%s, priority=%s)' % (self.id, queue, self.priority))
+                run_query.apply_async((job_id, ), task_id=job_id, queue=queue, priority=self.priority)
 
         else:
             raise ValidationError({
@@ -267,7 +264,8 @@ class QueryJob(Job):
             yield from generate_votable(adapter.fetchall(self.actual_query), get_job_columns(self),
                                         table=download_adapter.get_table_name(self.schema_name, self.table_name),
                                         infos=download_adapter.get_infos('OK', self.query, self.query_language, job_sources),
-                                        links=download_adapter.get_links(job_sources))
+                                        links=download_adapter.get_links(job_sources),
+                                        services=download_adapter.get_services())
             self.drop_uploads()
 
         except (OperationalError, ProgrammingError, InternalError, DataError) as e:
@@ -289,12 +287,7 @@ class QueryJob(Job):
             })
 
     def abort(self):
-        if settings.ASYNC:
-            # first, revoke the task in celery, regardless the phase
-            revoke(str(self.id))
-
         current_phase = self.phase
-
         if current_phase in self.PHASE_ACTIVE:
             # next, set the phase to ABORTED
             self.phase = self.PHASE_ABORTED
@@ -503,7 +496,7 @@ class QueryArchiveJob(Job):
         verbose_name=_('Column name'),
         help_text=_('Column name for this download.')
     )
-    files = JSONField(
+    files = models.JSONField(
         verbose_name=_('Files'),
         help_text=_('List of files in the archive.')
     )

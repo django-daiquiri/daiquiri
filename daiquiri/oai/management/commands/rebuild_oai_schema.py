@@ -18,7 +18,27 @@ class Command(BaseCommand):
         adapter = OaiAdapter()
 
         if options['delete']:
+            # delete and bulk ingest all records
             Record.objects.all().delete()
+
+            records = []
+            for resource_type, resource in adapter.get_resource_list():
+                if options['resource_type'] in [None, resource_type]:
+                    resource_id, identifier, datestamp, set_spec, public = adapter.get_record(resource_type, resource)
+
+                    if public is True:
+                        for metadata_prefix in adapter.get_metadata_prefixes(resource_type):
+                            records.append(Record(
+                                identifier=identifier,
+                                metadata_prefix=metadata_prefix,
+                                datestamp=datestamp,
+                                set_spec=set_spec,
+                                deleted=False,
+                                resource_type=resource_type,
+                                resource_id=resource_id
+                            ))
+
+            Record.objects.bulk_create(records)
         else:
             # mark deleted or unpublished records as deleted
             for record in Record.objects.all():
@@ -28,6 +48,7 @@ class Command(BaseCommand):
                     record.deleted = True
                     record.save()
 
-        for resource_type, resource in OaiAdapter().get_resource_list():
-            if options['resource_type'] in [None, resource_type]:
-                update_records(resource_type, resource)
+            # update records one by one
+            for resource_type, resource in adapter.get_resource_list():
+                if options['resource_type'] in [None, resource_type]:
+                    update_records(resource_type, resource)

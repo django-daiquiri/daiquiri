@@ -25,26 +25,27 @@ def update_records(resource_type, resource):
 
     adapter = OaiAdapter()
 
-    try:
-        resource_id, identifier, datestamp, set_spec, public = adapter.get_record(resource_type, resource)
-    except TypeError:
-        raise RuntimeError('Could not obtain record for %s %s' % (resource_type, resource))
+    if resource_type in adapter.resource_types:
+        try:
+            resource_id, identifier, datestamp, set_spec, public = adapter.get_record(resource_type, resource)
+        except TypeError:
+            raise RuntimeError('Could not obtain record for %s %s' % (resource_type, resource))
 
-    if public is True:
-        for metadata_prefix in adapter.resource_types[resource_type]:
-            try:
-                record = Record.objects.get(identifier=identifier, metadata_prefix=metadata_prefix)
-            except Record.DoesNotExist:
-                record = Record(identifier=identifier, metadata_prefix=metadata_prefix)
+        if public is True:
+            for metadata_prefix in adapter.get_metadata_prefixes(resource_type):
+                try:
+                    record = Record.objects.get(identifier=identifier, metadata_prefix=metadata_prefix)
+                except Record.DoesNotExist:
+                    record = Record(identifier=identifier, metadata_prefix=metadata_prefix)
 
-            record.datestamp = datestamp
-            record.set_spec = set_spec
-            record.deleted = False
-            record.resource_type = resource_type
-            record.resource_id = resource_id
-            record.save()
-    else:
-        delete_records(resource_type, resource)
+                record.datestamp = datestamp
+                record.set_spec = set_spec
+                record.deleted = False
+                record.resource_type = resource_type
+                record.resource_id = resource_id
+                record.save()
+        else:
+            delete_records(resource_type, resource)
 
 
 def delete_records(resource_type, resource):
@@ -52,17 +53,18 @@ def delete_records(resource_type, resource):
 
     adapter = OaiAdapter()
 
-    try:
-        resource_id, identifier, datestamp, set_spec, public = adapter.get_record(resource_type, resource)
-    except TypeError:
-        raise RuntimeError('Could not obtain record for %s %s' % (resource_type, resource))
-
-    for metadata_prefix in adapter.resource_types[resource_type]:
+    if resource_type in adapter.resource_types:
         try:
-            record = Record.objects.get(identifier=identifier, metadata_prefix=metadata_prefix)
-            record.datestamp = datestamp
-            record.set_spec = set_spec
-            record.deleted = True
-            record.save()
-        except Record.DoesNotExist:
-            pass
+            resource_id, identifier, datestamp, set_spec, public = adapter.get_record(resource_type, resource)
+        except TypeError:
+            raise RuntimeError('Could not obtain record for %s %s' % (resource_type, resource))
+
+        for metadata_prefix in adapter.get_metadata_prefixes(resource_type):
+            try:
+                record = Record.objects.get(identifier=identifier, metadata_prefix=metadata_prefix)
+                record.datestamp = datestamp
+                record.set_spec = set_spec
+                record.deleted = True
+                record.save()
+            except Record.DoesNotExist:
+                pass

@@ -23,6 +23,7 @@ from django.utils.timezone import localtime
 from django.utils.translation import ugettext_lazy as _
 
 from ipware import get_client_ip as ipware_get_client_ip
+from markdown import markdown as markdown_function
 
 import xlsxwriter
 
@@ -160,6 +161,10 @@ def get_doi_url(doi):
     return 'https://doi.org/%s' % doi.rstrip('/') if doi else None
 
 
+def get_doi(doi_url):
+    return urlparse(doi_url).path.lstrip('/') if doi_url else None
+
+
 def filter_by_access_level(user, items):
     filtered_items = []
 
@@ -206,10 +211,17 @@ def human2bytes(string):
         return number * 1024**5
 
 
+def markdown(md):
+    return markdown_function(md, extensions=[
+        'fenced_code',
+        'attr_list'
+    ])
+
+
 def make_query_dict_upper_case(input_dict):
     output_dict = input_dict.copy()
 
-    for key in output_dict.keys():
+    for key in input_dict.keys():
         if key.upper() != key:
             values = output_dict.getlist(key)
 

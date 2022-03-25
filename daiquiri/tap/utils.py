@@ -23,10 +23,7 @@ def update_schema(schema):
     Update or create the schema in the TAP_SCHEMA.
     '''
     if check_tap_visibility(schema):
-        try:
-            tap_schema = TapSchema.objects.get(pk=schema.id)
-        except TapSchema.DoesNotExist:
-            tap_schema = TapSchema.objects.create(pk=schema.id)
+        tap_schema, created = TapSchema.objects.get_or_create(pk=schema.id)
 
         tap_schema.schema_name = schema.name
         tap_schema.utype = None
@@ -34,16 +31,24 @@ def update_schema(schema):
             tap_schema.description = schema.description[:255]
         tap_schema.save()
 
+        if created:
+            # call the handler for each table of the schema
+            for table in schema.tables.all():
+                update_table(table)
+
     else:
         # remove the schema from the TAP_SCHEMA (if it exists)
         try:
-            TapSchema.objects.get(pk=schema.id).delete()
+            tap_schema = TapSchema.objects.get(pk=schema.id)
+            tap_schema.delete()
+
+            # remove tables and colums
+            for tap_table in tap_schema.tables.all():
+                tap_table.columns.all().delete()
+                tap_table.delete()
+
         except TapSchema.DoesNotExist:
             pass
-
-    # call the handler for each table of the schema
-    for table in schema.tables.all():
-        update_table(table)
 
 
 def delete_schema(schema):
@@ -68,11 +73,7 @@ def update_table(table):
         tap_schema = None
 
     if check_tap_visibility(table) and tap_schema:
-        try:
-            tap_table = TapTable.objects.get(pk=table.id)
-            tap_table.schema = tap_schema
-        except TapTable.DoesNotExist:
-            tap_table = TapTable.objects.create(pk=table.id, schema=tap_schema)
+        tap_table, created = TapTable.objects.get_or_create(pk=table.id, defaults={'schema': tap_schema})
 
         tap_table.schema_name = str(table.schema)
         tap_table.table_name = str(table.schema) + '.' + str(table.name)
@@ -81,19 +82,23 @@ def update_table(table):
         if table.description:
             tap_table.description = table.description[:255]
         tap_table.table_index = table.order
-
         tap_table.save()
+
+        if created:
+            # call the handler for each table of the schema
+            for column in table.columns.all():
+                update_column(column)
 
     else:
         # remove the table from the TAP_SCHEMA (if it exists)
         try:
-            TapTable.objects.get(pk=table.id).delete()
+            tap_table = TapTable.objects.get(pk=table.id)
+            tap_table.delete()
+
+            # remove columns
+            tap_table.columns.all().delete()
         except TapTable.DoesNotExist:
             pass
-
-    # call the handler for each column of the table
-    for column in table.columns.all():
-        update_column(column)
 
 
 def delete_table(table):

@@ -5,8 +5,9 @@ import struct
 import sys
 from xml.sax.saxutils import escape, quoteattr
 
-from daiquiri import __version__ as daiquiri_version
 from django.contrib.sites.models import Site
+
+from daiquiri import __version__ as daiquiri_version
 
 
 def generate_csv(generator, fields):
@@ -27,7 +28,7 @@ def generate_csv(generator, fields):
             yield f.getvalue()
 
 
-def generate_votable(generator, fields, infos=[], links=[], table=None, empty=None):
+def generate_votable(generator, fields, infos=[], links=[], services=[], table=None, empty=None):
     yield '''<?xml version="1.0"?>
 <VOTABLE version="1.3"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -66,8 +67,14 @@ def generate_votable(generator, fields, infos=[], links=[], table=None, empty=No
                 value = field[key].replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
                 attrs.append('%s="%s"' % (key, value))
 
-        if 'arraysize' in field and field['arraysize']:
-            attrs.append('arraysize="%s"' % field['arraysize'])
+        if 'meta.id' in field['ucd'] and 'meta.ref' in field['ucd']:
+            attrs.append('ID="datalinkID"')
+
+        if 'arraysize' in field:
+            if field.get('datatype') == 'char' and field['arraysize'] is None:
+                attrs.append('arraysize="*"')
+            elif field['arraysize']:
+                attrs.append('arraysize="%s"' % field['arraysize'])
 
         if 'datatype' in field:
             if field['datatype'] in ['boolean', 'char', 'unsignedByte', 'short', 'int', 'long', 'float', 'double']:
@@ -97,7 +104,26 @@ def generate_votable(generator, fields, infos=[], links=[], table=None, empty=No
             </DATA>'''
     yield '''
         </TABLE>
-    </RESOURCE>
+    </RESOURCE>'''
+
+    for service in services:
+        yield '''
+    <RESOURCE type="meta" utype="adhoc:service">'''
+        for param in service.get('params', []):
+            yield '''
+        <PARAM name="{name}" datatype="{datatype}" arraysize="{arraysize}" value="{value}" />'''.format(**param)
+
+        for group in service.get('groups', []):
+            yield '''
+        <GROUP name="{name}">'''.format(**group)
+            for param in group.get('params', []):
+                yield '''
+            <PARAM name="{name}" datatype="{datatype}" arraysize="{arraysize}" value="{value}" ref="{ref}"/>'''.format(**param)
+            yield '''
+        </GROUP>'''
+        yield '''
+    </RESOURCE>'''
+    yield '''
 </VOTABLE>
 '''
 

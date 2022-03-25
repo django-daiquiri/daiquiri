@@ -11,7 +11,7 @@ register = template.Library()
 
 
 @register.inclusion_tag('metadata/tags/schemas_menu.html', takes_context=True)
-def schemas_menu(context):
+def schemas_menu(context, tables=True):
 
     schemas = Schema.objects.filter_by_metadata_access_level(context.request.user)
 
@@ -24,7 +24,7 @@ def schemas_menu(context):
                 'name': table.name,
                 'label': '%s.%s' % (schema.name, table.name)
                 } for table in schema.tables.filter_by_metadata_access_level(context.request.user)
-            ]
+            ] if tables else []
         })
 
     return context

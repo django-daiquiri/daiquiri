@@ -1,24 +1,37 @@
+from django import forms
 from django.conf import settings
 from django.contrib import admin
 
 from .models import Schema, Table, Column, Function
 
 
+class SchemaAdminForm(forms.ModelForm):
+    license = forms.ChoiceField(choices=settings.LICENSE_CHOICES, required=False)
+
+
+class TableAdminForm(forms.ModelForm):
+    license = forms.ChoiceField(choices=settings.LICENSE_CHOICES, required=False)
+
+
 class SchemaAdmin(admin.ModelAdmin):
+    form = SchemaAdminForm
+
     search_fields = ('__str__', )
-    list_display = ('order' ,'__str__', 'access_level', 'metadata_access_level')
+    list_display = ('order', '__str__', 'access_level', 'metadata_access_level')
     list_display_links = ('__str__', )
 
 
 class TableAdmin(admin.ModelAdmin):
+    form = TableAdminForm
+
     search_fields = ('__str__', )
-    list_display = ('order' ,'__str__', 'access_level', 'metadata_access_level')
+    list_display = ('order', '__str__', 'access_level', 'metadata_access_level')
     list_display_links = ('__str__', )
 
 
 class ColumnAdmin(admin.ModelAdmin):
     search_fields = ('__str__', 'datatype')
-    list_display = ('order' ,'__str__', 'datatype', 'access_level', 'metadata_access_level')
+    list_display = ('order', '__str__', 'datatype', 'access_level', 'metadata_access_level')
     list_display_links = ('__str__', )
 
     # only show access_level, metadata_access_level, and groups when

@@ -16,7 +16,7 @@ class DataciteSerializer(serializers.ModelSerializer):
     contributors = JSONListField(default=[])
     language = serializers.ReadOnlyField(default=settings.SITE_LANGUAGE)
     alternate_identifiers = serializers.SerializerMethodField()
-    related_identifiers = JSONListField(default=[]) 
+    related_identifiers = JSONListField(default=[])
     resource_type = serializers.SerializerMethodField()
     formats = serializers.SerializerMethodField()
     sizes = serializers.SerializerMethodField()
@@ -61,7 +61,7 @@ class DataciteSchemaSerializer(DataciteSerializer):
             'language',
             'resource_type',
             'alternate_identifiers',
-            'related_identifiers',            
+            'related_identifiers',
             'sizes',
             'formats',
             'license',
@@ -120,7 +120,7 @@ class DataciteTableSerializer(DataciteSerializer):
 
     def get_identifier(self, obj):
         return obj.doi or 'tables/%i' % obj.pk
-    
+
     def get_resource_type(self, obj):
         return 'Database table'
 

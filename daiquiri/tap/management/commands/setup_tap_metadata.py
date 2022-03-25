@@ -1,3 +1,4 @@
+from django.apps import apps
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
@@ -38,6 +39,32 @@ class Command(BaseCommand):
                 column.name = column_metadata['name']
                 column.description = column_metadata['description']
                 column.order = column_metadata['order']
+                column.datatype = column_metadata['datatype']
+                column.arraysize = column_metadata['arraysize']
+                column.std = column_metadata['std']
+                column.access_level = column_metadata['access_level']
+                column.metadata_access_level = column_metadata['metadata_access_level']
+                column.save()
+
+        if apps.is_installed('daiquiri.datalink'):
+            from daiquiri.datalink.constants import DATALINK_TABLE, DATALINK_FIELDS
+
+            table = Table()
+            table.schema = schema
+            table.name = DATALINK_TABLE['name']
+            table.description = DATALINK_TABLE['description']
+            table.order = DATALINK_TABLE['order']
+            table.access_level = DATALINK_TABLE['access_level']
+            table.metadata_access_level = DATALINK_TABLE['metadata_access_level']
+            table.save()
+
+            for column_metadata in DATALINK_FIELDS:
+                column = Column()
+                column.table = table
+                column.name = column_metadata['name']
+                column.order = column_metadata['order']
+                column.description = column_metadata['description']
+                column.ucd = column_metadata['ucd']
                 column.datatype = column_metadata['datatype']
                 column.arraysize = column_metadata['arraysize']
                 column.std = column_metadata['std']

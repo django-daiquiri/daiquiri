@@ -2,8 +2,6 @@ from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from jsonfield import JSONField
-
 
 class Meeting(models.Model):
 
@@ -100,8 +98,8 @@ class Participant(models.Model):
         max_length=256,
         verbose_name=_('Email'),
     )
-    details = JSONField(
-        null=True, blank=True, default={},
+    details = models.JSONField(
+        null=True, blank=True, default=dict,
         verbose_name=_('Details'),
         help_text=_('Choices are given by settings.MEETINGS_PARTICIPANT_DETAIL_KEYS')
     )
