@@ -5,6 +5,8 @@
 
     <h1>{% blocktrans %}Datalinks for {{ ID }}{% endblocktrans %}</h1>
 
+    {% if datalinks %}
+
     <table class="table table-bordered">
         <thead>
             <tr>
@@ -33,5 +35,11 @@
             {% endfor %}
         </tbody>
     </table>
+
+    {% else %}
+
+    <p>No datalinks could be found for this ID.</p>
+
+    {% endif %}
 
 {% endblock %}
