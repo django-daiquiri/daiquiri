@@ -59,9 +59,9 @@ class TableSerializer(serializers.ModelSerializer):
 
     label = serializers.CharField(source='__str__', read_only=True)
 
-    related_identifiers = JSONListField()
-    creators = JSONListField()
-    contributors = JSONListField()
+    related_identifiers = JSONListField(required=False)
+    creators = JSONListField(required=False)
+    contributors = JSONListField(required=False)
     license = serializers.ChoiceField(choices=settings.LICENSE_CHOICES, default='')
 
     class Meta:
@@ -73,9 +73,9 @@ class SchemaSerializer(serializers.ModelSerializer):
 
     label = serializers.CharField(source='__str__', read_only=True)
 
-    related_identifiers = JSONListField()
-    creators = JSONListField()
-    contributors = JSONListField()
+    related_identifiers = JSONListField(required=False)
+    creators = JSONListField(required=False)
+    contributors = JSONListField(required=False)
     license = serializers.ChoiceField(choices=settings.LICENSE_CHOICES, default='', initial='')
 
     class Meta:
