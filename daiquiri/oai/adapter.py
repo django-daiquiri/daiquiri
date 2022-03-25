@@ -2,6 +2,7 @@ from datetime import datetime
 
 from django.apps import apps
 from django.conf import settings
+from django.utils.timezone import now
 
 from daiquiri.core.adapter import DatabaseAdapter
 from daiquiri.core.constants import ACCESS_LEVEL_PUBLIC
@@ -181,7 +182,7 @@ class MetadataOaiAdapterMixin(object):
 
     def get_schema_record(self, schema):
         identifier = self.get_identifier('schemas/{}'.format(schema))
-        datestamp = schema.updated or schema.published
+        datestamp = schema.updated or schema.published or now().date()
         set_spec = 'schema'
         public = (schema.metadata_access_level == ACCESS_LEVEL_PUBLIC) \
             and (schema.published is not None)
@@ -190,7 +191,7 @@ class MetadataOaiAdapterMixin(object):
 
     def get_table_record(self, table):
         identifier = self.get_identifier('tables/{}'.format(table))
-        datestamp = table.updated or table.published
+        datestamp = table.updated or table.published or now().date()
         set_spec = 'table'
         public = (table.metadata_access_level == ACCESS_LEVEL_PUBLIC) \
             and (table.published is not None) \
