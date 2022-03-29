@@ -37,8 +37,14 @@ angular.module('stream', ['core'])
         var url = service.stream_url + '/' + service.resource + '/?' + $httpParamSerializer(service.values);
 
         $http.get(url + '&download=').then(function() {
-            // download the file, headers will prevent the browser reloading the page
-            window.location.href = url;
+            // download the file using an iframe
+            var iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = url;
+            iframe.onload = function() {
+              this.parentNode.removeChild(this)
+            }
+            document.body.appendChild(iframe)
         }, function(result) {
             service.errors = result.data;
         });

@@ -57,8 +57,14 @@ app.factory('DownloadService', ['$http', '$resource', '$injector', 'PollingServi
                 service.pending_downloads--;
                 PollingService.unregister(options.download_job_id);
 
-                // download the file, headers will prevent the browser reloading the page
-                window.location.href = url;
+                // download the file using an iframe
+                var iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                iframe.src = url;
+                iframe.onload = function() {
+                  this.parentNode.removeChild(this)
+                }
+                document.body.appendChild(iframe)
             } else if (result.data == 'ERROR') {
                 service.pending_downloads--;
                 PollingService.unregister(options.download_job_id);
