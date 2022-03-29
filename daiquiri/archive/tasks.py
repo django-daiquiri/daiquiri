@@ -11,7 +11,7 @@ from daiquiri.core.tasks import Task
 
 
 @shared_task(track_started=True, base=Task)
-def create_archive_zip_file(archive_job_id):
+def create_download_archive_task(archive_job_id):
     # always import daiquiri packages inside the task
     from daiquiri.archive.models import ArchiveJob
 

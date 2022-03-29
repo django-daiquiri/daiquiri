@@ -41,13 +41,13 @@ from .process import (
     check_permissions,
 )
 from .tasks import (
-    run_query,
-    run_ingest,
-    create_download_file,
-    create_archive_file,
-    rename_table,
-    drop_table,
-    abort_query
+    run_database_query_task,
+    run_database_ingest_task,
+    create_download_table_task,
+    create_download_archive_task,
+    rename_database_table_task,
+    drop_database_table_task,
+    abort_databae_query_task
 )
 
 logger = logging.getLogger(__name__)
@@ -219,12 +219,12 @@ class QueryJob(Job):
             job_id = str(self.id)
             if not settings.ASYNC:
                 logger.info('job %s submitted (sync)' % self.id)
-                run_query.apply((job_id, ), task_id=job_id, throw=True)
+                run_database_query_task.apply((job_id, ), task_id=job_id, throw=True)
 
             else:
                 queue = 'query.{}'.format(self.queue)
                 logger.info('job %s submitted (async, queue=%s, priority=%s)' % (self.id, queue, self.priority))
-                run_query.apply_async((job_id, ), task_id=job_id, queue=queue, priority=self.priority)
+                run_database_query_task.apply_async((job_id, ), task_id=job_id, queue=queue, priority=self.priority)
 
         else:
             raise ValidationError({
@@ -267,7 +267,7 @@ class QueryJob(Job):
                                         services=download_adapter.get_services())
             self.drop_uploads()
 
-        except (OperationalError, ProgrammingError, InternalError, DataError) as e:
+        except (OperationalError, ProgrammingError, InternalError, DataError):
             raise StopIteration()
 
     def ingest(self, file_path):
@@ -276,9 +276,9 @@ class QueryJob(Job):
             self.save()
 
             if not settings.ASYNC:
-                run_ingest.apply((self.id, file_path), throw=True)
+                run_database_ingest_task.apply((self.id, file_path), throw=True)
             else:
-                run_ingest.apply_async((self.id, file_path), queue='download')
+                run_database_ingest_task.apply_async((self.id, file_path), queue='download')
 
         else:
             raise ValidationError({
@@ -313,17 +313,17 @@ class QueryJob(Job):
             task_args = (self.schema_name, self.table_name, new_table_name)
 
             if not settings.ASYNC:
-                rename_table.apply(task_args, throw=True)
+                rename_database_table_task.apply(task_args, throw=True)
             else:
-                rename_table.apply_async(task_args)
+                rename_database_table_task.apply_async(task_args)
 
     def drop_table(self):
         task_args = (self.schema_name, self.table_name)
 
         if not settings.ASYNC:
-            drop_table.apply(task_args, throw=True)
+            drop_database_table_task.apply(task_args, throw=True)
         else:
-            drop_table.apply_async(task_args)
+            drop_database_table_task.apply_async(task_args)
 
     def drop_uploads(self):
         if self.uploads:
@@ -331,17 +331,17 @@ class QueryJob(Job):
                 task_args = (settings.TAP_UPLOAD, table_name)
 
                 if not settings.ASYNC:
-                    drop_table.apply(task_args, throw=True)
+                    drop_database_table_task.apply(task_args, throw=True)
                 else:
-                    drop_table.apply_async(task_args)
+                    drop_database_table_task.apply_async(task_args)
 
     def abort_query(self):
         task_args = (self.pid, )
 
         if not settings.ASYNC:
-            abort_query.apply(task_args, throw=True)
+            abort_databae_query_task.apply(task_args, throw=True)
         else:
-            abort_query.apply_async(task_args)
+            abort_databae_query_task.apply_async(task_args)
 
     def stream(self, format_key):
         if self.phase == self.PHASE_COMPLETED:
@@ -462,11 +462,11 @@ class DownloadJob(Job):
             download_id = str(self.id)
             if not settings.ASYNC:
                 logger.info('download_job %s submitted (sync)' % download_id)
-                create_download_file.apply((download_id, ), task_id=download_id, throw=True)
+                create_download_table_task.apply((download_id, ), task_id=download_id, throw=True)
 
             else:
                 logger.info('download_job %s submitted (async, queue=download)' % download_id)
-                create_download_file.apply_async((download_id, ), task_id=download_id, queue='download')
+                create_download_table_task.apply_async((download_id, ), task_id=download_id, queue='download')
 
         else:
             raise ValidationError({
@@ -567,11 +567,11 @@ class QueryArchiveJob(Job):
             archive_id = str(self.id)
             if not settings.ASYNC:
                 logger.info('archive_job %s submitted (sync)' % archive_id)
-                create_archive_file.apply((archive_id, ), task_id=archive_id, throw=True)
+                create_download_archive_task.apply((archive_id, ), task_id=archive_id, throw=True)
 
             else:
                 logger.info('archive_job %s submitted (async, queue=download)' % archive_id)
-                create_archive_file.apply_async((archive_id, ), task_id=archive_id, queue='download')
+                create_download_archive_task.apply_async((archive_id, ), task_id=archive_id, queue='download')
 
         else:
             raise ValidationError({

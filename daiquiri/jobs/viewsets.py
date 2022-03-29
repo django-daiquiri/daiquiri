@@ -183,7 +183,7 @@ class AsyncJobViewSet(JobViewSet):
         }, renderer_context=self.get_renderer_context())
         return HttpResponse(renderered_data, content_type=get_content_type(request, UWSRenderer))
 
-    @action(detail=True, methods=['get'], url_path='results/(?P<result>[A-Za-z0-9\-]+)', url_name='result')
+    @action(detail=True, methods=['get'], url_path=r'results/(?P<result>[A-Za-z0-9\-]+)', url_name='result')
     def result(self, request, pk, result):
         job = self.get_object()
 

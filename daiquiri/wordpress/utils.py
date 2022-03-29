@@ -6,9 +6,9 @@ import requests
 from django.conf import settings
 from django.core.files import File
 
-from .tasks import delete_wordpress_user as delete_wordpress_user_task
-from .tasks import update_wordpress_role as update_wordpress_role_task
-from .tasks import update_wordpress_user as update_wordpress_user_task
+from .tasks import delete_wordpress_user_task
+from .tasks import update_wordpress_role_task
+from .tasks import update_wordpress_user_task
 
 
 def update_wordpress_user(user):
