@@ -1,7 +1,7 @@
 import subprocess
 
 from django.conf import settings
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 
 
 class Command(BaseCommand):
@@ -16,6 +16,9 @@ class Command(BaseCommand):
         ])
 
     def handle(self, *args, **options):
+        if not settings.CELERY_PIDFILE_PATH:
+            raise CommandError('CELERY_PIDFILE_PATH is not set')
+
         queues = [
             {
                 'node': '{}_default'.format(settings.DAIQUIRI_APP),
@@ -45,9 +48,9 @@ class Command(BaseCommand):
 
         args += [
             '--pidfile={}/%n.pid'.format(settings.CELERY_PIDFILE_PATH),
-            '--loglevel={}'.format(settings.LOG_LEVEL)
+            '--loglevel={}'.format(settings.CELERY_LOG_LEVEL)
         ]
-        if settings.LOG_DIR:
+        if settings.CELERY_LOG_PATH:
             args += [
                 '--logfile={}/%n.log'.format(settings.CELERY_LOG_PATH)
             ]
