@@ -31,8 +31,8 @@ class Command(BaseCommand):
                 'concurency': 1
             }
         ] + [{
-            'node': '{}_queue.{}'.format(settings.DAIQUIRI_APP, queue['key']),
-            'queue': 'queue.{}'.format(queue['key']),
+            'node': '{}_query_{}'.format(settings.DAIQUIRI_APP, queue['key']),
+            'queue': 'query_{}'.format(queue['key']),
             'concurency': queue.get('concurency', 1)
         } for queue in settings.QUERY_QUEUES]
 
