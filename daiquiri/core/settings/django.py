@@ -239,3 +239,5 @@ if MEMCACHE_KEY_PREFIX:
     }
 
 CELERY_BROKER_URL = env.get('CELERY_BROKER_URL', 'amqp://')
+CELERY_PIDFILE_PATH = env.get_abspath('CELERY_PIDFILE_PATH')
+CELERY_LOG_PATH = env.get_abspath('CELERY_LOG_PATH')
