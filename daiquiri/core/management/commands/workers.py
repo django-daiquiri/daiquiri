@@ -36,7 +36,7 @@ class Command(BaseCommand):
             'concurency': queue.get('concurency', 1)
         } for queue in settings.QUERY_QUEUES]
 
-        args = ['celery', '-A', 'config', 'multi', options['operation']]
+        args = [settings.CELERY_BIN, '-A', 'config', 'multi', options['operation']]
         args += [queue['node'] for queue in queues]
 
         if options['operation'] in ['start', 'restart']:
