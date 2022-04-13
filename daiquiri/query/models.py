@@ -129,10 +129,6 @@ class QueryJob(Job):
         else:
             return 10
 
-    @property
-    def priority(self):
-        return next((queue['priority'] for queue in settings.QUERY_QUEUES if queue['key'] == self.queue))
-
     @cached_property
     def column_names(self):
         return [column['name'] for column in self.metadata['columns']]
@@ -223,8 +219,8 @@ class QueryJob(Job):
 
             else:
                 queue = 'query.{}'.format(self.queue)
-                logger.info('job %s submitted (async, queue=%s, priority=%s)' % (self.id, queue, self.priority))
-                run_database_query_task.apply_async((job_id, ), task_id=job_id, queue=queue, priority=self.priority)
+                logger.info('job %s submitted (async, queue=%s)' % (self.id, queue))
+                run_database_query_task.apply_async((job_id, ), task_id=job_id, queue=queue)
 
         else:
             raise ValidationError({

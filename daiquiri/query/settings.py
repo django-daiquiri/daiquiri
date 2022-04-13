@@ -17,10 +17,16 @@ QUERY_MAX_ACTIVE_JOBS = {
 }
 QUERY_QUEUES = [
     {
-        'key': 'default',
-        'label': 'Default',
-        'timeout': 10,
-        'priority': 1,
+        'key': 'short',
+        'label': '30 seconds',
+        'timeout': 30,
+        'access_level': 'PUBLIC',
+        'groups': []
+    },
+    {
+        'key': 'long',
+        'label': '1 Hour',
+        'timeout': 3600,
         'access_level': 'PUBLIC',
         'groups': []
     }
