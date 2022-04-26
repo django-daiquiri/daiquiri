@@ -2,6 +2,17 @@ import daiquiri.core.env as env
 
 ASYNC = env.get_bool('ASYNC')
 
+QUEUES = [
+    {
+        'key': 'default',
+        'concurency': 1
+    },
+    {
+        'key': 'download',
+        'concurency': 1
+    }
+]
+
 IPV4_PRIVACY_MASK = 16
 IPV6_PRIVACY_MASK = 32
 

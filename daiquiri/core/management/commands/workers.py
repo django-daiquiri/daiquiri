@@ -19,18 +19,11 @@ class Command(BaseCommand):
         if not settings.CELERY_PIDFILE_PATH:
             raise CommandError('CELERY_PIDFILE_PATH is not set')
 
-        queues = [
-            {
-                'node': '{}_default'.format(settings.DAIQUIRI_APP),
-                'queue': 'default',
-                'concurency': 1
-            },
-            {
-                'node': '{}_download'.format(settings.DAIQUIRI_APP),
-                'queue': 'download',
-                'concurency': 1
-            }
-        ] + [{
+        queues = [{
+            'node': '{}_{}'.format(settings.DAIQUIRI_APP, queue['key']),
+            'queue': queue['key'],
+            'concurency': queue.get('concurency', 1)
+        } for queue in settings.QUEUES] + [{
             'node': '{}_query_{}'.format(settings.DAIQUIRI_APP, queue['key']),
             'queue': 'query_{}'.format(queue['key']),
             'concurency': queue.get('concurency', 1)
