@@ -26,6 +26,7 @@ app.factory('DownloadService', ['$http', '$resource', '$injector', 'PollingServi
             angular.forEach(response, function(download) {
                 if (download.download_service) {
                     service[download.key] = $injector.get(download.download_service);
+                    service[download.key].init(download.options);
                 }
             });
         });
