@@ -218,7 +218,7 @@ class QueryJob(Job):
                 run_database_query_task.apply((job_id, ), task_id=job_id, throw=True)
 
             else:
-                queue = 'query.{}'.format(self.queue)
+                queue = 'query_{}'.format(self.queue)
                 logger.info('job %s submitted (async, queue=%s)' % (self.id, queue))
                 run_database_query_task.apply_async((job_id, ), task_id=job_id, queue=queue)
 
