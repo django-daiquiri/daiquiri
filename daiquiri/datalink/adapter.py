@@ -1,4 +1,6 @@
 from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.http import Http404
 from django.urls import reverse
 
 from daiquiri.core.constants import ACCESS_LEVEL_PUBLIC
@@ -6,6 +8,7 @@ from daiquiri.core.adapter import DatabaseAdapter
 from daiquiri.core.utils import import_class, get_doi_url
 
 from .constants import DATALINK_RELATION_TYPES
+from .models import Datalink
 
 
 def DatalinkAdapter():
@@ -51,6 +54,14 @@ class BaseDatalinkAdapter(object):
 
     def get_links(self, resource_type, resource):
         return getattr(self, 'get_%s_links' % resource_type)(resource)
+
+    def get_context_data(self, request, **kwargs):
+        context = {}
+
+        if 'ID' in kwargs:
+            context['datalinks'] = Datalink.objects.filter(ID=kwargs['ID'])
+
+        return context
 
 
 class TablesDatalinkAdapterMixin(object):
@@ -210,8 +221,28 @@ class MetadataDatalinkAdapterMixin(object):
         return table_links
 
 
+class QueryJobDatalinkAdapterMixin(object):
+    '''
+    Injects the query job into the context data for the daiquiri.datalinks.views.datalink view
+    '''
+
+    def get_context_data(self, request, **kwargs):
+        from daiquiri.query.models import QueryJob
+
+        context = super().get_context_data(request, **kwargs)
+
+        if 'job' in request.GET:
+            try:
+                context['query_job'] = QueryJob.objects.filter_by_owner(request.user).get(pk=request.GET['job'])
+            except (QueryJob.DoesNotExist, ValidationError):
+                pass
+
+        return context
+
+
 class DefaultDatalinkAdapter(MetadataDatalinkAdapterMixin,
                              TablesDatalinkAdapterMixin,
+                             QueryJobDatalinkAdapterMixin,
                              BaseDatalinkAdapter):
 
     resource_types = ['datalink', 'schema', 'table']

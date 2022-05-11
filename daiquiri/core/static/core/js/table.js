@@ -39,7 +39,11 @@ angular.module('core')
                 return row[column_index];
             },
             datalink_url: function(row, column_index) {
-                return service.datalink_url + row[column_index];
+                if (service.params.job) {
+                    return service.datalink_url + row[column_index] + '?job=' + service.params.job;
+                } else {
+                    return service.datalink_url + row[column_index];
+                }
             }
         }
     };
