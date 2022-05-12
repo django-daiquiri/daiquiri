@@ -60,6 +60,7 @@ class BaseDatalinkAdapter(object):
 
         if 'ID' in kwargs:
             context['datalinks'] = Datalink.objects.filter(ID=kwargs['ID'])
+            context['ID'] = kwargs['ID']
 
         return context
 
