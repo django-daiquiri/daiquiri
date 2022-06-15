@@ -214,7 +214,8 @@ def human2bytes(string):
 def markdown(md):
     return markdown_function(md, extensions=[
         'fenced_code',
-        'attr_list'
+        'attr_list',
+        'codehilite'
     ])
 
 
