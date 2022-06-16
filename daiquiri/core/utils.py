@@ -213,10 +213,16 @@ def human2bytes(string):
 
 def markdown(md):
     return markdown_function(md, extensions=[
-        'fenced_code',
-        'attr_list',
-        'codehilite'
-    ])
+                                    'fenced_code',
+                                    'attr_list',
+                                    'codehilite'
+                                    ],
+                                 extension_configs={
+                                    'codehilite':{
+                                        'guess_lang':'false'
+                                    }
+                                 }
+                             )
 
 
 def make_query_dict_upper_case(input_dict):
