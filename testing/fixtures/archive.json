@@ -191,24 +191,46 @@
     "model": "daiquiri_archive.archivejob",
     "pk": "64aab8ae-50e8-4fa9-8579-8c3345473f6d",
     "fields": {
-      "data": "{\"search\":\"image_01\"}",
-      "files": "[\"images/image_01.jpg\",\"images/image_01.fits\"]"
+      "data": {
+        "search": "image_01"
+      },
+      "files": [
+        "images/image_01.jpg",
+        "images/image_01.fits"
+      ]
     }
   },
   {
     "model": "daiquiri_archive.archivejob",
     "pk": "79bef6fa-15b0-408d-8af3-2011c4d2487f",
     "fields": {
-      "data": "{\"search\":\"image_02\"}",
-      "files": "[\"images/image_02.fits\",\"images/image_02.jpg\"]"
+      "data": {
+        "search": "image_02"
+      },
+      "files": [
+        "images/image_02.fits",
+        "images/image_02.jpg"
+      ]
     }
   },
   {
     "model": "daiquiri_archive.archivejob",
     "pk": "25515f20-1ee9-4a12-bda3-f4ef7289c998",
     "fields": {
-      "data": "{\"file_ids\":[\"1b1812c3-2911-4a28-bff1-41ad45086d28\",\"074fec76-6143-4d58-a1f6-a7e8c23af15e\",\"95362abc-ad62-4403-b04c-8ea64e642d1d\",\"c5e61e94-767d-4a44-9fea-1f1f36318fbe\"]}",
-      "files": "[\"images/image_01.fits\",\"images/image_01.jpg\",\"images/image_02.fits\",\"images/image_02.jpg\"]"
+      "data": {
+        "file_ids": [
+          "1b1812c3-2911-4a28-bff1-41ad45086d28",
+          "074fec76-6143-4d58-a1f6-a7e8c23af15e",
+          "95362abc-ad62-4403-b04c-8ea64e642d1d",
+          "c5e61e94-767d-4a44-9fea-1f1f36318fbe"
+        ]
+      },
+      "files": [
+        "images/image_01.fits",
+        "images/image_01.jpg",
+        "images/image_02.fits",
+        "images/image_02.jpg"
+      ]
     }
   }
 ]

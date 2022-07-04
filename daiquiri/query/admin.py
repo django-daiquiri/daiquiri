@@ -12,14 +12,14 @@ class QueryJobAdmin(JobAdmin):
 
 
 class DownloadJobAdmin(JobAdmin):
-    search_fields = JobAdmin.search_fields + ['schema_name', 'job__table_name', 'format_key']
-    list_display = JobAdmin.list_display + ['job', 'file_path']
+    search_fields = JobAdmin.search_fields + ['schema_name', 'query_job__table_name', 'format_key']
+    list_display = JobAdmin.list_display + ['query_job', 'file_path']
     actions = ['abort_job', 'archive_job']
 
 
 class QueryArchiveJobAdmin(JobAdmin):
-    search_fields = JobAdmin.search_fields + ['schema_name', 'job__table_name', 'format_key']
-    list_display = JobAdmin.list_display + ['job', 'file_path']
+    search_fields = JobAdmin.search_fields + ['schema_name', 'query_job__table_name', 'format_key']
+    list_display = JobAdmin.list_display + ['query_job', 'file_path']
     actions = ['abort_job', 'archive_job']
 
 

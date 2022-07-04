@@ -48,7 +48,7 @@
             </h4>
 
             {% if table.description %}
-            {{ table.description }}
+            {{ table.description | markdown }}
             {% endif %}
         </li>
         {% endfor %}

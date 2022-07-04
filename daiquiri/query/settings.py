@@ -17,10 +17,16 @@ QUERY_MAX_ACTIVE_JOBS = {
 }
 QUERY_QUEUES = [
     {
-        'key': 'default',
-        'label': 'Default',
-        'timeout': 10,
-        'priority': 1,
+        'key': 'short',
+        'label': '30 seconds',
+        'timeout': 30,
+        'access_level': 'PUBLIC',
+        'groups': []
+    },
+    {
+        'key': 'long',
+        'label': '1 Hour',
+        'timeout': 3600,
         'access_level': 'PUBLIC',
         'groups': []
     }
@@ -65,6 +71,21 @@ QUERY_DROPDOWNS = [
             'url': 'http://vizier.u-strasbg.fr/viz-bin/votable',
             'catalogs': ['I/322A', 'I/259']
         }
+    }
+]
+QUERY_DOWNLOADS = [
+    {
+        'key': 'table',
+        'model': 'daiquiri.query.models.DownloadJob',
+        'template': 'query/query_download_table.html',
+        'params': ['format_key']
+    },
+    {
+        'key': 'archive',
+        'model': 'daiquiri.query.models.QueryArchiveJob',
+        'template': 'query/query_download_archive.html',
+        'service': 'query/js/downloads/archive.js',
+        'params': ['column_name']
     }
 ]
 QUERY_DEFAULT_DOWNLOAD_FORMAT = 'votable'

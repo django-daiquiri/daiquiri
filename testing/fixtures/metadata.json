@@ -97,7 +97,7 @@
   },
   {
     "model": "daiquiri_metadata.schema",
-    "pk": 5,
+    "pk": 6,
     "fields": {
       "order": 1000,
       "name": "tap_schema",
@@ -232,9 +232,9 @@
   },
   {
     "model": "daiquiri_metadata.table",
-    "pk": 5,
+    "pk": 8,
     "fields": {
-      "schema": 5,
+      "schema": 6,
       "order": 1,
       "name": "schemas",
       "title": "",
@@ -259,9 +259,9 @@
   },
   {
     "model": "daiquiri_metadata.table",
-    "pk": 6,
+    "pk": 9,
     "fields": {
-      "schema": 5,
+      "schema": 6,
       "order": 2,
       "name": "tables",
       "title": "",
@@ -286,13 +286,40 @@
   },
   {
     "model": "daiquiri_metadata.table",
-    "pk": 7,
+    "pk": 10,
     "fields": {
-      "schema": 5,
+      "schema": 6,
       "order": 3,
       "name": "columns",
       "title": "",
       "description": "The table of columns of the service",
+      "long_description": "",
+      "attribution": "",
+      "license": "",
+      "doi": "",
+      "related_identifiers": [],
+      "type": "table",
+      "nrows": null,
+      "size": null,
+      "utype": "",
+      "creators": [],
+      "contributors": [],
+      "published": null,
+      "updated": null,
+      "access_level": "PUBLIC",
+      "metadata_access_level": "PUBLIC",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_metadata.table",
+    "pk": 11,
+    "fields": {
+      "schema": 6,
+      "order": 4,
+      "name": "datalink",
+      "title": "",
+      "description": "The table of datalinks for the service",
       "long_description": "",
       "attribution": "",
       "license": "",
@@ -320,7 +347,7 @@
       "name": "id",
       "description": "unique identifier",
       "unit": "",
-      "ucd": "meta.id;meta.main",
+      "ucd": "meta.id;meta.main;meta.ref",
       "utype": "",
       "datatype": "long",
       "arraysize": null,
@@ -764,7 +791,7 @@
       "name": "file",
       "description": "",
       "unit": "",
-      "ucd": "meta.file",
+      "ucd": "meta.ref;meta.file",
       "utype": "",
       "datatype": "char",
       "arraysize": 32,
@@ -877,9 +904,9 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 48,
+    "pk": 75,
     "fields": {
-      "table": 5,
+      "table": 8,
       "order": 1,
       "name": "id",
       "description": "Internal ID of the schema",
@@ -899,9 +926,9 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 49,
+    "pk": 76,
     "fields": {
-      "table": 5,
+      "table": 8,
       "order": 2,
       "name": "schema_name",
       "description": "The name of the schema",
@@ -921,9 +948,9 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 50,
+    "pk": 77,
     "fields": {
-      "table": 5,
+      "table": 8,
       "order": 3,
       "name": "utype",
       "description": "The IVOA UTYPE of the schema",
@@ -943,9 +970,9 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 51,
+    "pk": 78,
     "fields": {
-      "table": 5,
+      "table": 8,
       "order": 4,
       "name": "description",
       "description": "The description of the schema",
@@ -965,9 +992,9 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 52,
+    "pk": 79,
     "fields": {
-      "table": 6,
+      "table": 9,
       "order": 1,
       "name": "id",
       "description": "Internal ID of the table",
@@ -987,9 +1014,9 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 53,
+    "pk": 80,
     "fields": {
-      "table": 6,
+      "table": 9,
       "order": 2,
       "name": "schema_name",
       "description": "The name of the schema of the table",
@@ -1009,9 +1036,9 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 54,
+    "pk": 81,
     "fields": {
-      "table": 6,
+      "table": 9,
       "order": 3,
       "name": "table_name",
       "description": "The name of the table",
@@ -1031,9 +1058,9 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 55,
+    "pk": 82,
     "fields": {
-      "table": 6,
+      "table": 9,
       "order": 4,
       "name": "table_type",
       "description": "The type of the table (table or view)",
@@ -1053,9 +1080,9 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 56,
+    "pk": 83,
     "fields": {
-      "table": 6,
+      "table": 9,
       "order": 5,
       "name": "utype",
       "description": "The IVOA UTYPE of the table",
@@ -1075,9 +1102,9 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 57,
+    "pk": 84,
     "fields": {
-      "table": 6,
+      "table": 9,
       "order": 6,
       "name": "description",
       "description": "The description of the table",
@@ -1097,9 +1124,9 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 58,
+    "pk": 85,
     "fields": {
-      "table": 6,
+      "table": 9,
       "order": 7,
       "name": "table_index",
       "description": "The ordering index of the table",
@@ -1119,9 +1146,9 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 59,
+    "pk": 86,
     "fields": {
-      "table": 6,
+      "table": 9,
       "order": 8,
       "name": "schema_id",
       "description": "The foreign key to the schema of this table",
@@ -1141,9 +1168,9 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 60,
+    "pk": 87,
     "fields": {
-      "table": 7,
+      "table": 10,
       "order": 1,
       "name": "id",
       "description": "Internal ID of the column",
@@ -1163,9 +1190,9 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 61,
+    "pk": 88,
     "fields": {
-      "table": 7,
+      "table": 10,
       "order": 2,
       "name": "table_name",
       "description": "The name of the table of the column",
@@ -1185,9 +1212,9 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 62,
+    "pk": 89,
     "fields": {
-      "table": 7,
+      "table": 10,
       "order": 3,
       "name": "column_name",
       "description": "The name of the column",
@@ -1207,9 +1234,9 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 63,
+    "pk": 90,
     "fields": {
-      "table": 7,
+      "table": 10,
       "order": 4,
       "name": "datatype",
       "description": "The datatype of the column",
@@ -1229,9 +1256,9 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 64,
+    "pk": 91,
     "fields": {
-      "table": 7,
+      "table": 10,
       "order": 5,
       "name": "arraysize",
       "description": "The size of the column for variable length datatypes",
@@ -1251,9 +1278,9 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 65,
+    "pk": 92,
     "fields": {
-      "table": 7,
+      "table": 10,
       "order": 6,
       "name": "size",
       "description": "The size of the column for variable length datatypes (legacy)",
@@ -1273,9 +1300,9 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 66,
+    "pk": 93,
     "fields": {
-      "table": 7,
+      "table": 10,
       "order": 7,
       "name": "description",
       "description": "The description of the column",
@@ -1295,9 +1322,9 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 67,
+    "pk": 94,
     "fields": {
-      "table": 7,
+      "table": 10,
       "order": 8,
       "name": "utype",
       "description": "The IVOA UTYPE of the column",
@@ -1317,9 +1344,9 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 68,
+    "pk": 95,
     "fields": {
-      "table": 7,
+      "table": 10,
       "order": 9,
       "name": "unit",
       "description": "The Unit of the column",
@@ -1339,9 +1366,9 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 69,
+    "pk": 96,
     "fields": {
-      "table": 7,
+      "table": 10,
       "order": 10,
       "name": "ucd",
       "description": "The IVOA UCD of the column",
@@ -1361,9 +1388,9 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 70,
+    "pk": 97,
     "fields": {
-      "table": 7,
+      "table": 10,
       "order": 11,
       "name": "principal",
       "description": "Designates if the column is considered a core part of the service",
@@ -1383,9 +1410,9 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 71,
+    "pk": 98,
     "fields": {
-      "table": 7,
+      "table": 10,
       "order": 12,
       "name": "indexed",
       "description": "Designates if the column is indexed",
@@ -1405,9 +1432,9 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 72,
+    "pk": 99,
     "fields": {
-      "table": 7,
+      "table": 10,
       "order": 13,
       "name": "std",
       "description": "Designates if the column is defined by some standard",
@@ -1427,9 +1454,9 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 73,
+    "pk": 100,
     "fields": {
-      "table": 7,
+      "table": 10,
       "order": 14,
       "name": "column_index",
       "description": "The ordering index of the column",
@@ -1449,9 +1476,9 @@
   },
   {
     "model": "daiquiri_metadata.column",
-    "pk": 74,
+    "pk": 101,
     "fields": {
-      "table": 7,
+      "table": 10,
       "order": 15,
       "name": "table_id",
       "description": "The foreign key to the table of this column",
@@ -1463,6 +1490,182 @@
       "principal": false,
       "indexed": false,
       "std": false,
+      "index_for": "",
+      "access_level": "PUBLIC",
+      "metadata_access_level": "PUBLIC",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_metadata.column",
+    "pk": 102,
+    "fields": {
+      "table": 11,
+      "order": 1,
+      "name": "ID",
+      "description": "Input identifier.",
+      "unit": "",
+      "ucd": "meta.id;meta.main",
+      "utype": "",
+      "datatype": "char",
+      "arraysize": null,
+      "principal": false,
+      "indexed": false,
+      "std": true,
+      "index_for": "",
+      "access_level": "PUBLIC",
+      "metadata_access_level": "PUBLIC",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_metadata.column",
+    "pk": 103,
+    "fields": {
+      "table": 11,
+      "order": 2,
+      "name": "access_url",
+      "description": "Link to data or service.",
+      "unit": "",
+      "ucd": "meta.ref.url",
+      "utype": "",
+      "datatype": "char",
+      "arraysize": null,
+      "principal": false,
+      "indexed": false,
+      "std": true,
+      "index_for": "",
+      "access_level": "PUBLIC",
+      "metadata_access_level": "PUBLIC",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_metadata.column",
+    "pk": 104,
+    "fields": {
+      "table": 11,
+      "order": 3,
+      "name": "service_def",
+      "description": "Reference to a service descriptor resource.",
+      "unit": "",
+      "ucd": "meta.ref",
+      "utype": "",
+      "datatype": "char",
+      "arraysize": null,
+      "principal": false,
+      "indexed": false,
+      "std": true,
+      "index_for": "",
+      "access_level": "PUBLIC",
+      "metadata_access_level": "PUBLIC",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_metadata.column",
+    "pk": 105,
+    "fields": {
+      "table": 11,
+      "order": 4,
+      "name": "error_message",
+      "description": "Error if an access_url cannot be created.",
+      "unit": "",
+      "ucd": "meta.code.error",
+      "utype": "",
+      "datatype": "char",
+      "arraysize": null,
+      "principal": false,
+      "indexed": false,
+      "std": true,
+      "index_for": "",
+      "access_level": "PUBLIC",
+      "metadata_access_level": "PUBLIC",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_metadata.column",
+    "pk": 106,
+    "fields": {
+      "table": 11,
+      "order": 5,
+      "name": "description",
+      "description": "Human-readable text describing this link.",
+      "unit": "",
+      "ucd": "meta.note",
+      "utype": "",
+      "datatype": "char",
+      "arraysize": null,
+      "principal": false,
+      "indexed": false,
+      "std": true,
+      "index_for": "",
+      "access_level": "PUBLIC",
+      "metadata_access_level": "PUBLIC",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_metadata.column",
+    "pk": 107,
+    "fields": {
+      "table": 11,
+      "order": 6,
+      "name": "semantics",
+      "description": "Term from a controlled vocabulary describing the link.",
+      "unit": "",
+      "ucd": "meta.code",
+      "utype": "",
+      "datatype": "char",
+      "arraysize": null,
+      "principal": false,
+      "indexed": false,
+      "std": true,
+      "index_for": "",
+      "access_level": "PUBLIC",
+      "metadata_access_level": "PUBLIC",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_metadata.column",
+    "pk": 108,
+    "fields": {
+      "table": 11,
+      "order": 7,
+      "name": "content_type",
+      "description": "Mime-type of the content the link returns.",
+      "unit": "",
+      "ucd": "meta.code.mime",
+      "utype": "",
+      "datatype": "char",
+      "arraysize": null,
+      "principal": false,
+      "indexed": false,
+      "std": true,
+      "index_for": "",
+      "access_level": "PUBLIC",
+      "metadata_access_level": "PUBLIC",
+      "groups": []
+    }
+  },
+  {
+    "model": "daiquiri_metadata.column",
+    "pk": 109,
+    "fields": {
+      "table": 11,
+      "order": 8,
+      "name": "content_length",
+      "description": "Size of the download the link returns.",
+      "unit": "",
+      "ucd": "phys.size;meta.file",
+      "utype": "",
+      "datatype": "long",
+      "arraysize": null,
+      "principal": false,
+      "indexed": false,
+      "std": true,
       "index_for": "",
       "access_level": "PUBLIC",
       "metadata_access_level": "PUBLIC",

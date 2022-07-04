@@ -23,8 +23,21 @@ def generate_csv(generator, fields):
 
     for row in generator:
         if row:
+            
+            # convert curl brace to square brace in all array-like columns
+            corrected_row = []
+            for col in row:
+
+                corrected_col = col
+                
+                if isinstance(col, str):
+                    if col.startswith('{') and col.endswith('}'):
+                        corrected_col = col.replace('{', '[').replace('}', ']')
+                
+                corrected_row = corrected_row + [corrected_col]
+            
             f = io_class()
-            csv.writer(f, quotechar='"').writerow(row)
+            csv.writer(f, quotechar='"').writerow(corrected_row)
             yield f.getvalue()
 
 
@@ -39,11 +52,12 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
     <RESOURCE type="results">'''
 
     for key, value in infos:
-        yield '''
-        <INFO name=%(key)s value=%(value)s />''' % {
-            'key': quoteattr(key),
-            'value': quoteattr(value)
-        }
+        if value is not None:
+            yield '''
+            <INFO name=%(key)s value=%(value)s />''' % {
+                'key': quoteattr(key),
+                'value': quoteattr(value)
+            }
 
     for title, content_role, href in links:
         yield '''

@@ -14,6 +14,13 @@ from daiquiri.core.utils import human2bytes, handle_file_upload
 from daiquiri.metadata.models import Table, Column
 
 
+def get_download_config(download_key):
+    try:
+        return next(filter(lambda c: c['key'] == download_key, settings.QUERY_DOWNLOADS))
+    except StopIteration:
+        return None
+
+
 def get_format_config(format_key):
 
     for format_config in settings.QUERY_DOWNLOAD_FORMATS:

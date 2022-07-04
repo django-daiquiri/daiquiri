@@ -28,6 +28,22 @@ class DropdownSerializer(serializers.Serializer):
         return obj['options']
 
 
+class DownloadSerializer(serializers.Serializer):
+
+    key = serializers.CharField()
+    download_service = serializers.SerializerMethodField()
+    options = serializers.SerializerMethodField()
+
+    def get_download_service(self, obj):
+        if obj.get('service'):
+            return obj['key'][0].upper() + obj['key'][1:] + 'DownloadService'
+        else:
+            return None
+
+    def get_options(self, obj):
+        return obj.get('options', {})
+
+
 class QueryJobSerializer(serializers.ModelSerializer):
 
     class Meta:

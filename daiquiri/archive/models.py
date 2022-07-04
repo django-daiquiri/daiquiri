@@ -16,7 +16,7 @@ from daiquiri.core.adapter import DatabaseAdapter
 from daiquiri.jobs.models import Job
 from daiquiri.jobs.managers import JobManager
 
-from .tasks import create_archive_zip_file
+from .tasks import create_download_archive_task
 
 logger = logging.getLogger(__name__)
 
@@ -68,7 +68,6 @@ class ArchiveJob(Job):
 
         verbose_name = _('ArchiveJob')
         verbose_name_plural = _('ArchiveJobs')
-
 
     @property
     def file_path(self):
@@ -163,11 +162,11 @@ class ArchiveJob(Job):
             archive_job_id = str(self.id)
             if not settings.ASYNC:
                 logger.info('archive_job %s submitted (sync)' % archive_job_id)
-                create_archive_zip_file.apply((archive_job_id, ), task_id=archive_job_id, throw=True)
+                create_download_archive_task.apply((archive_job_id, ), task_id=archive_job_id, throw=True)
 
             else:
                 logger.info('archive_job %s submitted (async, queue=download)' % archive_job_id)
-                create_archive_zip_file.apply_async((archive_job_id, ), task_id=archive_job_id, queue='download')
+                create_download_archive_task.apply_async((archive_job_id, ), task_id=archive_job_id, queue='download')
 
         else:
             raise ValidationError({

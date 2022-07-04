@@ -3,17 +3,14 @@ from django.shortcuts import render
 
 from daiquiri.core.renderers.vosi import AvailabilityRenderer, CapabilitiesRenderer
 
-from .models import Datalink
+from .adapter import DatalinkAdapter
 from .vo import get_availability, get_capabilities
 
 
 def datalink(request, ID):
-    datalinks = Datalink.objects.filter(ID=ID)
-
-    return render(request, 'datalink/datalink.html', {
-        'ID': ID,
-        'datalinks': datalinks
-    })
+    adapter = DatalinkAdapter()
+    context = adapter.get_context_data(request, ID=ID)
+    return render(request, 'datalink/datalink.html', context)
 
 
 def availability(request):

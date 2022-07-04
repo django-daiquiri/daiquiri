@@ -18,7 +18,7 @@ def wordpress_cli(*args):
 
 
 @shared_task(base=Task)
-def update_wordpress_user(username, email, first_name, last_name):
+def update_wordpress_user_task(username, email, first_name, last_name):
     try:
         # check if the user already exists
         wordpress_cli('user', 'get', username)
@@ -32,7 +32,7 @@ def update_wordpress_user(username, email, first_name, last_name):
 
 
 @shared_task(base=Task)
-def delete_wordpress_user(username):
+def delete_wordpress_user_task(username):
     try:
         # delete the user
         wordpress_cli('user', 'delete', username, '--reassign=-1', '--yes')
@@ -42,7 +42,7 @@ def delete_wordpress_user(username):
 
 
 @shared_task(base=Task)
-def update_wordpress_role(username, role):
+def update_wordpress_role_task(username, role):
     try:
         # set the role for the user
         wordpress_cli('user',  'set-role', username, role)

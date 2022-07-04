@@ -37,7 +37,7 @@ class RunQueryTask(Task):
 
 
 @shared_task(base=RunQueryTask)
-def run_query(job_id):
+def run_database_query_task(job_id):
     # always import daiquiri packages inside the task
     from daiquiri.core.adapter import DatabaseAdapter
     from daiquiri.query.models import QueryJob
@@ -147,7 +147,7 @@ def run_query(job_id):
 
 
 @shared_task(base=Task)
-def run_ingest(job_id, file_path):
+def run_database_ingest_task(job_id, file_path):
     from daiquiri.core.adapter import DatabaseAdapter
     from daiquiri.query.models import QueryJob
     from daiquiri.stats.models import Record
@@ -244,7 +244,7 @@ def run_ingest(job_id, file_path):
 
 
 @shared_task(base=Task)
-def create_download_file(download_id):
+def create_download_table_task(download_id):
     # always import daiquiri packages inside the task
     from daiquiri.query.models import DownloadJob
 
@@ -276,7 +276,7 @@ def create_download_file(download_id):
         try:
 
             with open(download_job.file_path, write_label) as f:
-                for line in download_job.job.stream(download_job.format_key):
+                for line in download_job.query_job.stream(download_job.format_key):
                     f.write(line)
 
         except Exception as e:
@@ -295,7 +295,7 @@ def create_download_file(download_id):
 
 
 @shared_task(track_started=True, base=Task)
-def create_archive_file(archive_id):
+def create_download_archive_task(archive_id):
     # always import daiquiri packages inside the task
     from daiquiri.query.models import QueryArchiveJob
 
@@ -334,14 +334,14 @@ def create_archive_file(archive_id):
 
 
 @shared_task(base=Task)
-def rename_table(schema_name, table_name, new_table_name):
+def rename_database_table_task(schema_name, table_name, new_table_name):
     from daiquiri.core.adapter import DatabaseAdapter
 
     DatabaseAdapter().rename_table(schema_name, table_name, new_table_name)
 
 
 @shared_task(base=Task)
-def drop_table(schema_name, table_name):
+def drop_database_table_task(schema_name, table_name):
     from daiquiri.core.adapter import DatabaseAdapter
 
     # drop the corresponding database table, but fail silently
@@ -352,7 +352,7 @@ def drop_table(schema_name, table_name):
 
 
 @shared_task(base=Task)
-def abort_query(pid):
+def abort_databae_query_task(pid):
     from daiquiri.core.adapter import DatabaseAdapter
 
     # abort the job on the database

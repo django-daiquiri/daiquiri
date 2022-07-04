@@ -36,6 +36,12 @@
     <script type="text/javascript" src="{% static 'query/js/services/plot.js' %}" ></script>
     <script type="text/javascript" src="{% static 'query/js/services/download.js' %}" ></script>
 
+    {% for download in settings.QUERY_DOWNLOADS %}
+    {% if download.service %}
+    <script type="text/javascript" src="{% static download.service %}" ></script>
+    {% endif %}
+    {% endfor %}
+
     {% for dropdown in settings.QUERY_DROPDOWNS %}
     <script type="text/javascript" src="{% static dropdown.service %}" ></script>
     {% endfor %}

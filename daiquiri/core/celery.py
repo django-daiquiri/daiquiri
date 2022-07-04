@@ -3,6 +3,7 @@ from kombu import Exchange, Queue
 
 from django.conf import settings
 
+
 def get_celery_app():
     app = Celery(settings.DAIQUIRI_APP)
 
@@ -18,9 +19,7 @@ def get_celery_app():
     ]
     for queue in settings.QUERY_QUEUES:
         queue_name = exchange_name = routing_key = 'query.{key}'.format(**queue)
-        queue = Queue(queue_name, Exchange(exchange_name), routing_key=routing_key, queue_arguments={
-            'x-max-priority': 5
-        })
+        queue = Queue(queue_name, Exchange(exchange_name), routing_key=routing_key)
         queues.append(queue)
 
     app.conf.task_default_queue = 'default'
