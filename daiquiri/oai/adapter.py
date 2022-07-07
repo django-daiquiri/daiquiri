@@ -166,17 +166,17 @@ class MetadataOaiAdapterMixin(object):
             for key, values in self.get_datalink(str(instance)).items():
                 try:
                     attr = getattr(instance, key)
-                    if isinstance(key, list):
+                    if isinstance(attr, dict):
                         attr.update(values)
-                    elif isinstance(key, list):
+                    elif isinstance(attr, list):
                         attr += values
                     else:
                         attr = values
                 except AttributeError:
                     attr = values
 
-            # update the instance
-            setattr(instance, key, values)
+                # update the instance
+                setattr(instance, key, attr)
 
         return instance
 
