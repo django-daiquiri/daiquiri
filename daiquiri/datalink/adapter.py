@@ -3,9 +3,9 @@ from django.core.exceptions import ValidationError
 from django.http import Http404
 from django.urls import reverse
 
-from daiquiri.core.constants import ACCESS_LEVEL_PUBLIC
 from daiquiri.core.adapter import DatabaseAdapter
-from daiquiri.core.utils import import_class, get_doi_url
+from daiquiri.core.constants import ACCESS_LEVEL_PUBLIC
+from daiquiri.core.utils import get_doi_url, import_class
 
 from .constants import DATALINK_RELATION_TYPES
 from .models import Datalink
@@ -144,19 +144,21 @@ class MetadataDatalinkAdapterMixin(object):
 
             if schema.related_identifiers:
                 for related_identifier in schema.related_identifiers:
-                    description = DATALINK_RELATION_TYPES.get(related_identifier.get('relation_type'), '') \
-                                                         .format('the {} schema'.format(schema)) \
-                                                         .capitalize()
-                    schema_links.append({
-                       'ID': identifier,
-                       'access_url': related_identifier.get('related_identifier'),
-                       'service_def': '',
-                       'error_message': '',
-                       'description': description,
-                       'semantics': '#auxiliary',
-                       'content_type': 'application/html',
-                       'content_length': None
-                    })
+                    access_url = related_identifier.get('related_identifier')
+                    if access_url is not None:
+                        description = DATALINK_RELATION_TYPES.get(related_identifier.get('relation_type'), '') \
+                                                             .format('the {} schema'.format(schema)) \
+                                                             .capitalize()
+                        schema_links.append({
+                           'ID': identifier,
+                           'access_url': access_url,
+                           'service_def': '',
+                           'error_message': '',
+                           'description': description,
+                           'semantics': '#auxiliary',
+                           'content_type': 'application/html',
+                           'content_length': None
+                        })
 
         return schema_links
 
@@ -204,20 +206,22 @@ class MetadataDatalinkAdapterMixin(object):
 
             if table.related_identifiers:
                 for related_identifier in table.related_identifiers:
-                    description = DATALINK_RELATION_TYPES.get(related_identifier.get('relation_type'), '') \
-                                                         .format('the {} table'.format(table)) \
-                                                         .capitalize()
+                    access_url = related_identifier.get('related_identifier')
+                    if access_url is not None:
+                        description = DATALINK_RELATION_TYPES.get(related_identifier.get('relation_type'), '') \
+                                                             .format('the {} table'.format(table)) \
+                                                             .capitalize()
 
-                    table_links.append({
-                       'ID': identifier,
-                       'access_url': related_identifier.get('related_identifier'),
-                       'service_def': '',
-                       'error_message': '',
-                       'description': description,
-                       'semantics': '#auxiliary',
-                       'content_type': 'application/html',
-                       'content_length': None
-                    })
+                        table_links.append({
+                           'ID': identifier,
+                           'access_url': access_url,
+                           'service_def': '',
+                           'error_message': '',
+                           'description': description,
+                           'semantics': '#auxiliary',
+                           'content_type': 'application/html',
+                           'content_length': None
+                        })
 
         return table_links
 
