@@ -6,7 +6,7 @@ from django.utils.timezone import now
 
 from daiquiri.core.adapter import DatabaseAdapter
 from daiquiri.core.constants import ACCESS_LEVEL_PUBLIC
-from daiquiri.core.utils import import_class, get_doi
+from daiquiri.core.utils import get_doi, import_class
 
 
 def OaiAdapter():
@@ -183,7 +183,7 @@ class MetadataOaiAdapterMixin(object):
     def get_schema_record(self, schema):
         identifier = self.get_identifier('schemas/{}'.format(schema))
         datestamp = schema.updated or schema.published or now().date()
-        set_spec = 'schema'
+        set_spec = 'schemas'
         public = (schema.metadata_access_level == ACCESS_LEVEL_PUBLIC) \
             and (schema.published is not None)
 
@@ -192,7 +192,7 @@ class MetadataOaiAdapterMixin(object):
     def get_table_record(self, table):
         identifier = self.get_identifier('tables/{}'.format(table))
         datestamp = table.updated or table.published or now().date()
-        set_spec = 'table'
+        set_spec = 'tables'
         public = (table.metadata_access_level == ACCESS_LEVEL_PUBLIC) \
             and (table.published is not None) \
             and (table.schema.metadata_access_level == ACCESS_LEVEL_PUBLIC) \
@@ -274,9 +274,15 @@ class DatalinkOAIAdapterMixin(object):
         return datalink
 
     def get_datalink_record(self, datalink):
-        identifier = self.get_identifier('datalinks/{}'.format(datalink['id']))
+        if '/' in datalink['id']:
+            # follow the convention <set_spec>/<identifier>
+            identifier = self.get_identifier(datalink['id'])
+            set_spec = datalink['id'].split('/')[0]
+        else:
+            identifier = self.get_identifier('datalinks/{}'.format(datalink['id']))
+            set_spec = 'datalinks'
+
         datestamp = datetime.strptime(settings.SITE_CREATED, '%Y-%m-%d').date()
-        set_spec = 'datalink'
         public = True
 
         return datalink['id'], identifier, datestamp, set_spec, public
