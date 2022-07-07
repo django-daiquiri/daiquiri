@@ -127,6 +127,10 @@ app.factory('QueryService', ['$resource', '$http', '$injector', '$q', '$filter',
 
     service.fetch_status = function() {
         return resources.status.query(function(response) {
+            if (angular.isDefined(service.status) && service.status.guest != response[0].guest) {
+                // the user has been logged out
+                $('#logout-modal').modal('show');
+            }
             service.status = response[0];
         }).$promise;
     };
