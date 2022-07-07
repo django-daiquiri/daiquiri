@@ -83,7 +83,11 @@ a,
     &:focus {
         color: $link-color-focus;
     }
-    &.btn {
+    &.btn-primary,
+    &.btn-success,
+    &.btn-info,
+    &.btn-warning,
+    &.btn-danger {
         color: white;
     }
     &.fa {
