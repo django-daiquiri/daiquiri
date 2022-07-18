@@ -170,7 +170,7 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         else:
             if row is None:
                 logger.info('Could not fetch %s.%s. Check if table and schema exist.', schema_name, table_name)
-                return []
+                return {}
             else:
                 return {
                     'name': row[0],
