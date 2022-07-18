@@ -8,7 +8,6 @@ from django.views.generic import TemplateView
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse_lazy
-
 from rest_framework.authtoken.models import Token
 
 from allauth.account.views import (
@@ -17,7 +16,7 @@ from allauth.account.views import (
     PasswordSetView as AllauthPasswordSetView
 )
 
-from daiquiri.core.views import ModelPermissionMixin
+from daiquiri.core.views import CSRFViewMixin, ModelPermissionMixin
 
 from .forms import UserForm, ProfileForm
 
@@ -75,7 +74,7 @@ def logout(request, *args, **kwargs):
     return response
 
 
-class UsersView(ModelPermissionMixin, TemplateView):
+class UsersView(ModelPermissionMixin, CSRFViewMixin, TemplateView):
     template_name = 'auth/users.html'
     permission_required = 'daiquiri_auth.view_profile'
 

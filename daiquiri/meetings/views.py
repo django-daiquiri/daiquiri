@@ -8,7 +8,7 @@ from django.urls import reverse
 from django.views.generic import View, TemplateView
 from django.utils.translation import ugettext_lazy as _
 
-from daiquiri.core.views import ModelPermissionMixin
+from daiquiri.core.views import CSRFViewMixin, ModelPermissionMixin
 from daiquiri.core.utils import get_model_field_meta, render_to_csv, render_to_xlsx
 
 from .models import Meeting, Participant, Contribution
@@ -103,7 +103,7 @@ def contributions(request, slug):
         return render(request, 'meetings/contributions_closed.html', {})
 
 
-class ManagementView(ModelPermissionMixin, TemplateView):
+class ManagementView(ModelPermissionMixin, CSRFViewMixin, TemplateView):
 
     template_name = 'meetings/management.html'
     permission_required = (

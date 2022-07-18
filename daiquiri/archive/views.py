@@ -1,10 +1,12 @@
 from django.contrib.auth.mixins import AccessMixin
 from django.views.generic import TemplateView
 
+from daiquiri.core.views import CSRFViewMixin
+
 from .permissions import HasPermission
 
 
-class ArchiveView(AccessMixin, TemplateView):
+class ArchiveView(AccessMixin, CSRFViewMixin, TemplateView):
     template_name = 'archive/archive.html'
 
     def dispatch(self, request, *args, **kwargs):
