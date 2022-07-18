@@ -54,11 +54,8 @@ class BaseOaiAdapter(object):
                         resource_type, self.__class__.__name__, method)
                     raise NotImplementedError(message)
 
-            try:
-                for metadata_prefix in self.get_metadata_prefixes(resource_type):
-                    self.get_serializer_class(metadata_prefix, resource_type)
-            except AttributeError as e:
-                raise NotImplementedError('"%s" is declared as resource_type, but %s' % (resource_type, e))
+            for metadata_prefix in self.get_metadata_prefixes(resource_type):
+                self.get_serializer_class(metadata_prefix, resource_type)
 
     def get_resource_list(self):
         for resource_type in self.resource_types:
@@ -80,11 +77,16 @@ class BaseOaiAdapter(object):
 
     def get_serializer_class(self, metadata_prefix, resource_type):
         serializer_class_attribute = '%s_%s_serializer_class' % (metadata_prefix, resource_type)
+        serializer_class_attribute_method = 'get_%s' % serializer_class_attribute
 
         if hasattr(self, serializer_class_attribute):
             return getattr(self, serializer_class_attribute)
+        elif hasattr(self, serializer_class_attribute_method):
+            return getattr(self, serializer_class_attribute_method)()
         else:
-            return getattr(self, 'get_%s' % serializer_class_attribute)()
+            message = '\'%s\' is declared as resource_type, but \'%s\' object has no attribute \'%s\'' % (
+                        resource_type, self.__class__.__name__, serializer_class_attribute_method)
+            raise NotImplementedError(message)
 
     def get_renderer(self, metadata_prefix):
         renderer_class = next(metadata_format['renderer_class']
