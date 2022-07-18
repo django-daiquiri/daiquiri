@@ -56,10 +56,10 @@ class Profile(models.Model):
     def reject(self, request):
         self.is_pending = False
         self.user.is_active = False
+        self.user.save(update_fields=['is_active'])
         self.save()
 
         user_rejected.send(sender=self.__class__, request=request, user=self.user)
-
 
     def activate(self, request):
         self.is_confirmed = True
@@ -68,13 +68,11 @@ class Profile(models.Model):
 
         user_activated.send(sender=self.__class__, request=request, user=self.user)
 
-
     def disable(self, request):
         self.user.is_active = False
         self.user.save(update_fields=['is_active'])
 
         user_disabled.send(sender=self.__class__, request=request, user=self.user)
-
 
     def enable(self, request):
         self.user.is_active = True
