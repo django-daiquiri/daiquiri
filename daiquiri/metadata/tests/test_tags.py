@@ -1,26 +1,15 @@
 from django.contrib.auth.models import AnonymousUser
-from django.test import TestCase, RequestFactory
 from django.template import RequestContext, Template
+from django.urls import reverse
 
 
-class MetadataTagsTestCase(TestCase):
+def test_schema_menu(db, rf):
+    template = "{% load metadata_tags %}{% schemas_menu %}"
 
-    databases = ('default', 'data', 'tap', 'oai')
+    request = rf.get(reverse('home'))
+    request.user = AnonymousUser()
 
-    fixtures = (
-        'auth.json',
-        'metadata.json'
-    )
+    context = RequestContext(request, {})
+    rendered_template = Template(template).render(context)
 
-    def setUp(self):
-        self.request = RequestFactory().get('/')
-        self.request.user = AnonymousUser()
-
-    def test_schema_menu(self):
-
-        template = "{% load metadata_tags %}{% schemas_menu %}"
-
-        context = RequestContext(self.request, {})
-        rendered_template = Template(template).render(context)
-
-        self.assertIn('daiquiri_data_obs', rendered_template)
+    assert 'daiquiri_data_obs' in rendered_template

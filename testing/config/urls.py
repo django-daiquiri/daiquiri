@@ -1,5 +1,5 @@
-from django.urls import include, path
 from django.contrib import admin
+from django.urls import include, path
 
 from daiquiri.core.views import home
 
@@ -8,12 +8,11 @@ urlpatterns = [
 
     path('accounts/', include('daiquiri.auth.urls_accounts')),
 
-    path('archive/', include('daiquiri.archive.urls', namespace='archive')),
     path('auth/', include('daiquiri.auth.urls_auth', namespace='auth')),
     path('conesearch/', include('daiquiri.conesearch.urls', namespace='conesearch')),
     path('contact/', include('daiquiri.contact.urls', namespace='contact')),
+    path('datalink/', include('daiquiri.datalink.urls', namespace='datalink')),
     path('files/', include('daiquiri.files.urls', namespace='files')),
-    path('meetings/', include('daiquiri.meetings.urls', namespace='meetings')),
     path('metadata/', include('daiquiri.metadata.urls', namespace='metadata')),
     path('oai/', include('daiquiri.oai.urls', namespace='oai')),
     path('serve/', include('daiquiri.serve.urls', namespace='serve')),

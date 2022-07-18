@@ -1,35 +1,24 @@
-from django.test import TestCase
+import pytest
+from django.urls import reverse
 
-from test_generator.views import TestListViewMixin
+users = (
+    ('admin', 'admin'),
+    ('manager', 'manager'),
+    ('user', 'user'),
+    ('anonymous', None),
+)
 
-from daiquiri.core.utils import setup_group
-
-
-class AuthViewTestCase(TestCase):
-
-    fixtures = (
-        'auth.json',
-    )
-
-    users = (
-        ('admin', 'admin'),
-        ('manager', 'manager'),
-        ('user', 'user'),
-        ('anonymous', None),
-    )
-
-    status_map = {
-        'list_view': {
-            'admin': 200, 'manager': 200, 'user': 403, 'anonymous': 302
-        }
+status_map = {
+    'users': {
+        'admin': 200, 'manager': 200, 'user': 403, 'anonymous': 302
     }
-
-    def setUp(self):
-        setup_group('user_manager')
+}
 
 
-class UsersTests(TestListViewMixin, AuthViewTestCase):
+@pytest.mark.parametrize('username,password', users)
+def test_users(db, client, username, password):
+    client.login(username=username, password=password)
 
-    url_names = {
-        'list_view': 'auth:users'
-    }
+    url = reverse('auth:users')
+    response = client.get(url)
+    assert response.status_code == status_map['users'][username]

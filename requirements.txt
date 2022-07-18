@@ -23,7 +23,12 @@ iso8601~=0.1.12
 jsonfield~=3.1.0
 Markdown~=3.3.4
 Pygments~=2.12.0
-python-dotenv~=0.19.1
+pytest~=6.2.5
+pytest-cov~=3.0.0
+pytest-django~=4.5.2
+pytest-dotenv~=0.5.2
+pytest-mock~=3.8.2
+pytest-pythonpath~=0.7.4
 queryparser_python3~=0.5.0
 rules==3.0
 XlsxWriter~=1.4.5

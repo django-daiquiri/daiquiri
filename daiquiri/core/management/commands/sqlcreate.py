@@ -3,7 +3,6 @@ import socket
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-
 COMMANDS = {
     'django.db.backends.mysql': {
         'default': '''
@@ -92,7 +91,6 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--schema', help='Show commands for a science schema.')
-        parser.add_argument('--test', action='store_true', help='Show commands for the test databases.')
         parser.add_argument('--datalink', help='Show commands for a datalink table.')
 
     def get_config(self, key):
@@ -109,7 +107,6 @@ class Command(BaseCommand):
             config['TAP_SCHEMA'] = settings.TAP_SCHEMA
             config['TAP_UPLOAD'] = settings.TAP_UPLOAD
             config['OAI_SCHEMA'] = settings.OAI_SCHEMA
-            config['TEST_NAME'] = 'test_%(NAME)s' % config
 
         return config
 

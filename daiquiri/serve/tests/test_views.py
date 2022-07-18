@@ -1,110 +1,81 @@
-from django.test import TestCase
+import pytest
+from django.urls import reverse
 
-from test_generator.views import TestViewMixin
-
-
-class ServeViewTestCase(TestCase):
-
-    databases = ('default', 'data', 'tap', 'oai')
-
-    fixtures = (
-        'auth.json',
-        'metadata.json',
-        'jobs.json',
-        'queryjobs.json'
-    )
-
-    users = (
-        ('admin', 'admin'),
-        ('user', 'user'),
-        ('test', 'test'),
-        ('anonymous', None),
-    )
+users = (
+    ('admin', 'admin'),
+    ('user', 'user'),
+    ('test', 'test'),
+    ('anonymous', None),
+)
 
 
-class PublicTableTests(TestViewMixin, ServeViewTestCase):
+@pytest.mark.parametrize('username,password', users)
+def test_public_table(db, client, username, password):
+    client.login(username=username, password=password)
 
-    url_names = {
-        'list_view': 'serve:table'
-    }
-
-    status_map = {
-        'list_view': {
-            'admin': 200, 'user': 200, 'test': 200, 'anonymous': 200
-        }
-    }
-
-    def _test_list_view(self, username):
-        self.assert_list_view(username, {
-            'schema_name': 'daiquiri_data_obs',
-            'table_name': 'stars'
-        })
+    url = reverse('serve:table', kwargs={
+        'schema_name': 'daiquiri_data_obs',
+        'table_name': 'stars'
+    })
+    response = client.get(url)
+    assert response.status_code == 200
 
 
-class InternalTableTests(TestViewMixin, ServeViewTestCase):
+@pytest.mark.parametrize('username,password', users)
+def test_internal_table(db, client, username, password):
+    client.login(username=username, password=password)
 
-    url_names = {
-        'list_view': 'serve:table'
-    }
-
-    status_map = {
-        'list_view': {
-            'admin': 200, 'user': 200, 'test': 200, 'anonymous': 404
-        }
-    }
-
-    def _test_list_view(self, username):
-        self.assert_list_view(username, {
-            'schema_name': 'daiquiri_data_sim',
-            'table_name': 'halos'
-        })
+    url = reverse('serve:table', kwargs={
+        'schema_name': 'daiquiri_data_sim',
+        'table_name': 'halos'
+    })
+    response = client.get(url)
+    assert response.status_code == 404 if username == 'anonymous' else 200
 
 
-class PrivateTableTests(TestViewMixin, ServeViewTestCase):
+@pytest.mark.parametrize('username,password', users)
+def test_private_table(db, client, username, password):
+    client.login(username=username, password=password)
 
-    url_names = {
-        'list_view': 'serve:table'
-    }
-
-    status_map = {
-        'list_view': {
-            'admin': 404, 'user': 404, 'test': 200, 'anonymous': 404
-        }
-    }
-
-    def _test_list_view(self, username):
-        self.assert_list_view(username, {
-            'schema_name': 'daiquiri_data_test',
-            'table_name': 'test'
-        })
+    url = reverse('serve:table', kwargs={
+        'schema_name': 'daiquiri_data_test',
+        'table_name': 'test'
+    })
+    response = client.get(url)
+    assert response.status_code == 200 if username == 'test' else 404
 
 
-class NotFoundTableTests(TestViewMixin, ServeViewTestCase):
+@pytest.mark.parametrize('username,password', users)
+def test_non_existing_schema(db, client, username, password):
+    client.login(username=username, password=password)
 
-    url_names = {
-        'list_view': 'serve:table'
-    }
+    url = reverse('serve:table', kwargs={
+        'schema_name': 'non_existing',
+        'table_name': 'stars'
+    })
+    response = client.get(url)
+    assert response.status_code == 404
 
-    status_map = {
-        'list_view': {
-            'admin': 404, 'user': 404, 'test': 404, 'anonymous': 404
-        }
-    }
 
-    def _test_non_existing_schema_view(self, username):
-        self.assert_list_view(username, {
-            'schema_name': 'non_existing',
-            'table_name': 'stars'
-        })
+@pytest.mark.parametrize('username,password', users)
+def test_non_existing_table(db, client, username, password):
+    client.login(username=username, password=password)
 
-    def _test_non_existing_table_view(self, username):
-        self.assert_list_view(username, {
-            'schema_name': 'daiquiri_data_obs',
-            'table_name': 'non_existing'
-        })
+    url = reverse('serve:table', kwargs={
+        'schema_name': 'daiquiri_data_obs',
+        'table_name': 'non_existing'
+    })
+    response = client.get(url)
+    assert response.status_code == 404
 
-    def _test_non_existing_user_table_view(self, username):
-        self.assert_list_view(username, {
-            'schema_name': 'daiquiri_user_user',
-            'table_name': 'non_existing'
-        })
+
+@pytest.mark.parametrize('username,password', users)
+def test_non_existing_user_table(db, client, username, password):
+    client.login(username=username, password=password)
+
+    url = reverse('serve:table', kwargs={
+        'schema_name': 'daiquiri_user_user',
+        'table_name': 'non_existing'
+    })
+    response = client.get(url)
+    assert response.status_code == 404

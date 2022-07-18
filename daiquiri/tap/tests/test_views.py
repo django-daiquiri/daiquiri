@@ -1,85 +1,53 @@
-from django.test import TestCase
+import pytest
+from django.urls import reverse
 
-from test_generator.views import TestListViewMixin
-
-
-class TapViewTestCase(TestCase):
-
-    databases = ('default', 'data', 'tap', 'oai')
-
-    fixtures = (
-        'auth.json',
-        'metadata.json',
-        'examples.json'
-    )
-
-    users = (
-        ('admin', 'admin'),
-        ('user', 'user'),
-        ('anonymous', None),
-    )
+users = (
+    ('admin', 'admin'),
+    ('user', 'user'),
+    ('anonymous', None),
+)
 
 
-class RootTests(TestListViewMixin, TapViewTestCase):
+@pytest.mark.parametrize('username,password', users)
+def test_root(db, client, username, password):
+    client.login(username=username, password=password)
 
-    url_names = {
-        'list_view': 'tap:root'
-    }
-
-    status_map = {
-        'list_view': {
-            'admin': 200, 'user': 200, 'anonymous': 200
-        }
-    }
+    url = reverse('tap:root')
+    response = client.get(url)
+    assert response.status_code == 200
 
 
-class AvailabilityTests(TestListViewMixin, TapViewTestCase):
+@pytest.mark.parametrize('username,password', users)
+def test_availability(db, client, username, password):
+    client.login(username=username, password=password)
 
-    url_names = {
-        'list_view': 'tap:availability'
-    }
-
-    status_map = {
-        'list_view': {
-            'admin': 200, 'user': 200, 'anonymous': 200
-        }
-    }
+    url = reverse('tap:availability')
+    response = client.get(url)
+    assert response.status_code == 200
 
 
-class CapabilitiesTests(TestListViewMixin, TapViewTestCase):
+@pytest.mark.parametrize('username,password', users)
+def test_capabilities(db, client, username, password):
+    client.login(username=username, password=password)
 
-    url_names = {
-        'list_view': 'tap:capabilities'
-    }
-
-    status_map = {
-        'list_view': {
-            'admin': 200, 'user': 200, 'anonymous': 200
-        }
-    }
+    url = reverse('tap:capabilities')
+    response = client.get(url)
+    assert response.status_code == 200
 
 
-class TablesTests(TestListViewMixin, TapViewTestCase):
+@pytest.mark.parametrize('username,password', users)
+def test_tables(db, client, username, password):
+    client.login(username=username, password=password)
 
-    url_names = {
-        'list_view': 'tap:tables'
-    }
-
-    status_map = {
-        'list_view': {
-            'admin': 200, 'user': 200, 'anonymous': 200
-        }
-    }
+    url = reverse('tap:tables')
+    response = client.get(url)
+    assert response.status_code == 200
 
 
-class ExamplesTests(TestListViewMixin, TapViewTestCase):
+@pytest.mark.parametrize('username,password', users)
+def test_examples(db, client, username, password):
+    client.login(username=username, password=password)
 
-    url_names = {
-        'list_view': 'tap:examples'
-    }
-
-    status_map = {
-        'list_view': {
-            'admin': 200, 'user': 200, 'anonymous': 200
-        }
-    }
+    url = reverse('tap:examples')
+    response = client.get(url)
+    assert response.status_code == 200

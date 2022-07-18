@@ -1,198 +1,155 @@
-from django.test import TestCase
+from urllib.parse import urlencode
 
-from test_generator.viewsets import TestViewsetMixin
+import pytest
+from django.urls import reverse
 
-
-class ServeTestCase(TestCase):
-
-    databases = ('default', 'data', 'tap', 'oai')
-
-    fixtures = (
-        'auth.json',
-        'metadata.json',
-        'jobs.json',
-        'queryjobs.json'
-    )
-
-    users = (
-        ('admin', 'admin'),
-        ('user', 'user'),
-        ('test', 'test'),
-        ('anonymous', None),
-    )
+users = (
+    ('admin', 'admin'),
+    ('user', 'user'),
+    ('test', 'test'),
+    ('anonymous', None),
+)
 
 
-class PublicRowTests(TestViewsetMixin, ServeTestCase):
+@pytest.mark.parametrize('username,password', users)
+def test_public_row_list(db, client, username, password):
+    client.login(username=username, password=password)
 
-    url_names = {
-        'viewset': 'serve:row'
-    }
-
-    status_map = {
-        'list_viewset': {
-            'admin': 200, 'user': 200, 'test': 200, 'anonymous': 200
-        }
-    }
-
-    def _test_list_viewset(self, username):
-        self.assert_list_viewset(username, query_params={
-            'schema': 'daiquiri_data_obs',
-            'table': 'stars'
-        })
+    url = reverse('serve:row-list') + '?' + urlencode({
+        'schema': 'daiquiri_data_obs',
+        'table': 'stars'
+    })
+    response = client.get(url)
+    assert response.status_code == 200
 
 
-class InternalRowTests(TestViewsetMixin, ServeTestCase):
+@pytest.mark.parametrize('username,password', users)
+def test_internal_row_list(db, client, username, password):
+    client.login(username=username, password=password)
 
-    url_names = {
-        'viewset': 'serve:row'
-    }
-
-    status_map = {
-        'list_viewset': {
-            'admin': 200, 'user': 200, 'test': 200, 'anonymous': 404
-        }
-    }
-
-    def _test_list_viewset(self, username):
-        self.assert_list_viewset(username, query_params={
-            'schema': 'daiquiri_data_sim',
-            'table': 'halos'
-        })
+    url = reverse('serve:row-list') + '?' + urlencode({
+        'schema': 'daiquiri_data_sim',
+        'table': 'halos'
+    })
+    response = client.get(url)
+    assert response.status_code == 404 if username == 'anonymous' else 200
 
 
-class PrivateRowTests(TestViewsetMixin, ServeTestCase):
+@pytest.mark.parametrize('username,password', users)
+def test_private_row_list(db, client, username, password):
+    client.login(username=username, password=password)
 
-    url_names = {
-        'viewset': 'serve:row'
-    }
-
-    status_map = {
-        'list_viewset': {
-            'admin': 404, 'user': 404, 'test': 200, 'anonymous': 404
-        }
-    }
-
-    def _test_list_viewset(self, username):
-        self.assert_list_viewset(username, query_params={
-            'schema': 'daiquiri_data_test',
-            'table': 'test'
-        })
+    url = reverse('serve:row-list') + '?' + urlencode({
+        'schema': 'daiquiri_data_test',
+        'table': 'test'
+    })
+    response = client.get(url)
+    assert response.status_code == 200 if username == 'test' else 404
 
 
-class NotFoundRowTests(TestViewsetMixin, ServeTestCase):
+@pytest.mark.parametrize('username,password', users)
+def test_non_existing_schema_row_list(db, client, username, password):
+    client.login(username=username, password=password)
 
-    url_names = {
-        'viewset': 'serve:row'
-    }
-
-    status_map = {
-        'list_viewset': {
-            'admin': 404, 'user': 404, 'test': 404, 'anonymous': 404
-        }
-    }
-
-    def _test_non_existing_schema_viewset(self, username):
-        self.assert_list_viewset(username, query_params={
-            'schema': 'non_existing',
-            'table': 'stars'
-        })
-
-    def _test_non_existing_table_viewset(self, username):
-        self.assert_list_viewset(username, query_params={
-            'schema': 'daiquiri_data_obs',
-            'table': 'non_existing'
-        })
-
-    def _test_non_existing_user_table_viewset(self, username):
-        self.assert_list_viewset(username, query_params={
-            'schema': 'daiquiri_user_user',
-            'table': 'non_existing'
-        })
+    url = reverse('serve:row-list') + '?' + urlencode({
+        'schema': 'non_existing',
+        'table': 'stars'
+    })
+    response = client.get(url)
+    assert response.status_code == 404
 
 
-class PublicColumnTests(TestViewsetMixin, ServeTestCase):
+@pytest.mark.parametrize('username,password', users)
+def test_non_existing_table_row_list(db, client, username, password):
+    client.login(username=username, password=password)
 
-    url_names = {
-        'viewset': 'serve:column'
-    }
-
-    status_map = {
-        'list_viewset': {
-            'admin': 200, 'user': 200, 'test': 200, 'anonymous': 200
-        }
-    }
-
-    def _test_list_viewset(self, username):
-        self.assert_list_viewset(username, query_params={
-            'schema': 'daiquiri_data_obs',
-            'table': 'stars'
-        })
+    url = reverse('serve:row-list') + '?' + urlencode({
+        'schema': 'daiquiri_data_obs',
+        'table': 'non_existing'
+    })
+    response = client.get(url)
+    assert response.status_code == 404
 
 
-class InternalColumnTests(TestViewsetMixin, ServeTestCase):
+@pytest.mark.parametrize('username,password', users)
+def test_non_existing_user_table_row_list(db, client, username, password):
+    client.login(username=username, password=password)
 
-    url_names = {
-        'viewset': 'serve:column'
-    }
-
-    status_map = {
-        'list_viewset': {
-            'admin': 200, 'user': 200, 'test': 200, 'anonymous': 404
-        }
-    }
-
-    def _test_list_viewset(self, username):
-        self.assert_list_viewset(username, query_params={
-            'schema': 'daiquiri_data_sim',
-            'table': 'halos'
-        })
+    url = reverse('serve:row-list') + '?' + urlencode({
+        'schema': 'daiquiri_user_user',
+        'table': 'non_existing'
+    })
+    response = client.get(url)
+    assert response.status_code == 404
 
 
-class PrivateColumnTests(TestViewsetMixin, ServeTestCase):
+@pytest.mark.parametrize('username,password', users)
+def test_public_column_list(db, client, username, password):
+    client.login(username=username, password=password)
 
-    url_names = {
-        'viewset': 'serve:column'
-    }
-
-    status_map = {
-        'list_viewset': {
-            'admin': 404, 'user': 404, 'test': 200, 'anonymous': 404
-        }
-    }
-
-    def _test_list_viewset(self, username):
-        self.assert_list_viewset(username, query_params={
-            'schema': 'daiquiri_data_test',
-            'table': 'test'
-        })
+    url = reverse('serve:column-list') + '?' + urlencode({
+        'schema': 'daiquiri_data_obs',
+        'table': 'stars'
+    })
+    response = client.get(url)
+    assert response.status_code == 200
 
 
-class NotFoundColumnTests(TestViewsetMixin, ServeTestCase):
+@pytest.mark.parametrize('username,password', users)
+def test_internal_column_list(db, client, username, password):
+    client.login(username=username, password=password)
 
-    url_names = {
-        'viewset': 'serve:column'
-    }
+    url = reverse('serve:column-list') + '?' + urlencode({
+        'schema': 'daiquiri_data_sim',
+        'table': 'halos'
+    })
+    response = client.get(url)
+    assert response.status_code == 404 if username == 'anonymous' else 200
 
-    status_map = {
-        'list_viewset': {
-            'admin': 404, 'user': 404, 'test': 404, 'anonymous': 404
-        }
-    }
 
-    def _test_non_existing_schema_viewset(self, username):
-        self.assert_list_viewset(username, query_params={
-            'schema': 'non_existing',
-            'table': 'stars'
-        })
+@pytest.mark.parametrize('username,password', users)
+def test_private_column_list(db, client, username, password):
+    client.login(username=username, password=password)
 
-    def _test_non_existing_table_viewset(self, username):
-        self.assert_list_viewset(username, query_params={
-            'schema': 'daiquiri_data_obs',
-            'table': 'non_existing'
-        })
+    url = reverse('serve:column-list') + '?' + urlencode({
+        'schema': 'daiquiri_data_test',
+        'table': 'test'
+    })
+    response = client.get(url)
+    assert response.status_code == 200 if username == 'test' else 404
 
-    def _test_non_existing_user_table_viewset(self, username):
-        self.assert_list_viewset(username, query_params={
-            'schema': 'daiquiri_user_user',
-            'table': 'non_existing'
-        })
+
+@pytest.mark.parametrize('username,password', users)
+def test_non_existing_schema_column_list(db, client, username, password):
+    client.login(username=username, password=password)
+
+    url = reverse('serve:column-list') + '?' + urlencode({
+        'schema': 'non_existing',
+        'table': 'stars'
+    })
+    response = client.get(url)
+    assert response.status_code == 404
+
+
+@pytest.mark.parametrize('username,password', users)
+def test_non_existing_table_column_list(db, client, username, password):
+    client.login(username=username, password=password)
+
+    url = reverse('serve:column-list') + '?' + urlencode({
+        'schema': 'daiquiri_data_obs',
+        'table': 'non_existing'
+    })
+    response = client.get(url)
+    assert response.status_code == 404
+
+
+@pytest.mark.parametrize('username,password', users)
+def test_non_existing_user_table_column_list(db, client, username, password):
+    client.login(username=username, password=password)
+
+    url = reverse('serve:column-list') + '?' + urlencode({
+        'schema': 'daiquiri_user_user',
+        'table': 'non_existing'
+    })
+    response = client.get(url)
+    assert response.status_code == 404

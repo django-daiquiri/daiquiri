@@ -40,7 +40,7 @@
           {
             "std": false,
             "name": "id",
-            "datatype": "int",
+            "datatype": "long",
             "description": "unique identifier",
             "utype": null,
             "ucd": "meta.id; meta.main",
@@ -52,7 +52,7 @@
           {
             "std": false,
             "name": "ra",
-            "datatype": "int",
+            "datatype": "double",
             "description": "Right ascension",
             "utype": null,
             "ucd": "pos.eq.ra; meta.main",
@@ -146,7 +146,7 @@
       "queue": "",
       "nrows": 10000,
       "size": 450560,
-      "metadata": "{}",
+      "metadata": {},
       "pid": 950,
       "uploads": {}
     }
@@ -164,7 +164,7 @@
       "queue": "",
       "nrows": 10000,
       "size": 450560,
-      "metadata": "{}",
+      "metadata": {},
       "pid": 950,
       "uploads": {}
     }
