@@ -1,17 +1,16 @@
 import os
 import sys
 
-import requests
-
-from astropy.io.votable import parse_single_table
-
 from django.conf import settings
 from django.utils.timezone import now
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
+
+import requests
+from astropy.io.votable import parse_single_table
 
 from daiquiri.core.adapter import DatabaseAdapter
-from daiquiri.core.utils import human2bytes, handle_file_upload
-from daiquiri.metadata.models import Table, Column
+from daiquiri.core.utils import handle_file_upload, human2bytes
+from daiquiri.metadata.models import Column, Table
 
 
 def get_download_config(download_key):

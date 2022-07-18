@@ -2,12 +2,12 @@ import logging
 import os
 import zipfile
 
-from celery import shared_task
-
 from django.conf import settings
-from django.db.utils import OperationalError, ProgrammingError, InternalError
+from django.db.utils import InternalError, OperationalError, ProgrammingError
 from django.utils.timezone import now
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
+
+from celery import shared_task
 
 from daiquiri.core.tasks import Task
 
@@ -41,7 +41,8 @@ def run_database_query_task(job_id):
     # always import daiquiri packages inside the task
     from daiquiri.core.adapter import DatabaseAdapter
     from daiquiri.query.models import QueryJob
-    from daiquiri.query.utils import get_quota, get_job_sources, get_job_columns, ingest_uploads
+    from daiquiri.query.utils import (get_job_columns, get_job_sources,
+                                      get_quota, ingest_uploads)
     from daiquiri.stats.models import Record
 
     # get logger
@@ -150,8 +151,8 @@ def run_database_query_task(job_id):
 def run_database_ingest_task(job_id, file_path):
     from daiquiri.core.adapter import DatabaseAdapter
     from daiquiri.query.models import QueryJob
-    from daiquiri.stats.models import Record
     from daiquiri.query.utils import get_quota, ingest_table
+    from daiquiri.stats.models import Record
 
     # get logger
     logger = logging.getLogger(__name__)

@@ -1,12 +1,12 @@
 import os
 
-from markdown import markdown as markdown_function
-
 from django import template
-from django.urls import reverse
 from django.template.defaultfilters import stringfilter
-from django.utils.encoding import force_text
+from django.urls import reverse
+from django.utils.encoding import force_str
 from django.utils.safestring import mark_safe
+
+from markdown import markdown as markdown_function
 
 from ..utils import get_script_alias
 
@@ -34,7 +34,7 @@ def next(value, arg):
 @register.filter(is_safe=True)
 @stringfilter
 def markdown(value):
-    return mark_safe(markdown_function(force_text(value)))
+    return mark_safe(markdown_function(force_str(value)))
 
 
 @register.filter(is_safe=True)

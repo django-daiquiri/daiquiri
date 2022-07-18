@@ -1,38 +1,33 @@
 import csv
-import ipaddress
 import importlib
+import ipaddress
 import math
 import os
 import re
 import sys
-
 from datetime import datetime
 from urllib.parse import urlparse
 from xml.dom import minidom
 
 from django import forms
 from django.conf import settings
-from django.contrib.auth.models import User, Group, Permission
+from django.contrib.auth.models import Group, Permission, User
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.mail import EmailMultiAlternatives, EmailMessage
+from django.core.mail import EmailMessage, EmailMultiAlternatives
 from django.db.models import Q
 from django.http import HttpResponse
-from django.template.loader import render_to_string
 from django.template import TemplateDoesNotExist
+from django.template.loader import render_to_string
 from django.utils.timezone import localtime
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
+import xlsxwriter
 from ipware import get_client_ip as ipware_get_client_ip
 from markdown import markdown as markdown_function
 
-import xlsxwriter
-
-from daiquiri.core.constants import (
-    GROUPS,
-    ACCESS_LEVEL_PRIVATE,
-    ACCESS_LEVEL_INTERNAL,
-    ACCESS_LEVEL_PUBLIC
-)
+from daiquiri.core.constants import (ACCESS_LEVEL_INTERNAL,
+                                     ACCESS_LEVEL_PRIVATE, ACCESS_LEVEL_PUBLIC,
+                                     GROUPS)
 
 if sys.version_info.major >= 3:
     long_type = int

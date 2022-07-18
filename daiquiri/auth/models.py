@@ -2,16 +2,11 @@ import logging
 
 from django.contrib.auth.models import User
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
+from .signals import (user_activated, user_confirmed, user_disabled,
+                      user_enabled, user_rejected)
 from .utils import get_full_name
-from .signals import (
-    user_confirmed,
-    user_rejected,
-    user_activated,
-    user_disabled,
-    user_enabled
-)
 
 logger = logging.getLogger(__name__)
 

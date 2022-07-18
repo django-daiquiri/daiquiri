@@ -1,5 +1,5 @@
-from django.core.management.base import BaseCommand,CommandError
-from django.utils.translation import ugettext_lazy as _
+from django.core.management.base import BaseCommand, CommandError
+from django.utils.translation import gettext_lazy as _
 
 from daiquiri.core.constants import ACCESS_LEVEL_CHOICES
 from daiquiri.metadata.models import Schema

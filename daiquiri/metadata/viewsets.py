@@ -42,7 +42,7 @@ class SchemaViewSet(viewsets.ModelViewSet):
     serializer_class = SchemaSerializer
 
     filter_backends = (DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
-    filter_fields = ('name', 'access_level', 'metadata_access_level')
+    filterset_fields = ('name', 'access_level', 'metadata_access_level')
     search_fields = ('name', 'description')
     ordering_fields = ('name', 'access_level', 'metadata_access_level')
 
@@ -113,7 +113,7 @@ class TableViewSet(viewsets.ModelViewSet):
     serializer_class = TableSerializer
 
     filter_backends = (DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
-    filter_fields = ('name', 'access_level', 'metadata_access_level')
+    filterset_fields = ('name', 'access_level', 'metadata_access_level')
     search_fields = ('name', 'description')
     ordering_fields = ('name', 'access_level', 'metadata_access_level')
 
@@ -163,7 +163,7 @@ class ColumnViewSet(viewsets.ModelViewSet):
     serializer_class = ColumnSerializer
 
     filter_backends = (DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
-    filter_fields = ('name', 'access_level', 'metadata_access_level')
+    filterset_fields = ('name', 'access_level', 'metadata_access_level')
     search_fields = ('name', 'description')
     ordering_fields = ('name', 'access_level', 'metadata_access_level')
 
@@ -187,7 +187,7 @@ class FunctionViewSet(viewsets.ModelViewSet):
     serializer_class = FunctionSerializer
 
     filter_backends = (DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
-    filter_fields = ('name', 'access_level', 'metadata_access_level')
+    filterset_fields = ('name', 'access_level', 'metadata_access_level')
     search_fields = ('name', 'description')
     ordering_fields = ('name', 'access_level', 'metadata_access_level')
 

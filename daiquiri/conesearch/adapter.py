@@ -1,13 +1,13 @@
 from django.conf import settings
 from django.http import FileResponse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
-from rest_framework.exceptions import ValidationError, NotFound
+from rest_framework.exceptions import NotFound, ValidationError
 
 from daiquiri.core.adapter import DatabaseAdapter
 from daiquiri.core.adapter.stream import BaseServiceAdapter
-from daiquiri.core.utils import import_class, make_query_dict_upper_case
 from daiquiri.core.generators import generate_votable
+from daiquiri.core.utils import import_class, make_query_dict_upper_case
 
 
 def ConeSearchAdapter():

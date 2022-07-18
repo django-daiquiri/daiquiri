@@ -1,10 +1,11 @@
 # inspired by https://djangosnippets.org/snippets/10572/
 
 from collections import OrderedDict
+
 from django.contrib.auth.hashers import CryptPasswordHasher, mask_hash
+from django.utils.crypto import constant_time_compare, get_random_string
 from django.utils.encoding import force_str
-from django.utils.crypto import get_random_string, constant_time_compare
-from django.utils.translation import ugettext_noop as _
+from django.utils.translation import gettext_noop as _
 
 
 class CrypdSHA512PasswordHasher(CryptPasswordHasher):

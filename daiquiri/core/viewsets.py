@@ -1,10 +1,9 @@
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from rest_framework import mixins, viewsets
+from rest_framework.exceptions import ParseError
 
 from .serializers import ChoicesSerializer
-
-from rest_framework.exceptions import ParseError
 
 
 class ChoicesViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):

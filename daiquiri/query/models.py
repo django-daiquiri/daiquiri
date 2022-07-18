@@ -1,54 +1,37 @@
 import logging
 import os
-
 from collections import OrderedDict
 
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.db import models
-from django.db.utils import OperationalError, ProgrammingError, InternalError, DataError
+from django.db.utils import (DataError, InternalError, OperationalError,
+                             ProgrammingError)
 from django.utils.functional import cached_property
-from django.utils.translation import ugettext_lazy as _
 from django.utils.timezone import now
+from django.utils.translation import gettext_lazy as _
 
 from rest_framework.exceptions import ValidationError
 
 from daiquiri.core.adapter import DatabaseAdapter, DownloadAdapter
 from daiquiri.core.constants import ACCESS_LEVEL_CHOICES
 from daiquiri.core.generators import generate_votable
-from daiquiri.jobs.models import Job
-from daiquiri.jobs.managers import JobManager
 from daiquiri.files.utils import check_file
+from daiquiri.jobs.managers import JobManager
+from daiquiri.jobs.models import Job
 from daiquiri.stats.models import Record
 
-from .managers import QueryJobManager, ExampleManager
-from .utils import (
-    get_format_config,
-    get_job_sources,
-    get_job_columns
-)
-from .process import (
-    check_quota,
-    check_number_of_active_jobs,
-    process_schema_name,
-    process_table_name,
-    process_query_language,
-    process_queue,
-    process_response_format,
-    translate_query,
-    process_query,
-    process_display_columns,
-    check_permissions,
-)
-from .tasks import (
-    run_database_query_task,
-    run_database_ingest_task,
-    create_download_table_task,
-    create_download_archive_task,
-    rename_database_table_task,
-    drop_database_table_task,
-    abort_databae_query_task
-)
+from .managers import ExampleManager, QueryJobManager
+from .process import (check_number_of_active_jobs, check_permissions,
+                      check_quota, process_display_columns, process_query,
+                      process_query_language, process_queue,
+                      process_response_format, process_schema_name,
+                      process_table_name, translate_query)
+from .tasks import (abort_databae_query_task, create_download_archive_task,
+                    create_download_table_task, drop_database_table_task,
+                    rename_database_table_task, run_database_ingest_task,
+                    run_database_query_task)
+from .utils import get_format_config, get_job_columns, get_job_sources
 
 logger = logging.getLogger(__name__)
 query_logger = logging.getLogger('query')

@@ -1,15 +1,17 @@
 import json
 from collections import OrderedDict
 
-from daiquiri.core.adapter import DatabaseAdapter
-from daiquiri.core.utils import filter_by_access_level
-from daiquiri.metadata.models import Column, Function, Schema, Table
 from django.conf import settings
 from django.core.cache import cache
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
+
 from queryparser.adql import ADQLQueryTranslator
 from queryparser.exceptions import QueryError, QuerySyntaxError
 from rest_framework.exceptions import ValidationError
+
+from daiquiri.core.adapter import DatabaseAdapter
+from daiquiri.core.utils import filter_by_access_level
+from daiquiri.metadata.models import Column, Function, Schema, Table
 
 from .utils import (get_default_table_name, get_indexed_objects,
                     get_max_active_jobs, get_quota, get_user_schema_name)
