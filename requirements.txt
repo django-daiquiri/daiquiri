@@ -1,4 +1,5 @@
 # in alphabetical order
+antlr4-python3-runtime==4.8
 astropy~=4.3.1
 celery~=5.2.3
 coverage~=6.0.2
