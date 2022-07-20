@@ -9,8 +9,6 @@ CONFIG_DIR = Path(find_spec('config').origin).parent
 BASE_DIR = CONFIG_DIR.parent
 DAIQUIRI_APP = BASE_DIR.name.replace('-', '_')
 
-print(CONFIG_DIR, BASE_DIR, DAIQUIRI_APP)
-
 BASE_URL = env.get_url('BASE_URL', '/')
 
 DEBUG = env.get_bool('DEBUG')
@@ -138,8 +136,6 @@ LANGUAGES = (
 )
 
 USE_I18N = True
-
-USE_L10N = True
 
 USE_TZ = True
 

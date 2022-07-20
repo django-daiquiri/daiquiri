@@ -9,24 +9,25 @@ from .utils import get_quota
 
 class TableNameValidator(object):
 
+    requires_context = True
+
     message = _('A job with this table name aready exists.')
 
-    def set_context(self, serializer_field):
+    def __call__(self, table_name, serializer_field):
         request = serializer_field.parent.context['request']
-        self.user = None if request.user.is_anonymous else request.user
+        user = None if request.user.is_anonymous else request.user
 
         if serializer_field.parent.instance:
-            self.current_table_name = serializer_field.parent.instance.table_name
+            current_table_name = serializer_field.parent.instance.table_name
         else:
-            self.current_table_name = None
+            current_table_name = None
 
-    def __call__(self, table_name):
         if table_name:
-            if self.current_table_name and table_name == self.current_table_name:
+            if current_table_name and table_name == current_table_name:
                 pass
             else:
                 try:
-                    QueryJob.objects.filter(owner=self.user).exclude(phase=QueryJob.PHASE_ARCHIVED).get(table_name=table_name)
+                    QueryJob.objects.filter(owner=user).exclude(phase=QueryJob.PHASE_ARCHIVED).get(table_name=table_name)
                     raise ValidationError([self.message])
                 except QueryJob.DoesNotExist:
                     pass
@@ -34,14 +35,15 @@ class TableNameValidator(object):
 
 class UploadFileValidator(object):
 
+    requires_context = True
+
     message = _("The maximum file size that can be uploaded is %s.")
 
-    def set_context(self, serializer_field):
+    def __call__(self, file, serializer_field):
         request = serializer_field.parent.context['request']
-        self.user = None if request.user.is_anonymous else request.user
+        user = None if request.user.is_anonymous else request.user
 
-    def __call__(self, file):
-        quota = get_quota(self.user, quota_settings='QUERY_UPLOAD_LIMIT')
+        quota = get_quota(user, quota_settings='QUERY_UPLOAD_LIMIT')
         if file.size > quota:
             raise ValidationError({
                 'file': self.message % quota
@@ -50,10 +52,11 @@ class UploadFileValidator(object):
 
 class UploadParamValidator(object):
 
-    def set_context(self, serializer_field):
-        self.request = serializer_field.parent.context['request']
+    requires_context = True
 
-    def __call__(self, uploads_string):
+    def __call__(self, uploads_string, serializer_field):
+        request = serializer_field.parent.context['request']
+
         uploads = uploads_string.split(';')
 
         for upload in uploads:
@@ -74,7 +77,7 @@ class UploadParamValidator(object):
                     })
 
                 # check if the file is in the body of the post request
-                if file_name not in self.request.data:
+                if file_name not in request.data:
                     raise ValidationError({
                         'UPLOAD': 'UPLOAD URI "%s" contains does not match uploaded file' % uri
                     })
