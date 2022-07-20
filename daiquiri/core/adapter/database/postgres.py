@@ -45,6 +45,14 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         'double precision': {
             'datatype': 'double',
             'arraysize': False
+        },
+        '_float4': {
+            'datatype': 'float',
+            'arraysize': '*'
+        },
+        '_float8': {
+            'datatype': 'double',
+            'arraysize': '*'
         }
     }
 
