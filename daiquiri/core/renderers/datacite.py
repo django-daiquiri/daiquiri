@@ -4,7 +4,7 @@ class DataciteRendererMixin(object):
         self.start('resource', {
             'xmlns': 'http://datacite.org/schema/kernel-4',
             'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
-            'xsi:schemaLocation': 'http://datacite.org/schema/kernel-4 http://schema.datacite.org/meta/kernel-4.1/metadata.xsd'
+            'xsi:schemaLocation': 'http://datacite.org/schema/kernel-4 http://schema.datacite.org/meta/kernel-4.4/metadata.xsd'
         })
         self.node('identifier', {'identifierType': 'DOI'}, metadata.get('identifier'))
 
