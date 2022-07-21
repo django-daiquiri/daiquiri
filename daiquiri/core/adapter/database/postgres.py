@@ -46,12 +46,28 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
             'datatype': 'double',
             'arraysize': False
         },
+        '_smallint': {
+            'datatype': 'short',
+            'arraysize': '*'
+        },
+        '_int': {
+            'datatype': 'int',
+            'arraysize': '*'
+        },
+        '_bigint': {
+            'datatype': 'long',
+            'arraysize': '*'
+        },
         '_float4': {
             'datatype': 'float',
             'arraysize': '*'
         },
         '_float8': {
             'datatype': 'double',
+            'arraysize': '*'
+        },
+        '_bool': {
+            'datatype': 'boolean',
             'arraysize': '*'
         }
     }
