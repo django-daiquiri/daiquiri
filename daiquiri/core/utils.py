@@ -181,7 +181,7 @@ def human2bytes(string):
     if not string:
         return 0
 
-    m = re.match('([0-9.]+)\s*([A-Za-z]+)', string)
+    m = re.match(r'([0-9.]+)\s*([A-Za-z]+)', string)
     number, unit = float(m.group(1)), m.group(2).strip().lower()
 
     if unit == 'kb' or unit == 'k':

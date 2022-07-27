@@ -159,10 +159,14 @@ class MySQLAdapter(BaseDatabaseAdapter):
             logger.error('Could not fetch %s.%s (%s)' % (schema_name, table_name, e))
             return {}
         else:
-            return {
-                'name': row[0],
-                'type': 'view' if row[1] == 'VIEW' else 'table'
-            }
+            if row is None:
+                logger.info('Could not fetch %s.%s. Check if table and schema exist.', schema_name, table_name)
+                return {}
+            else:
+                return {
+                    'name': row[0],
+                    'type': 'view' if row[1] == 'VIEW' else 'table'
+                }
 
     def fetch_columns(self, schema_name, table_name):
         # prepare sql string
@@ -230,7 +234,7 @@ class MySQLAdapter(BaseDatabaseAdapter):
         self.execute(sql)
 
     def _convert_datatype(self, datatype_string):
-        result = re.match('([a-z]+)\(*(\d*)\)*', datatype_string)
+        result = re.match(r'([a-z]+)\(*(\d*)\)*', datatype_string)
 
         if result:
             native_datatype = result.group(1)

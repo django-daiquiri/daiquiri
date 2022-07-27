@@ -41,7 +41,7 @@ def test_fetch_nrows(db):
 
 def test_fetch_size(db):
     size = DatabaseAdapter().fetch_size('daiquiri_data_obs', 'stars')
-    assert size == 950272
+    assert size > 0
 
 
 def test_fetch_columns(db):
@@ -52,7 +52,9 @@ def test_fetch_columns(db):
 
 def test_fetch_column(db):
     column = DatabaseAdapter().fetch_column('daiquiri_data_obs', 'stars', 'id')
-    assert column['datatype'].startswith('long') is True
+    assert column['name'] == 'id'
+    assert column['datatype']
+    assert column['indexed'] is True
 
 
 def test_fetch_column_names(db):

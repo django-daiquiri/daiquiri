@@ -11,8 +11,8 @@ router.register(r'rows', RowViewSet, basename='row')
 router.register(r'columns', ColumnViewSet, basename='column')
 
 urlpatterns = [
-    re_path('^table/(?P<schema_name>[A-Za-z0-9_]+)/(?P<table_name>[A-Za-z0-9_]+)/$', table, name='table'),
-    re_path('^references/(?P<key>[-\w]+)/(?P<value>.+)/$', reference, name='reference'),
+    re_path(r'^table/(?P<schema_name>[A-Za-z0-9_]+)/(?P<table_name>[A-Za-z0-9_]+)/$', table, name='table'),
+    re_path(r'^references/(?P<key>[-\w]+)/(?P<value>.+)/$', reference, name='reference'),
 
     # rest api
     path('api/', include(router.urls)),

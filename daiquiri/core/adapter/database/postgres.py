@@ -216,7 +216,7 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
                 return columns
             else:
                 for column in columns:
-                    columnname = '(' + column['name'] + ')'
+                    columnname = '({})'.format(column['name'])
                     if str(rows).find(columnname) > -1:
                         column['indexed'] = True
             return columns
@@ -260,9 +260,10 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
                 logger.error('Could not fetch indexes of %s.%s.%s (%s)', schema_name, table_name, column_name, e)
                 return column
             else:
-                columnname = '(\'' + column['name'] + '\')'
+                columnname = '({})'.format(column['name'])
                 if str(rows).find(columnname) > -1:
                     column['indexed'] = True
+
             return column
 
     def fetch_column_names(self, schema_name, table_name):

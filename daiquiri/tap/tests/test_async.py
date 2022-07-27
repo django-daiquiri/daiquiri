@@ -221,7 +221,9 @@ def test_post_job_list_create_run(db, client, mocker, username, password, query)
     a job with these parameters and runs it.
     '''
     mocker.patch(settings.ADAPTER_DATABASE + '.submit_query', mock.Mock())
+    mocker.patch(settings.ADAPTER_DATABASE + '.fetch_nrows', mock.Mock(return_value=100))
     mocker.patch(settings.ADAPTER_DATABASE + '.fetch_size', mock.Mock(return_value=100))
+    mocker.patch(settings.ADAPTER_DATABASE + '.fetch_columns', mock.Mock(return_value=[]))
     mocker.patch(settings.ADAPTER_DATABASE + '.count_rows', mock.Mock(return_value=100))
     mocker.patch(settings.ADAPTER_DATABASE + '.create_user_schema_if_not_exists', mock.Mock())
 
