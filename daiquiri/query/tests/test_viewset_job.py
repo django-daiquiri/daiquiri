@@ -1,8 +1,10 @@
+import pytest
+
 from pathlib import Path
 from unittest import mock
 
-import pytest
 from django.conf import settings
+from django.test import override_settings
 from django.urls import reverse
 
 from ..models import QueryJob
@@ -54,6 +56,10 @@ instances = [
     '1b6c93ef-4161-4402-b1a7-d1237657e807'
 ]
 
+public_queries = [
+    'SELECT ra, dec, parallax, id FROM daiquiri_data_obs.stars'
+]
+
 internal_queries = [
     'SELECT ra, dec, parallax, id FROM daiquiri_data_obs.stars',
     'SELECT x, y, z, vx, vy, vz, id FROM daiquiri_data_sim.halos'
@@ -82,6 +88,16 @@ def test_list(db, client, username, password):
             assert response.json()['count'] == 0
 
 
+@override_settings(QUERY_ANONYMOUS=True)
+def test_list_anonymous(db, client):
+    url = reverse(urlnames['list'])
+    response = client.get(url)
+    assert response.status_code == 200, response.json()
+
+    if response.status_code == 200:
+        assert response.json()['count'] == 0
+
+
 @pytest.mark.parametrize('username,password', users)
 @pytest.mark.parametrize('pk', instances)
 def test_detail(db, client, username, password, pk):
@@ -94,6 +110,23 @@ def test_detail(db, client, username, password, pk):
 
     if response.status_code == 200:
         assert response.json().get('table_name') == instance.table_name
+
+
+@override_settings(QUERY_ANONYMOUS=True)
+@pytest.mark.parametrize('query', public_queries)
+def test_create_public(db, client, mocker, query):
+    mocker.patch(settings.ADAPTER_DATABASE + '.submit_query', mock.Mock())
+    mocker.patch(settings.ADAPTER_DATABASE + '.fetch_columns', mock.Mock(return_value=[]))
+    mocker.patch(settings.ADAPTER_DATABASE + '.fetch_size', mock.Mock(return_value=100))
+    mocker.patch(settings.ADAPTER_DATABASE + '.count_rows', mock.Mock(return_value=100))
+    mocker.patch(settings.ADAPTER_DATABASE + '.create_user_schema_if_not_exists', mock.Mock())
+
+    url = reverse(urlnames['list'])
+    response = client.post(url, {
+        'query_language': 'adql-2.0',
+        'query': query
+    })
+    assert response.status_code == 201, response.json()
 
 
 @pytest.mark.parametrize('username,password', users)

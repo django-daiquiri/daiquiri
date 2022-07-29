@@ -1,4 +1,6 @@
 import pytest
+
+from django.test import override_settings
 from django.urls import reverse
 
 from ..models import Example
@@ -122,4 +124,15 @@ def test_user(db, client, username, password):
 
     if response.status_code == 200:
         assert len(response.json()) == (3 if username == 'admin' else 2)
+        assert response.json()[0]['id'] == 1
+
+
+@override_settings(QUERY_ANONYMOUS=True)
+def test_user_anonymous(db, client):
+    url = reverse(urlnames['user'])
+    response = client.get(url)
+    assert response.status_code == 200, response.json()
+
+    if response.status_code == 200:
+        assert len(response.json()) == 1
         assert response.json()[0]['id'] == 1

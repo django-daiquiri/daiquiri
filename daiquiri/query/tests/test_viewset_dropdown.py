@@ -1,4 +1,6 @@
 import pytest
+
+from django.test import override_settings
 from django.urls import reverse
 
 users = (
@@ -26,6 +28,16 @@ def test_list(db, client, username, password):
     url = reverse(urlnames['list'])
     response = client.get(url)
     assert response.status_code == status_map['list'][username], response.json()
+
+    if response.status_code == 200:
+        assert [item['key'] for item in response.json()] == ['simbad', 'vizier']
+
+
+@override_settings(QUERY_ANONYMOUS=True)
+def test_list_anonymous(db, client):
+    url = reverse(urlnames['list'])
+    response = client.get(url)
+    assert response.status_code == 200
 
     if response.status_code == 200:
         assert [item['key'] for item in response.json()] == ['simbad', 'vizier']
