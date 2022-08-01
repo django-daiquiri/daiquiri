@@ -22,6 +22,7 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
         webgl: true
     };
 
+
     service.init = function(opt) {
         service.ready = false;
 
@@ -57,6 +58,7 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
 
     service.update = function() {
         service.clear();
+
 
         if (service.values.x) {
             var x_column = $filter('filter')(service.columns, {name: service.values.x}, true)[0];
@@ -100,6 +102,7 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
         } else {
             service.ready = true;
         }
+        console.log(service);
     };
 
     service.clear = function() {
@@ -128,35 +131,39 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
     };
 
     service.draw = function() {
-        var xmin = Math.min.apply(null, service.source.data.x),
-            xmax = Math.max.apply(null, service.source.data.x),
-            ymin = Math.min.apply(null, service.source.data.y),
-            ymax = Math.max.apply(null, service.source.data.y);
 
-        if (!isNaN(xmin) && !isNaN(xmax) && !isNaN(ymin) && !isNaN(ymax)) {
+        if (service.plottype == 'multilines'){
 
-            // compute a 1% padding around the data
-            var xpad, ypad;
-            if (xmax == xmin) {
-                xpad = 0.001 * xmax;
-            } else {
-                xpad = 0.01 * (xmax - xmin);
-            }
-            if (ymax == ymin) {
-                ypad = 0.001 * ymax;
-            } else {
-                ypad = 0.01 * (ymax - ymin);
-            }
+          var xmin = Math.min.apply(null, service.source.data.x),
+              xmax = Math.max.apply(null, service.source.data.x),
+              ymin = Math.min.apply(null, service.source.data.y),
+              ymax = Math.max.apply(null, service.source.data.y);
 
-            // create some ranges for the plot
-            var x_range = new Bokeh.Range1d({
-                start: xmin - xpad,
-                end: xmax + xpad
-            });
-            var y_range = new Bokeh.Range1d({
-                start: ymin - ypad,
-                end: ymax + ypad
-            });
+          if (!isNaN(xmin) && !isNaN(xmax) && !isNaN(ymin) && !isNaN(ymax)) {
+
+              // compute a 1% padding around the data
+              var xpad, ypad;
+              if (xmax == xmin) {
+                  xpad = 0.001 * xmax;
+              } else {
+                  xpad = 0.01 * (xmax - xmin);
+              }
+              if (ymax == ymin) {
+                  ypad = 0.001 * ymax;
+              } else {
+                  ypad = 0.01 * (ymax - ymin);
+              }
+
+              // create some ranges for the plot
+              var x_range = new Bokeh.Range1d({
+                  start: xmin - xpad,
+                  end: xmax + xpad
+              });
+              var y_range = new Bokeh.Range1d({
+                  start: ymin - ypad,
+                  end: ymax + ypad
+              });
+
 
             // make the plot
             var figure_options = {
@@ -185,17 +192,20 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
             figure.outline_line_color = '#dddddd';
             figure.toolbar.logo = null;
 
-            var circles = figure.circle({
+            var circles = figure.line({
                 x: { field: "x" },
                 y: { field: "y" },
                 source: service.source,
-                fill_alpha: 0.5
+                line_color: '#88ccee'
             });
+
+
 
             Bokeh.Plotting.show(figure, $('#canvas'));
             $('.bk-button-bar-list[type="scroll"] .bk-toolbar-button').click();
             $('.bk-button-bar-list[type="inspectors"] .bk-toolbar-button').click();
         }
+      }
     }
 
     service.toggle_webgl = function() {

@@ -54,6 +54,29 @@ QUERY_FORMS = [
         'template': 'query/query_form_upload.html'
     }
 ]
+QUERY_PLOTS = [q for q in [
+    {
+        'key': 'multilines',
+        'label': 'Lines',
+        'is_active': True,
+    },
+    {
+        'key': 'histogram',
+        'label': 'Histogram',
+        'is_active': True,
+    },
+    {
+        'key': 'histogram_2d',
+        'label': '2D Histogram',
+        'is_active': True,
+    },
+    {
+        'key': 'skyplot',
+        'label': 'Sky-Plot',
+        'is_active': True,
+    },
+] if q['is_active']]
+
 QUERY_DROPDOWNS = [
     {
         'key': 'simbad',
