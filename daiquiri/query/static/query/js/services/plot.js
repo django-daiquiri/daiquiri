@@ -10,6 +10,8 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
         rows: $resource(baseurl + 'serve/api/rows/')
     }
 
+    var validtypes = ['short', 'int', 'long', 'float', 'double']
+
     var service = {
         params: {
             page_size: 100000,
@@ -40,7 +42,13 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
         angular.extend(service.params, opt.params);
 
         // set columns
-        service.columns = opt.columns
+        // service.columns = opt.columns
+        service.columns = $filter('filter')(opt.columns, (e) => {
+          if (validtypes.indexOf(e.datatype) > -1){return true;}
+          else {return false;}
+        }, true)
+
+
         if (angular.isDefined(service.columns[0])) {
             service.values.x = service.columns[0].name;
         } else {
@@ -53,6 +61,9 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
             service.values.y = null;
         }
 
+        service.values.y2 = null;
+        service.values.y3 = null;
+
         service.update();
     };
 
@@ -63,7 +74,7 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
         if (service.values.x) {
             var x_column = $filter('filter')(service.columns, {name: service.values.x}, true)[0];
 
-            if (['int', 'long', 'float', 'double'].indexOf(x_column.datatype) > -1) {
+            if (validtypes.indexOf(x_column.datatype) > -1) {
                 service.errors.x = null;
 
                 service.labels.x = x_column.name;
@@ -80,7 +91,7 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
         if (service.values.y) {
             var y_column = $filter('filter')(service.columns, {name: service.values.y}, true)[0];
 
-            if (['int', 'long', 'float', 'double'].indexOf(y_column.datatype) > -1) {
+            if (validtypes.indexOf(y_column.datatype) > -1) {
                 service.errors.y = null;
 
                 service.labels.y = y_column.name;
@@ -94,6 +105,23 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
             service.errors.y = 'empty';
         }
 
+        if (service.values.y2) {
+            var y2_column = $filter('filter')(service.columns, {name: service.values.y2}, true)[0];
+
+            if (validtypes.indexOf(y2_column.datatype) > -1) {
+                service.errors.y2 = null;
+
+                service.labels.y2 = y2_column.name;
+                if (y2_column.unit && y2_column.unit.length > 0) {
+                    service.labels.y2 += ' [' + y2_column.unit + ']';
+                }
+            } else {
+                service.errors.y2 = y2_column.datatype;
+            }
+        } else {
+            service.errors.y2 = 'empty';
+        }
+
         if (service.errors.x === null && service.errors.y === null) {
             service.fetch().then(function() {
                 service.draw();
@@ -102,7 +130,6 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
         } else {
             service.ready = true;
         }
-        console.log(service);
     };
 
     service.clear = function() {
@@ -117,18 +144,43 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
             column: service.values.y
         });
 
-        return $q.all([
-            resources.rows.paginate(x_params).$promise,
-            resources.rows.paginate(y_params).$promise
-        ]).then(function(results) {
+
+
+        if (service.values.y2){
+          var y2_params = angular.extend({}, service.params, {
+              column: service.values.y2
+          });
+
+          return $q.all([
+              resources.rows.paginate(x_params).$promise,
+              resources.rows.paginate(y_params).$promise,
+              resources.rows.paginate(y2_params).$promise
+          ]).then(function(results) {
             service.source = new Bokeh.ColumnDataSource({
                 data: {
                     x: results[0].results,
-                    y: results[1].results
+                    y: results[1].results,
+                    y2: results[2].results
                 }
             });
-        });
+          });
+
+        }
+        else {
+          return $q.all([
+              resources.rows.paginate(x_params).$promise,
+              resources.rows.paginate(y_params).$promise
+          ]).then(function(results) {
+              service.source = new Bokeh.ColumnDataSource({
+                  data: {
+                      x: results[0].results,
+                      y: results[1].results
+                  }
+              });
+          });
+        };
     };
+
 
     service.draw = function() {
 
@@ -138,6 +190,10 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
               xmax = Math.max.apply(null, service.source.data.x),
               ymin = Math.min.apply(null, service.source.data.y),
               ymax = Math.max.apply(null, service.source.data.y);
+          if (service.source.data.y2){
+            ymin = Math.min.apply(ymin, service.source.data.y2);
+            ymax = Math.max.apply(ymax, service.source.data.y2);
+          }
 
           if (!isNaN(xmin) && !isNaN(xmax) && !isNaN(ymin) && !isNaN(ymax)) {
 
@@ -192,14 +248,26 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
             figure.outline_line_color = '#dddddd';
             figure.toolbar.logo = null;
 
-            var circles = figure.line({
+
+            var circles = figure.circle({
                 x: { field: "x" },
                 y: { field: "y" },
                 source: service.source,
-                line_color: '#88ccee'
+                fill_alpha: 0.7,
+                size: 6,
+                color: '#88ccee'
             });
 
-
+            if (service.source.data.y2){
+              var circles2 = figure.circle({
+                  x: { field: "x" },
+                  y: { field: "y2" },
+                  source: service.source,
+                  fill_alpha: 0.7,
+                  size: 6,
+                  color: '#ff0000'
+              });
+            }
 
             Bokeh.Plotting.show(figure, $('#canvas'));
             $('.bk-button-bar-list[type="scroll"] .bk-toolbar-button').click();

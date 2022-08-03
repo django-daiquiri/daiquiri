@@ -7,7 +7,7 @@
             <select class="form-control-sm" id="plot_x" ng-model="service.plot.values.x" ng-change="service.plot.errors.x = null">
                 <option value="">---</option>
                 <option value="{$ option.name $}"
-                    ng-repeat="option in service.job.columns">
+                    ng-repeat="option in service.plot.columns">
                     {$ option.name $}
                 </option>
             </select>
@@ -33,7 +33,7 @@
             <select class="form-control-sm" id="plot_y" ng-model="service.plot.values.y" ng-change="service.plot.errors.y = null">
                 <option value="">---</option>
                 <option value="{$ option.name $}"
-                    ng-repeat="option in service.job.columns">
+                    ng-repeat="option in service.plot.columns">
                     {$ option.name $}
                 </option>
             </select>
@@ -56,36 +56,23 @@
 <div class="row">
   <div class="col-md-5">
   </div>
-  <div class="form-group" ng-class="{'has-error': service.plot.errors.y2 }">
+  <div class="form-group">
       <label class="control-label" for="plot_y2">{% trans 'Y<sub>2</sub> axis'%}</label>
 
       <select class="form-control-sm" id="plot_y2" ng-model="service.plot.values.y2" ng-change="service.plot.errors.y2 = null">
           <option value="">---</option>
           <option value="{$ option.name $}"
-              ng-repeat="option in service.job.columns">
+              ng-repeat="option in service.plot.columns">
               {$ option.name $}
           </option>
       </select>
-
-      <ul class="help-block list-unstyled">
-          <li ng-show="service.plot.errors.y2">
-              <span ng-show="service.plot.errors.y2 == 'empty'">
-                  {% trans 'No column selected' %}
-              </span>
-              <span ng-show="service.plot.errors.y2 != 'empty'">
-                  {% blocktrans with datatype='{$ service.plot.errors.y $}' %}
-                  Columns of the type {{ datatype }} can not be plotted
-                  {% endblocktrans%}
-              </span>
-          </li>
-      </ul>
   </div>
 </div>
 
 <div class="row">
   <div class="col-md-5">
   </div>
-  <div class="form-group" ng-class="{'has-error': service.plot.errors.y3 }">
+  <div class="form-group">
       <label class="control-label" for="plot_y3">{% trans 'Y<sub>3</sub> axis'%}</label>
 
       <select class="form-control-sm" id="plot_y3" ng-model="service.plot.values.y3" ng-change="service.plot.errors.y3 = null">
@@ -95,18 +82,5 @@
               {$ option.name $}
           </option>
       </select>
-
-      <ul class="help-block list-unstyled">
-          <li ng-show="service.plot.errors.y3">
-              <span ng-show="service.plot.errors.y3 == 'empty'">
-                  {% trans 'No column selected' %}
-              </span>
-              <span ng-show="service.plot.errors.y3 != 'empty'">
-                  {% blocktrans with datatype='{$ service.plot.errors.y $}' %}
-                  Columns of the type {{ datatype }} can not be plotted
-                  {% endblocktrans%}
-              </span>
-          </li>
-      </ul>
   </div>
 </div>
