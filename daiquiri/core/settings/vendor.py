@@ -126,25 +126,19 @@ VENDOR = {
         ]
     },
     'Bokeh': {
-        'url': 'https://cdnjs.cloudflare.com/ajax/libs/bokeh/0.12.9/',
+        'url': 'https://cdnjs.cloudflare.com/ajax/libs/bokeh/2.4.3/',
         'js': [
             {
                 'path': 'bokeh.min.js',
-                'sri': 'sha256-gm+i+GziZJeKlRYH8akT+7hC0yT0tK+VCoxApQ/uU1A='
+                'sri': 'sha512-PGHpUrgIu340bOgopWWl8jqvdwjQNPqdCQZAOBM1XUW7To2LCyOpPwMsdoMdTwIhhG8oaZx/UUfKpi4NMWaDFA=='
             },
             {
                 'path': 'bokeh-gl.min.js',
-                'sri': 'sha256-lle0sk6DP7Leca/0dBodUdbkGTqtqNUTLkbVZa1PceE='
+                'sri': 'sha512-5d8x/ZAQ6s/wqnLTFSZGBLXjSXK6RFrOpvzpgIDuzzOs8tKYYSY2D6qlhSgTz/oW9vb0iJkjMYMA8GJJfALaTg=='
             },
             {
                 'path': 'bokeh-api.min.js',
-                'sri': 'sha256-v22ko+YNfTgeB3sa9OjSWmHds7uwi3KjjVBFLhhGdy0='
-            }
-        ],
-        'css': [
-            {
-                'path': 'bokeh.min.css',
-                'sri': 'sha256-Gke8Knvnof6hLUSaaUp++1Chsbh5yxwdjslBLRO5iK4='
+                'sri': 'sha512-M4sK7tJZoaDdYHfN4iRKfbD3W4P3hB9GGj3HnisgfQJCmrZUy4ajqjdxsMZjH+R7+tsN7+PsR4ouMiXYT2mJlA=='
             }
         ]
     }

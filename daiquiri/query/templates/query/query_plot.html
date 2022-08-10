@@ -1,9 +1,12 @@
 {% load i18n %}
     <div class="row fieldset">
-      <div class="col-md-5">
+      <div class="col-md-4">
         <div class="form-group">
             <label class="control-label" for="plot_type">{% trans 'Plot type'%}</label>
-            <select class="form-control" id="plot_type" ng-model="service.plot.plottype" ng-init="service.plot.plottype='{{settings.QUERY_PLOTS.0.key}}'">
+            <select class="form-control" id="plot_type"
+                    ng-model="service.plot.plottype"
+                    ng-init="service.plot.plottype='{{settings.QUERY_PLOTS.0.key}}'"
+                    ng-change="service.plot.values.y2=null;service.plot.values.y3=null;">
               {% for plottype in settings.QUERY_PLOTS %}
                 {% if plottype.is_active %}
                 <option value="{{plottype.key}}">{{ plottype.label }}</option>
@@ -18,11 +21,24 @@
           </button>
       </div>
     </div>
-
-    <div ng-show="service.plot.plottype == 'multilines'">
-        {% include 'query/query_plot_multilines.html' %}
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <div style="min-height:150px">
+          <div ng-show="service.plot.plottype == 'scatter_plot'">
+              {% include 'query/query_plot_scatter.html' %}
+          </div>
+          <div ng-show="service.plot.plottype == 'scatter_cmap_plot'">
+              {% include 'query/query_plot_scatter_cmap.html' %}
+          </div>
+          <div ng-show="service.plot.plottype == 'histogram'">
+              {% include 'query/query_plot_histogram.html' %}
+          </div>
+          <div ng-show="service.plot.plottype == 'histogram_2d'">
+              {% include 'query/query_plot_histogram2d.html' %}
+          </div>
+        </div>
+      </div>
     </div>
-
     <div id="canvas" class="daiquiri-query-plot-canvas"></div>
 
     <p class="text-muted small" ng-show="service.plot.ready && !service.plot.errors.x && !service.plot.errors.y">

@@ -56,8 +56,13 @@ QUERY_FORMS = [
 ]
 QUERY_PLOTS = [q for q in [
     {
-        'key': 'multilines',
-        'label': 'Lines',
+        'key': 'scatter_plot',
+        'label': 'Scatter-Plot',
+        'is_active': True,
+    },
+    {
+        'key': 'scatter_cmap_plot',
+        'label': 'Scatter-Cmap-Plot',
         'is_active': True,
     },
     {
@@ -68,12 +73,12 @@ QUERY_PLOTS = [q for q in [
     {
         'key': 'histogram_2d',
         'label': '2D Histogram',
-        'is_active': True,
+        'is_active': False,
     },
     {
         'key': 'skyplot',
         'label': 'Sky-Plot',
-        'is_active': True,
+        'is_active': False,
     },
 ] if q['is_active']]
 
