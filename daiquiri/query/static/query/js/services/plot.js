@@ -330,12 +330,6 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
 
         var figure = new Bokeh.Plotting.figure(figure_options);
 
-        //figure.x_axis_label = service.labels.x;
-        //figure.x_axis_label_text_font = 'DroidSans'
-
-        //figure.y_axis_label = service.labels.y;
-        //figure.y_axis_label_text_font = 'DroidSans'
-
         figure.toolbar.active_scroll = figure.toolbar.wheel_zoom;
         figure.outline_line_color = '#dddddd';
         figure.toolbar.logo = null;
@@ -608,7 +602,6 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
         var xmin = Math.min.apply(null, service.source.data.x),
             xmax = Math.max.apply(null, service.source.data.x);
 
-
         if (!isNaN(xmin) && !isNaN(xmax)) {
 
             // construct the histogram
@@ -633,7 +626,6 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
                     }
                 }
             }
-
 
             var ymax = 1.1*Math.max.apply(null, histogram);
             var ymin = -0.01*ymax;
@@ -779,7 +771,6 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
                   y: bin_pos_y,
                   color: '#1b9e77'
               });
-
 
               Bokeh.Plotting.show(figure, $('#canvas'));
               $('.bk-button-bar-list[type="scroll"] .bk-toolbar-button').click();

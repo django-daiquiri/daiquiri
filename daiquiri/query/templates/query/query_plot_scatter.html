@@ -3,7 +3,7 @@
     <div class="col-md-4">
     	<label class="control-label" for="plot_x">{% trans 'X axis'%}</label>
         <div class="form-inline" id="plot_x" ng-class="{'has-error': service.plot.errors.x }">
-            <select class="form-control-sm" ng-model="service.plot.values.x" ng-change="service.plot.errors.x = null">
+            <select class="form-control-sm select-value-md" ng-model="service.plot.values.x" ng-change="service.plot.errors.x = null">
                 <option value="{$ option.name $}"
                     ng-repeat="option in service.plot.columns">
                     {$ option.name $}
@@ -14,7 +14,7 @@
     <div class="col-md-8">
     	<label class="control-label" for="plot_y">{% trans 'Y<sub>1</sub> axis'%}</label>
         <div class="form-inline" id="plot_y" ng-class="{'has-error': service.plot.errors.y }">
-            <select class="form-control-sm" ng-model="service.plot.values.y" ng-change="service.plot.errors.y = null">
+            <select class="form-control-sm select-value-md" ng-model="service.plot.values.y" ng-change="service.plot.errors.y = null">
                 <option value="{$ option.name $}"
                     ng-repeat="option in service.plot.columns">
                     {$ option.name $}
@@ -52,7 +52,7 @@
 	<div class="col-md-8">
 		<label class="control-label" for="plot_y2">{% trans 'Y<sub>2</sub> axis'%}</label>
 		<div class="form-inline" id="plot_y2">
-		    <select class="form-control-sm" ng-model="service.plot.values.y2" ng-change="service.plot.errors.y2 = null">
+		    <select class="form-control-sm select-value-md" ng-model="service.plot.values.y2" ng-change="service.plot.errors.y2 = null">
 			    <option value="">---</option>
 			    <option value="{$ option.name $}" ng-repeat="option in service.plot.columns">
 			      {$ option.name $}
@@ -88,7 +88,7 @@
 	<div class="col-md-8">
 		<label class="control-label" for="plot_y3">{% trans 'Y<sub>3</sub> axis'%}</label>
 		<div class="form-inline" id="plot_y3">
-		    <select class="form-control-sm" ng-model="service.plot.values.y3" ng-change="service.plot.errors.y3 = null">
+		    <select class="form-control-sm select-value-md" ng-model="service.plot.values.y3" ng-change="service.plot.errors.y3 = null">
 			    <option value="">---</option>
 			    <option value="{$ option.name $}" ng-repeat="option in service.plot.columns">
 			      {$ option.name $}

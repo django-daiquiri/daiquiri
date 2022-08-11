@@ -4,7 +4,7 @@
     <div class="col-md-4">
     	<label class="control-label" for="plot_x">{% trans 'Column'%}</label>
         <div class="form-inline" id="plot_x" ng-class="{'has-error': service.plot.errors.x }">
-            <select class="form-control-sm" ng-model="service.plot.values.x" ng-change="service.plot.errors.x = null">
+            <select class="form-control-sm select-value-md" ng-model="service.plot.values.x" ng-change="service.plot.errors.x = null">
                 <option value="{$ option.name $}"
                     ng-repeat="option in service.plot.columns">
                     {$ option.name $}
@@ -28,7 +28,7 @@
     <div class="col-md-8">
         <label class="control-label" for="plot_filter">{% trans 'Filter'%}</label>
         <div class="form-inline" id="plot_filter">
-            <select class="form-control-sm" ng-model="service.plot.values.y2" ng-change="service.plot.errors.y2 = null">
+            <select class="form-control-sm select-value-md" ng-model="service.plot.values.y2" ng-change="service.plot.errors.y2 = null">
                 <option value="">---</option>
                 <option value="{$ option.name $}" ng-repeat="option in service.plot.columns">
                   {$ option.name $}
@@ -42,7 +42,7 @@
                 </option>
             </select>
 
-            <input class="mw-10 form-control-sm" type="number" id="plot_filter_number" ng-model="service.plot.values.hist_filter_number">
+            <input class="form-control-sm select-value-sm" size="1" type="number" id="plot_filter_number" ng-model="service.plot.values.hist_filter_number">
         </div>
     </div>
 </div>
