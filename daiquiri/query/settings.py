@@ -72,15 +72,10 @@ QUERY_PLOTS = [
         'is_active': True,
     },
     {
-        'key': 'histogram_2d',
+        'key': 'histogram_2d', # not implemented yet
         'label': '2D Histogram',
         'is_active': False,
-    },
-    {
-        'key': 'skyplot',
-        'label': 'Sky-Plot',
-        'is_active': False,
-    },
+    }
 ]
 
 QUERY_DROPDOWNS = [

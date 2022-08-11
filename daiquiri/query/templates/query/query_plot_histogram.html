@@ -35,7 +35,7 @@
                 </option>
             </select>
 
-            <select class="form-control-sm" id="plot_filter_op">
+            <select class="form-control-sm" ng-model="service.plot.values.hist_op" id="plot_filter_op">
                 <option value="{$ op $}"
                     ng-repeat="op in service.plot.available_hist_op">
                     {$ op $}

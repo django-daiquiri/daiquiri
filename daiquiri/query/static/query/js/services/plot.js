@@ -616,13 +616,17 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
             }
 
             for (var x of service.source.data.x) {
-                histogram[Math.floor((x - xmin) / bin_size)]++;
+                if (x){
+                    histogram[Math.floor((x - xmin) / bin_size)]++;
+                }
             }
 
             if (service.values.y2){
                 for (var i in service.source.data.x) {
-                    if (math_operations[service.values.hist_op](service.source.data.y2[i], service.values.hist_filter_number)){
-                        histogram_t[Math.floor((service.source.data.x[i] - xmin) / bin_size)]++;
+                    if (service.source.data.x[i]){
+                        if (math_operations[service.values.hist_op](service.source.data.y2[i], service.values.hist_filter_number)){
+                            histogram_t[Math.floor((service.source.data.x[i] - xmin) / bin_size)]++;
+                        }
                     }
                 }
             }
@@ -708,27 +712,19 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
             var bin_pos_x = new Array(bins).fill(0);
             var bin_pos_y = new Array(bins).fill(0);
             for (var i=0;i<bins;i++){
-            bin_pos_x[i] = xmin + bin_size_x*(i+0.5);
-            bin_pos_y[i] = ymin + bin_size_y*(i+0.5);
+                bin_pos_x[i] = xmin + bin_size_x*(i+0.5);
+                bin_pos_y[i] = ymin + bin_size_y*(i+0.5);
             }
 
 
             for (var i in service.source.data.x) {
             	var x_value = service.source.data.x[i];
             	var y_value = service.source.data.y[i];
-            histogram[Math.floor((x_value - xmin) / bin_size_x)][Math.floor((y_value - ymin) / bin_size_y)]++;
-            }
-
-            var norm = new Array(bins).fill(0);
-            for (var i=0;i<bins;i++){
-                norm[i] = Math.max.apply(null, histogram[i]);
-            }
-            norm = Math.max.apply(null, norm);
-            for (var i=0;i<bins;i++){
-                for (var j=0;j<bins;j++){
-                    histogram[i][j] = histogram[i][j]/norm;
+                if(x_value && y_value){
+                    histogram[Math.floor((x_value - xmin) / bin_size_x)][Math.floor((y_value - ymin) / bin_size_y)]++;
                 }
             }
+            service.source.histogram = histogram;
 
             // compute a 1% padding around the data
             var xpad, ypad;
@@ -753,28 +749,13 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
               end: ymax + ypad
             });
 
+
             var figure = create_figure(x_range, y_range);
-            /*
-              var hist = figure.image({
-              	image: histogram,
-              	x: bin_pos_x,
-              	y: bin_pos_y,
-              	dw: bin_size_x,
-              	dh: bin_size_y
-              });
-              console.log(hist);
-              */
-              //figure.yaxis[0].axis_label = "Frequency";
 
-              var hist = figure.circle({
-                  x: bin_pos_x,
-                  y: bin_pos_y,
-                  color: '#1b9e77'
-              });
 
-              Bokeh.Plotting.show(figure, $('#canvas'));
-              $('.bk-button-bar-list[type="scroll"] .bk-toolbar-button').click();
-              $('.bk-button-bar-list[type="inspectors"] .bk-toolbar-button').click();
+            Bokeh.Plotting.show(figure, $('#canvas'));
+            $('.bk-button-bar-list[type="scroll"] .bk-toolbar-button').click();
+            $('.bk-button-bar-list[type="inspectors"] .bk-toolbar-button').click();
           }
     }
 
