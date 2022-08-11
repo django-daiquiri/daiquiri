@@ -54,7 +54,8 @@ QUERY_FORMS = [
         'template': 'query/query_form_upload.html'
     }
 ]
-QUERY_PLOTS = [q for q in [
+
+QUERY_PLOTS = [
     {
         'key': 'scatter_plot',
         'label': 'Scatter-Plot',
@@ -80,7 +81,7 @@ QUERY_PLOTS = [q for q in [
         'label': 'Sky-Plot',
         'is_active': False,
     },
-] if q['is_active']]
+]
 
 QUERY_DROPDOWNS = [
     {
