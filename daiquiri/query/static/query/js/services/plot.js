@@ -86,7 +86,12 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
 
         // exclude columns with ucds defined in the excluded_ucd
         service.columns = $filter('filter')(service.columns, (col) => {
-            if (excluded_ucd.map((e) => {return col.ucd.indexOf(e)}).some((e) => {return e>=0;})){
+            if (excluded_ucd.map((e) => {
+                if (col.ucd) {return col.ucd.indexOf(e);}
+                else {return -1;}
+            }).some((e) => {
+                return e>=0;
+            })){
                 return false;
             }
             else {return true;}
