@@ -70,11 +70,6 @@ QUERY_PLOTS = [
         'key': 'histogram',
         'label': 'Histogram',
         'is_active': True,
-    },
-    {
-        'key': 'histogram_2d', # not implemented yet
-        'label': '2D Histogram',
-        'is_active': False,
     }
 ]
 
