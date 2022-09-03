@@ -355,7 +355,7 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
                 color: service.colors.y,
                 legend_label: service.legends.y
             });
-
+            
             if (service.source.data.y2){
                 var plot_y2 = figure[service.symbols.y2]({
                     x: { field: "x" },
@@ -368,7 +368,7 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
                 });
                 figure.yaxis[0].axis_label += "; " + service.labels.y2;
             }
-            
+             
             if (service.source.data.y3){
                 var plot_y3 = figure[service.symbols.y3]({
                     x: { field: "x" },
@@ -381,7 +381,7 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
                 });
                 figure.yaxis[0].axis_label += "; " + service.labels.y3;
             }
-
+            
             Bokeh.Plotting.show(figure, $('#canvas'));
             $('.bk-button-bar-list[type="scroll"] .bk-toolbar-button').click();
             $('.bk-button-bar-list[type="inspectors"] .bk-toolbar-button').click();

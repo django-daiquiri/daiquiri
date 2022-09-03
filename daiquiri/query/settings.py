@@ -58,12 +58,12 @@ QUERY_FORMS = [
 QUERY_PLOTS = [
     {
         'key': 'scatter_plot',
-        'label': 'Scatter-Plot',
+        'label': 'Scatter',
         'is_active': True,
     },
     {
         'key': 'scatter_cmap_plot',
-        'label': 'Scatter-Cmap-Plot',
+        'label': 'Scatter (color coded)',
         'is_active': True,
     },
     {
