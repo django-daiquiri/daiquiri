@@ -1,48 +1,49 @@
 {% load i18n %}
 
-<div class="row">
-    <div class="col-md-4">
-    	<label class="control-label" for="plot_x">{% trans 'Column'%}</label>
-        <div class="form-inline" id="plot_x" ng-class="{'has-error': service.plot.errors.x }">
-            <select class="form-control-sm select-value-md" ng-model="service.plot.values.x" ng-change="service.plot.errors.x = null">
-                <option value="{$ option.name $}"
-                    ng-repeat="option in service.plot.columns">
-                    {$ option.name $}
-                </option>
-            </select>
-            <ul class="help-block list-unstyled">
-                <li ng-show="service.plot.errors.x">
-                    <span ng-show="service.plot.errors.x == 'empty'">
-                        {% trans 'No column selected' %}
-                    </span>
-                    <span ng-show="service.plot.errors.x != 'empty'">
-                        {% blocktrans with datatype='{$ service.plot.errors.x $}' %}
-                        Columns of the type {{ datatype }} can not be plotted
-                        {% endblocktrans%}
-                    </span>
-                </li>
-            </ul>
+<div class="form-group form-inline form-horizontal row" align="left">
+  <label class="control-label" style="width:70px" align="left"
+        for="plot_x">
+    {% trans 'Column'%}
+  </label>
+  <select id="plot_x" 
+        class="form-control select-value-md" 
+        ng-model="service.plot.values.x" 
+        ng-change="service.plot.errors.x = null">
+    <option value="{$ option.name $}"
+          ng-repeat="option in service.plot.columns">
+      {$ option.name $}
+    </option>
+  </select>
+</div>
 
-        </div>
-    </div>
-    <div class="col-md-8">
-        <label class="control-label" for="plot_filter">{% trans 'Filter'%}</label>
-        <div class="form-inline" id="plot_filter">
-            <select class="form-control-sm select-value-md" ng-model="service.plot.values.y2" ng-change="service.plot.errors.y2 = null">
-                <option value="">---</option>
-                <option value="{$ option.name $}" ng-repeat="option in service.plot.columns">
-                  {$ option.name $}
-                </option>
-            </select>
+<div class="form-group form-inline form-horizontal row" align="left">
+  <label class="control-label" style="width:70px" align="left"
+        for="plot_filter">
+    {% trans 'Filter'%}
+  </label>
+  <select id="plot_filter" 
+        class="form-control select-value-md" 
+        ng-model="service.plot.values.y2" 
+        ng-change="service.plot.errors.y2 = null">
+    <option value="">---</option>
+    <option value="{$ option.name $}" 
+          ng-repeat="option in service.plot.columns">
+      {$ option.name $}
+    </option>
+  </select>
 
-            <select class="form-control-sm" ng-model="service.plot.values.hist_op" id="plot_filter_op">
-                <option value="{$ op $}"
-                    ng-repeat="op in service.plot.available_hist_op">
-                    {$ op $}
-                </option>
-            </select>
+  <select class="form-control"
+        ng-model="service.plot.values.hist_op" 
+        id="plot_filter_op">
+    <option value="{$ op $}"
+          ng-repeat="op in service.plot.available_hist_op">
+      {$ op $}
+    </option>
+  </select>
 
-            <input class="form-control-sm select-value-sm" size="1" type="number" id="plot_filter_number" ng-model="service.plot.values.hist_filter_number">
-        </div>
-    </div>
+  <input class="form-control select-value-sm" 
+      size="1" 
+      type="number" 
+      id="plot_filter_number" 
+      ng-model="service.plot.values.hist_filter_number"/>
 </div>

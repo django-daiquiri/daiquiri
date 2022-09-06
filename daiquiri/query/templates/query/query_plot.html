@@ -1,60 +1,59 @@
 {% load i18n %}
-    <div class="row fieldset">
-      <div class="col-md-4">
-        <div class="form-group">
-            <label class="control-label" for="plot_type">{% trans 'Plot type'%}</label>
-            <select class="form-control" id="plot_type"
-                    ng-model="service.plot.plottype"
-                    ng-init="service.plot.plottype='{{settings.QUERY_PLOTS.0.key}}'"
-                    ng-change="service.plot.values.y2=null;service.plot.values.y3=null;">
-              {% for plottype in settings.QUERY_PLOTS %}
-                {% if plottype.is_active %}
-                <option value="{{plottype.key}}">{{ plottype.label }}</option>
-                {% endif %}
-              {% endfor %}
-            </select>
-        </div>
-      </div>
-      <div class="col-md-2">
-          <button class="btn btn-default daiquiri-query-plot-button" ng-click="service.plot.update()">
-              {% trans 'Update plot' %}
-          </button>
-      </div>
+
+<div class="panel">
+  <div class="panel-body">
+    <div class="form-group form-inline form-horizontal row" style="margin-bottom:35px">
+      <label class="control-label" style="width:70px"
+            for="plot_type">
+        {% trans 'Plot type'%}
+      </label>
+      <select class="form-control select-value-md" 
+              id="plot_type"
+              ng-model="service.plot.plottype"
+              ng-init="service.plot.plottype='{{settings.QUERY_PLOTS.0.key}}'"
+              ng-change="service.plot.values.y2=null;service.plot.values.y3=null;">
+        {% for plottype in settings.QUERY_PLOTS %}
+          {% if plottype.is_active %}
+            <option value="{{plottype.key}}">{{ plottype.label }}</option>
+          {% endif %}
+        {% endfor %}
+      </select>
     </div>
-    <div class="panel panel-default">
-      <div class="panel-body">
-        <div style="min-height:150px">
-          <div ng-show="service.plot.plottype == 'scatter_plot'">
-              {% include 'query/query_plot_scatter.html' %}
-          </div>
-          <div ng-show="service.plot.plottype == 'scatter_cmap_plot'">
-              {% include 'query/query_plot_scatter_cmap.html' %}
-          </div>
-          <div ng-show="service.plot.plottype == 'histogram'">
-              {% include 'query/query_plot_histogram.html' %}
-          </div>
-          <div ng-show="service.plot.plottype == 'histogram_2d'">
-              {% include 'query/query_plot_histogram2d.html' %}
-          </div>
-        </div>
-      </div>
+    <div ng-show="service.plot.plottype == 'scatter_plot'">
+      {% include 'query/query_plot_scatter.html' %}
     </div>
-    <div id="canvas" class="daiquiri-query-plot-canvas"></div>
+    <div ng-show="service.plot.plottype == 'scatter_cmap_plot'">
+      {% include 'query/query_plot_scatter_cmap.html' %}
+    </div>
+    <div ng-show="service.plot.plottype == 'histogram'">
+      {% include 'query/query_plot_histogram.html' %}
+    </div>
+    <div>
+      <button class="fixed-bottom btn btn-default daiquiri-query-plot-button" 
+              ng-click="service.plot.update()">
+        {% trans 'Update plot' %}
+      </button>
+    </div>
+  </div>
+</div>
 
-    <p class="text-muted small" ng-show="service.plot.ready && !service.plot.errors.x && !service.plot.errors.y">
-        {% blocktrans with page_size='{$ service.plot.params.page_size $}' trimmed %}
-        For performance reasons, we plot only the first {{ page_size }} rows.
-        {% endblocktrans %}
+<div id="canvas" class="daiquiri-query-plot-canvas"></div>
 
-        <span ng-show="service.plot.webgl">
-        {% blocktrans with page_size='{$ service.plot.params.page_size $}' trimmed %}
-        WebGL is enabled (<a href="" ng-click="service.plot.toggle_webgl()">disable</a>).
-        {% endblocktrans %}
-        </span>
+<p class="text-muted small" 
+    ng-show="service.plot.ready && !service.plot.errors.x && !service.plot.errors.y">
+  {% blocktrans with page_size='{$ service.plot.params.page_size $}' trimmed %}
+    For performance reasons, we plot only the first {{ page_size }} rows.
+  {% endblocktrans %}
 
-        <span ng-hide="service.plot.webgl">
-        {% blocktrans with page_size='{$ service.plot.params.page_size $}' trimmed %}
-        WebGL is disabled (<a href="" ng-click="service.plot.toggle_webgl()">enable</a>).
-        {% endblocktrans %}
-        </span>
-    </p>
+  <span ng-show="service.plot.webgl">
+    {% blocktrans with page_size='{$ service.plot.params.page_size $}' trimmed %}
+      WebGL is enabled (<a href="" ng-click="service.plot.toggle_webgl()">disable</a>).
+    {% endblocktrans %}
+  </span>
+
+  <span ng-hide="service.plot.webgl">
+    {% blocktrans with page_size='{$ service.plot.params.page_size $}' trimmed %}
+      WebGL is disabled (<a href="" ng-click="service.plot.toggle_webgl()">enable</a>).
+    {% endblocktrans %}
+  </span>
+</p>

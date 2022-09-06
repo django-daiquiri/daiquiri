@@ -1,83 +1,64 @@
 {% load i18n %}
-<div class="row">
-    <div class="col-md-4">
-    	<label class="control-label" for="plot_x">{% trans 'X axis'%}</label>
-        <div class="form-inline" id="plot_x" ng-class="{'has-error': service.plot.errors.x }">
-            <select class="form-control-sm select-value-md" ng-model="service.plot.values.x" ng-change="service.plot.errors.x = null">
-                <option value="{$ option.name $}"
-                    ng-repeat="option in service.plot.columns">
-                    {$ option.name $}
-                </option>
-            </select>
-        </div>
-    </div>
-    <div class="col-md-8">
-    	<label class="control-label" for="plot_y">{% trans 'Y axis'%}</label>
-        <div class="form-inline" id="plot_y" ng-class="{'has-error': service.plot.errors.y }">
-            <select class="form-control-sm select-value-md" ng-model="service.plot.values.y" ng-change="service.plot.errors.y = null">
-                <option value="{$ option.name $}"
-                    ng-repeat="option in service.plot.columns">
-                    {$ option.name $}
-                </option>
-            </select>
-        </div>
-    </div>
+<div class="form-group form-horizontal form-inline row" align="left">
+  <label class="control-label" style="width:70px"
+        for="plot_x">
+    {% trans 'X axis'%}
+  </label>
+  <select id="plot_x" 
+        class="form-control select-value-md" 
+        ng-model="service.plot.values.x" 
+        ng-change="service.plot.errors.x = null">
+    <option value="{$ option.name $}"
+          ng-repeat="option in service.plot.columns">
+      {$ option.name $}
+    </option>
+  </select>
+</div>
+
+<div class="form-group form-horizontal form-inline row">
+  <label class="control-label" style="width:70px"
+        for="plot_y">
+    {% trans 'Y axis'%}
+  </label>
+  <select id="plot_y" 
+        class="form-control select-value-md" 
+        ng-model="service.plot.values.y" 
+        ng-change="service.plot.errors.y = null">
+    <option value="{$ option.name $}"
+          ng-repeat="option in service.plot.columns">
+      {$ option.name $}
+    </option>
+  </select>
 </div>
 
 
-
-<div class="row">
-	<div class="col-md-4">
-	</div>
-	<div class="col-md-8">
-		<label class="control-label" for="plot_y2">{% trans 'Z axis'%}</label>
-		<div class="form-inline" id="plot_y2">
-		    <select class="form-control-sm select-value-md" ng-model="service.plot.values.y2" ng-change="service.plot.errors.y2 = null" ng-init="">
-			    <option value="{$ option.name $}" ng-repeat="option in service.plot.columns">
-			      {$ option.name $}
-			    </option>
-		    </select>
-		</div>
-	</div>
+<div class="form-group form-horizontal form-inline row">
+  <label class="control-label" style="width:70px"
+        for="plot_y2">
+    {% trans 'Z axis'%}
+  </label>
+  <select id="plot_y2" 
+        class="form-control select-value-md" 
+        ng-model="service.plot.values.y2" 
+        ng-change="service.plot.errors.y2 = null" 
+        ng-init="">
+    <option value="{$ option.name $}" 
+          ng-repeat="option in service.plot.columns">
+      {$ option.name $}
+    </option>
+  </select>
+  &nbsp;
+  <label class="control-label" 
+        for="plot_cmap">
+    {% trans 'Colormap'%}
+  </label>
+  <select id="plot_cmap" 
+        class="form-control" 
+        ng-model="service.plot.cmap">
+    <option value="{$ cmapname $}" 
+          ng-repeat="(cmapname, cmapdata) in service.plot.available_cmaps">
+      {$ cmapname $}
+    </option>
+  </select>
 </div>
 
-<div class="row">
-	<div class="col-md-4">
-	</div>
-	<div class="col-md-8">
-		<label class="control-label" for="plot_cmap">{% trans 'Colormap'%}</label>
-		<div class="form-inline" id="plot_cmap">
-            <select class="form-control-sm" ng-model="service.plot.cmap">
-			    <option value="{$ cmapname $}" ng-repeat="(cmapname, cmapdata) in service.plot.available_cmaps">
-			      {$ cmapname $}
-			    </option>
-		    </select>
-		</div>
-	</div>
-</div>
-
-<ul class="help-block list-unstyled">
-    <li ng-show="service.plot.errors.x">
-        <span ng-show="service.plot.errors.x == 'empty'">
-            {% trans 'No column selected' %}
-        </span>
-        <span ng-show="service.plot.errors.x != 'empty'">
-            {% blocktrans with datatype='{$ service.plot.errors.x $}' %}
-            Columns of the type {{ datatype }} can not be plotted
-            {% endblocktrans%}
-        </span>
-    </li>
-</ul>
-
- <ul class="help-block list-unstyled">
-     <li ng-show="service.plot.errors.y">
-         <span ng-show="service.plot.errors.y == 'empty'">
-             {% trans 'No column selected' %}
-         </span>
-         <span ng-show="service.plot.errors.y != 'empty'">
-             {% blocktrans with datatype='{$ service.plot.errors.y $}' %}
-             Columns of the type {{ datatype }} can not be plotted
-             {% endblocktrans%}
-         </span>
-     </li>
- </ul>
