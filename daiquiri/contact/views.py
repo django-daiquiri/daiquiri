@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.utils.timezone import now
 from django.views.generic import TemplateView
 
-from daiquiri.core.views import ModelPermissionMixin
+from daiquiri.core.views import CSRFViewMixin, ModelPermissionMixin
 
 from .forms import ContactForm
 from .utils import send_contact_message
@@ -43,6 +43,6 @@ def contact(request):
     return render(request, 'contact/contact.html', {'form': contact_form})
 
 
-class MessagesView(ModelPermissionMixin, TemplateView):
+class MessagesView(ModelPermissionMixin, CSRFViewMixin, TemplateView):
     template_name = 'contact/messages.html'
     permission_required = 'daiquiri_contact.view_contactmessage'

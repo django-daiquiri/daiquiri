@@ -1,13 +1,13 @@
 from django.http import Http404
 from django.views.generic import TemplateView
 
-from daiquiri.core.views import ModelPermissionMixin
+from daiquiri.core.views import CSRFViewMixin, ModelPermissionMixin
 from daiquiri.core.utils import get_model_field_meta
 
 from .models import Schema, Table, Column, Function
 
 
-class ManagementView(ModelPermissionMixin, TemplateView):
+class ManagementView(ModelPermissionMixin, CSRFViewMixin, TemplateView):
     template_name = 'metadata/management.html'
     permission_required = 'daiquiri_metadata.view_schema'
 

@@ -7,6 +7,8 @@ from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
 from django.views.generic import View
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.utils.decorators import method_decorator
 
 from daiquiri.core.utils import render_to_xml
 
@@ -82,3 +84,10 @@ class SingleObjectXMLMixin(View):
 
     def get_context_data(self):
         raise NotImplementedError()
+
+
+class CSRFViewMixin(View):
+
+    @method_decorator(ensure_csrf_cookie)
+    def get(self, request, *args, **kwargs):
+        return super().get(self, request, *args, **kwargs)
