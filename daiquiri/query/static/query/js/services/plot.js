@@ -292,7 +292,6 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
 
     figure.toolbar.active_scroll = figure.toolbar.wheel_zoom;
     figure.outline_line_color = '#dddddd';
-    figure.toolbar.logo = null;
     return figure;
   }
 
