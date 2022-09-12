@@ -278,7 +278,7 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
       x_range: x_range,
       y_range: y_range,
       plot_width: $('.col-md-9').width(),
-      tools: 'wheel_zoom,box_zoom,reset,save',
+      tools: 'wheel_zoom,box_zoom,reset,save,pan,crosshair',
       x_axis_label: service.labels.x,
       y_axis_label: service.labels.y,
       background_fill_color: '#f5f5f5'
