@@ -318,6 +318,26 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
     return [ymin, ymax]
   }
 
+  // returns xpad ypad
+  compute_padding = function(xmin, xmax, ymin, ymax){
+
+    var xpad, ypad;
+    if (xmax == xmin) {
+      xpad = 0.001 * xmax;
+    }
+    else {
+      xpad = 0.05 * (xmax - xmin);
+    }
+
+    if (ymax == ymin) {
+      ypad = 0.001 * ymax;
+    }
+    else {
+      ypad = 0.05 * (ymax - ymin);
+    }
+    return [xpad, ypad];
+  }
+
 
   service.draw_scatter_plot = function() {
     var xmin, xmax, ymin, ymax;
@@ -326,22 +346,9 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
 
     if (!isNaN(xmin) && !isNaN(xmax) && !isNaN(ymin) && !isNaN(ymax)) {
 
-      // compute a 1% padding around the data
+      // compute padding around the data
       var xpad, ypad;
-
-      if (xmax == xmin) {
-        xpad = 0.001 * xmax;
-      }
-      else {
-        xpad = 0.01 * (xmax - xmin);
-      }
-
-      if (ymax == ymin) {
-        ypad = 0.001 * ymax;
-      }
-      else {
-        ypad = 0.01 * (ymax - ymin);
-      }
+      [xpad, ypad] = compute_padding(xmin, xmax, ymin, ymax);
 
       // create some ranges for the plot
       var x_range = new Bokeh.Range1d({
@@ -406,22 +413,11 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
 
       if (!isNaN(xmin) && !isNaN(xmax) && !isNaN(ymin) && !isNaN(ymax)) {
 
-      // compute a 1% padding around the data
+      // compute padding around the data
       var xpad, ypad;
-      if (xmax == xmin) {
-        xpad = 0.001 * xmax;
-      }
-      else {
-        xpad = 0.01 * (xmax - xmin);
-      }
-      if (ymax == ymin) {
-        ypad = 0.001 * ymax;
-      }
-      else {
-        ypad = 0.01 * (ymax - ymin);
-      }
+      [xpad, ypad] = compute_padding(xmin, xmax, ymin, ymax);
 
-      // create some ranges for the plot
+       // create some ranges for the plot
       var x_range = new Bokeh.Range1d({
         start: xmin - xpad,
           end: xmax + xpad
@@ -499,21 +495,9 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
       var ymax = 1.05*Math.max.apply(null, histogram);
       var ymin = -0.01*ymax;
 
-      // compute a 1% padding around the data
+      // compute padding around the data
       var xpad, ypad;
-      if (xmax == xmin) {
-        xpad = 0.001 * xmax;
-      }
-      else {
-        xpad = 0.05 * (xmax - xmin);
-      }
-
-      if (ymax == ymin) {
-        ypad = 0.001 * ymax;
-      }
-      else {
-        ypad = 0.05 * (ymax - ymin);
-      }
+      [xpad, ypad] = compute_padding(xmin, xmax, ymin, ymax);
 
       // create some ranges for the plot
       var x_range = new Bokeh.Range1d({
