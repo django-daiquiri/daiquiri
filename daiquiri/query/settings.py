@@ -54,6 +54,25 @@ QUERY_FORMS = [
         'template': 'query/query_form_upload.html'
     }
 ]
+
+QUERY_PLOTS = [
+    {
+        'key': 'scatter_plot',
+        'label': 'Scatter',
+        'is_active': True,
+    },
+    {
+        'key': 'scatter_cmap_plot',
+        'label': 'Scatter (color coded)',
+        'is_active': True,
+    },
+    {
+        'key': 'histogram',
+        'label': 'Histogram',
+        'is_active': True,
+    }
+]
+
 QUERY_DROPDOWNS = [
     {
         'key': 'simbad',
