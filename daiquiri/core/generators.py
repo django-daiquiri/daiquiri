@@ -39,6 +39,15 @@ def generate_csv(generator, fields):
             csv.writer(f, quotechar='"').writerow(corrected_row)
             yield f.getvalue()
 
+            
+def correct_col_for_votable(col):
+    corrected_col = col
+
+    if col.startswith('{') and col.endswith('}'): # this is an array
+        # remove {} and replace , with space
+        corrected_col = col.replace('{', '').replace('}', '').replace(',', ' ')
+
+    return corrected_col
 
 def generate_votable(generator, fields, infos=[], links=[], services=[], table=None, empty=None):
     yield '''<?xml version="1.0"?>
@@ -114,7 +123,7 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
                     <TR>
                         <TD>%s</TD>
                     </TR>''' % '''</TD>
-                        <TD>'''.join([('' if cell in ['NULL', None] else escape(str(cell))) for cell in row])
+                        <TD>'''.join([('' if cell in ['NULL', None] else correct_col_for_votable(escape(str(cell)))) for cell in row])
 
         yield '''
                 </TABLEDATA>

@@ -45,6 +45,30 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         'double precision': {
             'datatype': 'double',
             'arraysize': False
+        },
+        '_int2': {
+            'datatype': 'short',
+            'arraysize': '*'
+        },
+        '_int4': {
+            'datatype': 'int',
+            'arraysize': '*'
+        },
+        '_int8': {
+            'datatype': 'long',
+            'arraysize': '*'
+        },
+        '_float4': {
+            'datatype': 'float',
+            'arraysize': '*'
+        },
+        '_float8': {
+            'datatype': 'double',
+            'arraysize': '*'
+        },
+        '_bool': {
+            'datatype': 'boolean',
+            'arraysize': '*'
         }
     }
 
@@ -297,20 +321,28 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
             'name': column_name
         }
 
-        if data_type.lower() in self.DATATYPES:
-            datatype = self.DATATYPES[data_type.lower()]
-        elif udt_name.lower() in self.DATATYPES:
+        if udt_name.lower() in self.DATATYPES: # universal types: int2, int4, int8, _float8, ...
             datatype = self.DATATYPES[udt_name.lower()]
+            
+        elif data_type.lower() in self.DATATYPES: # postgres types: smallint, bigint, ARRAY, ...
+            datatype = self.DATATYPES[data_type.lower()]
+            
         else:
             datatype = None
 
         if datatype:
-            column['datatype'] = datatype['datatype']
+            if '_' in udt_name.lower(): # ARRAY
+                column['datatype'] = datatype['datatype'] # the _ is still needed, will be removed by the serializer.
+                column['arraysize'] = '*'
 
-            if datatype['arraysize']:
-                column['arraysize'] = character_maximum_length
             else:
-                column['arraysize'] = None
+                column['datatype'] = datatype['datatype']
+
+                if datatype['arraysize'] == True:
+                    column['arraysize'] = character_maximum_length
+                else:
+                    column['arraysize'] = None
+            
         else:
             column['datatype'] = 'char'
             column['arraysize'] = 32
