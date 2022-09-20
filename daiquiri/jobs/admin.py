@@ -1,7 +1,8 @@
 from django.contrib import admin
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from .models import Job
+
 
 class JobAdmin(admin.ModelAdmin):
     search_fields = ['id', 'job_type', 'owner__username', 'phase']

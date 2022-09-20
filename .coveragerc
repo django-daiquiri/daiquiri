@@ -5,3 +5,6 @@ source = daiquiri
 omit = \
     */tests/test_*
     */migrations/*
+exclude_lines =
+    raise Exception
+    except ImportError:

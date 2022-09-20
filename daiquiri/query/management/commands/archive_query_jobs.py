@@ -10,7 +10,7 @@ from daiquiri.query.models import QueryJob
 
 class Command(BaseCommand):
 
-    pattern = re.compile('(\d+)([dsmhw])')
+    pattern = re.compile(r'(\d+)([dsmhw])')
 
     def add_arguments(self, parser):
         parser.add_argument('username', help='Remove all query jobs of this user.')

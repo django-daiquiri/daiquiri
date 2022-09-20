@@ -2,16 +2,11 @@ import logging
 
 from django.contrib.auth.models import User
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
+from .signals import (user_activated, user_confirmed, user_disabled,
+                      user_enabled, user_rejected)
 from .utils import get_full_name
-from .signals import (
-    user_confirmed,
-    user_rejected,
-    user_activated,
-    user_disabled,
-    user_enabled
-)
 
 logger = logging.getLogger(__name__)
 
@@ -56,10 +51,10 @@ class Profile(models.Model):
     def reject(self, request):
         self.is_pending = False
         self.user.is_active = False
+        self.user.save(update_fields=['is_active'])
         self.save()
 
         user_rejected.send(sender=self.__class__, request=request, user=self.user)
-
 
     def activate(self, request):
         self.is_confirmed = True
@@ -68,13 +63,11 @@ class Profile(models.Model):
 
         user_activated.send(sender=self.__class__, request=request, user=self.user)
 
-
     def disable(self, request):
         self.user.is_active = False
         self.user.save(update_fields=['is_active'])
 
         user_disabled.send(sender=self.__class__, request=request, user=self.user)
-
 
     def enable(self, request):
         self.user.is_active = True

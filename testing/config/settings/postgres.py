@@ -10,7 +10,7 @@ DATABASES = {
         'HOST': '127.0.0.1',
         'TEST': {
             'NAME': 'test_daiquiri_app',
-        },
+        }
     },
     'data': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -20,7 +20,7 @@ DATABASES = {
         'HOST': '127.0.0.1',
         'TEST': {
             'NAME': 'test_daiquiri_data',
-        },
+        }
     },
     'tap': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -30,7 +30,7 @@ DATABASES = {
         'HOST': '127.0.0.1',
         'TEST': {
             'NAME': 'test_daiquiri_tap',
-        },
+        }
     },
     'oai': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -40,8 +40,8 @@ DATABASES = {
         'HOST': '127.0.0.1',
         'TEST': {
             'NAME': 'test_daiquiri_oai',
-        },
-    },
+        }
+    }
 }
 
 ADAPTER_DATABASE = 'daiquiri.core.adapter.database.postgres.PostgreSQLAdapter'

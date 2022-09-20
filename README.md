@@ -3,9 +3,9 @@ Daiquiri (Django version)
 
 **A framework for the publication of scientific databases**
 
-[![Build Status](https://travis-ci.org/aipescience/django-daiquiri.svg?branch=master)](https://travis-ci.org/aipescience/django-daiquiri)
-[![Coverage Status](https://coveralls.io/repos/github/aipescience/django-daiquiri/badge.svg?branch=master)]()
-[![License](http://img.shields.io/badge/license-APACHE-blue.svg?style=flat)](https://github.com/aipescience/django-daiquiri/blob/master/LICENSE)
+[![pytest Workflow Status](https://github.com/django-daiquiri/daiquiri/actions/workflows/pytest.yml/badge.svg)](https://github.com/django-daiquiri/daiquiri/actions/workflows/pytest.yml)
+[![Coverage Status](https://coveralls.io/repos/django-daiquiri/daiquiri/badge.svg?branch=master&service=github)](https://coveralls.io/github/django-daiquiri/daiquiri?branch=master)
+[![License](http://img.shields.io/badge/license-APACHE-blue.svg?style=flat)](https://github.com/django-daiquiri/daiquiri/blob/master/LICENSE)
 [![Latest Version](https://img.shields.io/pypi/v/django-daiquiri.svg?style=flat)](https://pypi.org/project/django-daiquiri/)
 
 This project is still in development. [gaia.aip.de](https://gaia.aip.de) is based on this version of Daiquiri.

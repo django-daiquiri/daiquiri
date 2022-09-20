@@ -1,17 +1,18 @@
 import os
-from . import BASE_DIR, DJANGO_APPS, ADDITIONAL_APPS
+
+from . import ADDITIONAL_APPS, BASE_DIR, DJANGO_APPS
 
 SITE_URL = 'http://testserver'
+SITE_CREATED = '2020-01-01'
 
 INSTALLED_APPS = DJANGO_APPS + [
-    'daiquiri.archive',
     'daiquiri.auth',
     'daiquiri.conesearch',
     'daiquiri.contact',
     'daiquiri.core',
+    'daiquiri.datalink',
     'daiquiri.files',
     'daiquiri.jobs',
-    'daiquiri.meetings',
     'daiquiri.metadata',
     'daiquiri.oai',
     'daiquiri.query',
@@ -35,9 +36,6 @@ ARCHIVE_DOWNLOAD_DIR = os.path.join(BASE_DIR, 'download')
 
 AUTH_SIGNUP = True
 AUTH_WORKFLOW = 'confirmation'
-
-ARCHIVE_ANONYMOUS = False
-ARCHIVE_BASE_PATH = os.path.join(BASE_DIR, 'files')
 
 FILES_BASE_PATH = os.path.join(BASE_DIR, 'files')
 

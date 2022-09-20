@@ -1,22 +1,50 @@
 Testing
 =======
 
+Setup tests
+-----------
+
+First, create a `local.py` file:
+
+
+```bash
+cp testing/config/settings/sample.local.py testing/config/settings/local.py
+```
+
+Afterwards edit the `local.py` as for a regular Daiquiri instance.
+
+The, setup the database:
+
+```bash
+# postgres
+psql < testing/sql/postgres/test.sql
+cat testing/sql/postgres/data/* | psql test_daiquiri_data
+
+# mysql
+mysql < testing/sql/mysql/test.sql
+cat testing/sql/mysql/data/* | mysql
+```
+
 Running tests
 -------------
 
+```bash
+# from the root directory of the daiquiri repo
+pytest --reuse-db                                               
+pytest --reuse-db -x                                                       # stop after the first failed test
+pytest --reuse-db daiquiri/auth                                            # test only the auth app
+pytest --reuse-db daiquiri/auth/tests/test_accounts.py                     # run only a specific test file
+pytest --reuse-db daiquiri/auth/tests/test_accounts.py::test_login         # run only a specific test
 ```
-testing/runtests.py
-testing/runtests.py -k              # keep the database between test runs
-testing/runtests.py daiquiri.query  # test only the query app
-```
+
 
 Coverage
 --------
 
-```
-coverage run testing/runtests.py
-coverage report                     # show a coverage report in the terminal
-coverage html                       # create browsable coverage report in htmlcov/
+```bash
+pytest --reuse-db --cov                    # show a coverage report in the terminal
+pytest --reuse-db --cov --cov-report html  # additionally create a browsable coverage report in htmlcov/
+pytest --reuse-db --cov=daiquiri/auth      # only compute coverage for the auth app
 ```
 
 Fixtures

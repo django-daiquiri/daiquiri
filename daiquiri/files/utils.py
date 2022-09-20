@@ -1,13 +1,13 @@
 import logging
 import os
 
-from sendfile import sendfile
-
 from django.conf import settings
-from django.utils.timezone import now
 from django.shortcuts import render
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.safestring import mark_safe
+from django.utils.timezone import now
+
+from sendfile import sendfile
 
 from daiquiri.core.utils import get_client_ip, markdown
 from daiquiri.stats.models import Record
@@ -62,7 +62,7 @@ def render_with_layout(request, file_path):
         if file_path.endswith('.html'):
             context['content'] = mark_safe(file_content)
         elif file_path.endswith('.md'):
-            context['content'] = mark_safe(force_text(markdown(file_content)))
+            context['content'] = mark_safe(force_str(markdown(file_content)))
 
     return render(request, 'files/layout.html', context)
 

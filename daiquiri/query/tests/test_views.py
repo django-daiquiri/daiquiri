@@ -1,51 +1,45 @@
-from django.test import TestCase
+import pytest
 
-from test_generator.views import TestListViewMixin
+from django.test import override_settings
+from django.urls import reverse
 
-from daiquiri.core.utils import setup_group
+users = (
+    ('admin', 'admin'),
+    ('manager', 'manager'),
+    ('user', 'user'),
+    ('anonymous', None),
+)
 
-
-class QueryViewTestCase(TestCase):
-
-    databases = ('default', 'data', 'tap', 'oai')
-
-    fixtures = (
-        'auth.json',
-        'metadata.json'
-    )
-
-    users = (
-        ('admin', 'admin'),
-        ('manager', 'manager'),
-        ('user', 'user'),
-        ('anonymous', None),
-    )
-
-    def setUp(self):
-        setup_group('query_manager')
-
-
-class QueryTests(TestListViewMixin, QueryViewTestCase):
-
-    url_names = {
-        'list_view': 'query:query'
+status_map = {
+    'query': {
+        'admin': 200, 'manager': 200, 'user': 200, 'anonymous': 302
+    },
+    'examples': {
+        'admin': 200, 'manager': 200, 'user': 403, 'anonymous': 302
     }
-
-    status_map = {
-        'list_view': {
-            'admin': 200, 'manager': 200, 'user': 200, 'anonymous': 302
-        }
-    }
+}
 
 
-class ExamplesTests(TestListViewMixin, QueryViewTestCase):
+@pytest.mark.parametrize('username,password', users)
+def test_query(db, client, username, password):
+    client.login(username=username, password=password)
 
-    url_names = {
-        'list_view': 'query:examples'
-    }
+    url = reverse('query:query')
+    response = client.get(url)
+    assert response.status_code == status_map['query'][username]
 
-    status_map = {
-        'list_view': {
-            'admin': 200, 'manager': 200, 'user': 403, 'anonymous': 302
-        }
-    }
+
+@override_settings(QUERY_ANONYMOUS=True)
+def test_list_anonymous(db, client):
+    url = reverse('query:query')
+    response = client.get(url)
+    assert response.status_code == 200
+
+
+@pytest.mark.parametrize('username,password', users)
+def test_examples(db, client, username, password):
+    client.login(username=username, password=password)
+
+    url = reverse('query:examples')
+    response = client.get(url)
+    assert response.status_code == status_map['examples'][username]

@@ -1,150 +1,112 @@
-from django.test import TestCase
+import pytest
+from django.urls import reverse
 
-from test_generator.views import TestViewMixin, TestListViewMixin
+users = (
+    ('admin', 'admin'),
+    ('manager', 'manager'),
+    ('user', 'user'),
+    ('test', 'test'),
+    ('anonymous', None),
+)
 
-from daiquiri.core.utils import setup_group
-
-
-class MetadataViewTestCase(TestViewMixin, TestCase):
-
-    databases = ('default', 'data', 'tap', 'oai')
-
-    fixtures = (
-        'auth.json',
-        'metadata.json'
-    )
-
-    users = (
-        ('admin', 'admin'),
-        ('manager', 'manager'),
-        ('user', 'user'),
-        ('test', 'test'),
-        ('anonymous', None),
-    )
-
-    def setUp(self):
-        setup_group('metadata_manager')
-
-
-class ManagementTests(TestListViewMixin, MetadataViewTestCase):
-
-    url_names = {
-        'list_view': 'metadata:management'
+status_map = {
+    'management': {
+        'admin': 200, 'manager': 200, 'user': 403, 'test': 403, 'anonymous': 302
+    },
+    'public_schema': {
+        'admin': 200, 'manager': 200, 'user': 200, 'test': 200, 'anonymous': 200
+    },
+    'internal_schema': {
+        'admin': 200, 'manager': 200, 'user': 200, 'test': 200, 'anonymous': 404
+    },
+    'private_schema': {
+        'admin': 404, 'manager': 404, 'user': 404, 'test': 200, 'anonymous': 404
+    },
+    'public_table': {
+        'admin': 200, 'manager': 200, 'user': 200, 'test': 200, 'anonymous': 200
+    },
+    'internal_table': {
+        'admin': 200, 'manager': 200, 'user': 200, 'test': 200, 'anonymous': 404
+    },
+    'private_table': {
+        'admin': 404, 'manager': 404, 'user': 404, 'test': 200, 'anonymous': 404
     }
-
-    status_map = {
-        'list_view': {
-            'admin': 200, 'manager': 200, 'user': 403, 'test': 403, 'anonymous': 302
-        }
-    }
+}
 
 
-class PublicSchemaTests(MetadataViewTestCase):
+@pytest.mark.parametrize('username,password', users)
+def test_management(db, client, username, password):
+    client.login(username=username, password=password)
 
-    url_names = {
-        'list_view': 'metadata:schema'
-    }
-
-    status_map = {
-        'list_view': {
-            'admin': 200, 'manager': 200, 'user': 200, 'test': 200, 'anonymous': 200
-        }
-    }
-
-    def _test_list_viewset(self, username):
-        self.assert_list_view(username, {
-            'schema_name': 'daiquiri_data_obs'
-        })
+    url = reverse('metadata:management')
+    response = client.get(url)
+    assert response.status_code == status_map['management'][username]
 
 
-class InternalSchemaTests(MetadataViewTestCase):
+@pytest.mark.parametrize('username,password', users)
+def test_public_schema(db, client, username, password):
+    client.login(username=username, password=password)
 
-    url_names = {
-        'list_view': 'metadata:schema'
-    }
-
-    status_map = {
-        'list_view': {
-            'admin': 200, 'manager': 200, 'user': 200, 'test': 200, 'anonymous': 404
-        }
-    }
-
-    def _test_list_viewset(self, username):
-        self.assert_list_view(username, {
-            'schema_name': 'daiquiri_data_sim'
-        })
+    url = reverse('metadata:schema', kwargs={
+        'schema_name': 'daiquiri_data_obs'
+    })
+    response = client.get(url)
+    assert response.status_code == status_map['public_schema'][username]
 
 
-class PrivateSchemaTests(MetadataViewTestCase):
+@pytest.mark.parametrize('username,password', users)
+def test_internal_schema(db, client, username, password):
+    client.login(username=username, password=password)
 
-    url_names = {
-        'list_view': 'metadata:schema'
-    }
-
-    status_map = {
-        'list_view': {
-            'admin': 404, 'manager': 404, 'user': 404, 'test': 200, 'anonymous': 404
-        }
-    }
-
-    def _test_list_viewset(self, username):
-        self.assert_list_view(username, {
-            'schema_name': 'daiquiri_data_test'
-        })
+    url = reverse('metadata:schema', kwargs={
+        'schema_name': 'daiquiri_data_sim'
+    })
+    response = client.get(url)
+    assert response.status_code == status_map['internal_schema'][username]
 
 
-class PublicTableTests(MetadataViewTestCase):
+@pytest.mark.parametrize('username,password', users)
+def test_private_schema(db, client, username, password):
+    client.login(username=username, password=password)
 
-    url_names = {
-        'list_view': 'metadata:table'
-    }
-
-    status_map = {
-        'list_view': {
-            'admin': 200, 'manager': 200, 'user': 200, 'test': 200, 'anonymous': 200
-        }
-    }
-
-    def _test_list_viewset(self, username):
-        self.assert_list_view(username, {
-            'schema_name': 'daiquiri_data_obs',
-            'table_name': 'stars'
-        })
+    url = reverse('metadata:schema', kwargs={
+        'schema_name': 'daiquiri_data_test'
+    })
+    response = client.get(url)
+    assert response.status_code == status_map['private_schema'][username]
 
 
-class InternalTableTests(MetadataViewTestCase):
+@pytest.mark.parametrize('username,password', users)
+def test_public_table(db, client, username, password):
+    client.login(username=username, password=password)
 
-    url_names = {
-        'list_view': 'metadata:table'
-    }
-
-    status_map = {
-        'list_view': {
-            'admin': 200, 'manager': 200, 'user': 200, 'test': 200, 'anonymous': 404
-        }
-    }
-
-    def _test_list_viewset(self, username):
-        self.assert_list_view(username, {
-            'schema_name': 'daiquiri_data_sim',
-            'table_name': 'halos'
-        })
+    url = reverse('metadata:table', kwargs={
+        'schema_name': 'daiquiri_data_obs',
+        'table_name': 'stars'
+    })
+    response = client.get(url)
+    assert response.status_code == status_map['public_table'][username]
 
 
-class PrivateTableTests(MetadataViewTestCase):
+@pytest.mark.parametrize('username,password', users)
+def test_internal_table(db, client, username, password):
+    client.login(username=username, password=password)
 
-    url_names = {
-        'list_view': 'metadata:table'
-    }
+    url = reverse('metadata:table', kwargs={
+        'schema_name': 'daiquiri_data_sim',
+        'table_name': 'halos'
+    })
+    response = client.get(url)
+    assert response.status_code == status_map['internal_table'][username]
 
-    status_map = {
-        'list_view': {
-            'admin': 404, 'manager': 404, 'user': 404, 'test': 200, 'anonymous': 404
-        }
-    }
 
-    def _test_list_viewset(self, username):
-        self.assert_list_view(username, {
-            'schema_name': 'daiquiri_data_test',
-            'table_name': 'test'
-        })
+@pytest.mark.parametrize('username,password', users)
+def test_private_table(db, client, username, password):
+    client.login(username=username, password=password)
+
+    url = reverse('metadata:table', kwargs={
+        'schema_name': 'daiquiri_data_test',
+        'table_name': 'test'
+    })
+    response = client.get(url)
+    assert response.status_code == status_map['private_table'][username]

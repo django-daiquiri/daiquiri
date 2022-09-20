@@ -1,13 +1,13 @@
-import imp
-import os
+from importlib.util import find_spec
+from pathlib import Path
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 import daiquiri.core.env as env
 
-CONFIG_DIR = imp.find_module('config')[1]
-BASE_DIR = os.path.dirname(CONFIG_DIR)
-DAIQUIRI_APP = os.path.basename(BASE_DIR).replace('-', '_')
+CONFIG_DIR = Path(find_spec('config').origin).parent
+BASE_DIR = CONFIG_DIR.parent
+DAIQUIRI_APP = BASE_DIR.name.replace('-', '_')
 
 BASE_URL = env.get_url('BASE_URL', '/')
 
@@ -101,11 +101,11 @@ MIDDLEWARE = [
     'django.contrib.sites.middleware.CurrentSiteMiddleware'
 ]
 
-TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates/')
+TEMPLATES_DIR = BASE_DIR / 'templates/'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [TEMPLATES_DIR] if os.path.exists(TEMPLATES_DIR) else [],
+        'DIRS': [TEMPLATES_DIR] if TEMPLATES_DIR.exists() else [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -128,7 +128,7 @@ LANGUAGE_CODE = 'en-us'
 TIME_ZONE = env.get('TIME_ZONE', 'UTC')
 
 LOCALE_PATHS = (
-    os.path.join(BASE_DIR, 'locale/'),
+    BASE_DIR / 'locale/',
 )
 
 LANGUAGES = (
@@ -136,8 +136,6 @@ LANGUAGES = (
 )
 
 USE_I18N = True
-
-USE_L10N = True
 
 USE_TZ = True
 
@@ -151,14 +149,14 @@ LANGUAGE_COOKIE_PATH = BASE_URL
 SESSION_COOKIE_PATH = BASE_URL
 
 MEDIA_URL = BASE_URL + 'media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media_root/')
+MEDIA_ROOT = BASE_DIR / 'media_root/'
 
 STATIC_URL = BASE_URL + 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static_root/')
+STATIC_ROOT = BASE_DIR / 'static_root/'
 
-STATICFILES_DIR = os.path.join(BASE_DIR, 'static/')
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'vendor/')]
-STATICFILES_DIRS += [STATICFILES_DIR] if os.path.exists(STATICFILES_DIR) else []
+STATICFILES_DIR = BASE_DIR / 'static/'
+STATICFILES_DIRS = [BASE_DIR / 'vendor/']
+STATICFILES_DIRS += [STATICFILES_DIR] if STATICFILES_DIR.exists() else []
 
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
@@ -167,7 +165,7 @@ STATICFILES_FINDERS = (
 )
 
 FIXTURE_DIRS = (
-    os.path.join(BASE_DIR, 'fixtures'),
+    BASE_DIR / 'fixtures',
 )
 
 AUTHENTICATION_BACKENDS = (
@@ -204,7 +202,6 @@ REST_FRAMEWORK = {
 SETTINGS_EXPORT = [
     'LOGIN_URL',
     'LOGOUT_URL',
-    'ARCHIVE_COLUMNS',
     'ACCOUNT_LOGOUT_ON_GET',
     'AUTH_WORKFLOW',
     'AUTH_TERMS_OF_USE',

@@ -1,71 +1,72 @@
-from django.test import TestCase
+import pytest
+from django.urls import reverse
 
-from test_generator.views import TestViewMixin, TestListViewMixin
+from ..models import ContactMessage
 
-from daiquiri.core.utils import setup_group
+users = (
+    ('admin', 'admin'),
+    ('manager', 'manager'),
+    ('user', 'user'),
+    ('anonymous', None),
+)
 
-
-class ContactViewTestCase(TestCase):
-
-    fixtures = (
-        'auth.json',
-        'contact.json'
-    )
-
-    users = (
-        ('admin', 'admin'),
-        ('manager', 'manager'),
-        ('user', 'user'),
-        ('anonymous', None),
-    )
-
-    status_map = {
-        'list_view': {
-            'admin': 200, 'manager': 200, 'user': 403, 'anonymous': 302
-        }
+status_map = {
+    'messages': {
+        'admin': 200, 'manager': 200, 'user': 403, 'anonymous': 302
     }
-
-    def setUp(self):
-        setup_group('contact_manager')
+}
 
 
-class MessagesTests(TestListViewMixin, ContactViewTestCase):
+@pytest.mark.parametrize('username,password', users)
+def test_messages(db, client, username, password):
+    client.login(username=username, password=password)
 
-    url_names = {
-        'list_view': 'contact:messages'
-    }
+    url = reverse('contact:messages')
+    response = client.get(url)
+    assert response.status_code == status_map['messages'][username]
 
 
-class ContactTests(TestViewMixin, ContactViewTestCase):
+@pytest.mark.parametrize('username,password', users)
+def test_contact_get(db, client, username, password):
+    client.login(username=username, password=password)
 
-    url_names = {
-        'create_view': 'contact:contact'
-    }
+    url = reverse('contact:contact')
+    response = client.get(url)
+    assert response.status_code == 200
 
-    status_map = {
-        'create_view_get': {
-            'admin': 200, 'manager': 200, 'user': 200, 'anonymous': 200
-        },
-        'create_view_post': {
-            'admin': 200, 'manager': 200, 'user': 200, 'anonymous': 200
-        }
-    }
 
-    def _test_contact_get(self, username):
-        self.assert_view('create_view_get', 'get', 'create_view', username)
+@pytest.mark.parametrize('username,password', users)
+def test_contact_post(db, client, username, password):
+    client.login(username=username, password=password)
 
-    def _test_contact_post(self, username):
-        self.assert_view('create_view_post', 'post', 'create_view', username, data={
-            'author': 'Tom Test',
-            'email': 'test@example.com',
-            'subject': 'This is a test',
-            'message': 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est. Lorem ipsum dolor sit amet.'
-        })
+    url = reverse('contact:contact')
+    response = client.post(url, {
+        'author': 'Tanja Test',
+        'email': 'test@example.com',
+        'subject': 'Test',
+        'message': 'This is a test.'
+    })
+    assert response.status_code == 200
+    assert ContactMessage.objects.count() == 3
 
-    def _test_contact_post_invalid(self, username):
-        self.assert_view('create_view_post', 'post', 'create_view', username, data={})
 
-    def _test_contact_cancel(self, username):
-        self.assert_view('create_view_post', 'post', 'create_view', username, data={
-            'cancel': True
-        })
+@pytest.mark.parametrize('username,password', users)
+def test_contact_post_invalid(db, client, username, password):
+    client.login(username=username, password=password)
+
+    url = reverse('contact:contact')
+    response = client.post(url, {})
+    assert response.status_code == 200
+    assert ContactMessage.objects.count() == 2
+
+
+@pytest.mark.parametrize('username,password', users)
+def test_contact_post_cancel(db, client, username, password):
+    client.login(username=username, password=password)
+
+    url = reverse('contact:contact')
+    response = client.post(url, {
+        'cancel': True
+    })
+    assert response.status_code == 200
+    assert ContactMessage.objects.count() == 2

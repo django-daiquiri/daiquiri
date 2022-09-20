@@ -1,7 +1,7 @@
 import io
 
 from django.utils.xmlutils import SimplerXMLGenerator
-from django.utils.encoding import smart_text
+from django.utils.encoding import smart_str
 
 from rest_framework.renderers import BaseRenderer
 
@@ -39,7 +39,7 @@ class XMLRenderer(BaseRenderer):
 
         self.xml.startElement(tag, {k: str(v) for k, v in attrs.items() if v is not None})
         if text:
-            self.xml.characters(smart_text(text))
+            self.xml.characters(smart_str(text))
         self.xml.endElement(tag)
 
     def _to_camel_case(self, snake_str):

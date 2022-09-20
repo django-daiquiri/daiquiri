@@ -323,7 +323,7 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
             raise ValidationError({'format': "Not supported."})
 
         try:
-            download_job = DownloadJob.objects.get(job=job, format_key=format_key)
+            download_job = DownloadJob.objects.get(query_job=job, format_key=format_key)
 
             # check if the file was lost
             if download_job.phase == download_job.PHASE_COMPLETED and os.path.isfile(download_job.file_path):

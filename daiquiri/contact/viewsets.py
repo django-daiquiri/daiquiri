@@ -29,7 +29,7 @@ class ContactMessageViewSet(viewsets.ModelViewSet):
         SpamBackend
     )
     search_fields = ('author', 'email', 'subject', 'message', 'status')
-    filter_fields = ('status', )
+    filterset_fields = ('status', )
 
 
 class StatusViewSet(ChoicesViewSet):

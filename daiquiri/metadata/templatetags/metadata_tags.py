@@ -1,8 +1,8 @@
 from django import template
-from django.utils.translation import ugettext_lazy as _
-from django.utils.html import format_html
-
 from django.conf import settings
+from django.utils.html import format_html
+from django.utils.translation import gettext_lazy as _
+
 from daiquiri.core.utils import get_doi_url
 
 from ..models import Schema

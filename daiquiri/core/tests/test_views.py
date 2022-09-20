@@ -1,29 +1,17 @@
-from django.test import TestCase
+import pytest
+from django.urls import reverse
 
-from test_generator.views import TestListViewMixin
-
-
-class CoreViewTestCase(TestCase):
-
-    fixtures = (
-        'auth.json',
-    )
-
-    users = (
-        ('admin', 'admin'),
-        ('user', 'user'),
-        ('anonymous', None),
-    )
-
-    status_map = {
-        'list_view': {
-            'admin': 200, 'user': 200, 'anonymous': 200
-        }
-    }
+users = (
+    ('admin', 'admin'),
+    ('user', 'user'),
+    ('anonymous', None),
+)
 
 
-class HomeTests(TestListViewMixin, CoreViewTestCase):
+@pytest.mark.parametrize('username,password', users)
+def test_home(db, client, username, password):
+    client.login(username=username, password=password)
 
-    url_names = {
-        'list_view': 'home'
-    }
+    url = reverse('home')
+    response = client.get(url)
+    assert response.status_code == 200
