@@ -2,7 +2,7 @@ import os
 
 from collections import OrderedDict
 
-from sendfile import sendfile
+from django_sendfile import sendfile
 
 from django.conf import settings
 from django.http import Http404, FileResponse

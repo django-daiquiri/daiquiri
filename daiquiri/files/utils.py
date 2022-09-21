@@ -7,7 +7,7 @@ from django.utils.encoding import force_str
 from django.utils.safestring import mark_safe
 from django.utils.timezone import now
 
-from sendfile import sendfile
+from django_sendfile import sendfile
 
 from daiquiri.core.utils import get_client_ip, markdown
 from daiquiri.stats.models import Record
