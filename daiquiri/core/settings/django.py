@@ -57,6 +57,11 @@ elif DATABASES['oai'].get('ENGINE') == 'django.db.backends.mysql':
 ADAPTER_DATABASE = env.get_database_adapter()
 ADAPTER_DOWNLOAD = env.get_download_adapter()
 
+if DATABASES['data'].get('ENGINE') == 'django.db.backends.postgresql':
+    USER_TABLESPACE = env.get('USER_TABLESPACE', 'pg_default')
+else:
+    USER_TABLESPACE = None
+
 DATABASE_ROUTERS = [
     'daiquiri.core.routers.TapRouter',
     'daiquiri.core.routers.OaiRouter',
