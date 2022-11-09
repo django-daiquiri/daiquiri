@@ -10,7 +10,7 @@ django-extensions~=3.2.0
 django-filter~=22.1
 django-ipware~=4.0.0
 django-libsass==0.9
-django-sendfile~=0.3.11
+django-sendfile2
 django-settings-export~=1.2.1
 django-test-generator~=0.6.1
 django-vendor-files~=0.3.0

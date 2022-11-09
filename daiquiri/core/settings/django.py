@@ -85,7 +85,8 @@ ADDITIONAL_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-    'rules'
+    'rules',
+    'django_sendfile',
 ]
 
 MIDDLEWARE = [
