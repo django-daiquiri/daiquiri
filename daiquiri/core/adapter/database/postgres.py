@@ -2,6 +2,8 @@ import logging
 
 from django.db import OperationalError, ProgrammingError
 
+from django.conf import settings
+
 from .base import BaseDatabaseAdapter
 
 logger = logging.getLogger(__name__)
@@ -102,13 +104,24 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
             'table': self.escape_identifier(table_name),
             'query': query,
             'timeout': int(timeout * 1000),
-            'max_records': max_records
+            'max_records': max_records,
+            'tablespace': settings.USER_TABLESPACE,
         }
 
-        if max_records is not None:
-            return 'SET SESSION statement_timeout TO %(timeout)s; COMMIT; CREATE TABLE %(schema)s.%(table)s AS %(query)s LIMIT %(max_records)s;' % params
+        query = 'SET SESSION statement_timeout TO %(timeout)s; COMMIT; CREATE TABLE %(schema)s.%(table)s'
+
+        if params['tablespace'] is not None:
+            query = query + ' TABLESPACE %(tablespace)s AS %(query)s'
         else:
-            return 'SET SESSION statement_timeout TO %(timeout)s; COMMIT; CREATE TABLE %(schema)s.%(table)s AS %(query)s;' % params
+            query = query + ' AS %(query)s'
+
+        if params['max_records'] is not None:
+            query = query + ' LIMIT %(max_records)s'
+
+        query = query + ';'
+
+        return query % params
+        
 
     def build_sync_query(self, query, timeout, max_records):
         # construct the actual query
