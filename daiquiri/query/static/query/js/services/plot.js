@@ -273,11 +273,11 @@ app.factory('PlotService', ['$resource', '$q', '$filter', function($resource, $q
   create_figure = function(x_range, y_range){
 
     var figure_options = {
-      width: 840,
-      height: 500,
+      width: $('.col-md-9').width(),
+      plot_width: $('.col-md-9').width(),
+      aspect_ratio: 1.6,
       x_range: x_range,
       y_range: y_range,
-      plot_width: $('.col-md-9').width(),
       tools: 'wheel_zoom,box_zoom,reset,save,pan,crosshair',
       x_axis_label: service.labels.x,
       y_axis_label: service.labels.y,
