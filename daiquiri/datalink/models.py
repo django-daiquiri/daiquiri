@@ -34,7 +34,7 @@ class Datalink(models.Model):
         max_length=80, db_index=True,
         verbose_name=_('Content type'),
     )
-    content_length = models.IntegerField(
+    content_length = models.BigIntegerField(
         null=True,
         verbose_name=_('Content length'),
     )
