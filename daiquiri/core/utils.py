@@ -169,7 +169,8 @@ def filter_by_access_level(user, items):
             filtered_items.append(item)
         elif item['access_level'] == ACCESS_LEVEL_INTERNAL:
             if user is not None:
-                filtered_items.append(item)
+                if user.is_authenticated:
+                    filtered_items.append(item)
         elif item['access_level'] == ACCESS_LEVEL_PRIVATE and 'groups' in item:
             if user is not None and user.groups.filter(name__in=item['groups']).exists():
                 filtered_items.append(item)
