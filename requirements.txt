@@ -29,6 +29,6 @@ pytest-django~=4.5.2
 pytest-dotenv~=0.5.2
 pytest-mock~=3.8.2
 pytest-pythonpath~=0.7.4
-queryparser_python3~=0.6.0
+queryparser_python3~=0.6.1
 rules==3.3
 XlsxWriter~=3.0.3
