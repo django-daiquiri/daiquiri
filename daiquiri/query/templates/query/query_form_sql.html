@@ -15,7 +15,9 @@
 <div class="daiquiri-query-dropdowns">
     {% include 'query/query_dropdown_schemas.html' %}
     {% include 'query/query_dropdown_columns.html' %}
-    {% include 'query/query_dropdown_functions.html' %}
+    {% if settings.QUERY_DROPDOWN_FUNCTIONS %}
+        {% include 'query/query_dropdown_functions.html' %}
+    {% endif %}
 
     {% for dropdown in settings.QUERY_DROPDOWNS %}
     {% include dropdown.template %}

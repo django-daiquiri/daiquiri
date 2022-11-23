@@ -73,6 +73,7 @@ QUERY_PLOTS = [
     }
 ]
 
+QUERY_DROPDOWN_FUNCTIONS = False;
 QUERY_DROPDOWNS = [
     {
         'key': 'simbad',
