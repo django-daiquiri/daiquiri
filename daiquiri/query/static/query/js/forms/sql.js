@@ -90,6 +90,10 @@ app.factory('SqlFormService', ['$timeout', '$filter', 'QueryService', 'BrowserSe
             service.values.query_language = item.query_language;
 
             editor.refresh();
+        } else if (resource == 'functions') {
+
+            editor.replaceSelection(item.query_string);
+
         } else {
             var query_language = $filter('filter')(QueryService.query_languages, {id: service.values.query_language})[0];
             var quote_char = query_language.quote_char;
