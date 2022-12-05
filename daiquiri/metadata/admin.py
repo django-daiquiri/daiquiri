@@ -16,7 +16,7 @@ class TableAdminForm(forms.ModelForm):
 class SchemaAdmin(admin.ModelAdmin):
     form = SchemaAdminForm
 
-    search_fields = ('__str__', )
+    search_fields = ('name',)
     list_display = ('order', '__str__', 'access_level', 'metadata_access_level')
     list_display_links = ('__str__', )
 
@@ -24,13 +24,13 @@ class SchemaAdmin(admin.ModelAdmin):
 class TableAdmin(admin.ModelAdmin):
     form = TableAdminForm
 
-    search_fields = ('__str__', )
+    search_fields = ('name', 'schema__name')
     list_display = ('order', '__str__', 'access_level', 'metadata_access_level')
     list_display_links = ('__str__', )
 
 
 class ColumnAdmin(admin.ModelAdmin):
-    search_fields = ('__str__', 'datatype')
+    search_fields = ('name', 'table__name', 'table__schema__name', 'datatype')
     list_display = ('order', '__str__', 'datatype', 'access_level', 'metadata_access_level')
     list_display_links = ('__str__', )
 
