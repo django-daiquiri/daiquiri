@@ -110,11 +110,15 @@ class DataciteRendererMixin(object):
             name = person.get('name')
             first_name = person.get('first_name')
             last_name = person.get('last_name')
+            name_type = person.get('name_type')
 
             if not name:
                 name = '{}, {}'.format(last_name, first_name)
 
-            self.node(person_type + 'Name', {}, name)
+            if name_type:
+                self.node(person_type + 'Name', {'nameType': name_type}, name)
+            else:
+                self.node(person_type + 'Name', {}, name)
 
             if first_name:
                 self.node('givenName', {}, first_name)
