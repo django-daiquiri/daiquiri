@@ -115,10 +115,7 @@ class DataciteRendererMixin(object):
             if not name:
                 name = '{}, {}'.format(last_name, first_name)
 
-            if name_type:
-                self.node(person_type + 'Name', {'nameType': name_type}, name)
-            else:
-                self.node(person_type + 'Name', {}, name)
+            self.node(person_type + 'Name', {'nameType': name_type}, name)
 
             if first_name:
                 self.node('givenName', {}, first_name)
@@ -136,6 +133,10 @@ class DataciteRendererMixin(object):
             affiliations = person.get('affiliations')
             if affiliations:
                 for affiliation in affiliations:
-                    self.node('affiliation', {}, affiliation)
+                    self.node('affiliation', {
+                        'affiliationIdentifier': affiliation.get('affiliation_identifier'),
+                        'affiliationIdentifierScheme': affiliation.get('affiliation_identifier_scheme'),
+                        'schemeURI': affiliation.get('scheme_uri')
+                        }, affiliation.get('affiliation'))
 
             self.end(person_type)
