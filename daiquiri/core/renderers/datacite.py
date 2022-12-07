@@ -26,8 +26,9 @@ class DataciteRendererMixin(object):
         for subject in metadata.get('subjects', []):
             self.node('subject', {
                 'xml:lang': 'en',
-                'schemeURI': subject.get('scheme_uri'),
-                'subjectScheme': subject.get('subject_scheme')
+                'subjectScheme': subject.get('subjectScheme'),
+                'schemeURI': subject.get('schemeURI'),
+                'valueURI': subject.get('valueURI')
             }, subject.get('subject'))
         self.end('subjects')
 
