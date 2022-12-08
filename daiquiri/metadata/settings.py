@@ -39,3 +39,14 @@ LICENSE_URLS = {
     LICENSE_BY_NC_SA: 'https://creativecommons.org/licenses/by-nc-sa/4.0/',
     LICENSE_BY_NC_ND: 'https://creativecommons.org/licenses/by-nc-nd/4.0/'
 }
+
+LICENSE_IDENTIFIERS = {
+    LICENSE_CC0: 'CC0-1.0',
+    LICENSE_PD: None,
+    LICENSE_BY: 'CC-BY-4.0',
+    LICENSE_BY_SA: 'CC-BY-SA-4.0',
+    LICENSE_BY_ND: 'CC-BY-ND-4.0',
+    LICENSE_BY_NC: 'CC-BY-NC-4.0',
+    LICENSE_BY_NC_SA: 'CC-BY-NC-SA-4.0',
+    LICENSE_BY_NC_ND: 'CC-BY-NC-ND-4.0'
+}

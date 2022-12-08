@@ -21,6 +21,8 @@ class DataciteSerializer(serializers.ModelSerializer):
     formats = serializers.SerializerMethodField()
     sizes = serializers.SerializerMethodField()
     license_url = serializers.SerializerMethodField()
+    license_label = serializers.SerializerMethodField()
+    license_identifier = serializers.SerializerMethodField()
     description = serializers.SerializerMethodField()
 
     def get_publication_year(self, obj):
@@ -40,6 +42,12 @@ class DataciteSerializer(serializers.ModelSerializer):
 
     def get_license_url(self, obj):
         return settings.LICENSE_URLS.get(obj.license)
+
+    def get_license_label(self, obj):
+        return str(dict(settings.LICENSE_CHOICES).get(obj.license))
+
+    def get_license_identifier(self, obj):
+        return settings.LICENSE_IDENTIFIERS.get(obj.license)
 
     def get_description(self, obj):
         return obj.long_description or obj.description
@@ -66,6 +74,8 @@ class DataciteSchemaSerializer(DataciteSerializer):
             'formats',
             'license',
             'license_url',
+            'license_label',
+            'license_identifier',
             'description',
         )
 
@@ -112,6 +122,8 @@ class DataciteTableSerializer(DataciteSerializer):
             'formats',
             'license',
             'license_url',
+            'license_label',
+            'license_identifier',
             'description',
         )
 

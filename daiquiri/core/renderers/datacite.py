@@ -88,7 +88,11 @@ class DataciteRendererMixin(object):
         license = metadata.get('license')
         if license is not None:
             self.start('rightsList')
-            self.node('rights', {'rightsURI': metadata.get('license_url')}, license)
+            self.node('rights', {
+                'rightsURI': metadata.get('license_url'),
+                'rightsIdentifier': metadata.get('license_identifier'),
+                },
+                metadata.get('license_label'))
             self.end('rightsList')
 
         description = metadata.get('long_description') or metadata.get('description')
