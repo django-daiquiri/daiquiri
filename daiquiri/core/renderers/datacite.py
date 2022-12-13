@@ -40,9 +40,13 @@ class DataciteRendererMixin(object):
         self.end('contributors')
 
         updated = metadata.get('updated')
-        if updated is not None:
+        published = metadata.get('published')
+        if updated is not None or published is not None:
             self.start('dates')
-            self.node('date', {'dateType': 'Updated'}, updated)
+            if updated:
+                self.node('date', {'dateType': 'Updated'}, updated)
+            if published:
+                self.node('date', {'dateType': 'Issued'}, published)
             self.end('dates')
 
         self.node('language', {}, metadata.get('language'))
