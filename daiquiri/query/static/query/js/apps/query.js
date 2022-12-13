@@ -27,6 +27,25 @@ app.directive('submitting', ['$timeout', function ($timeout) {
     };
 }]);
 
+
+app.directive('tooltip', function () {
+    return {
+        restrict: 'A',
+        link: function (scope, element, attrs) {
+            element.hover(function () {
+                // exclude user-schema from showing a tooltip to prevent
+                // multiple tooltips due to the 3sec update of the user-schema
+                if (attrs.schemaflag != "user_schema") {
+                    element.tooltip('show');
+                }
+            }, function () {
+                element.tooltip('hide');
+            });
+        }
+    };
+});
+
+
 app.controller('QueryController', ['$scope', 'QueryService', function($scope, QueryService) {
 
     $scope.service = QueryService;

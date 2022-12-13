@@ -141,6 +141,11 @@ app.factory('QueryService', ['$resource', '$http', '$injector', '$q', '$filter',
         }, function(response) {
             var user_schema = response[0];
 
+            // flag for the user schema to exclude it from showing a tooltip.
+            // Otherwise, the fact that the user-schema us updated every 3 seconds
+            // breaks the show/hide mechanic of the tooltip.
+            user_schema.schema_flag = 'user_schema';
+
             var user_columns = [];
             angular.forEach(user_schema.tables, function(table) {
                 angular.forEach(table.columns, function(column) {

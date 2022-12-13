@@ -26,7 +26,13 @@
                 ng-class="{ 'active': browser.isActive(browserId, $parent.$index, $index) }">
                 <a href=""
                     ng-click="itemClicked(browserId, item, $parent.$index, $index);"
-                    ng-dblclick="itemDblClicked(browserId, item, $parent.$index, $index);">
+                    ng-dblclick="itemDblClicked(browserId, item, $parent.$index, $index);"
+                    data-toggle="tooltip"
+                    data-html="true"
+                    data-placement="left"
+                    data-container="body"
+                    schemaflag="{{item.schema_flag}}"
+                    title="{{item.description}}" tooltip>
                     <i class="pull-right fa fa-chevron-right" ng-show="column.selected == $index"></i>
                     {$ item.name $}
                 </a>
