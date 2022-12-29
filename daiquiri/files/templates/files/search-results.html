@@ -1,0 +1,11 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% load compress %}
+
+{% block content %}
+<main class="container">
+    <div class="wide">
+        {% include 'files/list-results.html' %}
+    </div>
+</main>
+{% endblock %}

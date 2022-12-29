@@ -1,0 +1,40 @@
+
+<h3> Search results for "{{ search_string }}". </h3>
+<p>There are {{ num_of_search_results }} pages(s) matching the search query.</p></br>
+
+<div>
+    {% for result in search_results %}
+    <div>
+        <a style="textunder" href="{{ result.url }}"> <h4>{{ result.url }} </h4> </a>
+        <p style="color:gray"> {{ result.body|striptags|truncatechars:500 }} </p></br>
+    </div>
+    {% endfor %}
+</div>
+
+<nav aria-label="...">
+    <ul class="pager">
+        {% if search_results.has_previous %}
+            <li class="previous">
+                <a href="?q={{ search_string }}&page={{ search_results.previous_page_number }}">
+                    <span aria-hidden="true">&larr;</span> Previous
+                </a>
+            </li>
+        {% else %}
+            <li class="previous disabled">
+                <a><span>&larr;</span> Previous</a>
+            </li>
+        {% endif %}
+
+        {% if search_results.has_next %}
+            <li class="next">
+                <a href="?q={{ search_string }}&page={{ search_results.next_page_number }}">
+                    Next <span aria-hidden="true">&rarr;</span>
+                </a>
+            </li>
+        {% else %}
+            <li class="next disabled">
+                <a>Next <span aria-hidden="true">&rarr;</span></a>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
