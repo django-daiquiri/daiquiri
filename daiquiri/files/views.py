@@ -15,7 +15,7 @@ from .utils import (
         get_file_path,
         render_with_layout,
         send_file,
-        get_all_cms_content
+        build_lunr_index
 )
 
 logger = logging.getLogger(__name__)
@@ -55,13 +55,14 @@ class SearchView(View):
 
     def get(self, request, **kwargs):
 
-        docs = get_all_cms_content()
-        idx = lunr(ref="url", fields=("body",), documents = docs)
+        idx, docs = build_lunr_index()
         results = []
         search_string = request.GET.get("q")
         if search_string:
-            file_ids = [f["ref"] for f in idx.search(search_string)]
-            results = [d for d in docs if d["url"] in file_ids]
+            file_urls = [f["ref"] for f in idx.search(search_string)]
+            results = [f for _, f in docs.items() if f["url"] in file_urls]
+        else:
+            search_string = ""
 
         paginator = Paginator(results, 5)
         page_number = request.GET.get('page')
