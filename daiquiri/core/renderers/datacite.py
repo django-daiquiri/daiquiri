@@ -26,8 +26,9 @@ class DataciteRendererMixin(object):
         for subject in metadata.get('subjects', []):
             self.node('subject', {
                 'xml:lang': 'en',
-                'schemeURI': subject.get('scheme_uri'),
-                'subjectScheme': subject.get('subject_scheme')
+                'subjectScheme': subject.get('subjectScheme'),
+                'schemeURI': subject.get('schemeURI'),
+                'valueURI': subject.get('valueURI')
             }, subject.get('subject'))
         self.end('subjects')
 
@@ -39,9 +40,13 @@ class DataciteRendererMixin(object):
         self.end('contributors')
 
         updated = metadata.get('updated')
-        if updated is not None:
+        published = metadata.get('published')
+        if updated is not None or published is not None:
             self.start('dates')
-            self.node('date', {'dateType': 'Updated'}, updated)
+            if updated:
+                self.node('date', {'dateType': 'Updated'}, updated)
+            if published:
+                self.node('date', {'dateType': 'Issued'}, published)
             self.end('dates')
 
         self.node('language', {}, metadata.get('language'))
@@ -87,7 +92,11 @@ class DataciteRendererMixin(object):
         license = metadata.get('license')
         if license is not None:
             self.start('rightsList')
-            self.node('rights', {'rightsURI': metadata.get('license_url')}, license)
+            self.node('rights', {
+                'rightsURI': metadata.get('license_url'),
+                'rightsIdentifier': metadata.get('license_identifier'),
+                },
+                metadata.get('license_label'))
             self.end('rightsList')
 
         description = metadata.get('long_description') or metadata.get('description')
@@ -110,11 +119,12 @@ class DataciteRendererMixin(object):
             name = person.get('name')
             first_name = person.get('first_name')
             last_name = person.get('last_name')
+            name_type = person.get('name_type')
 
             if not name:
                 name = '{}, {}'.format(last_name, first_name)
 
-            self.node(person_type + 'Name', {}, name)
+            self.node(person_type + 'Name', {'nameType': name_type}, name)
 
             if first_name:
                 self.node('givenName', {}, first_name)
@@ -132,6 +142,10 @@ class DataciteRendererMixin(object):
             affiliations = person.get('affiliations')
             if affiliations:
                 for affiliation in affiliations:
-                    self.node('affiliation', {}, affiliation)
+                    self.node('affiliation', {
+                        'affiliationIdentifier': affiliation.get('affiliation_identifier'),
+                        'affiliationIdentifierScheme': affiliation.get('affiliation_identifier_scheme'),
+                        'schemeURI': affiliation.get('scheme_uri')
+                        }, affiliation.get('affiliation'))
 
             self.end(person_type)

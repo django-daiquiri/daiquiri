@@ -31,6 +31,7 @@ SITE_LANGUAGE = 'en'
 SITE_SUBJECTS = [
     {
         'subject': 'Astronomy',
+        'subjectScheme': 'Library of Congress Subject Headings (LCSH)',
         'schemeURI': 'http://id.loc.gov/authorities/subjects',
         'valueURI': 'http://id.loc.gov/authorities/subjects/sh85009003'
     }
