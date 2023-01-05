@@ -14,7 +14,7 @@
 
 <formgroup
     data-type="file"
-    data-label="{% trans 'File' %}"
+    data-label="{% trans 'File (max {$ service.status.upload_limit | bytes $})' %}"
     data-model="service.forms.upload.values.file"
     data-errors="service.forms.upload.errors.file"
     data-help="{% trans 'Drag and drop file or click to open a file browser' %}">

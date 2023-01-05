@@ -69,7 +69,8 @@ class StatusViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
             'guest': not request.user.is_authenticated,
             'queued_jobs': None,
             'size': QueryJob.objects.get_size(request.user),
-            'quota': get_quota(request.user)
+            'quota': get_quota(request.user),
+            'upload_limit': get_quota(request.user, quota_settings='QUERY_UPLOAD_LIMIT')
         }])
 
 
