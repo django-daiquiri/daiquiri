@@ -1,12 +1,13 @@
 
 <h3> Search results for "{{ search_string }}". </h3>
-<p>There are {{ num_of_search_results }} pages(s) matching the search query.</p></br>
+<p>There are <b>{{ num_of_search_results }}</b> pages(s) matching the search query.</p></br>
 
 <div>
     {% for result in search_results %}
     <div>
-        <a style="textunder" href="{{ result.url }}"> <h4>{{ result.url }} </h4> </a>
-        <p style="color:gray"> {{ result.body|striptags|truncatechars:500 }} </p></br>
+        <h3> {{ result.title|striptags }} </h3>
+        <a style="textunder" href="{{ result.url }}"> {{ result.url }} </a>
+        <p style="color:gray"> {{ result.body|striptags|truncatechars:400 }} </p></br>
     </div>
     {% endfor %}
 </div>

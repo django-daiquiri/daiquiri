@@ -14,9 +14,11 @@ from .utils import (
         get_directory,
         get_file_path,
         render_with_layout,
-        send_file,
-        build_lunr_index
+        send_file
 )
+
+from .search import search_for_string
+
 
 logger = logging.getLogger(__name__)
 
@@ -55,13 +57,9 @@ class SearchView(View):
 
     def get(self, request, **kwargs):
 
-        idx, docs = build_lunr_index()
-        results = []
         search_string = request.GET.get("q")
-        if search_string:
-            file_urls = [f["ref"] for f in idx.search(search_string)]
-            results = [f for _, f in docs.items() if f["url"] in file_urls]
-        else:
+        results = search_for_string(search_string)
+        if search_string is None:
             search_string = ""
 
         paginator = Paginator(results, 5)
