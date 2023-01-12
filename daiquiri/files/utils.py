@@ -111,7 +111,7 @@ def build_lunr_index():
     global _lunr_index
     global _cms_files
 
-    docs_path = os.path.join(settings.FILES_BASE_PATH, settings.FILES_DOCS_PATH)
+    docs_path = os.path.join(settings.FILES_BASE_PATH, settings.FILES_DOCS_REL_PATH)
 
     unique_files = set()
     for dir_path, _, files in os.walk(docs_path):
