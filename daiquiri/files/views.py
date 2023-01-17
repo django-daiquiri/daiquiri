@@ -1,24 +1,19 @@
 import logging
-import time
-from lunr import lunr
-from django.contrib.admin.options import Paginator
 
 from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
-from django.http import Http404, HttpResponse
+from django.http import Http404
 from django.shortcuts import render
 from django.views.generic import View
-from django.utils.safestring import mark_safe
 
+from .search import Searcher
 from .utils import (
         get_directory,
         get_file_path,
         render_with_layout,
         send_file
 )
-
-from .search import Searcher
 
 
 logger = logging.getLogger(__name__)
