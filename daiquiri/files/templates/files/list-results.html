@@ -1,3 +1,4 @@
+{% load search_highlight %}
 
 <h3> Search results for "{{ search_string }}". </h3>
 <p>There are <b>{{ num_of_search_results }}</b> pages(s) matching the search query.</p></br>
@@ -5,9 +6,9 @@
 <div>
     {% for result in search_results %}
     <div>
-        <h3> {{ result.title|striptags }} </h3>
+        <h3> {{ result.title | underline:result.match_data }}</h3>
         <a style="textunder" href="{{ result.url }}"> {{ result.url }} </a>
-        <p style="color:gray"> {{ result.body|striptags|truncatechars:400 }} </p></br>
+        <p>{{ result.body | highlight:result.match_data }} </p></br> 
     </div>
     {% endfor %}
 </div>

@@ -1,4 +1,5 @@
 import logging
+import time
 from lunr import lunr
 from django.contrib.admin.options import Paginator
 
@@ -17,7 +18,7 @@ from .utils import (
         send_file
 )
 
-from .search import search_for_string
+from .search import Searcher
 
 
 logger = logging.getLogger(__name__)
@@ -39,7 +40,7 @@ class FileView(View):
 
         directory = get_directory(request.user, file_path)
         if directory is None:
-            logger.debug('%s if forbidden', file_path)
+            logger.debug('%s is forbidden', file_path)
             if request.user.is_authenticated:
                 raise PermissionDenied
             else:
@@ -57,10 +58,9 @@ class SearchView(View):
 
     def get(self, request, **kwargs):
 
-        search_string = request.GET.get("q")
-        results = search_for_string(search_string)
-        if search_string is None:
-            search_string = ""
+        search_string = request.GET.get("q", "")
+
+        results = Searcher.search_for_string(string_query=search_string)
 
         paginator = Paginator(results, 5)
         page_number = request.GET.get('page')
