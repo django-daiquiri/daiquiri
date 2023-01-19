@@ -3,7 +3,7 @@ import re
 
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
-
+from allauth.account.models import EmailAddress
 from daiquiri.auth.models import Profile
 
 # from rdmo.projects.models import Membership
@@ -91,6 +91,10 @@ class Command(BaseCommand):
         found_users = []
         for _, user in enumerate(User.objects.all().order_by("date_joined")):
             profile = Profile.objects.get(user__username=user.username)
+            email = EmailAddress.objects.filter(user=user.id, verified=True).first()
+            email_verified = False
+            if email is not None:
+                email_verified = True
             m = self.check_match(user, profile, options)
             if m is True:
                 found_users.append(
@@ -102,9 +106,10 @@ class Command(BaseCommand):
                         "date_joined": user.date_joined,
                         "unix_joined": user.date_joined.timestamp(),
                         "email": user.email,
+                        "email_verified": email_verified,
                         "last_login": user.last_login,
-                        "is_pending": profile.is_pending,
-                        "is_confirmed": profile.is_confirmed,
+                        "profile_pending": profile.is_pending,
+                        "profile_confirmed": profile.is_confirmed,
                     }
                 )
         return found_users
