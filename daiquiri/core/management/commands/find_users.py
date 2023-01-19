@@ -19,14 +19,19 @@ class Command(BaseCommand):
         )
         parser.add_argument("--last_name", default=".*", help="find users by last name")
         parser.add_argument(
-            "--is_pending",
+            "--email_verified",
             default=".*",
-            help="find user by is_pending, requires argument, supports: true/false and 1/0",
+            help="filter users by email_verified, requires argument, supports: true/false/1/0",
         )
         parser.add_argument(
-            "--is_confirmed",
+            "--profile_pending",
             default=".*",
-            help="find users by is_confirmed, required argument, supports: true/false and 1/0",
+            help="filter users by profile_pending, requires argument, supports: true/false/1/0",
+        )
+        parser.add_argument(
+            "--profile_confirmed",
+            default=".*",
+            help="filter users by profile_confirmed, requires argument, supports: true/false/1/0",
         )
         parser.add_argument(
             "-p",
@@ -72,7 +77,7 @@ class Command(BaseCommand):
     def bools_are_equal(self, b1, b2):
         return self.make_bool(b1) == self.make_bool(b2)
 
-    def check_match(self, user, profile, options):
+    def check_match(self, user, profile, email_verified, options):
         if self.rx_match(options["id"], user.id) is False:
             return False
         if self.rx_match(options["email"], user.email) is False:
@@ -81,9 +86,17 @@ class Command(BaseCommand):
             return False
         if self.rx_match(options["last_name"], user.last_name) is False:
             return False
-        if self.bools_are_equal(options["is_pending"], profile.is_pending) is False:
+        if (
+            self.bools_are_equal(options["profile_pending"], profile.is_pending)
+            is False
+        ):
             return False
-        if self.bools_are_equal(options["is_confirmed"], profile.is_confirmed) is False:
+        if (
+            self.bools_are_equal(options["profile_confirmed"], profile.is_confirmed)
+            is False
+        ):
+            return False
+        if self.bools_are_equal(options["email_verified"], email_verified) is False:
             return False
         return True
 
@@ -95,7 +108,7 @@ class Command(BaseCommand):
             email_verified = False
             if email is not None:
                 email_verified = True
-            m = self.check_match(user, profile, options)
+            m = self.check_match(user, profile, email_verified, options)
             if m is True:
                 found_users.append(
                     {
