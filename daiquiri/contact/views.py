@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.utils.timezone import now
 from django.views.generic import TemplateView
@@ -8,6 +9,7 @@ from .forms import ContactForm
 from .utils import send_contact_message
 
 
+@login_required()
 def contact(request):
     contact_form = ContactForm(request.POST or None)
 
@@ -21,8 +23,9 @@ def contact(request):
             message.set_status_active()
             message.created = now()
 
-            if request.user.is_authenticated:
-                message.user = request.user
+            message.user = request.user
+            message.email = request.user.email
+            message.author = request.user.profile.full_name
 
             message.save()
 

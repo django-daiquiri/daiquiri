@@ -10,15 +10,12 @@ class ContactForm(forms.ModelForm):
 
     class Meta:
         model = ContactMessage
-        fields = ['author', 'email', 'subject', 'message']
+        fields = ['subject', 'message']
         widgets = {
-            'author': forms.TextInput(attrs={'placeholder': _('Your name')}),
-            'email': forms.TextInput(attrs={'placeholder': _('Your email address')}),
             'subject': forms.TextInput(attrs={'placeholder': _('Subject')}),
             'message': forms.Textarea(attrs={'placeholder': _('Your message')}),
         }
         labels = {
-            'author': _('Your name'),
-            'email': _('Please enter your email address so our answer will reach you'),
+            'subject': _('Subject'),
             'message': _('Your message')
         }
