@@ -41,7 +41,7 @@ def test_contact_get(db, client, username, password):
 
 
 @pytest.mark.parametrize('username,password', invalid_users)
-def test_contact_get(db, client, username, password):
+def test_contact_get_anon(db, client, username, password):
     client.login(username=username, password=password)
 
     url = reverse('contact:contact')
