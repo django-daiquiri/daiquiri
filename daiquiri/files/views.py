@@ -1,5 +1,6 @@
 import logging
 
+from django.conf import settings
 from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
@@ -57,7 +58,7 @@ class SearchView(View):
 
         results = Searcher.search_for_string(string_query=search_string)
 
-        paginator = Paginator(results, 5)
+        paginator = Paginator(results, settings.FILES_SEARCH_RESULTS_PER_PAGE)
         page_number = request.GET.get('page')
         search_results = paginator.get_page(page_number)
 
