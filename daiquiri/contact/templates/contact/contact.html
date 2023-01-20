@@ -9,6 +9,9 @@
         <p>
             {% trans "Please enter your contact details and your message." %}
         </p>
+        <p>
+            {% trans "The answer will be sent to " %}<b>{{ user.email }}</b>
+        </p>
 
         <form method="post" action="{% url 'contact:contact' %}" novalidate>
             {% csrf_token %}
