@@ -15,7 +15,7 @@ from .utils import get_file_path, read_file_content
 logger = logging.getLogger(__name__)
 
 
-class Searcher:
+class Searcher(object):
 
     cms_files = {}
 
@@ -41,23 +41,6 @@ class Searcher:
         results = sorted(results, key=lambda res: -res['score'])
 
         return cls._reformat(results.copy())
-
-
-    @classmethod
-    def find_title_in_content(cls, html):
-        start_pattern = "<h\d{1,5}>"
-        end_pattern = "</h\d{1,5}>"
-
-        title = "..."
-        match_start = re.search(start_pattern, html)
-        if match_start:
-            title_starts_at = match_start.span()[1]
-            match_end = re.search(end_pattern, html[title_starts_at:])
-            if match_end:
-                title_ends_at = title_starts_at + match_end.span()[0]
-                title = html[title_starts_at:title_ends_at]
-        return title
-
 
 
     @classmethod
@@ -119,6 +102,22 @@ class Searcher:
                 } for path, doc in cls.cms_files.items()]
             cls.lunr_index = lunr(ref="url", fields=("body", "title",), documents = docs)
 
+
+
+    @classmethod
+    def find_title_in_content(cls, html):
+        start_pattern = "<h\d{1,5}>"
+        end_pattern = "</h\d{1,5}>"
+
+        title = "..."
+        match_start = re.search(start_pattern, html)
+        if match_start:
+            title_starts_at = match_start.span()[1]
+            match_end = re.search(end_pattern, html[title_starts_at:])
+            if match_end:
+                title_ends_at = title_starts_at + match_end.span()[0]
+                title = html[title_starts_at:title_ends_at]
+        return title
 
 
     @classmethod
