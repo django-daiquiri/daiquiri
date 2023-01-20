@@ -27,7 +27,7 @@ class Searcher:
         cls.build_lunr_index()
 
         try:
-            lunr_results = cls.lunr_index.search(string_query) 
+            lunr_results = cls.lunr_index.search(string_query)
             file_urls = {f["ref"]: f["score"] for f in lunr_results}
             match_data = {f["ref"]: f["match_data"].metadata for f in lunr_results}
             results = [f for _, f in cls.cms_files.items() if f["url"] in file_urls]
