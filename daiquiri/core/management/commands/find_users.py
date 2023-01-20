@@ -6,8 +6,6 @@ from django.core.management.base import BaseCommand
 from allauth.account.models import EmailAddress
 from daiquiri.auth.models import Profile
 
-# from rdmo.projects.models import Membership
-
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
@@ -47,12 +45,14 @@ class Command(BaseCommand):
         )
 
     def save_csv(self, data, filename):
-        if len(data) > 0:
-            data_file = open(filename, "w")
-            csv_writer = csv.writer(data_file)
-            csv_writer.writerow(list(data[0].keys()))
+        if len(data) > 1:
+            data_file = open(filename, "w", newline="", encoding="utf-8")
+            csv_writer = csv.DictWriter(
+                data_file, fieldnames=list(data[0].keys()), dialect="unix"
+            )
+            csv_writer.writeheader()
             for user in data:
-                csv_writer.writerow(user.values())
+                csv_writer.writerow(user)
             print("List written to " + filename)
 
     def print_file(self, filename):
