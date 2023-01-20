@@ -1,0 +1,17 @@
+{% load i18n %}
+
+<button type="button" class="btn btn-default"
+    ng-click="service.forms.sql.toggle_dropdown('functions')"
+    ng-class="{'active': service.forms.sql.dropdown == 'functions'}">
+
+    {% trans 'Functions' %} <span class="caret"></span>
+</button>
+
+<div class="daiquiri-query-dropdown"
+  ng-show="service.forms.sql.dropdown == 'functions'">
+    <div daiquiri-browser data-browser-id="functions" 
+        class="daiquiri-metadata-browser"></div>
+    <p class="help-block small">
+        {% trans 'A double click will paste the function into the query field.' %}
+    </p>
+</div>

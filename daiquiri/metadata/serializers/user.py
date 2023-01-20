@@ -82,5 +82,6 @@ class FunctionSerializer(serializers.ModelSerializer):
             'id',
             'order',
             'name',
+            'description',
             'query_string'
         )
