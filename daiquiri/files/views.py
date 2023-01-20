@@ -1,3 +1,4 @@
+import os
 import logging
 
 from django.conf import settings
@@ -27,7 +28,7 @@ class FileView(View):
     def get(self, request, file_path, **kwargs):
         if self.root:
             logger.debug('root=%s', self.root)
-            file_path = self.root.strip('/') + '/' + file_path
+            file_path = os.path.join(self.root, file_path)
 
         file_path = get_file_path(file_path)
         if file_path is None:
