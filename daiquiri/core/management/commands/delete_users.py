@@ -1,3 +1,4 @@
+import csv
 import re
 import sys
 
@@ -27,24 +28,27 @@ class Command(BaseCommand):
     def make_user_id_list(self, filename):
         user_ids = []
         try:
-            filecontent = open(filename, "r")
+            filecontent = open(filename, "r", encoding="utf-8", newline="")
         except Exception as e:
             print("Error reading id list file. " + str(e))
             sys.exit(1)
         else:
-            for line in filecontent.read().splitlines():
-                m = re.search(r"^[0-9]+", line)
+            csv_reader = csv.DictReader(filecontent, dialect="unix")
+            for dic in csv_reader:
+                m = re.search(r"^[0-9]+$", dic["id"])
                 if bool(m) is True:
-                    user_ids.append(m.group(0))
-        return sorted(user_ids)
+                    user_ids.append(dic)
+        return sorted(user_ids, key=lambda k: k["id"])
 
-    def delete_users(self, user_ids, dry_run):
-        for id in user_ids:
+    def delete_users(self, user_dic, dry_run):
+        for dic in user_dic:
             try:
-                u = User.objects.get(id=id)
+                u = User.objects.get(id=dic["id"])
                 if dry_run is False:
+                    print("Delete user %s, %s" % (dic["id"], dic["email"]))
                     u.delete()
-                print("User deleted " + str(id))
+                else:
+                    print("Would have deleted user: %s, %s" % (dic["id"], dic["email"]))
             except Exception as e:
                 print("Error deleting user " + str(id) + ". " + str(e))
 
