@@ -2,6 +2,7 @@ import os
 import re
 
 import logging
+from django.shortcuts import Http404
 
 from lunr import lunr
 
@@ -63,8 +64,8 @@ class Searcher:
     def build_lunr_index(cls):
 
         if settings.FILES_DOCS_REL_PATH is None:
-            logger.debug('FILES_DOCS_REL_PATH is not defined')
-            return None
+            logger.error('FILES_DOCS_REL_PATH is not defined')
+            raise Http404
 
         docs_path = os.path.join(settings.FILES_BASE_PATH, settings.FILES_DOCS_REL_PATH)
 
@@ -77,7 +78,8 @@ class Searcher:
 
 
         if len(unique_files) == 0:
-            logger.debug(f'No files found in {docs_path}')
+            logger.error(f'No files found in {docs_path}')
+            raise Http404
 
 
         any_changes = False
