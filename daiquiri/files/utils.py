@@ -1,5 +1,5 @@
-import logging
 import os
+import logging
 
 from django.conf import settings
 from django.shortcuts import render
@@ -53,18 +53,30 @@ def check_file(user, file_path):
 
 
 def render_with_layout(request, file_path):
-    absolute_file_path = os.path.join(settings.FILES_BASE_PATH, file_path)
 
     context = {}
-    with open(absolute_file_path) as f:
-        file_content = f.read()
-
-        if file_path.endswith('.html'):
-            context['content'] = mark_safe(file_content)
-        elif file_path.endswith('.md'):
-            context['content'] = mark_safe(force_str(markdown(file_content)))
+    absolute_file_path = os.path.join(settings.FILES_BASE_PATH, file_path)
+    content = read_file_content(absolute_file_path)
+    if content:
+        context["content"] = content
 
     return render(request, 'files/layout.html', context)
+
+
+
+def read_file_content(abs_file_path):
+    """ Reads the content of a html- or md-file and returns html
+    """
+    if abs_file_path.endswith('.html') or abs_file_path.endswith('.md'):
+        with open(abs_file_path) as f:
+            file_content = f.read()
+
+            if abs_file_path.endswith('.html'):
+                return mark_safe(file_content)
+            elif abs_file_path.endswith('.md'):
+                return mark_safe(force_str(markdown(file_content)))
+    else:
+        return ""
 
 
 def send_file(request, file_path, search=None):
@@ -86,3 +98,5 @@ def send_file(request, file_path, search=None):
     # send the file to the client
     absolute_file_path = os.path.join(settings.FILES_BASE_PATH, file_path)
     return sendfile(request, absolute_file_path)
+
+

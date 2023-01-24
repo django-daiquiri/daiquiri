@@ -21,6 +21,7 @@ drf-extensions~=0.7.1
 ipaddress~=1.0.22
 iso8601~=1.0.2
 jsonfield~=3.1.0
+lunr~=0.6.2
 Markdown~=3.4.1
 Pygments~=2.12.0
 pytest~=6.2.5

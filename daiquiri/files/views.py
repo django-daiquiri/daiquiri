@@ -1,11 +1,22 @@
+import os
 import logging
 
+from django.conf import settings
 from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import PermissionDenied
+from django.core.paginator import Paginator
 from django.http import Http404
+from django.shortcuts import render
 from django.views.generic import View
 
-from .utils import get_directory, get_file_path, render_with_layout, send_file
+from .search import Searcher
+from .utils import (
+        get_directory,
+        get_file_path,
+        render_with_layout,
+        send_file
+)
+
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +28,7 @@ class FileView(View):
     def get(self, request, file_path, **kwargs):
         if self.root:
             logger.debug('root=%s', self.root)
-            file_path = self.root.strip('/') + '/' + file_path
+            file_path = os.path.join(self.root, file_path)
 
         file_path = get_file_path(file_path)
         if file_path is None:
@@ -26,7 +37,7 @@ class FileView(View):
 
         directory = get_directory(request.user, file_path)
         if directory is None:
-            logger.debug('%s if forbidden', file_path)
+            logger.debug('%s is forbidden', file_path)
             if request.user.is_authenticated:
                 raise PermissionDenied
             else:
@@ -36,3 +47,27 @@ class FileView(View):
             return render_with_layout(request, file_path)
         else:
             return send_file(request, file_path)
+
+
+class SearchView(View):
+
+    root = None
+
+    def get(self, request, **kwargs):
+
+        search_string = request.GET.get("q", "")
+
+        results = Searcher.search_for_string(string_query=search_string)
+
+        paginator = Paginator(results, settings.FILES_SEARCH_RESULTS_PER_PAGE)
+        page_number = request.GET.get('page')
+        search_results = paginator.get_page(page_number)
+
+        context = {
+                "search_results": search_results,
+                "search_string": search_string,
+                "num_of_search_results": len(results)
+                }
+
+        return render(request, "files/search-results.html", context)
+
