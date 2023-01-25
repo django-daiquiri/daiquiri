@@ -19,7 +19,7 @@ query_job:
   * jobID
   * schema_name
   * table_name
-  
+
 -->
 
 {% block wide %}
@@ -28,10 +28,10 @@ query_job:
 
     {% if datalinks %}
 
-	    <h2>Data Links</h2>
+        <h2>Data Links</h2>
 
         <table class="table table-condensed table-striped">
-        
+
         <thead>
             <tr>
                 <!-- <td><b>ID</b></td> -->
@@ -44,12 +44,12 @@ query_job:
                 <td><b>content_length</b></td>
             </tr>
         </thead>
-        
+
         <tbody>
 
         {% for datalink in datalinks %}
 
-	        {% if not datalink.service_def %}
+            {% if not datalink.service_def %}
 
             <tr>
 
@@ -64,7 +64,7 @@ query_job:
 
             </tr>
 
-	        {% endif %}
+            {% endif %}
 
         {% endfor %}
 
