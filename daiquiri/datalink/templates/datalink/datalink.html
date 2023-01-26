@@ -1,44 +1,80 @@
 {% extends 'core/wide.html' %}
 {% load i18n %}
 
+<!-- Context
+
+ID
+
+datalinks: (array)
+  * ID
+  * access_url
+  * service_Def
+  * error_message
+  * description
+  * semantics
+  * content_type
+  * content_length
+
+query_job:
+  * jobID
+  * schema_name
+  * table_name
+
+-->
+
 {% block wide %}
 
     <h1>{% blocktrans %}Datalinks for {{ ID }}{% endblocktrans %}</h1>
 
     {% if datalinks %}
 
-    <table class="table table-bordered">
+        <h2>Data Links</h2>
+
+        <table class="table table-condensed table-striped">
+
         <thead>
             <tr>
-                <td>ID</td>
-                <td>access_url</td>
-                <td>service_def</td>
-                <td>error_message</td>
-                <td>description</td>
-                <td>semantics</td>
-                <td>content_type</td>
-                <td>content_length</td>
+                <!-- <td><b>ID</b></td> -->
+                <td><b>access_url</b></td>
+                <!-- <td>service_def</td> -->
+                <!-- <td>error_message</td> -->
+                <td><b>description</b></td>
+                <td><b>semantics</b></td>
+                <td><b>content_type</b></td>
+                <td><b>content_length</b></td>
             </tr>
         </thead>
+
         <tbody>
-            {% for datalink in datalinks %}
+
+        {% for datalink in datalinks %}
+
+            {% if not datalink.service_def %}
+
             <tr>
-                <td>{{ datalink.ID }}</td>
-                <td>{{ datalink.access_url }}</td>
-                <td>{{ datalink.service_def }}</td>
-                <td>{{ datalink.error_message }}</td>
+
+                <!-- <td>{{ datalink.ID }}</td> -->
+                <td><a href={{ datalink.access_url }}>{{ datalink.access_url }}</a></td>
+                <!-- <td>{{ datalink.service_def }}</td> -->
+                <!-- <td>{{ datalink.error_message }}</td> -->
                 <td>{{ datalink.description }}</td>
                 <td>{{ datalink.semantics }}</td>
                 <td>{{ datalink.content_type }}</td>
-                <td>{{ datalink.content_length }}</td>
+                <td>{{ datalink.content_length|filesizeformat }}</td>
+
             </tr>
-            {% endfor %}
+
+            {% endif %}
+
+        {% endfor %}
+
         </tbody>
-    </table>
+
+        </table>
 
     {% else %}
 
-    <p>No datalinks could be found for this ID.</p>
+        <p>No datalinks could be found for this ID.</p>
 
     {% endif %}
 
