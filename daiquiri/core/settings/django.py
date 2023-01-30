@@ -92,6 +92,7 @@ ADDITIONAL_APPS = [
     'allauth.socialaccount',
     'rules',
     'django_sendfile',
+    'honeypot',
 ]
 
 MIDDLEWARE = [
@@ -104,7 +105,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.contrib.sites.middleware.CurrentSiteMiddleware'
+    'django.contrib.sites.middleware.CurrentSiteMiddleware',
+    'honeypot.middleware.HoneypotMiddleware'
 ]
 
 TEMPLATES_DIR = BASE_DIR / 'templates/'
@@ -248,3 +250,7 @@ CELERY_BIN = env.get('CELERY_BIN', 'celery')
 CELERY_PIDFILE_PATH = env.get_abspath('CELERY_PIDFILE_PATH')
 CELERY_LOG_LEVEL = env.get('CELERY_LOG_LEVEL', 'INFO')
 CELERY_LOG_PATH = env.get_abspath('CELERY_LOG_PATH')
+
+HONEYPOT_FIELD_NAME = "phone"
+# HONEYPOT_VALUE = ""
+# HONEYPOT_VERIFIER = ""

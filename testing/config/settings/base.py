@@ -1,6 +1,7 @@
 import os
 
-from . import ADDITIONAL_APPS, BASE_DIR, DJANGO_APPS
+from . import (ADDITIONAL_APPS, BASE_DIR, DJANGO_APPS, HONEYPOT_FIELD_NAME,
+               MIDDLEWARE)
 
 SITE_URL = 'http://testserver'
 SITE_CREATED = '2020-01-01'
@@ -62,3 +63,8 @@ QUERY_DOWNLOAD_DIR = os.path.join(BASE_DIR, 'download')
 QUERY_UPLOAD_DIR = os.path.join(BASE_DIR, 'upload')
 
 SERVE_DOWNLOAD_DIR = os.path.join(BASE_DIR, 'files')
+
+MIDDLEWARE = MIDDLEWARE
+MIDDLEWARE.remove('honeypot.middleware.HoneypotMiddleware')
+
+HONEYPOT_FIELD_NAME = HONEYPOT_FIELD_NAME
