@@ -35,3 +35,24 @@ def test_honeypot_signup_post(db, client):
     # check that a profile was created
     profile = Profile.objects.get(user__username='testing')
     assert profile.is_pending is True
+
+def test_honeypot_login_field_not_empty(db, client):
+    settings.MIDDLEWARE.append('honeypot.middleware.HoneypotMiddleware')
+    url = reverse('account_login')
+    response = client.post(url, {
+        'login': 'user',
+        'password': 'user',
+        settings.HONEYPOT_FIELD_NAME: "some text here",
+    })
+    settings.MIDDLEWARE.remove('honeypot.middleware.HoneypotMiddleware')
+    assert response.status_code == 400
+
+def test_honeypot_login_field_missing(db, client):
+    settings.MIDDLEWARE.append('honeypot.middleware.HoneypotMiddleware')
+    url = reverse('account_login')
+    response = client.post(url, {
+        'login': 'user',
+        'password': 'user',
+    })
+    settings.MIDDLEWARE.remove('honeypot.middleware.HoneypotMiddleware')
+    assert response.status_code == 400
