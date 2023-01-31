@@ -65,6 +65,4 @@ QUERY_UPLOAD_DIR = os.path.join(BASE_DIR, 'upload')
 SERVE_DOWNLOAD_DIR = os.path.join(BASE_DIR, 'files')
 
 MIDDLEWARE = MIDDLEWARE
-MIDDLEWARE.remove('honeypot.middleware.HoneypotMiddleware')
-
 HONEYPOT_FIELD_NAME = HONEYPOT_FIELD_NAME

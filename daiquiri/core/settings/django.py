@@ -105,8 +105,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.contrib.sites.middleware.CurrentSiteMiddleware',
-    'honeypot.middleware.HoneypotMiddleware'
+    'django.contrib.sites.middleware.CurrentSiteMiddleware'
 ]
 
 TEMPLATES_DIR = BASE_DIR / 'templates/'
