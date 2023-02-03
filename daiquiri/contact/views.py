@@ -1,10 +1,7 @@
-from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.utils.timezone import now
 from django.views.generic import TemplateView
-
-from honeypot.decorators import check_honeypot
 
 from daiquiri.core.views import CSRFViewMixin, ModelPermissionMixin
 
@@ -13,7 +10,6 @@ from .utils import send_contact_message
 
 
 @login_required()
-@check_honeypot(field_name=settings.HONEYPOT_FIELD_NAME)
 def contact(request):
     contact_form = ContactForm(request.POST or None)
 

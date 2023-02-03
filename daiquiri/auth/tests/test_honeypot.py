@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.urls import reverse
 
+from daiquiri.core.utils import sanitize_str
+
 testset_login = {
     "url": "account_login",
     "data": {
@@ -32,7 +34,7 @@ def run_honeypot_test(db, client, testset, honeypot, exp):
     data = testset["data"]
     url = reverse(testset["url"])
     if honeypot is not None:
-        data[settings.HONEYPOT_FIELD_NAME] = honeypot
+        data[sanitize_str(settings.HONEYPOT_FIELD_NAME)] = honeypot
     response = client.post(url, data)
     assert response.status_code == exp
 
@@ -49,21 +51,21 @@ def run_honeypot_test(db, client, testset, honeypot, exp):
 #     run_honeypot_test(db, client, testset_login, None, 400)
 
 
-# def test_honeypot_signup(db, client):
-#     run_honeypot_test(db, client, testset_signup, "", 302)
+def test_honeypot_signup(db, client):
+    run_honeypot_test(db, client, testset_signup, settings.HONEYPOT_FIELD_VALUE, 302)
 
 
-# def test_honeypot_signup_honeypot_field_invalid(db, client):
-#     run_honeypot_test(db, client, testset_signup, "some_text", 400)
+def test_honeypot_signup_honeypot_field_invalid(db, client):
+    run_honeypot_test(db, client, testset_signup, "some_text", 400)
 
 
-# def test_honeypot_signup_honeypot_field_missing(db, client):
-#     run_honeypot_test(db, client, testset_signup, None, 400)
+def test_honeypot_signup_honeypot_field_missing(db, client):
+    run_honeypot_test(db, client, testset_signup, None, 400)
 
 
 def test_contact_post(db, client):
     client.login(username="admin", password="admin")
-    run_honeypot_test(db, client, testset_contact, "", 200)
+    run_honeypot_test(db, client, testset_contact, settings.HONEYPOT_FIELD_VALUE, 200)
 
 
 def test_contact_post_honeypot_field_invalid(db, client):

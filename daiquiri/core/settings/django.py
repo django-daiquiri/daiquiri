@@ -105,8 +105,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.contrib.sites.middleware.CurrentSiteMiddleware',
-    'honeypot.middleware.HoneypotResponseMiddleware'
+    'django.contrib.sites.middleware.CurrentSiteMiddleware'
 ]
 
 TEMPLATES_DIR = BASE_DIR / 'templates/'
@@ -251,6 +250,6 @@ CELERY_PIDFILE_PATH = env.get_abspath('CELERY_PIDFILE_PATH')
 CELERY_LOG_LEVEL = env.get('CELERY_LOG_LEVEL', 'INFO')
 CELERY_LOG_PATH = env.get_abspath('CELERY_LOG_PATH')
 
-HONEYPOT_FIELD_NAME = "phone"
-# HONEYPOT_VALUE = ""
-# HONEYPOT_VERIFIER = ""
+HONEYPOT_FIELD_NAME = "Phone"
+HONEYPOT_FIELD_VALUE = ""
+HONEYPOT_FIELD_HIDDEN = True
