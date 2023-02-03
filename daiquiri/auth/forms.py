@@ -79,7 +79,8 @@ class SignupForm(ProfileForm):
         label=_('First name'), widget=forms.TextInput(attrs={'placeholder': _('First name')}))
     last_name = forms.CharField(max_length=30,
         label=_('Last name'), widget=forms.TextInput(attrs={'placeholder': _('Last name')}))
-    locals()[sanitize_str(settings.HONEYPOT_FIELD_NAME)] = HoneypotField()
+    if settings.HONEYPOT_ENABLED is True:
+        locals()[sanitize_str(settings.HONEYPOT_FIELD_NAME)] = HoneypotField()
 
     field_order = ['username', 'email', 'password1', 'password2']
 

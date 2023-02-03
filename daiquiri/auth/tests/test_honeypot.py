@@ -33,6 +33,10 @@ testset_contact = {
 def run_honeypot_test(db, client, testset, honeypot, exp):
     data = testset["data"]
     url = reverse(testset["url"])
+    if settings.HONEYPOT_ENABLED is False:
+        exp = 302
+        if "contact" in url:
+            exp = 200
     if honeypot is not None:
         data[sanitize_str(settings.HONEYPOT_FIELD_NAME)] = honeypot
     response = client.post(url, data)

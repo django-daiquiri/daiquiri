@@ -12,7 +12,8 @@ from .models import ContactMessage
 class ContactForm(forms.ModelForm):
 
     use_required_attribute = False
-    locals()[sanitize_str(settings.HONEYPOT_FIELD_NAME)] = HoneypotField()
+    if settings.HONEYPOT_ENABLED is True:
+        locals()[sanitize_str(settings.HONEYPOT_FIELD_NAME)] = HoneypotField()
 
     class Meta:
         model = ContactMessage
