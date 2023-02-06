@@ -1,12 +1,40 @@
+
 from django import forms
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.exceptions import BadRequest
 from django.utils.translation import gettext as _
 
-from daiquiri.core.utils import get_detail_fields
+from daiquiri.core.utils import get_detail_fields, sanitize_str
 
 from .models import Profile
 
+
+class HoneypotField(forms.CharField):
+    hpstyle = 'border: 1px dashed'
+    hplabel = settings.HONEYPOT_FIELD_NAME
+    if settings.HONEYPOT_FIELD_HIDDEN is True:
+        hpstyle = 'opacity: 0; position: absolute; top: 0; left: 0; height: 0; width: 0; z-index: -1;'
+        hplabel = ''
+    default_widget = forms.TextInput(
+        {'style': hpstyle, 'tabindex': '-1', 'autocomplete': 'off'}
+    )
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('widget', HoneypotField.default_widget)
+        kwargs['required'] = False
+        kwargs['label'] = self.hplabel
+        super().__init__(*args, **kwargs)
+
+    def validate(self, value):
+        return value == settings.HONEYPOT_FIELD_VALUE
+
+    def clean(self, value):
+        cleaned_value = super().clean(value)
+        if self.validate(cleaned_value) is True:
+            return cleaned_value
+        else:
+            raise BadRequest('invalid request')
 
 class UserForm(forms.ModelForm):
     class Meta:
@@ -14,7 +42,7 @@ class UserForm(forms.ModelForm):
         fields = ('first_name', 'last_name')
         widgets = {
             'first_name': forms.TextInput(attrs={'placeholder': _('First name')}),
-            'last_name': forms.TextInput(attrs={'placeholder': _('Last name')})
+            'last_name': forms.TextInput(attrs={'placeholder': _('Last name')}),
         }
 
 
@@ -51,6 +79,8 @@ class SignupForm(ProfileForm):
         label=_('First name'), widget=forms.TextInput(attrs={'placeholder': _('First name')}))
     last_name = forms.CharField(max_length=30,
         label=_('Last name'), widget=forms.TextInput(attrs={'placeholder': _('Last name')}))
+    if settings.HONEYPOT_ENABLED is True:
+        locals()[sanitize_str(settings.HONEYPOT_FIELD_NAME)] = HoneypotField()
 
     field_order = ['username', 'email', 'password1', 'password2']
 

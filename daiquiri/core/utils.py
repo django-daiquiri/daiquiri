@@ -392,3 +392,6 @@ def handle_file_upload(directory, file):
             destination.write(chunk)
 
     return file_path
+
+def sanitize_str(strval):
+    return re.sub(r'[^a-zA-Z0-9]', '_', strval.lower())

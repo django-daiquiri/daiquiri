@@ -1,5 +1,10 @@
+
 from django import forms
+from django.conf import settings
 from django.utils.translation import gettext as _
+
+from daiquiri.auth.forms import HoneypotField
+from daiquiri.core.utils import sanitize_str
 
 from .models import ContactMessage
 
@@ -7,6 +12,8 @@ from .models import ContactMessage
 class ContactForm(forms.ModelForm):
 
     use_required_attribute = False
+    if settings.HONEYPOT_ENABLED is True:
+        locals()[sanitize_str(settings.HONEYPOT_FIELD_NAME)] = HoneypotField()
 
     class Meta:
         model = ContactMessage
