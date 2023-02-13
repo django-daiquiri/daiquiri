@@ -321,10 +321,18 @@ def create_download_archive_task(archive_id):
         archive_job.save()
 
         # create a zipfile with all files
-        with zipfile.ZipFile(archive_job.file_path, 'w') as z:
-            os.chdir(settings.FILES_BASE_PATH)
-            for file_path in archive_job.files:
-                z.write(file_path)
+        try:
+            with zipfile.ZipFile(archive_job.file_path, 'w') as z:
+                os.chdir(settings.FILES_BASE_PATH)
+                for file_path in archive_job.files:
+                    z.write(file_path)
+
+        except Exception as e:
+            archive_job.phase = archive_job.PHASE_ERROR
+            archive_job.error_summary = str(e)
+            archive_job.save()
+            logger.info('archive_job %s failed (%s)' % (archive_job.id, archive_job.error_summary))
+            raise e
 
         archive_job.end_time = now()
         archive_job.phase = archive_job.PHASE_COMPLETED
