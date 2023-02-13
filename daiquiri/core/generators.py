@@ -93,7 +93,7 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
                                   .replace('>', '&gt;')
                 attrs.append('%s="%s"' % (key, value))
 
-        if 'ucd' in field:
+        if field.get('ucd'):
             if 'meta.id' in field['ucd'] and 'meta.ref' in field['ucd']:
                 attrs.append('ID="datalinkID"')
 
