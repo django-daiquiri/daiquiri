@@ -201,6 +201,12 @@ class BaseDatabaseAdapter(object):
             self.execute(sql)
 
     def create_table(self, schema_name, table_name, columns):
+
+        # check column types
+        for column in columns:
+            if self.COLUMNTYPES.get(column['datatype'], None) is None:
+                raise TypeError("Column {name} is of type {datatype}. {datatype} is not supported by Postgres, the table can not be created.".format(datatype = column['datatype']))
+
         # prepare sql string
         sql = 'CREATE TABLE %(schema)s.%(table)s (%(columns)s);' % {
             'schema': self.escape_identifier(schema_name),

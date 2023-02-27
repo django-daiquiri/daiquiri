@@ -76,12 +76,17 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
 
     COLUMNTYPES = {
         'char': 'text',
+        'unicodeChar': 'text',
         'boolean': 'boolean',
+        'bit': 'boolean',
+        # 'unsignedByte': ???, not supported by Postgres... could be solved with pguint extention
         'short': 'smallint',
         'int': 'integer',
         'long': 'bigint',
         'float': 'real',
         'double': 'double precision'
+        #'floatComplex': ???, not supported by Postgres
+        #'doubleComplex': ???, not supported by Postgres
     }
 
     search_stmt_template = '%s::text LIKE %%s'
