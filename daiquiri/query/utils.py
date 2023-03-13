@@ -294,6 +294,7 @@ def ingest_table(schema_name, table_name, file_path, drop_table=False):
             'datatype': field.datatype,
             'ucd': field.ucd,
             'unit': str(field.unit),
+            'arraysize': field.arraysize,
         })
 
     if drop_table:
