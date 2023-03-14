@@ -48,6 +48,10 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
             'datatype': 'double',
             'arraysize': False
         },
+        'spoint':{
+            'datatype': 'char',
+            'arraysize': True   
+        },
         '_int2': {
             'datatype': 'short',
             'arraysize': '*'
@@ -84,9 +88,10 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         'int': 'integer',
         'long': 'bigint',
         'float': 'real',
-        'double': 'double precision'
+        'double': 'double precision',
         #'floatComplex': ???, not supported by Postgres
         #'doubleComplex': ???, not supported by Postgres
+        'spoint': 'spoint',
     }
 
     search_stmt_template = '%s::text LIKE %%s'
