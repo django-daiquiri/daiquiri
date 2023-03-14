@@ -281,6 +281,25 @@ def fetch_file(user, url):
 
     return file_path
 
+def catch_special_types(field):
+    '''Catch any DB specific datatype, which are not VO compatible. i.e.: like spoint for postgres.
+    '''
+    adapter = DatabaseAdapter()
+
+    if adapter.database_config['ENGINE'] == 'django.db.backends.postgresql':
+    
+        if( field.name == "pos" and field.datatype in ("char", "unicodeChar") ):
+            datatype = "spoint"
+            arraysize = None
+        else:
+            datatype = field.datatype
+            arraysize = field.arraysize
+
+    else:
+        datatype = field.datatype
+        arraysize = field.arraysize
+
+    return(datatype, arraysize)
 
 def ingest_table(schema_name, table_name, file_path, drop_table=False):
     adapter = DatabaseAdapter()
@@ -289,11 +308,15 @@ def ingest_table(schema_name, table_name, file_path, drop_table=False):
 
     columns = []
     for field in table.fields:
+
+        datatype, arraysize = catch_special_types(field)
+    
         columns.append({
             'name': field.name,
-            'datatype': field.datatype,
+            'datatype': datatype,
             'ucd': field.ucd,
             'unit': str(field.unit),
+            'arraysize': arraysize,
         })
 
     if drop_table:
