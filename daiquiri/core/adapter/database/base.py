@@ -341,7 +341,10 @@ class BaseDatabaseAdapter(object):
         if mask_cell:
             return 'NULL'
         else:
-            if cell.dtype.char == 'S':
+            if type(cell) == str: 
+                # this is the case for fields datatype="char" and arraysize="*"
+                value = cell
+            elif cell.dtype.char == 'S':
                 # chars need to be decoded
                 value = cell.decode()
             elif cell.dtype.char == '?':
