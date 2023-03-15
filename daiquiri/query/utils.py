@@ -194,15 +194,20 @@ def get_job_column(job, display_column_name):
     except (ValueError, KeyError):
         return {}
 
-    if schema_name == settings.TAP_UPLOAD:
+    if (schema_name == settings.TAP_UPLOAD) or (schema_name == get_user_schema_name(job.owner)):
         # for TAP_UPLOAD get the information directly from the database
         column = DatabaseAdapter().fetch_column(schema_name, table_name, column_name)
 
-        # add the uploads metadata (ucds, units)
+        # add the uploads metadata (ucds, units, description)
         for upload_column in job.metadata['upload_columns']:
             if upload_column['name'] == column['name']:
                 column.update(upload_column)
                 break
+
+        # add the job metadata (ucds, units, description)
+        for user_column in job.metadata['user_columns']:
+            if user_column['name'] == column['name']:
+                column.update(user_column)
                 
         return column
 

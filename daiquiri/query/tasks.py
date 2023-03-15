@@ -127,6 +127,7 @@ def run_database_query_task(job_id):
             job.metadata.pop('display_columns', None)
             job.metadata.pop('tables', None)
             job.metadata.pop('upload_columns', None)
+            job.metadata.pop('user_columns', None)
 
             # create a stats record for this job
             Record.objects.create(
