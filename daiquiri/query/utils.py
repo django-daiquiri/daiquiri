@@ -196,7 +196,15 @@ def get_job_column(job, display_column_name):
 
     if schema_name == settings.TAP_UPLOAD:
         # for TAP_UPLOAD get the information directly from the database
-        return DatabaseAdapter().fetch_column(schema_name, table_name, column_name)
+        column = DatabaseAdapter().fetch_column(schema_name, table_name, column_name)
+
+        # add the uploads metadata (ucds, units)
+        for upload_column in job.metadata['upload_columns']:
+            if upload_column['name'] == column['name']:
+                column.update(upload_column)
+                break
+                
+        return column
 
     else:
         # for regular schemas consult the metadata store
@@ -262,6 +270,9 @@ def handle_upload_param(request, upload_param):
 
 
 def ingest_uploads(uploads, user):
+
+    columns = []
+
     if uploads:
         for table_name, location in uploads.items():
             if location.startswith('http:') or location.startswith('https:'):
@@ -269,7 +280,9 @@ def ingest_uploads(uploads, user):
             else:
                 file_path = location
 
-            ingest_table(settings.TAP_UPLOAD, table_name, file_path, drop_table=True)
+            columns = ingest_table(settings.TAP_UPLOAD, table_name, file_path, drop_table=True)
+
+    return columns
 
 
 def fetch_file(user, url):
