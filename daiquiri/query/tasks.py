@@ -84,7 +84,7 @@ def run_database_query_task(job_id):
 
         # get the actual query and submit the job to the database
         try:
-            ingest_uploads(job.uploads, job.owner)
+            job.metadata['upload_columns'] = ingest_uploads(job.uploads, job.owner)
 
             # this is where the work ist done (and the time is spend)
             adapter.submit_query(job.actual_query)
@@ -126,6 +126,8 @@ def run_database_query_task(job_id):
             # remove unneeded metadata
             job.metadata.pop('display_columns', None)
             job.metadata.pop('tables', None)
+            job.metadata.pop('upload_columns', None)
+            job.metadata.pop('user_columns', None)
 
             # create a stats record for this job
             Record.objects.create(

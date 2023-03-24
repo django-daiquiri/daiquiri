@@ -23,7 +23,7 @@ from daiquiri.stats.models import Record
 
 from .managers import ExampleManager, QueryJobManager
 from .process import (check_number_of_active_jobs, check_permissions,
-                      check_quota, process_display_columns, process_query,
+                      check_quota, process_display_columns, process_user_columns, process_query,
                       process_query_language, process_queue,
                       process_response_format, process_schema_name,
                       process_table_name, translate_query)
@@ -177,6 +177,7 @@ class QueryJob(Job):
             # initialize metadata and store map of aliases
             self.metadata = {
                 'display_columns': process_display_columns(processor.display_columns),
+                'user_columns': process_user_columns(self, processor.tables),
                 'tables': processor.tables
             }
 

@@ -239,6 +239,21 @@ def process_display_columns(processor_display_columns):
 
     return OrderedDict(display_columns)
 
+def process_user_columns(job, processor_tables):
+    '''Process the columns of user tables
+    '''
+    columns = []
+    
+    # get type from input job itself.
+    QueryJob = type(job)
+    
+    for schema_name, table_name in processor_tables:
+        # check if a user table is part of the table list
+        if schema_name == get_user_schema_name(job.owner):
+            user_job = QueryJob.objects.filter(owner=job.owner).exclude(phase=QueryJob.PHASE_ARCHIVED).get(table_name=table_name)
+            columns.extend(user_job.metadata['columns'])
+
+    return columns
 
 def check_permissions(user, keywords, tables, columns, functions):
     messages = []
