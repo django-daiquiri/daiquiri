@@ -39,7 +39,7 @@ CREATE TABLE %(TABLE_NAME)s (
   `description` varchar(256),
   `semantics` varchar(80) NOT NULL,
   `content_type` varchar(80),
-  `content_length` int(11),
+  `content_length` bigint(20),
   PRIMARY KEY (`link_id`)
 );
 '''
@@ -77,7 +77,7 @@ CREATE TABLE %(TABLE_NAME)s (
     description character varying(256),
     semantics character varying(80) NOT NULL,
     content_type character varying(80),
-    content_length integer
+    content_length bigint
 );
 '''
     }
