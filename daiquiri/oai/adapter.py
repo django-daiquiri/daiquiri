@@ -253,6 +253,14 @@ class DatalinkOAIAdapterMixin(object):
                     'relation_type': 'IsDescribedBy'
                 })
 
+            elif semantics == '#detached-header':
+                datalink['formats'].append(content_type)
+                datalink['related_identifiers'].append({
+                    'related_identifier': access_url,
+                    'related_identifier_type': 'URL',
+                    'relation_type': 'IsSupplementedBy'
+                })
+
             elif semantics == '#documentation':
                 datalink['alternate_identifiers'].append({
                     'alternate_identifier': access_url,
