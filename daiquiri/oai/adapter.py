@@ -257,10 +257,9 @@ class DatalinkOAIAdapterMixin(object):
             elif semantics == '#detached-header':
                 if content_type not in datalink['formats']:
                     datalink['formats'].append(content_type)
-                datalink['related_identifiers'].append({
-                    'related_identifier': access_url,
-                    'related_identifier_type': 'URL',
-                    'relation_type': 'IsSupplementedBy'
+                datalink['alternate_identifiers'].append({
+                    'alternate_identifier': access_url,
+                    'alternate_identifier_type': 'URL'
                 })
 
             elif semantics == '#documentation':
