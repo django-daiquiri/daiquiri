@@ -269,7 +269,7 @@ class DatalinkOAIAdapterMixin(object):
                 })
 
             elif semantics == '#documentation':
-                datalink['alternate_identifiers'].append({
+                datalink['related_identifiers'].append({
                     'related_identifier': access_url,
                     'related_identifier_type': 'URL',
                     'relation_type': 'IsDocumentedBy'
@@ -283,10 +283,9 @@ class DatalinkOAIAdapterMixin(object):
                 })
 
             elif semantics == '#preview':
-                datalink['related_identifiers'].append({
-                    'related_identifier': access_url,
-                    'related_identifier_type': 'URL',
-                    'relation_type': 'IsDescribedBy'
+                datalink['alternate_identifiers'].append({
+                    'alternate_identifier': access_url,
+                    'alternate_identifier_type': 'DOI Landing Page'
                 })
 
             elif semantics == '#preview-image':
