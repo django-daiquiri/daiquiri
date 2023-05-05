@@ -91,7 +91,7 @@ class TablesDatalinkAdapterMixin(object):
                'description': row[5] or '',
                'semantics': row[6],
                'content_type': row[7] or '',
-               'content_length': row[8] or 0
+               'content_length': row[8]
             }
         ]
 
