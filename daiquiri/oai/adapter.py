@@ -237,7 +237,12 @@ class DatalinkOAIAdapterMixin(object):
 
         datalink = {
             'formats': [],
-            'alternate_identifiers': [],
+            'alternate_identifiers': [
+                {
+                    'alternate_identifier': pk,
+                    'alternate_identifier_type': 'datalink'
+                }
+            ],
             'related_identifiers': []
         }
         for access_url, description, semantics, content_type, content_length in rows:
@@ -246,20 +251,44 @@ class DatalinkOAIAdapterMixin(object):
                 datalink['title'] = description
 
             elif semantics == '#this':
-                datalink['formats'].append(content_type)
+                if content_type not in datalink['formats']:
+                    datalink['formats'].append(content_type)
                 datalink['related_identifiers'].append({
                     'related_identifier': access_url,
                     'related_identifier_type': 'URL',
                     'relation_type': 'IsDescribedBy'
                 })
 
+            elif semantics == '#detached-header':
+                if content_type not in datalink['formats']:
+                    datalink['formats'].append(content_type)
+                datalink['related_identifiers'].append({
+                    'related_identifier': access_url,
+                    'related_identifier_type': 'URL',
+                    'relation_type': 'IsSupplementedBy'
+                })
+
             elif semantics == '#documentation':
-                datalink['alternate_identifiers'].append({
-                    'alternate_identifier': access_url,
-                    'alternate_identifier_type': 'URL'
+                datalink['related_identifiers'].append({
+                    'related_identifier': access_url,
+                    'related_identifier_type': 'URL',
+                    'relation_type': 'IsDocumentedBy'
+                })
+
+            elif semantics == '#progenitor':
+                datalink['related_identifiers'].append({
+                    'related_identifier': access_url,
+                    'related_identifier_type': 'URL',
+                    'relation_type': 'IsDerivedFrom'
                 })
 
             elif semantics == '#preview':
+                datalink['alternate_identifiers'].append({
+                    'alternate_identifier': access_url,
+                    'alternate_identifier_type': 'DOI Landing Page'
+                })
+
+            elif semantics == '#preview-image':
                 datalink['related_identifiers'].append({
                     'related_identifier': access_url,
                     'related_identifier_type': 'URL',

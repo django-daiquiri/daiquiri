@@ -59,7 +59,7 @@ class BaseDatalinkAdapter(object):
         context = {}
 
         if 'ID' in kwargs:
-            context['datalinks'] = Datalink.objects.filter(ID=kwargs['ID'])
+            context['datalinks'] = Datalink.objects.filter(ID=kwargs['ID']).order_by('semantics')
             context['ID'] = kwargs['ID']
 
         return context
@@ -91,7 +91,7 @@ class TablesDatalinkAdapterMixin(object):
                'description': row[5] or '',
                'semantics': row[6],
                'content_type': row[7] or '',
-               'content_length': row[8] or 0
+               'content_length': row[8]
             }
         ]
 

@@ -90,7 +90,7 @@ class DataciteSchemaSerializer(DataciteSerializer):
         url = self.context['request'].build_absolute_uri(reverse('metadata:schema', args=[obj.name]))
         return [{
             'alternate_identifier': url,
-            'alternate_identifier_type': 'URL'
+            'alternate_identifier_type': 'DOI Landing Page'
         }]
 
     def get_resource_type(self, obj):
@@ -142,7 +142,7 @@ class DataciteTableSerializer(DataciteSerializer):
         url = self.context['request'].build_absolute_uri(reverse('metadata:table', args=[obj.schema.name, obj.name]))
         return [{
             'alternate_identifier': url,
-            'alternate_identifier_type': 'URL'
+            'alternate_identifier_type': 'DOI Landing Page'
         }]
 
     def get_sizes(self, obj):
