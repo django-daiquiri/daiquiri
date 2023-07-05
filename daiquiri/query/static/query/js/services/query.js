@@ -146,6 +146,7 @@ app.factory('QueryService', ['$resource', '$http', '$injector', '$q', '$filter',
             // breaks the show/hide mechanic of the tooltip.
             user_schema.schema_flag = 'user_schema';
 
+            /*
             var user_columns = [];
             angular.forEach(user_schema.tables, function(table) {
                 angular.forEach(table.columns, function(column) {
@@ -154,9 +155,11 @@ app.factory('QueryService', ['$resource', '$http', '$injector', '$q', '$filter',
                     user_columns.push(column_copy);
                 });
             });
+            */
 
             BrowserService.render('schemas', service.schemas.concat(user_schema));
-            BrowserService.render('columns', service.columns.concat(user_columns));
+            BrowserService.render('columns', service.columns);
+            //BrowserService.render('columns', service.columns.concat(user_columns));
         }).$promise;
     }
 
