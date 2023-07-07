@@ -1,3 +1,5 @@
+import re
+
 from django.core.validators import URLValidator
 from django.utils.translation import gettext_lazy as _
 
@@ -12,6 +14,9 @@ class TableNameValidator(object):
     requires_context = True
 
     message = _('A job with this table name aready exists.')
+    message_allowed_chars = _(
+        'Please only use letters, numbers, hyphens or underscores.'
+    )
 
     def __call__(self, table_name, serializer_field):
         request = serializer_field.parent.context['request']
@@ -22,6 +27,8 @@ class TableNameValidator(object):
         else:
             current_table_name = None
 
+        if bool(re.search(r'^[0-9a-zA-Z_\-]+$', table_name)) is False:
+            raise ValidationError([self.message_allowed_chars])
         if table_name:
             if current_table_name and table_name == current_table_name:
                 pass
