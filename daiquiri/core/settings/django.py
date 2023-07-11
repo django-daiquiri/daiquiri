@@ -186,6 +186,7 @@ ACCOUNT_LOGOUT_REDIRECT_URL = BASE_URL
 ACCOUNT_ADAPTER = 'daiquiri.auth.adapter.DaiquiriAccountAdapter'
 ACCOUNT_SIGNUP_FORM_CLASS = 'daiquiri.auth.forms.SignupForm'
 ACCOUNT_USER_DISPLAY = 'daiquiri.auth.utils.get_full_name'
+ACCOUNT_USERNAME_VALIDATORS = 'daiquiri.auth.validators.username_validators'
 ACCOUNT_USERNAME_MIN_LENGTH = 4
 ACCOUNT_PASSWORD_MIN_LENGTH = 4
 ACCOUNT_EMAIL_MAX_LENGTH = 190

@@ -18,9 +18,9 @@ class DaiquiriUsernameValidator(validators.RegexValidator):
     '''
     This is almost identical to https://github.com/django/django/blob/main/django/core/validators.py
     '''
-    regex = r'^[\w]+\Z'
+    regex = r'^[a-z0-9_]+\Z'
     message = _(
-        'Enter a valid username. This value may contain only English letters, '
+        'Enter a valid username. This value may contain only English small letters, '
         'numbers, and the underscore.'
     )
     flags = re.ASCII
