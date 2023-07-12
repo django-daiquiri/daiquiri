@@ -20,8 +20,8 @@ class DaiquiriUsernameValidator(validators.RegexValidator):
     '''
     regex = r'^[a-z0-9_]+\Z'
     message = _(
-        'Enter a valid username. This value may contain only English small letters, '
-        'numbers, and the underscore.'
+        'Enter a valid username. This value may contain only English lowercase letters, '
+        'numbers, and underscores.'
     )
     flags = re.ASCII
 
