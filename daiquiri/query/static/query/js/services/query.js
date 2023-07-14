@@ -141,11 +141,6 @@ app.factory('QueryService', ['$resource', '$http', '$injector', '$q', '$filter',
         }, function(response) {
             var user_schema = response[0];
 
-            // flag the user schema to exclude it from showing a tooltip.
-            // Otherwise, the fact that the user_schema is updated every 3 seconds
-            // breaks the show/hide mechanic of the tooltip.
-            user_schema.schema_flag = 'user_schema';
-
             BrowserService.render('schemas', service.schemas.concat(user_schema));
             BrowserService.render('columns', service.columns);
         }).$promise;

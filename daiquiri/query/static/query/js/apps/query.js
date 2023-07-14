@@ -33,13 +33,12 @@ app.directive('tooltip', function () {
         restrict: 'A',
         link: function (scope, element, attrs) {
             element.hover(function () {
-                // exclude user-schema from showing a tooltip to prevent
-                // multiple tooltips due to the 3sec update of the user-schema
-                if (attrs.schemaflag != "user_schema") {
-                    element.tooltip('show');
-                }
+                element.tooltip('show');
             }, function () {
                 element.tooltip('hide');
+                // hide all other open tooltips
+                // clarification: sometimes tooltips are rendered multiple times due to the re-rendering after an API request
+                $('[data-toggle="tooltip"], .tooltip').tooltip("hide");
             });
         }
     };
