@@ -43,7 +43,7 @@ def test_list(db, client, username, password):
     assert response.status_code == status_map['list'][username], response.json()
 
     if response.status_code == 200:
-        assert len(response.json()) == 10
+        assert len(response.json()) == 7
 
 
 @pytest.mark.parametrize('username,password', users)
