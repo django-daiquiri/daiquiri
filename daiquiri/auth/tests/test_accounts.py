@@ -13,6 +13,22 @@ def test_login(db, client):
     assert response.url == reverse('home')
 
 
+def test_login_unverified(db, client):
+    url = reverse('account_login')
+    response = client.post(url, {
+        'login': 'unverified_user',
+        'password': 'user'
+    })
+
+    # check that the signup redirects to the pending page or the confirm email page
+    assert response.status_code == 302
+    assert response.url == reverse('account_email_verification_sent')
+
+    # check that a profile is pending
+    profile = Profile.objects.get(user__username='unverified_user')
+    assert profile.is_pending is True
+
+
 def test_invalid(db, client):
     url = reverse('account_login')
     response = client.post(url, {
@@ -35,48 +51,64 @@ def test_signup_get(db, client):
     assert response.status_code == 200
 
 
-def test_signup_post(db, client):
+def test_signup_post_email_exists_verified(db, client):
     url = reverse('account_signup')
     response = client.post(url, {
-        'email': 'testing@example.com',
-        'username': 'testing',
+        'email': 'user@example.com',
+        'username': 'user2',
         'first_name': 'Tanja',
         'last_name': 'Test',
         'password1': 'testing',
         'password2': 'testing'
     })
 
-    # check that the signup redirects to the pending page or the confirm email page
+   # check that the signup redirects to the pending page or the confirm email page
     assert response.status_code == 302
+    assert response.url == reverse('account_email_verification_sent')
 
-    # check that a profile was created
-    profile = Profile.objects.get(user__username='testing')
-    assert profile.is_pending is True
+    # check that a profile was not created
+    assert Profile.objects.filter(user__username='user2').exists() is False
 
 
-def test_signup_post_invalid(db, client):
+def test_signup_post_email_exists_unverified(db, client):
     url = reverse('account_signup')
     response = client.post(url, {
-        'email': 'testing@example.com',
-        'username': 'testing',
-        'first_name': 'Tanja',
-        'last_name': 'Test',
+        'email': 'user_unverif@example.com',
+        'username': 'unverified_user_2',
+        'first_name': 'Gregor2',
+        'last_name': 'Unverified',
         'password1': 'testing',
-        'password2': 'invalid'
+        'password2': 'testing'
+    })
+
+   # check that the signup redirects to the pending page or the confirm email page
+    assert response.status_code == 302
+    assert response.url == reverse('account_email_verification_sent')
+
+    # check that a profile was not created
+    assert Profile.objects.filter(user__username='unverified_user_2').exists() is False
+
+
+def test_signup_post_user_exists_unverified(db, client):
+    url = reverse('account_signup')
+    response = client.post(url, {
+        'email': 'user_unverif@example2.com',
+        'username': 'unverified_user',
+        'first_name': 'Gregor',
+        'last_name': 'Unverified',
+        'password1': 'testing',
+        'password2': 'testing'
     })
 
     # check that the signup returns 200 (with validation error)
     assert response.status_code == 200
-    assert b'* You must type the same password each time.' in response.content
-
-    # check that a profile was not created
-    assert Profile.objects.filter(user__username='testing').exists() is False
+    assert b'* A user with that username already exists.' in response.content
 
 
-def test_signup_post_exists(db, client):
+def test_signup_post_user_exists_verified(db, client):
     url = reverse('account_signup')
     response = client.post(url, {
-        'email': 'user@example.com',
+        'email': 'user@example2.com',
         'username': 'user',
         'first_name': 'Tanja',
         'last_name': 'Test',
@@ -87,10 +119,6 @@ def test_signup_post_exists(db, client):
     # check that the signup returns 200 (with validation error)
     assert response.status_code == 200
     assert b'* A user with that username already exists.' in response.content
-    assert b'* A user is already registered with this e-mail address.' in response.content
-
-    # check that a profile was not created
-    assert Profile.objects.filter(user__username='testing').exists() is False
 
 
 def test_profile_get_for_user(db, client):
