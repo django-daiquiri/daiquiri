@@ -186,6 +186,7 @@ ACCOUNT_LOGOUT_REDIRECT_URL = BASE_URL
 ACCOUNT_ADAPTER = 'daiquiri.auth.adapter.DaiquiriAccountAdapter'
 ACCOUNT_SIGNUP_FORM_CLASS = 'daiquiri.auth.forms.SignupForm'
 ACCOUNT_USER_DISPLAY = 'daiquiri.auth.utils.get_full_name'
+ACCOUNT_USERNAME_VALIDATORS = 'daiquiri.auth.validators.username_validators'
 ACCOUNT_USERNAME_MIN_LENGTH = 4
 ACCOUNT_PASSWORD_MIN_LENGTH = 4
 ACCOUNT_EMAIL_MAX_LENGTH = 190
@@ -196,6 +197,7 @@ ACCOUNT_EMAIL_VERIFICATION = env.get('ACCOUNT_EMAIL_VERIFICATION', 'mandatory')
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 
 SOCIALACCOUNT_ADAPTER = 'daiquiri.auth.adapter.DaiquiriSocialAccountAdapter'
+SOCIALACCOUNT_AUTO_SIGNUP = False
 
 REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_CLASSES': (
