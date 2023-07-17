@@ -66,11 +66,6 @@ def token(request):
 def logout(request, *args, **kwargs):
     response = allauth_logout(request, *args, **kwargs)
 
-    # delete wordpress cookies
-    for cookie in request.COOKIES:
-        if cookie.startswith('wordpress') or cookie.startswith('wp-settings'):
-            response.delete_cookie(cookie, path=getattr(settings, 'BASE_URL', '/'))
-
     return response
 
 
