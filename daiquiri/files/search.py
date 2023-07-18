@@ -106,8 +106,8 @@ class Searcher(object):
 
     @classmethod
     def find_title_in_content(cls, html):
-        start_pattern = "<h\d{1,5}>"
-        end_pattern = "</h\d{1,5}>"
+        start_pattern = "<h\\d{1,5}>"
+        end_pattern = "</h\\d{1,5}>"
 
         title = "..."
         match_start = re.search(start_pattern, html)
