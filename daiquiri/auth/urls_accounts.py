@@ -10,7 +10,6 @@ urlpatterns = [
     re_path(r'^token/$', token, name='account_token'),
     re_path(r'^pending/$', TemplateView.as_view(template_name='account/account_pending.html'), name='account_pending'),
 
-    # override login by allauth to remove wordpress cookies
     re_path(r"^logout/$", logout, name="account_logout"),
 
     # include allauth patterns

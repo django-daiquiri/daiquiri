@@ -11,27 +11,11 @@ ACCESS_LEVEL_CHOICES = (
 )
 
 GROUPS = {
-    'wordpress_editor': [],
-    'wordpress_admin': [],
     'contact_manager': [
         'daiquiri_contact.view_contactmessage',
         'daiquiri_contact.add_contactmessage',
         'daiquiri_contact.change_contactmessage',
         'daiquiri_contact.delete_contactmessage'
-    ],
-    'meetings_manager': [
-        'daiquiri_meetings.view_meeting',
-        'daiquiri_meetings.add_meeting',
-        'daiquiri_meetings.change_meeting',
-        'daiquiri_meetings.delete_meeting',
-        'daiquiri_meetings.view_participant',
-        'daiquiri_meetings.add_participant',
-        'daiquiri_meetings.change_participant',
-        'daiquiri_meetings.delete_participant',
-        'daiquiri_meetings.view_contribution',
-        'daiquiri_meetings.add_contribution',
-        'daiquiri_meetings.change_contribution',
-        'daiquiri_meetings.delete_contribution'
     ],
     'metadata_manager': [
         'daiquiri_metadata.view_schema',
