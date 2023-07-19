@@ -86,7 +86,7 @@ CREATE TABLE %(TABLE_NAME)s (
 
 class Command(BaseCommand):
 
-    requires_system_checks = False
+    requires_system_checks = []
     can_import_settings = True
 
     def add_arguments(self, parser):
