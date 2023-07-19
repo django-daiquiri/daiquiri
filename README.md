@@ -7,6 +7,11 @@
 [![License](http://img.shields.io/badge/license-APACHE-blue.svg?style=flat)](https://github.com/django-daiquiri/daiquiri/blob/master/LICENSE)
 [![Latest Version](https://img.shields.io/pypi/v/django-daiquiri.svg?style=flat)](https://pypi.org/project/django-daiquiri/)
 
+#### Homepage of the Daiquiri default app
+![daiquiri-default-app](https://github.com/django-daiquiri/daiquiri/assets/45099849/586c9039-9978-4845-9f31-f002576392f6)
+
+#### Query interface from [Gaia@AIP](https://gaia.aip.de/)
+![daiquiri-gaia-query](https://github.com/django-daiquiri/daiquiri/assets/45099849/fa160b81-b253-4c5c-ad1d-34d4edf529b2)
 
 
 ## Introduction
