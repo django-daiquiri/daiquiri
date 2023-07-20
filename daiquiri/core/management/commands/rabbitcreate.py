@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand
 
 class Command(BaseCommand):
 
-    requires_system_checks = False
+    requires_system_checks = []
     can_import_settings = True
 
     def handle(self, *args, **options):
