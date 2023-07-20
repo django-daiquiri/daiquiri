@@ -53,6 +53,9 @@ class UWSRenderer(XMLRenderer):
             elif key == 'parameters':
                 self.render_parameters(value, request)
 
+            elif key == 'error_summary':
+                self.render_error_summary(value, request)
+
             else:
                 self.node('uws:' + self._to_camel_case(key), {}, value)
 
@@ -79,6 +82,20 @@ class UWSRenderer(XMLRenderer):
 
         self.end('uws:parameters')
 
+    def render_error_summary(self, data, request, root=False):
+
+        if data:
+            if data != "":
+                self.start('uws:errorSummary', {
+                    'hasDetail': True,
+                    'type': "fatal"
+                })
+                self.node("uws:message", text=data)
+                self.end("uws:errorSummary")
+            else:
+                self.node("uws:errorSummary", {}, None)
+        else:
+            self.node("uws:errorSummary", {}, data)
 
 class UWSErrorRenderer(ErrorRenderer):
 
