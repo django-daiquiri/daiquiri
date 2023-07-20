@@ -41,20 +41,13 @@ applications based on a common easily maintainable code base.
 Daiquiri enables collaboration and institutions to create customized websites,
 comprising of the following features:
 
-* An interactive Query interface enabling users to perform SQL/ADQL queries
-against catalog databases. The queries are analyzed using the
-[queryparser](https://github.com/django-daiquiri/queryparser) and permissions 
-are checked depending on user accounts and groups.
+* An interactive Query interface enabling users to perform SQL/ADQL queries against catalog databases. The queries are analyzed using the [queryparser](https://github.com/django-daiquiri/queryparser) and permissions are checked depending on user accounts and groups.
 * Asynchronous database queries, which can take minutes or even hours.
 * Download of the query results in different formats and visualization of the data.
-* A programmatic interface to the database implementing the
-[IVOA TAP](http://www.ivoa.net/documents/TAP/20180830/PR-TAP-1.1-20180830.html) protocol.
+* A programmatic interface to the database implementing the [IVOA TAP](http://www.ivoa.net/documents/TAP/20180830/PR-TAP-1.1-20180830.html) protocol.
 * A cone search API based on the [IVOA Simple Cone Search](http://www.ivoa.net/documents/latest/ConeSearch.html) recommendation.
-* An integration into to [IVOA registry of registry](http://rofr.ivoa.net/) to 
-make the VO endpoints available in applications like, e.g.
-[topcat](http://www.star.bris.ac.uk/~mbt/topcat/).
-* A metadata management backend containing information about the database schemas
-and tables including DOI and UCD.
+* An integration into to [IVOA registry of registry](http://rofr.ivoa.net/) to make the VO endpoints available in applications like, e.g. [topcat](http://www.star.bris.ac.uk/~mbt/topcat/).
+* A metadata management backend containing information about the database schemas and tables including DOI and UCD.
 * The download of files connected to the database tables, including access restrictions.
 * An OAI-PMH2 endpoint to make the metadata stored in the system available to harvesters.
 * A cut-out API for multi-dimensional data (e.g. data cubes).

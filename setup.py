@@ -21,6 +21,7 @@ setup(
     url='https://github.com/django-daiquiri/daiquiri',
     description=u'Daiquiri is a framework for the publication of scientific databases.',
     long_description=open('README.md').read(),
+    long_description_content_type="text/markdown",
     install_requires=install_requires,
     classifiers=[
         'Development Status :: 4 - Beta',
