@@ -1,9 +1,10 @@
 {% extends 'core/base.html' %}
-
+{% load announcement_tags %}
 {% block content %}
 
 <main class="container">
     <section class="wide">
+        {% show_announcements %}
         {% block wide %}{% endblock %}
     </section>
 </main>

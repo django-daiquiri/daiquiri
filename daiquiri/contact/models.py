@@ -44,3 +44,33 @@ class ContactMessage(models.Model):
     def set_status_spam(self):
         self.status = self.STATUS_SPAM
         self.save()
+
+
+class AnnouncementMessage(models.Model):
+
+    # alert types must correspond to the bootstrap alert types
+    ALERT_TYPE_INFO = "info"
+    ALERT_TYPE_WARNING = "warning"
+    ALERT_TYPE_ERROR = "danger"
+
+    ANNOUNCEMENT_TYPE_CHOICES = (
+        (ALERT_TYPE_INFO, "info"),
+        (ALERT_TYPE_WARNING, "warning"),
+        (ALERT_TYPE_ERROR, "urgent"),
+    )
+
+    title = models.CharField(max_length=100, blank=True, null=True)
+    announcement = models.TextField()
+    announcement_type = models.CharField(max_length=8, choices=ANNOUNCEMENT_TYPE_CHOICES, default=ALERT_TYPE_INFO)
+    updated = models.DateTimeField(auto_now=True)
+    visible = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ('-updated', 'title')
+
+        verbose_name = _('Announcement message')
+        verbose_name_plural = _('Announcement messages')
+
+    def __str__(self):
+        return f"{self.title}: '{self.announcement}'"
+

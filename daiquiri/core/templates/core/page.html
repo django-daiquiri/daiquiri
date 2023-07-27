@@ -1,8 +1,10 @@
 {% extends 'core/base.html' %}
+{% load announcement_tags %}
 
 {% block content %}
 
 <main class="container">
+    {% show_announcements %}
     <div class="row">
         <section class="page col-md-9">
             {% block page %}{% endblock %}
