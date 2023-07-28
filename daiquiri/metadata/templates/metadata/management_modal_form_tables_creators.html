@@ -18,40 +18,34 @@
 
                         <div class="row">
                             <formgroup
-                                class="col-md-3"
+                                class="col-md-4"
                                 data-type="text"
                                 data-label="{% trans 'Name' %}"
                                 data-model="creator.name">
                             </formgroup>
                             <formgroup
-                                class="col-md-3"
+                                class="col-md-4"
                                 data-type="text"
                                 data-label="{% trans 'First name' %}"
                                 data-model="creator.first_name">
                             </formgroup>
                             <formgroup
-                                class="col-md-3"
+                                class="col-md-4"
                                 data-type="text"
                                 data-label="{% trans 'Last name' %}"
                                 data-model="creator.last_name">
                             </formgroup>
+                        </div>
+                        <div class="row">
                             <formgroup
-                                class="col-md-3"
+                                class="col-md-4"
                                 data-type="text"
                                 data-label="{% trans 'ORCID' %}"
                                 data-model="creator.orcid">
                             </formgroup>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-9">
-                               <formgroup
-                                    data-type="textareasplit"
-                                    data-label="{% trans 'Affiliations' %}"
-                                    data-help="{% trans 'Seperate multiple affiliations by newlines' %}"
-                                    data-model="creator.affiliations">
-                                </formgroup>
+                            <div class="col-md-4">
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <button type="button" class="btn btn-danger form-inline-button"
                                     ng-click="service.removePerson('creators', $index)">
 
