@@ -66,8 +66,7 @@ angular.module('metadata', ['core'])
                 name: '',
                 first_name: '',
                 last_name: '',
-                orcid: '',
-                affiliations: ''
+                orcid: ''
             }
         }
     };
