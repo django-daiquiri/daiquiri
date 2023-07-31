@@ -215,9 +215,9 @@ def process_display_columns(processor_display_columns):
     for processor_display_column, original_column in processor_display_columns:
         if processor_display_column == '*':
             schema_name, table_name, tmp = original_column
-            for column_name in DatabaseAdapter().fetch_column_names(schema_name, table_name):
-                display_columns.append((column_name, (schema_name, table_name, column_name)))
-
+            columns = Column.objects.filter(table__schema__name=schema_name).filter(table__name=table_name).order_by('order')
+            for column in columns:
+                display_columns.append((column.name, (schema_name, table_name, column.name)))
         else:
             display_columns.append((processor_display_column, original_column))
 
