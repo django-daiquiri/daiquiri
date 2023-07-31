@@ -139,6 +139,13 @@ class DataciteRendererMixin(object):
                     'nameIdentifierScheme': 'ORCID'
                 }, orcid)
 
+            ror = person.get('ror')
+            if ror:
+                self.node('nameIdentifier', {
+                    'schemeURI': 'http://ror.org/',
+                    'nameIdentifierScheme': 'ROR'
+                }, ror)
+
             affiliations = person.get('affiliations')
             if affiliations:
                 for affiliation in affiliations:
