@@ -5,6 +5,7 @@ from daiquiri.core.serializers import JSONListField
 
 from rest_framework import serializers
 
+from .validators import PersonListValidator
 from ..models import Schema, Table, Column, Function
 
 
@@ -60,8 +61,8 @@ class TableSerializer(serializers.ModelSerializer):
     label = serializers.CharField(source='__str__', read_only=True)
 
     related_identifiers = JSONListField(required=False)
-    creators = JSONListField(required=False)
-    contributors = JSONListField(required=False)
+    creators = JSONListField(required=False, validators=[PersonListValidator()])
+    contributors = JSONListField(required=False, validators=[PersonListValidator()])
     license = serializers.ChoiceField(choices=settings.LICENSE_CHOICES, default='')
 
     class Meta:
@@ -74,8 +75,8 @@ class SchemaSerializer(serializers.ModelSerializer):
     label = serializers.CharField(source='__str__', read_only=True)
 
     related_identifiers = JSONListField(required=False)
-    creators = JSONListField(required=False)
-    contributors = JSONListField(required=False)
+    creators = JSONListField(required=False, validators=[PersonListValidator()])
+    contributors = JSONListField(required=False, validators=[PersonListValidator()])
     license = serializers.ChoiceField(choices=settings.LICENSE_CHOICES, default='', initial='')
 
     class Meta:
