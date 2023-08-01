@@ -99,6 +99,14 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
         if 'datatype' in field:
             if field['datatype'] in ['boolean', 'char', 'unsignedByte', 'short', 'int', 'long', 'float', 'double']:
                 attrs.append('datatype="{}"'.format(field['datatype']))
+
+            elif field['datatype'] in ['short[]', 'int[]', 'long[]', 'float[]', 'double[]']:
+                attrs.append(f'datatype="{field["datatype"].rstrip("[]")}"')
+                if field['arraysize']:
+                    attrs.append(f'arraysize="{field["arraysize"]}"')
+                else:
+                    attrs.append('arraysize="*"')
+
             else:
                 attrs.append('xtype="{}"'.format(field['datatype']))
 
