@@ -85,7 +85,27 @@ class BaseDatalinkAdapter(object):
         rows = list(Datalink.objects.filter(ID__in=identifiers).values_list(*field_names))
 
         # get the dynamic datalink entries
-        dyn_rows = [tuple(link.values()) for link in self.get_dyn_datalink_links(identifiers)]
+        try:
+            dyn_rows = [(
+                link['ID'],
+                link['access_url'],
+                link['service_def'],
+                link['error_message'],
+                link['description'],
+                link['semantics'],
+                link['content_type'],
+                link['content_size']) for link in self.get_dyn_datalink_links(identifiers)
+            ]
+
+        # in case of malformation give some hints to the developper
+        except KeyError as e:
+            class_name = str(self.__class__)
+            raise KeyError(f"The key '{e.args[0]}' is missing in one of the dictionaries returned by {class_name}.get_dyn_datalink_links(id)")
+
+        # otherwise just raise
+        except Exception as e:
+            raise e
+
         rows = rows + dyn_rows
 
         # check for missing IDs and return error message
