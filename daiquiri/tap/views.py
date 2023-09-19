@@ -25,6 +25,10 @@ def tables(request):
 
 
 def examples(request):
-    return render(request, 'tap/examples.html', {
+    template = 'tap/examples.html'
+    user_agent = request.headers.get("User-Agent", "").lower()
+    if "topcat" in user_agent or "curl" in user_agent:
+        template = 'tap/examples.xhtml'
+    return render(request, template, {
         'examples': Example.objects.filter_by_access_level(request.user)
     })

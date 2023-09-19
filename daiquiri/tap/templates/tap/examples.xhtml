@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+{% load static %}
+
+<title>{{ request.site.name }}</title>
+
+<meta charset="UTF-8" />
+
+<meta property="og:title" content="{{ request.site.name }}" />
+<meta property="og:url" content="{{ request.site.domain }}" />
+
+<meta name='baseurl' content="{% url 'home' %}" />
+<meta name='staticurl' content="{% static '' %}" />
+
+<link rel="shortcut icon" href="{% static 'core/img/favicon.png' %}" type="image/png" />
+
+</head>
+
+<body>
+<div vocab="http://www.ivoa.net/rdf/examples#">
+    {% for example in examples %}
+    <div id="example-{{ example.id }}" resource="#example-{{ example.id }}" typeof="example" class="daiquiri-tap-example">
+        <h2 property="name">{{ example.name }}</h2>
+        {% if example.description %}
+        <p property="description">{{ example.description }}</p>
+        {% endif %}
+        <pre property="query">{{ example.query_string }}</pre>
+    </div>
+    {% endfor %}
+</div>
+
+</body>
+
+</html>
