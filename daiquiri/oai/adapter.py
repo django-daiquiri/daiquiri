@@ -7,6 +7,7 @@ from django.utils.timezone import now
 from daiquiri.core.adapter import DatabaseAdapter
 from daiquiri.core.constants import ACCESS_LEVEL_PUBLIC
 from daiquiri.core.utils import get_doi, import_class
+from daiquiri.datalink.adapter import DatalinkAdapter
 
 
 def OaiAdapter():
@@ -219,21 +220,21 @@ class DatalinkOAIAdapterMixin(object):
         return import_class('daiquiri.datalink.serializers.DataciteSerializer')
 
     def get_datalink_list(self):
-        for table in self.tables:
-            schema_name, table_name = table.split('.')
-            rows = DatabaseAdapter().fetch_rows(schema_name, table_name, column_names=['ID', 'access_url'],
-                                                page_size=0, filters={'semantics': '#doi'})
 
-            for ID, access_url in rows:
+        adapter = DatalinkAdapter()
+        # get all datalink entries: DatalinkTables, Metadata and Dynamic
+        rows = adapter.get_datalink_rows([pk])
+    
+        for ID, access_url, _, _, _, semantics, _, _ in rows:
+            if semantics == '#doi':
                 yield 'datalink', {'id': str(ID), 'doi': get_doi(access_url)}
+            
 
     def get_datalink(self, pk):
-        rows = []
-        for table in self.tables:
-            schema_name, table_name = table.split('.')
-            rows += DatabaseAdapter().fetch_rows(schema_name, table_name, column_names=[
-                'access_url', 'description', 'semantics', 'content_type', 'content_length'
-            ], filters={'ID': str(pk)})
+    
+        adapter = DatalinkAdapter()
+        # get all datalink entries: DatalinkTables, Metadata and Dynamic
+        rows = adapter.get_datalink_rows([pk])
 
         datalink = {
             'formats': [],
@@ -245,7 +246,7 @@ class DatalinkOAIAdapterMixin(object):
             ],
             'related_identifiers': []
         }
-        for access_url, description, semantics, content_type, content_length in rows:
+        for _, access_url, _, _, description, semantics, content_type, content_length in rows:
             if semantics == '#doi':
                 datalink['doi'] = get_doi(access_url)
                 datalink['title'] = description

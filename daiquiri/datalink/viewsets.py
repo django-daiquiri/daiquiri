@@ -7,11 +7,12 @@ from django_user_agents.utils import get_user_agent
 from daiquiri.core.generators import generate_votable
 
 from .constants import DATALINK_FIELDS, DATALINK_CONTENT_TYPE
-
+from .adapter import DatalinkAdapter
 from .models import Datalink
 
-
 class SyncDatalinkJobViewSet(viewsets.GenericViewSet):
+    '''Generate the datalink VOTable
+    ''' 
 
     def list(self, request):
         return self.perform_sync_job(request, request.GET)
@@ -20,17 +21,14 @@ class SyncDatalinkJobViewSet(viewsets.GenericViewSet):
         return self.perform_sync_job(request, request.POST)
 
     def perform_sync_job(self, request, data):
-        rows = []
 
         if 'ID' in data:
             identifiers = data.getlist('ID')
-            field_names = [field['name'] for field in DATALINK_FIELDS]
-            rows = list(Datalink.objects.filter(ID__in=identifiers).values_list(*field_names))
 
-            # check for missing IDs and return error message
-            for identifier in identifiers:
-                if not any(filter(lambda row: row[0] == identifier, rows)):
-                    rows.append((identifier, None, None, 'NotFoundFault: {}'.format(identifier), None, None, None, None))
+        adapter = DatalinkAdapter()
+
+        # get all datalink entries (DatalinkTable, Metadata and Dynamic)
+        rows = adapter.get_datalink_rows(identifiers)
 
         if data.get('RESPONSEFORMAT') == 'application/json':
             return JsonResponse({
