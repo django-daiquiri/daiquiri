@@ -1,0 +1,24 @@
+{% extends 'core/page.html' %}
+{% load i18n %}
+
+{% block page %}
+
+    {% include 'account/terms_of_use.html' %}
+
+    {% if user.is_authenticated %}
+        <div style="margin-top:2em">
+        {% if consent %}
+            <p><b>You have agreed to the terms of use </b></p>
+        {% else %}
+            <form method="post" action="{% url 'terms_of_use' %}">
+                {% csrf_token %}
+                <input type="submit"
+                    class="btn btn-primary"
+                    name="consent"
+                    value="{% trans 'I agree to the terms of use' %}" />
+            <form>
+        {% endif %}
+        </div>
+    {% endif %}
+
+{% endblock %}

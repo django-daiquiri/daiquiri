@@ -1,7 +1,16 @@
 from django.urls import include, re_path
 from django.views.generic import TemplateView
 
-from .views import profile_update, profile_json, token, logout, password_change, password_set
+from .views import (
+    profile_update,
+    profile_json,
+    terms_of_use,
+    token,
+    logout,
+    password_change,
+    password_set,
+    terms_of_use
+)
 
 
 urlpatterns = [
@@ -16,5 +25,6 @@ urlpatterns = [
     re_path(r'^password/change/$', password_change, name='account_change_password'),
     re_path(r'^password/change/done/$', TemplateView.as_view(template_name='account/password_change_done.html'), name='account_change_password_done'),
     re_path(r'^password/set/$', password_set, name='account_password_set'),
+    re_path(r'^terms_of_use/$', terms_of_use, name='terms_of_use'),
     re_path(r'^', include('allauth.urls')),
 ]

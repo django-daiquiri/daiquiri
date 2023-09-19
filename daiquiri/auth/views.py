@@ -3,9 +3,10 @@ import json
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
+from daiquiri.auth.models import Profile
 from daiquiri.core.utils import get_referer_path_info, get_next
 from django.views.generic import TemplateView
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import Http404, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from rest_framework.authtoken.models import Token
@@ -40,6 +41,21 @@ def profile_update(request):
         'profile_form': profile_form,
         'next': get_referer_path_info(request, default='/')
     })
+
+
+def terms_of_use(request):
+    context = {}
+    if settings.AUTH_TERMS_OF_USE == False:
+        raise Http404 
+    if request.user.is_authenticated:
+        profile = Profile.objects.get(user=request.user)
+        if request.method == 'POST':
+            if 'consent' in request.POST:
+                profile.consent = True
+                profile.save()
+        context["consent"] = profile.consent
+
+    return render(request, 'account/terms_of_use_page.html', context)
 
 
 @login_required()
