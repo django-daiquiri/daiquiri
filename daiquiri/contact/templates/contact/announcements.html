@@ -2,7 +2,7 @@
     {% for msg in announcements %}
     <div class="alert alert-{{ msg.announcement_type }}"
         role="alert">
-        {{ msg.announcement }}
+        {{ msg.announcement | safe }}
     </div>
     {% endfor %}
 {% endif %}
