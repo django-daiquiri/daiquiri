@@ -1,4 +1,6 @@
+from django.core.exceptions import ValidationError
 from rest_framework import filters
+from daiquiri.auth.validators import DaiquiriUsernameValidator
 
 
 class SpamBackend(filters.BaseFilterBackend):
@@ -26,6 +28,7 @@ class DefaultMessageFilter(object):
         ("no_filter", "Show to all users"),
         ("logged_in_users", "Show to the logged in users only"),
         ("user_has_not_consented", "Show to user who has not consented yet"),
+        ("user_has_invalid_username", "Show to user with an invalid username"),
     )
 
     def no_filter(request):
@@ -42,5 +45,10 @@ class DefaultMessageFilter(object):
                 return True
         return False
 
-
-
+    def user_has_invalid_username(request):
+        if request.user.is_authenticated:
+            try:
+                DaiquiriUsernameValidator()(request.user.username)
+            except ValidationError:
+                return True
+            return False
