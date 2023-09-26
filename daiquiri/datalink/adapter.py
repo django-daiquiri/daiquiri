@@ -54,6 +54,8 @@ class BaseDatalinkAdapter(object):
                     raise NotImplementedError(message)
 
     def get_list(self):
+        '''This is only used by rebuild_datalink_table, so it needs to gather only the tabular datalink entries.
+        '''
         for resource_type in self.resource_types:
             yield from getattr(self, 'get_%s_list' % resource_type)()
 
@@ -77,7 +79,7 @@ class BaseDatalinkAdapter(object):
         return context
 
     def get_datalink_rows(self, identifiers, **kwargs):
-        '''Get the list of datalink entries for the provided identifiers
+        '''Get the list of datalink entries for the provided identifiers (incl. table- and dynamic- datalink)
         '''
 
         # get the datalink entries from Datalink Table and metadata (Table and Schema)
