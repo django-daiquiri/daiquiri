@@ -220,15 +220,15 @@ class DatalinkOAIAdapterMixin(object):
         return import_class('daiquiri.datalink.serializers.DataciteSerializer')
 
     def get_datalink_list(self):
+        '''This function is used by rebuild_oai_schema only, it only needs to gather the doi objects declared via datalink (no other entries).
+        '''
+        for table in self.tables:
+            schema_name, table_name = table.split('.')
+            rows = DatabaseAdapter().fetch_rows(schema_name, table_name, column_names=['ID', 'access_url'],
+                                                page_size=0, filters={'semantics': '#doi'})
 
-        adapter = DatalinkAdapter()
-        # get all datalink entries: DatalinkTables, Metadata and Dynamic
-        rows = adapter.get_datalink_rows([pk])
-    
-        for ID, access_url, _, _, _, semantics, _, _ in rows:
-            if semantics == '#doi':
+            for ID, access_url in rows:
                 yield 'datalink', {'id': str(ID), 'doi': get_doi(access_url)}
-            
 
     def get_datalink(self, pk):
     
