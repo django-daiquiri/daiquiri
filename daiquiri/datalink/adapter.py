@@ -94,7 +94,7 @@ class BaseDatalinkAdapter(object):
                 link['description'],
                 link['semantics'],
                 link['content_type'],
-                link['content_size']) for link in self.get_dyn_datalink_links(identifiers)
+                link['content_length']) for link in self.get_dyn_datalink_links(identifiers)
             ]
 
         # in case of malformation give some hints to the developper
