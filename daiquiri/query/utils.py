@@ -208,7 +208,7 @@ def get_job_column(job, display_column_name):
         for user_column in job.metadata['user_columns']:
             if user_column['name'] == column['name']:
                 column.update(user_column)
-                
+
         return column
 
     else:
@@ -247,10 +247,6 @@ def get_job_columns(job):
             column = get_job_column(job, database_column['name'])
             column.update(database_column)
             columns.append(column)
-
-    else:
-        for display_column in job.metadata['display_columns']:
-            columns.append(get_job_column(job, display_column))
 
     return columns
 
