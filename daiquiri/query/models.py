@@ -214,10 +214,14 @@ class QueryJob(Job):
     def run_sync(self):
         adapter = DatabaseAdapter()
 
-        self.actual_query = adapter.build_sync_query(
+        adapter.create_user_schema_if_not_exists(self.schema_name)
+
+        self.actual_query = adapter.build_query(
+            self.schema_name,
+            self.table_name,
             self.native_query,
             settings.QUERY_SYNC_TIMEOUT,
-            self.max_records
+            self.max_records,
         )
 
         job_sources = get_job_sources(self)
@@ -237,15 +241,23 @@ class QueryJob(Job):
             user=self.owner
         )
 
-        try:
-            download_adapter = DownloadAdapter()
+        adapter.submit_query(self.actual_query)
 
-            yield from generate_votable(adapter.fetchall(self.actual_query), get_job_columns(self),
-                                        table=download_adapter.get_table_name(self.schema_name, self.table_name),
-                                        infos=download_adapter.get_infos('OK', self.query, self.query_language, job_sources),
-                                        links=download_adapter.get_links(job_sources),
-                                        services=download_adapter.get_services())
+        try:
+
+            yield from DownloadAdapter().generate(
+                    'votable',
+                    get_job_columns(self),
+                    sources=self.metadata.get("sources", []),
+                    schema_name=self.schema_name,
+                    table_name=self.table_name,
+                    nrows=self.nrows,
+                    query_status=self.result_status,
+                    query=self.native_query,
+                    query_language=self.query_language)
+
             self.drop_uploads()
+            self.drop_table()
 
         except (OperationalError, ProgrammingError, InternalError, DataError):
             raise StopIteration()

@@ -7,7 +7,7 @@ from daiquiri.core.adapter import DatabaseAdapter
 from daiquiri.core.constants import ACCESS_LEVEL_PUBLIC
 from daiquiri.core.utils import get_doi_url, import_class
 
-from .constants import DATALINK_RELATION_TYPES
+from .constants import DATALINK_RELATION_TYPES, DATALINK_FIELDS
 from .models import Datalink
 
 
@@ -30,6 +30,14 @@ class BaseDatalinkAdapter(object):
     * get_<resource_type>_links(self, resource): returns a resource into a list
       of rows of the datalink table (list of python dicts)
 
+    There are two further adapters, which do not declare resources:
+
+    * DynamicDatalinkAdapter: the latter does not declare a resource, but will inject on the fly 
+      extra datalink entries according to the method: get_dyn_datalink_links()
+
+    * QueryJobDatalinkAdapterMixin: The latter does not declare a resource either, but it injects 
+      extra context information for the datalink viewer.
+
     See the mixins below for an example.
     """
 
@@ -46,6 +54,8 @@ class BaseDatalinkAdapter(object):
                     raise NotImplementedError(message)
 
     def get_list(self):
+        '''This is only used by rebuild_datalink_table, so it needs to gather only the tabular datalink entries.
+        '''
         for resource_type in self.resource_types:
             yield from getattr(self, 'get_%s_list' % resource_type)()
 
@@ -56,13 +66,57 @@ class BaseDatalinkAdapter(object):
         return getattr(self, 'get_%s_links' % resource_type)(resource)
 
     def get_context_data(self, request, **kwargs):
+        '''Get the datalink related context data for a given request
+        '''
         context = {}
 
         if 'ID' in kwargs:
-            context['datalinks'] = Datalink.objects.filter(ID=kwargs['ID']).order_by('semantics')
+            field_names = [field['name'] for field in DATALINK_FIELDS]
+            # more precise would be to use a serializer instead of list(QuerySet.values())
+            context['datalinks'] = list(Datalink.objects.filter(ID=kwargs['ID']).order_by('semantics').values())
             context['ID'] = kwargs['ID']
 
         return context
+
+    def get_datalink_rows(self, identifiers, **kwargs):
+        '''Get the list of datalink entries for the provided identifiers (incl. table- and dynamic- datalink)
+        '''
+
+        # get the datalink entries from Datalink Table and metadata (Table and Schema)
+        field_names = [field['name'] for field in DATALINK_FIELDS]
+        rows = list(Datalink.objects.filter(ID__in=identifiers).values_list(*field_names))
+
+        # get the dynamic datalink entries
+        try:
+            dyn_rows = [(
+                link['ID'],
+                link['access_url'],
+                link['service_def'],
+                link['error_message'],
+                link['description'],
+                link['semantics'],
+                link['content_type'],
+                link['content_length']) for link in self.get_dyn_datalink_links(identifiers)
+            ]
+
+        # in case of malformation give some hints to the developper
+        except KeyError as e:
+            class_name = str(self.__class__)
+            raise KeyError(f"The key '{e.args[0]}' is missing in one of the dictionaries returned by {class_name}.get_dyn_datalink_links(id)")
+
+        # otherwise just raise
+        except Exception as e:
+            raise e
+
+        rows = rows + dyn_rows
+
+        # check for missing IDs and return error message
+        for identifier in identifiers:
+            if not any(filter(lambda row: row[0] == identifier, rows)):
+                rows.append((identifier, None, None, 'NotFoundFault: {}'.format(identifier), None, None, None, None))        
+
+        return rows
+        
 
 
 class TablesDatalinkAdapterMixin(object):
@@ -226,6 +280,29 @@ class MetadataDatalinkAdapterMixin(object):
         return table_links
 
 
+class DynamicDatalinkAdapterMixin(object):
+    '''Define the interface to dynamically add datalink entries
+    '''
+
+    def get_dyn_datalink_links(self, IDs, **kwargs):
+        '''No dynamically generated entries. Can be overwriten.
+
+        this method should return a list of dict with the following keys:
+             ID, access_url, service_def, error_message, description, semantics, content_type, content_length
+        '''
+        return([])
+
+    def get_context_data(self, request, **kwargs):
+        '''Inject dynamically generated Datalink entries into the context for the daiquiri.datalinks.views.datalink View
+        '''
+        context = super().get_context_data(request, **kwargs)
+
+        if 'ID' in kwargs:
+            context['datalinks'] = context['datalinks'] + self.get_dyn_datalink_links([kwargs['ID']], **kwargs)
+
+        return context
+
+
 class QueryJobDatalinkAdapterMixin(object):
     '''
     Injects the query job into the context data for the daiquiri.datalinks.views.datalink view
@@ -244,8 +321,8 @@ class QueryJobDatalinkAdapterMixin(object):
 
         return context
 
-
-class DefaultDatalinkAdapter(MetadataDatalinkAdapterMixin,
+class DefaultDatalinkAdapter(DynamicDatalinkAdapterMixin,
+                             MetadataDatalinkAdapterMixin,
                              TablesDatalinkAdapterMixin,
                              QueryJobDatalinkAdapterMixin,
                              BaseDatalinkAdapter):
