@@ -1,5 +1,5 @@
 __title__ = 'django-daiquiri'
-__version__ = '0.4.3'
+__version__ = '0.4.4'
 __author__ = 'Jochen Klar'
 __email__ = 'mail@jochenklar.de'
 __license__ = 'Apache-2.0'
