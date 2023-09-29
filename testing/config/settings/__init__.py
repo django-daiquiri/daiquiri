@@ -6,6 +6,7 @@ from daiquiri.core.settings.vendor import *
 
 from daiquiri.auth.settings import *
 from daiquiri.conesearch.settings import *
+from daiquiri.contact.settings import *
 from daiquiri.cutout.settings import *
 from daiquiri.datalink.settings import *
 from daiquiri.files.settings import *
