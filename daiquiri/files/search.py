@@ -68,7 +68,8 @@ class Searcher(object):
         any_changes = False
 
         # clean up files that do not exist anymore
-        for file_path in Searcher.cms_files:
+        previous_cms_files = Searcher.cms_files
+        for file_path in previous_cms_files:
             if file_path not in unique_files:
                 any_changes = True
                 cls.cms_files.pop(file_path)
