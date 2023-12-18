@@ -190,7 +190,7 @@ class MetadataDatalinkAdapterMixin(object):
                    'access_url': get_doi_url(schema.doi),
                    'service_def': '',
                    'error_message': '',
-                   'description': 'Digital object identifier (DOI) for the {} schema'.format(schema),
+                   'description': '{}'.format(schema.title),
                    'semantics': '#doi',
                    'content_type': 'application/html',
                    'content_length': None
@@ -252,7 +252,7 @@ class MetadataDatalinkAdapterMixin(object):
                    'access_url': get_doi_url(table.doi),
                    'service_def': '',
                    'error_message': '',
-                   'description': 'Digital object identifier (DOI) for the {} table'.format(table),
+                   'description': '{}'.format(table.title),
                    'semantics': '#doi',
                    'content_type': 'application/html',
                    'content_length': None
