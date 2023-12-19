@@ -58,9 +58,21 @@ query_job:
                 <!-- <td>{{ datalink.service_def }}</td> -->
                 <!-- <td>{{ datalink.error_message }}</td> -->
                 <td>{{ datalink.description }}</td>
-                <td>{{ datalink.semantics }}</td>
+                <td>
+                    {% if datalink.semantics in custom_semantics %}
+                    <a href="{{ settings.SITE_URL }}{% url 'datalink:datalink-semantics' %}{{ datalink.semantics }}">{{ datalink.semantics }}</a>
+                    {% else %}
+                    <a href="https://www.ivoa.net/rdf/datalink/core/2022-01-27/datalink.html{{ datalink.semantics }}">{{ datalink.semantics }}</a>
+                    {% endif %}
+                </td>
                 <td>{{ datalink.content_type }}</td>
-                <td>{{ datalink.content_length|filesizeformat }}</td>
+                <td>
+                    {% if datalink_content_length > 0 %}
+                    {{ datalink.content_length | filesizeformat }}
+                    {% else %}
+                    {{ datalink.content_length }}
+                    {% endif %}
+                </td>
 
             </tr>
 
