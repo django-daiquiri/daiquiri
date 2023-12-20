@@ -199,6 +199,9 @@ class MetadataDatalinkAdapterMixin(object):
                         description = DATALINK_RELATION_TYPES.get(related_identifier.get('relation_type'), '') \
                                                              .format('the {} schema'.format(schema)) \
                                                              .capitalize()
+                        if related_identifier.get('related_identifier_type') == "DOI":
+                            access_url = get_doi_url(access_url)
+
                         schema_links.append({
                            'ID': identifier,
                            'access_url': access_url,
@@ -261,6 +264,9 @@ class MetadataDatalinkAdapterMixin(object):
                         description = DATALINK_RELATION_TYPES.get(related_identifier.get('relation_type'), '') \
                                                              .format('the {} table'.format(table)) \
                                                              .capitalize()
+
+                        if related_identifier.get('related_identifier_type') == "DOI":
+                            access_url = get_doi_url(access_url)
 
                         table_links.append({
                            'ID': identifier,

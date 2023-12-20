@@ -67,7 +67,7 @@ query_job:
                 </td>
                 <td>{{ datalink.content_type }}</td>
                 <td>
-                    {% if datalink_content_length > 0 %}
+                    {% if datalink.content_length > 0 %}
                     {{ datalink.content_length | filesizeformat }}
                     {% else %}
                     {{ datalink.content_length }}
