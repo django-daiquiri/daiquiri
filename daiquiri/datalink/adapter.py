@@ -81,39 +81,32 @@ class BaseDatalinkAdapter(object):
     def get_datalink_rows(self, identifiers, **kwargs):
         '''Get the list of datalink entries for the provided identifiers (incl. table- and dynamic- datalink)
         '''
-
         # get the datalink entries from Datalink Table and metadata (Table and Schema)
-        field_names = [field['name'] for field in DATALINK_FIELDS]
-        rows = list(Datalink.objects.filter(ID__in=identifiers).values_list(*field_names))
+        static_datalink_rows = list(Datalink.objects.filter(ID__in=identifiers).values())
 
         # get the dynamic datalink entries
-        try:
-            dyn_rows = [(
-                link['ID'],
-                link['access_url'],
-                link['service_def'],
-                link['error_message'],
-                link['description'],
-                link['semantics'],
-                link['content_type'],
-                link['content_length']) for link in self.get_dyn_datalink_links(identifiers)
-            ]
+        dyn_datalink_rows = self.get_dyn_datalink_links(identifiers)
+        datalink_rows = static_datalink_rows + dyn_datalink_rows
 
-        # in case of malformation give some hints to the developper
+        # create a full URI for the custom semantics
+        for row in datalink_rows:
+            if row['semantics'] in settings.DATALINK_CUSTOM_SEMANTICS:
+                row['semantics'] = settings.SITE_URL + reverse('datalink:datalink-semantics') + row['semantics']
+
+        field_names = [field['name'] for field in DATALINK_FIELDS]
+
+        try:
+            rows = [[link[key] for key in field_names] for link in datalink_rows]
         except KeyError as e:
             class_name = str(self.__class__)
-            raise KeyError(f"The key '{e.args[0]}' is missing in one of the dictionaries returned by {class_name}.get_dyn_datalink_links(id)")
-
-        # otherwise just raise
+            raise KeyError(f"The key '{e.args[0]}' is missing in one of the dictionaries returned by {class_name}.get_dyn_datalink_links(id) or in the Datalink model.")
         except Exception as e:
             raise e
-
-        rows = rows + dyn_rows
 
         # check for missing IDs and return error message
         for identifier in identifiers:
             if not any(filter(lambda row: row[0] == identifier, rows)):
-                rows.append((identifier, None, None, 'NotFoundFault: {}'.format(identifier), None, None, None, None))        
+                rows.append((identifier, None, None, 'NotFoundFault: {}'.format(identifier), None, None, None, None))
 
         return rows
         
@@ -190,7 +183,7 @@ class MetadataDatalinkAdapterMixin(object):
                    'access_url': get_doi_url(schema.doi),
                    'service_def': '',
                    'error_message': '',
-                   'description': 'Digital object identifier (DOI) for the {} schema'.format(schema),
+                   'description': '{}'.format(schema.title),
                    'semantics': '#doi',
                    'content_type': 'application/html',
                    'content_length': None
@@ -203,6 +196,9 @@ class MetadataDatalinkAdapterMixin(object):
                         description = DATALINK_RELATION_TYPES.get(related_identifier.get('relation_type'), '') \
                                                              .format('the {} schema'.format(schema)) \
                                                              .capitalize()
+                        if related_identifier.get('related_identifier_type') == "DOI":
+                            access_url = get_doi_url(access_url)
+
                         schema_links.append({
                            'ID': identifier,
                            'access_url': access_url,
@@ -252,7 +248,7 @@ class MetadataDatalinkAdapterMixin(object):
                    'access_url': get_doi_url(table.doi),
                    'service_def': '',
                    'error_message': '',
-                   'description': 'Digital object identifier (DOI) for the {} table'.format(table),
+                   'description': '{}'.format(table.title),
                    'semantics': '#doi',
                    'content_type': 'application/html',
                    'content_length': None
@@ -265,6 +261,9 @@ class MetadataDatalinkAdapterMixin(object):
                         description = DATALINK_RELATION_TYPES.get(related_identifier.get('relation_type'), '') \
                                                              .format('the {} table'.format(table)) \
                                                              .capitalize()
+
+                        if related_identifier.get('related_identifier_type') == "DOI":
+                            access_url = get_doi_url(access_url)
 
                         table_links.append({
                            'ID': identifier,

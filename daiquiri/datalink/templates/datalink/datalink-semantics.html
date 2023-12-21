@@ -1,0 +1,29 @@
+{% extends 'core/wide.html' %}
+{% load i18n %}
+
+{% block wide %}
+
+    <h1>The extension to the Datalink-core dictionary</h1>
+
+    <table class="table table-condensed table-striped">
+
+    <thead>
+        <tr>
+            <td><b>Term</b></td>
+            <td><b>Description</b></td>
+        </tr>
+    </thead>
+
+    <tbody>
+
+    {% for semantics, description in custom_semantics.items %}
+        <tr>
+            <td>{{ settings.SITE_URL }}{% url 'datalink:datalink-semantics' %}{{ semantics }}</td>
+            <td>{{ description }}</td>
+        </tr>
+    {% endfor %}
+
+    </tbody>
+
+    </table>
+{% endblock %}
