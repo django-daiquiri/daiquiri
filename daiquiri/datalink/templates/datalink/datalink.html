@@ -62,7 +62,7 @@ query_job:
                     {% if datalink.semantics in custom_semantics %}
                     <a href="{{ settings.SITE_URL }}{% url 'datalink:datalink-semantics' %}{{ datalink.semantics }}">{{ datalink.semantics }}</a>
                     {% else %}
-                    <a href="https://www.ivoa.net/rdf/datalink/core/2022-01-27/datalink.html{{ datalink.semantics }}">{{ datalink.semantics }}</a>
+                    <a href="http://www.ivoa.net/rdf/datalink/core{{ datalink.semantics }}">{{ datalink.semantics }}</a>
                     {% endif %}
                 </td>
                 <td>{{ datalink.content_type }}</td>

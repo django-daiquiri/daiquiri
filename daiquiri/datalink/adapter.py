@@ -99,7 +99,7 @@ class BaseDatalinkAdapter(object):
             rows = [[link[key] for key in field_names] for link in datalink_rows]
         except KeyError as e:
             class_name = str(self.__class__)
-            raise KeyError(f"The key '{e.args[0]}' is missing in one of the dictionaries returned by {class_name}.get_dyn_datalink_links(id) or in the Datalnk model.")
+            raise KeyError(f"The key '{e.args[0]}' is missing in one of the dictionaries returned by {class_name}.get_dyn_datalink_links(id) or in the Datalink model.")
         except Exception as e:
             raise e
 
