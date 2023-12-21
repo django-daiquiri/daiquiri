@@ -18,11 +18,9 @@
 
     {% for semantics, description in custom_semantics.items %}
         <tr>
-
             <td>{{ settings.SITE_URL }}{% url 'datalink:datalink-semantics' %}{{ semantics }}</td>
             <td>{{ description }}</td>
         </tr>
-
     {% endfor %}
 
     </tbody>

@@ -81,15 +81,12 @@ class BaseDatalinkAdapter(object):
     def get_datalink_rows(self, identifiers, **kwargs):
         '''Get the list of datalink entries for the provided identifiers (incl. table- and dynamic- datalink)
         '''
-
-
         # get the datalink entries from Datalink Table and metadata (Table and Schema)
         static_datalink_rows = list(Datalink.objects.filter(ID__in=identifiers).values())
 
         # get the dynamic datalink entries
         dyn_datalink_rows = self.get_dyn_datalink_links(identifiers)
         datalink_rows = static_datalink_rows + dyn_datalink_rows
-
 
         # create a full URI for the custom semantics
         for row in datalink_rows:
