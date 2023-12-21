@@ -1,8 +1,8 @@
 # in alphabetical order
-astropy~=5.3.1
-celery~=5.3.1
+astropy~=5.3.4
+celery~=5.3.6
 coverage~=7.2.7
-Django~=4.2.3
+Django~=4.2.8
 django-allauth~=0.54.0
 django-compressor~=4.4
 django-extensions~=3.2.3
