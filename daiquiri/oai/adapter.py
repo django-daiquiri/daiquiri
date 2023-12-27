@@ -247,7 +247,9 @@ class DatalinkOAIAdapterMixin(object):
             'related_identifiers': []
         }
         for _, access_url, _, _, description, semantics, content_type, content_length in rows:
-            if semantics == '#doi':
+            # doi is a custom datalink semantic which means that it will containt the full URL to the description
+            # hence, only the end of the semantics string should be checked for #doi
+            if semantics.endswith('#doi'):
                 datalink['doi'] = get_doi(access_url)
                 datalink['title'] = description
 
