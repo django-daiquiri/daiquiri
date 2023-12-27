@@ -2,7 +2,7 @@
 
 <script type="text/ng-template" id="tooltip.html">
     <div ng-show="column.description">
-        <strong>{% trans 'Description' %}</strong> {$ column.description $}
+        <strong>{% trans 'Description' %}</strong> <span ng-bind-html="column.description"></span>
     </div>
     <div ng-show="column.unit">
         <strong>{% trans 'Unit' %}</strong> {$ column.unit $}
