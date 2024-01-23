@@ -13,6 +13,7 @@
             <th>{% trans '# records' %}</th>
             <th>{% trans '# users' %}</th>
             <th>{% trans '# client IP' %}</th>
+            <th>{% trans '# size' %}</th>
         </tr>
     </thead>
     <tbody>
@@ -22,6 +23,7 @@
             <td>{{ resource_type.count }}</td>
             <td>{{ resource_type.users }}</td>
             <td>{{ resource_type.client_ips }}</td>
+            <td>{{ resource_type.size | filesizeformat }}</td>
         </tr>
         {% endfor %}
     </tbody>

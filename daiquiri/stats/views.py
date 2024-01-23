@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.db.models.functions import ExtractYear
 from django.views.generic import TemplateView
 
 from daiquiri.core.views import ModelPermissionMixin
@@ -21,5 +22,6 @@ class ManagementView(ModelPermissionMixin, TemplateView):
             resource_type['count'] = queryset.count()
             resource_type['client_ips'] = queryset.order_by('client_ip').values('client_ip').distinct().count()
             resource_type['users'] = queryset.order_by('user').values('user').distinct().count()
+            resource_type['size'] = sum(queryset.filter(size__gte=0).values_list('size', flat=True))
 
         return context

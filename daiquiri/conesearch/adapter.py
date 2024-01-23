@@ -85,7 +85,10 @@ class BaseConeSearchAdapter(BaseServiceAdapter):
                 errors[key] = [_('This field must be a float.')]
 
     def stream(self):
-        return FileResponse(generate_votable(DatabaseAdapter().fetchall(self.sql, self.args), self.columns), content_type='application/xml')
+        return FileResponse(
+            generate_votable(DatabaseAdapter().fetchall(self.sql, self.args), self.columns),
+            content_type='application/xml'
+        )
 
 
 class SimpleConeSearchAdapter(BaseConeSearchAdapter):

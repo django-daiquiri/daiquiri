@@ -10,6 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from celery import shared_task
 
 from daiquiri.core.tasks import Task
+from daiquiri.stats.models import Record
 
 
 class RunQueryTask(Task):
@@ -136,12 +137,10 @@ def run_database_query_task(job_id):
                 resource={
                     'job_id': job.id,
                     'job_type': job.job_type,
-                    'query': job.query,
-                    'query_language': job.query_language,
-                    'sources': job.metadata.get('sources', [])
                 },
                 client_ip=job.client_ip,
-                user=job.owner
+                user=job.owner,
+                size=job.size
             )
 
             job.save()
@@ -238,7 +237,8 @@ def run_database_ingest_task(job_id, file_path):
                     'job_type': job.job_type,
                 },
                 client_ip=job.client_ip,
-                user=job.owner
+                user=job.owner,
+                size=job.size
             )
 
             job.save()
@@ -292,6 +292,17 @@ def create_download_table_task(download_id):
         else:
             download_job.phase = download_job.PHASE_COMPLETED
             logger.info('download_job %s completed' % download_job.file_path)
+            Record.objects.create(
+                time=download_job.start_time,
+                resource_type='CREATE_FILE',
+                resource={
+                    'job_id': download_job.id,
+                    'job_type': download_job.job_type,
+                    'file_path': download_job.file_path
+                },
+                client_ip=download_job.client_ip,
+                size=os.path.getsize(download_job.file_path)
+            )
         finally:
             download_job.end_time = now()
             download_job.save()
@@ -339,6 +350,17 @@ def create_download_archive_task(archive_id):
         archive_job.end_time = now()
         archive_job.phase = archive_job.PHASE_COMPLETED
         archive_job.save()
+        Record.objects.create(
+            time=archive_job.start_time,
+            resource_type='CREATE_ZIP',
+            resource={
+                'job_id': archive_job.id,
+                'job_type': archive_job.job_type,
+                'file_path': archive_job.file_path
+            },
+            client_ip=archive_job.client_ip,
+            size=os.path.getsize(archive_job.file_path)
+        )
 
         # log completion
         logger.info('create_archive_zip_file %s completed' % archive_job.file_path)

@@ -15,6 +15,8 @@ class Record(models.Model):
     client_ip = models.GenericIPAddressField(blank=True, null=True)
     user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
 
+    size = models.PositiveBigIntegerField(null=True, blank=True)
+
     class Meta:
         ordering = ('-time', )
 

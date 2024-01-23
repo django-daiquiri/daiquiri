@@ -39,7 +39,7 @@ def generate_csv(generator, fields):
             csv.writer(f, quotechar='"').writerow(corrected_row)
             yield f.getvalue()
 
-            
+
 def correct_col_for_votable(col):
     corrected_col = col
 
