@@ -223,8 +223,6 @@ class QueryJob(Job):
             self.max_records,
         )
 
-        job_sources = get_job_sources(self)
-
         adapter.submit_query(self.actual_query)
 
         # create a stats record for this job
