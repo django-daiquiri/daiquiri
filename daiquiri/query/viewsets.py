@@ -6,6 +6,7 @@ from django_sendfile import sendfile
 
 from django.conf import settings
 from django.http import Http404, FileResponse
+from django.utils.timezone import now
 
 from rest_framework import viewsets, mixins, filters
 from rest_framework.response import Response
@@ -28,6 +29,7 @@ from daiquiri.core.utils import (
     import_class
 )
 from daiquiri.jobs.viewsets import SyncJobViewSet, AsyncJobViewSet
+from daiquiri.stats.models import Record
 
 from .models import QueryJob, DownloadJob, Example
 from .serializers import (
@@ -262,6 +264,18 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
             raise NotFound
 
         if download_job.phase == download_job.PHASE_COMPLETED and request.GET.get('download', True):
+            Record.objects.create(
+                time=now(),
+                resource_type='DOWNLOAD',
+                resource={
+                    'job_id': download_job.id,
+                    'job_type': download_job.job_type,
+                    'file_path': download_job.file_path
+                },
+                client_ip=download_job.client_ip,
+                user=download_job.owner,
+                size=os.path.getsize(download_job.file_path)
+            )
             return sendfile(request, download_job.file_path, attachment=True)
         else:
             return Response(download_job.phase)

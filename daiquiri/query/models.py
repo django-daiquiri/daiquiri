@@ -15,7 +15,6 @@ from rest_framework.exceptions import ValidationError
 
 from daiquiri.core.adapter import DatabaseAdapter, DownloadAdapter
 from daiquiri.core.constants import ACCESS_LEVEL_CHOICES
-from daiquiri.core.generators import generate_votable
 from daiquiri.files.utils import check_file
 from daiquiri.jobs.managers import JobManager
 from daiquiri.jobs.models import Job
@@ -224,7 +223,7 @@ class QueryJob(Job):
             self.max_records,
         )
 
-        job_sources = get_job_sources(self)
+        adapter.submit_query(self.actual_query)
 
         # create a stats record for this job
         Record.objects.create(
@@ -233,15 +232,11 @@ class QueryJob(Job):
             resource={
                 'job_id': None,
                 'job_type': self.job_type,
-                'query': self.query,
-                'query_language': self.query_language,
-                'sources': job_sources
             },
             client_ip=self.client_ip,
-            user=self.owner
+            user=self.owner,
+            size=adapter.fetch_size(self.schema_name, self.table_name)
         )
-
-        adapter.submit_query(self.actual_query)
 
         try:
 

@@ -87,16 +87,18 @@ def send_file(request, file_path, search=None):
     if search:
         resource['search'] = search
 
+    absolute_file_path = os.path.join(settings.FILES_BASE_PATH, file_path)
+
     Record.objects.create(
         time=now(),
         resource_type='FILE',
         resource=resource,
         client_ip=get_client_ip(request),
-        user=request.user if request.user.is_authenticated else None
+        user=request.user if request.user.is_authenticated else None,
+        size=os.path.getsize(absolute_file_path)
     )
 
     # send the file to the client
-    absolute_file_path = os.path.join(settings.FILES_BASE_PATH, file_path)
     return sendfile(request, absolute_file_path)
 
 
