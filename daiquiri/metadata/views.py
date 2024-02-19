@@ -22,6 +22,21 @@ class ManagementView(ModelPermissionMixin, CSRFViewMixin, TemplateView):
         return context
 
 
+class SchemasView(TemplateView):
+    template_name = 'metadata/schemas.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(SchemasView, self).get_context_data(**kwargs)
+
+        try:
+            schemas = Schema.objects.filter_by_metadata_access_level(self.request.user).all()
+        except Schema.DoesNotExist:
+            raise Http404()
+
+        context['schemas'] = schemas
+        return context
+
+
 class SchemaView(TemplateView):
     template_name = 'metadata/schema.html'
 
