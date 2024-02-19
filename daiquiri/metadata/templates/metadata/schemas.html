@@ -10,10 +10,11 @@
         Database Schemas
     </h1>
 
+    <hr>
     <ul class="list-unstyled">
         {% for schema in schemas %}
         <li>
-            <h4>
+            <h2>
                 <a href="{% url 'metadata:schema' schema.name %}">
                     {% if schema.title %}
                     {{ schema.title }} ({{ schema }})
@@ -21,11 +22,14 @@
                     {{ schema }}
                     {% endif %}
                 </a>
-            </h4>
+            </h2>
             {% if schema.description %}
-            {{ schema.description | markdown }}
+                {{ schema.description | markdown }}
+            {% elif schema.long_description %}
+                {{ schema.long_description | markdown }}
             {% endif %}
         </li>
+        <hr>
         {% endfor %}
     </ul>
 
