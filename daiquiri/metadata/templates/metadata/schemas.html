@@ -6,15 +6,15 @@
 
 {% block page %}
 
-    <h1 class="hide-overflow">
-        Database Schemas
-    </h1>
+    <h2 class="hide-overflow">
+        Metadata for {{ settings.SITE_TITLE }} databases
+    </h2>
+    </br>
 
-    <hr>
     <ul class="list-unstyled">
         {% for schema in schemas %}
         <li>
-            <h2>
+            <h3>
                 <a href="{% url 'metadata:schema' schema.name %}">
                     {% if schema.title %}
                     {{ schema.title }} ({{ schema }})
@@ -22,14 +22,13 @@
                     {{ schema }}
                     {% endif %}
                 </a>
-            </h2>
+            </h3>
             {% if schema.description %}
                 {{ schema.description | markdown }}
             {% elif schema.long_description %}
                 {{ schema.long_description | markdown }}
             {% endif %}
         </li>
-        <hr>
         {% endfor %}
     </ul>
 
