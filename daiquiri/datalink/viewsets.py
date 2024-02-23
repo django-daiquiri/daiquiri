@@ -24,6 +24,8 @@ class SyncDatalinkJobViewSet(viewsets.GenericViewSet):
 
         if 'ID' in data:
             identifiers = data.getlist('ID')
+        else:
+            identifiers = []
 
         adapter = DatalinkAdapter()
 
