@@ -1,0 +1,20 @@
+{% extends 'core/new/wide.html' %}
+{% load static %}
+
+{% block css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'query/dist/css/jobs.css' %}" />
+{% endblock %}
+
+{% block js %}
+{{ block.super }}
+<script src="{% static 'query/dist/js/jobs.js' %}" defer></script>
+{% endblock %}
+
+{% block wide %}
+
+    <h1>Query jobs</h1>
+
+    <div id="app" class="jobs"></div>
+
+{% endblock %}
