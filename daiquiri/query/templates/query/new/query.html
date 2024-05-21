@@ -8,12 +8,11 @@
 
 {% block js %}
 {{ block.super }}
+<script src="{% url 'javascript-catalog' %}"></script>
 <script src="{% static 'query/dist/js/query.js' %}" defer></script>
 {% endblock %}
 
 {% block wide %}
-
-    <h1>Query interface</h1>
 
     <div id="app" class="query"></div>
 
