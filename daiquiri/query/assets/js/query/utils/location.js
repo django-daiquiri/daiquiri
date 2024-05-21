@@ -2,7 +2,7 @@ import { isEmpty, isNil, trim } from 'lodash'
 
 import { baseUrl } from '../../../../../core/assets/js/utils/location'
 
-const basePath = `${baseUrl}query/new/`
+const basePath = `${baseUrl}/query/new/`
 
 const parseLocation = () => {
   const path = trim(window.location.pathname.replace(basePath, ''), '/')
@@ -40,4 +40,4 @@ const buildPath = ({ jobId, formKey }) => {
   return path
 }
 
-export { parseLocation, updateLocation, buildPath }
+export { basePath, parseLocation, updateLocation, buildPath }

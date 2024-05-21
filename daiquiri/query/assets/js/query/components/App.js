@@ -1,13 +1,27 @@
-import React from 'react'
+import React, { useState } from 'react'
 
-import { parseLocation } from '../utils/location'
+import { parseLocation, updateLocation } from '../utils/location'
 
+import Form from './Form'
 import Forms from './Forms'
+import Job from './Job'
 import Jobs from './Jobs'
 import Status from './Status'
 
 const App = () => {
-  const { jobId, formKey } = parseLocation()
+  const location = parseLocation()
+
+  const [state, setState] = useState(location)
+
+  const loadJob = (jobId) => {
+    updateLocation({ jobId })
+    setState({ jobId })
+  }
+
+  const loadForm = (formKey) => {
+    updateLocation({ formKey })
+    setState({ formKey })
+  }
 
   return (
     <div className="container">
@@ -16,15 +30,15 @@ const App = () => {
       <div className="row">
         <div className="col-sm-4">
           <Status />
-          <Forms />
-          <Jobs />
+          <Forms loadForm={loadForm} />
+          <Jobs loadJob={loadJob} />
         </div>
         <div className="col-sm-8">
           {
-            jobId && <pre>{jobId}</pre>
+            state.jobId && <Job jobId={state.jobId} />
           }
           {
-            formKey && <pre>{formKey}</pre>
+            state.formKey && <Form formKey={state.formKey} />
           }
         </div>
       </div>

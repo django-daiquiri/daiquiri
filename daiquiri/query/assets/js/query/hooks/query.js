@@ -35,3 +35,10 @@ export const useUserSchema = () => {
     refetchInterval: refetchInterval
   })
 }
+
+export const useJobQuery = (jobId) => {
+  return useQuery({
+    queryKey: ['job', jobId],
+    queryFn: () => QueryApi.fetchJob(jobId)
+  })
+}
