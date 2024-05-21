@@ -109,6 +109,11 @@ class UsersView(ModelPermissionMixin, CSRFViewMixin, TemplateView):
         return context
 
 
+class NewUsersView(ModelPermissionMixin, CSRFViewMixin, TemplateView):
+    template_name = 'auth/new/users.html'
+    permission_required = 'daiquiri_auth.view_profile'
+
+
 class PasswordChangeView(AllauthPasswordChangeView):
 
     success_url = reverse_lazy('account_change_password_done')

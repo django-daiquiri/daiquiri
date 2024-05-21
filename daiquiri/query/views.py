@@ -32,3 +32,18 @@ class ExamplesView(ModelPermissionMixin, CSRFViewMixin, TemplateView):
             'Example': get_model_field_meta(Example)
         }
         return context
+
+
+class NewQueryView(AnonymousAccessMixin, CSRFViewMixin, TemplateView):
+    template_name = 'query/new/query.html'
+    anonymous_setting = 'QUERY_ANONYMOUS'
+
+
+class NewJobsView(LoginRequiredMixin, CSRFViewMixin, TemplateView):
+    template_name = 'query/new/jobs.html'
+
+
+class NewExamplesView(ModelPermissionMixin, CSRFViewMixin, TemplateView):
+
+    template_name = 'query/new/examples.html'
+    permission_required = 'daiquiri_query.view_example'

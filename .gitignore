@@ -16,6 +16,7 @@ __pycache__/
 /htmlcov
 /env
 /venv
+/node_modules
 
 build
 dist

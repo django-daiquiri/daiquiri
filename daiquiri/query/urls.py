@@ -1,7 +1,7 @@
-from django.urls import include, path
+from django.urls import include, path, re_path
 from rest_framework import routers
 
-from .views import ExamplesView, JobsView, QueryView
+from .views import ExamplesView, JobsView, QueryView, NewQueryView, NewJobsView, NewExamplesView
 from .viewsets import (DropdownViewSet, ExampleViewSet, FormViewSet,
                        PhaseViewSet, QueryJobViewSet, QueryLanguageViewSet,
                        QueueViewSet, StatusViewSet, DownloadViewSet)
@@ -23,6 +23,9 @@ urlpatterns = [
     path(r'', QueryView.as_view(), name='query'),
     path(r'jobs/', JobsView.as_view(), name='jobs'),
     path(r'examples/', ExamplesView.as_view(), name='examples'),
+    re_path(r'new/', NewQueryView.as_view(), name='query_new'),
+    re_path(r'jobs/new/', NewJobsView.as_view(), name='jobs_new'),
+    path(r'examples/new/', NewExamplesView.as_view(), name='examples_new'),
 
     # rest api
     path(r'api/', include(router.urls)),
