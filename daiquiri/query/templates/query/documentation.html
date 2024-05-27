@@ -1,0 +1,115 @@
+{% extends 'core/wide.html' %}
+{% load static %}
+{% load compress %}
+{% load i18n %}
+
+
+{% block wide %}
+
+<h2>{% trans 'Support for the ADQL queries at ' %} {{settings.SITE_TITLE }}</h2>
+    <p> The current implementation supports the ADQL version 
+        <a href="https://www.ivoa.net/documents/ADQL/20231215/index.html">2.1</a>.
+        While our service adheres to the ADQL standard, it's important to note
+        that the standard allows for some flexibility in the implementation of 
+        ADQL datatypes and functions. Here, we describe how we've implemented 
+        the ADQL datatypes and functions in our service, outlining the 
+        differences from the official ADQL standard.
+    </p>
+    <h3> Datatypes </h3>
+    <p>Our services do not explicitly return ADQL datatypes for 
+    <a href="https://www.ivoa.net/documents/ADQL/20231215/REC-ADQL-2.1.html#tth_sEc3.5.1">point</a>,
+    <a href="https://www.ivoa.net/documents/ADQL/20231215/REC-ADQL-2.1.html#tth_sEc3.5.2">circle</a>, and
+    <a href="https://www.ivoa.net/documents/ADQL/20231215/REC-ADQL-2.1.html#tth_sEc3.5.3">polygon</a>
+    (for example, there is no <code>point</code> as a xtype). Instead, they
+    return an array that fully adheres to the standard. For instance, there is
+    a double/float array of size 2 for a <code>point</code>,
+    size 3 for a <code>circle</code>, and size '*' for a <code>polygon</code>.
+    </p>
+    <h3> Functions </h3>
+    <table class="table table-striped">
+        <tbody>
+            <tr>
+                <td><a href="https://www.ivoa.net/documents/ADQL/20231215/REC-ADQL-2.1.html#tth_sEc4.2.18">POINT</a></td>
+                <td>Fully supported</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.ivoa.net/documents/ADQL/20231215/REC-ADQL-2.1.html#tth_sEc4.2.11">CIRCLE</a></td>
+                <td>Supported syntax: </br>
+                    <code>CIRCLE(25.4, -20.0, 10.0)</code></br>
+                    <code>CIRCLE('ICRS', 25.4, -20.0, 10.0)</code>(deprecated)</br>
+                    <code>CIRCLE(POINT(25.4, -20.0), 10.0)</code></br>
+                    <code>CIRCLE(t1.ra, t1.dec, t1.radius)</code> </br>
+                    <code>CIRCLE(POINT(t1.ra, t1.dec), t1.radius)</code> </br>
+                    <b>Not</b> supported:</br>
+                    <code>CIRCLE(t1.center, t1.radius)</code> where
+                    <code>t1.center</code> is a reference to a column that
+                    contains a POINT value.
+                </td>
+            </tr>
+            <tr>
+                <td><a href="https://www.ivoa.net/documents/ADQL/20231215/REC-ADQL-2.1.html#tth_sEc4.2.9">BOX</a></td>
+                <td>This function is deprecated in ADQL 2.1.</br>
+                    Supported syntax:</br>
+                    <code>BOX(25.4, -20.0, 10.0, 10.0)</code> </br>
+                    <code>BOX('ICRS', 25.4, -20.0, 10.0, 10.0)</code> </br>
+                    References to the columns are not supported!
+                </td>
+            </tr>
+            <tr>
+                <td><a href="https://www.ivoa.net/documents/ADQL/20231215/REC-ADQL-2.1.html#tth_sEc4.2.19">POLYGON</a></td>
+                <td> Supported syntax: </br>
+                    <code>POLYGON(10.0, -10.5, 20.0, 20.5, 30.0, 30.5)</code></br>
+                    <code>POLYGON('ICRS', 10.0, -10.5, 20.0, 20.5, 30.0, 30.5)</code> (deprecated)
+                </td>
+            </tr>
+            <tr>
+                <td><a href="https://www.ivoa.net/documents/ADQL/20231215/REC-ADQL-2.1.html#tth_sEc4.2.8">AREA</a></td>
+                <td> Supported for the implemented geometric types
+                    <code>POINT</code>, <code>CIRCLE</code>,
+                    <code>BOX</code> and <code>POLYGON</code>
+                </td>
+            </tr>
+            <tr>
+                <td><a href="https://www.ivoa.net/documents/ADQL/20231215/REC-ADQL-2.1.html#tth_sEc4.2.16">DISTANCE</a></td>
+                <td>Supports the two and four parameters version.</br>
+                    <code>DISTANCE(POINT(ra, dec), POINT(13.66, -58.3))</code></br>
+                    <code>DISTANCE(ra, dec, 13.66, -58.3)</code></br>
+                    where <code>ra</code> and <code>dec</code> are column references.</br>
+                    <b>Not</b> supported are references to the columns of
+                    type <code>POINT</code>.
+                </td>
+            </tr>
+            <tr>
+                <td><a href="https://www.ivoa.net/documents/ADQL/20231215/REC-ADQL-2.1.html#tth_sEc4.2.12">CONTAINS</a></td>
+                <td>Does <b>not</b> support references to the columns containing 
+                    values of the types <code>POINT</code>, <code>CIRCLE</code> or <code>POLYGON</code>.
+                    The values must be created explicitly in the query. The examples
+                    for the supported syntax are <br>
+                    <code>CONTAINS(POINT(25.0, -19.5), CIRCLE(25.4, -20.0, 10.0))</code></br>
+                    <code>CONTAINS(POINT(ra, dec), CIRCLE(25.4, -20.0, 10.0))</code></br>
+                    <code>CONTAINS(POINT(25.0, -19.5), CIRCLE(ra, dec, 10.0))</code>
+                </td>
+            </tr>
+            <tr>
+                <td><a href="https://www.ivoa.net/documents/ADQL/20231215/REC-ADQL-2.1.html#tth_sEc4.2.17">INTERSECTS</a></td>
+                <td>Does <b>not</b> support references to the columns containing 
+                    values of the types <code>POINT</code>, <code>CIRCLE</code> or <code>POLYGON</code>.
+                    The values must be created explicitly in the query. The examples
+                    for the supported syntax are <br>
+                    <code>INTERSECTS(CIRCLE(25.4, -20.0, 1),
+                                     POLYGON(20.0, -15.0,
+                                             20.0, -5.0,
+                                             10.0, -5.0,
+                                             10.0, -15.0))
+                    </code></br>
+                    <code>INTERSECTS(CIRCLE(ra, dec, 1),
+                                     POLYGON(20.0, -15.0,
+                                             20.0, -5.0,
+                                             10.0, -5.0,
+                                             10.0, -15.0))
+                    </code>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+{% endblock %}

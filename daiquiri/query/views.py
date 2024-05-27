@@ -32,3 +32,8 @@ class ExamplesView(ModelPermissionMixin, CSRFViewMixin, TemplateView):
             'Example': get_model_field_meta(Example)
         }
         return context
+
+
+class QueryDocumentationView(TemplateView):
+
+    template_name = 'query/documentation.html'
