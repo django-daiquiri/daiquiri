@@ -1,7 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
 
-from daiquiri.core.views import AnonymousAccessMixin, CSRFViewMixin, ModelPermissionMixin
+from daiquiri.core.views import AnonymousAccessMixin, CSRFViewMixin, ModelPermissionMixin, StoreIdViewMixin
 from daiquiri.core.utils import get_model_field_meta
 
 from .models import QueryJob, Example
@@ -34,16 +34,16 @@ class ExamplesView(ModelPermissionMixin, CSRFViewMixin, TemplateView):
         return context
 
 
-class NewQueryView(AnonymousAccessMixin, CSRFViewMixin, TemplateView):
+class NewQueryView(AnonymousAccessMixin, CSRFViewMixin, StoreIdViewMixin, TemplateView):
     template_name = 'query/new/query.html'
     anonymous_setting = 'QUERY_ANONYMOUS'
 
 
-class NewJobsView(LoginRequiredMixin, CSRFViewMixin, TemplateView):
+class NewJobsView(LoginRequiredMixin, CSRFViewMixin, StoreIdViewMixin, TemplateView):
     template_name = 'query/new/jobs.html'
 
 
-class NewExamplesView(ModelPermissionMixin, CSRFViewMixin, TemplateView):
+class NewExamplesView(ModelPermissionMixin, CSRFViewMixin, StoreIdViewMixin, TemplateView):
 
     template_name = 'query/new/examples.html'
     permission_required = 'daiquiri_query.view_example'

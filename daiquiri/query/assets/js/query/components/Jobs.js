@@ -1,9 +1,10 @@
-import React, { useState } from 'react'
+import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import { isEmpty, isNil } from 'lodash'
 
 import { baseUrl } from '../../../../../core/assets/js/utils/location'
+import { useLsState } from '../../../../../core/assets/js/hooks/ls'
 
 import { useJobsQuery } from '../hooks/query'
 import { basePath } from '../utils/location'
@@ -13,7 +14,7 @@ import Loading from './Loading'
 const Jobs = ({ jobId, loadJob }) => {
   const { data: jobs } = useJobsQuery()
 
-  const [open, setOpen] = useState([''])
+  const [openRunIds, setOpenRunIds] = useLsState('query.openRunIds', [''])
 
   const handleLoadJob = (event, job) => {
     event.preventDefault()
@@ -21,8 +22,18 @@ const Jobs = ({ jobId, loadJob }) => {
   }
 
   const toggleRunId = (runId) => {
-    setOpen(open.includes(runId) ? open.filter((entry) => entry !== runId) : [...open, runId])
+    setOpenRunIds(openRunIds.includes(runId) ? openRunIds.filter((entry) => entry !== runId) : [...openRunIds, runId])
   }
+
+  // open the run id of the selected job
+  useEffect(() => {
+    if (!isEmpty(jobs)) {
+      const job = jobs.find((job) => job.id === jobId)
+      if (job && !openRunIds.includes(job.run_id)) {
+        setOpenRunIds([...openRunIds, job.run_id])
+      }
+    }
+  }, [jobs, jobId])
 
   // sort jobs according to their run id
   const runIds = isNil(jobs) ? [] : jobs.reduce((runIds, job) => {
@@ -60,7 +71,7 @@ const Jobs = ({ jobId, loadJob }) => {
                           <div className="d-flex align-items-center">
                             {isEmpty(runId) ? gettext('No run id') : interpolate(gettext('Run id: %s'), [runId])}
                             <span className="ms-auto material-symbols-rounded">
-                              {open.includes(runId) ? 'folder_open' : 'folder'}
+                              {openRunIds.includes(runId) ? 'folder_open' : 'folder'}
                             </span>
                           </div>
                         </button>
@@ -68,7 +79,7 @@ const Jobs = ({ jobId, loadJob }) => {
                     )
                   }
                   {
-                    open.includes(runId) && (
+                    openRunIds.includes(runId) && (
                       jobs.filter((job) => job.run_id === runId).map((job) => (
                         <li key={job.id} className={classNames({
                           'list-group-item': true,
