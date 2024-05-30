@@ -1,9 +1,14 @@
-.card {
-    .card-body {
-        p {
-            &:last-child {
-                margin-bottom: 0;
-            }
+.jobs {
+    .list-group {
+        max-height: 400px;
+        overflow-y: auto;
+
+        button.btn-link {
+            background-color: var(--bs-light);
+        }
+
+        [class*="material-symbols-"] {
+            font-size: 1rem;
         }
     }
 }

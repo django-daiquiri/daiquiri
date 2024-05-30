@@ -24,16 +24,16 @@ const App = () => {
   }
 
   return (
-    <div className="container">
+    <div>
       <h1 className="mb-4">Query interface</h1>
 
       <div className="row">
-        <div className="col-sm-4">
+        <div className="col-sm-3">
           <Status />
-          <Forms loadForm={loadForm} />
-          <Jobs loadJob={loadJob} />
+          <Forms formKey={state.formKey} loadForm={loadForm} />
+          <Jobs jobId={state.jobId} loadJob={loadJob} />
         </div>
-        <div className="col-sm-8">
+        <div className="col-sm-9">
           {
             state.jobId && <Job jobId={state.jobId} />
           }

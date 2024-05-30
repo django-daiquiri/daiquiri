@@ -1,0 +1,14 @@
+a {
+    text-decoration: var(--bs-link-decoration);
+
+    &:hover {
+        text-decoration: var(--bs-link-hover-decoration);
+    }
+}
+
+.btn-link {
+    border-radius: 0;
+    border: none;
+    font-size: var(--bs-body-font-size);
+    font-weight: var(--bs-body-weight-size);
+}

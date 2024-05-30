@@ -109,8 +109,10 @@ const baseConfig = {
       {
         test: /(fonts|files)\/.*\.(svg|woff2?|ttf|eot|otf)(\?.*)?$/,
         loader: 'file-loader',
+        type: 'javascript/auto',
         options: {
-          name: 'fonts/[name].[ext]'
+          name: 'fonts/[name].[ext]',
+          esModule: false
         }
       },
       {
