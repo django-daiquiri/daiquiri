@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 import QueryApi from '../api/QueryApi'
 
@@ -15,8 +15,7 @@ export const useStatusQuery = () => {
 export const useFormsQuery = () => {
   return useQuery({
     queryKey: ['forms'],
-    queryFn: () => QueryApi.fetchForms(),
-    refetchInterval: refetchInterval
+    queryFn: () => QueryApi.fetchForms()
   })
 }
 
@@ -28,7 +27,7 @@ export const useJobsQuery = () => {
   })
 }
 
-export const useUserSchema = () => {
+export const useUserSchemaQuery = () => {
   return useQuery({
     queryKey: ['userSchema'],
     queryFn: () => QueryApi.fetchUserSchema(),
@@ -40,5 +39,51 @@ export const useJobQuery = (jobId) => {
   return useQuery({
     queryKey: ['job', jobId],
     queryFn: () => QueryApi.fetchJob(jobId)
+  })
+}
+
+export const useUpdateJobMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (variables) => {
+      return QueryApi.updateJob(variables.job.id, variables.values)
+    },
+    onSuccess: (data, variables) => {
+      queryClient.setQueryData(['job', variables.job.id], {...variables.job, ...data})
+      queryClient.invalidateQueries({ queryKey: ['jobs'] })
+      variables.onSuccess()
+    },
+    onError: (error, variables) => {
+      variables.setErrors(error.errors)
+    }
+  })
+}
+
+export const useArchiveJobMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (variables) => {
+      return QueryApi.archiveJob(variables.job.id)
+    },
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['jobs'] })
+      variables.onSuccess()
+    }
+  })
+}
+
+export const useAbortJobMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (variables) => {
+      return QueryApi.abortJob(variables.job.id)
+    },
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['jobs'] })
+      variables.onSuccess()
+    }
   })
 }

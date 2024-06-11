@@ -51,6 +51,18 @@ class QueryApi extends BaseApi {
     return this.get('/query/api/functions/user/')
   }
 
+  static updateJob(id, values) {
+    return this.put(`/query/api/jobs/${id}/`, values)
+  }
+
+  static abortJob(id) {
+    return this.put(`/query/api/jobs/${id}/abort/`)
+  }
+
+  static archiveJob(id) {
+    return this.delete(`/query/api/jobs/${id}/`)
+  }
+
 }
 
 export default QueryApi
