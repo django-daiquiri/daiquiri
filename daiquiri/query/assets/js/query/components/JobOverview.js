@@ -15,7 +15,7 @@ const JobOverview = ({ job }) => {
   const [showArchiveModal, toggleArchiveModal] = useToggle()
 
   return (
-    <div className="job-overview mb-5">
+    <div className="job-overview">
       <p>
         {gettext('On this page, you can find an overview about a submitted query job.' +
                  ' For a table view of the results, the plotting tool, and to access' +
