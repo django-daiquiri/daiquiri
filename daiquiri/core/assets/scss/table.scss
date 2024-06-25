@@ -1,0 +1,91 @@
+.dq-table {
+    .dq-table-header {
+        display: flex;
+        gap: 5px;
+
+        .page-link {
+            cursor: pointer;
+        }
+    }
+
+    .dq-table-pane {
+        border: 1px solid var(--bs-border-color);
+        border-radius: 4px;
+        width: auto;
+        overflow-x: auto;
+        table-layout: fixed;
+        width: 100%;
+
+        table.table {
+            margin: 0;
+            table-layout: fixed !important;
+
+            th,
+            td {
+                width: 300px;
+                padding: 0;
+                border-right: 1px solid var(--bs-border-color);
+
+                &:last-child,
+                &:last-child {
+                    border-right: none;
+                }
+            }
+            tr {
+                &.selected {
+                    background-color: var(--dq-table-active-bg);
+                }
+            }
+            th.dq-table-check {
+                width: 32px;
+
+                @include media-breakpoint-up(md) {
+                    width: 40px;
+                }
+            }
+            .dq-table-cell,
+            .dq-table-check {
+                white-space: nowrap;
+                padding: 8px;
+                position: relative;
+                overflow: hidden;
+            }
+            .dq-table-check {
+                white-space: nowrap;
+                padding: 9px 4px 7px 6px;
+                text-align: center;
+            }
+
+            th {
+                .dq-table-cell {
+                    display: flex;
+                    padding-right: 0;
+
+                    .name {
+                        overflow: hidden;
+                        flex-grow: 1;
+                    }
+                    .info {
+                        .material-symbols-rounded {
+                            font-size: 20px !important;
+                        }
+                    }
+                    .order {
+                        cursor: pointer;
+
+                        .material-symbols-rounded {
+                            line-height: 20px !important;
+                        }
+                    }
+                    .handle {
+                        width: 10px;
+
+                        &:hover {
+                            cursor: move;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

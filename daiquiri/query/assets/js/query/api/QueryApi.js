@@ -35,6 +35,14 @@ class QueryApi extends BaseApi {
     return this.get(`/query/api/jobs/${id}/`)
   }
 
+  static fetchJobColumns(id, params) {
+    return this.get(`/query/api/jobs/${id}/columns/?${encodeParams(params)}`)
+  }
+
+  static fetchJobRows(id, params) {
+    return this.get(`/query/api/jobs/${id}/rows/?${encodeParams(params)}`)
+  }
+
   static fetchUserSchema(params) {
     return this.get(`/query/api/jobs/tables/?${encodeParams(params)}`)
   }

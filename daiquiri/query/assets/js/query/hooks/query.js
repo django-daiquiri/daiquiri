@@ -1,5 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-
+import { keepPreviousData, useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import QueryApi from '../api/QueryApi'
 
 const refetchInterval = 4000
@@ -39,6 +38,22 @@ export const useJobQuery = (jobId) => {
   return useQuery({
     queryKey: ['job', jobId],
     queryFn: () => QueryApi.fetchJob(jobId)
+  })
+}
+
+export const useJobColumnsQuery = (jobId, params) => {
+  return useQuery({
+    queryKey: ['jobColumns', jobId, params],
+    queryFn: () => QueryApi.fetchJobColumns(jobId, params),
+    placeholderData: keepPreviousData
+  })
+}
+
+export const useJobRowsQuery = (jobId, params) => {
+  return useQuery({
+    queryKey: ['jobRows', jobId, params],
+    queryFn: () => QueryApi.fetchJobRows(jobId, params),
+    placeholderData: keepPreviousData
   })
 }
 
