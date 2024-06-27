@@ -1,3 +1,7 @@
+html {
+    font-size: var(--dq-font-size);
+}
+
 a,
 .btn-link {
     text-decoration: var(--bs-link-decoration);
@@ -14,4 +18,13 @@ a,
     border: none;
     font-size: var(--bs-body-font-size);
     font-weight: var(--bs-body-weight-size);
+}
+
+button {
+    [class^="material-symbols"] {
+        vertical-align: middle;
+        line-height: 0 !important;
+        position: relative;
+        top: -2px;
+    }
 }

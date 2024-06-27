@@ -55,7 +55,7 @@ const Job = ({ jobId, loadJob, loadForm }) => {
           </a>
         </li>
       </ul>
-      <div className="job-tab-content mt-4">
+      <div className="job-tab-content mt-3">
         {
           activeTab === 'overview' && <JobOverview job={job} />
         }

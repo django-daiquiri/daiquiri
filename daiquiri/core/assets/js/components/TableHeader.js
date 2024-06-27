@@ -1,18 +1,27 @@
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 
-const TableHeader = ({ count, params, setParams }) => {
+const TableHeader = ({ pageCount, params, setParams }) => {
 
-  const lastPage = count / params.page_size
+  const [searchInput, setSearchInput] = useState('')
+
   const isFirstPage = params.page == 1
-  const isLastPage = params.page == lastPage
+  const isLastPage = params.page == pageCount
+
+  const handleSearch = (event) => {
+    event.preventDefault()
+    setParams({...params, search: searchInput})
+  }
 
   const handleFirst = () => setParams({...params, page: 1})
   const handlePrevious = () => setParams({...params, page: params.page - 1})
   const handleNext = () => setParams({...params, page: params.page + 1})
-  const handleLast = () => setParams({...params, page: lastPage })
-  const handleReset = () => setParams({page: 1, page_size: 10})
+  const handleLast = () => setParams({...params, page: pageCount })
+  const handleReset = () => {
+    setSearchInput('')
+    setParams({page: 1, page_size: 10})
+  }
 
   // eslint-disable-next-line react/prop-types
   const PageItem = ({label, disabled, onClick}) => (
@@ -24,13 +33,29 @@ const TableHeader = ({ count, params, setParams }) => {
   )
 
   return (
-    <div className="dq-table-header">
+    <div className="dq-table-header d-md-flex">
+      <form className="flex-grow-1 mb-3" onSubmit={handleSearch}>
+        <div className="input-group">
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Search"
+            value={searchInput}
+            onChange={(event) => setSearchInput(event.target.value)}
+          />
+          <button className="btn btn-outline-secondary" type="button" onClick={handleSearch}>
+            <span className="material-symbols-rounded">search</span>
+          </button>
+        </div>
+      </form>
+
       <ul className="pagination">
         <PageItem label={gettext('First')} onClick={handleFirst} disabled={isFirstPage} />
         <PageItem label={gettext('Previous')} onClick={handlePrevious} disabled={isFirstPage} />
         <PageItem label={gettext('Next')} onClick={handleNext} disabled={isLastPage} />
         <PageItem label={gettext('Last')} onClick={handleLast} disabled={isLastPage} />
       </ul>
+
       <ul className="pagination">
         <PageItem label={gettext('Reset')} onClick={handleReset} />
       </ul>
@@ -39,7 +64,7 @@ const TableHeader = ({ count, params, setParams }) => {
 }
 
 TableHeader.propTypes = {
-  count: PropTypes.number,
+  pageCount: PropTypes.number.isRequired,
   params: PropTypes.object.isRequired,
   setParams: PropTypes.func.isRequired
 }
