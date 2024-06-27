@@ -28,12 +28,12 @@ const App = () => {
       <h1 className="mb-4">Query interface</h1>
 
       <div className="row">
-        <div className="col-sm-3">
+        <div className="col-lg-3 order-2 order-lg-1">
           <Status />
           <Forms formKey={state.formKey} loadForm={loadForm} />
           <Jobs jobId={state.jobId} loadJob={loadJob} />
         </div>
-        <div className="col-sm-9">
+        <div className="col-lg-9 order-1 order-lg-2">
           {
             state.jobId && <Job jobId={state.jobId} />
           }

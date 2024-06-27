@@ -11,7 +11,7 @@ const Table = ({ columns, rows, pageSizes, params, setParams }) => {
   const pageCount = rows.count / params.page_size
 
   return show && (
-    <div className="dq-table">
+    <div className="dq-table mb-3">
       <TableHeader
         pageCount={pageCount}
         params={params}

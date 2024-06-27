@@ -9,7 +9,7 @@ const TableFooter = ({ rowCount, pageCount, pageSizes, params, setParams }) => {
 
   return (
     <div className="dq-table-footer d-md-flex mt-3">
-      <p className="flex-grow-1 mt-1 mb-1">
+      <p className="flex-grow-1 mt-md-1 mb-md-1 mb-2">
         {
           params.search ? (
             interpolate(gettext('Page %s of %s (%s rows total, filtering for "%s")'),
