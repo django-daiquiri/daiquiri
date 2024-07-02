@@ -49,6 +49,19 @@ const Jobs = ({ jobId, loadJob }) => {
     }
   })
 
+  const jobPhaseSymbols = {
+    'PENDING': 'pause_circle',
+    'QUEUED': 'progress_activity',
+    'EXECUTING': 'play_circle',
+    'COMPLETED': 'check_circle',
+    'ERROR': 'warning',
+    'ABORTED': 'cancel',
+    'UNKNOWN': 'help',
+    'HELD': 'stop_circle',
+    'SUSPENDED': 'pause_circle',
+    'ARCHIVED': 'block'
+  }
+
   return (
     <div className="jobs card card-nav mb-3">
       <div className="card-header">
@@ -70,7 +83,7 @@ const Jobs = ({ jobId, loadJob }) => {
                         <button type="button" className="btn btn-link" onClick={() => toggleRunId(runId)}>
                           <div className="d-flex align-items-center">
                             {isEmpty(runId) ? gettext('No run id') : interpolate(gettext('Run id: %s'), [runId])}
-                            <span className="ms-auto material-symbols-rounded">
+                            <span className="material-symbols-rounded ms-auto">
                               {openRunIds.includes(runId) ? 'folder_open' : 'folder'}
                             </span>
                           </div>
@@ -86,7 +99,12 @@ const Jobs = ({ jobId, loadJob }) => {
                           'active': job.id === jobId
                         })}>
                           <a href={`${basePath}/${job.id}/`} onClick={(event) => handleLoadJob(event, job)}>
-                            {job.table_name}
+                            <span className="float-end">
+                              <span className="material-symbols-rounded">
+                                {jobPhaseSymbols[job.phase]}
+                              </span>
+                            </span>
+                            <span>{job.table_name}</span>
                           </a>
                         </li>
                       ))
