@@ -14,6 +14,19 @@ const JobOverview = ({ job }) => {
   const [showAbortModal, toggleAbortModal] = useToggle()
   const [showArchiveModal, toggleArchiveModal] = useToggle()
 
+  const jobPhaseClass = {
+    'PENDING': 'badge text-bg-primary',
+    'QUEUED': 'badge text-bg-info',
+    'EXECUTING': 'badge text-bg-secondary',
+    'COMPLETED': 'badge text-bg-success',
+    'ERROR': 'badge text-bg-danger',
+    'ABORTED': 'badge text-bg-secondary',
+    'UNKNOWN': 'badge text-bg-secondary',
+    'HELD': 'badge text-bg-secondary',
+    'SUSPENDED': 'badge text-bg-secondary',
+    'ARCHIVED': 'badge text-bg-secondary'
+  }
+
   return (
     <div className="job-overview">
       <p>
@@ -43,7 +56,9 @@ const JobOverview = ({ job }) => {
         <div className="card-body">
           <dl className="row mb-0">
             <dt className="col-sm-4 text-end">{gettext('Job status')}</dt>
-            <dd className="col-sm-8 mb-0">{job.phase}</dd>
+            <dd className="col-sm-8 mb-0">
+              <span className={jobPhaseClass[job.phase]}>{job.phase}</span>
+            </dd>
 
             <dt className="col-sm-4 text-end">{gettext('Full database table name')}</dt>
             <dd className="col-sm-8 mb-0"><code>{job.schema_name}.{job.table_name}</code></dd>
@@ -100,7 +115,7 @@ const JobOverview = ({ job }) => {
             }
 
             {
-              job.sources && job.sources.length && (
+              job.sources && job.sources.length > 0 && (
                 <>
                   <dt className="col-sm-4 text-end">{gettext('Source tables')}</dt>
                   <dd className="col-sm-8 mb-0">
