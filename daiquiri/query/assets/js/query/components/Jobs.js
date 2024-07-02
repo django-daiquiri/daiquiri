@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import { isEmpty, isNil } from 'lodash'
 
-import { baseUrl } from '../../../../../core/assets/js/utils/location'
+import { baseUrl, userId } from '../../../../../core/assets/js/utils/meta'
 import { useLsState } from '../../../../../core/assets/js/hooks/ls'
 
 import { useJobsQuery } from '../hooks/query'
@@ -116,11 +116,15 @@ const Jobs = ({ jobId, loadJob }) => {
           </ul>
         )
       }
-      <div className="card-footer">
-        <a href={`${baseUrl}/query/jobs/new/`} target="_blank" rel="noreferrer">
-          {gettext('View verbose job list')}
-        </a>
-      </div>
+      {
+        userId && (
+          <div className="card-footer">
+            <a href={`${baseUrl}/query/jobs/new/`} target="_blank" rel="noreferrer">
+              {gettext('View verbose job list')}
+            </a>
+          </div>
+        )
+      }
     </div>
   )
 }

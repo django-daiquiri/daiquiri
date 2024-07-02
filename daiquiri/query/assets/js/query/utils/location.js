@@ -1,6 +1,6 @@
 import { isEmpty, isNil, trim } from 'lodash'
 
-import { baseUrl } from '../../../../../core/assets/js/utils/location'
+import { baseUrl } from '../../../../../core/assets/js/utils/meta'
 
 const basePath = `${baseUrl}/query/new/`
 

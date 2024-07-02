@@ -1,7 +1,7 @@
 import Cookies from 'js-cookie'
 import isUndefined from 'lodash/isUndefined'
 
-import { baseUrl } from '../utils/location'
+import { baseUrl } from '../utils/meta'
 
 function ApiError(statusText, status) {
   this.status = status
