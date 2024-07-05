@@ -9,7 +9,6 @@
 
         button.btn-link {
             background-color: var(--bs-light);
-
         }
     }
 }
@@ -17,5 +16,13 @@
 .codemirror {
     .cm-line {
         padding: 0;
+    }
+}
+
+.sql-form {
+    .form-label {
+        font-weight: bold;
+        font-size: small;
+        margin-bottom: 0.25rem;
     }
 }

@@ -11,6 +11,10 @@ class QueryApi extends BaseApi {
     return this.get('/query/api/forms/')
   }
 
+  static fetchForm(key) {
+    return this.get(`/query/api/forms/${key}/`)
+  }
+
   static fetchDropdowns() {
     return this.get('/query/api/dropdowns/')
   }

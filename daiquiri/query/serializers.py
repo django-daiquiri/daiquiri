@@ -1,18 +1,35 @@
+from django.template.loader import get_template, TemplateDoesNotExist
+
 from rest_framework import serializers
 
 from daiquiri.jobs.serializers import SyncJobSerializer, AsyncJobSerializer
-
 from .models import QueryJob, Example
 from .validators import TableNameValidator, UploadFileValidator, UploadParamValidator
 
 
-class FormSerializer(serializers.Serializer):
+class FormListSerializer(serializers.Serializer):
 
     key = serializers.CharField()
+    label = serializers.CharField()
+
+    # TODO: remove
     form_service = serializers.SerializerMethodField()
 
     def get_form_service(self, obj):
         return obj['key'][0].upper() + obj['key'][1:] + 'FormService'
+
+
+class FormDetailSerializer(serializers.Serializer):
+
+    key = serializers.CharField()
+    label = serializers.CharField()
+    template = serializers.SerializerMethodField()
+
+    def get_template(self, obj):
+        try:
+            return get_template(obj['template']).render(request=self.context.get('request')).strip()
+        except (KeyError, TemplateDoesNotExist):
+            return None
 
 
 class DropdownSerializer(serializers.Serializer):

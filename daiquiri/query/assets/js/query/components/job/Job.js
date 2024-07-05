@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { isNil } from 'lodash'
 import classNames from 'classnames'
 
-import { useJobQuery } from '../hooks/query'
+import { useJobQuery } from '../../hooks/query'
 
 import { useLsState } from 'daiquiri/core/assets/js/hooks/ls'
 
@@ -22,9 +22,7 @@ const Job = ({ jobId, loadJob, loadForm }) => {
     setActiveTab(tab)
   }
 
-  return isNil(job) ? (
-      <span>{gettext('Loading ...')}</span>
-    ) : (
+  return !isNil(job) && (
     <div className="job">
       <h2 className="mb-4">
         {interpolate(gettext('Query job `%s`'), [job.table_name])}

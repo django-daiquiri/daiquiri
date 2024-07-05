@@ -20,6 +20,30 @@ export const useFormsQuery = () => {
   })
 }
 
+export const useFormQuery = (formKey) => {
+  return useQuery({
+    queryKey: ['form', formKey],
+    queryFn: () => QueryApi.fetchForm(formKey),
+    placeholderData: keepPreviousData
+  })
+}
+
+export const useQueryLanguagesQuery = () => {
+  return useQuery({
+    queryKey: ['queryLanguages'],
+    queryFn: () => QueryApi.fetchQueryLanguages(),
+    placeholderData: keepPreviousData
+  })
+}
+
+export const useQueuesQuery = () => {
+  return useQuery({
+    queryKey: ['queues'],
+    queryFn: () => QueryApi.fetchQueues(),
+    placeholderData: keepPreviousData
+  })
+}
+
 export const useJobsQuery = () => {
   return useQuery({
     queryKey: ['jobs'],

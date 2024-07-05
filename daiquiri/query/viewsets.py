@@ -33,7 +33,8 @@ from daiquiri.stats.models import Record
 
 from .models import QueryJob, DownloadJob, Example
 from .serializers import (
-    FormSerializer,
+    FormDetailSerializer,
+    FormListSerializer,
     DropdownSerializer,
     DownloadSerializer,
     QueryJobSerializer,
@@ -76,13 +77,21 @@ class StatusViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         }])
 
 
-class FormViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+class FormViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     permission_classes = (HasPermission, )
-
-    serializer_class = FormSerializer
 
     def get_queryset(self):
         return settings.QUERY_FORMS
+
+    def get_object(self):
+        return next(form for form in self.get_queryset() if form.get('key') == self.kwargs.get('pk'))
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return FormListSerializer
+        else:
+            return FormDetailSerializer
+
 
 
 class DropdownViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):

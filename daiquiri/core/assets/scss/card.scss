@@ -37,6 +37,8 @@
 
         &.active,
         &.active:hover {
+            border-color: var(--dq-card-nav-active-bg);
+
             a,
             button.btn-link {
                 color: var(--dq-card-nav-active-color);

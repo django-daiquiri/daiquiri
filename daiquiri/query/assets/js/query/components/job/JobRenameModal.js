@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-
 import className from 'classnames'
 
 import { useModal } from 'daiquiri/core/assets/js/hooks/modal'
 
-import { useUpdateJobMutation } from '../hooks/query'
+import { useUpdateJobMutation } from '../../hooks/query'
 
 const JobRenameModal = ({ job, show, toggle }) => {
   const [ref, showModal, hideModal]  = useModal()

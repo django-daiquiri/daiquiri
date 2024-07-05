@@ -3,9 +3,9 @@ import PropTypes from 'prop-types'
 
 import { useModal } from 'daiquiri/core/assets/js/hooks/modal'
 
-import { useArchiveJobMutation } from '../hooks/query'
+import { useAbortJobMutation } from '../../hooks/query'
 
-const JobArchiveModal = ({ job, show, toggle }) => {
+const JobAbortModal = ({ job, show, toggle }) => {
   const [ref, showModal, hideModal]  = useModal()
 
   useEffect(() => {
@@ -14,7 +14,7 @@ const JobArchiveModal = ({ job, show, toggle }) => {
     }
   }, [show])
 
-  const mutation = useArchiveJobMutation()
+  const mutation = useAbortJobMutation()
 
   const handleSubmit = () => {
     mutation.mutate({job, onSuccess: handleClose})
@@ -35,7 +35,7 @@ const JobArchiveModal = ({ job, show, toggle }) => {
           </div>
           <div className="modal-body">
             <p dangerouslySetInnerHTML={{
-              __html: interpolate(gettext('You are about to archive the job <code>%s</code>.'), [job.id])
+              __html: interpolate(gettext('You are about to abort the job <code>%s</code>.'), [job.id])
             }} />
             <p className="text-danger">
               {gettext('This action cannot be undone!')}
@@ -46,7 +46,7 @@ const JobArchiveModal = ({ job, show, toggle }) => {
               {gettext('Close')}
             </button>
             <button type="button" className="btn btn-sm btn-danger" onClick={handleSubmit}>
-              {gettext('Archive')}
+              {gettext('Abort')}
             </button>
           </div>
         </div>
@@ -55,10 +55,10 @@ const JobArchiveModal = ({ job, show, toggle }) => {
   )
 }
 
-JobArchiveModal.propTypes = {
+JobAbortModal.propTypes = {
   job: PropTypes.object.isRequired,
   show: PropTypes.bool.isRequired,
   toggle: PropTypes.func.isRequired
 }
 
-export default JobArchiveModal
+export default JobAbortModal

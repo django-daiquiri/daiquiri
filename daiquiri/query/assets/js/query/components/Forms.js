@@ -32,7 +32,7 @@ const Forms = ({ formKey, loadForm }) => {
               forms.map((form) => (
                 <li key={form.key} className={classNames({'list-group-item': true, 'active': form.key === formKey})}>
                   <a href={`${basePath}/${form.key}/`} onClick={(event) => handleLoadForm(event, form)}>
-                    {form.key}
+                    {form.label}
                   </a>
                 </li>
               ))
