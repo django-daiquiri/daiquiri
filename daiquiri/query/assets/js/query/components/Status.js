@@ -2,6 +2,7 @@ import React from 'react'
 import { isNil } from 'lodash'
 
 import { baseUrl } from 'daiquiri/core/assets/js/utils/meta'
+import { bytes2human } from 'daiquiri/core/assets/js/utils/bytes'
 
 import { useStatusQuery } from '../hooks/query'
 
@@ -49,14 +50,14 @@ const Status = () => {
                 <p className={status.size > status.quota ? 'text-danger': null} dangerouslySetInnerHTML={{
                   __html: interpolate(gettext(
                     'The guest user is using %s of its quota of %s.'),
-                    [status.size, status.quota]
+                    [bytes2human(status.size), bytes2human(status.quota)]
                   )
                 }} />
               ) : (
                 <p className={status.size > status.quota ? 'text-danger': null} dangerouslySetInnerHTML={{
                   __html: interpolate(gettext(
                     'You are using %s of your quota of %s.'),
-                    [status.size, status.quota]
+                    [bytes2human(status.size), bytes2human(status.quota)]
                   )
                 }} />
               )
