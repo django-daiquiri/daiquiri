@@ -3,8 +3,8 @@ import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import { isEmpty, isNil } from 'lodash'
 
-import { baseUrl, userId } from '../../../../../core/assets/js/utils/meta'
-import { useLsState } from '../../../../../core/assets/js/hooks/ls'
+import { baseUrl, userId } from 'daiquiri/core/assets/js/utils/meta'
+import { useLsState } from 'daiquiri/core/assets/js/hooks/ls'
 
 import { useJobsQuery } from '../hooks/query'
 import { basePath } from '../utils/location'

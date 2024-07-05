@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 import className from 'classnames'
 
-import { useModal } from '../../../../../core/assets/js/hooks/modal'
+import { useModal } from 'daiquiri/core/assets/js/hooks/modal'
 
 import { useUpdateJobMutation } from '../hooks/query'
 

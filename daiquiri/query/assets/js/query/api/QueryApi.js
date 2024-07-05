@@ -1,5 +1,5 @@
-import BaseApi from '../../../../../core/assets/js/api/BaseApi'
-import { encodeParams } from '../../../../../core/assets/js/utils/api'
+import BaseApi from 'daiquiri/core/assets/js/api/BaseApi'
+import { encodeParams } from 'daiquiri/core/assets/js/utils/api'
 
 class QueryApi extends BaseApi {
 

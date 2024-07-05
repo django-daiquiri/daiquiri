@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 
-import { useModal } from '../../../../../core/assets/js/hooks/modal'
+import { useModal } from 'daiquiri/core/assets/js/hooks/modal'
 
 import { useAbortJobMutation } from '../hooks/query'
 

@@ -1,8 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import CodeMirrorDisplay from '../../../../../core/assets/js/components/CodeMirrorDisplay'
-import { useToggle } from '../../../../../core/assets/js/hooks'
+import CodeMirrorDisplay from 'daiquiri/core/assets/js/components/CodeMirrorDisplay'
+import { useToggle } from 'daiquiri/core/assets/js/hooks'
 
 import JobRenameModal from './JobRenameModal'
 import JobAbortModal from './JobAbortModal'

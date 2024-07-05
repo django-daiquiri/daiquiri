@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 
-import Table from '../../../../../core/assets/js/components/Table'
+import Table from 'daiquiri/core/assets/js/components/Table'
 
 import { useJobColumnsQuery, useJobRowsQuery } from '../hooks/query'
 

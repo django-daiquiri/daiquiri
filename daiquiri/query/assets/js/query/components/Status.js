@@ -1,7 +1,7 @@
 import React from 'react'
 import { isNil } from 'lodash'
 
-import { baseUrl } from '../../../../../core/assets/js/utils/meta'
+import { baseUrl } from 'daiquiri/core/assets/js/utils/meta'
 
 import { useStatusQuery } from '../hooks/query'
 

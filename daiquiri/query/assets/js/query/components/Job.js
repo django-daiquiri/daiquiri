@@ -5,7 +5,7 @@ import classNames from 'classnames'
 
 import { useJobQuery } from '../hooks/query'
 
-import { useLsState } from '../../../../../core/assets/js/hooks/ls'
+import { useLsState } from 'daiquiri/core/assets/js/hooks/ls'
 
 import JobOverview from './JobOverview'
 import JobResults from './JobResults'
