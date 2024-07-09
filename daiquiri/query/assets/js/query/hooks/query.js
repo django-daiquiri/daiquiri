@@ -86,6 +86,40 @@ export const useJobRowsQuery = (jobId, params) => {
   })
 }
 
+export const useSubmitJobMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (variables) => {
+      return QueryApi.submitJob(variables.values)
+    },
+    onSuccess: (data, variables) => {
+      variables.loadJob(data.id)
+      queryClient.invalidateQueries({ queryKey: ['jobs'] })
+    },
+    onError: (error, variables) => {
+      variables.setErrors(error.errors)
+    }
+  })
+}
+
+export const useUploadJobMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (variables) => {
+      return QueryApi.uploadJob(variables.values)
+    },
+    onSuccess: (data, variables) => {
+      variables.loadJob(data.id)
+      queryClient.invalidateQueries({ queryKey: ['jobs'] })
+    },
+    onError: (error, variables) => {
+      variables.setErrors(error.errors)
+    }
+  })
+}
+
 export const useUpdateJobMutation = () => {
   const queryClient = useQueryClient()
 

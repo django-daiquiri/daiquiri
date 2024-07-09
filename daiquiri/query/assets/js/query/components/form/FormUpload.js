@@ -1,14 +1,23 @@
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 
 import Template from 'daiquiri/core/assets/js/components/Template'
 import { bytes2human } from 'daiquiri/core/assets/js/utils/bytes'
 
-import { useStatusQuery } from '../../hooks/query'
+import { useStatusQuery, useUploadJobMutation } from '../../hooks/query'
 
-const FormUpload = ({ form }) => {
+import Text from './common/Text'
+
+const FormUpload = ({ form, loadJob }) => {
+
+  const [values, setValues] = useState({
+    table_name: '',
+    run_id: '',
+  })
+  const [errors, setErrors] = useState({})
 
   const { data: status } = useStatusQuery()
+  const mutation = useUploadJobMutation()
 
   const handleUpload = () => {
     console.log('handleUpload')
@@ -31,12 +40,20 @@ const FormUpload = ({ form }) => {
 
         <div className="row">
           <div className="col-md-10">
-            <label htmlFor="table-name" className="form-label">{gettext('Table name')}</label>
-            <input type="text" className="form-control" id="table-name"></input>
+            <Text
+              label={gettext('Table name')}
+              value={values.table_name}
+              errors={errors.table_name}
+              setValue={(table_name) => setValues({...values, table_name})}
+            />
           </div>
           <div className="col-md-2">
-            <label htmlFor="table-name" className="form-label">{gettext('Run id')}</label>
-            <input type="text" className="form-control" id="table-name"></input>
+            <Text
+              label={gettext('Run id')}
+              value={values.run_id}
+              errors={errors.run_id}
+              setValue={(run_id) => setValues({...values, run_id})}
+            />
           </div>
         </div>
 
@@ -51,7 +68,8 @@ const FormUpload = ({ form }) => {
 }
 
 FormUpload.propTypes = {
-  form: PropTypes.object.isRequired
+  form: PropTypes.object.isRequired,
+  loadJob: PropTypes.func.isRequired
 }
 
 export default FormUpload

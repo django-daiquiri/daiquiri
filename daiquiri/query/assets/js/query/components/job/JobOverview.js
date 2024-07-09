@@ -1,7 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import CodeMirrorDisplay from 'daiquiri/core/assets/js/components/CodeMirrorDisplay'
+import ReactCodeMirror from '@uiw/react-codemirror'
+import { EditorView } from '@codemirror/view'
+import { sql } from '@codemirror/lang-sql'
+
 import { useToggle } from 'daiquiri/core/assets/js/hooks'
 
 import JobRenameModal from './JobRenameModal'
@@ -27,6 +30,20 @@ const JobOverview = ({ job }) => {
     'ARCHIVED': 'badge text-bg-secondary'
   }
 
+  const renderQuery = (query) => (
+    <ReactCodeMirror
+      className="codemirror"
+      value={query}
+      extensions={[sql(), EditorView.lineWrapping]}
+      editable={false}
+      basicSetup={{
+        lineNumbers: false,
+        foldGutter: false,
+        highlightActiveLine: false,
+      }}
+    />
+  )
+
   return (
     <div className="job-overview">
       <p>
@@ -40,7 +57,7 @@ const JobOverview = ({ job }) => {
           {gettext('Query')}
         </div>
         <div className="card-body">
-          <CodeMirrorDisplay value={job.query} />
+          {renderQuery(job.query)}
         </div>
         <div className="card-footer">
           <button className="btn btn-link">
@@ -159,7 +176,7 @@ const JobOverview = ({ job }) => {
           {gettext('Native query')}
         </div>
         <div className="card-body">
-          <CodeMirrorDisplay value={job.native_query} />
+          {renderQuery(job.native_query)}
         </div>
       </div>
 
@@ -168,7 +185,7 @@ const JobOverview = ({ job }) => {
           {gettext('Actual query')}
         </div>
         <div className="card-body">
-          <CodeMirrorDisplay value={job.actual_query} />
+          {renderQuery(job.actual_query)}
         </div>
       </div>
 

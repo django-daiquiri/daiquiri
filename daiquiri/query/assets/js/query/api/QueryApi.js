@@ -63,6 +63,14 @@ class QueryApi extends BaseApi {
     return this.get('/query/api/functions/user/')
   }
 
+  static submitJob(values) {
+    return this.post('/query/api/jobs/', values)
+  }
+
+  static uploadJob(values) {
+    return this.post('/query/api/jobs/', values)
+  }
+
   static updateJob(id, values) {
     return this.put(`/query/api/jobs/${id}/`, values)
   }

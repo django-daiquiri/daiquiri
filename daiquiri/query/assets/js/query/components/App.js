@@ -38,7 +38,7 @@ const App = () => {
             state.jobId && <Job jobId={state.jobId} />
           }
           {
-            state.formKey && <Form formKey={state.formKey} />
+            state.formKey && <Form formKey={state.formKey} loadJob={loadJob} />
           }
         </div>
       </div>
