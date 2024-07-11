@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { isNil } from 'lodash'
 import classNames from 'classnames'
 
-import { useJobQuery } from '../../hooks/query'
+import { useJobQuery } from '../../hooks/queries'
 
 import { useLsState } from 'daiquiri/core/assets/js/hooks/ls'
 

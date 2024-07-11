@@ -4,7 +4,7 @@ import className from 'classnames'
 
 import { useModal } from 'daiquiri/core/assets/js/hooks/modal'
 
-import { useUpdateJobMutation } from '../../hooks/query'
+import { useUpdateJobMutation } from '../../hooks/mutations'
 
 const JobRenameModal = ({ job, show, toggle }) => {
   const [ref, showModal, hideModal]  = useModal()

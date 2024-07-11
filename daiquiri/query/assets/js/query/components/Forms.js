@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import { isNil } from 'lodash'
 
-import { useFormsQuery } from '../hooks/query'
+import { useFormsQuery } from '../hooks/queries'
 import { basePath } from '../utils/location'
 
 import Loading from './Loading'

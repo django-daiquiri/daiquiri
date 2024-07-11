@@ -1,0 +1,48 @@
+.dq-browser {
+    .row {
+        div[class^='col'] {
+            border-right: var(--bs-card-border-width) solid var(--bs-card-border-color);
+
+            &:last-child {
+                border-right: none;
+            }
+        }
+
+        .dq-browser-title {
+            padding: 0.25rem 0.75rem;
+            border-bottom: var(--bs-card-border-width) solid var(--bs-card-border-color);
+        }
+
+        .dq-browser-list {
+            margin: 0;
+            padding: 0;
+
+            height: 100px;
+            overflow-y: auto;
+
+            li {
+                margin: 0;
+                list-style: none;
+
+                button.btn-link {
+                    padding: 0.25rem 0.75rem;
+                    border-radius: 0;
+                    width: 100%;
+                    text-align: left;
+
+                    text-decoration: none;
+                    cursor: pointer;
+
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+
+                    &:hover {
+                        color: var(--dq-card-nav-hover-color);
+                        background-color: var(--dq-card-nav-hover-bg);
+                    }
+                }
+            }
+        }
+    }
+}

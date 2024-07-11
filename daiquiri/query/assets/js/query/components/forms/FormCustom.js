@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 import Template from 'daiquiri/core/assets/js/components/Template'
 
-const FormCustom = ({ form, loadJob }) => {
+const FormCustom = ({ form }) => {
   return (
     <div className="form">
       <h2>{form.label}</h2>
@@ -13,8 +13,7 @@ const FormCustom = ({ form, loadJob }) => {
 }
 
 FormCustom.propTypes = {
-  form: PropTypes.object.isRequired,
-  loadJob: PropTypes.func.isRequired
+  form: PropTypes.object.isRequired
 }
 
 export default FormCustom

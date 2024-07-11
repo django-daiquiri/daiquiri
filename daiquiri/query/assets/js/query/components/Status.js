@@ -4,7 +4,7 @@ import { isNil } from 'lodash'
 import { baseUrl } from 'daiquiri/core/assets/js/utils/meta'
 import { bytes2human } from 'daiquiri/core/assets/js/utils/bytes'
 
-import { useStatusQuery } from '../hooks/query'
+import { useStatusQuery } from '../hooks/queries'
 
 const Status = () => {
   const { data: status } = useStatusQuery()

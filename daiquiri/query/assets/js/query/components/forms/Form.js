@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { isNil } from 'lodash'
 
-import { useFormQuery } from '../../hooks/query'
+import { useFormQuery } from '../../hooks/queries'
 
 import FormSql from './FormSql'
 import FormCustom from './FormCustom'

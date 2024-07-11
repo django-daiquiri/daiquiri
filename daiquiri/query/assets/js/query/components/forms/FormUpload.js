@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import Template from 'daiquiri/core/assets/js/components/Template'
 import { bytes2human } from 'daiquiri/core/assets/js/utils/bytes'
 
-import { useStatusQuery, useUploadJobMutation } from '../../hooks/query'
+import { useStatusQuery, useUploadJobMutation } from '../../hooks/queries'
 
 import Text from './common/Text'
 

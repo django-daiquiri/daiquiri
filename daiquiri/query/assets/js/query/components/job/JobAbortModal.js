@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 import { useModal } from 'daiquiri/core/assets/js/hooks/modal'
 
-import { useAbortJobMutation } from '../../hooks/query'
+import { useAbortJobMutation } from '../../hooks/mutations'
 
 const JobAbortModal = ({ job, show, toggle }) => {
   const [ref, showModal, hideModal]  = useModal()

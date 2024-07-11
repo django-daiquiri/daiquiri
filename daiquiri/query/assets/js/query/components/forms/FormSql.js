@@ -6,11 +6,14 @@ import { useLsState } from 'daiquiri/core/assets/js/hooks/ls'
 
 import Template from 'daiquiri/core/assets/js/components/Template'
 
+import { useQueryLanguagesQuery, useQueuesQuery } from '../../hooks/queries'
+import { useSubmitJobMutation } from '../../hooks/mutations'
+
 import Query from './common/Query'
 import Select from './common/Select'
 import Text from './common/Text'
 
-import { useQueryLanguagesQuery, useQueuesQuery, useSubmitJobMutation } from '../../hooks/query'
+import SchemaDropdown from './dropdowns/SchemaDropdown'
 
 const FormSql = ({ form, loadJob, query }) => {
 
@@ -22,7 +25,6 @@ const FormSql = ({ form, loadJob, query }) => {
     queue: '',
   })
   const [errors, setErrors] = useState({})
-
 
   const { data: queues } = useQueuesQuery()
   const { data: queryLanguages } = useQueryLanguagesQuery()
@@ -90,13 +92,7 @@ const FormSql = ({ form, loadJob, query }) => {
         </div>
 
         {
-          openDropdown && (
-            <div className="card mt-2">
-              <div className="card-body">
-                {openDropdown}
-              </div>
-            </div>
-          )
+          openDropdown == 'schemas' && <SchemaDropdown />
         }
       </div>
 

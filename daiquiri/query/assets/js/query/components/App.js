@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 
 import { parseLocation, updateLocation } from '../utils/location'
 
-import Form from './form/Form'
+import Form from './forms/Form'
 import Forms from './Forms'
 import Job from './job/Job'
 import Jobs from './Jobs'

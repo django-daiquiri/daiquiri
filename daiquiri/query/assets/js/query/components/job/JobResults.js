@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 import Table from 'daiquiri/core/assets/js/components/Table'
 
-import { useJobColumnsQuery, useJobRowsQuery } from '../../hooks/query'
+import { useJobColumnsQuery, useJobRowsQuery } from '../../hooks/queries'
 
 const JobResults = ({ job }) => {
   const [params, setParams] = useState({

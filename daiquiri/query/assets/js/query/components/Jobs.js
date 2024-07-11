@@ -6,7 +6,7 @@ import { isEmpty, isNil } from 'lodash'
 import { baseUrl, userId } from 'daiquiri/core/assets/js/utils/meta'
 import { useLsState } from 'daiquiri/core/assets/js/hooks/ls'
 
-import { useJobsQuery } from '../hooks/query'
+import { useJobsQuery } from '../hooks/queries'
 import { basePath } from '../utils/location'
 
 import Loading from './Loading'
