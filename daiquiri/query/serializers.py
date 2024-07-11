@@ -136,7 +136,7 @@ class QueryJobCreateSerializer(serializers.ModelSerializer):
     queue = serializers.CharField(required=False)
     query_language = serializers.CharField(required=True)
     query = serializers.CharField(required=True)
-    run_id = serializers.CharField(default='')
+    run_id = serializers.CharField(default='', allow_blank=True)
 
     class Meta:
         model = QueryJob
