@@ -18,9 +18,9 @@ const App = () => {
     setState({ jobId })
   }
 
-  const loadForm = (formKey) => {
+  const loadForm = (formKey, query = null) => {
     updateLocation({ formKey })
-    setState({ formKey })
+    setState({ formKey, query })
   }
 
   return (
@@ -35,10 +35,10 @@ const App = () => {
         </div>
         <div className="col-lg-9 order-1 order-lg-2">
           {
-            state.jobId && <Job jobId={state.jobId} />
+            state.jobId && <Job jobId={state.jobId} loadForm={loadForm} />
           }
           {
-            state.formKey && <Form formKey={state.formKey} loadJob={loadJob} />
+            state.formKey && <Form formKey={state.formKey} loadJob={loadJob} query={state.query} />
           }
         </div>
       </div>

@@ -15,9 +15,9 @@ import { useQueryLanguagesQuery, useQueuesQuery, useSubmitJobMutation } from '..
 const FormSql = ({ form, loadJob, query }) => {
 
   const [values, setValues] = useState({
-    query: query || 'SELECT ra, dec, parallax, id FROM daiquiri_data_obs.stars',
+    query: query || '',
     table_name: '',
-    run_id: '1',
+    run_id: '',
     query_language: '',
     queue: '',
   })

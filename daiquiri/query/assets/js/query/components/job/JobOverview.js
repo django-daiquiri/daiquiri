@@ -11,7 +11,7 @@ import JobRenameModal from './JobRenameModal'
 import JobAbortModal from './JobAbortModal'
 import JobArchiveModal from './JobArchiveModal'
 
-const JobOverview = ({ job }) => {
+const JobOverview = ({ job, loadForm }) => {
 
   const [showRenameModal, toggleRenameModal] = useToggle()
   const [showAbortModal, toggleAbortModal] = useToggle()
@@ -60,7 +60,7 @@ const JobOverview = ({ job }) => {
           {renderQuery(job.query)}
         </div>
         <div className="card-footer">
-          <button className="btn btn-link">
+          <button className="btn btn-link" onClick={() => loadForm('sql', job.query)}>
             {gettext('Open new query form with this query')}
           </button>
         </div>
@@ -198,7 +198,8 @@ const JobOverview = ({ job }) => {
 }
 
 JobOverview.propTypes = {
-  job: PropTypes.object.isRequired
+  job: PropTypes.object.isRequired,
+  loadForm: PropTypes.func.isRequired
 }
 
 export default JobOverview
