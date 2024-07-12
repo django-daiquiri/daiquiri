@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import classname from 'classnames'
+import classNames from 'classnames'
 
 import Errors from './Errors'
 
@@ -10,7 +10,7 @@ const Select = ({ label, value, options, errors, setValue }) => {
       <label htmlFor="queue" className="form-label">{label}</label>
       <select
         id="queue"
-        className={classname('form-control', {'is-invalid': errors})}
+        className={classNames('form-control', {'is-invalid': errors})}
         value={value}
         onChange={(event) => setValue(event.target.value)}>
       {

@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import classname from 'classnames'
+import classNames from 'classnames'
 
 import ReactCodeMirror from '@uiw/react-codemirror'
 import { EditorView } from '@codemirror/view'
@@ -14,7 +14,7 @@ const Query = ({ label, value, errors, setValue }) => {
       <label htmlFor="query" className="form-label">{label}</label>
       <ReactCodeMirror
         id="query"
-        className={classname('form-control codemirror', {'is-invalid': errors})}
+        className={classNames('form-control codemirror', {'is-invalid': errors})}
         value={value}
         onChange={setValue}
         extensions={[sql(), EditorView.lineWrapping]}

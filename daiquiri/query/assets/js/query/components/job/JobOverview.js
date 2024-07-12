@@ -52,19 +52,23 @@ const JobOverview = ({ job, loadForm }) => {
                  ' the download form, please use the tabs at the top of the page.')}
       </p>
 
-      <div className="card mb-3">
-        <div className="card-header">
-          {gettext('Query')}
-        </div>
-        <div className="card-body">
-          {renderQuery(job.query)}
-        </div>
-        <div className="card-footer">
-          <button className="btn btn-link" onClick={() => loadForm('sql', job.query)}>
-            {gettext('Open new query form with this query')}
-          </button>
-        </div>
-      </div>
+      {
+        job.query && (
+          <div className="card mb-3">
+            <div className="card-header">
+              {gettext('Query')}
+            </div>
+            <div className="card-body">
+              {renderQuery(job.query)}
+            </div>
+            <div className="card-footer">
+              <button className="btn btn-link" onClick={() => loadForm('sql', job.query)}>
+                {gettext('Open new query form with this query')}
+              </button>
+            </div>
+          </div>
+        )
+      }
 
       <div className="card mb-3">
         <div className="card-header">
@@ -76,6 +80,15 @@ const JobOverview = ({ job, loadForm }) => {
             <dd className="col-sm-8 mb-0">
               <span className={jobPhaseClass[job.phase]}>{job.phase}</span>
             </dd>
+
+            {
+              job.phase == 'ERROR' && (
+                <>
+                  <dt className="col-sm-4 text-end">{gettext('Error')}</dt>
+                  <dd className="col-sm-8 text-danger mb-0">{job.error_summary}</dd>
+                </>
+              )
+            }
 
             <dt className="col-sm-4 text-end">{gettext('Full database table name')}</dt>
             <dd className="col-sm-8 mb-0"><code>{job.schema_name}.{job.table_name}</code></dd>
@@ -171,23 +184,31 @@ const JobOverview = ({ job, loadForm }) => {
         </div>
       </div>
 
-      <div className="card mb-3">
-        <div className="card-header">
-          {gettext('Native query')}
-        </div>
-        <div className="card-body">
-          {renderQuery(job.native_query)}
-        </div>
-      </div>
+      {
+        job.native_query && (
+          <div className="card mb-3">
+            <div className="card-header">
+              {gettext('Native query')}
+            </div>
+            <div className="card-body">
+              {renderQuery(job.native_query)}
+            </div>
+          </div>
+        )
+      }
 
-      <div className="card mb-3">
-        <div className="card-header">
-          {gettext('Actual query')}
-        </div>
-        <div className="card-body">
-          {renderQuery(job.actual_query)}
-        </div>
-      </div>
+      {
+        job.actual_query && (
+          <div className="card mb-3">
+            <div className="card-header">
+              {gettext('Actual query')}
+            </div>
+            <div className="card-body">
+              {renderQuery(job.actual_query)}
+            </div>
+          </div>
+        )
+      }
 
       <JobRenameModal job={job} show={showRenameModal} toggle={toggleRenameModal} />
       <JobAbortModal job={job} show={showAbortModal} toggle={toggleAbortModal} />

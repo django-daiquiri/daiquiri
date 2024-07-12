@@ -68,7 +68,12 @@ class QueryApi extends BaseApi {
   }
 
   static uploadJob(values) {
-    return this.post('/query/api/jobs/', values)
+    var formData = new FormData()
+    for (const [key, value] of Object.entries(values)) {
+      formData.append(key, value)
+    }
+
+    return this.upload('/query/api/jobs/upload/', formData)
   }
 
   static updateJob(id, values) {

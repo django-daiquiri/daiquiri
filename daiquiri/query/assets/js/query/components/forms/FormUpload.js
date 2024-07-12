@@ -4,13 +4,16 @@ import PropTypes from 'prop-types'
 import Template from 'daiquiri/core/assets/js/components/Template'
 import { bytes2human } from 'daiquiri/core/assets/js/utils/bytes'
 
-import { useStatusQuery, useUploadJobMutation } from '../../hooks/queries'
+import { useStatusQuery } from '../../hooks/queries'
+import { useUploadJobMutation } from '../../hooks/mutations'
 
+import File from './common/File'
 import Text from './common/Text'
 
 const FormUpload = ({ form, loadJob }) => {
 
   const [values, setValues] = useState({
+    file: null,
     table_name: '',
     run_id: '',
   })
@@ -20,8 +23,11 @@ const FormUpload = ({ form, loadJob }) => {
   const mutation = useUploadJobMutation()
 
   const handleUpload = () => {
-    console.log('handleUpload')
+    mutation.mutate({values, setErrors, loadJob})
   }
+
+  const fileLabel = status ? interpolate(gettext('File (max. %s)'), [bytes2human(status.upload_limit)])
+                           : gettext('File')
 
   return (
     <div className="form">
@@ -29,14 +35,12 @@ const FormUpload = ({ form, loadJob }) => {
       <Template template={form.template} />
 
       <div className="sql-form mt-3">
-        <div className="mb-3">
-          <label htmlFor="table-name" className="form-label" dangerouslySetInnerHTML={{
-            __html: interpolate(gettext('File (max. %s)'), [bytes2human(status.upload_limit)])
-          }} />
-          <div className="form-text">
-            {gettext('Drag and drop file or click to open a file browser')}
-          </div>
-        </div>
+        <File
+          label={fileLabel}
+          value={values.file}
+          errors={errors.file}
+          setValue={(file) => setValues({...values, file})}
+        />
 
         <div className="row">
           <div className="col-md-10">
