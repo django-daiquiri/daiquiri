@@ -11,6 +11,13 @@
 }
 
 .card-nav {
+    --dq-card-nav-color: var(--bs-link-color);
+    --dq-card-nav-bg: #fff;
+    --dq-card-nav-active-color: #fff;
+    --dq-card-nav-active-bg: var(--bs-primary-bg);
+    --dq-card-nav-hover-color: var(--bs-link-color);
+    --dq-card-nav-hover-bg: var(--bs-secondary-bg);
+
     .list-group-item {
         cursor: pointer;
 

@@ -1,4 +1,5 @@
 html {
+    --dq-font-size: 14px;  // sets font-size for <html> and sets what 1rem means
     font-size: var(--dq-font-size);
 }
 
@@ -20,7 +21,7 @@ a,
     font-weight: var(--bs-body-weight-size);
 }
 
-button {
+.btn-symbol {
     [class^="material-symbols"] {
         vertical-align: middle;
         line-height: 0 !important;
@@ -28,3 +29,4 @@ button {
         top: -2px;
     }
 }
+

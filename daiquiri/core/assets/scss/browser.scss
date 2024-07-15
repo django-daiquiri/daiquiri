@@ -1,7 +1,14 @@
 .dq-browser {
+    --dq-browser-border-color: var(--bs-card-border-color);
+    --dq-browser-border-width: var(--bs-card-border-width);
+    --dq-browser-hover-color: var(--bs-link-color);
+    --dq-browser-hover-bg: var(--bs-secondary-bg);
+    --dq-browser-active-color: #fff;
+    --dq-browser-active-bg: var(--bs-primary-bg);
+
     .row {
         div[class^='col'] {
-            border-right: var(--bs-card-border-width) solid var(--bs-card-border-color);
+            border-right: var(--dq-browser-border-width) solid var(--dq-browser-border-color);
 
             &:last-child {
                 border-right: none;
@@ -10,14 +17,14 @@
 
         .dq-browser-title {
             padding: 0.25rem 0.75rem;
-            border-bottom: var(--bs-card-border-width) solid var(--bs-card-border-color);
+            border-bottom: var(--dq-browser-border-width) solid var(--dq-browser-border-color);
         }
 
         .dq-browser-list {
             margin: 0;
             padding: 0;
 
-            height: 100px;
+            height: 200px;
             overflow-y: auto;
 
             li {
@@ -38,8 +45,20 @@
                     text-overflow: ellipsis;
 
                     &:hover {
-                        color: var(--dq-card-nav-hover-color);
-                        background-color: var(--dq-card-nav-hover-bg);
+                        color: var(--dq-browser-hover-color);
+                        background-color: var(--dq-browser-hover-bg);
+                    }
+
+                    &.active {
+                        color: var(--dq-browser-active-color);
+                        background-color: var(--dq-browser-active-bg);
+                    }
+
+                    [class^="material-symbols"] {
+                        vertical-align: middle;
+                        line-height: 1.5rem;
+                        position: relative;
+                        top: -1px;
                     }
                 }
             }

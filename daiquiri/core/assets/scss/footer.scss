@@ -9,6 +9,20 @@ main {
 }
 
 footer {
+    --dq-footer-content-color: white;
+    --dq-footer-content-bg: #444B53;
+    --dq-footer-content-link-color: var(--dq-footer-content-color);
+    --dq-footer-content-link-color-visited: var(--dq-footer-content-link-color);
+    --dq-footer-content-link-color-hover: var(--dq-footer-content-link-color);
+    --dq-footer-content-link-color-focus: var(--dq-footer-content-link-color);
+
+    --dq-footer-bottom-color: white;
+    --dq-footer-bottom-bg: black;
+    --dq-footer-bottom-link-color: var(--dq-footer-bottom-color);
+    --dq-footer-bottom-link-color-visited: var(--dq-footer-bottom-link-color);
+    --dq-footer-bottom-link-color-hover: var(--dq-footer-bottom-link-color);
+    --dq-footer-bottom-link-color-focus: var(--dq-footer-bottom-link-color);
+
     margin-top: 60px;
 
     .content {
