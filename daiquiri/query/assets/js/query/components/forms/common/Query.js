@@ -8,12 +8,13 @@ import { sql } from '@codemirror/lang-sql'
 
 import Errors from './Errors'
 
-const Query = ({ label, value, errors, setValue }) => {
+const Query = ({ label, value, errors, setValue, editor }) => {
   return (
     <div className="mb-2">
       <label htmlFor="query" className="form-label">{label}</label>
       <ReactCodeMirror
         id="query"
+        ref={editor}
         className={classNames('form-control codemirror', {'is-invalid': errors})}
         value={value}
         onChange={setValue}
@@ -34,6 +35,7 @@ Query.propTypes = {
   value: PropTypes.string.isRequired,
   errors: PropTypes.array,
   setValue: PropTypes.func.isRequired,
+  editor: PropTypes.object,
 }
 
 export default Query

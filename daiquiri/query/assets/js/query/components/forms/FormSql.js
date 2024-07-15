@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import { get } from 'lodash'
 
@@ -25,6 +25,9 @@ const FormSql = ({ form, loadJob, query }) => {
     queue: '',
   })
   const [errors, setErrors] = useState({})
+  const [cursor, setCursor] = useState(0)
+
+  const editor = useRef()
 
   const { data: queues } = useQueuesQuery()
   const { data: queryLanguages } = useQueryLanguagesQuery()
@@ -58,6 +61,21 @@ const FormSql = ({ form, loadJob, query }) => {
     })
   }
 
+  const handlePaste = (item) => {
+    const query_language = values.query_language || getDefaultQueryLanguage()
+    const quote_char = queryLanguages.find((ql) => ql.id == query_language).quote_char
+    const query_string = item.query_strings.map((qs) => (quote_char + qs + quote_char)).join('.')
+
+    // see https://codemirror.net/examples/change/
+    editor.current.view.dispatch({
+      changes: {
+        from: editor.current.view.state.selection.main.from,
+        to: editor.current.view.state.selection.main.to,
+        insert: query_string
+      }
+    })
+  }
+
   return (
     <div className="form mb-4">
       <h2>{form.label}</h2>
@@ -65,34 +83,34 @@ const FormSql = ({ form, loadJob, query }) => {
 
       <div className="sql-dropdowns">
         <div className="d-md-flex">
-          <button type="button" className="btn btn-outline-secondary dropdown-toggle me-2 mb-2"
+          <button type="button" className="btn btn-outline-form dropdown-toggle me-2 mb-2"
                   onClick={() => handleDrowpdown('schemas')}>
             {gettext('Database')}
           </button>
-          <button type="button" className="btn btn-outline-secondary dropdown-toggle me-2 mb-2"
+          <button type="button" className="btn btn-outline-form dropdown-toggle me-2 mb-2"
                   onClick={() => handleDrowpdown('columns')}>
             {gettext('Columns')}
           </button>
-          <button type="button" className="btn btn-outline-secondary dropdown-toggle me-2 mb-2"
+          <button type="button" className="btn btn-outline-form dropdown-toggle me-2 mb-2"
                   onClick={() => handleDrowpdown('functions')}>
             {gettext('Functions')}
           </button>
-          <button type="button" className="btn btn-outline-secondary dropdown-toggle me-2 mb-2"
+          <button type="button" className="btn btn-outline-form dropdown-toggle me-2 mb-2"
                   onClick={() => handleDrowpdown('simbad')}>
             {gettext('Simbad')}
           </button>
-          <button type="button" className="btn btn-outline-secondary dropdown-toggle me-2 me-md-auto mb-2"
+          <button type="button" className="btn btn-outline-form dropdown-toggle me-2 me-md-auto mb-2"
                   onClick={() => handleDrowpdown('vizier')}>
             {gettext('VizieR')}
           </button>
-          <button type="button" className="btn btn-outline-secondary dropdown-toggle mb-2"
+          <button type="button" className="btn btn-outline-form dropdown-toggle mb-2"
                   onClick={() => handleDrowpdown('examples')}>
             {gettext('Examples')}
           </button>
         </div>
 
         {
-          openDropdown == 'schemas' && <SchemaDropdown />
+          openDropdown == 'schemas' && <SchemaDropdown onDoubleClick={handlePaste} />
         }
       </div>
 
@@ -103,6 +121,7 @@ const FormSql = ({ form, loadJob, query }) => {
             value={values.query}
             errors={get(errors, 'query.messages') || errors.query}
             setValue={(query) => setValues({...values, query})}
+            editor={editor}
           />
         </div>
 
