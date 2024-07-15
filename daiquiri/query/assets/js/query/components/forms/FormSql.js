@@ -14,6 +14,7 @@ import Select from './common/Select'
 import Text from './common/Text'
 
 import ColumnsDropdown from './dropdowns/ColumnsDropdown'
+import ExamplesDropdown from './dropdowns/ExamplesDropdown'
 import SchemasDropdown from './dropdowns/SchemasDropdown'
 
 const FormSql = ({ form, loadJob, query }) => {
@@ -76,6 +77,10 @@ const FormSql = ({ form, loadJob, query }) => {
     })
   }
 
+  const handleReplace = (item) => {
+    setValues({...values, query: item.query_string})
+  }
+
   return (
     <div className="form mb-4">
       <h2>{form.label}</h2>
@@ -114,6 +119,9 @@ const FormSql = ({ form, loadJob, query }) => {
         }
         {
           openDropdown == 'columns' && <ColumnsDropdown onDoubleClick={handlePaste} />
+        }
+        {
+          openDropdown == 'examples' && <ExamplesDropdown onDoubleClick={handleReplace} />
         }
 
       </div>
