@@ -14,52 +14,57 @@
                 border-right: none;
             }
         }
+    }
 
-        .dq-browser-title {
-            padding: 0.25rem 0.75rem;
-            border-bottom: var(--dq-browser-border-width) solid var(--dq-browser-border-color);
-        }
+    .dq-browser-title {
+        padding: 0.25rem 0.75rem;
+        border-bottom: var(--dq-browser-border-width) solid var(--dq-browser-border-color);
+    }
 
-        .dq-browser-list {
+    .dq-browser-filter {
+        padding: 0.25rem 0.75rem;
+        border-bottom: var(--dq-browser-border-width) solid var(--dq-browser-border-color);
+    }
+
+    .dq-browser-list {
+        margin: 0;
+        padding: 0;
+
+        height: 200px;
+        overflow-y: auto;
+
+        li {
             margin: 0;
-            padding: 0;
+            list-style: none;
 
-            height: 200px;
-            overflow-y: auto;
+            button.btn-link {
+                padding: 0.25rem 0.75rem;
+                border-radius: 0;
+                width: 100%;
+                text-align: left;
 
-            li {
-                margin: 0;
-                list-style: none;
+                text-decoration: none;
+                cursor: pointer;
 
-                button.btn-link {
-                    padding: 0.25rem 0.75rem;
-                    border-radius: 0;
-                    width: 100%;
-                    text-align: left;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
 
-                    text-decoration: none;
-                    cursor: pointer;
+                &:hover {
+                    color: var(--dq-browser-hover-color);
+                    background-color: var(--dq-browser-hover-bg);
+                }
 
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
+                &.active {
+                    color: var(--dq-browser-active-color);
+                    background-color: var(--dq-browser-active-bg);
+                }
 
-                    &:hover {
-                        color: var(--dq-browser-hover-color);
-                        background-color: var(--dq-browser-hover-bg);
-                    }
-
-                    &.active {
-                        color: var(--dq-browser-active-color);
-                        background-color: var(--dq-browser-active-bg);
-                    }
-
-                    [class^="material-symbols"] {
-                        vertical-align: middle;
-                        line-height: 1.5rem;
-                        position: relative;
-                        top: -1px;
-                    }
+                [class^="material-symbols"] {
+                    vertical-align: middle;
+                    line-height: 1.5rem;
+                    position: relative;
+                    top: -1px;
                 }
             }
         }

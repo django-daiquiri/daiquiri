@@ -13,7 +13,8 @@ import Query from './common/Query'
 import Select from './common/Select'
 import Text from './common/Text'
 
-import SchemaDropdown from './dropdowns/SchemaDropdown'
+import ColumnsDropdown from './dropdowns/ColumnsDropdown'
+import SchemasDropdown from './dropdowns/SchemasDropdown'
 
 const FormSql = ({ form, loadJob, query }) => {
 
@@ -25,7 +26,6 @@ const FormSql = ({ form, loadJob, query }) => {
     queue: '',
   })
   const [errors, setErrors] = useState({})
-  const [cursor, setCursor] = useState(0)
 
   const editor = useRef()
 
@@ -110,8 +110,12 @@ const FormSql = ({ form, loadJob, query }) => {
         </div>
 
         {
-          openDropdown == 'schemas' && <SchemaDropdown onDoubleClick={handlePaste} />
+          openDropdown == 'schemas' && <SchemasDropdown onDoubleClick={handlePaste} />
         }
+        {
+          openDropdown == 'columns' && <ColumnsDropdown onDoubleClick={handlePaste} />
+        }
+
       </div>
 
       <div className="sql-form mt-2">

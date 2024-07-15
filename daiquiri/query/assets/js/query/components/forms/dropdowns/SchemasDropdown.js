@@ -6,7 +6,7 @@ import { isEmpty } from 'lodash'
 import { useUserSchemasQuery } from 'daiquiri/metadata/assets/js/hooks/queries'
 import { useUserSchemaQuery } from '../../../hooks/queries'
 
-const SchemaDropdown = ({ onDoubleClick }) => {
+const SchemasDropdown = ({ onDoubleClick }) => {
   const { data: schemas } = useUserSchemasQuery()
   const { data: userSchema } = useUserSchemaQuery()
 
@@ -121,8 +121,8 @@ const SchemaDropdown = ({ onDoubleClick }) => {
   )
 }
 
-SchemaDropdown.propTypes = {
+SchemasDropdown.propTypes = {
   onDoubleClick: PropTypes.func.isRequired
 }
 
-export default SchemaDropdown
+export default SchemasDropdown
