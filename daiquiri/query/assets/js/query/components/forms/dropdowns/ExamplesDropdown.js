@@ -3,6 +3,8 @@ import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import { isEmpty } from 'lodash'
 
+import Tooltip from 'daiquiri/core/assets/js/components/Tooltip'
+
 import { useUserExamplesQuery } from '../../../hooks/queries'
 
 const ExamplesDropdown = ({ onDoubleClick }) => {
@@ -39,13 +41,15 @@ const ExamplesDropdown = ({ onDoubleClick }) => {
                 (example) => (isEmpty(filterValue) || example.name.includes(filterValue))
               ).map((example) => (
                 <li key={example.id}>
-                  <button
-                    className={classNames('btn btn-link d-flex', {'active': activeItem === example})}
-                    onClick={() => handleClick(example)}
-                    onDoubleClick={() => onDoubleClick(example)}
-                  >
-                    <div>{example.name}</div>
-                  </button>
+                  <Tooltip title={example.description} placement="left">
+                    <button
+                      className={classNames('btn btn-link d-flex', {'active': activeItem === example})}
+                      onClick={() => handleClick(example)}
+                      onDoubleClick={() => onDoubleClick(example)}
+                    >
+                      <div>{example.name}</div>
+                    </button>
+                  </Tooltip>
                 </li>
               ))
             }

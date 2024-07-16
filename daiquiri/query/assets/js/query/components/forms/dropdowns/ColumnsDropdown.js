@@ -3,6 +3,8 @@ import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import { isEmpty } from 'lodash'
 
+import Tooltip from 'daiquiri/core/assets/js/components/Tooltip'
+
 import { useUserSchemasQuery } from 'daiquiri/metadata/assets/js/hooks/queries'
 import { useUserSchemaQuery } from '../../../hooks/queries'
 
@@ -41,6 +43,16 @@ const ColumnsDropdown = ({ onDoubleClick }) => {
     }
   }
 
+  const getColumnTooltip = (item) => {
+    let tooltip = item.description
+
+    if (!isEmpty(item.unit)) {
+      tooltip += `</br><b>Unit:</b> ${item.unit}`
+    }
+
+    return tooltip
+  }
+
   return (
     <div className="mb-4">
       <div className="card">
@@ -61,13 +73,15 @@ const ColumnsDropdown = ({ onDoubleClick }) => {
             {
               columns.filter((column) => (isEmpty(filterValue) || column.name.includes(filterValue))).map((column) => (
                 <li key={column.id}>
-                  <button
-                    className={classNames('btn btn-link d-flex', {'active': activeItem === column})}
-                    onClick={() => handleClick(column)}
-                    onDoubleClick={() => onDoubleClick(column)}
-                  >
-                    <div>{column.name}</div>
-                  </button>
+                  <Tooltip title={getColumnTooltip(column)} placement="left">
+                    <button
+                      className={classNames('btn btn-link d-flex', {'active': activeItem === column})}
+                      onClick={() => handleClick(column)}
+                      onDoubleClick={() => onDoubleClick(column)}
+                    >
+                      <div>{column.name}</div>
+                    </button>
+                  </Tooltip>
                 </li>
               ))
             }

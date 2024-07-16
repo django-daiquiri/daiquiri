@@ -1,8 +1,13 @@
 h1 {
     margin-top: 60px;
 }
+
 .modal-body {
     :last-child {
         margin-bottom: 0;
     }
+}
+
+.tooltip .tooltip-inner {
+    text-align: left;
 }

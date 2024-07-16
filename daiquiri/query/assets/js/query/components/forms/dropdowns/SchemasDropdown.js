@@ -3,6 +3,8 @@ import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import { isEmpty } from 'lodash'
 
+import Tooltip from 'daiquiri/core/assets/js/components/Tooltip'
+
 import { useUserSchemasQuery } from 'daiquiri/metadata/assets/js/hooks/queries'
 import { useUserSchemaQuery } from '../../../hooks/queries'
 
@@ -44,6 +46,16 @@ const SchemasDropdown = ({ onDoubleClick }) => {
     }
   }
 
+  const getColumnTooltip = (item) => {
+    let tooltip = item.description
+
+    if (!isEmpty(item.unit)) {
+      tooltip += `</br><b>Unit:</b> ${item.unit}`
+    }
+
+    return tooltip
+  }
+
   return (
     <div className="mb-4">
       <div className="card">
@@ -57,14 +69,16 @@ const SchemasDropdown = ({ onDoubleClick }) => {
                 {
                   visibleSchemas.map((schema, index) => (
                     <li key={index}>
-                      <button
-                        className={classNames('btn btn-link d-flex', {'active': activeItem === schema})}
-                        onClick={() => handleClick('schema', schema)}
-                        onDoubleClick={() => onDoubleClick(schema)}
-                      >
-                        <div>{schema.name}</div>
-                        {(openSchema.id == schema.id) && <div className="material-symbols-rounded ms-auto">chevron_right</div>}
-                      </button>
+                      <Tooltip title={schema.description} placement="left">
+                        <button
+                          className={classNames('btn btn-link d-flex', {'active': activeItem === schema})}
+                          onClick={() => handleClick('schema', schema)}
+                          onDoubleClick={() => onDoubleClick(schema)}
+                        >
+                          <div>{schema.name}</div>
+                          {(openSchema.id == schema.id) && <div className="material-symbols-rounded ms-auto">chevron_right</div>}
+                        </button>
+                      </Tooltip>
                     </li>
                   ))
                 }
@@ -78,14 +92,16 @@ const SchemasDropdown = ({ onDoubleClick }) => {
                 {
                   visibleTables.map((table, index) => (
                     <li key={index}>
-                      <button
-                        className={classNames('btn btn-link  d-flex', {'active': activeItem === table})}
-                        onClick={() => handleClick('table', table)}
-                        onDoubleClick={() => onDoubleClick(table)}
-                      >
-                        <div>{table.name}</div>
-                        {(openTable.id == table.id) && <div className="material-symbols-rounded ms-auto">chevron_right</div>}
-                      </button>
+                      <Tooltip title={table.description} placement="left">
+                        <button
+                          className={classNames('btn btn-link d-flex', {'active': activeItem === table})}
+                          onClick={() => handleClick('table', table)}
+                          onDoubleClick={() => onDoubleClick(table)}
+                        >
+                          <div>{table.name}</div>
+                          {(openTable.id == table.id) && <div className="material-symbols-rounded ms-auto">chevron_right</div>}
+                        </button>
+                      </Tooltip>
                     </li>
                   ))
                 }
@@ -99,13 +115,15 @@ const SchemasDropdown = ({ onDoubleClick }) => {
                 {
                   visibleColumns.map((column, index) => (
                     <li key={index}>
-                      <button
-                        className={classNames('btn btn-link', {'active': activeItem === column})}
-                        onClick={() => handleClick('column', column)}
-                        onDoubleClick={() => onDoubleClick(column)}
-                      >
-                        {column.name}
-                      </button>
+                      <Tooltip title={getColumnTooltip(column)} placement="left">
+                        <button
+                          className={classNames('btn btn-link', {'active': activeItem === column})}
+                          onClick={() => handleClick('column', column)}
+                          onDoubleClick={() => onDoubleClick(column)}
+                        >
+                          {column.name}
+                        </button>
+                      </Tooltip>
                     </li>
                   ))
                 }
