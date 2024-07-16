@@ -8,7 +8,7 @@ import Tooltip from 'daiquiri/core/assets/js/components/Tooltip'
 import { useUserSchemasQuery } from 'daiquiri/metadata/assets/js/hooks/queries'
 import { useUserSchemaQuery } from '../../../hooks/queries'
 
-const SchemasDropdown = ({ onDoubleClick }) => {
+const SchemasDropdown = ({ onPaste }) => {
   const { data: schemas } = useUserSchemasQuery()
   const { data: userSchema } = useUserSchemaQuery()
 
@@ -73,7 +73,7 @@ const SchemasDropdown = ({ onDoubleClick }) => {
                         <button
                           className={classNames('btn btn-link d-flex', {'active': activeItem === schema})}
                           onClick={() => handleClick('schema', schema)}
-                          onDoubleClick={() => onDoubleClick(schema)}
+                          onDoubleClick={() => onPaste(schema)}
                         >
                           <div>{schema.name}</div>
                           {(openSchema.id == schema.id) && <div className="material-symbols-rounded ms-auto">chevron_right</div>}
@@ -96,7 +96,7 @@ const SchemasDropdown = ({ onDoubleClick }) => {
                         <button
                           className={classNames('btn btn-link d-flex', {'active': activeItem === table})}
                           onClick={() => handleClick('table', table)}
-                          onDoubleClick={() => onDoubleClick(table)}
+                          onDoubleClick={() => onPaste(table)}
                         >
                           <div>{table.name}</div>
                           {(openTable.id == table.id) && <div className="material-symbols-rounded ms-auto">chevron_right</div>}
@@ -119,7 +119,7 @@ const SchemasDropdown = ({ onDoubleClick }) => {
                         <button
                           className={classNames('btn btn-link', {'active': activeItem === column})}
                           onClick={() => handleClick('column', column)}
-                          onDoubleClick={() => onDoubleClick(column)}
+                          onDoubleClick={() => onPaste(column)}
                         >
                           {column.name}
                         </button>
@@ -140,7 +140,7 @@ const SchemasDropdown = ({ onDoubleClick }) => {
 }
 
 SchemasDropdown.propTypes = {
-  onDoubleClick: PropTypes.func.isRequired
+  onPaste: PropTypes.func.isRequired
 }
 
 export default SchemasDropdown

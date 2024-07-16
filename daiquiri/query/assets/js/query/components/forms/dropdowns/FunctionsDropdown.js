@@ -7,7 +7,7 @@ import Tooltip from 'daiquiri/core/assets/js/components/Tooltip'
 
 import { useUserFunctionsQuery } from 'daiquiri/metadata/assets/js/hooks/queries'
 
-const FunctionsDropdown = ({ onDoubleClick }) => {
+const FunctionsDropdown = ({ onPaste }) => {
   const { data: functions } = useUserFunctionsQuery()
 
   const [activeItem, setActiveItem] = useState(null)
@@ -45,7 +45,7 @@ const FunctionsDropdown = ({ onDoubleClick }) => {
                     <button
                       className={classNames('btn btn-link d-flex', {'active': activeItem === func})}
                       onClick={() => handleClick(func)}
-                      onDoubleClick={() => onDoubleClick(func)}
+                      onDoubleClick={() => onPaste(func)}
                     >
                       <div>{func.name}</div>
                     </button>
@@ -64,7 +64,7 @@ const FunctionsDropdown = ({ onDoubleClick }) => {
 }
 
 FunctionsDropdown.propTypes = {
-  onDoubleClick: PropTypes.func.isRequired
+  onPaste: PropTypes.func.isRequired
 }
 
 export default FunctionsDropdown

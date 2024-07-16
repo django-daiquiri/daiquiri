@@ -1,5 +1,8 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import QueryApi from '../api/QueryApi'
+import SimbadApi from '../api/SimbadApi'
+
+import { encodeParams } from 'daiquiri/core/assets/js/utils/api'
 
 const refetchInterval = 4000
 
@@ -40,6 +43,14 @@ export const useQueuesQuery = () => {
   return useQuery({
     queryKey: ['queues'],
     queryFn: () => QueryApi.fetchQueues(),
+    placeholderData: keepPreviousData
+  })
+}
+
+export const useDropdownsQuery = () => {
+  return useQuery({
+    queryKey: ['drowdowns'],
+    queryFn: () => QueryApi.fetchDropdowns(),
     placeholderData: keepPreviousData
   })
 }
@@ -90,6 +101,14 @@ export const useJobRowsQuery = (jobId, params) => {
   return useQuery({
     queryKey: ['jobRows', jobId, params],
     queryFn: () => QueryApi.fetchJobRows(jobId, params),
+    placeholderData: keepPreviousData
+  })
+}
+
+export const useSimbadQuery = (url, search) => {
+  return useQuery({
+    queryKey: ['simbad', search],
+    queryFn: () => SimbadApi.search(url, search),
     placeholderData: keepPreviousData
   })
 }

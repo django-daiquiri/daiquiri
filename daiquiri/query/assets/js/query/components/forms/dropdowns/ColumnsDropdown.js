@@ -8,7 +8,7 @@ import Tooltip from 'daiquiri/core/assets/js/components/Tooltip'
 import { useUserSchemasQuery } from 'daiquiri/metadata/assets/js/hooks/queries'
 import { useUserSchemaQuery } from '../../../hooks/queries'
 
-const ColumnsDropdown = ({ onDoubleClick }) => {
+const ColumnsDropdown = ({ onPaste }) => {
   const { data: schemas } = useUserSchemasQuery()
   const { data: userSchema } = useUserSchemaQuery()
 
@@ -77,7 +77,7 @@ const ColumnsDropdown = ({ onDoubleClick }) => {
                     <button
                       className={classNames('btn btn-link d-flex', {'active': activeItem === column})}
                       onClick={() => handleClick(column)}
-                      onDoubleClick={() => onDoubleClick(column)}
+                      onDoubleClick={() => onPaste(column)}
                     >
                       <div>{column.name}</div>
                     </button>
@@ -96,7 +96,7 @@ const ColumnsDropdown = ({ onDoubleClick }) => {
 }
 
 ColumnsDropdown.propTypes = {
-  onDoubleClick: PropTypes.func.isRequired
+  onPaste: PropTypes.func.isRequired
 }
 
 export default ColumnsDropdown

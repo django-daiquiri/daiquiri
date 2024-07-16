@@ -6,7 +6,7 @@ import { useLsState } from 'daiquiri/core/assets/js/hooks/ls'
 
 import Template from 'daiquiri/core/assets/js/components/Template'
 
-import { useQueryLanguagesQuery, useQueuesQuery } from '../../hooks/queries'
+import { useDropdownsQuery, useQueryLanguagesQuery, useQueuesQuery } from '../../hooks/queries'
 import { useSubmitJobMutation } from '../../hooks/mutations'
 
 import Query from './common/Query'
@@ -17,6 +17,7 @@ import ColumnsDropdown from './dropdowns/ColumnsDropdown'
 import ExamplesDropdown from './dropdowns/ExamplesDropdown'
 import FunctionsDropdown from './dropdowns/FunctionsDropdown'
 import SchemasDropdown from './dropdowns/SchemasDropdown'
+import SimbadDropdown from './dropdowns/SimbadDropdown'
 
 const FormSql = ({ form, loadJob, query }) => {
 
@@ -33,6 +34,7 @@ const FormSql = ({ form, loadJob, query }) => {
 
   const { data: queues } = useQueuesQuery()
   const { data: queryLanguages } = useQueryLanguagesQuery()
+  const { data: dropdowns } = useDropdownsQuery()
   const mutation = useSubmitJobMutation()
 
   const getDefaultQueryLanguage = () => queryLanguages[0].id
@@ -63,7 +65,7 @@ const FormSql = ({ form, loadJob, query }) => {
     })
   }
 
-  const handlePaste = (item) => {
+  const handleInsert = (item) => {
     let query_string = item.query_string
 
     if (isNil(query_string)) {
@@ -121,16 +123,23 @@ const FormSql = ({ form, loadJob, query }) => {
         </div>
 
         {
-          openDropdown == 'schemas' && <SchemasDropdown onDoubleClick={handlePaste} />
+          openDropdown == 'schemas' && <SchemasDropdown onPaste={handleInsert} />
         }
         {
-          openDropdown == 'columns' && <ColumnsDropdown onDoubleClick={handlePaste} />
+          openDropdown == 'columns' && <ColumnsDropdown onPaste={handleInsert} />
         }
         {
-          openDropdown == 'functions' && <FunctionsDropdown onDoubleClick={handlePaste} />
+          openDropdown == 'functions' && <FunctionsDropdown onPaste={handleInsert} />
         }
         {
-          openDropdown == 'examples' && <ExamplesDropdown onDoubleClick={handleReplace} />
+          dropdowns && dropdowns.map((dropdown, index) => {
+            if (dropdown.key == 'simbad' && openDropdown == 'simbad') {
+              return <SimbadDropdown key={index} options={dropdown.options} onPaste={handleInsert} />
+            }
+          })
+        }
+        {
+          openDropdown == 'examples' && <ExamplesDropdown onPaste={handleReplace} />
         }
 
       </div>
