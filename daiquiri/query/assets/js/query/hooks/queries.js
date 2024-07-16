@@ -55,7 +55,7 @@ export const useJobsQuery = () => {
 
 export const useUserSchemaQuery = () => {
   return useQuery({
-    queryKey: ['userSchemas'],
+    queryKey: ['userSchema'],
     queryFn: () => QueryApi.fetchUserSchema(),
     refetchInterval: refetchInterval,
     placeholderData: keepPreviousData

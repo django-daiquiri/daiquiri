@@ -6,6 +6,10 @@ class MetadataApi extends BaseApi {
     return this.get('/metadata/api/schemas/user/')
   }
 
+  static fetchUserFunctions() {
+    return this.get('/metadata/api/functions/user/')
+  }
+
 }
 
 export default MetadataApi

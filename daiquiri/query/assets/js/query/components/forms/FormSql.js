@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react'
 import PropTypes from 'prop-types'
-import { get } from 'lodash'
+import { get, isNil } from 'lodash'
 
 import { useLsState } from 'daiquiri/core/assets/js/hooks/ls'
 
@@ -15,6 +15,7 @@ import Text from './common/Text'
 
 import ColumnsDropdown from './dropdowns/ColumnsDropdown'
 import ExamplesDropdown from './dropdowns/ExamplesDropdown'
+import FunctionsDropdown from './dropdowns/FunctionsDropdown'
 import SchemasDropdown from './dropdowns/SchemasDropdown'
 
 const FormSql = ({ form, loadJob, query }) => {
@@ -63,9 +64,14 @@ const FormSql = ({ form, loadJob, query }) => {
   }
 
   const handlePaste = (item) => {
-    const query_language = values.query_language || getDefaultQueryLanguage()
-    const quote_char = queryLanguages.find((ql) => ql.id == query_language).quote_char
-    const query_string = item.query_strings.map((qs) => (quote_char + qs + quote_char)).join('.')
+    let query_string = item.query_string
+
+    if (isNil(query_string)) {
+      const query_language = values.query_language || getDefaultQueryLanguage()
+      const quote_char = queryLanguages.find((ql) => ql.id == query_language).quote_char
+
+      query_string = item.query_strings.map((qs) => (quote_char + qs + quote_char)).join('.')
+    }
 
     // see https://codemirror.net/examples/change/
     editor.current.view.dispatch({
@@ -119,6 +125,9 @@ const FormSql = ({ form, loadJob, query }) => {
         }
         {
           openDropdown == 'columns' && <ColumnsDropdown onDoubleClick={handlePaste} />
+        }
+        {
+          openDropdown == 'functions' && <FunctionsDropdown onDoubleClick={handlePaste} />
         }
         {
           openDropdown == 'examples' && <ExamplesDropdown onDoubleClick={handleReplace} />
