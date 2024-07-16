@@ -117,7 +117,7 @@ const FormSql = ({ form, loadJob, query }) => {
               </button>
             ))
           }
-          <button type="button" className="btn btn-outline-form dropdown-toggle mb-2"
+          <button type="button" className="btn btn-outline-form dropdown-toggle ms-auto mb-2"
                   onClick={() => handleDrowpdown('examples')}>
             {gettext('Examples')}
           </button>
