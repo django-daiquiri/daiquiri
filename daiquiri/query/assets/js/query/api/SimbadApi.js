@@ -2,14 +2,14 @@ import { encodeParams } from 'daiquiri/core/assets/js/utils/api'
 
 export default class SimbadApi {
 
-  static search(url, search) {
+  static search(options, search) {
     const params = {
       'Ident': search,
       'output.format': 'votable',
       'output.params': 'main_id,coo(d),otype(V)'
     }
 
-    return fetch(url + '?' + encodeParams(params))
+    return fetch(options.url + '?' + encodeParams(params))
       .then((response) => {
         if (response.ok) {
           return response.text()
@@ -21,17 +21,16 @@ export default class SimbadApi {
         const xml = domParser.parseFromString(xmlString, 'text/xml')
         const xmlRows = [...xml.querySelectorAll('TABLEDATA TR')]
         xmlRows.forEach((xmlRow) => {
-          const children = xmlRow.childNodes
-          const row = {
-            object: children[0].textContent,
-            type: children[6].textContent,
-            ra: children[1].textContent,
-            de: children[2].textContent,
-          }
-          rows.push(row)
+          const fields = [...xmlRow.childNodes].map((childNode) => childNode.textContent)
+          rows.push({
+            object: fields[0],
+            type: fields[6],
+            ra: fields[1],
+            de: fields[2],
+          })
         })
 
-        return rows
+        return { rows }
       })
   }
 }

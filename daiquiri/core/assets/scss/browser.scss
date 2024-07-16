@@ -27,13 +27,12 @@
     .dq-browser-list,
     .dq-browser-table {
         height: var(--dq-browser-height);
+        overflow-y: auto;
     }
 
     .dq-browser-list {
         margin: 0;
         padding: 0;
-
-        overflow-y: auto;
 
         li {
             margin: 0;

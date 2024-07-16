@@ -77,16 +77,14 @@ QUERY_DROPDOWN_FUNCTIONS = False;
 QUERY_DROPDOWNS = [
     {
         'key': 'simbad',
-        'service': 'query/js/dropdowns/simbad.js',
-        'template': 'query/query_dropdown_simbad.html',
+        'label': 'Simbad',
         'options': {
             'url': 'http://simbad.u-strasbg.fr/simbad/sim-id'
         }
     },
     {
         'key': 'vizier',
-        'service': 'query/js/dropdowns/vizier.js',
-        'template': 'query/query_dropdown_vizier.html',
+        'label': 'VizieR',
         'options': {
             'url': 'http://vizier.u-strasbg.fr/viz-bin/votable',
             'catalogs': ['I/322A', 'I/259']

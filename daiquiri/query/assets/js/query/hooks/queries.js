@@ -1,8 +1,9 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { isEmpty } from 'lodash'
+
 import QueryApi from '../api/QueryApi'
 import SimbadApi from '../api/SimbadApi'
-
-import { encodeParams } from 'daiquiri/core/assets/js/utils/api'
+import VizierApi from '../api/VizierApi'
 
 const refetchInterval = 4000
 
@@ -109,6 +110,16 @@ export const useSimbadQuery = (url, search) => {
   return useQuery({
     queryKey: ['simbad', search],
     queryFn: () => SimbadApi.search(url, search),
-    placeholderData: keepPreviousData
+    placeholderData: keepPreviousData,
+    enabled: !isEmpty(search)
+  })
+}
+
+export const useVizierQuery = (url, search) => {
+  return useQuery({
+    queryKey: ['vizier', search],
+    queryFn: () => VizierApi.search(url, search),
+    placeholderData: keepPreviousData,
+    enabled: !isEmpty(search)
   })
 }

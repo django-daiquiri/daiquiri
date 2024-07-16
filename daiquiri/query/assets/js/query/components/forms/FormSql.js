@@ -18,6 +18,7 @@ import ExamplesDropdown from './dropdowns/ExamplesDropdown'
 import FunctionsDropdown from './dropdowns/FunctionsDropdown'
 import SchemasDropdown from './dropdowns/SchemasDropdown'
 import SimbadDropdown from './dropdowns/SimbadDropdown'
+import VizierDropdown from './dropdowns/VizierDropdown'
 
 const FormSql = ({ form, loadJob, query }) => {
 
@@ -108,14 +109,14 @@ const FormSql = ({ form, loadJob, query }) => {
                   onClick={() => handleDrowpdown('functions')}>
             {gettext('Functions')}
           </button>
-          <button type="button" className="btn btn-outline-form dropdown-toggle me-2 mb-2"
-                  onClick={() => handleDrowpdown('simbad')}>
-            {gettext('Simbad')}
-          </button>
-          <button type="button" className="btn btn-outline-form dropdown-toggle me-2 me-md-auto mb-2"
-                  onClick={() => handleDrowpdown('vizier')}>
-            {gettext('VizieR')}
-          </button>
+          {
+            dropdowns && dropdowns.map((dropdown, index) => (
+              <button key={index} type="button" className="btn btn-outline-form dropdown-toggle me-2 mb-2"
+                      onClick={() => handleDrowpdown(dropdown.key)}>
+                {dropdown.label}
+              </button>
+            ))
+          }
           <button type="button" className="btn btn-outline-form dropdown-toggle mb-2"
                   onClick={() => handleDrowpdown('examples')}>
             {gettext('Examples')}
@@ -135,6 +136,8 @@ const FormSql = ({ form, loadJob, query }) => {
           dropdowns && dropdowns.map((dropdown, index) => {
             if (dropdown.key == 'simbad' && openDropdown == 'simbad') {
               return <SimbadDropdown key={index} options={dropdown.options} onPaste={handleInsert} />
+            } else if ((dropdown.key == 'vizier' && openDropdown == 'vizier')) {
+              return <VizierDropdown key={index} options={dropdown.options} onPaste={handleInsert} />
             }
           })
         }

@@ -2,13 +2,13 @@ import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { isEmpty } from 'lodash'
 
-import { useSimbadQuery } from '../../../hooks/queries'
+import { useVizierQuery } from '../../../hooks/queries'
 
-const SimbadDropdown = ({ options, onPaste }) => {
+const VizierDropdown = ({ options, onPaste }) => {
   const [searchValue, setSearchValue] = useState('')
   const [search, setSearch] = useState('')
 
-  const { data: results } = useSimbadQuery(options, search)
+  const { data: results } = useVizierQuery(options, search)
 
   return (
     <div className="mb-4">
@@ -19,7 +19,7 @@ const SimbadDropdown = ({ options, onPaste }) => {
               <input
                 type="text"
                 className="form-control"
-                placeholder={gettext('Object name')}
+                placeholder={gettext('Object name or coordinates')}
                 value={searchValue}
                 onChange={(event) => setSearchValue(event.target.value)}
                 onKeyDown={(event) => {
@@ -29,7 +29,7 @@ const SimbadDropdown = ({ options, onPaste }) => {
                 }}>
               </input>
               <button className="btn btn-outline-primary" type="button" onClick={() => setSearch(searchValue)}>
-                {gettext('Search on SIMBAD')}
+                {gettext('Search on VizieR')}
               </button>
             </div>
           </div>
@@ -37,9 +37,10 @@ const SimbadDropdown = ({ options, onPaste }) => {
             <table className="table">
               <thead>
                 <tr>
-                  <th>{gettext('Object')}</th>
-                  <th>{gettext('Type')}</th>
+                  <th>{gettext('ID')}</th>
                   <th>{gettext('Coordinates')}</th>
+                  <th>{gettext('Distance')}</th>
+                  <th>{gettext('Catalog')}</th>
                 </tr>
               </thead>
               {
@@ -57,17 +58,38 @@ const SimbadDropdown = ({ options, onPaste }) => {
                       ) : (
                         results.rows.map((row, index) => (
                           <tr key={index}>
-                            <td>{row.object}</td>
-                            <td>{row.type}</td>
                             <td>
-                              <button className="btn btn-link" onClick={() => onPaste({query_string: row.ra})}>
+                              <button
+                                className="btn btn-link"
+                                onClick={() => onPaste({query_string: row.id})}
+                              >
+                                {row.id}
+                              </button>
+                            </td>
+                            <td>
+                              <button
+                                className="btn btn-link"
+                                onClick={() => onPaste({query_string: row.ra})}
+                              >
                                 {row.ra}
                               </button>
                               {' '}
-                              <button className="btn btn-link" onClick={() => onPaste({query_string: row.de})}>
+                              <button
+                                className="btn btn-link"
+                                onClick={() => onPaste({query_string: row.de})}
+                              >
                                 {row.de}
                               </button>
                             </td>
+                            <td>
+                              <button
+                                className="btn btn-link"
+                                onClick={() => onPaste({query_string: row.distance})}
+                              >
+                                {row.distance}
+                              </button>
+                            </td>
+                            <td>{row.catalog}</td>
                           </tr>
                         ))
                       )
@@ -86,9 +108,9 @@ const SimbadDropdown = ({ options, onPaste }) => {
   )
 }
 
-SimbadDropdown.propTypes = {
+VizierDropdown.propTypes = {
   options: PropTypes.object.isRequired,
   onPaste: PropTypes.func.isRequired
 }
 
-export default SimbadDropdown
+export default VizierDropdown
