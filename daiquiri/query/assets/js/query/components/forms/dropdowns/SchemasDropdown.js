@@ -22,25 +22,25 @@ const SchemasDropdown = ({ onDoubleClick }) => {
       setOpenSchema(schemas[0])
       setOpenTable(schemas[0].tables[0])
 
-      setVisibleSchemas(schemas.map((schema) => ({...schema, type: 'schema'})))
-      setVisibleTables(schemas[0].tables.map((table) => ({...table, type: 'table'})))
-      setVisibleColumns(schemas[0].tables[0].columns.map((column) => ({...column, type: 'column'})))
+      setVisibleSchemas([...schemas, ...userSchema])
+      setVisibleTables(schemas[0].tables)
+      setVisibleColumns(schemas[0].tables[0].columns)
     }
   }, [schemas, userSchema])
 
-  const handleClick = (item) => {
+  const handleClick = (type, item) => {
     if (item != activeItem) {
       setActiveItem(item)
     }
-    if (item.type == 'schema' && item != openSchema) {
+    if (type == 'schema' && item != openSchema) {
       setOpenSchema(item)
       setOpenTable(item.tables[0])
-      setVisibleTables(item.tables.map((table) => ({...table, type: 'table'})))
-      setVisibleColumns(item.tables[0].columns.map((column) => ({...column, type: 'column'})))
+      setVisibleTables(item.tables)
+      setVisibleColumns(item.tables[0].columns)
     }
-    if (item.type == 'table' && item != openTable) {
+    if (type == 'table' && item != openTable) {
       setOpenTable(item)
-      setVisibleColumns(item.columns.map((column) => ({...column, type: 'column'})))
+      setVisibleColumns(item.columns)
     }
   }
 
@@ -55,11 +55,11 @@ const SchemasDropdown = ({ onDoubleClick }) => {
               </div>
               <ul className="dq-browser-list">
                 {
-                  visibleSchemas.map((schema) => (
-                    <li key={schema.id}>
+                  visibleSchemas.map((schema, index) => (
+                    <li key={index}>
                       <button
                         className={classNames('btn btn-link d-flex', {'active': activeItem === schema})}
-                        onClick={() => handleClick(schema)}
+                        onClick={() => handleClick('schema', schema)}
                         onDoubleClick={() => onDoubleClick(schema)}
                       >
                         <div>{schema.name}</div>
@@ -76,11 +76,11 @@ const SchemasDropdown = ({ onDoubleClick }) => {
               </div>
               <ul className="dq-browser-list">
                 {
-                  visibleTables.map((table) => (
-                    <li key={table.id}>
+                  visibleTables.map((table, index) => (
+                    <li key={index}>
                       <button
                         className={classNames('btn btn-link  d-flex', {'active': activeItem === table})}
-                        onClick={() => handleClick(table)}
+                        onClick={() => handleClick('table', table)}
                         onDoubleClick={() => onDoubleClick(table)}
                       >
                         <div>{table.name}</div>
@@ -97,11 +97,11 @@ const SchemasDropdown = ({ onDoubleClick }) => {
               </div>
               <ul className="dq-browser-list">
                 {
-                  visibleColumns.map((column) => (
-                    <li key={column.id}>
+                  visibleColumns.map((column, index) => (
+                    <li key={index}>
                       <button
                         className={classNames('btn btn-link', {'active': activeItem === column})}
-                        onClick={() => handleClick(column)}
+                        onClick={() => handleClick('column', column)}
                         onDoubleClick={() => onDoubleClick(column)}
                       >
                         {column.name}
