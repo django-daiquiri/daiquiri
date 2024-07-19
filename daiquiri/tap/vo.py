@@ -51,6 +51,7 @@ def get_capabilities():
             'languages': [{
                 'name': language['key'],
                 'version': language['version'],
+                'ivo-id': language.get('ivo-id', None),
                 'description': language['description'],
             } for language in settings.QUERY_LANGUAGES]
         },

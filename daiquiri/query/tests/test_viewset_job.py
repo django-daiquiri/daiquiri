@@ -123,7 +123,7 @@ def test_create_public(db, client, mocker, query):
 
     url = reverse(urlnames['list'])
     response = client.post(url, {
-        'query_language': 'adql-2.0',
+        'query_language': 'adql-2.1',
         'query': query
     })
     assert response.status_code == 201, response.json()
@@ -142,7 +142,7 @@ def test_create_internal(db, client, mocker, username, password, query):
 
     url = reverse(urlnames['list'])
     response = client.post(url, {
-        'query_language': 'adql-2.0',
+        'query_language': 'adql-2.1',
         'query': query
     })
     assert response.status_code == status_map['create_internal'][username], response.json()
@@ -161,7 +161,7 @@ def test_create_private(db, client, mocker, username, password, query):
 
     url = reverse(urlnames['list'])
     response = client.post(url, {
-        'query_language': 'adql-2.0',
+        'query_language': 'adql-2.1',
         'query': query
     })
     assert response.status_code == status_map['create_private'][username], response.json()
