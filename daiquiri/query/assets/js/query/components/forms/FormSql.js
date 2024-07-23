@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { get, isNil } from 'lodash'
 
@@ -6,12 +6,12 @@ import { useLsState } from 'daiquiri/core/assets/js/hooks/ls'
 
 import Template from 'daiquiri/core/assets/js/components/Template'
 
-import { useDropdownsQuery, useQueryLanguagesQuery, useQueuesQuery } from '../../hooks/queries'
+import { useDropdownsQuery, useFormQuery, useQueryLanguagesQuery, useQueuesQuery } from '../../hooks/queries'
 import { useSubmitJobMutation } from '../../hooks/mutations'
 
+import Input from './common/Input'
 import Query from './common/Query'
 import Select from './common/Select'
-import Text from './common/Text'
 
 import ColumnsDropdown from './dropdowns/ColumnsDropdown'
 import ExamplesDropdown from './dropdowns/ExamplesDropdown'
@@ -20,7 +20,12 @@ import SchemasDropdown from './dropdowns/SchemasDropdown'
 import SimbadDropdown from './dropdowns/SimbadDropdown'
 import VizierDropdown from './dropdowns/VizierDropdown'
 
-const FormSql = ({ form, loadJob, query }) => {
+const FormSql = ({ formKey, loadJob, query }) => {
+  const { data: form } = useFormQuery(formKey)
+  const { data: queues } = useQueuesQuery()
+  const { data: queryLanguages } = useQueryLanguagesQuery()
+  const { data: dropdowns } = useDropdownsQuery()
+  const mutation = useSubmitJobMutation()
 
   const [values, setValues] = useState({
     query: query || '',
@@ -33,13 +38,8 @@ const FormSql = ({ form, loadJob, query }) => {
 
   const editor = useRef()
 
-  const { data: queues } = useQueuesQuery()
-  const { data: queryLanguages } = useQueryLanguagesQuery()
-  const { data: dropdowns } = useDropdownsQuery()
-  const mutation = useSubmitJobMutation()
-
-  const getDefaultQueryLanguage = () => queryLanguages[0].id
-  const getDefaultQueue = () => queues[0].id
+  const getDefaultQueryLanguage = () => isNil(queryLanguages) ? '' : queryLanguages[0].id
+  const getDefaultQueue = () => isNil(queues) ? '' : queues[0].id
 
   const [openDropdown, setOpenDropdown] = useLsState('query.openDropdown')
 
@@ -47,18 +47,20 @@ const FormSql = ({ form, loadJob, query }) => {
     setOpenDropdown(openDropdown == dropdownKey ? false : dropdownKey)
   }
 
+  useEffect(() => {
+    setValues({
+      ...values,
+      queue: values.queue || getDefaultQueue(),
+      query_language: values.query_language || getDefaultQueryLanguage()})
+  }, [queues, queryLanguages])
+
   const handleSubmit = () => {
-    mutation.mutate({
-      values: {
-        ...values,
-        query_language: values.query_language || getDefaultQueryLanguage(),
-        queue: values.queue || getDefaultQueue()
-      }, setErrors, loadJob})
+    mutation.mutate({values, setErrors, loadJob})
   }
 
   const handleClear = () => {
     setValues({
-      query: '\n\n\n',
+      query: '',
       table_name: '',
       run_id: '',
       query_language: getDefaultQueryLanguage(),
@@ -90,12 +92,12 @@ const FormSql = ({ form, loadJob, query }) => {
     setValues({...values, query: item.query_string})
   }
 
-  return (
-    <div className="form mb-4">
+  return form && (
+    <div className="query-form mb-4">
       <h2>{form.label}</h2>
       <Template template={form.template} />
 
-      <div className="sql-dropdowns">
+      <div className="query-dropdowns">
         <div className="d-md-flex">
           <button type="button" className="btn btn-outline-form dropdown-toggle me-2 mb-2"
                   onClick={() => handleDrowpdown('schemas')}>
@@ -147,7 +149,7 @@ const FormSql = ({ form, loadJob, query }) => {
 
       </div>
 
-      <div className="sql-form mt-2">
+      <div className="mt-2">
         <div className="mb-3">
           <Query
             label={gettext('SQL query')}
@@ -160,7 +162,7 @@ const FormSql = ({ form, loadJob, query }) => {
 
         <div className="row">
           <div className="col-md-4">
-            <Text
+            <Input
               label={gettext('Table name')}
               value={values.table_name}
               errors={errors.table_name}
@@ -168,7 +170,7 @@ const FormSql = ({ form, loadJob, query }) => {
             />
           </div>
           <div className="col-md-2">
-            <Text
+            <Input
               label={gettext('Run id')}
               value={values.run_id}
               errors={errors.run_id}
@@ -209,7 +211,7 @@ const FormSql = ({ form, loadJob, query }) => {
 }
 
 FormSql.propTypes = {
-  form: PropTypes.object.isRequired,
+  formKey: PropTypes.string.isRequired,
   loadJob: PropTypes.func.isRequired,
   query: PropTypes.string
 }

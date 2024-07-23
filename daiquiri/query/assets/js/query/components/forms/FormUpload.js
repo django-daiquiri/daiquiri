@@ -4,13 +4,16 @@ import PropTypes from 'prop-types'
 import Template from 'daiquiri/core/assets/js/components/Template'
 import { bytes2human } from 'daiquiri/core/assets/js/utils/bytes'
 
-import { useStatusQuery } from '../../hooks/queries'
+import { useFormQuery, useStatusQuery } from '../../hooks/queries'
 import { useUploadJobMutation } from '../../hooks/mutations'
 
 import File from './common/File'
-import Text from './common/Text'
+import Input from './common/Input'
 
-const FormUpload = ({ form, loadJob }) => {
+const FormUpload = ({ formKey, loadJob }) => {
+  const { data: form } = useFormQuery(formKey)
+  const { data: status } = useStatusQuery()
+  const mutation = useUploadJobMutation()
 
   const [values, setValues] = useState({
     file: null,
@@ -19,9 +22,6 @@ const FormUpload = ({ form, loadJob }) => {
   })
   const [errors, setErrors] = useState({})
 
-  const { data: status } = useStatusQuery()
-  const mutation = useUploadJobMutation()
-
   const handleUpload = () => {
     mutation.mutate({values, setErrors, loadJob})
   }
@@ -29,12 +29,12 @@ const FormUpload = ({ form, loadJob }) => {
   const fileLabel = status ? interpolate(gettext('File (max. %s)'), [bytes2human(status.upload_limit)])
                            : gettext('File')
 
-  return (
+  return form && (
     <div className="form">
       <h2>{form.label}</h2>
       <Template template={form.template} />
 
-      <div className="sql-form mt-3">
+      <div className="upload-form mt-3">
         <File
           label={fileLabel}
           value={values.file}
@@ -44,7 +44,7 @@ const FormUpload = ({ form, loadJob }) => {
 
         <div className="row">
           <div className="col-md-10">
-            <Text
+            <Input
               label={gettext('Table name')}
               value={values.table_name}
               errors={errors.table_name}
@@ -52,7 +52,7 @@ const FormUpload = ({ form, loadJob }) => {
             />
           </div>
           <div className="col-md-2">
-            <Text
+            <Input
               label={gettext('Run id')}
               value={values.run_id}
               errors={errors.run_id}
@@ -72,7 +72,7 @@ const FormUpload = ({ form, loadJob }) => {
 }
 
 FormUpload.propTypes = {
-  form: PropTypes.object.isRequired,
+  formKey: PropTypes.string.isRequired,
   loadJob: PropTypes.func.isRequired
 }
 

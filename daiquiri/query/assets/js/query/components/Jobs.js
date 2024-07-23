@@ -63,7 +63,7 @@ const Jobs = ({ jobId, loadJob }) => {
   }
 
   return (
-    <div className="jobs card card-nav mb-3">
+    <div className="query-jobs card card-nav mb-3">
       <div className="card-header">
         {gettext('Job list')}
       </div>

@@ -4,6 +4,8 @@ import { parseLocation, updateLocation } from '../utils/location'
 
 import Form from './forms/Form'
 import Forms from './Forms'
+import FormSql from './forms/FormSql'
+import FormUpload from './forms/FormUpload'
 import Job from './job/Job'
 import Jobs from './Jobs'
 import Status from './Status'
@@ -12,6 +14,17 @@ const App = () => {
   const location = parseLocation()
 
   const [state, setState] = useState(location)
+
+  const getForm = () => {
+    switch (state.formKey) {
+      case 'sql':
+        return <FormSql formKey={state.formKey} loadJob={loadJob} query={state.query} />
+      case 'upload':
+        return <FormUpload formKey={state.formKey} loadJob={loadJob} />
+      default:
+        return <Form formKey={state.formKey} loadJob={loadJob} />
+    }
+  }
 
   const loadJob = (jobId) => {
     updateLocation({ jobId })
@@ -38,7 +51,7 @@ const App = () => {
             state.jobId && <Job jobId={state.jobId} loadForm={loadForm} />
           }
           {
-            state.formKey && <Form formKey={state.formKey} loadJob={loadJob} query={state.query} />
+            state.formKey && getForm()
           }
         </div>
       </div>

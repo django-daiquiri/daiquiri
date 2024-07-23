@@ -1,4 +1,5 @@
 from django.template.loader import get_template, TemplateDoesNotExist
+from django.utils.translation import gettext_lazy as _
 
 from rest_framework import serializers
 
@@ -23,7 +24,9 @@ class FormDetailSerializer(serializers.Serializer):
 
     key = serializers.CharField()
     label = serializers.CharField()
-    template = serializers.SerializerMethodField()
+    template = serializers.SerializerMethodField(required=False)
+    fields = serializers.JSONField(default=list)
+    submit = serializers.CharField(default=_('Submit'))
 
     def get_template(self, obj):
         try:
