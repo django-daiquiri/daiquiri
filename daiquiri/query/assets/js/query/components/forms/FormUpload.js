@@ -30,7 +30,7 @@ const FormUpload = ({ formKey, loadJob }) => {
                            : gettext('File')
 
   return form && (
-    <div className="form">
+    <div className="query-form mb-4">
       <h2>{form.label}</h2>
       <Template template={form.template} />
 
@@ -61,7 +61,7 @@ const FormUpload = ({ formKey, loadJob }) => {
           </div>
         </div>
 
-        <div className="mt-4">
+        <div className="mt-2">
           <button type="button" className="btn btn-primary me-auto" onClick={() => handleUpload()}>
             {gettext('Upload table')}
           </button>
