@@ -14,11 +14,6 @@
 }
 
 .codemirror {
-    .cm-content,
-    .cm-gutter {
-        min-height: 15rem;
-    }
-
     .cm-line {
         padding: 0;
     }
@@ -49,5 +44,12 @@
         font-weight: bold;
         font-size: small;
         margin-bottom: 0.25rem;
+    }
+
+    .codemirror {
+        .cm-content,
+        .cm-gutter {
+            min-height: 15rem;
+        }
     }
 }
