@@ -73,47 +73,53 @@ const Jobs = ({ jobId, loadJob }) => {
             <Loading />
           </div>
         ) : (
-          <ul className="list-group list-group-flush">
-            {
-              runIds.map((runId) => (
-                <React.Fragment key={runId}>
-                  {
-                    runIds.length > 1 && (
-                      <li key={runId} className="list-group-item">
-                        <button type="button" className="btn btn-link" onClick={() => toggleRunId(runId)}>
-                          <div className="d-flex align-items-center">
-                            {isEmpty(runId) ? gettext('No run id') : interpolate(gettext('Run id: %s'), [runId])}
-                            <span className="material-symbols-rounded ms-auto">
-                              {openRunIds.includes(runId) ? 'folder_open' : 'folder'}
-                            </span>
-                          </div>
-                        </button>
-                      </li>
-                    )
-                  }
-                  {
-                    openRunIds.includes(runId) && (
-                      jobs.filter((job) => job.run_id === runId).map((job) => (
-                        <li key={job.id} className={classNames({
-                          'list-group-item': true,
-                          'active': job.id === jobId
-                        })}>
-                          <a href={`${basePath}/${job.id}/`} onClick={(event) => handleLoadJob(event, job)}>
-                            <span className="float-end">
-                              <span className="material-symbols-rounded">
-                                {jobPhaseSymbols[job.phase]}
+          isEmpty(jobs) ? (
+            <div className="card-body">
+              {gettext('No jobs found.')}
+            </div>
+          ) : (
+            <ul className="list-group list-group-flush">
+              {
+                runIds.map((runId) => (
+                  <React.Fragment key={runId}>
+                    {
+                      runIds.length > 1 && (
+                        <li key={runId} className="list-group-item">
+                          <button type="button" className="btn btn-link" onClick={() => toggleRunId(runId)}>
+                            <div className="d-flex align-items-center">
+                              {isEmpty(runId) ? gettext('No run id') : interpolate(gettext('Run id: %s'), [runId])}
+                              <span className="material-symbols-rounded ms-auto">
+                                {openRunIds.includes(runId) ? 'folder_open' : 'folder'}
                               </span>
-                            </span>
-                            <span>{job.table_name}</span>
-                          </a>
+                            </div>
+                          </button>
                         </li>
-                      ))
-                    )
-                  }
-                </React.Fragment>
-              ))
-            }
-          </ul>
+                      )
+                    }
+                    {
+                      openRunIds.includes(runId) && (
+                        jobs.filter((job) => job.run_id === runId).map((job) => (
+                          <li key={job.id} className={classNames({
+                            'list-group-item': true,
+                            'active': job.id === jobId
+                          })}>
+                            <a href={`${basePath}/${job.id}/`} onClick={(event) => handleLoadJob(event, job)}>
+                              <span className="float-end">
+                                <span className="material-symbols-rounded">
+                                  {jobPhaseSymbols[job.phase]}
+                                </span>
+                              </span>
+                              <span>{job.table_name}</span>
+                            </a>
+                          </li>
+                        ))
+                      )
+                    }
+                  </React.Fragment>
+                ))
+              }
+            </ul>
+          )
         )
       }
       {
