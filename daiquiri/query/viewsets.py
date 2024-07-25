@@ -8,7 +8,7 @@ from django.conf import settings
 from django.http import Http404, FileResponse
 from django.utils.timezone import now
 
-from rest_framework import viewsets, mixins, filters
+from rest_framework import viewsets, mixins, filters, status
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError, NotFound
 from rest_framework.decorators import action
@@ -41,6 +41,7 @@ from .serializers import (
     QueryJobListSerializer,
     QueryJobRetrieveSerializer,
     QueryJobCreateSerializer,
+    QueryJobFormSerializer,
     QueryJobUpdateSerializer,
     QueryJobUploadSerializer,
     QueryLanguageSerializer,
@@ -180,6 +181,31 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
     def tables(self, request):
         queryset = self.get_queryset().filter(phase=QueryJob.PHASE_COMPLETED)[:100]
         return Response(fetch_user_schema_metadata(request.user, queryset))
+
+    @action(detail=False, methods=['post'], url_path='forms/(?P<form_key>[a-z]+)', url_name='forms')
+    def forms(self, request, form_key):
+        try:
+            form = next(form for form in settings.QUERY_FORMS if form.get('key') == form_key)
+        except StopIteration:
+            raise NotFound
+
+        try:
+            adapter_class = import_class(form['adapter'])
+            adapter = adapter_class()
+        except (AttributeError, KeyError):
+            raise NotFound
+
+        # follows CreateModelMixin.create(request, *args, **kwargs)
+        serializer = QueryJobFormSerializer(
+            data=request.data,
+            form=form,
+            adapter=adapter,
+            context=self.get_serializer_context()
+        )
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     @action(detail=False, methods=['post'], url_path='upload', url_name='upload')
     def upload(self, request):

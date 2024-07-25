@@ -147,6 +147,34 @@ class QueryJobCreateSerializer(serializers.ModelSerializer):
         )
 
 
+class QueryJobFormSerializer(QueryJobCreateSerializer):
+
+    query_language = serializers.SerializerMethodField()
+    query = serializers.SerializerMethodField()
+
+    class Meta:
+        model = QueryJob
+        fields = QueryJobCreateSerializer.Meta.fields
+
+    def __init__(self, *args, **kwargs):
+        self.form = kwargs.pop('form')
+        self.adapter = kwargs.pop('adapter')
+
+        super().__init__(*args, **kwargs)
+
+        for field in self.form.get('fields', []):
+            if field.get('type') == 'number':
+                self.fields[field['key']] = serializers.FloatField(required=True)
+            else:
+                self.fields[field['key']] = serializers.CharField(required=False)
+
+    def get_query_language(self, obj):
+        return self.adapter.get_query_language(obj)
+
+    def get_query(self, obj):
+        return self.adapter.get_query(obj)
+
+
 class QueryJobUpdateSerializer(serializers.ModelSerializer):
 
     table_name = serializers.CharField(required=True, validators=[TableNameValidator()])

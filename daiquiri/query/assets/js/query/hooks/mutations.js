@@ -6,7 +6,7 @@ export const useSubmitJobMutation = () => {
 
   return useMutation({
     mutationFn: (variables) => {
-      return QueryApi.submitJob(variables.values)
+      return QueryApi.submitJob(variables.values, variables.formKey)
     },
     onSuccess: (data, variables) => {
       variables.loadJob(data.id)

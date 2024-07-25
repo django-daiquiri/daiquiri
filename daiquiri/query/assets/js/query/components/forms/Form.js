@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { isNil } from 'lodash'
 
 import { useFormQuery, useQueuesQuery } from '../../hooks/queries'
+import { useSubmitJobMutation } from '../../hooks/mutations'
 
 import Template from 'daiquiri/core/assets/js/components/Template'
 
@@ -12,6 +13,7 @@ import Select from './common/Select'
 const Form = ({ formKey, loadJob }) => {
   const { data: form } = useFormQuery(formKey)
   const { data: queues } = useQueuesQuery()
+  const mutation = useSubmitJobMutation()
 
   const [values, setValues] = useState({
     table_name: '',
@@ -38,7 +40,7 @@ const Form = ({ formKey, loadJob }) => {
   }, [form, queues])
 
   const handleSubmit = () => {
-    console.log('handleSubmit', values)
+    mutation.mutate({values, setErrors, loadJob, formKey})
   }
 
   const handleClear = () => {
