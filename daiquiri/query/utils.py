@@ -9,7 +9,7 @@ import requests
 from astropy.io.votable import parse_single_table
 
 from daiquiri.core.adapter import DatabaseAdapter
-from daiquiri.core.utils import handle_file_upload, human2bytes
+from daiquiri.core.utils import import_class, handle_file_upload, human2bytes
 from daiquiri.metadata.models import Column, Table
 
 
@@ -295,13 +295,14 @@ def fetch_file(user, url):
 
     return file_path
 
+
 def catch_special_types(field):
     '''Catch any DB specific datatype, which are not VO compatible. i.e.: like spoint for postgres.
     '''
     adapter = DatabaseAdapter()
 
     if adapter.database_config['ENGINE'] == 'django.db.backends.postgresql':
-    
+
         if( field.name == "pos" and field.datatype in ("char", "unicodeChar") ):
             datatype = "spoint"
             arraysize = None
@@ -315,6 +316,7 @@ def catch_special_types(field):
 
     return(datatype, arraysize)
 
+
 def ingest_table(schema_name, table_name, file_path, drop_table=False):
     adapter = DatabaseAdapter()
 
@@ -324,7 +326,7 @@ def ingest_table(schema_name, table_name, file_path, drop_table=False):
     for field in table.fields:
 
         datatype, arraysize = catch_special_types(field)
-    
+
         columns.append({
             'name': field.name,
             'datatype': datatype,
@@ -342,3 +344,17 @@ def ingest_table(schema_name, table_name, file_path, drop_table=False):
     os.remove(file_path)
 
     return columns
+
+
+def get_query_form(form_key):
+    try:
+        return next(form for form in settings.QUERY_FORMS if form.get('key') == form_key)
+    except StopIteration:
+        raise RuntimeError(f'Query form "{form_key}"" not found.')
+
+
+def get_query_form_adapter(form):
+    try:
+        return import_class(form['adapter'])()
+    except (AttributeError, KeyError):
+        raise RuntimeError('Query form adapter for query form "{key}"" not found.'.format(**form))

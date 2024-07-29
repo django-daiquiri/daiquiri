@@ -6,6 +6,7 @@ from rest_framework import serializers
 from daiquiri.jobs.serializers import SyncJobSerializer, AsyncJobSerializer
 from .models import QueryJob, Example
 from .validators import TableNameValidator, UploadFileValidator, UploadParamValidator
+from .utils import get_query_form, get_query_form_adapter
 
 
 class FormListSerializer(serializers.Serializer):
@@ -25,7 +26,7 @@ class FormDetailSerializer(serializers.Serializer):
     key = serializers.CharField()
     label = serializers.CharField()
     template = serializers.SerializerMethodField(required=False)
-    fields = serializers.JSONField(default=list)
+    fields = serializers.SerializerMethodField(required=False, method_name='get_adapter_fields')
     submit = serializers.CharField(default=_('Submit'))
 
     def get_template(self, obj):
@@ -33,6 +34,9 @@ class FormDetailSerializer(serializers.Serializer):
             return get_template(obj['template']).render(request=self.context.get('request')).strip()
         except (KeyError, TemplateDoesNotExist):
             return None
+
+    def get_adapter_fields(self, obj):
+        return get_query_form_adapter(obj).get_fields()
 
 
 class DropdownSerializer(serializers.Serializer):
@@ -157,12 +161,14 @@ class QueryJobFormSerializer(QueryJobCreateSerializer):
         fields = QueryJobCreateSerializer.Meta.fields
 
     def __init__(self, *args, **kwargs):
-        self.form = kwargs.pop('form')
-        self.adapter = kwargs.pop('adapter')
+        form_key = kwargs.pop('form_key')
+        form = get_query_form(form_key)
+
+        self.adapter = get_query_form_adapter(form)
 
         super().__init__(*args, **kwargs)
 
-        for field in self.form.get('fields', []):
+        for field in self.adapter.get_fields():
             if field.get('type') == 'number':
                 self.fields[field['key']] = serializers.FloatField(required=True)
             else:

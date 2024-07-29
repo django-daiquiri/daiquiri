@@ -52,11 +52,13 @@ from .serializers import (
 )
 from .permissions import HasPermission
 from .utils import (
+    fetch_user_schema_metadata,
     get_download_config,
     get_format_config,
+    get_query_form,
+    get_query_form_adapter,
     get_quota,
     get_user_upload_directory,
-    fetch_user_schema_metadata,
     handle_upload_param,
     ingest_uploads
 )
@@ -184,22 +186,10 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'], url_path='forms/(?P<form_key>[a-z]+)', url_name='forms')
     def forms(self, request, form_key):
-        try:
-            form = next(form for form in settings.QUERY_FORMS if form.get('key') == form_key)
-        except StopIteration:
-            raise NotFound
-
-        try:
-            adapter_class = import_class(form['adapter'])
-            adapter = adapter_class()
-        except (AttributeError, KeyError):
-            raise NotFound
-
         # follows CreateModelMixin.create(request, *args, **kwargs)
         serializer = QueryJobFormSerializer(
             data=request.data,
-            form=form,
-            adapter=adapter,
+            form_key=form_key,
             context=self.get_serializer_context()
         )
         serializer.is_valid(raise_exception=True)
