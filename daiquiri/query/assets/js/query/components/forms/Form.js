@@ -7,6 +7,7 @@ import { useSubmitJobMutation } from '../../hooks/mutations'
 
 import Template from 'daiquiri/core/assets/js/components/Template'
 
+import Errors from './common/Errors'
 import Input from './common/Input'
 import Select from './common/Select'
 
@@ -102,6 +103,24 @@ const Form = ({ formKey, loadJob }) => {
             />
           </div>
         </div>
+
+        {
+          errors.query && (
+            <div>
+              <div className="is-invalid"></div>
+              <Errors errors={errors.query} />
+            </div>
+          )
+        }
+
+        {
+          errors.query_language && (
+            <div>
+              <div className="is-invalid"></div>
+              <Errors errors={errors.query_language} />
+            </div>
+          )
+        }
 
         <div className="d-flex mt-2">
           <button type="button" className="btn btn-primary me-auto" onClick={() => handleSubmit()}>
