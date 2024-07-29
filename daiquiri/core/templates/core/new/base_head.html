@@ -8,7 +8,8 @@
 <meta property="og:title" content="{{ request.site.name }}" />
 <meta property="og:url" content="{{ request.site.domain }}" />
 
-<meta name='baseurl' content="{% url 'home' %}" />
-<meta name='staticurl' content="{% static '' %}" />
+<meta name="baseurl" content="{% url 'home' %}" />
+<meta name="staticurl" content="{% static '' %}" />
+<meta name="userid" content="{{ request.user.id|default_if_none:'' }}" />
 
 <link rel="shortcut icon" href="{% static 'core/img/favicon.png' %}" type="image/png" />

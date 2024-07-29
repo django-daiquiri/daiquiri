@@ -1,0 +1,9 @@
+.file-control {
+    .dropzone {
+        border: var(--bs-border-width) dashed var(--bs-border-color);
+        border-radius: var(--bs-border-radius);
+        padding: 1rem 1rem;
+        cursor: copy;
+        font-size: 1rem;
+    }
+}
