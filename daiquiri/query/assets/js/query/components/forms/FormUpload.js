@@ -63,7 +63,7 @@ const FormUpload = ({ formKey, loadJob }) => {
 
         <div className="mt-2">
           <button type="button" className="btn btn-primary me-auto" onClick={() => handleUpload()}>
-            {gettext('Upload table')}
+            {form.submit || gettext('Upload')}
           </button>
         </div>
       </div>

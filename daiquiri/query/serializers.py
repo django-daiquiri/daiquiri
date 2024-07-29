@@ -26,8 +26,8 @@ class FormDetailSerializer(serializers.Serializer):
     key = serializers.CharField()
     label = serializers.CharField()
     template = serializers.SerializerMethodField(required=False)
-    fields = serializers.SerializerMethodField(required=False, method_name='get_adapter_fields')
-    submit = serializers.CharField(default=_('Submit'))
+    fields = serializers.SerializerMethodField(method_name='get_adapter_fields')
+    submit = serializers.CharField(default=None)
 
     def get_template(self, obj):
         try:
@@ -36,7 +36,8 @@ class FormDetailSerializer(serializers.Serializer):
             return None
 
     def get_adapter_fields(self, obj):
-        return get_query_form_adapter(obj).get_fields()
+        adapter = get_query_form_adapter(obj)
+        return adapter.get_fields() if adapter else None
 
 
 class DropdownSerializer(serializers.Serializer):

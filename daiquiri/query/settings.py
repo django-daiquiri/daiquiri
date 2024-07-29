@@ -44,17 +44,14 @@ QUERY_FORMS = [
     {
         'key': 'sql',
         'label': 'SQL query',
-        'service': 'query/js/forms/sql.js',
-        'template': 'query/query_form_sql.html'
+        'template': 'query/new/query_form_sql.html'
     },
     {
         'key': 'upload',
         'label': 'Upload VOTable',
-        'service': 'query/js/forms/upload.js',
-        'template': 'query/query_form_upload.html'
+        'template': 'query/new/query_form_upload.html'
     }
 ]
-
 QUERY_PLOTS = [
     {
         'key': 'scatter_plot',

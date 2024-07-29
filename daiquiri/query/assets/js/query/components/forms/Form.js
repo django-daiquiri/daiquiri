@@ -124,7 +124,7 @@ const Form = ({ formKey, loadJob }) => {
 
         <div className="d-flex mt-2">
           <button type="button" className="btn btn-primary me-auto" onClick={() => handleSubmit()}>
-            {form.submit}
+            {form.submit || gettext('Submit')}
           </button>
           <button type="button" className="btn btn-outline-secondary" onClick={() => handleClear()}>
             {gettext('Clear input window')}

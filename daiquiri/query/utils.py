@@ -354,7 +354,9 @@ def get_query_form(form_key):
 
 
 def get_query_form_adapter(form):
-    try:
-        return import_class(form['adapter'])()
-    except (AttributeError, KeyError):
-        raise RuntimeError('Query form adapter for query form "{key}"" not found.'.format(**form))
+    adapter_class = form.get('adapter')
+    if adapter_class:
+        try:
+            return import_class(form['adapter'])()
+        except AttributeError:
+            raise RuntimeError(f'Query form adapter "{adapter_class}"" could not be imported.')

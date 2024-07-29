@@ -199,7 +199,7 @@ const FormSql = ({ formKey, loadJob, query }) => {
 
         <div className="d-flex mt-2">
           <button type="button" className="btn btn-primary me-auto" onClick={() => handleSubmit()}>
-            {gettext('Submit new SQL Query')}
+            {form.submit || gettext('Submit new SQL query')}
           </button>
           <button type="button" className="btn btn-outline-secondary" onClick={() => handleClear()}>
             {gettext('Clear input window')}
