@@ -1,4 +1,5 @@
 graft daiquiri
+include requirements.txt
 prune testing
 prune docs
 
