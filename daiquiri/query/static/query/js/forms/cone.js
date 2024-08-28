@@ -15,7 +15,7 @@ app.factory('ConeFormService', ['QueryService', function(QueryService) {
 
     service.submit = function() {
         service.values.query = 'SELECT ra, de FROM daiquiri_data_obs.stars WHERE SQRT(POWER(ra - ' + service.values.ra + ', 2) + POWER(de - ' + service.values.de + ', 2)) <= ' + service.values.radius / 60.0 / 60.0;
-        service.values.query_language = 'adql-2.0';
+        service.values.query_language = 'adql-2.1';
 
         QueryService.submit_job(service.values)
             .then(function() {

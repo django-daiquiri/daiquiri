@@ -65,7 +65,7 @@ class CapabilitiesRendererMixin(object):
         for language in capability.get('languages', []):
             self.start('language')
             self.node('name', {}, language.get('name'))
-            self.node('version', {}, language.get('version'))
+            self.node('version', {'ivo-id': language.get('ivo-id', None)}, language.get('version'))
             self.node('description', {}, language.get('description'))
             self.end('language')
 
