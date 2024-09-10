@@ -360,3 +360,21 @@ def get_query_form_adapter(form):
             return import_class(form['adapter'])()
         except AttributeError:
             raise RuntimeError(f'Query form adapter "{adapter_class}"" could not be imported.')
+
+
+def get_query_language_choices():
+    return [
+        (query_language['key'], query_language['label']) for query_language in settings.QUERY_LANGUAGES
+    ]
+
+
+def get_queue_choices():
+    return [
+        (queue['key'], queue['label']) for queue in settings.QUERY_QUEUES
+    ]
+
+
+def get_query_download_format_choices():
+    return [
+        (download_format['key'], download_format['label']) for download_format in settings.QUERY_DOWNLOAD_FORMATS
+    ]
