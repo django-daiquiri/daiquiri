@@ -237,7 +237,7 @@ EMAIL_HOST_PASSWORD = env.get('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = env.get('EMAIL_PORT', '25')
 EMAIL_USE_TLS = env.get_bool('EMAIL_USE_TLS')
 
-SENDFILE_BACKEND = env.get('SENDFILE_BACKEND', 'sendfile.backends.simple')
+SENDFILE_BACKEND = env.get('SENDFILE_BACKEND', 'django_sendfile.backends.simple')
 
 MEMCACHE_KEY_PREFIX = env.get('MEMCACHE_KEY_PREFIX')
 if MEMCACHE_KEY_PREFIX:

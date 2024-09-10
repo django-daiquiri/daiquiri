@@ -23,6 +23,7 @@ from daiquiri.core.permissions import HasModelPermission
 from daiquiri.core.paginations import ListPagination
 from daiquiri.core.utils import (
     get_client_ip,
+    get_file_size,
     fix_for_json,
     filter_by_access_level,
     handle_file_upload,
@@ -37,6 +38,7 @@ from .serializers import (
     FormListSerializer,
     DropdownSerializer,
     DownloadSerializer,
+    QueryDownloadFormatSerializer,
     QueryJobSerializer,
     QueryJobListSerializer,
     QueryJobRetrieveSerializer,
@@ -301,7 +303,10 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
             )
             return sendfile(request, download_job.file_path, attachment=True)
         else:
-            return Response(download_job.phase)
+            return Response({
+                'phase': download_job.phase,
+                'size': get_file_size(download_job.file_path),
+            })
 
     @action(detail=True, methods=['post'], url_name='create-download',
             url_path=r'download/(?P<download_key>[a-z\-]+)')
@@ -408,6 +413,14 @@ class QueryLanguageViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
     def get_queryset(self):
         return filter_by_access_level(self.request.user, settings.QUERY_LANGUAGES)
+
+
+class QueryDownloadFormatViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    permission_classes = (HasPermission, )
+    serializer_class = QueryDownloadFormatSerializer
+
+    def get_queryset(self):
+        return settings.QUERY_DOWNLOAD_FORMATS
 
 
 class PhaseViewSet(ChoicesViewSet):

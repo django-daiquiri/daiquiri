@@ -220,6 +220,17 @@ class QueryLanguageSerializer(serializers.Serializer):
         return '%(key)s-%(version)s' % obj
 
 
+
+class QueryDownloadFormatSerializer(serializers.Serializer):
+
+    key = serializers.CharField()
+    extension = serializers.CharField()
+    content_type = serializers.CharField()
+    label = serializers.CharField()
+    help = serializers.CharField()
+
+
+
 class ExampleSerializer(serializers.ModelSerializer):
 
     class Meta:

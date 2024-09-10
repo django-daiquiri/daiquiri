@@ -1,5 +1,5 @@
 import BaseApi from 'daiquiri/core/assets/js/api/BaseApi'
-import { encodeParams } from 'daiquiri/core/assets/js/utils/api'
+import { downloadFile, encodeParams } from 'daiquiri/core/assets/js/utils/api'
 
 class QueryApi extends BaseApi {
 
@@ -25,6 +25,10 @@ class QueryApi extends BaseApi {
 
   static fetchQueryLanguages() {
     return this.get('/query/api/querylanguages/')
+  }
+
+  static fetchDownloadFormats() {
+    return this.get('/query/api/downloadformats/')
   }
 
   static fetchPhases() {
@@ -90,6 +94,20 @@ class QueryApi extends BaseApi {
 
   static archiveJob(id) {
     return this.delete(`/query/api/jobs/${id}/`)
+  }
+
+  static submitDownloadJob(id, downloadKey, downloadFormatKey) {
+    return this.post(`/query/api/jobs/${id}/download/${downloadKey}/`, { format_key: downloadFormatKey })
+  }
+
+  static fetchDownloadJob(id, downloadKey, downloadId) {
+    const url = `/query/api/jobs/${id}/download/${downloadKey}/${downloadId}/`
+    return this.get(`${url}?download=`).then((response) => {
+      if (response.phase === 'COMPLETED') {
+        downloadFile(url)
+      }
+      return response
+    })
   }
 
 }

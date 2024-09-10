@@ -393,5 +393,13 @@ def handle_file_upload(directory, file):
 
     return file_path
 
+
 def sanitize_str(strval):
     return re.sub(r'[^a-zA-Z0-9]', '_', strval.lower())
+
+
+def get_file_size(file_path):
+    try:
+        return os.stat(file_path).st_size
+    except FileNotFoundError:
+        return 0

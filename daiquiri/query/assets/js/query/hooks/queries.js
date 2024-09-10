@@ -40,6 +40,14 @@ export const useQueryLanguagesQuery = () => {
   })
 }
 
+export const useDownloadFormatsQuery = () => {
+  return useQuery({
+    queryKey: ['downloads'],
+    queryFn: () => QueryApi.fetchDownloadFormats(),
+    placeholderData: keepPreviousData
+  })
+}
+
 export const useQueuesQuery = () => {
   return useQuery({
     queryKey: ['queues'],
@@ -121,5 +129,17 @@ export const useVizierQuery = (url, search) => {
     queryFn: () => VizierApi.search(url, search),
     placeholderData: keepPreviousData,
     enabled: !isEmpty(search)
+  })
+}
+
+export const useDownloadJobQuery = (jobId, downloadKey, downloadJobId) => {
+  return useQuery({
+    queryKey: ['downloadJob', jobId, downloadKey, downloadJobId],
+    queryFn: () => QueryApi.fetchDownloadJob(jobId, downloadKey, downloadJobId),
+    placeholderData: keepPreviousData,
+    enabled: !isEmpty(downloadJobId),
+    refetchInterval: (query) => {
+      return (query.state.data && ['QUEUED', 'EXECUTING'].includes(query.state.data.phase)) ? refetchInterval : false
+    }
   })
 }

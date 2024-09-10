@@ -18,4 +18,14 @@ const encodeParams = params => {
   }).join('&')
 }
 
-export { encodeParams }
+const downloadFile = url => {
+  const iframe = document.createElement('iframe')
+  iframe.style.display = 'none'
+  iframe.src = url
+  iframe.onload = function() {
+    this.parentNode.removeChild(this)
+  }
+  document.body.appendChild(iframe)
+}
+
+export { downloadFile, encodeParams }
