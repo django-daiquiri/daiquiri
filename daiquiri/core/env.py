@@ -49,17 +49,21 @@ def get_database(key):
     if database_string:
         database_type = urlparse(database_string).scheme
 
-        # rewrite mariadb since it is not supported by dj_database_url
-        if database_type == 'mariadb':
-            database_string = database_string.replace('mariadb://', 'mysql://')
+        if database_type != 'dasksql':
+            # rewrite mariadb since it is not supported by dj_database_url
+            if database_type == 'mariadb':
+                database_string = database_string.replace('mariadb://', 'mysql://')
 
-        database_config = dj_database_url.parse(database_string)
+            database_config = dj_database_url.parse(database_string)
 
-        # patch bug in dj_database_url
-        if database_type in ['postgres', 'postgresql', 'pgsql']:
-            database_config['ENGINE'] = 'django.db.backends.postgresql'
+            # patch bug in dj_database_url
+            if database_type in ['postgres', 'postgresql', 'pgsql']:
+                database_config['ENGINE'] = 'django.db.backends.postgresql'
 
-        return database_config
+            return database_config
+
+        else:
+            return parse_dask_url(database_string)
 
     else:
         return {}
@@ -75,6 +79,8 @@ def get_database_adapter():
         return 'daiquiri.core.adapter.database.mysql.MySQLAdapter'
     elif database_type == 'mariadb':
         return 'daiquiri.core.adapter.database.mariadb.MariaDBAdapter'
+    elif database_type == 'dasksql':
+        return 'daiquiri.core.adapter.database.dasksql.DaskSQLAdapter'
     else:
         return None
 
@@ -89,3 +95,15 @@ def get_download_adapter():
         return 'daiquiri.core.adapter.download.mysqldump.MysqldumpAdapter'
     else:
         return None
+
+def parse_dask_url(url: str) -> dict:
+    parsed_url = urlparse(url)
+    db = {
+        "ENGINE": 'django.db.backends.postgresql',
+        "NAME": parsed_url.path,
+        "USER": None,
+        "PASSWORD": None,
+        "HOST": parsed_url.hostname,
+        "PORT": parsed_url.port,
+    }
+    return db
