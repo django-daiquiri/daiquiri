@@ -1,9 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { colors, symbols } from '../../constants/plot'
+import { colors, symbols } from '../../../constants/plot'
 
-const JobPlotScatterForm = ({ columns, values, setValues }) => {
+const ScatterForm = ({ columns, values, setValues }) => {
 
   const labels = {
     y1: <span>Y<sub>1</sub></span>,
@@ -85,10 +85,10 @@ const JobPlotScatterForm = ({ columns, values, setValues }) => {
   )
 }
 
-JobPlotScatterForm.propTypes = {
+ScatterForm.propTypes = {
   columns: PropTypes.array.isRequired,
   values: PropTypes.object.isRequired,
   setValues: PropTypes.func.isRequired
 }
 
-export default JobPlotScatterForm
+export default ScatterForm

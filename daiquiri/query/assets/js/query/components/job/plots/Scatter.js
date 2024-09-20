@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { isNil } from 'lodash'
 
-import { colors, symbols } from '../../constants/plot'
-import { useJobPlotQuery } from '../../hooks/queries'
+import { colors, symbols } from '../../../constants/plot'
+import { useJobPlotQuery } from '../../../hooks/queries'
 
-import JobPlotScatterForm from './JobPlotScatterForm'
-import JobPlotScatterPlot from './JobPlotScatterPlot'
+import ScatterForm from './ScatterForm'
+import ScatterPlot from './ScatterPlot'
 
-const JobPlotScatter = ({ jobId, columns }) => {
+const Scatter = ({ jobId, columns }) => {
 
   const [values, setValues] = useState({
     x: {
@@ -48,15 +48,15 @@ const JobPlotScatter = ({ jobId, columns }) => {
 
   return (
     <div>
-      <JobPlotScatterForm columns={columns} values={values} setValues={setValues} />
-      <JobPlotScatterPlot columns={columns} values={values} x={x} y1={y1} y2={y2} y3={y3} />
+      <ScatterForm columns={columns} values={values} setValues={setValues} />
+      <ScatterPlot columns={columns} values={values} x={x} y1={y1} y2={y2} y3={y3} />
     </div>
   )
 }
 
-JobPlotScatter.propTypes = {
+Scatter.propTypes = {
   jobId: PropTypes.string.isRequired,
   columns: PropTypes.array.isRequired
 }
 
-export default JobPlotScatter
+export default Scatter

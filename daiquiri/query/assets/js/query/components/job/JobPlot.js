@@ -4,8 +4,9 @@ import { isNil } from 'lodash'
 
 import { validTypes, excludedUcds } from '../../constants/plot'
 
-import JobPlotColorScatter from './JobPlotColorScatter'
-import JobPlotScatter from './JobPlotScatter'
+import ColorScatter from './plots/ColorScatter'
+import Scatter from './plots/Scatter'
+
 import JobPlotType from './JobPlotType'
 
 const JobPlot = ({ job }) => {
@@ -22,10 +23,10 @@ const JobPlot = ({ job }) => {
     <div>
       <JobPlotType type={type} setType={setType} />
       {
-        (type == 'scatter') && <JobPlotScatter jobId={job.id} columns={columns} />
+        (type == 'scatter') && <Scatter jobId={job.id} columns={columns} />
       }
       {
-        (type == 'colorScatter') && <JobPlotColorScatter jobId={job.id} columns={columns} />
+        (type == 'colorScatter') && <ColorScatter jobId={job.id} columns={columns} />
       }
     </div>
   )

@@ -1,9 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { cmaps } from '../../constants/plot'
+import { cmaps } from '../../../constants/plot'
 
-const JobPlotColorScatterForm = ({ columns, values, setValues }) => {
+const ColorScatterForm = ({ columns, values, setValues }) => {
   return (
     <div className="card mb-2">
       <div className="card-body">
@@ -78,10 +78,10 @@ const JobPlotColorScatterForm = ({ columns, values, setValues }) => {
   )
 }
 
-JobPlotColorScatterForm.propTypes = {
+ColorScatterForm.propTypes = {
   columns: PropTypes.array.isRequired,
   values: PropTypes.object.isRequired,
   setValues: PropTypes.func.isRequired
 }
 
-export default JobPlotColorScatterForm
+export default ColorScatterForm
