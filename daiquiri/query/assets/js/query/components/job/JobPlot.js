@@ -5,13 +5,14 @@ import { isNil } from 'lodash'
 import { validTypes, excludedUcds } from '../../constants/plot'
 
 import ColorScatter from './plots/ColorScatter'
+import Histogram from './plots/Histogram'
 import Scatter from './plots/Scatter'
 
 import JobPlotType from './JobPlotType'
 
 const JobPlot = ({ job }) => {
 
-  const [type, setType] = useState('colorScatter')
+  const [type, setType] = useState('histogram')
   const [columns, setColumns] = useState([])
 
   useEffect(() => setColumns(job.columns.filter((column) => (
@@ -27,6 +28,9 @@ const JobPlot = ({ job }) => {
       }
       {
         (type == 'colorScatter') && <ColorScatter jobId={job.id} columns={columns} />
+      }
+      {
+        (type == 'histogram') && <Histogram jobId={job.id} columns={columns} />
       }
     </div>
   )

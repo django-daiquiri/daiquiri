@@ -19,11 +19,11 @@ export const symbols = [
   {name: 'Star', symbol: 'star', materialSymbol: 'star', fontSize: 18},
 ]
 
-export const operations = {
-  '>': (x, y) => (x > y),
-  '<': (x, y) => (x < y),
-  '==': (x, y) => (x == y)
-}
+export const operations = [
+  {name: '>', operation: (x, y) => (x > y)},
+  {name: '<', operation: (x, y) => (x < y)},
+  {name: '==', operation: (x, y) => (x == y)}
+]
 
 export const validTypes = ['short', 'int', 'long', 'float', 'double', 'boolean']
 
