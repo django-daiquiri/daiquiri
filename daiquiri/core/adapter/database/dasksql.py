@@ -142,9 +142,10 @@ class DaskSQLAdapter(object):
                 schema_name = created_table.split(".")[0]
                 table_name = created_table.split(".")[1]
                 path_to_created_table = os.path.join(data_path, schema_name, f"{table_name}")
-                os.mkdir(path_to_created_table)
-                df = c.schema[schema_name].tables[table_name].df.compute()
-                df.to_parquet(os.path.join(path_to_created_table, f"{table_name}.parquet"), engine='pyarrow')
+                # os.mkdir(path_to_created_table)
+                df = dd.from_pandas(c.schema[schema_name].tables[table_name].df.compute(), chunksize=500000)
+                name_function = lambda x: f"part{x}.parquet"
+                df.to_parquet(os.path.join(path_to_created_table, ""), engine='pyarrow', name_function=name_function)
                 return df
 
             return result.compute()
@@ -164,23 +165,36 @@ class DaskSQLAdapter(object):
         nrows = result.result()
         return nrows
 
-    def fetch_rows(self, schema_name, table_name, column_names=None, ordering=None, page=None, page_size=None, search=None, filters=None):
+    def fetch_rows(self, schema_name, table_name,
+                   column_names=None,
+                   ordering=None,
+                   page=1,
+                   page_size=10,
+                   search=None,
+                   filters=None):
 
-        def _execute_dask_sql(schema_name, table_name, data_path):
+        def _execute_dask_sql(schema_name, table_name, data_path, query):
             import os
             from dask_sql import Context
             import dask.dataframe as dd
             c = Context()
-            query = f"select * from {schema_name}.{table_name};"
             path_to_table = os.path.join(data_path, schema_name, table_name)
             df = dd.read_parquet(path_to_table, engine='pyarrow')
             c.create_schema(schema_name)
             c.create_table(table_name, df, schema_name=schema_name)
             result = c.sql(query).compute()
-            return tuple(result.itertuples(index=False, name=None))
+            return result
 
-        result = self.client.submit(_execute_dask_sql, schema_name, table_name, self.data_path).result()
-        return result
+        if not column_names:
+            column_names = ["*",]
+
+        query = f"select {','.join(column_names)} from {schema_name}.{table_name}"
+        if page_size > 0:
+            offset = (int(page) - 1) * int(page_size)
+            query += f" LIMIT {page_size} OFFSET {offset}"
+        query += ";"
+        result = self.client.submit(_execute_dask_sql, schema_name, table_name, self.data_path, query).result()
+        return tuple(result.itertuples(index=False, name=None))
 
 
 
