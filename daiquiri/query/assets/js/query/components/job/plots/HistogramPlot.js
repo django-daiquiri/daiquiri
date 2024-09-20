@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import Plot from 'react-plotly.js'
 import { isNil } from 'lodash'
 
-import { operations } from '../../../constants/plot'
+import { config, layout, operations } from '../../../constants/plot'
 import { getColumnLabel } from '../../../utils/plot'
 
 const HistogramPlot = ({ columns, values, x, s }) => {
@@ -35,15 +35,7 @@ const HistogramPlot = ({ columns, values, x, s }) => {
             <Plot
               data={data}
               layout={{
-                autosize: true,
-                aspectratio: 1,
-                dragmode: 'pan',
-                margin: {
-                  l: 40,
-                  r: 40,
-                  b: 40,
-                  t: 40
-                },
+                ...layout,
                 bargap: 0.1,
                 xaxis: {
                   title: {
@@ -56,15 +48,9 @@ const HistogramPlot = ({ columns, values, x, s }) => {
                   }
                 }
               }}
-              style={{
-                width: '100%',
-              }}
+              style={{width: '100%'}}
               useResizeHandler={true}
-              config={{
-                displayModeBar: true,
-                displaylogo: false,
-                modeBarButtonsToRemove: ['select2d', 'lasso2d']
-              }}
+              config={config}
             />
           </div>
         </div>

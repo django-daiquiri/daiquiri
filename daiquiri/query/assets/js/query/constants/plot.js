@@ -1,4 +1,19 @@
-/* define the cmap (extracted from the matplotlib) */
+export const layout = {
+  autosize: true,
+  dragmode: 'pan',
+  margin: {
+    l: 40,
+    r: 40,
+    b: 40,
+    t: 40
+  }
+}
+
+export const config = {
+  displayModeBar: true,
+  displaylogo: false,
+  modeBarButtonsToRemove: ['select2d', 'lasso2d']
+}
 
 export const colors = [
   {name:'Red', hex:'#e41a1c'},

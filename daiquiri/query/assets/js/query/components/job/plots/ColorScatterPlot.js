@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import Plot from 'react-plotly.js'
 import { isNil } from 'lodash'
 
+import { config, layout } from '../../../constants/plot'
 import { getColumnLabel } from '../../../utils/plot'
 
 const ColorScatterPlot = ({ columns, values, x, y, z  }) => {
@@ -12,7 +13,7 @@ const ColorScatterPlot = ({ columns, values, x, y, z  }) => {
     return (
       <div className="card">
         <div className="card-body">
-          <div className="ratio ratio-1x1">
+          <div className="ratio ratio-2x3">
             <Plot
               data={[
                 {
@@ -34,15 +35,7 @@ const ColorScatterPlot = ({ columns, values, x, y, z  }) => {
                 }
               ]}
               layout={{
-                autosize: true,
-                aspectratio: 1,
-                dragmode: 'pan',
-                margin: {
-                  l: 40,
-                  r: 40,
-                  b: 40,
-                  t: 40
-                },
+                ...layout,
                 xaxis: {
                   title: {
                     text: getColumnLabel(columns, values.x.column),
@@ -54,15 +47,9 @@ const ColorScatterPlot = ({ columns, values, x, y, z  }) => {
                   }
                 }
               }}
-              style={{
-                width: '100%',
-              }}
+              style={{width: '100%'}}
               useResizeHandler={true}
-              config={{
-                displayModeBar: true,
-                displaylogo: false,
-                modeBarButtonsToRemove: ['select2d', 'lasso2d']
-              }}
+              config={config}
             />
           </div>
         </div>
