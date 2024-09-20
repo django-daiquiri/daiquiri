@@ -93,6 +93,8 @@ def get_download_adapter():
         return 'daiquiri.core.adapter.download.pgdump.PgDumpAdapter'
     elif database_type in ['mysql', 'mariadb']:
         return 'daiquiri.core.adapter.download.mysqldump.MysqldumpAdapter'
+    elif database_type == 'dasksql':
+        return 'daiquiri.core.adapter.download.dasksql.DaskDownloadAdapter'
     else:
         return None
 
@@ -107,3 +109,5 @@ def parse_dask_url(url: str) -> dict:
         "PORT": parsed_url.port,
     }
     return db
+
+
