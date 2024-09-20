@@ -13,23 +13,19 @@ const JobPlotScatter = ({ jobId, columns }) => {
   const [values, setValues] = useState({
     x: {
       column: '',
-      label: ''
     },
     y1: {
       column: '',
-      label: '',
       color: colors[0].hex,
       symbol: symbols[0].symbol
     },
     y2: {
       column: '',
-      label: '',
       color: colors[1].hex,
       symbol: symbols[1].symbol
     },
     y3: {
       column: '',
-      label: '',
       color: colors[2].hex,
       symbol: symbols[2].symbol
     }

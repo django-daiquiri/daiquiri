@@ -4,12 +4,13 @@ import { isNil } from 'lodash'
 
 import { validTypes, excludedUcds } from '../../constants/plot'
 
+import JobPlotColorScatter from './JobPlotColorScatter'
 import JobPlotScatter from './JobPlotScatter'
 import JobPlotType from './JobPlotType'
 
 const JobPlot = ({ job }) => {
 
-  const [type, setType] = useState('scatter')
+  const [type, setType] = useState('colorScatter')
   const [columns, setColumns] = useState([])
 
   useEffect(() => setColumns(job.columns.filter((column) => (
@@ -22,6 +23,9 @@ const JobPlot = ({ job }) => {
       <JobPlotType type={type} setType={setType} />
       {
         (type == 'scatter') && <JobPlotScatter jobId={job.id} columns={columns} />
+      }
+      {
+        (type == 'colorScatter') && <JobPlotColorScatter jobId={job.id} columns={columns} />
       }
     </div>
   )

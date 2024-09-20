@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 const types = [
   ['scatter', 'Scatter plot'],
-  ['scatter_color', 'Scatter plot (color coded)'],
+  ['colorScatter', 'Scatter plot (color coded)'],
   ['histogram', 'Histogram'],
 ]
 

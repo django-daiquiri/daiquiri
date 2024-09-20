@@ -5,42 +5,34 @@ import { isNil } from 'lodash'
 
 import { getColumnLabel } from '../../utils/plot'
 
-const JobPlotScatterPlot = ({ columns, values, x, y1, y2, y3  }) => {
-  if (isNil(x)) {
+const JobPlotColorScatterPlot = ({ columns, values, x, y, z  }) => {
+  if (isNil(x) || isNil(y) || isNil(z)) {
     return null
   } else {
-    const data = [[values.y1, y1], [values.y2, y2], [values.y3, y3]].reduce((data, [yValues, y]) => {
-      if (isNil(y)) {
-        return data
-      } else {
-        return [...data, {
-          x: x.results,
-          y: y.results,
-          type: 'scattergl',
-          mode: 'markers',
-          marker: {
-            color: yValues.color,
-            symbol: yValues.symbol
-          },
-          name: yValues.column
-        }]
-      }
-    }, [])
-
-    const yLabel = [[values.y1, y1], [values.y2, y2], [values.y3, y3]].reduce((label, [yValues, y]) => {
-      if (isNil(y)) {
-        return label
-      } else {
-        return [...label, getColumnLabel(columns, yValues.column)]
-      }
-    }, []).join(', ')
-
     return (
       <div className="card">
         <div className="card-body">
           <div className="ratio ratio-1x1">
             <Plot
-              data={data}
+              data={[
+                {
+                  x: x.results,
+                  y: y.results,
+                  type: 'scattergl',
+                  mode: 'markers',
+                  marker: {
+                    showscale: true,
+                    color: z.results,
+                    colorscale: values.z.cmap,
+                    colorbar: {
+                      title: {
+                        text: getColumnLabel(columns, values.z.column),
+                        side: 'right'
+                      }
+                    }
+                  },
+                }
+              ]}
               layout={{
                 autosize: true,
                 aspectratio: 1,
@@ -58,7 +50,7 @@ const JobPlotScatterPlot = ({ columns, values, x, y1, y2, y3  }) => {
                 },
                 yaxis: {
                   title: {
-                    text: yLabel,
+                    text: getColumnLabel(columns, values.y.column),
                   }
                 }
               }}
@@ -79,13 +71,12 @@ const JobPlotScatterPlot = ({ columns, values, x, y1, y2, y3  }) => {
   }
 }
 
-JobPlotScatterPlot.propTypes = {
+JobPlotColorScatterPlot.propTypes = {
   columns: PropTypes.array.isRequired,
   values: PropTypes.object.isRequired,
   x: PropTypes.object,
-  y1: PropTypes.object,
-  y2: PropTypes.object,
-  y3: PropTypes.object
+  y: PropTypes.object,
+  z: PropTypes.object
 }
 
-export default JobPlotScatterPlot
+export default JobPlotColorScatterPlot

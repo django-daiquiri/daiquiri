@@ -73,7 +73,7 @@ const JobPlotScatterForm = ({ columns, values, setValues }) => {
                   setValues({...values, [y]: {...values[y], symbol: value.target.value}})
                 }}>
                   {
-                    symbols.map(symbol => <option key={symbol.symbol} value={symbol.symbol}>{symbol.label}</option>)
+                    symbols.map(symbol => <option key={symbol.symbol} value={symbol.symbol}>{symbol.name}</option>)
                   }
                 </select>
               </div>
