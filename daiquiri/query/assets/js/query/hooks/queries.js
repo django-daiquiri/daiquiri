@@ -114,6 +114,19 @@ export const useJobRowsQuery = (jobId, params) => {
   })
 }
 
+export const useJobPlotQuery = (jobId, column) => {
+  return useQuery({
+    queryKey: ['jobPlot', jobId, column],
+    queryFn: () => QueryApi.fetchJobRows(jobId, {column: column, page_size: 10000}).then((response) => {
+      response.min = Math.min.apply(null, response.results)
+      response.max = Math.max.apply(null, response.results)
+      return response
+    }),
+    placeholderData: keepPreviousData,
+    enabled: !isEmpty(column)
+  })
+}
+
 export const useSimbadQuery = (url, search) => {
   return useQuery({
     queryKey: ['simbad', search],
