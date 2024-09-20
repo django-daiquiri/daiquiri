@@ -14,13 +14,15 @@ const JobResults = ({ job }) => {
   const { data: columns } = useJobColumnsQuery(job.id, params)
   const { data: rows } = useJobRowsQuery(job.id, params)
 
-  return (
+  return job.phase == 'COMPLETED' ? (
     <Table
       columns={columns}
       rows={rows}
       params={params}
       setParams={setParams}
     />
+  )  : (
+    <p className="text-danger">The query job did not complete successfully.</p>
   )
 }
 

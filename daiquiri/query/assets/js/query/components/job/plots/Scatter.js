@@ -8,7 +8,7 @@ import { useJobPlotQuery } from '../../../hooks/queries'
 import ScatterForm from './ScatterForm'
 import ScatterPlot from './ScatterPlot'
 
-const Scatter = ({ jobId, columns }) => {
+const Scatter = ({ job, columns }) => {
 
   const [values, setValues] = useState({
     x: {
@@ -41,10 +41,10 @@ const Scatter = ({ jobId, columns }) => {
     }
   }), [columns])
 
-  const { data: x } = useJobPlotQuery(jobId, values.x.column)
-  const { data: y1 } = useJobPlotQuery(jobId, values.y1.column)
-  const { data: y2 } = useJobPlotQuery(jobId, values.y2.column)
-  const { data: y3 } = useJobPlotQuery(jobId, values.y3.column)
+  const { data: x } = useJobPlotQuery(job, values.x.column)
+  const { data: y1 } = useJobPlotQuery(job, values.y1.column)
+  const { data: y2 } = useJobPlotQuery(job, values.y2.column)
+  const { data: y3 } = useJobPlotQuery(job, values.y3.column)
 
   return (
     <div>
@@ -55,7 +55,7 @@ const Scatter = ({ jobId, columns }) => {
 }
 
 Scatter.propTypes = {
-  jobId: PropTypes.string.isRequired,
+  job: PropTypes.object.isRequired,
   columns: PropTypes.array.isRequired
 }
 

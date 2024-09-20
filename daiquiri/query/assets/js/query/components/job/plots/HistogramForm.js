@@ -52,7 +52,7 @@ const HistogramForm = ({ columns, values, setValues }) => {
             <select className="form-select" id="scatter-plot-select" value={values.s.column} onChange={(event) => {
               setValues({...values, s: {...values.s, column: event.target.value}})
             }}>
-              <option>---</option>
+              <option value="">---</option>
               {
                 columns.map((column, columnIndex) => <option key={columnIndex} value={column.name}>{column.name}</option>)
               }
@@ -62,7 +62,6 @@ const HistogramForm = ({ columns, values, setValues }) => {
             <select className="form-select" value={values.s.operation} onChange={(event) => {
               setValues({...values, s: {...values.s, operation: event.target.value}})
             }}>
-              <option>---</option>
               {
                 operations.map((operation, operationIndex) => <option key={operationIndex} value={operation.name}>{operation.name}</option>)
               }

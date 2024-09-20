@@ -16,13 +16,13 @@ const ColorScatterPlot = ({ columns, values, x, y, z  }) => {
             <Plot
               data={[
                 {
-                  x: x.results,
-                  y: y.results,
+                  x: x,
+                  y: y,
                   type: 'scattergl',
                   mode: 'markers',
                   marker: {
                     showscale: true,
-                    color: z.results,
+                    color: z,
                     colorscale: values.z.cmap,
                     colorbar: {
                       title: {
@@ -74,9 +74,9 @@ const ColorScatterPlot = ({ columns, values, x, y, z  }) => {
 ColorScatterPlot.propTypes = {
   columns: PropTypes.array.isRequired,
   values: PropTypes.object.isRequired,
-  x: PropTypes.object,
-  y: PropTypes.object,
-  z: PropTypes.object
+  x: PropTypes.array,
+  y: PropTypes.array,
+  z: PropTypes.array
 }
 
 export default ColorScatterPlot

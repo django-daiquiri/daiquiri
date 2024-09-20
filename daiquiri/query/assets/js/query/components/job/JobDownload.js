@@ -53,7 +53,7 @@ const JobDownload = ({ job }) => {
     }
   }
 
-  return (
+  return job.phase == 'COMPLETED' ? (
     <div>
       <p>
         {gettext('For further processing of the data, you can download the results table' +
@@ -90,6 +90,8 @@ const JobDownload = ({ job }) => {
         )
       }
     </div>
+  ) : (
+    <p className="text-danger">The query job did not complete successfully.</p>
   )
 }
 

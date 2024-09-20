@@ -8,7 +8,7 @@ import { useJobPlotQuery } from '../../../hooks/queries'
 import HistogramForm from './HistogramForm'
 import HistogramPlot from './HistogramPlot'
 
-const Histogram = ({ jobId, columns }) => {
+const Histogram = ({ job, columns }) => {
 
   const [values, setValues] = useState({
     x: {
@@ -29,8 +29,8 @@ const Histogram = ({ jobId, columns }) => {
     }
   }), [columns])
 
-  const { data: x } = useJobPlotQuery(jobId, values.x.column)
-  const { data: s } = useJobPlotQuery(jobId, values.s.column)
+  const { data: x } = useJobPlotQuery(job, values.x.column)
+  const { data: s } = useJobPlotQuery(job, values.s.column)
 
   return (
     <div>
@@ -41,7 +41,7 @@ const Histogram = ({ jobId, columns }) => {
 }
 
 Histogram.propTypes = {
-  jobId: PropTypes.string.isRequired,
+  job: PropTypes.object.isRequired,
   columns: PropTypes.array.isRequired
 }
 

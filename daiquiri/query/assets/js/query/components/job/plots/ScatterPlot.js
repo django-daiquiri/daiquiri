@@ -14,8 +14,8 @@ const ScatterPlot = ({ columns, values, x, y1, y2, y3  }) => {
         return data
       } else {
         return [...data, {
-          x: x.results,
-          y: y.results,
+          x: x,
+          y: y,
           type: 'scattergl',
           mode: 'markers',
           marker: {
@@ -82,10 +82,10 @@ const ScatterPlot = ({ columns, values, x, y1, y2, y3  }) => {
 ScatterPlot.propTypes = {
   columns: PropTypes.array.isRequired,
   values: PropTypes.object.isRequired,
-  x: PropTypes.object,
-  y1: PropTypes.object,
-  y2: PropTypes.object,
-  y3: PropTypes.object
+  x: PropTypes.array,
+  y1: PropTypes.array,
+  y2: PropTypes.array,
+  y3: PropTypes.array
 }
 
 export default ScatterPlot

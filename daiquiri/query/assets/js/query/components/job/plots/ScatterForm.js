@@ -31,7 +31,7 @@ const ScatterForm = ({ columns, values, setValues }) => {
             <select className="form-select" id="scatter-plot-x-axis" value={values.x.column} onChange={(value) => {
               setValues({...values, x: {...values.x, column: value.target.value}})
             }}>
-              <option>---</option>
+              <option value="">---</option>
               {
                 columns.map((column, columnIndex) => <option key={columnIndex} value={column.name}>{column.name}</option>)
               }
@@ -50,7 +50,7 @@ const ScatterForm = ({ columns, values, setValues }) => {
                 <select className="form-select" id={`scatter-plot-${y}-axis`} value={values[y].column} onChange={(value) => {
                   setValues({...values, [y]: {...values[y], column: value.target.value}})
                 }}>
-                  <option>---</option>
+                  <option value="">---</option>
                   {
                     columns.map((column, columnIndex) => <option key={columnIndex} value={column.name}>{column.name}</option>)
                   }

@@ -12,7 +12,7 @@ import JobPlotType from './JobPlotType'
 
 const JobPlot = ({ job }) => {
 
-  const [type, setType] = useState('histogram')
+  const [type, setType] = useState('scatter')
   const [columns, setColumns] = useState([])
 
   useEffect(() => setColumns(job.columns.filter((column) => (
@@ -20,19 +20,21 @@ const JobPlot = ({ job }) => {
     !excludedUcds.some((ucd) => (!isNil(column.ucd) && column.ucd.split(';').includes(ucd)))
   ))), [job])
 
-  return (
+  return job.phase == 'COMPLETED' ? (
     <div>
       <JobPlotType type={type} setType={setType} />
       {
-        (type == 'scatter') && <Scatter jobId={job.id} columns={columns} />
+        (type == 'scatter') && <Scatter job={job} columns={columns} />
       }
       {
-        (type == 'colorScatter') && <ColorScatter jobId={job.id} columns={columns} />
+        (type == 'colorScatter') && <ColorScatter job={job} columns={columns} />
       }
       {
-        (type == 'histogram') && <Histogram jobId={job.id} columns={columns} />
+        (type == 'histogram') && <Histogram job={job} columns={columns} />
       }
     </div>
+  ) : (
+    <p className="text-danger">The query job did not complete successfully.</p>
   )
 }
 

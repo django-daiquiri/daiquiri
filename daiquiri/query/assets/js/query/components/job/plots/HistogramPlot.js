@@ -12,7 +12,7 @@ const HistogramPlot = ({ columns, values, x, s }) => {
   } else {
     const data = [
       {
-        x: x.results,
+        x: x,
         type: 'histogram',
         nbinsx: values.bins
       }
@@ -22,7 +22,7 @@ const HistogramPlot = ({ columns, values, x, s }) => {
       const operation = operations.find(operation => operation.name == values.s.operation) || operations[0]
 
       data.push({
-        x: x.results.filter((value, index) => operation.operation(s.results[index], values.s.value)),
+        x: x.filter((value, index) => operation.operation(s[index], values.s.value)),
         type: 'histogram',
         nbinsx: values.bins
       })
@@ -76,8 +76,8 @@ const HistogramPlot = ({ columns, values, x, s }) => {
 HistogramPlot.propTypes = {
   columns: PropTypes.array.isRequired,
   values: PropTypes.object.isRequired,
-  x: PropTypes.object,
-  s: PropTypes.object,
+  x: PropTypes.array,
+  s: PropTypes.array,
 }
 
 export default HistogramPlot

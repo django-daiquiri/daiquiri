@@ -8,7 +8,7 @@ import { useJobPlotQuery } from '../../../hooks/queries'
 import ColorScatterForm from './ColorScatterForm'
 import ColorScatterPlot from './ColorScatterPlot'
 
-const ColorScatter = ({ jobId, columns }) => {
+const ColorScatter = ({ job, columns }) => {
 
   const [values, setValues] = useState({
     x: {
@@ -36,9 +36,9 @@ const ColorScatter = ({ jobId, columns }) => {
     }
   }), [columns])
 
-  const { data: x } = useJobPlotQuery(jobId, values.x.column)
-  const { data: y } = useJobPlotQuery(jobId, values.y.column)
-  const { data: z } = useJobPlotQuery(jobId, values.z.column)
+  const { data: x } = useJobPlotQuery(job, values.x.column)
+  const { data: y } = useJobPlotQuery(job, values.y.column)
+  const { data: z } = useJobPlotQuery(job, values.z.column)
 
   return (
     <div>
@@ -49,7 +49,7 @@ const ColorScatter = ({ jobId, columns }) => {
 }
 
 ColorScatter.propTypes = {
-  jobId: PropTypes.string.isRequired,
+  job: PropTypes.object.isRequired,
   columns: PropTypes.array.isRequired
 }
 
