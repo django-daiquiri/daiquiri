@@ -10,7 +10,7 @@ const types = [
 
 const JobPlotType = ({ type, setType }) => {
   return (
-    <div className="card mb-3">
+    <div className="card mb-2">
       <div className="card-body">
         {
           types.map(([value, label]) => (
