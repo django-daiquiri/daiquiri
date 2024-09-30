@@ -1,3 +1,5 @@
+$handle-width: 0.5rem;
+
 .dq-table {
     .dq-table-header {
         gap: 1rem;
@@ -21,7 +23,6 @@
 
             th,
             td {
-                width: 300px;
                 padding: 0;
                 border-right: 1px solid var(--bs-border-color);
 
@@ -37,7 +38,7 @@
             }
             td {
                 .dq-table-cell {
-                    padding: 0.5rem;
+                    padding: $handle-width 0.5rem;
                     white-space: nowrap;
                     overflow: hidden;
                 }
@@ -48,18 +49,18 @@
                     display: flex;
                     align-items: center;
 
-                    padding: 0.5rem;
-                    padding-right: 0;
+                    padding: 0;
 
                     user-select: none;
 
                     .name {
+                        padding-top: 0.5rem;
+                        padding-bottom: 0.5rem;
                         user-select: text;
                         overflow: hidden;
                         flex-grow: 1;
                     }
                     .info {
-
                         font-size: 1.2rem;
                         cursor: help;
                     }
@@ -67,16 +68,20 @@
                         cursor: pointer;
                     }
                     .handle {
-                        width: 0.5rem;
-                        height: 2rem;
+                        width: $handle-width;
+                        padding-top: 0.5rem;
+                        padding-bottom: 0.5rem;
 
                         &:hover {
                             cursor: move;
                         }
                     }
                 }
+                &:first-child .dq-table-cell {
+                    padding-left: $handle-width;
+                }
                 &:last-child .dq-table-cell {
-                    padding-right: 0.5rem;  // matches .handle
+                    padding-right: $handle-width;
                 }
             }
         }
