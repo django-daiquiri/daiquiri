@@ -2,15 +2,12 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import QueryApi from '../api/QueryApi'
 
 export const useSubmitJobMutation = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (variables) => {
       return QueryApi.submitJob(variables.values, variables.formKey)
     },
     onSuccess: (data, variables) => {
       variables.loadJob(data.id)
-      queryClient.invalidateQueries({ queryKey: ['jobs'] })
     },
     onError: (error, variables) => {
       variables.setErrors(error.errors)
@@ -19,15 +16,12 @@ export const useSubmitJobMutation = () => {
 }
 
 export const useUploadJobMutation = () => {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (variables) => {
       return QueryApi.uploadJob(variables.values)
     },
     onSuccess: (data, variables) => {
       variables.loadJob(data.id)
-      queryClient.invalidateQueries({ queryKey: ['jobs'] })
     },
     onError: (error, variables) => {
       variables.setErrors(error.errors)

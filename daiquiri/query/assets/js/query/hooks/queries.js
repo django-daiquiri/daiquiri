@@ -1,4 +1,4 @@
-import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query'
 import { isEmpty } from 'lodash'
 
 import QueryApi from '../api/QueryApi'
@@ -64,10 +64,24 @@ export const useDropdownsQuery = () => {
   })
 }
 
-export const useJobsQuery = () => {
+export const useJobsQuery = (jobId) => {
+  const queryClient = useQueryClient()
+
   return useQuery({
     queryKey: ['jobs'],
-    queryFn: () => QueryApi.fetchJobs({page_size: 1000, archived: ''}).then((response) => response.results),
+    queryFn: () => QueryApi.fetchJobs({page_size: 1000, archived: ''}).then((response) => {
+      const jobs = response.results
+
+      // get the current job from the query cache (from the useJobQuery hook)
+      const currentJob = queryClient.getQueryData(['job', jobId])
+      jobs.filter(job => job.id == jobId).forEach(job => {
+        if (currentJob.phase !== job.phase) {
+          queryClient.invalidateQueries({ queryKey: ['job', jobId] })
+        }
+      })
+
+      return jobs
+    }),
     refetchInterval: refetchInterval,
     placeholderData: keepPreviousData
   })
@@ -91,26 +105,34 @@ export const useUserExamplesQuery = () => {
 }
 
 export const useJobQuery = (jobId) => {
+  const queryClient = useQueryClient()
+
   return useQuery({
     queryKey: ['job', jobId],
-    queryFn: () => QueryApi.fetchJob(jobId),
+    queryFn: () => QueryApi.fetchJob(jobId).then(response => {
+      // reload the jobs list
+      queryClient.invalidateQueries({ queryKey: ['jobs'] })
+      return response
+    }),
     placeholderData: keepPreviousData
   })
 }
 
-export const useJobColumnsQuery = (jobId, params) => {
+export const useJobColumnsQuery = (job, params) => {
   return useQuery({
-    queryKey: ['jobColumns', jobId, params],
-    queryFn: () => QueryApi.fetchJobColumns(jobId, params),
-    placeholderData: keepPreviousData
+    queryKey: ['jobColumns', job.id, params],
+    queryFn: () => QueryApi.fetchJobColumns(job.id, params),
+    placeholderData: keepPreviousData,
+    enabled: job.phase == 'COMPLETED'
   })
 }
 
-export const useJobRowsQuery = (jobId, params) => {
+export const useJobRowsQuery = (job, params) => {
   return useQuery({
-    queryKey: ['jobRows', jobId, params],
-    queryFn: () => QueryApi.fetchJobRows(jobId, params),
-    placeholderData: keepPreviousData
+    queryKey: ['jobRows', job.id, params],
+    queryFn: () => QueryApi.fetchJobRows(job.id, params),
+    placeholderData: keepPreviousData,
+    enabled: job.phase == 'COMPLETED'
   })
 }
 
@@ -125,7 +147,8 @@ export const useJobPlotQuery = (job, column) => {
         return null
       }
     },
-    placeholderData: keepPreviousData
+    placeholderData: keepPreviousData,
+    enabled: job.phase == 'COMPLETED'
   })
 }
 
@@ -147,12 +170,12 @@ export const useVizierQuery = (url, search) => {
   })
 }
 
-export const useDownloadJobQuery = (jobId, downloadKey, downloadJobId) => {
+export const useDownloadJobQuery = (job, downloadKey, downloadJobId) => {
   return useQuery({
-    queryKey: ['downloadJob', jobId, downloadKey, downloadJobId],
-    queryFn: () => QueryApi.fetchDownloadJob(jobId, downloadKey, downloadJobId),
+    queryKey: ['downloadJob', job.id, downloadKey, downloadJobId],
+    queryFn: () => QueryApi.fetchDownloadJob(job.id, downloadKey, downloadJobId),
     placeholderData: keepPreviousData,
-    enabled: !isEmpty(downloadJobId),
+    enabled: job.phase == 'COMPLETED' && !isEmpty(downloadJobId),
     refetchInterval: (query) => {
       return (query.state.data && ['QUEUED', 'EXECUTING'].includes(query.state.data.phase)) ? refetchInterval : false
     }

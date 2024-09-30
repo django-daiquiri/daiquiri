@@ -7,6 +7,8 @@ import { sql } from '@codemirror/lang-sql'
 
 import { useToggle } from 'daiquiri/core/assets/js/hooks'
 
+import { jobPhaseBadge } from '../../constants/job'
+
 import JobRenameModal from './JobRenameModal'
 import JobAbortModal from './JobAbortModal'
 import JobArchiveModal from './JobArchiveModal'
@@ -16,19 +18,6 @@ const JobOverview = ({ job, loadForm }) => {
   const [showRenameModal, toggleRenameModal] = useToggle()
   const [showAbortModal, toggleAbortModal] = useToggle()
   const [showArchiveModal, toggleArchiveModal] = useToggle()
-
-  const jobPhaseClass = {
-    'PENDING': 'badge text-bg-primary',
-    'QUEUED': 'badge text-bg-info',
-    'EXECUTING': 'badge text-bg-secondary',
-    'COMPLETED': 'badge text-bg-success',
-    'ERROR': 'badge text-bg-danger',
-    'ABORTED': 'badge text-bg-secondary',
-    'UNKNOWN': 'badge text-bg-secondary',
-    'HELD': 'badge text-bg-secondary',
-    'SUSPENDED': 'badge text-bg-secondary',
-    'ARCHIVED': 'badge text-bg-secondary'
-  }
 
   const renderQuery = (query) => (
     <ReactCodeMirror
@@ -78,7 +67,7 @@ const JobOverview = ({ job, loadForm }) => {
           <dl className="row mb-0">
             <dt className="col-sm-4 text-end">{gettext('Job status')}</dt>
             <dd className="col-sm-8 mb-0">
-              <span className={jobPhaseClass[job.phase]}>{job.phase}</span>
+              <span className={jobPhaseBadge[job.phase]}>{job.phase}</span>
             </dd>
 
             {

@@ -28,23 +28,24 @@ const TableHead = ({ columns, params, setParams }) => {
                 </div>
                 {
                   tooltips && (
-                    <div className="info">
-                      <span className="material-symbols-rounded align-middle text-body-tertiary">help</span>
+                    <div className="info material-symbols-rounded text-body-tertiary">
+                      question_mark
                     </div>
                   )
                 }
-                <div className="order" onClick={() => handleOrdering(column)}>
-                  <span className={classNames('material-symbols-rounded align-middle', {
+                <div
+                  className={classNames('order material-symbols-rounded', {
                     'text-body-tertiary': ![column.name, '-' + column.name].includes(ordering)
-                  })}>
-                    {
-                      ordering == '-' + column.name ? (
-                        'expand_less'
-                      ) : (
-                        'expand_more'
-                      )
-                    }
-                  </span>
+                  })}
+                  onClick={() => handleOrdering(column)}
+                >
+                  {
+                    ordering == '-' + column.name ? (
+                      'expand_less'
+                    ) : (
+                      'expand_more'
+                    )
+                  }
                 </div>
                 {
                   columnIndex < columns.length -1 && (

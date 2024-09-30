@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 
 import { bytes2human } from 'daiquiri/core/assets/js/utils/bytes'
 
+import { jobPhaseClass, jobPhaseMessage } from '../../constants/job'
 import { useDownloadFormatsQuery, useDownloadJobQuery } from '../../hooks/queries'
 import { useSubmitDownloadJobMutation } from '../../hooks/mutations'
 
@@ -11,7 +12,7 @@ const JobDownload = ({ job }) => {
   const downloadJobId = mutation.data && mutation.data.id
 
   const { data: downloadFormats } = useDownloadFormatsQuery()
-  const { data: downloadJob} = useDownloadJobQuery(job.id, 'table', downloadJobId)
+  const { data: downloadJob} = useDownloadJobQuery(job, 'table', downloadJobId)
 
   const handleSubmit = (downloadFormat) => {
     mutation.mutate({ job, downloadKey: 'table', downloadFormatKey: downloadFormat.key })
@@ -91,7 +92,7 @@ const JobDownload = ({ job }) => {
       }
     </div>
   ) : (
-    <p className="text-danger">The query job did not complete successfully.</p>
+    <p className={jobPhaseClass[job.phase]}>{jobPhaseMessage[job.phase]}</p>
   )
 }
 

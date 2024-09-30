@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 
 import Table from 'daiquiri/core/assets/js/components/Table'
 
+import { jobPhaseClass, jobPhaseMessage } from '../../constants/job'
 import { useJobColumnsQuery, useJobRowsQuery } from '../../hooks/queries'
 
 const JobResults = ({ job }) => {
@@ -11,8 +12,8 @@ const JobResults = ({ job }) => {
     page_size: 10
   })
 
-  const { data: columns } = useJobColumnsQuery(job.id, params)
-  const { data: rows } = useJobRowsQuery(job.id, params)
+  const { data: columns } = useJobColumnsQuery(job, params)
+  const { data: rows } = useJobRowsQuery(job, params)
 
   return job.phase == 'COMPLETED' ? (
     <Table
@@ -22,7 +23,7 @@ const JobResults = ({ job }) => {
       setParams={setParams}
     />
   )  : (
-    <p className="text-danger">The query job did not complete successfully.</p>
+    <p className={jobPhaseClass[job.phase]}>{jobPhaseMessage[job.phase]}</p>
   )
 }
 

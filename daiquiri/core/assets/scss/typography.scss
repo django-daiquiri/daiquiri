@@ -21,15 +21,6 @@ a,
     font-weight: var(--bs-body-weight-size);
 }
 
-.btn-symbol {
-    [class^="material-symbols"] {
-        vertical-align: middle;
-        line-height: 0 !important;
-        position: relative;
-        top: -2px;
-    }
-}
-
 .btn-outline-form {
     --bs-btn-border-color: var(--bs-border-color);
     --bs-btn-hover-bg: var(--bs-secondary-bg);

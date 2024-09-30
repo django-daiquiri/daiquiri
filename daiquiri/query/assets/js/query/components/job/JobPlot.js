@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { isNil } from 'lodash'
 
+import { jobPhaseClass, jobPhaseMessage } from '../../constants/job'
 import { validTypes, excludedUcds } from '../../constants/plot'
 
 import ColorScatter from './plots/ColorScatter'
@@ -34,7 +35,7 @@ const JobPlot = ({ job }) => {
       }
     </div>
   ) : (
-    <p className="text-danger">The query job did not complete successfully.</p>
+    <p className={jobPhaseClass[job.phase]}>{jobPhaseMessage[job.phase]}</p>
   )
 }
 

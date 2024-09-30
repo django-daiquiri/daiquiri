@@ -6,13 +6,14 @@ import { isEmpty, isNil } from 'lodash'
 import { baseUrl, userId } from 'daiquiri/core/assets/js/utils/meta'
 import { useLsState } from 'daiquiri/core/assets/js/hooks/ls'
 
+import { jobPhaseSymbol, jobPhaseSymbolSpin } from '../constants/job'
 import { useJobsQuery } from '../hooks/queries'
 import { basePath } from '../utils/location'
 
 import Loading from './Loading'
 
 const Jobs = ({ jobId, loadJob }) => {
-  const { data: jobs } = useJobsQuery()
+  const { data: jobs } = useJobsQuery(jobId, loadJob)
 
   const [openRunIds, setOpenRunIds] = useLsState('query.openRunIds', [''])
 
@@ -48,19 +49,6 @@ const Jobs = ({ jobId, loadJob }) => {
       return (a < b) ? -1 : 1
     }
   })
-
-  const jobPhaseSymbols = {
-    'PENDING': 'pause_circle',
-    'QUEUED': 'progress_activity',
-    'EXECUTING': 'play_circle',
-    'COMPLETED': 'check_circle',
-    'ERROR': 'warning',
-    'ABORTED': 'cancel',
-    'UNKNOWN': 'help',
-    'HELD': 'stop_circle',
-    'SUSPENDED': 'pause_circle',
-    'ARCHIVED': 'block'
-  }
 
   return (
     <div className="query-jobs card card-nav mb-3">
@@ -105,8 +93,10 @@ const Jobs = ({ jobId, loadJob }) => {
                           })}>
                             <a href={`${basePath}/${job.id}/`} onClick={(event) => handleLoadJob(event, job)}>
                               <span className="float-end">
-                                <span className="material-symbols-rounded">
-                                  {jobPhaseSymbols[job.phase]}
+                                <span className={classNames('material-symbols-rounded', {
+                                  'symbols-spin': jobPhaseSymbolSpin.includes(job.phase)
+                                })}>
+                                  {jobPhaseSymbol[job.phase]}
                                 </span>
                               </span>
                               <span>{job.table_name}</span>

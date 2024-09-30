@@ -35,54 +35,48 @@
                     background-color: var(--dq-table-active-bg);
                 }
             }
-            th.dq-table-check {
-                width: 32px;
-
-                @include media-breakpoint-up(md) {
-                    width: 40px;
+            td {
+                .dq-table-cell {
+                    padding: 0.5rem;
+                    white-space: nowrap;
+                    overflow: hidden;
                 }
-            }
-            .dq-table-cell,
-            .dq-table-check {
-                white-space: nowrap;
-                padding: 8px;
-                position: relative;
-                overflow: hidden;
-            }
-            .dq-table-check {
-                white-space: nowrap;
-                padding: 9px 4px 7px 6px;
-                text-align: center;
             }
 
             th {
                 .dq-table-cell {
                     display: flex;
+                    align-items: center;
+
+                    padding: 0.5rem;
                     padding-right: 0;
 
+                    user-select: none;
+
                     .name {
+                        user-select: text;
                         overflow: hidden;
                         flex-grow: 1;
                     }
                     .info {
-                        .material-symbols-rounded {
-                            font-size: 20px !important;
-                        }
+
+                        font-size: 1.2rem;
+                        cursor: help;
                     }
                     .order {
                         cursor: pointer;
-
-                        .material-symbols-rounded {
-                            line-height: 20px !important;
-                        }
                     }
                     .handle {
-                        width: 10px;
+                        width: 0.5rem;
+                        height: 2rem;
 
                         &:hover {
                             cursor: move;
                         }
                     }
+                }
+                &:last-child .dq-table-cell {
+                    padding-right: 0.5rem;  // matches .handle
                 }
             }
         }
