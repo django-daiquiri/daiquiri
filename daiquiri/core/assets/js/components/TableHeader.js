@@ -2,6 +2,8 @@ import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 
+import { useDebouncedCallback } from 'use-debounce'
+
 const TableHeader = ({ pageCount, params, setParams }) => {
 
   const [searchInput, setSearchInput] = useState('')
@@ -9,10 +11,7 @@ const TableHeader = ({ pageCount, params, setParams }) => {
   const isFirstPage = params.page == 1
   const isLastPage = params.page == pageCount
 
-  const handleSearch = (event) => {
-    event.preventDefault()
-    setParams({...params, search: searchInput})
-  }
+  const handleSearch = useDebouncedCallback(() => setParams({...params, search: searchInput}), 500)
 
   const handleFirst = () => setParams({...params, page: 1})
   const handlePrevious = () => setParams({...params, page: params.page - 1})
@@ -32,22 +31,19 @@ const TableHeader = ({ pageCount, params, setParams }) => {
     </li>
   )
 
+
   return (
     <div className="dq-table-header d-md-flex">
-      <form className="flex-grow-1 mb-3" onSubmit={handleSearch}>
-        <div className="input-group">
-          <input
-            type="text"
-            className="form-control"
-            placeholder="Search"
-            value={searchInput}
-            onChange={(event) => setSearchInput(event.target.value)}
-          />
-          <button className="btn btn-outline-secondary" type="button" onClick={handleSearch}>
-            <span className="material-symbols-rounded">search</span>
-          </button>
-        </div>
-      </form>
+      <input
+        type="text"
+        className="form-control flex-grow-1 mb-3"
+        placeholder={gettext('Filter')}
+        value={searchInput}
+        onChange={(event) => {
+          setSearchInput(event.target.value)
+          handleSearch()
+        }}
+      />
 
       <ul className="pagination">
         <PageItem label={gettext('First')} onClick={handleFirst} disabled={isFirstPage} />
