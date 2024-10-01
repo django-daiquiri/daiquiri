@@ -1,11 +1,18 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { isEmpty } from 'lodash'
 
 const TableBody = ({ columns, rows }) => {
   return (
     <tbody>
       {
-        rows.results && rows.results.map((row, rowIndex) => (
+        isEmpty(rows.results) ? (
+          <td>
+            <div className="dq-table-cell">
+              {gettext('No rows were retrieved.')}
+            </div>
+          </td>
+        ) : rows.results.map((row, rowIndex) => (
           <tr key={rowIndex}>
             {
               columns.map((column, columnIndex) => (
