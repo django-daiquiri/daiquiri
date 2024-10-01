@@ -2,6 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { isEmpty } from 'lodash'
 
+import TableCell from './TableCell'
+
 const TableBody = ({ columns, rows }) => {
   return (
     <tbody>
@@ -17,9 +19,7 @@ const TableBody = ({ columns, rows }) => {
             {
               columns.map((column, columnIndex) => (
                 <td key={columnIndex}>
-                  <div className="dq-table-cell">
-                    {row[columnIndex]}
-                  </div>
+                  <TableCell column={column} value={row[columnIndex]} />
                 </td>
               ))
             }

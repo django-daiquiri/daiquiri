@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 import TableHandle from './TableHandle'
-import Popover from './Popover'
+import Popover from '../Popover'
 
 const TableHead = ({ columns, params, setParams }) => {
   const tooltips = true
