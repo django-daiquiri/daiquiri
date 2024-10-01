@@ -1,0 +1,13 @@
+.popover {
+    --bs-popover-header-bg: white;
+
+    .popover-body {
+        p {
+            margin-bottom: 0.5rem;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+    }
+}

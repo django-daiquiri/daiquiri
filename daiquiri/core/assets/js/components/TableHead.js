@@ -1,8 +1,10 @@
 import React, { useState } from 'react'
+import { renderToString } from 'react-dom/server'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 import TableHandle from './TableHandle'
+import Popover from './Popover'
 
 const TableHead = ({ columns, params, setParams }) => {
   const tooltips = true
@@ -13,6 +15,29 @@ const TableHead = ({ columns, params, setParams }) => {
   const handleOrdering = (column) => {
     setParams({...params, ordering: (ordering == column.name) ? '-' + column.name : column.name})
   }
+
+  const getPopoverTitle = (column) => renderToString(
+    <b>{column.name}</b>
+  )
+
+  const getPopoverContent = (column) => renderToString(
+    <div>
+      {column.description && getPopoverParagraph(gettext('Description'), column.description)}
+      {column.unit && getPopoverParagraph(gettext('Unit'), column.unit)}
+      {column.ucd && getPopoverParagraph(gettext('UCD'), column.ucd)}
+      {column.datatype && getPopoverParagraph(gettext('Data type'), column.datatype)}
+      {column.arraysize && getPopoverParagraph(gettext('Array size'), column.arraysize)}
+      {column.principal && getPopoverParagraph(null, gettext('This column is considered a core part of the service.'))}
+      {column.indexed && getPopoverParagraph(null, gettext('This column is indexed.'))}
+      {column.std && getPopoverParagraph(null, gettext('This column is defined by a standard.'))}
+    </div>
+  )
+
+  const getPopoverParagraph = (label, text) => (
+    <p>
+      {label && <strong>{label}</strong>} {text}
+    </p>
+  )
 
   return (
     <thead>
@@ -37,9 +62,11 @@ const TableHead = ({ columns, params, setParams }) => {
                 </div>
                 {
                   tooltips && (
-                    <div className="info material-symbols-rounded text-body-tertiary">
-                      question_mark
-                    </div>
+                    <Popover title={getPopoverTitle(column)} content={getPopoverContent(column)}>
+                      <div className="info material-symbols-rounded text-body-tertiary">
+                        question_mark
+                      </div>
+                    </Popover>
                   )
                 }
                 <div
