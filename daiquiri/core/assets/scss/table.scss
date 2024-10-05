@@ -31,11 +31,6 @@ $handle-width: 0.5rem;
                     border-right: none;
                 }
             }
-            tr {
-                &.selected {
-                    background-color: var(--dq-table-active-bg);
-                }
-            }
             td {
                 .dq-table-cell {
                     padding: $handle-width 0.5rem;
@@ -82,6 +77,33 @@ $handle-width: 0.5rem;
                 }
                 &:last-child .dq-table-cell {
                     padding-right: $handle-width;
+                }
+            }
+        }
+    }
+
+    .dq-table-modal {
+        .modal-body {
+            min-height: 6rem;
+        }
+
+        .dq-table-modal-navigation {
+            width: 4rem;
+            height: 4rem;
+
+            background-color: var(--bs-secondary-bg);
+            border-radius: 50%;
+
+            button {
+                opacity: 0.5;
+
+                [class^="material-symbols"] {
+                    font-size: 1.6rem;
+                    font-weight: bold;
+                }
+
+                &:hover {
+                    opacity: 1;
                 }
             }
         }

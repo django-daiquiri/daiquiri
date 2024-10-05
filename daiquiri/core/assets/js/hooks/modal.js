@@ -1,5 +1,6 @@
 import { useRef } from 'react'
 import { Modal } from 'bootstrap'
+import { isNil } from 'lodash'
 
 export const useModal = () => {
   const ref = useRef()
@@ -11,7 +12,9 @@ export const useModal = () => {
 
   const hideModal = () => {
     const modal = Modal.getInstance(ref.current)
-    modal.hide()
+    if (!isNil(modal)) {
+      modal.hide()
+    }
   }
 
   return [ref, showModal, hideModal]

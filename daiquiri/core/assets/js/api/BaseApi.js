@@ -15,7 +15,7 @@ function ValidationError(errors) {
   this.errors = errors
 }
 
-class BaseApi {
+export default class BaseApi {
 
   static get(url) {
     return fetch(baseUrl + url).catch(error => {
@@ -23,6 +23,18 @@ class BaseApi {
     }).then(response => {
       if (response.ok) {
         return response.json()
+      } else {
+        throw new ApiError(response.statusText, response.status)
+      }
+    })
+  }
+
+  static getText(url) {
+    return fetch(baseUrl + url).catch(error => {
+      throw new ApiError(error.message)
+    }).then(response => {
+      if (response.ok) {
+        return response.text()
       } else {
         throw new ApiError(response.statusText, response.status)
       }
@@ -120,5 +132,3 @@ class BaseApi {
   }
 
 }
-
-export default BaseApi

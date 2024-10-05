@@ -4,7 +4,7 @@ import { isEmpty } from 'lodash'
 
 import TableCell from './TableCell'
 
-const TableBody = ({ columns, rows }) => {
+const TableBody = ({ columns, rows, active, onClick }) => {
   return (
     <tbody>
       {
@@ -15,11 +15,17 @@ const TableBody = ({ columns, rows }) => {
             </div>
           </td>
         ) : rows.results.map((row, rowIndex) => (
-          <tr key={rowIndex}>
+          <tr key={rowIndex} className={active.rowIndex == rowIndex ? 'table-active' : ''}>
             {
               columns.map((column, columnIndex) => (
                 <td key={columnIndex}>
-                  <TableCell column={column} value={row[columnIndex]} />
+                  <TableCell
+                    column={column}
+                    value={row[columnIndex]}
+                    rowIndex={rowIndex}
+                    columnIndex={columnIndex}
+                    onClick={onClick}
+                  />
                 </td>
               ))
             }
@@ -32,7 +38,9 @@ const TableBody = ({ columns, rows }) => {
 
 TableBody.propTypes = {
   columns: PropTypes.array.isRequired,
-  rows: PropTypes.object.isRequired
+  rows: PropTypes.object.isRequired,
+  active: PropTypes.object.isRequired,
+  onClick: PropTypes.func.isRequired
 }
 
 export default TableBody
