@@ -27,6 +27,10 @@ class QueryApi extends BaseApi {
     return this.get('/query/api/querylanguages/')
   }
 
+  static fetchDownloads() {
+    return this.get('/query/api/downloads/')
+  }
+
   static fetchDownloadFormats() {
     return this.get('/query/api/downloadformats/')
   }
@@ -96,8 +100,8 @@ class QueryApi extends BaseApi {
     return this.delete(`/query/api/jobs/${id}/`)
   }
 
-  static submitDownloadJob(id, downloadKey, downloadFormatKey) {
-    return this.post(`/query/api/jobs/${id}/download/${downloadKey}/`, { format_key: downloadFormatKey })
+  static submitDownloadJob(id, downloadKey, data) {
+    return this.post(`/query/api/jobs/${id}/download/${downloadKey}/`, data)
   }
 
   static fetchDownloadJob(id, downloadKey, downloadId) {

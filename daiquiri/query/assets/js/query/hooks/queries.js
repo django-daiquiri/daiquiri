@@ -40,9 +40,17 @@ export const useQueryLanguagesQuery = () => {
   })
 }
 
-export const useDownloadFormatsQuery = () => {
+export const useDownloadsQuery = () => {
   return useQuery({
     queryKey: ['downloads'],
+    queryFn: () => QueryApi.fetchDownloads(),
+    placeholderData: keepPreviousData
+  })
+}
+
+export const useDownloadFormatsQuery = () => {
+  return useQuery({
+    queryKey: ['downloadFormats'],
     queryFn: () => QueryApi.fetchDownloadFormats(),
     placeholderData: keepPreviousData
   })

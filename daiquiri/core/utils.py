@@ -401,5 +401,5 @@ def sanitize_str(strval):
 def get_file_size(file_path):
     try:
         return os.stat(file_path).st_size
-    except FileNotFoundError:
+    except (FileNotFoundError, TypeError):
         return 0

@@ -1,21 +1,27 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { isNil } from 'lodash'
 
 import { bytes2human } from 'daiquiri/core/assets/js/utils/bytes'
 
 import { jobPhaseClass, jobPhaseMessage } from '../../constants/job'
-import { useDownloadFormatsQuery, useDownloadJobQuery } from '../../hooks/queries'
+import { useDownloadJobQuery, useDownloadsQuery } from '../../hooks/queries'
 import { useSubmitDownloadJobMutation } from '../../hooks/mutations'
+
+import Archive from './downloads/Archive'
+import Form from './downloads/Form'
+import Table from './downloads/Table'
 
 const JobDownload = ({ job }) => {
   const mutation = useSubmitDownloadJobMutation()
-  const downloadJobId = mutation.data && mutation.data.id
 
-  const { data: downloadFormats } = useDownloadFormatsQuery()
-  const { data: downloadJob} = useDownloadJobQuery(job, 'table', downloadJobId)
+  const activeDownloadJob = mutation.data || {}
 
-  const handleSubmit = (downloadFormat) => {
-    mutation.mutate({ job, downloadKey: 'table', downloadFormatKey: downloadFormat.key })
+  const { data: downloads } = useDownloadsQuery()
+  const { data: downloadJob} = useDownloadJobQuery(job, activeDownloadJob.key, activeDownloadJob.id)
+
+  const handleSubmit = (downloadKey, data) => {
+    mutation.mutate({ job, downloadKey, data })
   }
 
   const getDownloadJobInfo = () => {
@@ -55,32 +61,23 @@ const JobDownload = ({ job }) => {
   }
 
   return job.phase == 'COMPLETED' ? (
-    <div>
-      <p>
+    <div className="query-download">
+      <p className="mb-4">
         {gettext('For further processing of the data, you can download the results table' +
                  ' to your local machine. For this file several formats are available.' +
                  ' Please choose a format for the download from the list below.')}
       </p>
 
-      <h4>{gettext('Download table')}</h4>
-
       {
-        downloadFormats && downloadFormats.map((downloadFormat, index) => (
-          <div key={index} className="row">
-            <div className="col-md-3">
-              <p>
-                <button className="btn btn-link text-start" onClick={() => handleSubmit(downloadFormat)}>
-                  {downloadFormat.label}
-                </button>
-              </p>
-            </div>
-            <div className="col-md-9">
-              <p>
-                {downloadFormat.help}
-              </p>
-            </div>
-          </div>
-        ))
+        downloads && downloads.map((download, downloadIndex) => {
+          if (download.key == 'table') {
+            return <Table key={downloadIndex} onSubmit={(data) => handleSubmit('table', data)} />
+          } else if (download.key == 'archive') {
+            return <Archive key={downloadIndex} columns={job.columns} onSubmit={(data) => handleSubmit('archive', data)} />
+          } else if (!isNil(download.form)) {
+            return <Form key={downloadIndex} form={download.form} onSubmit={(data) => handleSubmit(download.key, data)} />
+          }
+        })
       }
 
       {

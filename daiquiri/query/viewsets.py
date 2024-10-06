@@ -350,7 +350,8 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
             download_job.run()
 
         return Response({
-            'id': download_job.id
+            'id': download_job.id,
+            'key': download_key
         })
 
     @action(detail=True, methods=['get'], url_path=r'stream/(?P<format_key>[A-Za-z0-9\-]+)', url_name='stream')

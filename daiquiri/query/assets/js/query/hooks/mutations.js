@@ -78,7 +78,7 @@ export const useAbortJobMutation = () => {
 export const useSubmitDownloadJobMutation = () => {
   return useMutation({
     mutationFn: (variables) => {
-      return QueryApi.submitDownloadJob(variables.job.id, variables.downloadKey, variables.downloadFormatKey)
+      return QueryApi.submitDownloadJob(variables.job.id, variables.downloadKey, variables.data)
     }
   })
 }

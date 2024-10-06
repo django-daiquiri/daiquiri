@@ -70,7 +70,7 @@ QUERY_PLOTS = [
     }
 ]
 
-QUERY_DROPDOWN_FUNCTIONS = False;
+QUERY_DROPDOWN_FUNCTIONS = False
 QUERY_DROPDOWNS = [
     {
         'key': 'simbad',
@@ -92,14 +92,11 @@ QUERY_DOWNLOADS = [
     {
         'key': 'table',
         'model': 'daiquiri.query.models.DownloadJob',
-        'template': 'query/query_download_table.html',
         'params': ['format_key']
     },
     {
         'key': 'archive',
         'model': 'daiquiri.query.models.QueryArchiveJob',
-        'template': 'query/query_download_archive.html',
-        'service': 'query/js/downloads/archive.js',
         'params': ['column_name']
     }
 ]
