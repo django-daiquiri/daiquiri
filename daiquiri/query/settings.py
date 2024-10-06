@@ -70,8 +70,19 @@ QUERY_PLOTS = [
     }
 ]
 
-QUERY_DROPDOWN_FUNCTIONS = False
 QUERY_DROPDOWNS = [
+    {
+        'key': 'schemas',
+        'label': 'Database',
+    },
+    {
+        'key': 'columns',
+        'label': 'Columns',
+    },
+    {
+        'key': 'functions',
+        'label': 'Functions',
+    },
     {
         'key': 'simbad',
         'label': 'Simbad',
@@ -86,6 +97,11 @@ QUERY_DROPDOWNS = [
             'url': 'http://vizier.u-strasbg.fr/viz-bin/votable',
             'catalogs': ['I/322A', 'I/259']
         }
+    },
+    {
+        'key': 'examples',
+        'label': 'Examples',
+        'classes': 'ms-auto'
     }
 ]
 QUERY_DOWNLOADS = [

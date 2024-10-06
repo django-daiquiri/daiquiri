@@ -87,7 +87,10 @@ class FormViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.Gen
         return settings.QUERY_FORMS
 
     def get_object(self):
-        return next(form for form in self.get_queryset() if form.get('key') == self.kwargs.get('pk'))
+        try:
+            return next(form for form in self.get_queryset() if form.get('key') == self.kwargs.get('pk'))
+        except StopIteration:
+            raise Http404
 
     def get_serializer_class(self):
         if self.action == 'list':

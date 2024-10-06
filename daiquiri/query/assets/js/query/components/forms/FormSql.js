@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
+
 import { get, isNil } from 'lodash'
 
 import { useLsState } from 'daiquiri/core/assets/js/hooks/ls'
@@ -99,30 +100,18 @@ const FormSql = ({ formKey, loadJob, query }) => {
 
       <div className="query-dropdowns">
         <div className="d-md-flex">
-          <button type="button" className="btn btn-outline-form dropdown-toggle me-2 mb-2"
-                  onClick={() => handleDrowpdown('schemas')}>
-            {gettext('Database')}
-          </button>
-          <button type="button" className="btn btn-outline-form dropdown-toggle me-2 mb-2"
-                  onClick={() => handleDrowpdown('columns')}>
-            {gettext('Columns')}
-          </button>
-          <button type="button" className="btn btn-outline-form dropdown-toggle me-2 mb-2"
-                  onClick={() => handleDrowpdown('functions')}>
-            {gettext('Functions')}
-          </button>
           {
             dropdowns && dropdowns.map((dropdown, index) => (
-              <button key={index} type="button" className="btn btn-outline-form dropdown-toggle me-2 mb-2"
-                      onClick={() => handleDrowpdown(dropdown.key)}>
+              <button
+                key={index}
+                type="button"
+                className={`btn btn-outline-form dropdown-toggle mb-2 ${dropdown.classes || 'me-2'}`}
+                onClick={() => handleDrowpdown(dropdown.key)}
+              >
                 {dropdown.label}
               </button>
             ))
           }
-          <button type="button" className="btn btn-outline-form dropdown-toggle ms-auto mb-2"
-                  onClick={() => handleDrowpdown('examples')}>
-            {gettext('Examples')}
-          </button>
         </div>
 
         {

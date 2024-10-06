@@ -43,7 +43,8 @@ class DropdownSerializer(serializers.Serializer):
 
     key = serializers.CharField()
     label = serializers.CharField()
-    options = serializers.JSONField()
+    classes = serializers.CharField(default=None)
+    options = serializers.JSONField(default=None)
 
 
 class DownloadSerializer(serializers.Serializer):
