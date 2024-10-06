@@ -68,7 +68,7 @@ const configList = [
       ]
     },
     output: {
-      path: path.resolve(__dirname, './daiquiri/query/static/query/dist/')
+      path: path.resolve(__dirname, './daiquiri/query/static/query/')
     }
   }
 ]

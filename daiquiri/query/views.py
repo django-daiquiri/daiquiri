@@ -34,11 +34,6 @@ class ExamplesView(ModelPermissionMixin, CSRFViewMixin, TemplateView):
         return context
 
 
-class NewQueryView(AnonymousAccessMixin, CSRFViewMixin, StoreIdViewMixin, TemplateView):
-    template_name = 'query/new/query.html'
-    anonymous_setting = 'QUERY_ANONYMOUS'
-
-
 class NewJobsView(LoginRequiredMixin, CSRFViewMixin, StoreIdViewMixin, TemplateView):
     template_name = 'query/new/jobs.html'
 

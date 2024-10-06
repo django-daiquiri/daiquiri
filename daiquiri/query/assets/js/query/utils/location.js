@@ -2,7 +2,7 @@ import { isEmpty, isNil, trim } from 'lodash'
 
 import { baseUrl } from 'daiquiri/core/assets/js/utils/meta'
 
-const basePath = `${baseUrl}/query/new/`
+const basePath = `${baseUrl}/query/`
 
 const parseLocation = () => {
   const path = trim(window.location.pathname.replace(basePath, ''), '/')

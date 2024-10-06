@@ -1,121 +1,19 @@
-{% extends 'core/wide.html' %}
+{% extends 'core/new/wide.html' %}
 {% load static %}
-{% load compress %}
-{% load i18n %}
-{% load vendor_tags %}
 
-{% block bodyargs %}ng-app="query" ng-controller="QueryController"{% endblock %}
+{% block css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'query/css/query.css' %}" type="text/css" />
+{% endblock %}
 
-{% block headextra %}
-    {% vendor 'angular' %}
-    {% vendor 'ng-infinite-scroll' %}
-    {% vendor 'codemirror' %}
-    {% vendor 'moment' %}
-    {% vendor 'Bokeh' %}
-
-    {% compress css %}
-    <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/browser.scss' %}" />
-    <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/table.scss' %}" />
-    <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/codemirror.scss' %}" />
-
-    <link rel="stylesheet" type="text/x-scss" href="{% static 'query/css/query.scss' %}" />
-    <link rel="stylesheet" type="text/x-scss" href="{% static 'query/css/plot.scss' %}" />
-    {% endcompress css %}
-
-    {% compress js %}
-    <script type="text/javascript" src="{% static 'core/js/core.js' %}" ></script>
-    <script type="text/javascript" src="{% static 'core/js/filter.js' %}" ></script>
-    <script type="text/javascript" src="{% static 'core/js/multiCheckbox.js' %}" ></script>
-    <script type="text/javascript" src="{% static 'core/js/byNumber.js' %}" ></script>
-    <script type="text/javascript" src="{% static 'core/js/formgroup.js' %}" ></script>
-    <script type="text/javascript" src="{% static 'core/js/browser.js' %}" ></script>
-    <script type="text/javascript" src="{% static 'core/js/table.js' %}" ></script>
-    <script type="text/javascript" src="{% static 'core/js/polling.js' %}" ></script>
-
-    <script type="text/javascript" src="{% static 'query/js/apps/query.js' %}" ></script>
-    <script type="text/javascript" src="{% static 'query/js/services/query.js' %}" ></script>
-    <script type="text/javascript" src="{% static 'query/js/services/plot.js' %}" ></script>
-    <script type="text/javascript" src="{% static 'query/js/services/download.js' %}" ></script>
-
-    {% for download in settings.QUERY_DOWNLOADS %}
-    {% if download.service %}
-    <script type="text/javascript" src="{% static download.service %}" ></script>
-    {% endif %}
-    {% endfor %}
-
-    {% for dropdown in settings.QUERY_DROPDOWNS %}
-    <script type="text/javascript" src="{% static dropdown.service %}" ></script>
-    {% endfor %}
-
-    {% for form in settings.QUERY_FORMS %}
-    <script type="text/javascript" src="{% static form.service %}" ></script>
-    {% endfor %}
-    {% endcompress js %}
+{% block js %}
+{{ block.super }}
+<script src="{% url 'javascript-catalog' %}"></script>
+<script src="{% static 'query/js/query.js' %}" defer></script>
 {% endblock %}
 
 {% block wide %}
 
-    <h1>{% trans 'Query interface' %}</h1>
-
-    <div class="daiquiri-query row" ng-cloak>
-        <div class="col-md-3">
-            {% include 'query/query_sidebar.html' %}
-        </div>
-        <div class="col-md-9">
-            {% for form in settings.QUERY_FORMS %}
-
-                {% include 'query/query_form.html' %}
-
-            {% endfor %}
-
-            <div ng-show="service.job">
-
-                <h2 class="daiquiri-query-job-title">{% trans 'Query job' %} `{$ service.job.table_name $}`</h2>
-
-                <ul class="nav nav-tabs daiquiri-query-job-tabs">
-                    <li role="presentation" ng-class="{active: service.tab == 'overview'}">
-                        <a href="" ng-click="service.activate_tab('overview')">
-                            {% trans 'Job overview' %}
-                        </a>
-                    </li>
-                    <li role="presentation" ng-class="{active: service.tab == 'results'}" ng-show="service.job.phase == 'COMPLETED'">
-                        <a href="" ng-click="service.activate_tab('results');">
-                            {% trans 'Results table' %}
-                        </a>
-                    </li>
-                    <li role="presentation" ng-class="{active: service.tab == 'plot'}" ng-show="service.job.phase == 'COMPLETED'">
-                        <a href="" ng-click="service.activate_tab('plot');">
-                            {% trans 'Plot' %}
-                        </a>
-                    </li>
-                    <li role="presentation" ng-class="{active: service.tab == 'download'}" ng-show="service.job.phase == 'COMPLETED'">
-                        <a href="" ng-click="service.activate_tab('download');">
-                            {% trans 'Download' %}
-                        </a>
-                    </li>
-                </ul>
-
-                <div class="daiquiri-query-overview" ng-show="service.tab == 'overview'">
-                    {% include 'query/query_overview.html' %}
-                </div>
-                <div class="daiquiri-query-results" ng-show="service.tab == 'results'">
-                    {% include 'query/query_results.html' %}
-                </div>
-                <div class="daiquiri-query-plot" ng-show="service.tab == 'plot'">
-                    {% include 'query/query_plot.html' %}
-                </div>
-                <div class="daiquiri-query-download" ng-show="service.tab == 'download'">
-                    {% include 'query/query_download.html' %}
-                </div>
-
-            </div>
-
-        </div>
-    </div>
-
-{% include 'query/query_modal_update_job.html' %}
-{% include 'query/query_modal_abort_job.html' %}
-{% include 'query/query_modal_archive_job.html' %}
-{% include 'query/query_modal_logout.html' %}
+    <div id="app" class="query"></div>
 
 {% endblock %}

@@ -1,7 +1,7 @@
 from django.urls import include, path, re_path
 from rest_framework import routers
 
-from .views import ExamplesView, JobsView, QueryView, NewQueryView, NewJobsView, NewExamplesView
+from .views import ExamplesView, JobsView, QueryView, NewJobsView, NewExamplesView
 from .viewsets import (DropdownViewSet, ExampleViewSet, FormViewSet,
                        PhaseViewSet, QueryDownloadFormatViewSet, QueryJobViewSet, QueryLanguageViewSet,
                        QueueViewSet, StatusViewSet, DownloadViewSet)
@@ -21,13 +21,14 @@ router.register(r'querylanguages', QueryLanguageViewSet, basename='querylanguage
 router.register(r'phases', PhaseViewSet, basename='phase')
 
 urlpatterns = [
-    path(r'', QueryView.as_view(), name='query'),
+    # rest api
+    path(r'api/', include(router.urls)),
+
     path(r'jobs/', JobsView.as_view(), name='jobs'),
     path(r'examples/', ExamplesView.as_view(), name='examples'),
     re_path(r'jobs/new/', NewJobsView.as_view(), name='jobs_new'),
-    re_path(r'new/', NewQueryView.as_view(), name='query_new'),
     path(r'examples/new/', NewExamplesView.as_view(), name='examples_new'),
 
-    # rest api
-    path(r'api/', include(router.urls)),
+    # query interface, needs to be last in list
+    re_path(r'', QueryView.as_view(), name='query'),
 ]
