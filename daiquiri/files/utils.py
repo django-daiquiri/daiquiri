@@ -1,6 +1,7 @@
 import os
 import logging
 
+from django.apps import apps
 from django.conf import settings
 from django.shortcuts import render
 from django.utils.encoding import force_str
@@ -88,7 +89,7 @@ def send_file(request, file_path, search=None):
 
     absolute_file_path = os.path.join(settings.FILES_BASE_PATH, file_path)
 
-    if 'daiquiri.stats' in settings.INSTALLED_APPS:
+    if apps.is_installed('daiquiri.stats'):
         from daiquiri.stats.models import Record
         Record.objects.create(
             time=now(),
