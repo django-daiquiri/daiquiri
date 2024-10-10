@@ -184,6 +184,8 @@ export const useDownloadJobQuery = (job, downloadKey, downloadJobId) => {
     queryFn: () => QueryApi.fetchDownloadJob(job.id, downloadKey, downloadJobId),
     placeholderData: keepPreviousData,
     enabled: job.phase == 'COMPLETED' && !isEmpty(downloadJobId),
+    refetchOnWindowFocus: false,
+    refetchIntervalInBackground: true,
     refetchInterval: (query) => {
       return (query.state.data && ['QUEUED', 'EXECUTING'].includes(query.state.data.phase)) ? refetchInterval : false
     }
