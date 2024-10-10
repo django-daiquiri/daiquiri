@@ -55,20 +55,20 @@ const configList = [
     name: 'query',
     entry: {
       examples: [
-        './daiquiri/query/assets/js/examples.js',
+        './daiquiri/query/assets/js/examples/examples.js',
         './daiquiri/query/assets/scss/examples.scss'
       ],
       jobs: [
-        './daiquiri/query/assets/js/jobs.js',
+        './daiquiri/query/assets/js/jobs/jobs.js',
         './daiquiri/query/assets/scss/jobs.scss'
       ],
       query: [
-        './daiquiri/query/assets/js/query.js',
+        './daiquiri/query/assets/js/query/query.js',
         './daiquiri/query/assets/scss/query.scss'
       ]
     },
     output: {
-      path: path.resolve(__dirname, './daiquiri/query/static/query/dist/')
+      path: path.resolve(__dirname, './daiquiri/query/static/query/')
     }
   }
 ]
@@ -109,8 +109,10 @@ const baseConfig = {
       {
         test: /(fonts|files)\/.*\.(svg|woff2?|ttf|eot|otf)(\?.*)?$/,
         loader: 'file-loader',
+        type: 'javascript/auto',
         options: {
-          name: 'fonts/[name].[ext]'
+          name: 'fonts/[name].[ext]',
+          esModule: false
         }
       },
       {

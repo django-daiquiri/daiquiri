@@ -8,7 +8,7 @@ from django.conf import settings
 from django.http import Http404, FileResponse
 from django.utils.timezone import now
 
-from rest_framework import viewsets, mixins, filters
+from rest_framework import viewsets, mixins, filters, status
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError, NotFound
 from rest_framework.decorators import action
@@ -23,6 +23,7 @@ from daiquiri.core.permissions import HasModelPermission
 from daiquiri.core.paginations import ListPagination
 from daiquiri.core.utils import (
     get_client_ip,
+    get_file_size,
     fix_for_json,
     filter_by_access_level,
     handle_file_upload,
@@ -33,13 +34,16 @@ from daiquiri.stats.models import Record
 
 from .models import QueryJob, DownloadJob, Example
 from .serializers import (
-    FormSerializer,
+    FormDetailSerializer,
+    FormListSerializer,
     DropdownSerializer,
     DownloadSerializer,
+    QueryDownloadFormatSerializer,
     QueryJobSerializer,
     QueryJobListSerializer,
     QueryJobRetrieveSerializer,
     QueryJobCreateSerializer,
+    QueryJobFormSerializer,
     QueryJobUpdateSerializer,
     QueryJobUploadSerializer,
     QueryLanguageSerializer,
@@ -50,11 +54,11 @@ from .serializers import (
 )
 from .permissions import HasPermission
 from .utils import (
+    fetch_user_schema_metadata,
     get_download_config,
     get_format_config,
     get_quota,
     get_user_upload_directory,
-    fetch_user_schema_metadata,
     handle_upload_param,
     ingest_uploads
 )
@@ -76,13 +80,24 @@ class StatusViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         }])
 
 
-class FormViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+class FormViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     permission_classes = (HasPermission, )
-
-    serializer_class = FormSerializer
 
     def get_queryset(self):
         return settings.QUERY_FORMS
+
+    def get_object(self):
+        try:
+            return next(form for form in self.get_queryset() if form.get('key') == self.kwargs.get('pk'))
+        except StopIteration:
+            raise Http404
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return FormListSerializer
+        else:
+            return FormDetailSerializer
+
 
 
 class DropdownViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -171,6 +186,19 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
     def tables(self, request):
         queryset = self.get_queryset().filter(phase=QueryJob.PHASE_COMPLETED)[:100]
         return Response(fetch_user_schema_metadata(request.user, queryset))
+
+    @action(detail=False, methods=['post'], url_path='forms/(?P<form_key>[a-z]+)', url_name='forms')
+    def forms(self, request, form_key):
+        # follows CreateModelMixin.create(request, *args, **kwargs)
+        serializer = QueryJobFormSerializer(
+            data=request.data,
+            form_key=form_key,
+            context=self.get_serializer_context()
+        )
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     @action(detail=False, methods=['post'], url_path='upload', url_name='upload')
     def upload(self, request):
@@ -278,7 +306,10 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
             )
             return sendfile(request, download_job.file_path, attachment=True)
         else:
-            return Response(download_job.phase)
+            return Response({
+                'phase': download_job.phase,
+                'size': get_file_size(download_job.file_path),
+            })
 
     @action(detail=True, methods=['post'], url_name='create-download',
             url_path=r'download/(?P<download_key>[a-z\-]+)')
@@ -322,7 +353,8 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
             download_job.run()
 
         return Response({
-            'id': download_job.id
+            'id': download_job.id,
+            'key': download_key
         })
 
     @action(detail=True, methods=['get'], url_path=r'stream/(?P<format_key>[A-Za-z0-9\-]+)', url_name='stream')
@@ -385,6 +417,14 @@ class QueryLanguageViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
     def get_queryset(self):
         return filter_by_access_level(self.request.user, settings.QUERY_LANGUAGES)
+
+
+class QueryDownloadFormatViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    permission_classes = (HasPermission, )
+    serializer_class = QueryDownloadFormatSerializer
+
+    def get_queryset(self):
+        return settings.QUERY_DOWNLOAD_FORMATS
 
 
 class PhaseViewSet(ChoicesViewSet):

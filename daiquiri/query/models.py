@@ -412,7 +412,7 @@ class DownloadJob(Job):
         verbose_name = _('DownloadJob')
         verbose_name_plural = _('DownloadJobs')
 
-    @property
+    @cached_property
     def file_path(self):
         if not self.owner:
             username = 'anonymous'
@@ -493,7 +493,7 @@ class QueryArchiveJob(Job):
         verbose_name = _('QueryArchiveJob')
         verbose_name_plural = _('QueryArchiveJob')
 
-    @property
+    @cached_property
     def file_path(self):
         if not self.owner:
             username = 'anonymous'
