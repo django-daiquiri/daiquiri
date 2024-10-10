@@ -44,12 +44,12 @@ QUERY_FORMS = [
     {
         'key': 'sql',
         'label': 'SQL query',
-        'template': 'query/new/query_form_sql.html'
+        'template': 'query/query_form_sql.html'
     },
     {
         'key': 'upload',
         'label': 'Upload VOTable',
-        'template': 'query/new/query_form_upload.html'
+        'template': 'query/query_form_upload.html'
     }
 ]
 QUERY_PLOTS = [
