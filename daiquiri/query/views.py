@@ -7,7 +7,7 @@ from daiquiri.core.utils import get_model_field_meta
 from .models import QueryJob, Example
 
 
-class QueryView(AnonymousAccessMixin, CSRFViewMixin, TemplateView):
+class QueryView(AnonymousAccessMixin, CSRFViewMixin, StoreIdViewMixin, TemplateView):
     template_name = 'query/query.html'
     anonymous_setting = 'QUERY_ANONYMOUS'
 
