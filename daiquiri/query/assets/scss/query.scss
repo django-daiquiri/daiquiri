@@ -19,7 +19,9 @@
     .cm-line {
         padding: 0;
     }
-
+    .cm-error {
+        text-decoration: underline 3px red;
+    }
     &.form-control {
         height: auto;
         padding: 0;

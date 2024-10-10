@@ -143,7 +143,7 @@ const FormSql = ({ formKey, loadJob, query }) => {
           <Query
             label={gettext('SQL query')}
             value={values.query}
-            errors={get(errors, 'query.messages') || errors.query}
+            errors={errors.query}
             setValue={(query) => setValues({...values, query})}
             editor={editor}
           />
