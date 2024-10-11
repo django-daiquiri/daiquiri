@@ -8,9 +8,19 @@ import VizierApi from '../api/VizierApi'
 const refetchInterval = 4000
 
 export const useStatusQuery = () => {
+  const queryClient = useQueryClient()
+  const status = queryClient.getQueryData(['status'])
+
   return useQuery({
     queryKey: ['status'],
-    queryFn: () => QueryApi.fetchStatus().then((response) => response[0]),
+    queryFn: () => QueryApi.fetchStatus().then((response) => {
+      if (status && (status.hash != response.hash)) {
+        queryClient.invalidateQueries({ queryKey: ['jobs'] })
+        queryClient.invalidateQueries({ queryKey: ['job'] })
+        queryClient.invalidateQueries({ queryKey: ['userSchema'] })
+      }
+      return response
+    }),
     refetchInterval: refetchInterval,
     placeholderData: keepPreviousData
   })
@@ -72,25 +82,10 @@ export const useDropdownsQuery = () => {
   })
 }
 
-export const useJobsQuery = (jobId) => {
-  const queryClient = useQueryClient()
-
+export const useJobsQuery = () => {
   return useQuery({
     queryKey: ['jobs'],
-    queryFn: () => QueryApi.fetchJobs({page_size: 1000, archived: ''}).then((response) => {
-      const jobs = response.results
-
-      // get the current job from the query cache (from the useJobQuery hook)
-      const currentJob = queryClient.getQueryData(['job', jobId])
-      jobs.filter(job => job.id == jobId).forEach(job => {
-        if (currentJob.phase !== job.phase) {
-          queryClient.invalidateQueries({ queryKey: ['job', jobId] })
-        }
-      })
-
-      return jobs
-    }),
-    refetchInterval: refetchInterval,
+    queryFn: () => QueryApi.fetchJobs({page_size: 1000, archived: ''}).then(response => response.results),
     placeholderData: keepPreviousData
   })
 }
@@ -99,7 +94,6 @@ export const useUserSchemaQuery = () => {
   return useQuery({
     queryKey: ['userSchema'],
     queryFn: () => QueryApi.fetchUserSchema(),
-    refetchInterval: refetchInterval,
     placeholderData: keepPreviousData
   })
 }
@@ -118,7 +112,6 @@ export const useJobQuery = (jobId) => {
   return useQuery({
     queryKey: ['job', jobId],
     queryFn: () => QueryApi.fetchJob(jobId).then(response => {
-      // reload the jobs list
       queryClient.invalidateQueries({ queryKey: ['jobs'] })
       return response
     }),

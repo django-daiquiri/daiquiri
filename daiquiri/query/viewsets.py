@@ -1,3 +1,4 @@
+import hashlib
 import os
 
 from collections import OrderedDict
@@ -71,13 +72,14 @@ class StatusViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = []
 
     def list(self, request):
-        return Response([{
+        return Response({
             'guest': not request.user.is_authenticated,
             'queued_jobs': None,
             'size': QueryJob.objects.get_size(request.user),
+            'hash':  QueryJob.objects.get_hash(request.user),
             'quota': get_quota(request.user),
             'upload_limit': get_quota(request.user, quota_settings='QUERY_UPLOAD_LIMIT')
-        }])
+        })
 
 
 class FormViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):

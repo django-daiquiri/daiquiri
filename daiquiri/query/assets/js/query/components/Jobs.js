@@ -13,7 +13,7 @@ import { basePath } from '../utils/location'
 import Loading from './Loading'
 
 const Jobs = ({ jobId, loadJob }) => {
-  const { data: jobs } = useJobsQuery(jobId, loadJob)
+  const { data: jobs } = useJobsQuery()
 
   const [openRunIds, setOpenRunIds] = useLsState('query.openRunIds', [''])
 
