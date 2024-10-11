@@ -1,3 +1,5 @@
+import hashlib
+
 from django.conf import settings
 from django.contrib.auth.mixins import (
     AccessMixin,
@@ -91,3 +93,15 @@ class CSRFViewMixin(View):
     @method_decorator(ensure_csrf_cookie)
     def get(self, request, *args, **kwargs):
         return super().get(self, request, *args, **kwargs)
+
+
+class StoreIdViewMixin(View):
+
+    def render_to_response(self, context, **response_kwargs):
+        response = super().render_to_response(context, **response_kwargs)
+        response.set_cookie('storeid', self.get_store_id())
+        return response
+
+    def get_store_id(self):
+        session_key = self.request.session.session_key or 'anonymous'
+        return hashlib.sha256(session_key.encode()).hexdigest()

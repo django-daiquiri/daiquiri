@@ -32,7 +32,7 @@ from daiquiri.core.constants import (ACCESS_LEVEL_INTERNAL,
 if sys.version_info.major >= 3:
     long_type = int
 else:
-    long_type = long
+    long_type = long  # noqa: F821
 
 
 def import_class(string):
@@ -393,5 +393,13 @@ def handle_file_upload(directory, file):
 
     return file_path
 
+
 def sanitize_str(strval):
     return re.sub(r'[^a-zA-Z0-9]', '_', strval.lower())
+
+
+def get_file_size(file_path):
+    try:
+        return os.stat(file_path).st_size
+    except (FileNotFoundError, TypeError):
+        return 0

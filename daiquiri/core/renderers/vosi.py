@@ -78,6 +78,14 @@ class CapabilitiesRendererMixin(object):
         if capability.get('verbosity'):
             self.node('verbosity', {}, capability.get('verbosity'))
 
+        for upload_method in capability.get('upload_methods', []):
+            self.node('uploadMethod', {'ivo-id': upload_method})
+
+        if capability.get('upload_limit'):
+            self.start('uploadLimit')
+            self.node('hard', {'unit': 'byte'}, capability.get('upload_limit'))
+            self.end('uploadLimit')
+
         test_query = capability.get('test_query')
         if test_query:
             self.start('testQuery')
@@ -92,12 +100,17 @@ class CapabilitiesRendererMixin(object):
 class CapabilitiesRenderer(CapabilitiesRendererMixin, XMLRenderer):
 
     def render_document(self, data, accepted_media_type=None, renderer_context=None):
-        self.start('vosi:capabilities', {
+        ns = {
+            'xmlns:cap': 'http://www.ivoa.net/xml/VOSICapabilities/v1.0',
             'xmlns:vosi': 'http://www.ivoa.net/xml/VOSITables/v1.0',
-            'xmlns:vs': 'http://www.ivoa.net/xml/VODataService/v1.0',
+            'xmlns:tr': 'http://www.ivoa.net/xml/TAPRegExt/v1.0',
+            'xmlns:vr': 'http://www.ivoa.net/xml/VOResource/v1.0',
+            'xmlns:vs': 'http://www.ivoa.net/xml/VODataService/v1.1',
             'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
-            'xsi:schemaLocation': 'http://www.ivoa.net/xml/VOSI/v1.0 http://www.ivoa.net/xml/VOSI/v1.0 http://www.ivoa.net/xml/VODataService/v1.0 http://www.ivoa.net/xml/VODataService/v1.0'
-        })
+        }
+        ns['xsi:schemaLocation'] = ' '.join(ns.values())
+
+        self.start('vosi:capabilities', ns)
 
         for capability in data:
             self.render_capability(capability)

@@ -8,11 +8,12 @@ from daiquiri.core.generators import generate_votable
 
 from .constants import DATALINK_FIELDS, DATALINK_CONTENT_TYPE
 from .adapter import DatalinkAdapter
-from .models import Datalink
+
 
 class SyncDatalinkJobViewSet(viewsets.GenericViewSet):
-    '''Generate the datalink VOTable
-    ''' 
+    '''
+    Generate the datalink VOTable
+    '''
 
     def list(self, request):
         return self.perform_sync_job(request, request.GET)
@@ -21,7 +22,6 @@ class SyncDatalinkJobViewSet(viewsets.GenericViewSet):
         return self.perform_sync_job(request, request.POST)
 
     def perform_sync_job(self, request, data):
-
         if 'ID' in data:
             identifiers = data.getlist('ID')
         else:
@@ -36,9 +36,15 @@ class SyncDatalinkJobViewSet(viewsets.GenericViewSet):
             return JsonResponse({
                 'links': [
                     {
-                        'href': row[1],
-                        'text': row[4]
-                    } for row in rows
+                        'ID': row[0],
+                        'access_url': row[1],
+                        'service_def': row[2],
+                        'error_message': row[3],
+                        'description': row[4],
+                        'semantics': row[5],
+                        'content_type': row[6],
+                        'content_length': row[7],
+                    } for row in rows if not row[3]
                 ]
             })
         else:

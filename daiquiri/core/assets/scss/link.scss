@@ -1,0 +1,9 @@
+:root,
+[data-bs-theme=light] {
+    --bs-link-color: #337ab7;
+    --bs-link-color-rgb: 51, 122, 183;
+    --bs-link-hover-color: var(--bs-link-color);
+    --bs-link-hover-color-rgb: var(--bs-link-color-rgb);
+    --bs-link-decoration: none;
+    --bs-link-hover-decoration: underline;  // this is not an official bootstrap variable
+}
