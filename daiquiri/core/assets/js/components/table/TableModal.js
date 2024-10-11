@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 
 import { useDataLinksQuery, useNoteQuery } from '../../hooks/queries'
 
+import TableModalDatalinks from './TableModalDatalinks'
 import TableModalNavigation from './TableModalNavigation'
 
 const TableModal = ({ modalRef, modalValues, onNavigation, onClose }) => {
@@ -23,17 +24,7 @@ const TableModal = ({ modalRef, modalValues, onNavigation, onClose }) => {
               <div className="modal-body">
                 <TableModalNavigation values={modalValues} onClick={onNavigation} />
                 {
-                  dataLinks && (
-                    <ul>
-                        {
-                          dataLinks.map((link, linkIndex) => (
-                            <li key={linkIndex}>
-                              <a href={link.href} target="_blank" rel="noreferrer">{link.text || link.href}</a>
-                            </li>
-                          ))
-                        }
-                    </ul>
-                  )
+                  dataLinks && <TableModalDatalinks dataLinks={dataLinks} />
                 }
                 {
                   note && <pre>{note}</pre>

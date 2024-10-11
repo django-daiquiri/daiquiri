@@ -36,8 +36,14 @@ class SyncDatalinkJobViewSet(viewsets.GenericViewSet):
             return JsonResponse({
                 'links': [
                     {
-                        'href': row[1],
-                        'text': row[4]
+                        'ID': row[0],
+                        'access_url': row[1],
+                        'service_def': row[2],
+                        'error_message': row[3],
+                        'description': row[4],
+                        'semantics': row[5],
+                        'content_type': row[6],
+                        'content_length': row[7],
                     } for row in rows if not row[3]
                 ]
             })
