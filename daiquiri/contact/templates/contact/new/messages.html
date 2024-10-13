@@ -3,6 +3,7 @@
 
 {% block js %}
 {{ block.super }}
+<script src="{% url 'javascript-catalog' %}"></script>
 <script src="{% static 'contact/dist/js/messages.js' %}" defer></script>
 {% endblock %}
 

@@ -1,0 +1,8 @@
+{% load i18n %}mailto:{{ message.email }}?subject=[{{ request.site.name }}] Re: {{ message.subject }}&body=
+%0A%0A
+{% blocktrans with author=message.author date=message.created|date:'short' trimmed %}
+On {{ date }}, {{ author }} wrote:
+{% endblocktrans %}
+%0A
+> {{ message.message }}
+%0A

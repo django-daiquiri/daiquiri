@@ -5,17 +5,17 @@ import { isNil } from 'lodash'
 export const useModal = () => {
   const ref = useRef()
 
-  const showModal = () => {
+  const show = () => {
     const modal = new Modal(ref.current, {})
     modal.show()
   }
 
-  const hideModal = () => {
+  const hide = () => {
     const modal = Modal.getInstance(ref.current)
     if (!isNil(modal)) {
       modal.hide()
     }
   }
 
-  return [ref, showModal, hideModal]
+  return {ref, show, hide}
 }
