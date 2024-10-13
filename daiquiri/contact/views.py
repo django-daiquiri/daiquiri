@@ -46,11 +46,6 @@ def contact(request):
     return render(request, 'contact/contact.html', {'form': contact_form})
 
 
-class MessagesView(ModelPermissionMixin, CSRFViewMixin, TemplateView):
+class MessagesView(ModelPermissionMixin, CSRFViewMixin, StoreIdViewMixin, TemplateView):
     template_name = 'contact/messages.html'
-    permission_required = 'daiquiri_contact.view_contactmessage'
-
-
-class NewMessagesView(ModelPermissionMixin, CSRFViewMixin, StoreIdViewMixin, TemplateView):
-    template_name = 'contact/new/messages.html'
     permission_required = 'daiquiri_contact.view_contactmessage'

@@ -35,7 +35,7 @@ class ContactMessageSerializer(serializers.ModelSerializer):
         return date(obj.created)
 
     def get_mailto(self, obj):
-        return render_to_string('contact/new/messages_mailto.html', {
+        return render_to_string('contact/messages_mailto.html', {
             'request': self.context.get('request'),
             'message': obj
         })

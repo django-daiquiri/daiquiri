@@ -26,7 +26,7 @@ const configList = [
       ]
     },
     output: {
-      path: path.resolve(__dirname, './daiquiri/contact/static/contact/dist/')
+      path: path.resolve(__dirname, './daiquiri/contact/static/contact/')
     }
   },
   {
