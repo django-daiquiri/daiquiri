@@ -17,7 +17,7 @@ from allauth.account.views import (
     PasswordSetView as AllauthPasswordSetView
 )
 
-from daiquiri.core.views import CSRFViewMixin, ModelPermissionMixin
+from daiquiri.core.views import CSRFViewMixin, ModelPermissionMixin, StoreIdViewMixin
 
 from .forms import UserForm, ProfileForm
 
@@ -107,6 +107,11 @@ class UsersView(ModelPermissionMixin, CSRFViewMixin, TemplateView):
             'profile_admin_url': profile_admin_url
         })
         return context
+
+
+class NewUsersView(ModelPermissionMixin, CSRFViewMixin, StoreIdViewMixin, TemplateView):
+    template_name = 'auth/new/users.html'
+    permission_required = 'daiquiri_auth.view_profile'
 
 
 class PasswordChangeView(AllauthPasswordChangeView):

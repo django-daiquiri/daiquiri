@@ -1,0 +1,9 @@
+.modal {
+    .modal-seperator {
+        margin-left: -14px;
+        margin-right: -14px;
+        margin-top: 14px;
+        margin-bottom: 14px;
+        border-bottom: 1px solid var(--bs-modal-header-border-color);
+    }
+}

@@ -1,47 +1,58 @@
+from django.conf import settings
+from django.template.defaultfilters import date
+from django.template.loader import get_template, TemplateDoesNotExist
+
 from rest_framework import serializers
 
 from daiquiri.jobs.serializers import SyncJobSerializer, AsyncJobSerializer
-
 from .models import QueryJob, Example
 from .validators import TableNameValidator, UploadFileValidator, UploadParamValidator
+from .utils import get_query_form, get_query_form_adapter
 
 
-class FormSerializer(serializers.Serializer):
+class FormListSerializer(serializers.Serializer):
 
     key = serializers.CharField()
+    label = serializers.CharField()
+
+    # TODO: remove
     form_service = serializers.SerializerMethodField()
 
     def get_form_service(self, obj):
         return obj['key'][0].upper() + obj['key'][1:] + 'FormService'
 
 
+class FormDetailSerializer(serializers.Serializer):
+
+    key = serializers.CharField()
+    label = serializers.CharField()
+    template = serializers.SerializerMethodField(required=False)
+    fields = serializers.SerializerMethodField(method_name='get_adapter_fields')
+    submit = serializers.CharField(default=None)
+
+    def get_template(self, obj):
+        try:
+            return get_template(obj['template']).render(request=self.context.get('request')).strip()
+        except (KeyError, TemplateDoesNotExist):
+            return None
+
+    def get_adapter_fields(self, obj):
+        adapter = get_query_form_adapter(obj)
+        return adapter.get_fields() if adapter else None
+
+
 class DropdownSerializer(serializers.Serializer):
 
     key = serializers.CharField()
-    dropdown_service = serializers.SerializerMethodField()
-    options = serializers.SerializerMethodField()
-
-    def get_dropdown_service(self, obj):
-        return obj['key'][0].upper() + obj['key'][1:] + 'DropdownService'
-
-    def get_options(self, obj):
-        return obj['options']
+    label = serializers.CharField()
+    classes = serializers.CharField(default=None)
+    options = serializers.JSONField(default=None)
 
 
 class DownloadSerializer(serializers.Serializer):
 
     key = serializers.CharField()
-    download_service = serializers.SerializerMethodField()
-    options = serializers.SerializerMethodField()
-
-    def get_download_service(self, obj):
-        if obj.get('service'):
-            return obj['key'][0].upper() + obj['key'][1:] + 'DownloadService'
-        else:
-            return None
-
-    def get_options(self, obj):
-        return obj.get('options', {})
+    form = serializers.JSONField(default=None)
 
 
 class QueryJobSerializer(serializers.ModelSerializer):
@@ -68,6 +79,11 @@ class QueryJobListSerializer(serializers.ModelSerializer):
 
 class QueryJobRetrieveSerializer(serializers.ModelSerializer):
 
+    phase_label = serializers.SerializerMethodField()
+    creation_time_label = serializers.SerializerMethodField()
+    start_time_label = serializers.SerializerMethodField()
+    end_time_label = serializers.SerializerMethodField()
+
     sources = serializers.SerializerMethodField()
     columns = serializers.SerializerMethodField()
 
@@ -77,9 +93,13 @@ class QueryJobRetrieveSerializer(serializers.ModelSerializer):
             'id',
             'run_id',
             'phase',
+            'phase_label',
             'creation_time',
+            'creation_time_label',
             'start_time',
+            'start_time_label',
             'end_time',
+            'end_time_label',
             'execution_duration',
             'time_queue',
             'time_query',
@@ -98,6 +118,18 @@ class QueryJobRetrieveSerializer(serializers.ModelSerializer):
             'sources',
             'columns'
         )
+
+    def get_phase_label(self, obj):
+        return dict(QueryJob.PHASE_CHOICES)[obj.phase]
+
+    def get_creation_time_label(self, obj):
+        return date(obj.creation_time, settings.DATETIME_FORMAT)
+
+    def get_start_time_label(self, obj):
+        return date(obj.start_time, settings.DATETIME_FORMAT)
+
+    def get_end_time_label(self, obj):
+        return date(obj.end_time, settings.DATETIME_FORMAT)
 
     def get_sources(self, obj):
         if obj.metadata:
@@ -119,7 +151,7 @@ class QueryJobCreateSerializer(serializers.ModelSerializer):
     queue = serializers.CharField(required=False)
     query_language = serializers.CharField(required=True)
     query = serializers.CharField(required=True)
-    run_id = serializers.CharField(default='')
+    run_id = serializers.CharField(default='', allow_blank=True)
 
     class Meta:
         model = QueryJob
@@ -131,6 +163,36 @@ class QueryJobCreateSerializer(serializers.ModelSerializer):
             'query',
             'run_id'
         )
+
+
+class QueryJobFormSerializer(QueryJobCreateSerializer):
+
+    query_language = serializers.SerializerMethodField()
+    query = serializers.SerializerMethodField()
+
+    class Meta:
+        model = QueryJob
+        fields = QueryJobCreateSerializer.Meta.fields
+
+    def __init__(self, *args, **kwargs):
+        form_key = kwargs.pop('form_key')
+        form = get_query_form(form_key)
+
+        self.adapter = get_query_form_adapter(form)
+
+        super().__init__(*args, **kwargs)
+
+        for field in self.adapter.get_fields():
+            if field.get('type') == 'number':
+                self.fields[field['key']] = serializers.FloatField(required=True)
+            else:
+                self.fields[field['key']] = serializers.CharField(required=False)
+
+    def get_query_language(self, obj):
+        return self.adapter.get_query_language(obj)
+
+    def get_query(self, obj):
+        return self.adapter.get_query(obj)
 
 
 class QueryJobUpdateSerializer(serializers.ModelSerializer):
@@ -169,6 +231,17 @@ class QueryLanguageSerializer(serializers.Serializer):
 
     def get_id(self, obj):
         return '%(key)s-%(version)s' % obj
+
+
+
+class QueryDownloadFormatSerializer(serializers.Serializer):
+
+    key = serializers.CharField()
+    extension = serializers.CharField()
+    content_type = serializers.CharField()
+    label = serializers.CharField()
+    help = serializers.CharField()
+
 
 
 class ExampleSerializer(serializers.ModelSerializer):

@@ -6,6 +6,9 @@ __pycache__/
 *.swp
 .DS_Store
 
+/daiquiri/contact/static/
+/daiquiri/query/static/
+
 /testing/config/settings/local.py
 /testing/download
 /testing/upload
@@ -16,6 +19,7 @@ __pycache__/
 /htmlcov
 /env
 /venv
+/node_modules
 
 build
 dist
