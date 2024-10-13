@@ -2,42 +2,30 @@ import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import className from 'classnames'
 
-import { useModal } from 'daiquiri/core/assets/js/hooks/modal'
+import { useUpdateJobMutation } from '../../../hooks/mutations'
 
-import { useUpdateJobMutation } from '../../hooks/mutations'
-
-const JobRenameModal = ({ job, show, toggle }) => {
-  const [ref, showModal, hideModal]  = useModal()
-
+const RenameModal = ({ modal, job }) => {
   const [values, setValues] = useState({table_name: '', run_id: ''})
   const [errors, setErrors] = useState({})
 
   const mutation = useUpdateJobMutation()
 
   useEffect(() => {
-    if (show) {
-      setValues({table_name: job.table_name, run_id: job.run_id})
-      setErrors({})
-      showModal()
-    }
-  }, [show])
+    setValues({table_name: job.table_name, run_id: job.run_id})
+    setErrors({})
+  }, [job])
 
   const handleSubmit = () => {
-    mutation.mutate({job, values, setErrors, onSuccess: handleClose})
-  }
-
-  const handleClose = () => {
-    hideModal()
-    toggle()
+    mutation.mutate({job, values, setErrors, onSuccess: modal.hide})
   }
 
   return (
-    <div ref={ref} className="modal" tabIndex="-1">
+    <div ref={modal.ref} className="modal" tabIndex="-1">
       <div className="modal-dialog">
         <div className="modal-content">
           <div className="modal-header">
             <h5 className="modal-title">{gettext('Update job')}</h5>
-            <button type="button" className="btn-close" onClick={handleClose}></button>
+            <button type="button" className="btn-close" onClick={modal.hide}></button>
           </div>
           <div className="modal-body">
             <div className="mb-3">
@@ -72,7 +60,7 @@ const JobRenameModal = ({ job, show, toggle }) => {
             </div>
           </div>
           <div className="modal-footer">
-            <button type="button" className="btn btn-sm btn-secondary" onClick={handleClose}>
+            <button type="button" className="btn btn-sm btn-secondary" onClick={modal.hide}>
               {gettext('Close')}
             </button>
             <button type="button" className="btn btn-sm btn-primary" onClick={handleSubmit}>
@@ -85,10 +73,9 @@ const JobRenameModal = ({ job, show, toggle }) => {
   )
 }
 
-JobRenameModal.propTypes = {
-  job: PropTypes.object.isRequired,
-  show: PropTypes.bool.isRequired,
-  toggle: PropTypes.func.isRequired
+RenameModal.propTypes = {
+  modal: PropTypes.object.isRequired,
+  job: PropTypes.object.isRequired
 }
 
-export default JobRenameModal
+export default RenameModal

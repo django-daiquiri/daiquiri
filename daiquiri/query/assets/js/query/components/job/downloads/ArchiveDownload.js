@@ -4,7 +4,7 @@ import { isEmpty } from 'lodash'
 
 import { isRefColumn, isImageColumn, isNoteColumn, isFileColumn} from 'daiquiri/core/assets/js/utils/table'
 
-const Archive = ({ columns, onSubmit }) => {
+const ArchiveDownload = ({ columns, onSubmit }) => {
 
   const isArchiveColumn = (column) => isRefColumn(column) && (
     isImageColumn(column) || isNoteColumn(column) || isFileColumn(column)
@@ -33,9 +33,9 @@ const Archive = ({ columns, onSubmit }) => {
   )
 }
 
-Archive.propTypes = {
+ArchiveDownload.propTypes = {
   columns: PropTypes.array.isRequired,
   onSubmit: PropTypes.func.isRequired
 }
 
-export default Archive
+export default ArchiveDownload

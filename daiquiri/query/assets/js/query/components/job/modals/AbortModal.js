@@ -1,37 +1,22 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 
-import { useModal } from 'daiquiri/core/assets/js/hooks/modal'
+import { useAbortJobMutation } from '../../../hooks/mutations'
 
-import { useAbortJobMutation } from '../../hooks/mutations'
-
-const JobAbortModal = ({ job, show, toggle }) => {
-  const [ref, showModal, hideModal]  = useModal()
-
-  useEffect(() => {
-    if (show) {
-      showModal()
-    }
-  }, [show])
-
+const JobAbortModal = ({ modal, job }) => {
   const mutation = useAbortJobMutation()
 
   const handleSubmit = () => {
-    mutation.mutate({job, onSuccess: handleClose})
-  }
-
-  const handleClose = () => {
-    hideModal()
-    toggle()
+    mutation.mutate({job, onSuccess: modal.hide()})
   }
 
   return (
-    <div ref={ref} className="modal" tabIndex="-1">
+    <div ref={modal.ref} className="modal" tabIndex="-1">
       <div className="modal-dialog modal-lg">
         <div className="modal-content">
           <div className="modal-header">
             <h5 className="modal-title">{gettext('Archive job')}</h5>
-            <button type="button" className="btn-close" onClick={handleClose}></button>
+            <button type="button" className="btn-close" onClick={modal.hide}></button>
           </div>
           <div className="modal-body">
             <p dangerouslySetInnerHTML={{
@@ -42,7 +27,7 @@ const JobAbortModal = ({ job, show, toggle }) => {
             </p>
           </div>
           <div className="modal-footer">
-            <button type="button" className="btn btn-sm btn-secondary" onClick={handleClose}>
+            <button type="button" className="btn btn-sm btn-secondary" onClick={modal.hide}>
               {gettext('Close')}
             </button>
             <button type="button" className="btn btn-sm btn-danger" onClick={handleSubmit}>
@@ -56,9 +41,8 @@ const JobAbortModal = ({ job, show, toggle }) => {
 }
 
 JobAbortModal.propTypes = {
-  job: PropTypes.object.isRequired,
-  show: PropTypes.bool.isRequired,
-  toggle: PropTypes.func.isRequired
+  modal: PropTypes.object.isRequired,
+  job: PropTypes.object.isRequired
 }
 
 export default JobAbortModal

@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import Input from '../../forms/common/Input'
 import Select from '../../forms/common/Select'
 
-const Form = ({ form, onSubmit }) => {
+const FormDownload = ({ form, onSubmit }) => {
   const initialValues = Object.fromEntries(
     form.fields.filter(field => field.type != 'submit').map(field => [field.key, field.default_value || ''])
   )
@@ -61,9 +61,9 @@ const Form = ({ form, onSubmit }) => {
   )
 }
 
-Form.propTypes = {
+FormDownload.propTypes = {
   form: PropTypes.object.isRequired,
   onSubmit: PropTypes.func.isRequired
 }
 
-export default Form
+export default FormDownload

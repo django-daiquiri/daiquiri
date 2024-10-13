@@ -17,5 +17,9 @@ export const useModal = () => {
     }
   }
 
-  return {ref, show, hide}
+  const isShown = () => {
+    return ref.current && ref.current.classList.contains('show')
+  }
+
+  return { ref, show, hide, isShown }
 }

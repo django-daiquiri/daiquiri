@@ -8,9 +8,9 @@ import { jobPhaseClass, jobPhaseMessage } from '../../constants/job'
 import { useDownloadJobQuery, useDownloadsQuery } from '../../hooks/queries'
 import { useSubmitDownloadJobMutation } from '../../hooks/mutations'
 
-import Archive from './downloads/Archive'
-import Form from './downloads/Form'
-import Table from './downloads/Table'
+import ArchiveDownload from './downloads/ArchiveDownload'
+import FormDownload from './downloads/FormDownload'
+import TableDownload from './downloads/TableDownload'
 
 const JobDownload = ({ job }) => {
   const mutation = useSubmitDownloadJobMutation()
@@ -71,11 +71,28 @@ const JobDownload = ({ job }) => {
       {
         downloads && downloads.map((download, downloadIndex) => {
           if (download.key == 'table') {
-            return <Table key={downloadIndex} onSubmit={(data) => handleSubmit('table', data)} />
+            return (
+              <TableDownload
+                key={downloadIndex}
+                onSubmit={(data) => handleSubmit('table', data)}
+              />
+            )
           } else if (download.key == 'archive') {
-            return <Archive key={downloadIndex} columns={job.columns} onSubmit={(data) => handleSubmit('archive', data)} />
+            return (
+              <ArchiveDownload
+                key={downloadIndex}
+                columns={job.columns}
+                onSubmit={(data) => handleSubmit('archive', data)}
+              />
+            )
           } else if (!isNil(download.form)) {
-            return <Form key={downloadIndex} form={download.form} onSubmit={(data) => handleSubmit(download.key, data)} />
+            return (
+              <FormDownload
+                key={downloadIndex}
+                form={download.form}
+                onSubmit={(data) => handleSubmit(download.key, data)}
+              />
+            )
           }
         })
       }

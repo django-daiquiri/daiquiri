@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 import { useDownloadFormatsQuery } from '../../../hooks/queries'
 
-const Table = ({ onSubmit }) => {
+const TableDownload = ({ onSubmit }) => {
   const { data: downloadFormats } = useDownloadFormatsQuery()
 
   return (
@@ -35,8 +35,8 @@ const Table = ({ onSubmit }) => {
   )
 }
 
-Table.propTypes = {
+TableDownload.propTypes = {
   onSubmit: PropTypes.func.isRequired
 }
 
-export default Table
+export default TableDownload

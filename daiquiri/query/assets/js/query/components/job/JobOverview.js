@@ -5,19 +5,19 @@ import ReactCodeMirror from '@uiw/react-codemirror'
 import { EditorView } from '@codemirror/view'
 import { sql } from '@codemirror/lang-sql'
 
-import { useToggle } from 'daiquiri/core/assets/js/hooks'
+import { useModal } from 'daiquiri/core/assets/js/hooks/modal'
 
 import { jobPhaseBadge } from '../../constants/job'
 
-import JobRenameModal from './JobRenameModal'
-import JobAbortModal from './JobAbortModal'
-import JobArchiveModal from './JobArchiveModal'
+import RenameModal from './modals/RenameModal'
+import AbortModal from './modals/AbortModal'
+import ArchiveModal from './modals/ArchiveModal'
 
 const JobOverview = ({ job, loadForm }) => {
 
-  const [showRenameModal, toggleRenameModal] = useToggle()
-  const [showAbortModal, toggleAbortModal] = useToggle()
-  const [showArchiveModal, toggleArchiveModal] = useToggle()
+  const renameModal = useModal()
+  const abortModal = useModal()
+  const archiveModal = useModal()
 
   const renderQuery = (query) => (
     <ReactCodeMirror
@@ -154,18 +154,18 @@ const JobOverview = ({ job, loadForm }) => {
         <div className="card-footer">
           {
             job.phase == 'COMPLETED' && (
-              <button className="btn btn-link d-block" onClick={toggleRenameModal}>
+              <button className="btn btn-link d-block" onClick={renameModal.show}>
                 {gettext('Rename the job\'s result table or run id')}
               </button>
             )
           }
           {
             ['EXECUTING', 'PENDING', 'QUEUED'].includes(job.phase) ? (
-              <button className="btn btn-link d-block" onClick={toggleAbortModal}>
+              <button className="btn btn-link d-block" onClick={abortModal.show}>
                 {gettext('Abort the job')}
               </button>
             ) : (
-              <button className="btn btn-link d-block" onClick={toggleArchiveModal}>
+              <button className="btn btn-link d-block" onClick={archiveModal.show}>
                 {gettext('Archive the job')}
               </button>
             )
@@ -199,9 +199,9 @@ const JobOverview = ({ job, loadForm }) => {
         )
       }
 
-      <JobRenameModal job={job} show={showRenameModal} toggle={toggleRenameModal} />
-      <JobAbortModal job={job} show={showAbortModal} toggle={toggleAbortModal} />
-      <JobArchiveModal job={job} show={showArchiveModal} toggle={toggleArchiveModal} />
+      <RenameModal modal={renameModal} job={job} />
+      <AbortModal modal={abortModal} job={job} />
+      <ArchiveModal modal={archiveModal} job={job} />
 
     </div>
   )

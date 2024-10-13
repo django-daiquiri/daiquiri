@@ -15,19 +15,19 @@ const Table = ({ columns, rows, pageSizes, params, setParams }) => {
   const show = !(isEmpty(columns) || isEmpty(rows))
   const pageCount = Math.ceil(rows.count / params.page_size)
 
-  const [modalRef, showModal, hideModal]  = useModal()
+  const modal = useModal()
   const [modalValues, setModalValues] = useState({})
   const [active, setActive] = useState({})
 
   useEffect(() => {
-    if (modalRef.current && modalRef.current.classList.contains('show') && modalValues.page == params.page) {
+    if (modal.isShown() && modalValues.page == params.page) {
       // update the modal if (a) it is shown and (b) if we are not currently changing pages
       updateModal(active)
     }
   }, [active])
 
   useEffect(() => {
-    if (modalRef.current && modalRef.current.classList.contains('show')) {
+    if (modal.isShown()) {
       // always update the modal if the rows change
       updateModal(active)
     }
@@ -45,7 +45,7 @@ const Table = ({ columns, rows, pageSizes, params, setParams }) => {
         imageSrc: isImageColumn(column) ? getFileUrl(column, value) : null,
         page: params.page,
         up: (rowIndex > 0 || params.page > 1),
-        down: (rowIndex < params.page_size - 1 || params.page < pageCount),
+        down: (rowIndex < rows.results.length - 1 || params.page < pageCount),
         right: columns.filter((c, i) => i > columnIndex).some(isModalColumn),
         left: columns.filter((c, i) => i < columnIndex).some(isModalColumn),
       })
@@ -55,11 +55,9 @@ const Table = ({ columns, rows, pageSizes, params, setParams }) => {
   const handleClick = (rowIndex, columnIndex) => {
     setActive({ rowIndex, columnIndex })
 
-    console.log(isModalColumn(columns[columnIndex]))
-
     if (isModalColumn(columns[columnIndex])) {
       updateModal({ rowIndex, columnIndex })
-      showModal()
+      modal.show()
     }
   }
 
@@ -114,10 +112,9 @@ const Table = ({ columns, rows, pageSizes, params, setParams }) => {
         setParams={setParams}
       />
       <TableModal
-        modalRef={modalRef}
+        modal={modal}
         modalValues={modalValues}
         onNavigation={handleNavigation}
-        onClose={hideModal}
       />
     </div>
   )
