@@ -67,7 +67,7 @@ const JobOverview = ({ job, loadForm }) => {
           <dl className="row mb-0">
             <dt className="col-sm-4 text-end">{gettext('Job status')}</dt>
             <dd className="col-sm-8 mb-0">
-              <span className={jobPhaseBadge[job.phase]}>{job.phase}</span>
+              <span className={jobPhaseBadge[job.phase]}>{job.phase_label}</span>
             </dd>
 
             {
@@ -86,7 +86,7 @@ const JobOverview = ({ job, loadForm }) => {
             <dd className="col-sm-8 mb-0"><code>{job.id}</code></dd>
 
             <dt className="col-sm-4 text-end">{gettext('Time submitted')}</dt>
-            <dd className="col-sm-8 mb-0">{job.creation_time}</dd>
+            <dd className="col-sm-8 mb-0">{job.creation_time_label}</dd>
 
             {
               job.queue && (

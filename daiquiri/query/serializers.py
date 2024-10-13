@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.template.defaultfilters import date
 from django.template.loader import get_template, TemplateDoesNotExist
 
 from rest_framework import serializers
@@ -77,6 +79,11 @@ class QueryJobListSerializer(serializers.ModelSerializer):
 
 class QueryJobRetrieveSerializer(serializers.ModelSerializer):
 
+    phase_label = serializers.SerializerMethodField()
+    creation_time_label = serializers.SerializerMethodField()
+    start_time_label = serializers.SerializerMethodField()
+    end_time_label = serializers.SerializerMethodField()
+
     sources = serializers.SerializerMethodField()
     columns = serializers.SerializerMethodField()
 
@@ -86,9 +93,13 @@ class QueryJobRetrieveSerializer(serializers.ModelSerializer):
             'id',
             'run_id',
             'phase',
+            'phase_label',
             'creation_time',
+            'creation_time_label',
             'start_time',
+            'start_time_label',
             'end_time',
+            'end_time_label',
             'execution_duration',
             'time_queue',
             'time_query',
@@ -107,6 +118,18 @@ class QueryJobRetrieveSerializer(serializers.ModelSerializer):
             'sources',
             'columns'
         )
+
+    def get_phase_label(self, obj):
+        return dict(QueryJob.PHASE_CHOICES)[obj.phase]
+
+    def get_creation_time_label(self, obj):
+        return date(obj.creation_time, settings.DATETIME_FORMAT)
+
+    def get_start_time_label(self, obj):
+        return date(obj.start_time, settings.DATETIME_FORMAT)
+
+    def get_end_time_label(self, obj):
+        return date(obj.end_time, settings.DATETIME_FORMAT)
 
     def get_sources(self, obj):
         if obj.metadata:
