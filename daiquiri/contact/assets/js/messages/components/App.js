@@ -13,6 +13,7 @@ import Modal from './Modal.js'
 
 const App = () => {
   const initalParams = {
+    page_size: 3,
     spam: false
   }
 
@@ -137,7 +138,7 @@ const App = () => {
         ordering={params.ordering}
         count={count}
         onSearch={handleSearch}
-        onNext={handleNext}
+        onNext={hasNextPage ? handleNext : null}
         onReset={handleReset}
         buttons={buttons}
         checkboxes={{}}
