@@ -68,6 +68,19 @@ class ProfileViewSet(mixins.UpdateModelMixin, mixins.ListModelMixin, mixins.Retr
         return Response(self.get_serializer(profile).data)
 
 
+class SettingsViewSet(viewsets.GenericViewSet):
+    permission_classes = (IsAuthManager, )
+    authentication_classes = (SessionAuthentication, TokenAuthentication)
+
+    queryset = {
+        'AUTH_WORKFLOW': settings.AUTH_WORKFLOW,
+        'AUTH_DETAIL_KEYS': settings.AUTH_DETAIL_KEYS
+    }
+
+    def list(self, request, *args, **kwargs):
+        return Response(self.get_queryset())
+
+
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = (IsAuthManager, )
     authentication_classes = (SessionAuthentication, TokenAuthentication)

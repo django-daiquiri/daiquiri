@@ -13,7 +13,6 @@ import Modal from './Modal.js'
 
 const App = () => {
   const initalParams = {
-    page_size: 3,
     spam: false
   }
 

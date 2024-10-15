@@ -11,5 +11,6 @@
 <meta name="baseurl" content="{% url 'home' %}" />
 <meta name="staticurl" content="{% static '' %}" />
 <meta name="userid" content="{{ request.user.id|default_if_none:'' }}" />
+<meta name="is_staff" content="{{ request.user.is_staff|default_if_none:'false'|lower }}" />
 
 <link rel="shortcut icon" href="{% static 'core/img/favicon.png' %}" type="image/png" />

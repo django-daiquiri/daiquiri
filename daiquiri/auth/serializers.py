@@ -8,7 +8,6 @@ from daiquiri.core.serializers import JSONDictField
 
 from .models import Profile
 
-
 class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -57,7 +56,18 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('id', 'full_name', 'user', 'is_confirmed', 'is_pending', 'emails', 'details', 'attributes')
+        fields = (
+            'id',
+            'full_name',
+            'user',
+            'is_confirmed',
+            'is_pending',
+            'emails',
+            'details',
+            'attributes',
+            'user_admin_url',
+            'profile_admin_url'
+        )
 
     def update(self, obj, validated_data):
         if 'user' in validated_data:

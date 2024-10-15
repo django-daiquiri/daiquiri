@@ -3,7 +3,8 @@
 
 {% block js %}
 {{ block.super }}
-<script src="{% static 'auth/dist/js/users.js' %}" defer></script>
+    <script src="{% url 'javascript-catalog' %}"></script>
+    <script src="{% static 'auth/dist/js/users.js' %}" defer></script>
 {% endblock %}
 
 {% block wide %}
