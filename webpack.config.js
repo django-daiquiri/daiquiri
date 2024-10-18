@@ -54,16 +54,8 @@ const configList = [
   {
     name: 'query',
     entry: {
-      examples: [
-        './daiquiri/query/assets/js/examples/examples.js',
-        './daiquiri/query/assets/scss/examples.scss'
-      ],
-      jobs: [
-        './daiquiri/query/assets/js/jobs/jobs.js',
-        './daiquiri/query/assets/scss/jobs.scss'
-      ],
       query: [
-        './daiquiri/query/assets/js/query/query.js',
+        './daiquiri/query/assets/js/query.js',
         './daiquiri/query/assets/scss/query.scss'
       ]
     },

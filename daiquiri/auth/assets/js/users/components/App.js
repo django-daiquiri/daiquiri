@@ -60,12 +60,6 @@ const App = () => {
     setParams({ ...params, search })
   }
 
-  const handleNext = () => {
-    if (hasNextPage) {
-      fetchNextPage()
-    }
-  }
-
   const handleReset = () => {
     setParams(initalParams)
   }
@@ -233,7 +227,7 @@ const App = () => {
         ordering={params.ordering}
         count={count}
         onSearch={handleSearch}
-        onNext={hasNextPage ? handleNext : null}
+        onNext={hasNextPage ? fetchNextPage : null}
         onReset={handleReset}
         checkboxes={{}}
       />

@@ -17,7 +17,11 @@ const Select = ({ label, value, options, errors, onChange }) => {
         value={value}
         onChange={(event) => onChange(event.target.value)}>
       {
-        options && options.map((option) => <option key={option.id} value={option.id}>{option.label}</option>)
+        options && options.map((option) => (
+          <option key={option.id} value={option.id}>
+            {option.label || option.text}
+          </option>
+        ))
       }
       </select>
       <Errors errors={errors} />

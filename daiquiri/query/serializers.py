@@ -64,14 +64,13 @@ class QueryJobSerializer(serializers.ModelSerializer):
         )
 
 
-class QueryJobListSerializer(serializers.ModelSerializer):
+class QueryJobIndexSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = QueryJob
         fields = (
             'id',
             'table_name',
-            'creation_time',
             'run_id',
             'phase'
         )

@@ -1,4 +1,3 @@
-import hashlib
 import os
 
 from collections import OrderedDict
@@ -41,10 +40,10 @@ from .serializers import (
     DownloadSerializer,
     QueryDownloadFormatSerializer,
     QueryJobSerializer,
-    QueryJobListSerializer,
     QueryJobRetrieveSerializer,
     QueryJobCreateSerializer,
     QueryJobFormSerializer,
+    QueryJobIndexSerializer,
     QueryJobUpdateSerializer,
     QueryJobUploadSerializer,
     QueryLanguageSerializer,
@@ -143,9 +142,7 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
         return queryset
 
     def get_serializer_class(self):
-        if self.action == 'list':
-            return QueryJobListSerializer
-        elif self.action == 'retrieve' or self.action == 'abort':
+        if self.action == 'list' or self.action == 'retrieve' or self.action == 'abort':
             return QueryJobRetrieveSerializer
         elif self.action == 'create':
             return QueryJobCreateSerializer
@@ -183,6 +180,12 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
 
     def perform_destroy(self, instance):
         instance.archive()
+
+    @action(detail=False, methods=['get'])
+    def index(self, request):
+        queryset = self.get_queryset().exclude(phase=QueryJob.PHASE_ARCHIVED)[:1000]
+        serializer = QueryJobIndexSerializer(queryset, many=True)
+        return Response(serializer.data)
 
     @action(detail=False, methods=['get'])
     def tables(self, request):
