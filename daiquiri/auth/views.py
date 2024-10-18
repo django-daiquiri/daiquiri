@@ -85,32 +85,8 @@ def logout(request, *args, **kwargs):
     return response
 
 
-class UsersView(ModelPermissionMixin, CSRFViewMixin, TemplateView):
+class UsersView(ModelPermissionMixin, CSRFViewMixin, StoreIdViewMixin, TemplateView):
     template_name = 'auth/users.html'
-    permission_required = 'daiquiri_auth.view_profile'
-
-    def get_context_data(self, **kwargs):
-        # get urls to the admin interface to be used with angular
-        user_admin_url = reverse('admin:auth_user_change', args=['row.id']).replace('row.id', '{$ row.id $}')
-        profile_admin_url = reverse('admin:daiquiri_auth_profile_change', args=['row.id']).replace('row.id', '{$ row.id $}')
-
-        detail_keys = settings.AUTH_DETAIL_KEYS
-        for detail_key in detail_keys:
-            detail_key['options_json'] = json.dumps(detail_key.get('options', {}))
-            detail_key['model'] = 'service.current_row.details.%s' % detail_key['key']
-            detail_key['errors'] = 'service.errors.%s' % detail_key['key']
-
-        context = super(UsersView, self).get_context_data(**kwargs)
-        context.update({
-            'detail_keys': detail_keys,
-            'user_admin_url': user_admin_url,
-            'profile_admin_url': profile_admin_url
-        })
-        return context
-
-
-class NewUsersView(ModelPermissionMixin, CSRFViewMixin, StoreIdViewMixin, TemplateView):
-    template_name = 'auth/new/users.html'
     permission_required = 'daiquiri_auth.view_profile'
 
 

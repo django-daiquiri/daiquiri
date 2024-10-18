@@ -1,132 +1,16 @@
-{% extends 'core/wide.html' %}
+{% extends 'core/new/wide.html' %}
 {% load static %}
-{% load i18n %}
-{% load compress %}
-{% load vendor_tags %}
 
-{% block bodyargs %}ng-app="users" ng-controller="UsersController"{% endblock %}
-
-{% block headextra %}
-    {% vendor 'angular' %}
-    {% vendor 'ng-infinite-scroll' %}
-
-    {% compress css %}
-    <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/list.scss' %}" />
-    <link rel="stylesheet" type="text/x-scss" href="{% static 'auth/css/users.scss' %}" />
-    {% endcompress css %}
-
-    {% compress js %}
-    <script type="text/javascript" src="{% static 'core/js/core.js' %}" ></script>
-    <script type="text/javascript" src="{% static 'core/js/list.js' %}" ></script>
-    <script type="text/javascript" src="{% static 'core/js/filter.js' %}" ></script>
-    <script type="text/javascript" src="{% static 'core/js/multiCheckbox.js' %}" ></script>
-    <script type="text/javascript" src="{% static 'core/js/byNumber.js' %}" ></script>
-    <script type="text/javascript" src="{% static 'core/js/formgroup.js' %}" ></script>
-    <script type="text/javascript" src="{% static 'auth/js/users.js' %}" ></script>
-    {% endcompress js %}
+{% block js %}
+{{ block.super }}
+    <script src="{% url 'javascript-catalog' %}"></script>
+    <script src="{% static 'auth/dist/js/users.js' %}" defer></script>
 {% endblock %}
 
 {% block wide %}
 
-    <div ng-cloak ng-show="service.list.ready">
-        <h1>User management</h1>
+    <h1>User management</h1>
 
-        <div class="daiquiri-list">
-            <div class="row daiquiri-list-header">
-                <form class="col-sm-6" ng-submit="service.list.search()">
-                    <div class="input-group">
-                        <input class="form-control"
-                               id="table-pager-search-input"
-                               placeholder="{% trans 'Search entries' %}"
-                               type="text" ng-model="service.list.search_string">
-                        <a href="" class="input-group-addon" ng-click="service.list.search()">
-                            <span class="fa fa-search"></span>
-                        </a>
-                    </div>
-                </form>
-
-                <div class="col-sm-6">
-                    <p class="count">
-                        {$ service.list.count $} {% trans 'users found' %}
-                    </p>
-                    <ul class="pagination pull-right">
-                        <li>
-                            <a href="" ng-click="service.list.reset()">{% trans 'Reset' %}</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="table-responsive">
-                <table class="table daiquiri-list-table" infinite-scroll="service.list.fetch()" infinite-scroll-distance="0.2">
-                    <thead>
-                        <th style="width: 25%;">{% trans 'Name (Username)' %}</th>
-                        <th style="width: 25%;">{% trans 'Email' %}</th>
-                        <th style="width: 20%;">{% trans 'Status' %}</th>
-                        <th style="width: 10%;">{% trans 'Groups' %}</th>
-                        <th style="width: 20%;"></th>
-                    </thead>
-                    <tbody>
-                        <tr ng-repeat="row in service.list.rows">
-                            <td>
-                                <a href="" ng-click="service.modal('show-user-modal', $index)">
-                                    {$ row.full_name $}
-                                </a>
-                                <em>({$ row.user.username $})</em>
-                            </td>
-                            <td>
-                                <div ng-repeat="email in row.emails">
-                                    <a href="mailto:{$ row.user.first_name $} {$ row.user.last_name $} <{$ email.email $}>">
-                                        {$ email.email $}
-                                    </a>
-                                    <span ng-show="!email.verified">({% trans 'not verified' %})</span>
-                                </div>
-                            </td>
-                            <td ng-class="{
-                                'text-success': row.user.is_active && !row.is_pending && !row.is_confirmed,
-                                'text-danger': !row.user.is_active,
-                                'text-info': row.is_pending || row.is_confirmed
-                            }">
-                                <span ng-show="row.user.is_superuser">
-                                    {% trans 'superuser' %}
-                                </span>
-                                <span ng-show="row.user.is_staff && !row.user.is_superuser">
-                                    {% trans 'staff' %}
-                                </span>
-                                <span ng-show="row.user.is_active && !row.is_pending && !row.is_confirmed">
-                                    {% trans 'active' %}
-                                </span>
-                                <span ng-hide="row.user.is_active">
-                                    {% trans 'disabled' %}
-                                </span>
-                                <span ng-show="row.is_pending">
-                                    {% trans 'pending' %}
-                                </span>
-                                <span ng-show="row.is_confirmed">
-                                    {% trans 'confirmed' %}
-                                </span>
-                            </td>
-                            <td>
-                                <span ng-repeat="group in service.groups|filterAgainstList:{'id': row.user.groups}">
-                                    {$ group.name $}{$ $last ? '' : ', ' $}
-                                </span>
-                            </td>
-                            <td class="text-right options">
-                                {% include 'auth/users_options.html' %}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    {% include 'auth/users_modal_show_user.html' %}
-    {% include 'auth/users_modal_update_user.html' %}
-    {% include 'auth/users_modal_disable_user.html' %}
-    {% include 'auth/users_modal_enable_user.html' %}
-    {% include 'auth/users_modal_confirm_user.html' %}
-    {% include 'auth/users_modal_reject_user.html' %}
-    {% include 'auth/users_modal_activate_user.html' %}
+    <div id="app" class="users"></div>
 
 {% endblock %}
