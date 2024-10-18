@@ -32,7 +32,7 @@ const ListHeader = ({ count, onSearch, onReset, buttons, checkboxes }) => {
 
       {
         !isEmpty(buttons) && (
-          <ul className="pagination me-2">
+          <ul className="pagination mb-2 me-2">
             {
               buttons.map((button, buttonIndex) => (
                 <li key={buttonIndex} className="page-item">
@@ -46,7 +46,7 @@ const ListHeader = ({ count, onSearch, onReset, buttons, checkboxes }) => {
         )
       }
 
-      <ul className="pagination">
+      <ul className="pagination mb-2">
         <li className="page-item">
           <span className="page-link" onClick={handleReset}>
             {gettext('Reset')}

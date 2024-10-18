@@ -25,8 +25,19 @@ class ProfileViewSet(mixins.UpdateModelMixin, mixins.ListModelMixin, mixins.Retr
     pagination_class = ListPagination
 
     filter_backends = (filters.SearchFilter, filters.OrderingFilter)
-    ordering_fields = ('user__username', 'user__email', 'user__first_name', 'user__last_name')
-    search_fields = ('user__username', 'user__email', 'user__first_name', 'user__last_name')
+    ordering_fields = (
+        'user__username',
+        'user__email',
+        'user__first_name',
+        'user__last_name',
+        'user__date_joined'
+    )
+    search_fields = (
+        'user__username',
+        'user__email',
+        'user__first_name',
+        'user__last_name'
+    )
 
     @action(detail=True, methods=['put'], permission_classes=[HasModelPermission])
     def confirm(self, request, pk=None):

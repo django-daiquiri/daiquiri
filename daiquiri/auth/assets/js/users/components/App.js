@@ -14,7 +14,9 @@ import UpdateModal from './UpdateModal.js'
 import ConfirmModal from './ConfirmModal.js'
 
 const App = () => {
-  const initalParams = {}
+  const initalParams = {
+    ordering: '-user__date_joined'
+  }
 
   const [params, setParams] = useState(initalParams)
 
@@ -74,72 +76,70 @@ const App = () => {
 
   const columns = [
     {
-      name: 'id', label: gettext('ID'), width: '5%'
-    },
-    {
-      name: 'full_name', label: gettext('Name (Username)'), width: '25%', onOrder: handleOrdering, formatter: (profile) => (
-        <>
+      name: 'user__username', label: gettext('Name (Username)'), onOrder: handleOrdering, width: '20%',
+      formatter: (profile) => (
+        <div className="d-flex gap-1">
           <button className="btn btn-link" title={gettext('Show user details')}
                   onClick={() => handleModal(showModal, profile)}>{profile.full_name}</button>
-          {' '}
-          <i>({profile.user.username})</i>
-        </>
+          <i className="d-block">({profile.user.username})</i>
+        </div>
       )
     },
     {
-      name: 'email', label: gettext('Email'), onOrder: handleOrdering,  width: '15%', formatter: (profile) => (
+      name: 'user__email', label: gettext('Email'), onOrder: handleOrdering,  width: '20%',
+      formatter: (profile) => (
         <a href={`mailto:${profile.user.email}`}>{profile.user.email}</a>
       )
     },
     {
-      name: 'status', label: gettext('Status'), onOrder: handleOrdering,  width: '15%', formatter: (profile) => (
-        <div className="d-flex gap-1 flex-wrap">
-          {
-            profile.user.is_superuser && (
-              <span className="badge text-bg-success">{gettext('superuser')}</span>
-            )
-          }
-          {
-            profile.user.is_staff && !profile.user.is_superuser && (
-              <span className="badge text-bg-success">{gettext('staff')}</span>
-            )
-          }
-          {
-            profile.user.is_active && !profile.is_pending && !profile.is_confirmed && (
-              <span className="badge text-bg-primary">{gettext('active')}</span>
-            )
-          }
-          {
-            !profile.user.is_active && (
-              <span className="badge text-bg-danger">{gettext('disabled')}</span>
-            )
-          }
-          {
-            profile.is_pending && (
-              <span className="badge text-bg-info">{gettext('pending')}</span>
-            )
-          }
-          {
-            profile.is_confirmed && (
-              <span className="badge text-bg-info">{gettext('confirmed')}</span>
-            )
-          }
-        </div>
-      )
+      name: 'user__date_joined', label: gettext('Date joined'), onOrder: handleOrdering,  width: '20%',
+      formatter: (profile) => profile.user.date_joined_label
     },
     {
-      name: 'groups', label: gettext('Groups'), width: '20%', formatter: (profile) => (
-        <div className="d-flex gap-1 flex-wrap">
-          {
-            profile.user.groups.map((group, groupIndex) => (
-              <span key={groupIndex} className="badge text-bg-secondary">{groups.find(g => g.id == group).name}</span>
-            ))
-          }
-        </div>
-      )
+      name: 'status', label: gettext('Status'), width: '15%', formatter: (profile) => <>
+        {
+          profile.user.is_superuser && (
+            <span className="badge text-bg-success me-1">{gettext('superuser')}</span>
+          )
+        }
+        {
+          profile.user.is_staff && !profile.user.is_superuser && (
+            <span className="badge text-bg-success me-1">{gettext('staff')}</span>
+          )
+        }
+        {
+          profile.user.is_active && !profile.is_pending && !profile.is_confirmed && (
+            <span className="badge text-bg-secondary me-1">{gettext('active')}</span>
+          )
+        }
+        {
+          !profile.user.is_active && (
+            <span className="badge text-bg-danger me-1">{gettext('disabled')}</span>
+          )
+        }
+        {
+          profile.is_pending && (
+            <span className="badge text-bg-primary me-1">{gettext('pending')}</span>
+          )
+        }
+        {
+          profile.is_confirmed && (
+            <span className="badge text-bg-primary me-1">{gettext('confirmed')}</span>
+          )
+        }
+      </>
     },
     {
-      width: '20%', formatter: (profile) => (
+      name: 'groups', label: gettext('Groups'), width: '15%', formatter: (profile) => <>
+        {
+          profile.user.groups.map((group, groupIndex) => (
+            <span key={groupIndex} className="badge text-bg-secondary me-1">{groups.find(g => g.id == group).name}</span>
+          ))
+        }
+      </>
+    },
+    {
+      width: '10%', formatter: (profile) => (
         <span className="d-flex gap-1 flex-wrap justify-content-end">
           <button className="btn btn-link" title={gettext('Show user details')}
                   onClick={() => handleModal(showModal, profile)}>
