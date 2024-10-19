@@ -5,10 +5,10 @@ import ListHeader from './ListHeader'
 import ListFooter from './ListFooter'
 import ListTable from './ListTable'
 
-const List = ({ columns, rows, ordering, count, onSearch, onNext, onReset, headerButtons, headerChildren }) => {
+const List = ({ columns, rows, ordering, count, onSearch, onNext, onReset, headerChildren }) => {
   return (
     <div className="dq-list mb-3">
-      <ListHeader count={count} onSearch={onSearch} onReset={onReset} buttons={headerButtons}>
+      <ListHeader count={count} onSearch={onSearch} onReset={onReset}>
         {headerChildren}
       </ListHeader>
       <ListTable columns={columns} rows={rows} ordering={ordering} />
@@ -25,7 +25,6 @@ List.propTypes = {
   onSearch: PropTypes.func,
   onNext: PropTypes.func,
   onReset: PropTypes.func,
-  headerButtons: PropTypes.array,
   headerChildren: PropTypes.node
 }
 

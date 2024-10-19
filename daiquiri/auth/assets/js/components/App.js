@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { isEmpty, isNil } from 'lodash'
+import { isEmpty, isNil, omit } from 'lodash'
 
 import { useModal } from 'daiquiri/core/assets/js/hooks/modal'
 import { isStaff, userId } from 'daiquiri/core/assets/js/utils/meta'
@@ -7,6 +7,7 @@ import { isStaff, userId } from 'daiquiri/core/assets/js/utils/meta'
 import { useGroupsQuery, useProfilesQuery, useSettingsQuery } from '../hooks/queries'
 import { useUpdateProfileMutation } from '../hooks/mutations'
 
+import Checkbox from 'daiquiri/core/assets/js/components/form/Checkbox'
 import List from 'daiquiri/core/assets/js/components/list/List'
 
 import ShowModal from './ShowModal.js'
@@ -46,10 +47,6 @@ const App = () => {
     return [...profiles, ...page.results]
   }, [])
 
-  const handleOrdering = (column) => {
-    const ordering = (params.ordering == column.name) ? '-' + column.name : column.name
-    setParams({ ...params, ordering })
-  }
 
   const handleModal = (modal, profile) => {
     setValues(profile)
@@ -60,8 +57,17 @@ const App = () => {
     setParams({ ...params, search })
   }
 
+  const handleFilter = (key) => {
+    setParams(params[key] ? omit(params, [key]) : { ...params, [key]: true})
+  }
+
   const handleReset = () => {
     setParams(initalParams)
+  }
+
+  const handleOrdering = (column) => {
+    const ordering = (params.ordering == column.name) ? '-' + column.name : column.name
+    setParams({ ...params, ordering })
   }
 
   const handleUpdate = (modal, action) => {
@@ -219,6 +225,36 @@ const App = () => {
     }
   ]
 
+  const headerChildren = (
+    <div className="d-md-flex flex-wrap gap-3">
+      <Checkbox
+        label={gettext('pending')}
+        checked={params.is_pending || false}
+        onChange={() => handleFilter('is_pending')}
+      />
+      <Checkbox
+        label={gettext('confirmed')}
+        checked={params.is_confirmed || false}
+        onChange={() => handleFilter('is_confirmed')}
+      />
+      <Checkbox
+        label={gettext('active')}
+        checked={params.user__is_active || false}
+        onChange={() => handleFilter('user__is_active')}
+      />
+      <Checkbox
+        label={gettext('staff')}
+        checked={params.user__is_staff || false}
+        onChange={() => handleFilter('user__is_staff')}
+      />
+      <Checkbox
+        label={gettext('superuser')}
+        checked={params.user__is_superuser || false}
+        onChange={() => handleFilter('user__is_superuser')}
+      />
+    </div>
+  )
+
   return !isEmpty(settings) && !isEmpty(groups) && (
     <div className="messages">
       <List
@@ -229,7 +265,7 @@ const App = () => {
         onSearch={handleSearch}
         onNext={hasNextPage ? fetchNextPage : null}
         onReset={handleReset}
-        checkboxes={{}}
+        headerChildren={headerChildren}
       />
       <ShowModal
         modal={showModal}

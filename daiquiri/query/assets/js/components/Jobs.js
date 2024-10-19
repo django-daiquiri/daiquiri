@@ -37,11 +37,6 @@ const Jobs = ({ loadForm, loadJob }) => {
     return [...messages, ...page.results]
   }, [])
 
-  const handleOrdering = (column) => {
-    const ordering = (params.ordering == column.name) ? '-' + column.name : column.name
-    setParams({ ...params, ordering })
-  }
-
   const handleModal = (modal, job) => {
     setModalJob(job)
     modal.show()
@@ -53,6 +48,17 @@ const Jobs = ({ loadForm, loadJob }) => {
 
   const handleReset = () => {
     setParams(initalParams)
+  }
+
+  const handleFilter = (phase) => {
+    setParams({ ...params,
+      phase: params.phase.includes(phase) ? params.phase.filter(p => p != phase) : [ ...params.phase, phase ]
+    })
+  }
+
+  const handleOrdering = (column) => {
+    const ordering = (params.ordering == column.name) ? '-' + column.name : column.name
+    setParams({ ...params, ordering })
   }
 
   const columns = [
@@ -129,19 +135,15 @@ const Jobs = ({ loadForm, loadJob }) => {
   ]
 
   const headerChildren = (
-    <div className="d-md-flex flex-wrap gap-1">
-      <strong >{gettext('Filter phases:')}</strong>
+    <div className="d-md-flex flex-wrap gap-3">
       {
         Object.entries(jobPhases).map(([phase, phaseLabel], phaseIndex) => (
-          <div key={phaseIndex} className="ms-2">
-            <Checkbox
-              label={phaseLabel}
-              checked={params.phase.includes(phase)}
-              onChange={() => setParams({ ...params,
-                phase: params.phase.includes(phase) ? params.phase.filter(p => p != phase) : [ ...params.phase, phase ]
-              })}
-            />
-          </div>
+          <Checkbox
+            key={phaseIndex}
+            label={phaseLabel}
+            checked={params.phase.includes(phase)}
+            onChange={() => handleFilter(phase)}
+          />
         ))
       }
     </div>

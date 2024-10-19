@@ -8,6 +8,8 @@ from rest_framework.exceptions import MethodNotAllowed
 from rest_framework.response import Response
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 
+from django_filters.rest_framework import DjangoFilterBackend
+
 from daiquiri.core.permissions import HasModelPermission
 from daiquiri.core.paginations import ListPagination
 
@@ -24,7 +26,7 @@ class ProfileViewSet(mixins.UpdateModelMixin, mixins.ListModelMixin, mixins.Retr
     serializer_class = ProfileSerializer
     pagination_class = ListPagination
 
-    filter_backends = (filters.SearchFilter, filters.OrderingFilter)
+    filter_backends = (filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend)
     ordering_fields = (
         'user__username',
         'user__email',
@@ -37,6 +39,13 @@ class ProfileViewSet(mixins.UpdateModelMixin, mixins.ListModelMixin, mixins.Retr
         'user__email',
         'user__first_name',
         'user__last_name'
+    )
+    filterset_fields = (
+        'is_pending',
+        'is_confirmed',
+        'user__is_active',
+        'user__is_staff',
+        'user__is_superuser',
     )
 
     @action(detail=True, methods=['put'], permission_classes=[HasModelPermission])

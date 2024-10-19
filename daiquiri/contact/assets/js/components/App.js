@@ -1,20 +1,19 @@
 import React, { useState } from 'react'
-import { isNil } from 'lodash'
+import { isNil, omit } from 'lodash'
 
 import { useModal } from 'daiquiri/core/assets/js/hooks/modal'
 
 import { useMessagesQuery } from '../hooks/queries'
 import { useUpdateMessageMutation } from '../hooks/mutations'
-import { messageStatusBadge } from '../constants/messages'
+import { messageStatus, messageStatusBadge } from '../constants/messages'
 
+import Checkbox from 'daiquiri/core/assets/js/components/form/Checkbox'
 import List from 'daiquiri/core/assets/js/components/list/List'
 
 import Modal from './Modal.js'
 
 const App = () => {
-  const initalParams = {
-    spam: false
-  }
+  const initalParams = {}
 
   const [params, setParams] = useState(initalParams)
 
@@ -31,18 +30,9 @@ const App = () => {
     return [...messages, ...page.results]
   }, [])
 
-  const handleOrdering = (column) => {
-    const ordering = (params.ordering == column.name) ? '-' + column.name : column.name
-    setParams({ ...params, ordering })
-  }
-
-  const handleShowModal = (message) => {
+  const handleModal = (message) => {
     setModalMessage(message)
     modal.show()
-  }
-
-  const handleUpdateMessage = (message, status) => {
-    mutation.mutate({ message: {...message, status }})
   }
 
   const handleSearch = (search) => {
@@ -59,13 +49,26 @@ const App = () => {
     setParams(initalParams)
   }
 
+  const handleFilter = (status) => {
+    setParams((params.status == status) ? omit(params, ['status']) : {...params, status})
+  }
+
+  const handleOrdering = (column) => {
+    const ordering = (params.ordering == column.name) ? '-' + column.name : column.name
+    setParams({ ...params, ordering })
+  }
+
+  const handleUpdate = (message, status) => {
+    mutation.mutate({ message: {...message, status }})
+  }
+
   const columns = [
     {
       name: 'id', label: gettext('ID'), width: '5%'
     },
     {
       name: 'subject', label: gettext('Subject'), width: '15%', onOrder: handleOrdering, formatter: (message) => (
-        <button className="btn btn-link" onClick={() => handleShowModal(message)}>{message.subject}</button>
+        <button className="btn btn-link" onClick={() => handleModal(message)}>{message.subject}</button>
       )
     },
     {
@@ -89,30 +92,30 @@ const App = () => {
       width: '10%', formatter: (message) => (
         <span className="d-flex gap-1 justify-content-end">
           <a href={message.mailto} className="material-symbols-rounded">reply</a>
-          <button className="btn btn-link" onClick={() => handleShowModal(message)}>
+          <button className="btn btn-link" onClick={() => handleModal(message)}>
             <span className="material-symbols-rounded">visibility</span>
           </button>
           {
             message.status == 'ACTIVE' && (
-              <button className="btn btn-link" onClick={() => handleUpdateMessage(message, 'CLOSED')}>
+              <button className="btn btn-link" onClick={() => handleUpdate(message, 'CLOSED')}>
                 <span className="material-symbols-rounded">check_box_outline_blank</span>
               </button>
             )
           }
           {
             message.status == 'CLOSED' && (
-              <button className="btn btn-link" onClick={() => handleUpdateMessage(message, 'ACTIVE')}>
+              <button className="btn btn-link" onClick={() => handleUpdate(message, 'ACTIVE')}>
                 <span className="material-symbols-rounded">check_box</span>
               </button>
             )
           }
           {
             message.status == 'SPAM' ? (
-              <button className="btn btn-link" onClick={() => handleUpdateMessage(message, 'ACTIVE')}>
+              <button className="btn btn-link" onClick={() => handleUpdate(message, 'ACTIVE')}>
                 <span className="material-symbols-rounded">report_off</span>
               </button>
             ) : (
-              <button className="btn btn-link" onClick={() => handleUpdateMessage(message, 'SPAM')}>
+              <button className="btn btn-link" onClick={() => handleUpdate(message, 'SPAM')}>
                 <span className="material-symbols-rounded">report</span>
               </button>
             )
@@ -122,12 +125,20 @@ const App = () => {
     }
   ]
 
-  const headerButtons = [
-    {
-      label: params.spam ? gettext('Show non-spam') : gettext('Show spam'),
-      onClick: () => setParams({page: 1, spam: !params.spam})
-    }
-  ]
+  const headerChildren = (
+    <div className="d-md-flex flex-wrap gap-3">
+      {
+        Object.entries(messageStatus).map(([status, statusLabel], statusIndex) => (
+          <Checkbox
+            key={statusIndex}
+            label={statusLabel}
+            checked={params.status == status}
+            onChange={() => handleFilter(status)}
+          />
+        ))
+      }
+    </div>
+  )
 
   return (
     <div className="messages">
@@ -139,8 +150,7 @@ const App = () => {
         onSearch={handleSearch}
         onNext={hasNextPage ? handleNext : null}
         onReset={handleReset}
-        headerButtons={headerButtons}
-        checkboxes={{}}
+        headerChildren={headerChildren}
       />
       <Modal modal={modal} message={modalMessage} />
     </div>
