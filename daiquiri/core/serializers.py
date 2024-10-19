@@ -1,3 +1,6 @@
+from django.conf import settings
+from django.template.defaultfilters import date
+
 from rest_framework import serializers
 
 from .utils import make_query_dict_upper_case
@@ -27,6 +30,12 @@ class JSONListField(serializers.JSONField):
             self.fail('invalid')
 
         return data
+
+
+class DateTimeLabelField(serializers.CharField):
+
+    def to_representation(self, value):
+        return date(value, settings.DATETIME_FORMAT)
 
 
 class ChoicesSerializer(serializers.Serializer):

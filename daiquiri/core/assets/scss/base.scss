@@ -1,0 +1,20 @@
+$FontPathOpenSans: ".~npm-font-open-sans/fonts/";
+@import "~npm-font-open-sans/open-sans";
+
+$material-symbols-font-path: '~material-symbols/';
+@import '~material-symbols';
+
+@import 'base/browser';
+@import 'base/card';
+@import 'base/fonts';
+@import 'base/footer';
+@import 'base/form';
+@import 'base/forms';
+@import 'base/layout';
+@import 'base/link';
+@import 'base/list';
+@import 'base/modal';
+@import 'base/popover';
+@import 'base/symbols';
+@import 'base/table';
+@import 'base/typography';

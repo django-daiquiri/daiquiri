@@ -8,8 +8,7 @@ from .views import (
     token,
     logout,
     password_change,
-    password_set,
-    terms_of_use
+    password_set
 )
 
 

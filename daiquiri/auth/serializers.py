@@ -4,12 +4,13 @@ from rest_framework import serializers
 
 from allauth.account.models import EmailAddress
 
-from daiquiri.core.serializers import JSONDictField
+from daiquiri.core.serializers import DateTimeLabelField, JSONDictField
 
 from .models import Profile
 
-
 class UserSerializer(serializers.ModelSerializer):
+
+    date_joined_label = DateTimeLabelField(source='date_joined')
 
     class Meta:
         model = User
@@ -23,6 +24,7 @@ class UserSerializer(serializers.ModelSerializer):
             'is_staff',
             'is_active',
             'date_joined',
+            'date_joined_label',
             'groups'
         )
         read_only_fields = (
@@ -57,7 +59,18 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('id', 'full_name', 'user', 'is_confirmed', 'is_pending', 'emails', 'details', 'attributes')
+        fields = (
+            'id',
+            'full_name',
+            'user',
+            'is_confirmed',
+            'is_pending',
+            'emails',
+            'details',
+            'attributes',
+            'user_admin_url',
+            'profile_admin_url'
+        )
 
     def update(self, obj, validated_data):
         if 'user' in validated_data:

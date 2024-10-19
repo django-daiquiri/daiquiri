@@ -2,8 +2,9 @@
 
     {% if request.user.is_staff %}
     <li>
-        <a href="{% url 'admin:index' %}">{% trans 'Django Admin' %}</a>
+        <a class="dropdown-item" href="{% url 'admin:index' %}">{% trans 'Admin' %}</a>
     </li>
-
-    <li role="separator" class="divider"></li>
+    <li>
+        <hr class="dropdown-divider" />
+    </li>
     {% endif %}
