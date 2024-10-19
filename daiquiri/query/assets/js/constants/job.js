@@ -1,3 +1,16 @@
+export const jobPhases = {
+  'PENDING': gettext('Pending'),
+  'QUEUED': gettext('Queued'),
+  'EXECUTING': gettext('Executing'),
+  'COMPLETED': gettext('Completed'),
+  'ERROR': gettext('Error'),
+  'ABORTED': gettext('Aborted'),
+  'UNKNOWN': gettext('Unknown'),
+  'HELD': gettext('Held'),
+  'SUSPENDED': gettext('Suspended'),
+  'ARCHIVED': gettext('Archived')
+}
+
 export const jobPhaseClass = {
   'PENDING': 'text-primary',
   'QUEUED': 'text-info-emphasis',

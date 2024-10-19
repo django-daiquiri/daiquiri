@@ -21,7 +21,6 @@ const App = () => {
   }
 
   const loadForm = (formKey, query = null) => {
-    console.log(query)
     updateLocation({ formKey })
     setState({ formKey, query })
   }

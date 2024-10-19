@@ -4,9 +4,10 @@ import { isNil } from 'lodash'
 
 import { useModal } from 'daiquiri/core/assets/js/hooks/modal'
 
-import { jobPhaseBadge } from 'daiquiri/query/assets/js/constants/job'
+import { jobPhases, jobPhaseBadge } from 'daiquiri/query/assets/js/constants/job'
 import { useJobsQuery } from 'daiquiri/query/assets/js/hooks/queries'
 
+import Checkbox from 'daiquiri/core/assets/js/components/form/Checkbox'
 import List from 'daiquiri/core/assets/js/components/list/List'
 
 import AbortModal from 'daiquiri/query/assets/js/components/modals/AbortModal'
@@ -16,7 +17,8 @@ import ShowModal from 'daiquiri/query/assets/js/components/modals/ShowModal'
 
 const Jobs = ({ loadForm, loadJob }) => {
   const initalParams = {
-    ordering: '-creation_time'
+    ordering: '-creation_time',
+    phase: Object.keys(jobPhases).filter(key => key != 'ARCHIVED')
   }
 
   const [params, setParams] = useState(initalParams)
@@ -119,12 +121,31 @@ const Jobs = ({ loadForm, loadJob }) => {
     }
   ]
 
-  const buttons = [
+  const headerButtons = [
     {
-      label: gettext('Back to query'),
+      label: gettext('New query'),
       onClick: () => loadForm('sql')
     }
   ]
+
+  const headerChildren = (
+    <div className="d-md-flex flex-wrap gap-1">
+      <strong >{gettext('Filter phases:')}</strong>
+      {
+        Object.entries(jobPhases).map(([phase, phaseLabel], phaseIndex) => (
+          <div key={phaseIndex} className="ms-2">
+            <Checkbox
+              label={phaseLabel}
+              checked={params.phase.includes(phase)}
+              onChange={() => setParams({ ...params,
+                phase: params.phase.includes(phase) ? params.phase.filter(p => p != phase) : [ ...params.phase, phase ]
+              })}
+            />
+          </div>
+        ))
+      }
+    </div>
+  )
 
   return (
     <div>
@@ -138,8 +159,8 @@ const Jobs = ({ loadForm, loadJob }) => {
         onSearch={handleSearch}
         onNext={hasNextPage ? fetchNextPage : null}
         onReset={handleReset}
-        buttons={buttons}
-        checkboxes={{}}
+        headerButtons={headerButtons}
+        headerChildren={headerChildren}
       />
 
       <ShowModal modal={showModal} job={modalJob} loadForm={loadForm} loadJob={loadJob} />

@@ -17,7 +17,7 @@ const Checkbox = ({ label, help, checked, errors, onChange }) => {
         checked={checked}
         onChange={() => onChange(!checked)}
       />
-      <label className="form-check-label" htmlFor={id}>{label}</label>
+      <label className="form-check-label user-select-none" htmlFor={id}>{label}</label>
       <Errors errors={errors} />
       {
         help && <div className="form-text">{help}</div>
