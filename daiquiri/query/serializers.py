@@ -78,7 +78,7 @@ class QueryJobIndexSerializer(serializers.ModelSerializer):
 
 class QueryJobRetrieveSerializer(serializers.ModelSerializer):
 
-    phase_label = serializers.SerializerMethodField()
+    phase_label = serializers.CharField(source='get_phase_display')
     creation_time_label = DateTimeLabelField(source='creation_time')
     start_time_label = DateTimeLabelField(source='start_time')
     end_time_label = DateTimeLabelField(source='end_time')
@@ -117,9 +117,6 @@ class QueryJobRetrieveSerializer(serializers.ModelSerializer):
             'sources',
             'columns'
         )
-
-    def get_phase_label(self, obj):
-        return dict(QueryJob.PHASE_CHOICES)[obj.phase]
 
     def get_sources(self, obj):
         if obj.metadata:

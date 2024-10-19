@@ -9,7 +9,7 @@ from .models import ContactMessage
 
 class ContactMessageSerializer(serializers.ModelSerializer):
 
-    status_label = serializers.SerializerMethodField()
+    status_label = serializers.CharField(source='get_status_display')
     mailto = serializers.SerializerMethodField()
     created_label = DateTimeLabelField(source='created')
 
@@ -28,9 +28,6 @@ class ContactMessageSerializer(serializers.ModelSerializer):
             'user',
             'mailto'
         )
-
-    def get_status_label(self, obj):
-        return dict(ContactMessage.STATUS_CHOICES)[obj.status]
 
     def get_mailto(self, obj):
         return render_to_string('contact/messages_mailto.html', {
