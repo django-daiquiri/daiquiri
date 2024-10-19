@@ -6,6 +6,8 @@ __pycache__/
 *.swp
 .DS_Store
 
+/daiquiri/auth/static/
+/daiquiri/core/static/
 /daiquiri/contact/static/
 /daiquiri/query/static/
 
