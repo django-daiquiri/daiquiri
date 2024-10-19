@@ -1,10 +1,10 @@
-from django.conf import settings
-from django.template.defaultfilters import date
 from django.template.loader import get_template, TemplateDoesNotExist
 
 from rest_framework import serializers
 
+from daiquiri.core.serializers import DateTimeLabelField
 from daiquiri.jobs.serializers import SyncJobSerializer, AsyncJobSerializer
+
 from .models import QueryJob, Example
 from .validators import TableNameValidator, UploadFileValidator, UploadParamValidator
 from .utils import get_query_form, get_query_form_adapter
@@ -79,9 +79,9 @@ class QueryJobIndexSerializer(serializers.ModelSerializer):
 class QueryJobRetrieveSerializer(serializers.ModelSerializer):
 
     phase_label = serializers.SerializerMethodField()
-    creation_time_label = serializers.SerializerMethodField()
-    start_time_label = serializers.SerializerMethodField()
-    end_time_label = serializers.SerializerMethodField()
+    creation_time_label = DateTimeLabelField(source='creation_time')
+    start_time_label = DateTimeLabelField(source='start_time')
+    end_time_label = DateTimeLabelField(source='end_time')
 
     sources = serializers.SerializerMethodField()
     columns = serializers.SerializerMethodField()
@@ -120,15 +120,6 @@ class QueryJobRetrieveSerializer(serializers.ModelSerializer):
 
     def get_phase_label(self, obj):
         return dict(QueryJob.PHASE_CHOICES)[obj.phase]
-
-    def get_creation_time_label(self, obj):
-        return date(obj.creation_time, settings.DATETIME_FORMAT)
-
-    def get_start_time_label(self, obj):
-        return date(obj.start_time, settings.DATETIME_FORMAT)
-
-    def get_end_time_label(self, obj):
-        return date(obj.end_time, settings.DATETIME_FORMAT)
 
     def get_sources(self, obj):
         if obj.metadata:

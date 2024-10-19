@@ -1,8 +1,8 @@
-from django.conf import settings
 from django.template.loader import render_to_string
-from django.template.defaultfilters import date
 
 from rest_framework import serializers
+
+from daiquiri.core.serializers import DateTimeLabelField
 
 from .models import ContactMessage
 
@@ -11,7 +11,7 @@ class ContactMessageSerializer(serializers.ModelSerializer):
 
     status_label = serializers.SerializerMethodField()
     mailto = serializers.SerializerMethodField()
-    created_label = serializers.SerializerMethodField()
+    created_label = DateTimeLabelField(source='created')
 
     class Meta:
         model = ContactMessage
@@ -31,9 +31,6 @@ class ContactMessageSerializer(serializers.ModelSerializer):
 
     def get_status_label(self, obj):
         return dict(ContactMessage.STATUS_CHOICES)[obj.status]
-
-    def get_created_label(self, obj):
-        return date(obj.created, settings.DATETIME_FORMAT)
 
     def get_mailto(self, obj):
         return render_to_string('contact/messages_mailto.html', {
