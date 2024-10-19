@@ -30,9 +30,11 @@ const Jobs = ({ loadForm, loadJob }) => {
   const renameModal = useModal()
 
   const { data, fetchNextPage, hasNextPage } = useJobsQuery(params)
+
   const count = isNil(data) ? null : interpolate(ngettext(
     'One job found.', '%s jobs found', data.pages[0].count
   ), [data.pages[0].count])
+
   const rows = isNil(data) ? [] : data.pages.reduce((messages, page) => {
     return [...messages, ...page.results]
   }, [])

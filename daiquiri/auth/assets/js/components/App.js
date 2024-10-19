@@ -47,7 +47,6 @@ const App = () => {
     return [...profiles, ...page.results]
   }, [])
 
-
   const handleModal = (modal, profile) => {
     setValues(profile)
     modal.show()
@@ -269,7 +268,7 @@ const App = () => {
       />
       <ShowModal
         modal={showModal}
-        values={values}
+        profile={values}
         details={settings.AUTH_DETAIL_KEYS}
       />
       <UpdateModal

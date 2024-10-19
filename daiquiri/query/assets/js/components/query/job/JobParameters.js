@@ -7,34 +7,34 @@ const JobParameters = ({ job }) => {
   return (
     <div className="job-parameters">
       <dl className="row mb-0">
-        <dt className="col-sm-3 text-end">{gettext('Job status')}</dt>
-        <dd className="col-sm-9 mb-0">
+        <dt className="col-md-3 text-md-end">{gettext('Job status')}</dt>
+        <dd className="col-md-9 mb-0">
           <span className={jobPhaseBadge[job.phase]}>{job.phase_label}</span>
         </dd>
 
         {
           job.phase == 'ERROR' && (
             <>
-              <dt className="col-sm-3 text-end">{gettext('Error')}</dt>
-              <dd className="col-sm-9 text-danger mb-0">{job.error_summary}</dd>
+              <dt className="col-md-3 text-md-end">{gettext('Error')}</dt>
+              <dd className="col-md-9 text-danger mb-0">{job.error_summary}</dd>
             </>
           )
         }
 
-        <dt className="col-sm-3 text-end">{gettext('Full database table name')}</dt>
-        <dd className="col-sm-9 mb-0"><code>{job.schema_name}.{job.table_name}</code></dd>
+        <dt className="col-md-3 text-md-end">{gettext('Full database table name')}</dt>
+        <dd className="col-md-9 mb-0"><code>{job.schema_name}.{job.table_name}</code></dd>
 
-        <dt className="col-sm-3 text-end">{gettext('Internal job id')}</dt>
-        <dd className="col-sm-9 mb-0"><code>{job.id}</code></dd>
+        <dt className="col-md-3 text-md-end">{gettext('Internal job id')}</dt>
+        <dd className="col-md-9 mb-0"><code>{job.id}</code></dd>
 
-        <dt className="col-sm-3 text-end">{gettext('Time submitted')}</dt>
-        <dd className="col-sm-9 mb-0">{job.creation_time_label}</dd>
+        <dt className="col-md-3 text-md-end">{gettext('Time submitted')}</dt>
+        <dd className="col-md-9 mb-0">{job.creation_time_label}</dd>
 
         {
           job.queue && (
             <>
-              <dt className="col-sm-3 text-end">{gettext('Queue')}</dt>
-              <dd className="col-sm-9 mb-0">{job.queue}</dd>
+              <dt className="col-md-3 text-md-end">{gettext('Queue')}</dt>
+              <dd className="col-md-9 mb-0">{job.queue}</dd>
             </>
           )
         }
@@ -42,8 +42,8 @@ const JobParameters = ({ job }) => {
         {
           job.start_time && job.creation_time && (
             <>
-              <dt className="col-sm-3 text-end">{gettext('Time in queue')}</dt>
-              <dd className="col-sm-9 mb-0">{job.time_queue} s</dd>
+              <dt className="col-md-3 text-md-end">{gettext('Time in queue')}</dt>
+              <dd className="col-md-9 mb-0">{job.time_queue} s</dd>
             </>
           )
         }
@@ -51,8 +51,8 @@ const JobParameters = ({ job }) => {
         {
           job.end_time && job.start_time && (
             <>
-              <dt className="col-sm-3 text-end">{gettext('Time for query')}</dt>
-              <dd className="col-sm-9 mb-0">{job.time_query} s</dd>
+              <dt className="col-md-3 text-md-end">{gettext('Time for query')}</dt>
+              <dd className="col-md-9 mb-0">{job.time_query} s</dd>
             </>
           )
         }
@@ -60,8 +60,8 @@ const JobParameters = ({ job }) => {
         {
           job.nrows !== null && (
             <>
-              <dt className="col-sm-3 text-end">{gettext('Number of rows')}</dt>
-              <dd className="col-sm-9 mb-0">{job.nrows}</dd>
+              <dt className="col-md-3 text-md-end">{gettext('Number of rows')}</dt>
+              <dd className="col-md-9 mb-0">{job.nrows}</dd>
             </>
           )
         }
@@ -69,8 +69,8 @@ const JobParameters = ({ job }) => {
         {
           job.size !== null && (
             <>
-              <dt className="col-sm-3 text-end">{gettext('Size of the table')}</dt>
-              <dd className="col-sm-9 mb-0">{job.size}</dd>
+              <dt className="col-md-3 text-md-end">{gettext('Size of the table')}</dt>
+              <dd className="col-md-9 mb-0">{job.size}</dd>
             </>
           )
         }
@@ -78,8 +78,8 @@ const JobParameters = ({ job }) => {
         {
           job.sources && job.sources.length > 0 && (
             <>
-              <dt className="col-sm-3 text-end">{gettext('Source tables')}</dt>
-              <dd className="col-sm-9 mb-0">
+              <dt className="col-md-3 text-md-end">{gettext('Source tables')}</dt>
+              <dd className="col-md-9 mb-0">
               {
                 job.sources.map((source, sourceIndex) => (
                   <a key={sourceIndex} className="d-inline-block" href={source.url} target="blank">

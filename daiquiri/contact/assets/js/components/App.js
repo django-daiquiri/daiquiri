@@ -10,7 +10,7 @@ import { messageStatus, messageStatusBadge } from '../constants/messages'
 import Checkbox from 'daiquiri/core/assets/js/components/form/Checkbox'
 import List from 'daiquiri/core/assets/js/components/list/List'
 
-import Modal from './Modal.js'
+import ShowModal from './ShowModal.js'
 
 const App = () => {
   const initalParams = {}
@@ -18,20 +18,22 @@ const App = () => {
   const [params, setParams] = useState(initalParams)
 
   const modal = useModal()
-  const [modalMessage, setModalMessage] = useState({})
+  const [values, setValues] = useState({})
 
   const mutation = useUpdateMessageMutation()
 
   const { data, fetchNextPage, hasNextPage } = useMessagesQuery(params)
+
   const count = isNil(data) ? null : interpolate(ngettext(
     'One contact message found.', '%s contact messages found', data.pages[0].count
   ), [data.pages[0].count])
+
   const rows = isNil(data) ? [] : data.pages.reduce((messages, page) => {
     return [...messages, ...page.results]
   }, [])
 
   const handleModal = (message) => {
-    setModalMessage(message)
+    setValues(message)
     modal.show()
   }
 
@@ -152,7 +154,7 @@ const App = () => {
         onReset={handleReset}
         headerChildren={headerChildren}
       />
-      <Modal modal={modal} message={modalMessage} />
+      <ShowModal modal={modal} message={values} />
     </div>
   )
 }
