@@ -1,8 +1,7 @@
-{% extends 'core/new/wide.html' %}
+{% extends 'core/wide.html' %}
 {% load static %}
 
 {% block js %}
-{{ block.super }}
 <script src="{% url 'javascript-catalog' %}"></script>
 <script src="{% static 'contact/js/messages.js' %}" defer></script>
 {% endblock %}

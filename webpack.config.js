@@ -15,7 +15,7 @@ const configList = [
       ]
     },
     output: {
-      path: path.resolve(__dirname, './daiquiri/auth/static/auth/dist/')
+      path: path.resolve(__dirname, './daiquiri/auth/static/auth/')
     }
   },
   {
@@ -33,12 +33,15 @@ const configList = [
     name: 'core',
     entry: {
       base: [
-        './daiquiri/core/assets/js/base.js',
         './daiquiri/core/assets/scss/base.scss'
+      ],
+      bootstrap: [
+        './daiquiri/core/assets/js/bootstrap.js',
+        './daiquiri/core/assets/scss/bootstrap.scss'
       ]
     },
     output: {
-      path: path.resolve(__dirname, './daiquiri/core/static/core/dist/')
+      path: path.resolve(__dirname, './daiquiri/core/static/core/')
     },
     plugins: [
       new CopyPlugin({
@@ -99,7 +102,7 @@ const baseConfig = {
         ]
       },
       {
-        test: /(fonts|files)\/.*\.(svg|woff2?|ttf|eot|otf)(\?.*)?$/,
+        test: /\.(woff2?|ttf|eot|otf)$/,
         loader: 'file-loader',
         type: 'javascript/auto',
         options: {
@@ -108,10 +111,12 @@ const baseConfig = {
         }
       },
       {
-        test: /\.svg$|\.png$|\.jpg$/,
+        test: /\.(svg|png|jpg)$/,
         loader: 'file-loader',
+        type: 'javascript/auto',
         options: {
-          name: 'img/[name].[ext]'
+          name: 'img/[name].[ext]',
+          esModule: false
         }
       }
     ]
