@@ -2,8 +2,8 @@ import React, { useState } from 'react'
 
 import { parseLocation, updateLocation } from '../utils/location'
 
-import Jobs from './jobs/Jobs'
-import Query from './query/Query'
+import Jobs from './Jobs'
+import Query from './Query'
 
 const App = () => {
   const location = parseLocation()

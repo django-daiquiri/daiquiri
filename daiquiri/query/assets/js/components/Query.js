@@ -1,13 +1,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import Form from './forms/Form'
-import Forms from './Forms'
-import FormSql from './forms/FormSql'
-import FormUpload from './forms/FormUpload'
-import Job from './job/Job'
-import Jobs from './Jobs'
-import Status from './Status'
+import Form from './query/forms/Form'
+import Forms from './query/Forms'
+import FormSql from './query/forms/FormSql'
+import FormUpload from './query/forms/FormUpload'
+import Job from './query/job/Job'
+import Jobs from './query/Jobs'
+import Status from './query/Status'
 
 const Query = ({ formKey, jobId, query, loadForm, loadJob, loadJobs }) => {
   const getForm = () => {

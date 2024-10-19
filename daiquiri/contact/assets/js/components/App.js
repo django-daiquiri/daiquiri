@@ -3,11 +3,11 @@ import { isNil } from 'lodash'
 
 import { useModal } from 'daiquiri/core/assets/js/hooks/modal'
 
-import List from 'daiquiri/core/assets/js/components/list/List'
-
 import { useMessagesQuery } from '../hooks/queries'
 import { useUpdateMessageMutation } from '../hooks/mutations'
 import { messageStatusBadge } from '../constants/messages'
+
+import List from 'daiquiri/core/assets/js/components/list/List'
 
 import Modal from './Modal.js'
 
@@ -122,7 +122,7 @@ const App = () => {
     }
   ]
 
-  const buttons = [
+  const headerButtons = [
     {
       label: params.spam ? gettext('Show non-spam') : gettext('Show spam'),
       onClick: () => setParams({page: 1, spam: !params.spam})
@@ -139,7 +139,7 @@ const App = () => {
         onSearch={handleSearch}
         onNext={hasNextPage ? handleNext : null}
         onReset={handleReset}
-        buttons={buttons}
+        headerButtons={headerButtons}
         checkboxes={{}}
       />
       <Modal modal={modal} message={modalMessage} />

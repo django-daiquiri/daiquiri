@@ -27,6 +27,7 @@ const ConfirmModal = ({ modal, label, action, onSubmit }) => {
 ConfirmModal.propTypes = {
   modal: PropTypes.object.isRequired,
   label: PropTypes.string.isRequired,
+  action: PropTypes.string.isRequired,
   onSubmit: PropTypes.func.isRequired
 }
 

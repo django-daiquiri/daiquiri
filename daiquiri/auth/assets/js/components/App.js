@@ -4,10 +4,10 @@ import { isEmpty, isNil } from 'lodash'
 import { useModal } from 'daiquiri/core/assets/js/hooks/modal'
 import { isStaff, userId } from 'daiquiri/core/assets/js/utils/meta'
 
-import List from 'daiquiri/core/assets/js/components/list/List'
-
 import { useGroupsQuery, useProfilesQuery, useSettingsQuery } from '../hooks/queries'
 import { useUpdateProfileMutation } from '../hooks/mutations'
+
+import List from 'daiquiri/core/assets/js/components/list/List'
 
 import ShowModal from './ShowModal.js'
 import UpdateModal from './UpdateModal.js'
