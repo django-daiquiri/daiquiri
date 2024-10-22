@@ -17,12 +17,12 @@
 {% endfor %}
 {% endif %}
 
-<li>
+<li class="list-inline-item fs-1">
     <a title="{{provider.name}}" class="socialaccount_provider {{provider.id}}"
         href="{% provider_login_url provider.id process=process scope=scope auth_params=auth_params %}">
 
         {% if provider.id != 'orcid' %}
-        <span class="fa fa-{{provider.id}} fa-2x"></span>
+        <span class="bi bi-{{provider.id}}"></span>
         {% else %}
         <span class="socialaccount_provider_name">{{ provider.name }}</span>
         {% endif %}

@@ -14,11 +14,11 @@
 
     {% for emailaddress in user.emailaddress_set.all %}
     <div class="d-flex gap-1 align-items-center pt-2 pb-2 border-top {% if forloop.last %}border-bottom{% endif %}">
-        <div class="form-check me-auto">
-            <input id="email_radio_{{forloop.counter}}" type="radio" name="email" class="form-check-input"
-                 {% if emailaddress.primary or user.emailaddress_set.count == 1 %}checked="checked"{%endif %}
-                 value="{{emailaddress.email}}"/>
-            <label for="email_radio_{{forloop.counter}}" class="form-check-label">{{ emailaddress.email }}</label>
+        <div class="form-radio me-auto">
+            <input class="form-radio-input" id="email_radio_{{forloop.counter}}"
+                   type="radio" name="email" value="{{emailaddress.email}}"
+                   {% if emailaddress.primary or user.emailaddress_set.count == 1 %}checked="checked"{%endif %} />
+            <label class="form-radio-label ms-1" for="email_radio_{{forloop.counter}}">{{ emailaddress.email }}</label>
         </div>
         {% if emailaddress.primary %}
         <div class="badge text-bg-primary">{% trans "Primary" %}</div>
