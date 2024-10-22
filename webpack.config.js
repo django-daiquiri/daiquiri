@@ -38,6 +38,9 @@ const configList = [
       bootstrap: [
         './daiquiri/core/assets/js/bootstrap.js',
         './daiquiri/core/assets/scss/bootstrap.scss'
+      ],
+      style: [
+        './daiquiri/core/assets/scss/style.scss'
       ]
     },
     output: {
