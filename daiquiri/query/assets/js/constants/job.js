@@ -37,20 +37,19 @@ export const jobPhaseBadge = {
   'ARCHIVED': 'badge text-bg-secondary'
 }
 
-export const jobPhaseSymbol = {
-  'PENDING': 'pause_circle',
-  'QUEUED': 'progress_activity',
-  'EXECUTING': 'play_circle',
-  'COMPLETED': 'check_circle',
-  'ERROR': 'warning',
-  'ABORTED': 'cancel',
-  'UNKNOWN': 'help',
-  'HELD': 'stop_circle',
-  'SUSPENDED': 'pause_circle',
-  'ARCHIVED': 'block'
+export const jobPhaseIcons = {
+  'PENDING': 'bi bi-pause-circle',
+  'EXECUTING': 'bi bi-play-circle',
+  'COMPLETED': 'bi bi-check-circle',
+  'ERROR': 'bi bi-exclamation-triangle',
+  'ABORTED': 'bi bi-x-circle',
+  'UNKNOWN': 'bi bi-question-circle',
+  'HELD': 'bi bi-exclamation-octogon',
+  'SUSPENDED': 'bi bi-exclamation-diamond',
+  'ARCHIVED': 'bi bi-exclamation-archive'
 }
 
-export const jobPhaseSymbolSpin = ['QUEUED']
+export const jobPhaseSpinner = ['QUEUED']
 
 export const jobPhaseMessage = {
   'PENDING': gettext('The query job is still pending.'),

@@ -56,11 +56,7 @@ $handle-width: 0.5rem;
                         flex-grow: 1;
                     }
                     .info {
-                        font-size: 1.2rem;
                         cursor: help;
-                    }
-                    .order {
-                        cursor: pointer;
                     }
                     .handle {
                         width: $handle-width;
@@ -94,13 +90,11 @@ $handle-width: 0.5rem;
             background-color: var(--bs-secondary-bg);
             border-radius: 50%;
 
-            button {
+            > .position-relative > .position-absolute {
+                height: 1em;
+                width: 1em;
+                line-height: 1em;
                 opacity: 0.5;
-
-                [class^="material-symbols"] {
-                    font-size: 1.6rem;
-                    font-weight: bold;
-                }
 
                 &:hover {
                     opacity: 1;

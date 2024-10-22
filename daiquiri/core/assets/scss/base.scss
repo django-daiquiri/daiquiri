@@ -1,8 +1,8 @@
 $FontPathOpenSans: ".~npm-font-open-sans/fonts/";
 @import "~npm-font-open-sans/open-sans";
 
-$material-symbols-font-path: '~material-symbols/';
-@import '~material-symbols';
+$bootstrap-icons-font-dir: '~bootstrap-icons/font/fonts';
+@import '~bootstrap-icons/font/bootstrap-icons.scss';
 
 @import 'base/browser';
 @import 'base/card';
@@ -15,7 +15,7 @@ $material-symbols-font-path: '~material-symbols/';
 @import 'base/list';
 @import 'base/modal';
 @import 'base/navigation';
+@import 'base/ordering';
 @import 'base/popover';
-@import 'base/symbols';
 @import 'base/table';
 @import 'base/typography';

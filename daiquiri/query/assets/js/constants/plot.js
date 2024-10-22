@@ -27,11 +27,11 @@ export const colors = [
 export const cmaps = ['Viridis', 'Inferno', 'Cividis', 'Grays', 'Turbo', 'Bluered']
 
 export const symbols = [
-  {name: 'Circle', symbol: 'circle', materialSymbol: 'circle', fontSize: 14},
-  {name: 'Square', symbol: 'square', materialSymbol: 'square', fontSize: 14},
-  {name: 'Diamond', symbol: 'diamond', materialSymbol: 'stat_0', fontSize: 22},
-  {name: 'Triangle', symbol: 'triangle-up', materialSymbol: 'change_history', fontSize: 16},
-  {name: 'Star', symbol: 'star', materialSymbol: 'star', fontSize: 18},
+  {name: 'Circle', symbol: 'circle', icon: 'bi bi-circle-fill'},
+  {name: 'Square', symbol: 'square', icon: 'bi bi-square-fill'},
+  {name: 'Diamond', symbol: 'diamond', icon: 'bi bi-diamond-fill'},
+  {name: 'Triangle', symbol: 'triangle-up', icon: 'bi bi-triangle-fill'},
+  {name: 'Star', symbol: 'star', icon: 'bi bi-star-fill'},
 ]
 
 export const operations = [

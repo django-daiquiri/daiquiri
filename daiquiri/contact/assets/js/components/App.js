@@ -93,32 +93,34 @@ const App = () => {
     {
       width: '10%', formatter: (message) => (
         <span className="d-flex gap-1 justify-content-end">
-          <a href={message.mailto} className="material-symbols-rounded">reply</a>
+          <a href={message.mailto}>
+            <i className="bi bi-reply"></i>
+          </a>
           <button className="btn btn-link" onClick={() => handleModal(message)}>
-            <span className="material-symbols-rounded">visibility</span>
+            <i className="bi bi-eye"></i>
           </button>
           {
             message.status == 'ACTIVE' && (
               <button className="btn btn-link" onClick={() => handleUpdate(message, 'CLOSED')}>
-                <span className="material-symbols-rounded">check_box_outline_blank</span>
+                <i className="bi bi-check2-circle"></i>
               </button>
             )
           }
           {
             message.status == 'CLOSED' && (
               <button className="btn btn-link" onClick={() => handleUpdate(message, 'ACTIVE')}>
-                <span className="material-symbols-rounded">check_box</span>
+                <i className="bi bi-circle"></i>
               </button>
             )
           }
           {
             message.status == 'SPAM' ? (
               <button className="btn btn-link" onClick={() => handleUpdate(message, 'ACTIVE')}>
-                <span className="material-symbols-rounded">report_off</span>
+                <i className="bi bi-octagon"></i>
               </button>
             ) : (
               <button className="btn btn-link" onClick={() => handleUpdate(message, 'SPAM')}>
-                <span className="material-symbols-rounded">report</span>
+                <i className="bi bi-exclamation-octagon"></i>
               </button>
             )
           }

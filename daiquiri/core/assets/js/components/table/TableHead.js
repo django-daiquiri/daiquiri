@@ -3,8 +3,10 @@ import { renderToString } from 'react-dom/server'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
+import Ordering from 'daiquiri/core/assets/js/components/Ordering'
+import Popover from 'daiquiri/core/assets/js/components/Popover'
+
 import TableHandle from './TableHandle'
-import Popover from '../Popover'
 
 const TableHead = ({ columns, params, setParams }) => {
   const tooltips = true
@@ -63,26 +65,11 @@ const TableHead = ({ columns, params, setParams }) => {
                 {
                   tooltips && (
                     <Popover title={getPopoverTitle(column)} content={getPopoverContent(column)}>
-                      <div className="info material-symbols-rounded text-body-tertiary">
-                        question_mark
-                      </div>
+                      <i className="bi bi-question-circle text-body-tertiary info me-1"></i>
                     </Popover>
                   )
                 }
-                <div
-                  className={classNames('order material-symbols-rounded', {
-                    'text-body-tertiary': ![column.name, '-' + column.name].includes(ordering)
-                  })}
-                  onClick={() => handleOrdering(column)}
-                >
-                  {
-                    ordering == '-' + column.name ? (
-                      'expand_less'
-                    ) : (
-                      'expand_more'
-                    )
-                  }
-                </div>
+                <Ordering column={column} ordering={ordering} onOrder={handleOrdering} />
                 {
                   columnIndex < (columns.length - 1) && (
                     <TableHandle columnIndex={columnIndex} widths={widths} setWidths={setWidths} />

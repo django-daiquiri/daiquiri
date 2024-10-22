@@ -6,7 +6,7 @@ import { isEmpty, isNil } from 'lodash'
 import { userId } from 'daiquiri/core/assets/js/utils/meta'
 import { useLsState } from 'daiquiri/core/assets/js/hooks/ls'
 
-import { jobPhaseSymbol, jobPhaseSymbolSpin } from 'daiquiri/query/assets/js/constants/job'
+import { jobPhaseIcons, jobPhaseSpinner } from 'daiquiri/query/assets/js/constants/job'
 import { useJobsIndexQuery } from 'daiquiri/query/assets/js/hooks/queries'
 import { basePath } from 'daiquiri/query/assets/js/utils/location'
 
@@ -76,9 +76,13 @@ const Jobs = ({ jobId, loadJob, loadJobs }) => {
                           <button type="button" className="btn btn-link" onClick={() => toggleRunId(runId)}>
                             <div className="d-flex align-items-center">
                               {isEmpty(runId) ? gettext('No run id') : interpolate(gettext('Run id: %s'), [runId])}
-                              <span className="material-symbols-rounded ms-auto">
-                                {openRunIds.includes(runId) ? 'folder_open' : 'folder'}
-                              </span>
+                              {
+                                openRunIds.includes(runId) ? (
+                                  <i className="bi bi-folder2-open ms-auto"></i>
+                                ) : (
+                                  <i className="bi bi-folder ms-auto"></i>
+                                )
+                              }
                             </div>
                           </button>
                         </li>
@@ -93,11 +97,13 @@ const Jobs = ({ jobId, loadJob, loadJobs }) => {
                           })}>
                             <a href={`${basePath}/${job.id}/`} onClick={(event) => handleLoadJob(event, job)}>
                               <span className="float-end">
-                                <span className={classNames('material-symbols-rounded', {
-                                  'symbols-spin': jobPhaseSymbolSpin.includes(job.phase)
-                                })}>
-                                  {jobPhaseSymbol[job.phase]}
-                                </span>
+                                {
+                                  jobPhaseSpinner.includes(job.phase) ? (
+                                    <div className="spinner-border spinner-border-sm"></div>
+                                  ) : (
+                                    <i className={jobPhaseIcons[job.phase]}></i>
+                                  )
+                                }
                               </span>
                               <span>{job.table_name}</span>
                             </a>

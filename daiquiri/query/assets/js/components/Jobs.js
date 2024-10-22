@@ -90,29 +90,29 @@ const Jobs = ({ loadForm, loadJob }) => {
         <span className="d-flex gap-1 flex-wrap justify-content-end">
           <button className="btn btn-link" title={gettext('Show job details')}
                   onClick={() => handleModal(showModal, job)}>
-            <span className="material-symbols-rounded">visibility</span>
+            <i className="bi bi-eye"></i>
           </button>
           <button className="btn btn-link" title={gettext('Open the job in the query interface')}
                   onClick={() => loadJob(job.id)}>
-            <span className="material-symbols-rounded">exit_to_app</span>
+            <i className="bi bi-box-arrow-in-right"></i>
           </button>
           {
             job.phase == 'COMPLETED' && (
               <button className="btn btn-link" title={gettext('Update job')}
                       onClick={() => handleModal(renameModal, job)}>
-                <span className="material-symbols-rounded">edit</span>
+                <i className="bi bi-pencil"></i>
               </button>
             )
           }
           <button className="btn btn-link" title={gettext('Open new query form with this query')}
                   onClick={() => loadForm('sql', job.query)}>
-            <span className="material-symbols-rounded">refresh</span>
+            <i className="bi bi-play-circle"></i>
           </button>
           {
             ['EXECUTING', 'PENDING', 'QUEUED'].includes(job.phase) && (
               <button className="btn btn-link" title={gettext('Abort job')}
                       onClick={() => handleModal(abortModal, job)}>
-                <span className="material-symbols-rounded">cancel</span>
+                <i className="bi bi-x-circle"></i>
               </button>
             )
           }
@@ -120,7 +120,7 @@ const Jobs = ({ loadForm, loadJob }) => {
             !['EXECUTING', 'PENDING', 'QUEUED', 'ARCHIVED'].includes(job.phase) && (
               <button className="btn btn-link" title={gettext('Archive job')}
                       onClick={() => handleModal(archiveModal, job)}>
-                <span className="material-symbols-rounded">delete</span>
+                <i className="bi bi-trash"></i>
               </button>
             )
           }

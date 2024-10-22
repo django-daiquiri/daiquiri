@@ -14,7 +14,7 @@ const ScatterForm = ({ columns, values, setValues }) => {
   const getSymbolHtml = (symbol) => {
     const s = symbols.find(s => s.symbol == symbol)
     return (
-      <span className="material-symbols-rounded" style={{ fontSize: s.fontSize }}>{s.materialSymbol}</span>
+      <i className={s.icon}></i>
     )
   }
 

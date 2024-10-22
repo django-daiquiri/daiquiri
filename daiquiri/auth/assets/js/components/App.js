@@ -142,12 +142,12 @@ const App = () => {
         <span className="d-flex gap-1 flex-wrap justify-content-end">
           <button className="btn btn-link" title={gettext('Show user details')}
                   onClick={() => handleModal(showModal, profile)}>
-            <span className="material-symbols-rounded">visibility</span>
+            <i className="bi bi-eye"></i>
           </button>
 
           <button className="btn btn-link" title={gettext('Update user')}
                   onClick={() => handleModal(updateModal, profile)}>
-            <span className="material-symbols-rounded">edit</span>
+            <i className="bi bi-pencil"></i>
           </button>
 
           {
@@ -156,7 +156,7 @@ const App = () => {
                 !profile.user.is_active && (
                   <button className="btn btn-link" title={gettext('Enable user')}
                           onClick={() => handleModal(enableModal, profile)}>
-                    <span className="material-symbols-rounded">check_circle</span>
+                    <i className="bi bi-check-circle"></i>
                   </button>
                 )
               }
@@ -164,7 +164,7 @@ const App = () => {
                 profile.user.is_active && (
                     <button className="btn btn-link" title={gettext('Disable user')}
                             onClick={() => handleModal(disableModal, profile)}>
-                      <span className="material-symbols-rounded">cancel</span>
+                      <i className="bi bi-x-circle"></i>
                     </button>
                   )
               }
@@ -175,12 +175,12 @@ const App = () => {
             settings.AUTH_WORKFLOW == 'confirmation' && profile.is_pending && !profile.is_confirmed && <>
               <button className="btn btn-link" title={gettext('Confirm user')}
                       onClick={() => handleModal(confirmModal, profile)}>
-                <span className="material-symbols-rounded">thumb_up</span>
+                <i className="bi bi-hand-thumbs-up"></i>
               </button>
 
               <button className="btn btn-link" title={gettext('Reject user')}
                       onClick={() => handleModal(rejectModal, profile)}>
-                <span className="material-symbols-rounded">thumb_down</span>
+                <i className="bi bi-hand-thumbs-down"></i>
               </button>
             </>
           }
@@ -189,12 +189,12 @@ const App = () => {
             settings.AUTH_WORKFLOW == 'activation' && profile.is_pending && <>
               <button className="btn btn-link" title={gettext('Activate user')}
                       onClick={() => handleModal(activateModal, profile)}>
-                <span className="material-symbols-rounded">check_circle</span>
+                <i className="bi bi-check-circle"></i>
               </button>
 
               <button className="btn btn-link" title={gettext('Reject user')}
                       onClick={() => handleModal(rejectModal, profile)}>
-                <span className="material-symbols-rounded">cancel</span>
+                <i className="bi bi-x-circle"></i>
               </button>
             </>
           }
@@ -205,17 +205,17 @@ const App = () => {
                 settings.AUTH_WORKFLOW == 'confirmation' && profile.is_pending && profile.is_confirmed && (
                   <button className="btn btn-link" title={gettext('Activate user')}
                           onClick={() => handleModal(activateModal, profile)}>
-                    <span className="material-symbols-rounded">check_circle</span>
+                    <i className="bi bi-check-circle"></i>
                   </button>
                 )
               }
 
               <a href={profile.user_admin_url} title={gettext('User Admin')} target="_blank" rel="noreferrer">
-                <span className="material-symbols-rounded">person</span>
+                <i className="bi bi-person"></i>
               </a>
 
               <a href={profile.profile_admin_url} title={gettext('Profile Admin')} target="_blank" rel="noreferrer">
-                <span className="material-symbols-rounded">account_circle</span>
+                <i className="bi bi-person-gear"></i>
               </a>
             </>
           }

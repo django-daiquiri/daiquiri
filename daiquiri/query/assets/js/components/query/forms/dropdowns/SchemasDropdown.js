@@ -76,7 +76,11 @@ const SchemasDropdown = ({ onPaste }) => {
                           onDoubleClick={() => onPaste(schema)}
                         >
                           <div>{schema.name}</div>
-                          {(openSchema.id == schema.id) && <div className="material-symbols-rounded ms-auto">chevron_right</div>}
+                          {
+                            (openSchema.id == schema.id) && (
+                              <div className="ms-auto"><i className="bi bi-chevron-right"></i></div>
+                            )
+                          }
                         </button>
                       </Tooltip>
                     </li>
@@ -99,7 +103,11 @@ const SchemasDropdown = ({ onPaste }) => {
                           onDoubleClick={() => onPaste(table)}
                         >
                           <div>{table.name}</div>
-                          {(openTable.id == table.id) && <div className="material-symbols-rounded ms-auto">chevron_right</div>}
+                          {
+                            (openSchema.id == table.id) && (
+                              <div className="ms-auto"><i className="bi bi-chevron-right"></i></div>
+                            )
+                          }
                         </button>
                       </Tooltip>
                     </li>
