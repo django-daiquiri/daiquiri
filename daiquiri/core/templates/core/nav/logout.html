@@ -1,0 +1,20 @@
+{% load i18n %}
+
+    <li>
+
+        {% if settings.ACCOUNT_LOGOUT_ON_GET %}
+
+        <a class="dropdown-item" href="{% url 'account_logout' %}">{% trans 'Logout' %}</a>
+
+        {% else %}
+
+        <form action="{% url 'account_logout' %}" method="POST">
+            {% csrf_token %}
+            <button type="submit" class="dropdown-item">
+                {% trans 'Logout' %}
+            </button>
+        </form>
+
+        {% endif %}
+
+    </li>

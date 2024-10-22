@@ -4,13 +4,13 @@
 {% load core_tags %}
 {% load metadata_tags %}
 
-{% block page %}
-
-    <h2 class="hide-overflow">
+{% block heading %}
+    <h1 class="overflow-hidden">
         Metadata for {{ settings.SITE_TITLE }} databases
-    </h2>
-    </br>
+    </h1>
+{% endblock %}
 
+{% block page %}
     <ul class="list-unstyled">
         {% for schema in schemas %}
         <li>
@@ -31,9 +31,5 @@
         </li>
         {% endfor %}
     </ul>
-
-{% endblock %}
-
-{% block sidebar %}
 
 {% endblock %}

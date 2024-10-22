@@ -1,0 +1,21 @@
+{% load widget_tweaks %}
+
+{% for field in form %}
+
+{% with field|widget_type as type %}
+
+    {% if type == 'checkboxinput' %}
+
+    {% include 'core/form/form_field_checkboxinput.html' %}
+
+    {% else %}
+
+    {% include 'core/form/form_field_default.html' %}
+
+    {% endif %}
+
+    {% endwith %}
+
+{% endfor %}
+
+{% include 'core/form/form_non_field_errors.html' %}

@@ -7,15 +7,19 @@
 
     <p>{% trans 'Your API token is:' %} <code>{{ token }}</code></p>
 
-    <form method="post" action="{% url 'account_token' %}" novalidate>
+    <form class="mb-3" method="post" action="{% url 'account_token' %}" novalidate>
         {% csrf_token %}
-        <input type="submit" name="regenerate" value="{% trans 'Regenerate token' %}" class="btn btn-default" />
+        <input type="submit" name="regenerate" value="{% trans 'Regenerate token' %}" class="btn btn-outline-secondary btn-sm" />
     </form>
 
     <p>
         {% trans 'You can use this token in HTTP requests by using the <code>Authorization</code> Header:' %}
     </p>
 
-    <pre>Authorization: Token {{ token }}</pre>
+    <div class="card text-bg-light">
+        <div class="card-body">
+            <pre class="mt-1 mb-0"><code>Authorization: Token {{ token }}</code></pre>
+        </div>
+    </div>
 
 {% endblock %}

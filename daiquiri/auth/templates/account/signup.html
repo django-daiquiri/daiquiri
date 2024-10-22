@@ -20,28 +20,7 @@
         <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
         {% endif %}
 
-        {% for field in form.visible_fields %}
-            {% if settings.AUTH_TERMS_OF_USE and field.html_name == 'consent' %}
-
-            <div class="form-group{% if field.errors %} has-error{% endif %} field-{{field.html_name}}">
-                <div class="checkbox">
-                    <label>
-                        {{ field }}
-                        {% trans 'I agree to the <a href="">terms of use</a>.' %}
-                    </label>
-                </div>
-            </div>
-
-            {% if field.errors %}
-            <div class="help-block error">
-                <p class="text-danger">{% trans 'You need to agree to the terms of use to proceed.' %}</p>
-            </div>
-            {% endif %}
-
-            {% else %}
-            {% include 'core/partials/form_field.html' with field=field %}
-            {% endif %}
-        {% endfor %}
+        {{ form }}
 
         <input type="submit" class="btn btn-primary" value="{% trans 'Create account' %}" />
     </form>
@@ -53,26 +32,12 @@
     </ul>
 
     {% if settings.AUTH_TERMS_OF_USE %}
-    <script>
-        $(document).ready(function() {
-            $('.form-group.field-consent a').on('click', function (event) {
-                console.log(1);
-                $('#terms-of-use-modal').modal('show');
-                event.preventDefault();
-            });
-        });
-    </script>
-
     <div class="modal" id="terms-of-use-modal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                    <h4 class="modal-title">
-                        {% trans 'Terms of use' %}
-                    </h4>
+                    <h5 class="modal-title">{% trans 'Terms of use' %}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
                 <div class="modal-body">
@@ -80,7 +45,7 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal" tabindex="-1">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         {% trans 'Close' %}
                     </button>
                 </div>

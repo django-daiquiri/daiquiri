@@ -1,0 +1,8 @@
+{% load widget_tweaks %}
+
+<div class="mb-3">
+  <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+  {% render_field field|add_error_class:"is-invalid" class="form-control" %}
+  {% include 'core/form/form_field_errors.html' %}
+  {% include 'core/form/form_field_help_text.html' %}
+</div>

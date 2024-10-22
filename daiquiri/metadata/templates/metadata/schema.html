@@ -4,15 +4,19 @@
 {% load core_tags %}
 {% load metadata_tags %}
 
-{% block page %}
+{% block heading %}
 
-    <h1 class="hide-overflow">
+    <h1 class="overflow-hidden">
         {% if schema.title %}
         {{ schema.title }} ({{ schema }})
         {% else %}
         {{ schema }}
         {% endif %}
     </h1>
+
+{% endblock %}
+
+{% block page %}
 
     {% if schema.long_description %}
 

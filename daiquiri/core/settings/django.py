@@ -76,6 +76,7 @@ DJANGO_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    'django.forms',
 ]
 
 ADDITIONAL_APPS = [
@@ -174,6 +175,8 @@ STATICFILES_FINDERS = (
 FIXTURE_DIRS = (
     BASE_DIR / 'fixtures',
 )
+
+FORM_RENDERER = 'daiquiri.core.forms.DaiquiriFormRenderer'
 
 AUTHENTICATION_BACKENDS = (
     'rules.permissions.ObjectPermissionBackend',

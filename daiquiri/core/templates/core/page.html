@@ -2,15 +2,19 @@
 
 {% block content %}
 
-<main class="container">
+<div class="container">
+    <hgroup>
+        {% block heading %}{% endblock %}
+    </hgroup>
+
     <div class="row">
-        <section class="page col-md-9">
+        <main class="col-md-9">
             {% block page %}{% endblock %}
-        </section>
-        <aside class="sidebar col-md-3">
+        </main>
+        <aside class="col-md-3">
             {% block sidebar %}{% endblock %}
         </aside>
     </div>
-</main>
+</div>
 
 {% endblock %}

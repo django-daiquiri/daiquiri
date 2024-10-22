@@ -1,0 +1,21 @@
+nav {
+    a {
+        text-decoration: none;
+
+        &:hover {
+            text-decoration: none;
+        }
+    }
+
+    ul.dropdown-menu > li > ul {
+        padding: 0;
+
+        li {
+            list-style: none;
+
+            a {
+                padding-left: 2em;
+            }
+        }
+    }
+}

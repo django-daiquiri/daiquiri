@@ -19,16 +19,16 @@
                         {{ user.profile.full_name }}<span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
-                        {% include 'core/base_navigation_account.html' %}
-                        {% include 'core/base_navigation_management.html' %}
-                        {% include 'core/base_navigation_admin.html' %}
-                        {% include 'core/base_navigation_logout.html' %}
+                        {% include 'core/nav/account.html' %}
+                        {% include 'core/nav/management.html' %}
+                        {% include 'core/nav/admin.html' %}
+                        {% include 'core/nav/logout.html' %}
                     </ul>
                 </li>
 
                 {% else %}
 
-                {% include 'core/base_navigation_login.html' %}
+                {% include 'core/nav/login.html' %}
 
                 {% endif %}
             </ul>

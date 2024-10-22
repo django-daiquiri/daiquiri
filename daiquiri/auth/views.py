@@ -1,8 +1,5 @@
-import json
-
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.urls import reverse
 from daiquiri.auth.models import Profile
 from daiquiri.core.utils import get_referer_path_info, get_next
 from django.views.generic import TemplateView
@@ -45,8 +42,9 @@ def profile_update(request):
 
 def terms_of_use(request):
     context = {}
-    if settings.AUTH_TERMS_OF_USE == False:
-        raise Http404 
+    if not settings.AUTH_TERMS_OF_USE:
+        raise Http404
+
     if request.user.is_authenticated:
         profile = Profile.objects.get(user=request.user)
         if request.method == 'POST':

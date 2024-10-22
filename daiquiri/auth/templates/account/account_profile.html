@@ -20,8 +20,9 @@
         <input type="hidden" name="next" value="{{ next }}" />
 
         <p><b>Username: {{ request.user.username }}</b></p>
-        {% include 'core/partials/form_fields.html' with form=user_form %}
-        {% include 'core/partials/form_fields.html' with form=profile_form %}
+
+        {{ user_form }}
+        {{ profile_form }}
 
         <input type="submit" value="{% trans 'Update profile' %}" class="btn btn-primary" />
         <input type="submit" name="cancel" value="{% trans 'Cancel' %}" class="btn btn-default" />
