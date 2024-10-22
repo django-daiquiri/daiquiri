@@ -21,53 +21,65 @@ const Job = ({ jobId, loadForm }) => {
     setActiveTab(tab)
   }
 
-  return !isNil(job) && (
-    <div className="job">
-      <h2 className="mb-4">
-        {interpolate(gettext('Query job `%s`'), [job.table_name])}
-      </h2>
-      <ul className="job-tabs nav nav-tabs">
-        <li className="nav-item">
-          <a className={classNames('nav-link', {'active': activeTab === 'overview'})} href="#"
-             onClick={(event) => handleClick(event, 'overview')}>
-            {gettext('Job overview')}
-          </a>
-        </li>
-        <li className="nav-item">
-          <a className={classNames('nav-link', {'active': activeTab === 'results'})} href="#"
-            onClick={(event) => handleClick(event, 'results')}>
-            {gettext('Results table')}
-          </a>
-        </li>
-        <li className="nav-item">
-          <a className={classNames('nav-link', {'active': activeTab === 'plot'})} href="#"
-            onClick={(event) => handleClick(event, 'plot')}>
-            {gettext('Plot')}
-          </a>
-        </li>
-        <li className="nav-item">
-          <a className={classNames('nav-link', {'active': activeTab === 'download'})} href="#"
-            onClick={(event) => handleClick(event, 'download')}>
-            {gettext('Download')}
-          </a>
-        </li>
-      </ul>
-      <div className="job-tab-content mt-3">
-        {
-          activeTab === 'overview' && <JobOverview job={job} loadForm={loadForm} />
-        }
-        {
-          activeTab === 'results' && <JobResults job={job} />
-        }
-        {
-          activeTab === 'plot' && <JobPlot job={job} />
-        }
-        {
-          activeTab === 'download' && <JobDownload job={job} />
-        }
+  if (isNil(job)) {
+    return null
+  } else if (job.errors) {
+    return (
+      <p className="text-danger">
+        {gettext('An error occurred while retrieving the job from the server:')}
+        {' '}
+        {job.errors.api ? job.errors.api.join(', ') : gettext('No error message provided.')}
+      </p>
+    )
+  } else {
+    return (
+      <div className="job">
+        <h2 className="mb-4">
+          {interpolate(gettext('Query job `%s`'), [job.table_name])}
+        </h2>
+        <ul className="job-tabs nav nav-tabs">
+          <li className="nav-item">
+            <a className={classNames('nav-link', {'active': activeTab === 'overview'})} href="#"
+               onClick={(event) => handleClick(event, 'overview')}>
+              {gettext('Job overview')}
+            </a>
+          </li>
+          <li className="nav-item">
+            <a className={classNames('nav-link', {'active': activeTab === 'results'})} href="#"
+              onClick={(event) => handleClick(event, 'results')}>
+              {gettext('Results table')}
+            </a>
+          </li>
+          <li className="nav-item">
+            <a className={classNames('nav-link', {'active': activeTab === 'plot'})} href="#"
+              onClick={(event) => handleClick(event, 'plot')}>
+              {gettext('Plot')}
+            </a>
+          </li>
+          <li className="nav-item">
+            <a className={classNames('nav-link', {'active': activeTab === 'download'})} href="#"
+              onClick={(event) => handleClick(event, 'download')}>
+              {gettext('Download')}
+            </a>
+          </li>
+        </ul>
+        <div className="job-tab-content mt-3">
+          {
+            activeTab === 'overview' && <JobOverview job={job} loadForm={loadForm} />
+          }
+          {
+            activeTab === 'results' && <JobResults job={job} />
+          }
+          {
+            activeTab === 'plot' && <JobPlot job={job} />
+          }
+          {
+            activeTab === 'download' && <JobDownload job={job} />
+          }
+        </div>
       </div>
-    </div>
-  )
+    )
+  }
 }
 
 Job.propTypes = {

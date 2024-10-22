@@ -37,7 +37,7 @@ export const useFormsQuery = () => {
 export const useFormQuery = (formKey) => {
   return useQuery({
     queryKey: ['form', formKey],
-    queryFn: () => QueryApi.fetchForm(formKey),
+    queryFn: () => QueryApi.fetchForm(formKey).catch(errors => errors),
     placeholderData: keepPreviousData
   })
 }
@@ -124,7 +124,7 @@ export const useJobQuery = (jobId) => {
     queryFn: () => QueryApi.fetchJob(jobId).then(response => {
       queryClient.invalidateQueries({ queryKey: ['jobs'] })
       return response
-    }),
+    }).catch(errors => errors),
     placeholderData: keepPreviousData
   })
 }
