@@ -3,5 +3,6 @@
 <div class="form-check mb-3">
   {% render_field field class="form-check-input" %}
   <label for="{{ field.id_for_label }}" class="form-check-label">{{ field.label }}</label>
-  {% if field.help_text %}<small class="form-text text-muted">{field.help_text}</small>{% endif %}
+  {% include 'core/form/form_field_errors.html' %}
+  {% include 'core/form/form_field_help_text.html' %}
 </div>
