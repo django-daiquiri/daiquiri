@@ -1,41 +1,16 @@
 from django import forms
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.exceptions import BadRequest, ValidationError
+from django.core.exceptions import ValidationError
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _
 from django.urls import reverse
 
-from daiquiri.core.utils import get_detail_fields, sanitize_str
+from daiquiri.core.forms import HoneypotField
+from daiquiri.core.utils import get_detail_fields
 
 from .models import Profile
 
-
-class HoneypotField(forms.CharField):
-    hpstyle = 'border: 1px dashed'
-    hplabel = settings.HONEYPOT_FIELD_NAME
-    if settings.HONEYPOT_FIELD_HIDDEN is True:
-        hpstyle = 'opacity: 0; position: absolute; top: 0; left: 0; height: 0; width: 0; z-index: -1;'
-        hplabel = ''
-    default_widget = forms.TextInput(
-        {'style': hpstyle, 'tabindex': '-1', 'autocomplete': 'off'}
-    )
-
-    def __init__(self, *args, **kwargs):
-        kwargs.setdefault('widget', HoneypotField.default_widget)
-        kwargs['required'] = False
-        kwargs['label'] = self.hplabel
-        super().__init__(*args, **kwargs)
-
-    def validate(self, value):
-        return value == settings.HONEYPOT_FIELD_VALUE
-
-    def clean(self, value):
-        cleaned_value = super().clean(value)
-        if self.validate(cleaned_value) is True:
-            return cleaned_value
-        else:
-            raise BadRequest('invalid request')
 
 class UserForm(forms.ModelForm):
     class Meta:
@@ -80,8 +55,6 @@ class SignupForm(ProfileForm):
         label=_('First name'), widget=forms.TextInput(attrs={'placeholder': _('First name')}))
     last_name = forms.CharField(max_length=30,
         label=_('Last name'), widget=forms.TextInput(attrs={'placeholder': _('Last name')}))
-    if settings.HONEYPOT_ENABLED is True:
-        locals()[sanitize_str(settings.HONEYPOT_FIELD_NAME)] = HoneypotField()
 
     field_order = ['username', 'email', 'password1', 'password2']
 
@@ -94,6 +67,9 @@ class SignupForm(ProfileForm):
             self.fields['consent'] = forms.BooleanField()
             self.fields['consent'].label = mark_safe(f'I agree to the <a href="{tos_url}" data-bs-toggle="modal" '
                                                       'data-bs-target="#terms-of-use-modal">terms of use</a>.')
+        # add honeypot field
+        if settings.HONEYPOT_ENABLED is True:
+            self.fields[settings.HONEYPOT_FIELD_NAME] = HoneypotField()
 
     def clean(self):
         if settings.AUTH_TERMS_OF_USE and not self.cleaned_data.get('consent'):

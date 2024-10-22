@@ -1,0 +1,6 @@
+{% load widget_tweaks %}
+
+<div class="{% if not field.label %}form-last {% endif %}mb-3">
+  <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+  {% render_field field|add_error_class:"is-invalid" class="form-control" %}
+</div>

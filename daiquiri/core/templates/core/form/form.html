@@ -3,10 +3,13 @@
 {% for field in form %}
 
 {% with field|widget_type as type %}
-
     {% if type == 'checkboxinput' %}
 
-    {% include 'core/form/form_field_checkboxinput.html' %}
+    {% include 'core/form/form_field_checkbox.html' %}
+
+    {% elif type == 'honeypotinput' %}
+
+    {% include 'core/form/form_field_honeypot.html' %}
 
     {% else %}
 
