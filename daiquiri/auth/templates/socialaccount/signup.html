@@ -29,14 +29,6 @@
         <input type="submit" class="btn btn-primary" value="{% trans 'Create account' %}" />
     </form>
 
-    {% if form.non_field_errors %}
-    <ul class="list-unstyled text-danger">
-    {% for error in form.non_field_errors %}
-        <li>{{ error }}</li>
-    {% endfor %}
-    </ul>
-    {% endif %}
-
     {% if settings.AUTH_TERMS_OF_USE %}
     <div class="modal" id="terms-of-use-modal" tabindex="-1">
         <div class="modal-dialog modal-lg">

@@ -1,7 +1,7 @@
 from django import forms
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.exceptions import BadRequest
+from django.core.exceptions import BadRequest, ValidationError
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _
 from django.urls import reverse
@@ -91,9 +91,13 @@ class SignupForm(ProfileForm):
         # add a consent field, the label is added in the template
         if settings.AUTH_TERMS_OF_USE:
             tos_url = reverse('terms_of_use')
-            self.fields['consent'] = forms.BooleanField(required=True)
+            self.fields['consent'] = forms.BooleanField()
             self.fields['consent'].label = mark_safe(f'I agree to the <a href="{tos_url}" data-bs-toggle="modal" '
                                                       'data-bs-target="#terms-of-use-modal">terms of use</a>.')
+
+    def clean(self):
+        if settings.AUTH_TERMS_OF_USE and not self.cleaned_data.get('consent'):
+            raise ValidationError(_('You need to agree to the terms of use.'))
 
     def signup(self, request, user):
         # create an empty details dict
