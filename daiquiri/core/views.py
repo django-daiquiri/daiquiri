@@ -99,7 +99,7 @@ class StoreIdViewMixin(View):
 
     def render_to_response(self, context, **response_kwargs):
         response = super().render_to_response(context, **response_kwargs)
-        response.set_cookie('storeid', self.get_store_id())
+        response.set_cookie('storeid', self.get_store_id(), samesite='Lax')
         return response
 
     def get_store_id(self):
