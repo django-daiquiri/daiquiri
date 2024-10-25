@@ -68,6 +68,17 @@ const configList = [
     output: {
       path: path.resolve(__dirname, './daiquiri/query/static/query/')
     }
+  },
+  {
+    name: 'serve',
+    entry: {
+      table: [
+        './daiquiri/serve/assets/js/table.js'
+      ]
+    },
+    output: {
+      path: path.resolve(__dirname, './daiquiri/serve/static/serve/')
+    }
   }
 ]
 
