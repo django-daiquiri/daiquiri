@@ -7,9 +7,10 @@ __pycache__/
 .DS_Store
 
 /daiquiri/auth/static/
-/daiquiri/core/static/
 /daiquiri/contact/static/
+/daiquiri/core/static/
 /daiquiri/query/static/
+/daiquiri/serve/static/
 
 /testing/config/settings/local.py
 /testing/download
