@@ -7,7 +7,7 @@ import Tooltip from 'daiquiri/core/assets/js/components/Tooltip'
 const Functions = ({ functions, activeItem, setActiveItem, getTooltip, onDoubleClick }) => {
   const handleClick = (item) => {
     if (item != activeItem) {
-      setActiveItem(item)
+      setActiveItem({ type: 'function', ...item })
     }
   }
 
