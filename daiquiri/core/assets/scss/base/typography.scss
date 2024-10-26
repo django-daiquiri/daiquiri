@@ -20,6 +20,14 @@ a,
     }
 }
 
+a.btn {
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: none;
+    }
+}
+
 .btn-link {
     margin: 0;
     padding: 0;

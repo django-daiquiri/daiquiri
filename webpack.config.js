@@ -58,6 +58,28 @@ const configList = [
     ]
   },
   {
+    name: 'metadata',
+    entry: {
+      management: [
+        './daiquiri/metadata/assets/js/management.js',
+        './daiquiri/metadata/assets/scss/management.scss'
+      ]
+    },
+    output: {
+      path: path.resolve(__dirname, './daiquiri/metadata/static/metadata/')
+    },
+    plugins: [
+      new CopyPlugin({
+        patterns: [
+          {
+            from: 'img/*',
+            context: './daiquiri/metadata/assets',
+          }
+        ]
+      })
+    ]
+  },
+  {
     name: 'query',
     entry: {
       query: [

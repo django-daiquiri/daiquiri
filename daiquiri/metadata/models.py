@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib.auth.models import Group
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.urls import reverse
 
 from daiquiri.core.constants import ACCESS_LEVEL_CHOICES, ACCESS_LEVEL_PRIVATE
 from daiquiri.core.managers import AccessLevelManager
@@ -107,6 +108,9 @@ class Schema(models.Model):
     @property
     def license_url(self):
         return settings.LICENSE_URLS[self.license]
+
+    def admin_url(self):
+        return reverse('admin:daiquiri_metadata_schema_change', args=[self.id])
 
 
 class Table(models.Model):
@@ -234,6 +238,10 @@ class Table(models.Model):
     def license_url(self):
         return settings.LICENSE_URLS[self.license]
 
+    @property
+    def admin_url(self):
+        return reverse('admin:daiquiri_metadata_table_change', args=[self.id])
+
 
 class Column(models.Model):
 
@@ -334,6 +342,10 @@ class Column(models.Model):
         else:
             return None
 
+    @property
+    def admin_url(self):
+        return reverse('admin:daiquiri_metadata_column_change', args=[self.id])
+
 
 class Function(models.Model):
 
@@ -381,3 +393,7 @@ class Function(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def admin_url(self):
+        return reverse('admin:daiquiri_metadata_function_change', args=[self.id])

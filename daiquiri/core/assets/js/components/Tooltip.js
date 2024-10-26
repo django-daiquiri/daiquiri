@@ -2,28 +2,24 @@ import React, { useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 import { Tooltip as BootstrapTooltip } from 'bootstrap'
 
-const Tooltip = ({ children, title, placement }) => {
+const Tooltip = ({ children, tooltip }) => {
   const ref = useRef(null)
 
   useEffect(() => {
-    if (title) {
+    if (tooltip && tooltip.title) {
       const t = new BootstrapTooltip(ref.current, {
-        title, placement, html: true, trigger: 'hover' })
+        html: true, trigger: 'hover', placement: 'bottom', ...tooltip
+      })
       return () => t.dispose()
     }
-  }, [title, placement])
+  }, [tooltip])
 
   return React.cloneElement(children, { ref })
 }
 
-Tooltip.defaultProps = {
-  placement: 'bottom'
-}
-
 Tooltip.propTypes = {
   children: PropTypes.node.isRequired,
-  title: PropTypes.string,
-  placement: PropTypes.string,
+  tooltip: PropTypes.object,
 }
 
 export default Tooltip

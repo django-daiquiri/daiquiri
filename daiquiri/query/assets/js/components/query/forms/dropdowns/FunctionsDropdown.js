@@ -7,7 +7,7 @@ import Tooltip from 'daiquiri/core/assets/js/components/Tooltip'
 
 import { useUserFunctionsQuery } from 'daiquiri/metadata/assets/js/hooks/queries'
 
-const FunctionsDropdown = ({ onPaste }) => {
+const FunctionsDropdown = ({ onDoubleClick }) => {
   const { data: functions } = useUserFunctionsQuery()
 
   const [activeItem, setActiveItem] = useState(null)
@@ -24,7 +24,7 @@ const FunctionsDropdown = ({ onPaste }) => {
       <div className="card">
         <div className="dq-browser">
           <div className="dq-browser-title">
-            {gettext('Columns')}
+            {gettext('Functions')}
           </div>
           <div className="dq-browser-filter">
             <input
@@ -41,11 +41,11 @@ const FunctionsDropdown = ({ onPaste }) => {
                 (func) => (isEmpty(filterValue) || func.name.includes(filterValue))
               ).map((func) => (
                 <li key={func.id}>
-                  <Tooltip title={func.description} placement="left">
+                  <Tooltip tooltip={{title: func.description, placement: 'left'}}>
                     <button
                       className={classNames('btn btn-link d-flex', {'active': activeItem === func})}
                       onClick={() => handleClick(func)}
-                      onDoubleClick={() => onPaste(func)}
+                      onDoubleClick={() => onDoubleClick('function', func)}
                     >
                       <div>{func.name}</div>
                     </button>
@@ -64,7 +64,7 @@ const FunctionsDropdown = ({ onPaste }) => {
 }
 
 FunctionsDropdown.propTypes = {
-  onPaste: PropTypes.func.isRequired
+  onDoubleClick: PropTypes.func.isRequired
 }
 
 export default FunctionsDropdown

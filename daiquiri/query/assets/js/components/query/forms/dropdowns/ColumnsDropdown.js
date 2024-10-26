@@ -8,7 +8,7 @@ import Tooltip from 'daiquiri/core/assets/js/components/Tooltip'
 import { useUserSchemasQuery } from 'daiquiri/metadata/assets/js/hooks/queries'
 import { useUserSchemaQuery } from 'daiquiri/query/assets/js/hooks/queries'
 
-const ColumnsDropdown = ({ onPaste }) => {
+const ColumnsDropdown = ({ onDoubleClick }) => {
   const { data: schemas } = useUserSchemasQuery()
   const { data: userSchema } = useUserSchemaQuery()
 
@@ -43,15 +43,10 @@ const ColumnsDropdown = ({ onPaste }) => {
     }
   }
 
-  const getColumnTooltip = (item) => {
-    let tooltip = item.description
-
-    if (!isEmpty(item.unit)) {
-      tooltip += `</br><b>Unit:</b> ${item.unit}`
-    }
-
-    return tooltip
-  }
+  const getTooltip = (item) => ({
+    title: item.description + isEmpty(item.unit) ? '' : `</br><b>Unit:</b> ${item.unit}`,
+    placement: 'left'
+  })
 
   return (
     <div className="mb-4">
@@ -73,11 +68,11 @@ const ColumnsDropdown = ({ onPaste }) => {
             {
               columns.filter((column) => (isEmpty(filterValue) || column.name.includes(filterValue))).map((column) => (
                 <li key={column.id}>
-                  <Tooltip title={getColumnTooltip(column)} placement="left">
+                  <Tooltip tooltip={getTooltip(column)}>
                     <button
                       className={classNames('btn btn-link d-flex', {'active': activeItem === column})}
                       onClick={() => handleClick(column)}
-                      onDoubleClick={() => onPaste(column)}
+                      onDoubleClick={() => onDoubleClick('column', column)}
                     >
                       <div>{column.name}</div>
                     </button>
@@ -96,7 +91,7 @@ const ColumnsDropdown = ({ onPaste }) => {
 }
 
 ColumnsDropdown.propTypes = {
-  onPaste: PropTypes.func.isRequired
+  onDoubleClick: PropTypes.func.isRequired
 }
 
 export default ColumnsDropdown

@@ -3,8 +3,8 @@ from rest_framework import routers
 
 from .views import ManagementView, SchemaView, SchemasView, TableView
 from .viewsets import (AccessLevelViewSet, ColumnViewSet, FunctionViewSet,
-                       LicenseViewSet, SchemaViewSet, TableTypeViewSet,
-                       TableViewSet)
+                       LicenseViewSet, SchemaViewSet,
+                       TableViewSet, MetaViewSet)
 
 app_name = 'metadata'
 
@@ -13,9 +13,9 @@ router.register(r'schemas', SchemaViewSet, basename='schema')
 router.register(r'tables', TableViewSet, basename='table')
 router.register(r'columns', ColumnViewSet, basename='column')
 router.register(r'functions', FunctionViewSet, basename='function')
-router.register(r'tabletypes', TableTypeViewSet, basename='tabletype')
 router.register(r'licenses', LicenseViewSet, basename='license')
 router.register(r'accesslevels', AccessLevelViewSet, basename='accesslevel')
+router.register(r'meta', MetaViewSet, basename='meta')
 
 urlpatterns = [
     path('api/', include(router.urls)),

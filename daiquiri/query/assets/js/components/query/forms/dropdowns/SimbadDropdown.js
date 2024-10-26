@@ -4,7 +4,7 @@ import { isEmpty } from 'lodash'
 
 import { useSimbadQuery } from 'daiquiri/query/assets/js/hooks/queries'
 
-const SimbadDropdown = ({ options, onPaste }) => {
+const SimbadDropdown = ({ options, onClick }) => {
   const [searchValue, setSearchValue] = useState('')
   const [search, setSearch] = useState('')
 
@@ -60,11 +60,11 @@ const SimbadDropdown = ({ options, onPaste }) => {
                             <td>{row.object}</td>
                             <td>{row.type}</td>
                             <td>
-                              <button className="btn btn-link" onClick={() => onPaste({query_string: row.ra})}>
+                              <button className="btn btn-link" onClick={() => onClick({query_string: row.ra})}>
                                 {row.ra}
                               </button>
                               {' '}
-                              <button className="btn btn-link" onClick={() => onPaste({query_string: row.de})}>
+                              <button className="btn btn-link" onClick={() => onClick({query_string: row.de})}>
                                 {row.de}
                               </button>
                             </td>
@@ -88,7 +88,7 @@ const SimbadDropdown = ({ options, onPaste }) => {
 
 SimbadDropdown.propTypes = {
   options: PropTypes.object.isRequired,
-  onPaste: PropTypes.func.isRequired
+  onClick: PropTypes.func.isRequired
 }
 
 export default SimbadDropdown

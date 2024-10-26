@@ -1,0 +1,229 @@
+import React from 'react'
+import PropTypes from 'prop-types'
+
+import { useGroupsQuery } from 'daiquiri/auth/assets/js/hooks/queries'
+
+import { useAccessLevelsQuery, useLicensesQuery, useMetaQuery } from '../hooks/queries'
+
+import Checkbox from 'daiquiri/core/assets/js/components/form/Checkbox'
+import Input from 'daiquiri/core/assets/js/components/form/Input'
+import Markdown from 'daiquiri/core/assets/js/components/form/Markdown'
+import Select from 'daiquiri/core/assets/js/components/form/Select'
+import Textarea from 'daiquiri/core/assets/js/components/form/Textarea'
+
+import EditName from './EditName'
+
+const EditTable = ({ values, errors, setValues, onSubmit }) => {
+  const { data: accessLevels } = useAccessLevelsQuery()
+  const { data: licenses } = useLicensesQuery()
+  const { data: meta } = useMetaQuery()
+  const { data: groups } = useGroupsQuery()
+
+  return values && meta && groups && (
+    <div className="card">
+      <div className="d-flex align-items-center card-header">
+        <span className="me-auto">
+          <strong>{gettext('Table')}</strong> {values.label}
+        </span>
+
+        <a className="btn btn-secondary btn-sm me-2" href={values.admin_url} target="_blank" rel="noreferrer">
+          {gettext('Admin')}
+        </a>
+        <button className="btn btn-primary btn-sm" onClick={() => onSubmit('table', values)}>
+          {gettext('Save')}
+        </button>
+      </div>
+      <div className="card-body">
+        <form onSubmit={(event => event.preventDefault())}>
+          <div className="row">
+            <div className="col-md-9">
+              <Input
+                label={meta.table.title.verbose_name}
+                help={meta.table.title.help_text}
+                value={values.title}
+                errors={errors.title}
+                onChange={(title) => setValues({ ...values, title })} />
+            </div>
+            <div className="col-md-3">
+              <Input
+                type="number"
+                label={meta.table.order.verbose_name}
+                help={meta.table.order.help_text}
+                value={values.order}
+                errors={errors.order}
+                onChange={(order) => setValues({ ...values, order })} />
+            </div>
+          </div>
+
+          <Textarea
+            label={meta.table.description.verbose_name}
+            help={meta.table.description.help_text}
+            value={values.description}
+            errors={errors.description}
+            onChange={(description) => setValues({ ...values, description })} />
+
+          <div className="row">
+            <div className="col-md-4">
+              <Select
+                label={meta.table.license.verbose_name}
+                help={meta.table.license.help_text}
+                value={values.license}
+                options={licenses}
+                errors={errors.license}
+                onChange={(license) => setValues({ ...values, license })} />
+            </div>
+            <div className="col-md-4">
+              <Input
+                label={meta.table.doi.verbose_name}
+                help={meta.table.doi.help_text}
+                value={values.doi}
+                errors={errors.doi}
+                onChange={(doi) => setValues({ ...values, doi })} />
+            </div>
+            <div className="col-md-4">
+              <Input
+                label={meta.table.utype.verbose_name}
+                help={meta.table.utype.help_text}
+                value={values.utype}
+                errors={errors.utype}
+                onChange={(utype) => setValues({ ...values, utype })} />
+            </div>
+          </div>
+
+          <div className="row">
+            <div className="col-md-6">
+              <Input
+                type="date"
+                label={meta.table.published.verbose_name}
+                help={meta.table.published.help_text}
+                value={values.published || ''}
+                errors={errors.published}
+                onChange={(published) => setValues({ ...values, published })} />
+            </div>
+            <div className="col-md-6">
+              <Input
+                type="date"
+                label={meta.table.updated.verbose_name}
+                help={meta.table.updated.help_text}
+                value={values.updated || ''}
+                errors={errors.updated}
+                onChange={(updated) => setValues({ ...values, updated })} />
+            </div>
+          </div>
+
+          <div className="row">
+            <div className="col-md-6">
+              <Select
+                label={meta.table.access_level.verbose_name}
+                help={meta.table.access_level.help_text}
+                value={values.access_level}
+                options={accessLevels}
+                errors={errors.access_level}
+                onChange={(access_level) => setValues({ ...values, access_level })} />
+            </div>
+            <div className="col-md-6">
+              <Select
+                label={meta.table.metadata_access_level.verbose_name}
+                help={meta.table.metadata_access_level.help_text}
+                value={values.metadata_access_level}
+                options={accessLevels}
+                errors={errors.metadata_access_level}
+                onChange={(metadata_access_level) => setValues({ ...values, metadata_access_level })} />
+            </div>
+          </div>
+
+          <div className="mb-3">
+            <strong className="d-block mb-2">{gettext('Groups with access')}</strong>
+            {
+              groups.map((group, groupIndex) => (
+                <Checkbox
+                  key={groupIndex}
+                  label={group.name}
+                  checked={values.groups.includes(group.id)}
+                  onChange={(checked) => setValues({ ...values, groups: checked ? (
+                    [ ...values.groups, group.id]
+                  ) : (
+                    values.groups.filter(g => g.id !== group.id)
+                  )})}
+                />
+              ))
+            }
+          </div>
+
+          <Markdown
+            label={meta.table.long_description.verbose_name}
+            help={meta.table.long_description.help_text}
+            value={values.long_description}
+            errors={errors.long_description}
+            onChange={(long_description) => setValues({ ...values, long_description })} />
+          <Markdown
+            label={meta.table.attribution.verbose_name}
+            help={meta.table.attribution.help_text}
+            value={values.attribution}
+            errors={errors.attribution}
+            onChange={(attribution) => setValues({ ...values, attribution })} />
+
+          <div className="mb-3">
+            <strong className="d-block mb-2">{gettext('Creators')}</strong>
+            {
+              values.creators.map((creator, creatorIndex) => (
+                <EditName
+                  key={creatorIndex}
+                  name={creator}
+                  onChange={(name) => setValues({
+                    ...values, creators: values.creators.map((c, ci) => ci == creatorIndex ? name : c)
+                  })}
+                  onRemove={() => setValues({
+                    ...values, creators: values.creators.filter((c, ci) => (ci != creatorIndex))
+                  })}
+                />
+              ))
+            }
+            <button type="button "className="btn btn-success" onClick={() => setValues({
+              ...values, creators: [...values.creators, {}]
+            })}>
+              <i className="bi bi-plus-circle"></i> {gettext('Creator')}
+            </button>
+          </div>
+
+          <div className="mb-3">
+            <strong className="d-block mb-2">{gettext('Contributors')}</strong>
+            {
+              values.contributors.map((contributor, contributorIndex) => (
+                <EditName
+                  key={contributorIndex}
+                  name={contributor}
+                  onChange={(name) => setValues({
+                    ...values, contributors: values.contributors.map((c, ci) => ci == contributorIndex ? name : c)
+                  })}
+                  onRemove={() => setValues({
+                    ...values, contributors: values.contributors.filter((c, ci) => (ci != contributorIndex))
+                  })}
+                />
+              ))
+            }
+            <button type="button "className="btn btn-success" onClick={() => setValues({
+              ...values, contributors: [...values.contributors, {}]
+            })}>
+              <i className="bi bi-plus-circle"></i> {gettext('Contributor')}
+            </button>
+          </div>
+        </form>
+      </div>
+      <div className="card-footer text-end">
+        <button className="btn btn-primary btn-sm" onClick={() => onSubmit('table', values)}>
+          {gettext('Save')}
+        </button>
+      </div>
+    </div>
+  )
+}
+
+EditTable.propTypes = {
+  values: PropTypes.object,
+  errors: PropTypes.object,
+  setValues: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired
+}
+
+export default EditTable

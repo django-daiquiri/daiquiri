@@ -7,7 +7,7 @@ import Tooltip from 'daiquiri/core/assets/js/components/Tooltip'
 
 import { useUserExamplesQuery } from 'daiquiri/query/assets/js/hooks/queries'
 
-const ExamplesDropdown = ({ onPaste }) => {
+const ExamplesDropdown = ({ onDoubleClick }) => {
   const { data: examples } = useUserExamplesQuery()
 
   const [activeItem, setActiveItem] = useState(null)
@@ -41,11 +41,11 @@ const ExamplesDropdown = ({ onPaste }) => {
                 (example) => (isEmpty(filterValue) || example.name.includes(filterValue))
               ).map((example) => (
                 <li key={example.id}>
-                  <Tooltip title={example.description} placement="left">
+                  <Tooltip tooltip={{title: example.description, placement: 'left'}}>
                     <button
                       className={classNames('btn btn-link d-flex', {'active': activeItem === example})}
                       onClick={() => handleClick(example)}
-                      onDoubleClick={() => onPaste(example)}
+                      onDoubleClick={() => onDoubleClick('example', example)}
                     >
                       <div>{example.name}</div>
                     </button>
@@ -64,7 +64,7 @@ const ExamplesDropdown = ({ onPaste }) => {
 }
 
 ExamplesDropdown.propTypes = {
-  onPaste: PropTypes.func.isRequired
+  onDoubleClick: PropTypes.func.isRequired
 }
 
 export default ExamplesDropdown

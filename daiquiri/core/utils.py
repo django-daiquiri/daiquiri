@@ -5,6 +5,7 @@ import math
 import os
 import re
 import sys
+from collections import defaultdict
 from datetime import datetime
 from urllib.parse import urlparse
 from xml.dom import minidom
@@ -81,15 +82,15 @@ def get_next(request):
         return get_script_alias(request) + next
 
 
-def get_model_field_meta(model):
-    meta = {}
+def get_model_field_meta(*models):
+    meta = defaultdict(lambda: defaultdict(dict))
 
-    for field in model._meta.get_fields():
-        meta[field.name] = {}
-        if hasattr(field, 'verbose_name'):
-            meta[field.name]['verbose_name'] = field.verbose_name
-        if hasattr(field, 'help_text'):
-            meta[field.name]['help_text'] = field.help_text
+    for model in models:
+        for field in model._meta.get_fields():
+            if hasattr(field, 'verbose_name'):
+                meta[model._meta.model_name][field.name]['verbose_name'] = field.verbose_name
+            if hasattr(field, 'help_text'):
+                meta[model._meta.model_name][field.name]['help_text'] = field.help_text
 
     return meta
 

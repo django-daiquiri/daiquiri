@@ -68,7 +68,7 @@ const FormSql = ({ formKey, loadJob, query }) => {
     })
   }
 
-  const handleInsert = (item) => {
+  const handleInsert = (type, item) => {
     let query_string = item.query_string
 
     if (isNil(query_string)) {
@@ -97,7 +97,7 @@ const FormSql = ({ formKey, loadJob, query }) => {
     editorRef.current.view.focus()
   }
 
-  const handleReplace = (item) => {
+  const handleReplace = (type, item) => {
     setValues({...values, query: item.query_string})
   }
 
@@ -123,25 +123,25 @@ const FormSql = ({ formKey, loadJob, query }) => {
         </div>
 
         {
-          openDropdown == 'schemas' && <SchemasDropdown onPaste={handleInsert} />
+          openDropdown == 'schemas' && <SchemasDropdown onDoubleClick={handleInsert} />
         }
         {
-          openDropdown == 'columns' && <ColumnsDropdown onPaste={handleInsert} />
+          openDropdown == 'columns' && <ColumnsDropdown onDoubleClick={handleInsert} />
         }
         {
-          openDropdown == 'functions' && <FunctionsDropdown onPaste={handleInsert} />
+          openDropdown == 'functions' && <FunctionsDropdown onDoubleClick={handleInsert} />
         }
         {
           dropdowns && dropdowns.map((dropdown, index) => {
             if (dropdown.key == 'simbad' && openDropdown == 'simbad') {
-              return <SimbadDropdown key={index} options={dropdown.options} onPaste={handleInsert} />
+              return <SimbadDropdown key={index} options={dropdown.options} onClick={handleInsert} />
             } else if ((dropdown.key == 'vizier' && openDropdown == 'vizier')) {
-              return <VizierDropdown key={index} options={dropdown.options} onPaste={handleInsert} />
+              return <VizierDropdown key={index} options={dropdown.options} onClick={handleInsert} />
             }
           })
         }
         {
-          openDropdown == 'examples' && <ExamplesDropdown onPaste={handleReplace} />
+          openDropdown == 'examples' && <ExamplesDropdown onDoubleClick={handleReplace} />
         }
 
       </div>

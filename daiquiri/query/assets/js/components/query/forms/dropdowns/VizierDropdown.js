@@ -4,7 +4,7 @@ import { isEmpty } from 'lodash'
 
 import { useVizierQuery } from 'daiquiri/query/assets/js/hooks/queries'
 
-const VizierDropdown = ({ options, onPaste }) => {
+const VizierDropdown = ({ options, onClick }) => {
   const [searchValue, setSearchValue] = useState('')
   const [search, setSearch] = useState('')
 
@@ -61,7 +61,7 @@ const VizierDropdown = ({ options, onPaste }) => {
                             <td>
                               <button
                                 className="btn btn-link"
-                                onClick={() => onPaste({query_string: row.id})}
+                                onClick={() => onClick({query_string: row.id})}
                               >
                                 {row.id}
                               </button>
@@ -69,14 +69,14 @@ const VizierDropdown = ({ options, onPaste }) => {
                             <td>
                               <button
                                 className="btn btn-link"
-                                onClick={() => onPaste({query_string: row.ra})}
+                                onClick={() => onClick({query_string: row.ra})}
                               >
                                 {row.ra}
                               </button>
                               {' '}
                               <button
                                 className="btn btn-link"
-                                onClick={() => onPaste({query_string: row.de})}
+                                onClick={() => onClick({query_string: row.de})}
                               >
                                 {row.de}
                               </button>
@@ -84,7 +84,7 @@ const VizierDropdown = ({ options, onPaste }) => {
                             <td>
                               <button
                                 className="btn btn-link"
-                                onClick={() => onPaste({query_string: row.distance})}
+                                onClick={() => onClick({query_string: row.distance})}
                               >
                                 {row.distance}
                               </button>
@@ -110,7 +110,7 @@ const VizierDropdown = ({ options, onPaste }) => {
 
 VizierDropdown.propTypes = {
   options: PropTypes.object.isRequired,
-  onPaste: PropTypes.func.isRequired
+  onClick: PropTypes.func.isRequired
 }
 
 export default VizierDropdown

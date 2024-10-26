@@ -10,6 +10,7 @@ from daiquiri.core.adapter import DatabaseAdapter
 from daiquiri.core.viewsets import ChoicesViewSet
 from daiquiri.core.permissions import HasModelPermission
 from daiquiri.core.constants import ACCESS_LEVEL_CHOICES
+from daiquiri.core.utils import get_model_field_meta
 
 from django.conf import settings
 
@@ -210,13 +211,6 @@ class FunctionViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-class TableTypeViewSet(ChoicesViewSet):
-    permission_classes = (IsAuthenticated, )
-    authentication_classes = (SessionAuthentication, TokenAuthentication)
-
-    queryset = Table.TYPE_CHOICES
-
-
 class LicenseViewSet(ChoicesViewSet):
     permission_classes = (IsAuthenticated, )
     authentication_classes = (SessionAuthentication, TokenAuthentication)
@@ -229,3 +223,11 @@ class AccessLevelViewSet(ChoicesViewSet):
     authentication_classes = (SessionAuthentication, TokenAuthentication)
 
     queryset = ACCESS_LEVEL_CHOICES
+
+
+class MetaViewSet(viewsets.ViewSet):
+    permission_classes = (IsAuthenticated, )
+    authentication_classes = (SessionAuthentication, TokenAuthentication)
+
+    def list(self, request, *args, **kwargs):
+        return Response(get_model_field_meta(Schema, Table, Column, Function))
