@@ -16,8 +16,8 @@ export const useStatusQuery = () => {
     queryFn: () => QueryApi.fetchStatus().then((response) => {
       if (status && (status.hash != response.hash)) {
         queryClient.invalidateQueries({ queryKey: ['jobsIndex'] })
+        queryClient.invalidateQueries({ queryKey: ['jobsTables'] })
         queryClient.invalidateQueries({ queryKey: ['job'] })
-        queryClient.invalidateQueries({ queryKey: ['userSchema'] })
       }
       return response
     }),
@@ -42,10 +42,10 @@ export const useFormQuery = (formKey) => {
   })
 }
 
-export const useQueryLanguagesQuery = () => {
+export const useDropdownsQuery = () => {
   return useQuery({
-    queryKey: ['queryLanguages'],
-    queryFn: () => QueryApi.fetchQueryLanguages(),
+    queryKey: ['drowdowns'],
+    queryFn: () => QueryApi.fetchDropdowns(),
     placeholderData: keepPreviousData
   })
 }
@@ -62,22 +62,6 @@ export const useDownloadFormatsQuery = () => {
   return useQuery({
     queryKey: ['downloadFormats'],
     queryFn: () => QueryApi.fetchDownloadFormats(),
-    placeholderData: keepPreviousData
-  })
-}
-
-export const useQueuesQuery = () => {
-  return useQuery({
-    queryKey: ['queues'],
-    queryFn: () => QueryApi.fetchQueues(),
-    placeholderData: keepPreviousData
-  })
-}
-
-export const useDropdownsQuery = () => {
-  return useQuery({
-    queryKey: ['drowdowns'],
-    queryFn: () => QueryApi.fetchDropdowns(),
     placeholderData: keepPreviousData
   })
 }
@@ -100,18 +84,10 @@ export const useJobsIndexQuery = () => {
   })
 }
 
-export const useUserSchemaQuery = () => {
+export const useJobsTablesQuery = () => {
   return useQuery({
-    queryKey: ['userSchema'],
-    queryFn: () => QueryApi.fetchUserSchema(),
-    placeholderData: keepPreviousData
-  })
-}
-
-export const useUserExamplesQuery = () => {
-  return useQuery({
-    queryKey: ['userExamples'],
-    queryFn: () => QueryApi.fetchUserExamples(),
+    queryKey: ['jobsTables'],
+    queryFn: () => QueryApi.fetchJobsTables(),
     placeholderData: keepPreviousData
   })
 }
@@ -163,6 +139,44 @@ export const useJobPlotQuery = (job, column) => {
   })
 }
 
+export const useUserExamplesQuery = () => {
+  return useQuery({
+    queryKey: ['userExamples'],
+    queryFn: () => QueryApi.fetchUserExamples(),
+    placeholderData: keepPreviousData
+  })
+}
+
+export const useDownloadJobQuery = (job, downloadKey, downloadJobId) => {
+  return useQuery({
+    queryKey: ['downloadJob', job.id, downloadKey, downloadJobId],
+    queryFn: () => QueryApi.fetchDownloadJob(job.id, downloadKey, downloadJobId),
+    placeholderData: keepPreviousData,
+    enabled: job.phase == 'COMPLETED' && !isEmpty(downloadJobId),
+    refetchOnWindowFocus: false,
+    refetchIntervalInBackground: true,
+    refetchInterval: (query) => {
+      return (query.state.data && ['QUEUED', 'EXECUTING'].includes(query.state.data.phase)) ? refetchInterval : false
+    }
+  })
+}
+
+export const useQueuesQuery = () => {
+  return useQuery({
+    queryKey: ['queues'],
+    queryFn: () => QueryApi.fetchQueues(),
+    placeholderData: keepPreviousData
+  })
+}
+
+export const useQueryLanguagesQuery = () => {
+  return useQuery({
+    queryKey: ['queryLanguages'],
+    queryFn: () => QueryApi.fetchQueryLanguages(),
+    placeholderData: keepPreviousData
+  })
+}
+
 export const useSimbadQuery = (url, search) => {
   return useQuery({
     queryKey: ['simbad', search],
@@ -178,19 +192,5 @@ export const useVizierQuery = (url, search) => {
     queryFn: () => VizierApi.search(url, search),
     placeholderData: keepPreviousData,
     enabled: !isEmpty(search)
-  })
-}
-
-export const useDownloadJobQuery = (job, downloadKey, downloadJobId) => {
-  return useQuery({
-    queryKey: ['downloadJob', job.id, downloadKey, downloadJobId],
-    queryFn: () => QueryApi.fetchDownloadJob(job.id, downloadKey, downloadJobId),
-    placeholderData: keepPreviousData,
-    enabled: job.phase == 'COMPLETED' && !isEmpty(downloadJobId),
-    refetchOnWindowFocus: false,
-    refetchIntervalInBackground: true,
-    refetchInterval: (query) => {
-      return (query.state.data && ['QUEUED', 'EXECUTING'].includes(query.state.data.phase)) ? refetchInterval : false
-    }
   })
 }

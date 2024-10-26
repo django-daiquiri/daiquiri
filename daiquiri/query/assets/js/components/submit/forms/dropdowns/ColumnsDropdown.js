@@ -6,11 +6,11 @@ import { isEmpty } from 'lodash'
 import Tooltip from 'daiquiri/core/assets/js/components/Tooltip'
 
 import { useUserSchemasQuery } from 'daiquiri/metadata/assets/js/hooks/queries'
-import { useUserSchemaQuery } from 'daiquiri/query/assets/js/hooks/queries'
+import { useJobsTablesQuery } from 'daiquiri/query/assets/js/hooks/queries'
 
 const ColumnsDropdown = ({ onDoubleClick }) => {
   const { data: schemas } = useUserSchemasQuery()
-  const { data: userSchema } = useUserSchemaQuery()
+  const { data: userSchema } = useJobsTablesQuery()
 
   const [columns, setColumns] = useState([])
   const [activeItem, setActiveItem] = useState(null)

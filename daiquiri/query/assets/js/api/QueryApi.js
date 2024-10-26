@@ -19,24 +19,12 @@ class QueryApi extends BaseApi {
     return this.get('/query/api/dropdowns/')
   }
 
-  static fetchQueues() {
-    return this.get('/query/api/queues/')
-  }
-
-  static fetchQueryLanguages() {
-    return this.get('/query/api/querylanguages/')
-  }
-
   static fetchDownloads() {
     return this.get('/query/api/downloads/')
   }
 
   static fetchDownloadFormats() {
     return this.get('/query/api/downloadformats/')
-  }
-
-  static fetchPhases() {
-    return this.get('/query/api/phases/')
   }
 
   static fetchJobs(params) {
@@ -47,32 +35,12 @@ class QueryApi extends BaseApi {
     return this.get('/query/api/jobs/index/')
   }
 
-  static fetchJob(id) {
-    return this.get(`/query/api/jobs/${id}/`)
-  }
-
-  static fetchJobColumns(id, params) {
-    return this.get(`/query/api/jobs/${id}/columns/?${encodeParams(params)}`)
-  }
-
-  static fetchJobRows(id, params) {
-    return this.get(`/query/api/jobs/${id}/rows/?${encodeParams(params)}`)
-  }
-
-  static fetchUserSchema(params) {
+  static fetchJobsTables(params) {
     return this.get(`/query/api/jobs/tables/?${encodeParams(params)}`)
   }
 
-  static fetchUserExamples() {
-    return this.get('/query/api/examples/user/')
-  }
-
-  static fetchUserSchemas() {
-    return this.get('/query/api/schemas/user/')
-  }
-
-  static fetchUserFunctions() {
-    return this.get('/query/api/functions/user/')
+  static fetchJob(id) {
+    return this.get(`/query/api/jobs/${id}/`)
   }
 
   static submitJob(values, formKey = null) {
@@ -104,6 +72,14 @@ class QueryApi extends BaseApi {
     return this.delete(`/query/api/jobs/${id}/`)
   }
 
+  static fetchJobColumns(id, params) {
+    return this.get(`/query/api/jobs/${id}/columns/?${encodeParams(params)}`)
+  }
+
+  static fetchJobRows(id, params) {
+    return this.get(`/query/api/jobs/${id}/rows/?${encodeParams(params)}`)
+  }
+
   static submitDownloadJob(id, downloadKey, data) {
     return this.post(`/query/api/jobs/${id}/download/${downloadKey}/`, data)
   }
@@ -116,6 +92,18 @@ class QueryApi extends BaseApi {
       }
       return response
     })
+  }
+
+  static fetchUserExamples() {
+    return this.get('/query/api/examples/user/')
+  }
+
+  static fetchQueues() {
+    return this.get('/query/api/queues/')
+  }
+
+  static fetchQueryLanguages() {
+    return this.get('/query/api/querylanguages/')
   }
 
 }
