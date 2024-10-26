@@ -28,6 +28,10 @@ const Schemas = ({ schemas, activeItem, setActiveItem, getTooltip, onDoubleClick
     }
   }, [schemas])
 
+  const isActive = (type, item) => {
+    return activeItem && activeItem.type == type && activeItem.id == item.id
+  }
+
   const handleClick = (type, item) => {
     if (item != activeItem) {
       setActiveItem(item)
@@ -60,7 +64,7 @@ const Schemas = ({ schemas, activeItem, setActiveItem, getTooltip, onDoubleClick
                   <li key={index}>
                     <Tooltip tooltip={getTooltip(schema)}>
                       <button
-                        className={classNames('btn btn-link d-flex', {'active': activeItem === schema})}
+                        className={classNames('btn btn-link d-flex', {'active': isActive('schema', schema)})}
                         onClick={() => handleClick('schema', schema)}
                         onDoubleClick={() => handleDoubleClick('schema', schema)}
                       >
@@ -87,7 +91,7 @@ const Schemas = ({ schemas, activeItem, setActiveItem, getTooltip, onDoubleClick
                   <li key={index}>
                     <Tooltip tooltip={getTooltip(table)}>
                       <button
-                        className={classNames('btn btn-link d-flex', {'active': activeItem === table})}
+                        className={classNames('btn btn-link d-flex', {'active': isActive('table', table)})}
                         onClick={() => handleClick('table', table)}
                         onDoubleClick={() => handleDoubleClick('table', table)}
                       >
@@ -114,7 +118,7 @@ const Schemas = ({ schemas, activeItem, setActiveItem, getTooltip, onDoubleClick
                   <li key={index}>
                     <Tooltip tooltip={getTooltip(column)}>
                       <button
-                        className={classNames('btn btn-link', {'active': activeItem === column})}
+                        className={classNames('btn btn-link', {'active': isActive('column', column)})}
                         onClick={() => handleClick('column', column)}
                         onDoubleClick={() => handleDoubleClick('column', column)}
                       >
