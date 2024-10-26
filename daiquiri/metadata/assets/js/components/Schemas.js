@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
-import { isEmpty } from 'lodash'
+import { isEmpty, isNil } from 'lodash'
 
 import Tooltip from 'daiquiri/core/assets/js/components/Tooltip'
 
@@ -14,12 +14,17 @@ const Schemas = ({ schemas, activeItem, setActiveItem, getTooltip, onDoubleClick
 
   useEffect(() => {
     if (!isEmpty(schemas)) {
-      setOpenSchema(schemas[0])
-      setOpenTable(schemas[0].tables[0])
-
       setVisibleSchemas(schemas)
-      setVisibleTables(schemas[0].tables)
-      setVisibleColumns(schemas[0].tables[0].columns)
+
+      if (isNil(openSchema)) {
+        setOpenSchema(schemas[0])
+        setVisibleTables(schemas[0].tables)
+      }
+
+      if (isNil(openTable)) {
+        setOpenTable(schemas[0].tables[0])
+        setVisibleColumns(schemas[0].tables[0].columns)
+      }
     }
   }, [schemas])
 
@@ -61,7 +66,7 @@ const Schemas = ({ schemas, activeItem, setActiveItem, getTooltip, onDoubleClick
                       >
                         <div>{schema.name}</div>
                         {
-                          (openSchema.id == schema.id) && (
+                          openSchema && (openSchema.id == schema.id) && (
                             <div className="ms-auto"><i className="bi bi-chevron-right"></i></div>
                           )
                         }
@@ -88,7 +93,7 @@ const Schemas = ({ schemas, activeItem, setActiveItem, getTooltip, onDoubleClick
                       >
                         <div>{table.name}</div>
                         {
-                          (openSchema.id == table.id) && (
+                          openTable && (openTable.id == table.id) && (
                             <div className="ms-auto"><i className="bi bi-chevron-right"></i></div>
                           )
                         }

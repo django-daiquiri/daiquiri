@@ -21,7 +21,7 @@ const SchemasDropdown = ({ onDoubleClick }) => {
   return !isUndefined(schemas) && !isUndefined(userSchema) && (
     <div>
       <Schemas
-        schemas={[...schemas, userSchema]}
+        schemas={[...schemas, ...userSchema]}
         activeItem={activeItem}
         setActiveItem={setActiveItem}
         getTooltip={getTooltip}
