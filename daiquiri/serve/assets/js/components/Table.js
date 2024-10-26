@@ -3,9 +3,9 @@ import PropTypes from 'prop-types'
 
 import { useTableColumnsQuery, useTableRowsQuery } from '../hooks/queries'
 
-import Table from 'daiquiri/core/assets/js/components/table/Table'
+import DaiquiriTable from 'daiquiri/core/assets/js/components/table/Table'
 
-const App = ({ schema, table }) => {
+const Table = ({ schema, table }) => {
   const initialParams = {
     schema,
     table,
@@ -19,7 +19,7 @@ const App = ({ schema, table }) => {
   const { data: rows } = useTableRowsQuery(params)
 
   return (
-    <Table
+    <DaiquiriTable
       columns={columns}
       rows={rows}
       params={params}
@@ -28,9 +28,9 @@ const App = ({ schema, table }) => {
   )
 }
 
-App.propTypes = {
+Table.propTypes = {
   schema: PropTypes.string.isRequired,
   table: PropTypes.string.isRequired
 }
 
-export default App
+export default Table

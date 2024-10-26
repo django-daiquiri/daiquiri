@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { isNil } from 'lodash'
+import { isEmpty, isNil } from 'lodash'
 
 import { useFormQuery, useQueuesQuery } from 'daiquiri/query/assets/js/hooks/queries'
 import { useSubmitJobMutation } from 'daiquiri/query/assets/js/hooks/mutations'
@@ -16,6 +16,43 @@ const Form = ({ formKey, loadJob }) => {
   const { data: queues } = useQueuesQuery()
   const mutation = useSubmitJobMutation()
 
+  const [values, setValues] = useState({
+    table_name: '',
+    run_id: '',
+    queue: '',
+  })
+  const [errors, setErrors] = useState({})
+
+  const getDefaultQueue = () => isNil(queues) ? '' : queues[0].id
+  const getInitialValues = () => (
+    (isNil(form) || isEmpty(form.fields)) ? {} : {
+      ...form.fields.reduce((initialValues, field) => (
+        {...initialValues, [field.key]: field.default_value || ''}
+      ), {})
+    }
+  )
+
+  const handleSubmit = () => {
+    mutation.mutate({values, setErrors, loadJob, formKey})
+  }
+
+  const handleClear = () => {
+    setValues({
+      table_name: '',
+      run_id: '',
+      queue: getDefaultQueue(),
+      ...getInitialValues()
+    })
+  }
+
+  useEffect(() => {
+    setValues({
+      ...values,
+      queue: values.queue || getDefaultQueue(),
+      ...getInitialValues()
+    })
+  }, [form, queues])
+
   if (isNil(form)) {
     return null
   } else if (form.errors) {
@@ -27,44 +64,6 @@ const Form = ({ formKey, loadJob }) => {
       </p>
     )
   } else {
-
-    const [values, setValues] = useState({
-      table_name: '',
-      run_id: '',
-      queue: '',
-    })
-    const [errors, setErrors] = useState({})
-
-    const getDefaultQueue = () => isNil(queues) ? '' : queues[0].id
-    const getInitialValues = () => (
-      isNil(form) ? {} : {
-        ...form.fields.reduce((initialValues, field) => (
-          {...initialValues, [field.key]: field.default_value || ''}
-        ), {})
-      }
-    )
-
-    useEffect(() => {
-      setValues({
-        ...values,
-        queue: values.queue || getDefaultQueue(),
-        ...getInitialValues()
-      })
-    }, [form, queues])
-
-    const handleSubmit = () => {
-      mutation.mutate({values, setErrors, loadJob, formKey})
-    }
-
-    const handleClear = () => {
-      setValues({
-        table_name: '',
-        run_id: '',
-        queue: getDefaultQueue(),
-        ...getInitialValues()
-      })
-    }
-
     return (
       <div className="query-form mb-4">
         <h2>{form.label}</h2>

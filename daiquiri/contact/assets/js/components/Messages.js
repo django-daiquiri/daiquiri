@@ -12,7 +12,7 @@ import List from 'daiquiri/core/assets/js/components/list/List'
 
 import ShowModal from './ShowModal.js'
 
-const App = () => {
+const Messages = () => {
   const initalParams = {}
 
   const [params, setParams] = useState(initalParams)
@@ -161,4 +161,4 @@ const App = () => {
   )
 }
 
-export default App
+export default Messages

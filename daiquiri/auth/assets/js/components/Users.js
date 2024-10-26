@@ -14,7 +14,7 @@ import ShowModal from './ShowModal.js'
 import UpdateModal from './UpdateModal.js'
 import ConfirmModal from './ConfirmModal.js'
 
-const App = () => {
+const Users = () => {
   const initalParams = {
     ordering: '-user__date_joined'
   }
@@ -289,4 +289,4 @@ const App = () => {
   )
 }
 
-export default App
+export default Users

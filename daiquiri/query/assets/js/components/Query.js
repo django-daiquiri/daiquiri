@@ -1,56 +1,45 @@
-import React from 'react'
-import PropTypes from 'prop-types'
+import React, { useState } from 'react'
 
-import Form from './query/forms/Form'
-import Forms from './query/Forms'
-import FormSql from './query/forms/FormSql'
-import FormUpload from './query/forms/FormUpload'
-import Job from './query/job/Job'
-import Jobs from './query/Jobs'
-import Status from './query/Status'
+import { parseLocation, updateLocation } from '../utils/location'
 
-const Query = ({ formKey, jobId, query, loadForm, loadJob, loadJobs }) => {
-  const getForm = () => {
-    switch (formKey) {
-      case 'sql':
-        return <FormSql formKey={formKey} loadJob={loadJob} query={query} />
-      case 'upload':
-        return <FormUpload formKey={formKey} loadJob={loadJob} />
-      default:
-        return <Form formKey={formKey} loadJob={loadJob} />
-    }
+import Jobs from './Jobs'
+import Submit from './Submit'
+
+const Query = () => {
+  const location = parseLocation()
+
+  const [state, setState] = useState(location)
+
+  const loadJobs = () => {
+    updateLocation({ jobs: true })
+    setState({ jobs: true })
   }
 
-  return (
-    <div>
-      <h1 className="mb-4">Query interface</h1>
+  const loadJob = (jobId) => {
+    updateLocation({ jobId })
+    setState({ jobId })
+  }
 
-      <div className="row">
-        <div className="col-lg-3 order-2 order-lg-1">
-          <Status />
-          <Forms formKey={formKey} loadForm={loadForm} />
-          <Jobs jobId={jobId} loadJob={loadJob} loadJobs={loadJobs} />
-        </div>
-        <div className="col-lg-9 order-1 order-lg-2">
-          {
-            jobId && <Job jobId={jobId} loadForm={loadForm} />
-          }
-          {
-            formKey && getForm()
-          }
-        </div>
-      </div>
-    </div>
+  const loadForm = (formKey, query = null) => {
+    updateLocation({ formKey })
+    setState({ formKey, query })
+  }
+
+  return state.jobs ? (
+    <Jobs
+      loadForm={loadForm}
+      loadJob={loadJob}
+    />
+  ) : (
+    <Submit
+      formKey={state.formKey}
+      jobId={state.jobId}
+      query={state.query}
+      loadJobs={loadJobs}
+      loadJob={loadJob}
+      loadForm={loadForm}
+    />
   )
-}
-
-Query.propTypes = {
-  formKey: PropTypes.string,
-  jobId: PropTypes.string,
-  query: PropTypes.string,
-  loadForm: PropTypes.func.isRequired,
-  loadJob: PropTypes.func.isRequired,
-  loadJobs: PropTypes.func.isRequired,
 }
 
 export default Query
