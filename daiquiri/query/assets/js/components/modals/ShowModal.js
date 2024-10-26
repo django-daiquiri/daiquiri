@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 import Query from 'daiquiri/core/assets/js/components/Query'
 
-import JobParameters from 'daiquiri/query/assets/js/components/query/job/JobParameters'
+import JobParameters from 'daiquiri/query/assets/js/components/submit/job/JobParameters'
 
 const ShowModal = ({ modal, job, loadForm, loadJob }) => {
   return (
