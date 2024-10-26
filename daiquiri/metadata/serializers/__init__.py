@@ -18,7 +18,6 @@ class GroupSerializer(serializers.ModelSerializer):
 
 class FunctionSerializer(serializers.ModelSerializer):
 
-    type = serializers.CharField(default='function')
     label = serializers.CharField(source='__str__', read_only=True)
     admin_url = serializers.CharField(read_only=True)
 
@@ -29,7 +28,6 @@ class FunctionSerializer(serializers.ModelSerializer):
 
 class ColumnSerializer(serializers.ModelSerializer):
 
-    type = serializers.CharField(default='column')
     label = serializers.CharField(source='__str__', read_only=True)
     admin_url = serializers.CharField(read_only=True)
 
@@ -43,7 +41,6 @@ class ColumnSerializer(serializers.ModelSerializer):
         else:
             fields = (
                 'id',
-                'type',
                 'label',
                 'order',
                 'name',
@@ -64,7 +61,6 @@ class ColumnSerializer(serializers.ModelSerializer):
 
 class TableSerializer(serializers.ModelSerializer):
 
-    type = serializers.CharField(default='table')
     label = serializers.CharField(source='__str__', read_only=True)
 
     related_identifiers = JSONListField(required=False)
@@ -80,7 +76,6 @@ class TableSerializer(serializers.ModelSerializer):
 
 class SchemaSerializer(serializers.ModelSerializer):
 
-    type = serializers.CharField(default='schema')
     label = serializers.CharField(source='__str__', read_only=True)
 
     related_identifiers = JSONListField(required=False)

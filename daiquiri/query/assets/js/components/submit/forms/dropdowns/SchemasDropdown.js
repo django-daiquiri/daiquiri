@@ -13,10 +13,12 @@ const SchemasDropdown = ({ onDoubleClick }) => {
 
   const [activeItem, setActiveItem] = useState(null)
 
-  const getTooltip = (item) => ({
-    title: item.description + isEmpty(item.unit) ? '' : `</br><b>Unit:</b> ${item.unit}`,
-    placement: 'left'
-  })
+  const getTooltip = (type, item) => {
+    return {
+      title: item.description + (isEmpty(item.unit) ? '' : `</br><b>Unit:</b> ${item.unit}`),
+      placement: 'left'
+    }
+  }
 
   return !isUndefined(schemas) && !isUndefined(userSchema) && (
     <div>

@@ -34,7 +34,7 @@ const Schemas = ({ schemas, activeItem, setActiveItem, getTooltip, onDoubleClick
 
   const handleClick = (type, item) => {
     if (item != activeItem) {
-      setActiveItem(item)
+      setActiveItem({ type, ...item })
     }
     if (type == 'schema' && item != openSchema) {
       setOpenSchema(item)
@@ -62,7 +62,7 @@ const Schemas = ({ schemas, activeItem, setActiveItem, getTooltip, onDoubleClick
               {
                 visibleSchemas.map((schema, index) => (
                   <li key={index}>
-                    <Tooltip tooltip={getTooltip(schema)}>
+                    <Tooltip tooltip={getTooltip('schema', schema)}>
                       <button
                         className={classNames('btn btn-link d-flex', {'active': isActive('schema', schema)})}
                         onClick={() => handleClick('schema', schema)}
@@ -89,7 +89,7 @@ const Schemas = ({ schemas, activeItem, setActiveItem, getTooltip, onDoubleClick
               {
                 visibleTables.map((table, index) => (
                   <li key={index}>
-                    <Tooltip tooltip={getTooltip(table)}>
+                    <Tooltip tooltip={getTooltip('table', table)}>
                       <button
                         className={classNames('btn btn-link d-flex', {'active': isActive('table', table)})}
                         onClick={() => handleClick('table', table)}
@@ -116,7 +116,7 @@ const Schemas = ({ schemas, activeItem, setActiveItem, getTooltip, onDoubleClick
               {
                 visibleColumns.map((column, index) => (
                   <li key={index}>
-                    <Tooltip tooltip={getTooltip(column)}>
+                    <Tooltip tooltip={getTooltip('column', column)}>
                       <button
                         className={classNames('btn btn-link', {'active': isActive('column', column)})}
                         onClick={() => handleClick('column', column)}

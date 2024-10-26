@@ -41,13 +41,13 @@ export const useMetadataQuery = ({ type, id }) => {
     queryFn: () => {
       switch (type) {
         case 'schema':
-          return MetadataApi.fetchSchema(id)
+          return MetadataApi.fetchSchema(id).then(response => ({ type, ...response }))
         case 'table':
-          return MetadataApi.fetchTable(id)
+          return MetadataApi.fetchTable(id).then(response => ({ type, ...response }))
         case 'column':
-          return MetadataApi.fetchColumn(id)
+          return MetadataApi.fetchColumn(id).then(response => ({ type, ...response }))
         case 'function':
-          return MetadataApi.fetchFunction(id)
+          return MetadataApi.fetchFunction(id).then(response => ({ type, ...response }))
       }
     },
     placeholderData: keepPreviousData,
