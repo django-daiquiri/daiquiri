@@ -1,15 +1,18 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { isUndefined } from 'lodash'
 
 import { useGroupsQuery } from 'daiquiri/auth/assets/js/hooks/queries'
 
-import { useMetaQuery } from '../hooks/queries'
+import { useAccessLevelsQuery, useMetaQuery } from '../hooks/queries'
 
 import Checkbox from 'daiquiri/core/assets/js/components/form/Checkbox'
 import Input from 'daiquiri/core/assets/js/components/form/Input'
+import Select from 'daiquiri/core/assets/js/components/form/Select'
 import Textarea from 'daiquiri/core/assets/js/components/form/Textarea'
 
 const EditColumn = ({ values, errors, setValues, onSubmit }) => {
+  const { data: accessLevels } = useAccessLevelsQuery()
   const { data: meta } = useMetaQuery()
   const { data: groups } = useGroupsQuery()
 
@@ -77,6 +80,49 @@ const EditColumn = ({ values, errors, setValues, onSubmit }) => {
             value={values.index_for}
             errors={errors.index_for}
             onChange={(index_for) => setValues({ ...values, index_for })} />
+
+          {
+            !isUndefined(values.access_level) && !isUndefined(values.metadata_access_level) && !isUndefined(values.groups) && <>
+              <div className="row">
+                <div className="col-md-6">
+                  <Select
+                    label={meta.column.access_level.verbose_name}
+                    help={meta.column.access_level.help_text}
+                    value={values.access_level}
+                    options={accessLevels}
+                    errors={errors.access_level}
+                    onChange={(access_level) => setValues({ ...values, access_level })} />
+                </div>
+                <div className="col-md-6">
+                  <Select
+                    label={meta.column.metadata_access_level.verbose_name}
+                    help={meta.column.metadata_access_level.help_text}
+                    value={values.metadata_access_level}
+                    options={accessLevels}
+                    errors={errors.metadata_access_level}
+                    onChange={(metadata_access_level) => setValues({ ...values, metadata_access_level })} />
+                </div>
+              </div>
+
+              <div className="mb-3">
+                <strong className="d-block mb-2">{gettext('Groups with access')}</strong>
+                {
+                  groups.map((group, groupIndex) => (
+                    <Checkbox
+                      key={groupIndex}
+                      label={group.name}
+                      checked={values.groups.includes(group.id)}
+                      onChange={(checked) => setValues({ ...values, groups: checked ? (
+                        [ ...values.groups, group.id]
+                      ) : (
+                        values.groups.filter(g => g.id !== group.id)
+                      )})}
+                    />
+                  ))
+                }
+              </div>
+            </>
+          }
 
           <Checkbox
             label={meta.column.principal.verbose_name}
