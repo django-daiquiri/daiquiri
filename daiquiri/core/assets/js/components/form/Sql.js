@@ -11,7 +11,7 @@ import { underlineRange } from 'daiquiri/core/assets/js/utils/codemirror'
 
 import Errors from './Errors'
 
-const Sql = ({ label, value, errors, onChange, editor }) => {
+const Sql = ({ label, value, errors, onChange, editorRef }) => {
 
   useEffect(() => {
     const positions = JSON.parse(get(errors, 'positions') || '[]')
@@ -19,7 +19,7 @@ const Sql = ({ label, value, errors, onChange, editor }) => {
     positions.forEach(position => {
       ranges.push({ from: position[0], to: position[1]})
     })
-    underlineRange(editor.current.view, ranges)
+    underlineRange(editorRef.current.view, ranges)
   }, [errors])
 
   return (
@@ -27,7 +27,7 @@ const Sql = ({ label, value, errors, onChange, editor }) => {
       <label htmlFor="query" className="form-label">{label}</label>
       <ReactCodeMirror
         id="query"
-        ref={editor}
+        ref={editorRef}
         className={classNames('form-control codemirror', {'is-invalid': errors})}
         value={value}
         onChange={onChange}
@@ -48,7 +48,7 @@ Sql.propTypes = {
   value: PropTypes.string.isRequired,
   errors: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
   onChange: PropTypes.func.isRequired,
-  editor: PropTypes.object,
+  editorRef: PropTypes.object,
 }
 
 export default Sql

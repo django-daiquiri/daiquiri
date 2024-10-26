@@ -36,7 +36,7 @@ const FormSql = ({ formKey, loadJob, query }) => {
   })
   const [errors, setErrors] = useState({})
 
-  const editor = useRef()
+  const editorRef = useRef()
 
   const getDefaultQueryLanguage = () => isNil(queryLanguages) ? '' : queryLanguages[0].id
   const getDefaultQueue = () => isNil(queues) ? '' : queues[0].id
@@ -79,13 +79,22 @@ const FormSql = ({ formKey, loadJob, query }) => {
     }
 
     // see https://codemirror.net/examples/change/
-    editor.current.view.dispatch({
+    editorRef.current.view.dispatch({
+      // replace the current selection with the query_string
       changes: {
-        from: editor.current.view.state.selection.main.from,
-        to: editor.current.view.state.selection.main.to,
+        from: editorRef.current.view.state.selection.main.from,
+        to: editorRef.current.view.state.selection.main.to,
         insert: query_string
+      },
+      // move the position of the cursor by the length of the pasted query_string
+      selection: {
+        anchor: editorRef.current.view.state.selection.main.from + query_string.length,
+        head: editorRef.current.view.state.selection.main.from + query_string.length
       }
     })
+
+    // re-focus the editor
+    editorRef.current.view.focus()
   }
 
   const handleReplace = (item) => {
@@ -144,7 +153,7 @@ const FormSql = ({ formKey, loadJob, query }) => {
             value={values.query}
             errors={errors.query}
             onChange={(query) => setValues({...values, query})}
-            editor={editor}
+            editorRef={editorRef}
           />
         </div>
 
