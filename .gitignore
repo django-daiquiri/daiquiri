@@ -9,6 +9,7 @@ __pycache__/
 /daiquiri/auth/static/
 /daiquiri/contact/static/
 /daiquiri/core/static/
+/daiquiri/metadata/static/
 /daiquiri/query/static/
 /daiquiri/serve/static/
 
