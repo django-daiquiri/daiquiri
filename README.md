@@ -94,5 +94,5 @@ main documentation.
 
 ## Documentation
 
-**Main documenation**:  [django-daiquiri.github.io](https://django-daiquiri.github.io)
+**Main documentation**:  [django-daiquiri.github.io](https://django-daiquiri.github.io)
 
