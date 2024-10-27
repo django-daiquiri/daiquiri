@@ -44,13 +44,11 @@ jobs:
     - name: Prepare MySQL database
       run: |
         sudo systemctl start mysql.service
-        mysql --user=root --password=root < testing/sql/mysql/test.sql
-        cat ../daiquiri/testing/sql/mysql/data/* | mysql --user=root --password=root
+        mysql --user=root --password=root < testing/sql/mysql/setup.sql
 
     - name: Prepare PostgreSQL database
       run: |
-        psql postgresql://postgres:postgres_password@localhost:5432 -f testing/sql/postgres/test.sql
-        cat ../daiquiri/testing/sql/postgres/data/* | psql postgresql://postgres:postgres_password@localhost:5432/test_daiquiri_data
+        psql postgresql://postgres:postgres_password@localhost:5432 -f testing/sql/postgres/setup.sql
         psql postgresql://postgres:postgres_password@localhost:5432/test_daiquiri_data -c 'VACUUM ANALYSE;'
 
     - name: Run tests

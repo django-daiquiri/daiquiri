@@ -18,8 +18,8 @@ CREATE DATABASE `test_oai_schema` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_
 GRANT ALL PRIVILEGES ON `test_oai_schema`.* to 'daiquiri_data'@'localhost';
 
 use test_daiquiri_data;
-source testing/sql/mysql/archive.sql;
-source testing/sql/mysql/obs.sql;
-source testing/sql/mysql/sim.sql;
-source testing/sql/mysql/test.sql;
-source testing/sql/mysql/user.sql;
+source testing/sql/mysql/data/archive.sql;
+source testing/sql/mysql/data/obs.sql;
+source testing/sql/mysql/data/sim.sql;
+source testing/sql/mysql/data/test.sql;
+source testing/sql/mysql/data/user.sql;

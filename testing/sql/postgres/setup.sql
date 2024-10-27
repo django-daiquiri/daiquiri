@@ -14,8 +14,8 @@ DROP DATABASE IF EXISTS test_daiquiri_oai;
 CREATE DATABASE test_daiquiri_oai WITH OWNER daiquiri_data;
 
 \c test_daiquiri_data;
-\i testing/sql/postgres/archive.sql
-\i testing/sql/postgres/obs.sql
-\i testing/sql/postgres/sim.sql
-\i testing/sql/postgres/test.sql
-\i testing/sql/postgres/user.sql
+\i testing/sql/postgres/data/archive.sql
+\i testing/sql/postgres/data/obs.sql
+\i testing/sql/postgres/data/sim.sql
+\i testing/sql/postgres/data/test.sql
+\i testing/sql/postgres/data/user.sql
