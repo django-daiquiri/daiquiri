@@ -1,13 +1,11 @@
-
-<form class="search-input" 
+<form class="search-input"
     role="search"
     method="get"
     action="{% url 'files:search' %}">
-    <input type="text" 
+    <input type="text"
         name="q"
-        class="form-control" 
+        class="form-control"
         placeholder="Search for..."
         pattern=".{3,}"
         required>
 </form>
-

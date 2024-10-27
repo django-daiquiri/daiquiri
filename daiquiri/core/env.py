@@ -5,7 +5,6 @@ from urllib.parse import urlparse
 
 import dj_database_url
 
-from django.core.exceptions import ImproperlyConfigured
 
 def get(key, default=None):
     return os.getenv(key, default)

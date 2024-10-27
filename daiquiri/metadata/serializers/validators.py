@@ -1,5 +1,3 @@
-from django.utils.translation import gettext_lazy as _
-
 from rest_framework.exceptions import ValidationError
 
 class PersonListValidator(object):
@@ -10,12 +8,12 @@ class PersonListValidator(object):
 
             if not isinstance(person, dict):
                 raise ValidationError("the person field must be a JSON Field")
-      
+
             affiliations = person.get("affiliations", [])
 
             if isinstance(affiliations, list):
                 for affiliation in affiliations:
-                
+
                     if isinstance(affiliation, dict):
                         if affiliation != {}: # if not empty dict should have at least affiliation name
                             affiliation_name = affiliation.get("affiliation", None)

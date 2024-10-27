@@ -1,6 +1,3 @@
-from django.conf import settings
-from django.template.defaultfilters import date
-
 from rest_framework import serializers
 
 from .utils import make_query_dict_upper_case

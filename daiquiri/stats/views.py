@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.db.models.functions import ExtractYear
 from django.views.generic import TemplateView
 
 from daiquiri.core.views import ModelPermissionMixin

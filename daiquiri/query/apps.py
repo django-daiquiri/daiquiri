@@ -14,4 +14,4 @@ class QueryConfig(AppConfig):
         if not settings.QUERY_DOWNLOAD_DIR:
             raise ImproperlyConfigured('QUERY_UPLOAD_DIR is not set')
 
-        from . import handlers
+        from . import handlers  # noqa: F401

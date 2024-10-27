@@ -1,9 +1,6 @@
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
-from django.db.utils import ProgrammingError
-
-from rest_framework.exceptions import ValidationError
 
 from daiquiri.core.adapter import DatabaseAdapter
 from daiquiri.query.models import QueryJob

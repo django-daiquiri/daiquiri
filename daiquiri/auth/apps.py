@@ -7,4 +7,4 @@ class AuthConfig(AppConfig):
     verbose_name = 'User Profiles'
 
     def ready(self):
-        from . import handlers
+        from . import handlers  # noqa: F401

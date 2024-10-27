@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.http import Http404
 from django.urls import reverse
 
 from daiquiri.core.adapter import DatabaseAdapter
@@ -32,10 +31,10 @@ class BaseDatalinkAdapter(object):
 
     There are two further adapters, which do not declare resources:
 
-    * DynamicDatalinkAdapter: the latter does not declare a resource, but will inject on the fly 
+    * DynamicDatalinkAdapter: the latter does not declare a resource, but will inject on the fly
       extra datalink entries according to the method: get_dyn_datalink_links()
 
-    * QueryJobDatalinkAdapterMixin: The latter does not declare a resource either, but it injects 
+    * QueryJobDatalinkAdapterMixin: The latter does not declare a resource either, but it injects
       extra context information for the datalink viewer.
 
     See the mixins below for an example.
@@ -71,7 +70,6 @@ class BaseDatalinkAdapter(object):
         context = {}
 
         if 'ID' in kwargs:
-            field_names = [field['name'] for field in DATALINK_FIELDS]
             # more precise would be to use a serializer instead of list(QuerySet.values())
             context['datalinks'] = list(Datalink.objects.filter(ID=kwargs['ID']).order_by('semantics').values())
             context['ID'] = kwargs['ID']
@@ -109,7 +107,6 @@ class BaseDatalinkAdapter(object):
                 rows.append((identifier, None, None, 'NotFoundFault: {}'.format(identifier), None, None, None, None))
 
         return rows
-        
 
 
 class TablesDatalinkAdapterMixin(object):

@@ -7,4 +7,4 @@ class MetadataConfig(AppConfig):
     verbose_name = 'Metadata'
 
     def ready(self):
-        from . import handlers
+        from . import handlers  # noqa: F401
