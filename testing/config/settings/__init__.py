@@ -2,7 +2,6 @@
 from daiquiri.core.settings.django import *
 from daiquiri.core.settings.daiquiri import *
 from daiquiri.core.settings.logging import *
-from daiquiri.core.settings.vendor import *
 
 from daiquiri.auth.settings import *
 from daiquiri.conesearch.settings import *
