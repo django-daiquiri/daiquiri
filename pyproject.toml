@@ -62,14 +62,16 @@ dependencies = [
 [project.optional-dependencies]
 ci = [
   "coveralls",
-  "rdmo[pytest]",
+  "django-daiquiri[mysql]",
+  "django-daiquiri[postgres]",
+  "django-daiquiri[pytest]",
 ]
 dev = [
   "build",
   "pre-commit",
   "ruff",
   "twine",
-  "rdmo[pytest]",
+  "django-daiquiri[pytest]",
 ]
 gunicorn = [
   "gunicorn>=23.0",
