@@ -8,7 +8,7 @@ jobs:
     strategy:
       matrix:
         db-backend: [mysql, postgres]
-        python-version: ['3.9', '3.11']
+        python-version: ['3.9', '3.12']
 
     services:
       postgres:
@@ -34,10 +34,7 @@ jobs:
 
     - name: Install Daiquiri
       run: |
-        pip install -e .
-        pip install psycopg2-binary
-        pip install mysqlclient
-        pip install coveralls
+        pip install -e .[ci]
 
     - name: Prepare testing app
       run: |

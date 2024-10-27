@@ -60,11 +60,16 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+ci = [
+  "coveralls",
+  "rdmo[pytest]",
+]
 dev = [
   "build",
   "pre-commit",
   "ruff",
   "twine",
+  "rdmo[pytest]",
 ]
 gunicorn = [
   "gunicorn>=23.0",
