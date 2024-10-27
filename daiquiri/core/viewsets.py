@@ -10,7 +10,7 @@ class ChoicesViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     serializer_class = ChoicesSerializer
 
 
-class RowViewSetMixin(object):
+class RowViewSetMixin:
 
     def _get_query_params(self, columns):
         # get the ordering
@@ -22,14 +22,14 @@ class RowViewSetMixin(object):
         # get the page from the querystring and make sure it is an int
         try:
             page = int(self.request.GET.get('page', '1'))
-        except ValueError:
-            raise ParseError(_('page must be an integer'))
+        except ValueError as e:
+            raise ParseError(_('page must be an integer')) from e
 
         # get the page_size from the querystring and make sure it is an int
         try:
             page_size = int(self.request.GET.get('page_size', '30'))
-        except ValueError:
-            raise ParseError(_('page_size must be an integer'))
+        except ValueError as e:
+            raise ParseError(_('page_size must be an integer')) from e
 
         # get additional filters from the querystring
         filters = {}

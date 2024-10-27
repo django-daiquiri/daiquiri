@@ -1,5 +1,5 @@
-import os
 import logging
+import os
 
 from django.conf import settings
 from django.shortcuts import render
@@ -39,7 +39,7 @@ def get_file_path(file_path):
 
 
 def get_directory(user, file_path):
-    # loop over all directories beginning with the hights depth and return as soon as a directory matches
+    # loop over all directories beginning with the highest depth and return as soon as a directory matches
     for directory in Directory.objects.order_by('-depth'):
         if os.path.normpath(file_path).startswith(directory.path):
             try:
@@ -100,5 +100,3 @@ def send_file(request, file_path, search=None):
 
     # send the file to the client
     return sendfile(request, absolute_file_path)
-
-

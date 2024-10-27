@@ -30,7 +30,7 @@ Running tests
 
 ```bash
 # from the root directory of the daiquiri repo
-pytest --reuse-db                                               
+pytest --reuse-db
 pytest --reuse-db -x                                                       # stop after the first failed test
 pytest --reuse-db daiquiri/auth                                            # test only the auth app
 pytest --reuse-db daiquiri/auth/tests/test_accounts.py                     # run only a specific test file

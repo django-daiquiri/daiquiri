@@ -11,8 +11,6 @@ from daiquiri.core.managers import AccessLevelManager
 
 class Directory(models.Model):
 
-    objects = AccessLevelManager()
-
     path = models.CharField(
         max_length=256, blank=True,
         verbose_name=_('Path'),
@@ -33,6 +31,8 @@ class Directory(models.Model):
     )
     depth = models.IntegerField(default=0)
 
+    objects = AccessLevelManager()
+
     class Meta:
         ordering = ('path', )
 
@@ -44,7 +44,7 @@ class Directory(models.Model):
 
     def save(self):
         self.depth = len(os.path.normpath(self.path).split(os.path.sep))
-        super(Directory, self).save()
+        super().save()
 
     @property
     def absolute_path(self):

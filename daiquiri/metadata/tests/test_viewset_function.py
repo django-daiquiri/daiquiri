@@ -1,4 +1,5 @@
 import pytest
+
 from django.urls import reverse
 
 from ..models import Function
@@ -45,7 +46,7 @@ urlnames = {
 instances = [1]
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_list(db, client, username, password):
     client.login(username=username, password=password)
 
@@ -57,7 +58,7 @@ def test_list(db, client, username, password):
         assert len(response.json()) == 1
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('pk', instances)
 def test_detail(db, client, username, password, pk):
     client.login(username=username, password=password)
@@ -71,7 +72,7 @@ def test_detail(db, client, username, password, pk):
         assert response.json().get('name') == instance.name
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_create(db, client, username, password):
     client.login(username=username, password=password)
 
@@ -83,7 +84,7 @@ def test_create(db, client, username, password):
     assert response.status_code == status_map['create'][username], response.json()
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('pk', instances)
 def test_update(db, client, username, password, pk):
     client.login(username=username, password=password)
@@ -101,7 +102,7 @@ def test_update(db, client, username, password, pk):
     assert instance.name == ('test' if response.status_code == 200 else instance_name)
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('pk', instances)
 def test_delete(db, client, username, password, pk):
     client.login(username=username, password=password)
@@ -112,7 +113,7 @@ def test_delete(db, client, username, password, pk):
     assert Function.objects.filter(pk=pk).exists() is not (response.status_code == 204)
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_management(db, client, username, password):
     client.login(username=username, password=password)
 
@@ -124,7 +125,7 @@ def test_management(db, client, username, password):
         assert len(response.json()) == 1
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_user(db, client, username, password):
     client.login(username=username, password=password)
 

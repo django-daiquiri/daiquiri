@@ -1,12 +1,12 @@
-from django.template.loader import get_template, TemplateDoesNotExist
+from django.template.loader import TemplateDoesNotExist, get_template
 
 from rest_framework import serializers
 
-from daiquiri.jobs.serializers import SyncJobSerializer, AsyncJobSerializer
+from daiquiri.jobs.serializers import AsyncJobSerializer, SyncJobSerializer
 
-from .models import QueryJob, Example
-from .validators import TableNameValidator, UploadFileValidator, UploadParamValidator
+from .models import Example, QueryJob
 from .utils import get_query_form, get_query_form_adapter
+from .validators import TableNameValidator, UploadFileValidator, UploadParamValidator
 
 
 class FormListSerializer(serializers.Serializer):
@@ -211,7 +211,7 @@ class QueryLanguageSerializer(serializers.Serializer):
     quote_char = serializers.CharField()
 
     def get_id(self, obj):
-        return '%(key)s-%(version)s' % obj
+        return '{key}-{version}'.format(**obj)
 
 
 

@@ -1,12 +1,12 @@
-from django_user_agents.utils import get_user_agent
-
 from rest_framework.reverse import reverse
+
+from django_user_agents.utils import get_user_agent
 
 
 def get_job_url(request, kwargs):
     namespace = request.resolver_match.namespace
     base_name = request.resolver_match.url_name.rsplit('-', 1)[0]
-    return reverse('%s:%s-detail' % (namespace, base_name), request=request, kwargs=kwargs)
+    return reverse(f'{namespace}:{base_name}-detail', request=request, kwargs=kwargs)
 
 
 def get_job_results(request, job):
@@ -15,7 +15,7 @@ def get_job_results(request, job):
 
     results = []
     for key in job.formats:
-        url = reverse('%s:%s-result' % (namespace, base_name), args=[job.id, key])
+        url = reverse(f'{namespace}:{base_name}-result', args=[job.id, key])
 
         results.append({
             'result_type': key,

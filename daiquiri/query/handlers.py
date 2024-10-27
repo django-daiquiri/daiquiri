@@ -1,8 +1,8 @@
 #from django.conf import settings
+from django.db.models.signals import post_delete, pre_save
 from django.dispatch import receiver
-from django.db.models.signals import pre_save, post_delete
 
-from .models import QueryJob, DownloadJob
+from .models import DownloadJob, QueryJob
 
 
 @receiver(pre_save, sender=QueryJob)

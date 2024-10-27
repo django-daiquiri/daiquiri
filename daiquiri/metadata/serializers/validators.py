@@ -1,6 +1,7 @@
 from rest_framework.exceptions import ValidationError
 
-class PersonListValidator(object):
+
+class PersonListValidator:
 
     def __call__(self, persons):
 

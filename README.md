@@ -18,9 +18,9 @@
 
 Today, the publication of research data plays an important role in astronomy
 and astrophysics. On the one hand, dedicated surveys like SDSS and RAVE, data
-intensive instruments like LOFAR, or massive simulations like Millennium and 
-MultiDark are initially planned to release their data for the community. 
-On the other hand, more traditionally oriented research projects strive to 
+intensive instruments like LOFAR, or massive simulations like Millennium and
+MultiDark are initially planned to release their data for the community.
+On the other hand, more traditionally oriented research projects strive to
 publish their data as a key requirement demanded by the funding agencies.
 
 The common approach is to publish this data via dedicated web sites. This
@@ -61,11 +61,11 @@ in Python. The following requirements are mandatory:
 
 * Python `>=3.9`
 * PostgreSQL `>=14`, MySQL `>=5.6`
-* RabbitMQ `>=3.5` (for asyncronous tasks like the query queue)
+* RabbitMQ `>=3.5` (for asynchronous tasks like the query queue)
 
 For demonstration, development or testing purposes, Daiquiri can be installed
 on Linux, macOS, or even Windows. If you, however, intent to set up a production
-enviroment, serving Daiquiri over a Network or the Internet, we strongly suggest
+environment, serving Daiquiri over a Network or the Internet, we strongly suggest
 that you use a recent Linux distribution, namely:
 
 * Debian 11
@@ -95,4 +95,3 @@ main documentation.
 ## Documentation
 
 **Main documentation**:  [django-daiquiri.github.io](https://django-daiquiri.github.io)
-

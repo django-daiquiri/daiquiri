@@ -6,8 +6,8 @@ from django_user_agents.utils import get_user_agent
 
 from daiquiri.core.generators import generate_votable
 
-from .constants import DATALINK_FIELDS, DATALINK_CONTENT_TYPE
 from .adapter import DatalinkAdapter
+from .constants import DATALINK_CONTENT_TYPE, DATALINK_FIELDS
 
 
 class SyncDatalinkJobViewSet(viewsets.GenericViewSet):

@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { renderToString } from 'react-dom/server'
 import PropTypes from 'prop-types'
-import classNames from 'classnames'
 
 import Ordering from 'daiquiri/core/assets/js/components/Ordering'
 import Popover from 'daiquiri/core/assets/js/components/Popover'

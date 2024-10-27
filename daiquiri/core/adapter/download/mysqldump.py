@@ -12,17 +12,17 @@ class MysqldumpAdapter(BaseDownloadAdapter):
         if data_only:
             self.args += ['--compact', '--skip-extended-insert']
 
-        if 'USER' in self.database_config and self.database_config['USER']:
-            self.args.append('--user=%(USER)s' % self.database_config)
+        if self.database_config.get('USER'):
+            self.args.append('--user={USER}'.format(**self.database_config))
 
-        if 'PASSWORD' in self.database_config and self.database_config['PASSWORD']:
-            self.args.append('--password=%(PASSWORD)s' % self.database_config)
+        if self.database_config.get('PASSWORD'):
+            self.args.append('--password={PASSWORD}'.format(**self.database_config))
 
-        if 'HOST' in self.database_config and self.database_config['HOST']:
-            self.args.append('--host=%(HOST)s' % self.database_config)
+        if self.database_config.get('HOST'):
+            self.args.append('--host={HOST}'.format(**self.database_config))
 
-        if 'PORT' in self.database_config and self.database_config['PORT']:
-            self.args.append('--port=%(PORT)s' % self.database_config)
+        if self.database_config.get('PORT'):
+            self.args.append('--port={PORT}'.format(**self.database_config))
 
         self.args.append(schema_name)
         self.args.append(table_name)

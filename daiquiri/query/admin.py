@@ -1,10 +1,10 @@
 from django.contrib import admin
-from django.forms import ModelForm, ChoiceField
+from django.forms import ChoiceField, ModelForm
 
 from daiquiri.jobs.admin import JobAdmin
 
-from .models import QueryJob, DownloadJob, QueryArchiveJob, Example
-from .utils import get_query_language_choices, get_queue_choices, get_query_download_format_choices
+from .models import DownloadJob, Example, QueryArchiveJob, QueryJob
+from .utils import get_query_download_format_choices, get_query_language_choices, get_queue_choices
 
 
 class QueryJobForm(ModelForm):
@@ -24,9 +24,9 @@ class ExampleForm(ModelForm):
 class QueryJobAdmin(JobAdmin):
     form = QueryJobForm
 
-    search_fields = JobAdmin.search_fields + ['schema_name', 'table_name']
-    list_display = JobAdmin.list_display + ['schema_name', 'table_name', 'nrows']
-    list_filter = JobAdmin.list_filter + ['query_language', 'queue']
+    search_fields = [*JobAdmin.search_fields, 'schema_name', 'table_name']
+    list_display = [*JobAdmin.list_display, 'schema_name', 'table_name', 'nrows']
+    list_filter = [*JobAdmin.list_filter, 'query_language', 'queue']
     actions = ['abort_job', 'archive_job']
 
 
@@ -34,16 +34,16 @@ class QueryJobAdmin(JobAdmin):
 class DownloadJobAdmin(JobAdmin):
     form = DownloadJobForm
 
-    search_fields = JobAdmin.search_fields + ['query_job__schema_name', 'query_job__table_name', 'format_key']
-    list_display = JobAdmin.list_display + ['query_job', 'file_path']
-    list_filter = JobAdmin.list_filter + ['format_key']
+    search_fields = [*JobAdmin.search_fields, 'query_job__schema_name', 'query_job__table_name', 'format_key']
+    list_display = [*JobAdmin.list_display, 'query_job', 'file_path']
+    list_filter = [*JobAdmin.list_filter, 'format_key']
     actions = ['abort_job', 'archive_job']
 
 
 @admin.register(QueryArchiveJob)
 class QueryArchiveJobAdmin(JobAdmin):
-    search_fields = JobAdmin.search_fields + ['query_job__schema_name', 'query_job__table_name', 'column_name', 'files']
-    list_display = JobAdmin.list_display + ['query_job', 'file_path']
+    search_fields = [*JobAdmin.search_fields, 'query_job__schema_name', 'query_job__table_name', 'column_name', 'files']
+    list_display = [*JobAdmin.list_display, 'query_job', 'file_path']
     actions = ['abort_job', 'archive_job']
 
 

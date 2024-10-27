@@ -1,9 +1,8 @@
 from django.urls import path, re_path
 from django.views.generic import TemplateView
 
-from .views import resource, availability, capabilities
+from .views import availability, capabilities, resource
 from .viewsets import ConeSearchView
-
 
 app_name = 'conesearch'
 

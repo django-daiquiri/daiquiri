@@ -5,7 +5,7 @@ from daiquiri.core.renderers.voresource import VoresourceRenderer
 from daiquiri.core.renderers.vosi import AvailabilityRenderer, CapabilitiesRenderer, TablesetRenderer
 from daiquiri.query.models import Example
 
-from .vo import get_resource, get_availability, get_capabilities, get_tableset
+from .vo import get_availability, get_capabilities, get_resource, get_tableset
 
 
 def resource(request):

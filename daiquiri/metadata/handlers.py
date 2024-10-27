@@ -1,9 +1,9 @@
 from django.apps import apps
 from django.core.cache import cache
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 
-from .models import Schema, Table, Column
+from .models import Column, Schema, Table
 
 
 @receiver(post_save, sender=Schema)

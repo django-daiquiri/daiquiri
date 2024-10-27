@@ -1,4 +1,5 @@
 import pytest
+
 from django.urls import reverse
 
 users = (
@@ -34,7 +35,7 @@ status_map = {
 }
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_management(db, client, username, password):
     client.login(username=username, password=password)
 
@@ -43,7 +44,7 @@ def test_management(db, client, username, password):
     assert response.status_code == status_map['management'][username]
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_public_schema(db, client, username, password):
     client.login(username=username, password=password)
 
@@ -54,7 +55,7 @@ def test_public_schema(db, client, username, password):
     assert response.status_code == status_map['public_schema'][username]
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_internal_schema(db, client, username, password):
     client.login(username=username, password=password)
 
@@ -65,7 +66,7 @@ def test_internal_schema(db, client, username, password):
     assert response.status_code == status_map['internal_schema'][username]
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_private_schema(db, client, username, password):
     client.login(username=username, password=password)
 
@@ -76,7 +77,7 @@ def test_private_schema(db, client, username, password):
     assert response.status_code == status_map['private_schema'][username]
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_public_table(db, client, username, password):
     client.login(username=username, password=password)
 
@@ -88,7 +89,7 @@ def test_public_table(db, client, username, password):
     assert response.status_code == status_map['public_table'][username]
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_internal_table(db, client, username, password):
     client.login(username=username, password=password)
 
@@ -100,7 +101,7 @@ def test_internal_table(db, client, username, password):
     assert response.status_code == status_map['internal_table'][username]
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_private_table(db, client, username, password):
     client.login(username=username, password=password)
 

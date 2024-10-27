@@ -1,25 +1,26 @@
-from django.http import HttpResponse, FileResponse
+from django.http import FileResponse, HttpResponse
+
 from rest_framework import viewsets
-from rest_framework.response import Response
-from rest_framework.parsers import FormParser, MultiPartParser
-from rest_framework.exceptions import ValidationError
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
+from rest_framework.authentication import BasicAuthentication, SessionAuthentication, TokenAuthentication
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
+from rest_framework.parsers import FormParser, MultiPartParser
+from rest_framework.response import Response
 
 from daiquiri.core.responses import HttpResponseSeeOther
 from daiquiri.core.utils import get_client_ip
 
+from .filters import UWSFilterBackend
 from .models import Job
+from .renderers import UWSErrorRenderer, UWSRenderer
 from .serializers import (
+    AsyncJobSerializer,
     JobListSerializer,
     JobRetrieveSerializer,
     JobUpdateSerializer,
     SyncJobSerializer,
-    AsyncJobSerializer
 )
-from .renderers import UWSRenderer, UWSErrorRenderer
-from .filters import UWSFilterBackend
-from .utils import get_job_url, get_job_results, get_content_type
+from .utils import get_content_type, get_job_results, get_job_url
 
 
 class JobViewSet(viewsets.GenericViewSet):
@@ -78,13 +79,13 @@ class SyncJobViewSet(JobViewSet):
         # handle possible uploads
         try:
             self.handle_upload(job, data.get('UPLOAD'))
-        except ValueError:
-            raise ValidationError('Could not parse VOTable')
+        except ValueError as e:
+            raise ValidationError('Could not parse VOTable') from e
 
         try:
             job.process()
         except ValidationError as e:
-            raise ValidationError(self.rewrite_exception(e))
+            raise ValidationError(self.rewrite_exception(e)) from e
 
         return FileResponse(job.run_sync(), content_type=job.formats[job.response_format])
 
@@ -106,14 +107,14 @@ class AsyncJobViewSet(JobViewSet):
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         serializer = JobListSerializer(queryset, many=True)
-        renderered_data = UWSRenderer().render(serializer.data, renderer_context=self.get_renderer_context())
-        return HttpResponse(renderered_data, content_type=get_content_type(request, UWSRenderer))
+        rendered_data = UWSRenderer().render(serializer.data, renderer_context=self.get_renderer_context())
+        return HttpResponse(rendered_data, content_type=get_content_type(request, UWSRenderer))
 
     def retrieve(self, request, *args, **kwargs):
         job = self.get_object()
         serializer = JobRetrieveSerializer(job, context={'request': request})
-        renderered_data = UWSRenderer().render(serializer.data, renderer_context=self.get_renderer_context())
-        return HttpResponse(renderered_data, content_type=get_content_type(request, UWSRenderer))
+        rendered_data = UWSRenderer().render(serializer.data, renderer_context=self.get_renderer_context())
+        return HttpResponse(rendered_data, content_type=get_content_type(request, UWSRenderer))
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -142,7 +143,7 @@ class AsyncJobViewSet(JobViewSet):
         try:
             job.process()
         except ValidationError as e:
-            raise ValidationError(self.rewrite_exception(e))
+            raise ValidationError(self.rewrite_exception(e)) from e
 
         job.save()
 
@@ -178,10 +179,10 @@ class AsyncJobViewSet(JobViewSet):
     def results(self, request, pk, key=None):
         job = self.get_object()
 
-        renderered_data = UWSRenderer().render({
+        rendered_data = UWSRenderer().render({
             'results': get_job_results(request, job)
         }, renderer_context=self.get_renderer_context())
-        return HttpResponse(renderered_data, content_type=get_content_type(request, UWSRenderer))
+        return HttpResponse(rendered_data, content_type=get_content_type(request, UWSRenderer))
 
     @action(detail=True, methods=['get'], url_path=r'results/(?P<result>[A-Za-z0-9\-]+)', url_name='result')
     def result(self, request, pk, result):
@@ -198,10 +199,10 @@ class AsyncJobViewSet(JobViewSet):
 
     @action(detail=True, methods=['get'])
     def parameters(self, request, pk):
-        renderered_data = UWSRenderer().render({
+        rendered_data = UWSRenderer().render({
             'parameters': self.get_object().parameters
         }, renderer_context=self.get_renderer_context())
-        return HttpResponse(renderered_data, content_type=get_content_type(request, UWSRenderer))
+        return HttpResponse(rendered_data, content_type=get_content_type(request, UWSRenderer))
 
     @action(detail=True, methods=['get', 'post'])
     def destruction(self, request, pk):
@@ -265,7 +266,7 @@ class AsyncJobViewSet(JobViewSet):
                     try:
                         job.process()
                     except ValidationError as e:
-                        raise ValidationError(self.rewrite_exception(e))
+                        raise ValidationError(self.rewrite_exception(e)) from e
 
                     job.run()
                     return HttpResponseSeeOther(self.get_success_url())

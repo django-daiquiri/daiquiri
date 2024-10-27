@@ -33,7 +33,7 @@ class HasObjectPermission(BasePermission):
         inspired by django.contrib.auth.mixins.PermissionRequiredMixin
         '''
         if view.permission_required is None:
-            raise ImproperlyConfigured('%s is missing the permission_required attribute.' % view.__class__.__name__)
+            raise ImproperlyConfigured(f'{view.__class__.__name__} is missing the permission_required attribute.')
 
         permission_required = view.permission_required[self.perms_map[method]]
 

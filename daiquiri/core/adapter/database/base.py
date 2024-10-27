@@ -6,7 +6,7 @@ from django.db import connections
 logger = logging.getLogger(__name__)
 
 
-class BaseDatabaseAdapter(object):
+class BaseDatabaseAdapter:
 
     def __init__(self, database_key, database_config):
         self.database_key = database_key
@@ -83,10 +83,7 @@ class BaseDatabaseAdapter(object):
         escaped_column_names = [self.escape_identifier(column_name) for column_name in column_names]
 
         # prepare sql string
-        sql = 'SELECT COUNT(*) FROM %(schema)s.%(table)s' % {
-            'schema': self.escape_identifier(schema_name),
-            'table': self.escape_identifier(table_name)
-        }
+        sql = f'SELECT COUNT(*) FROM {self.escape_identifier(schema_name)}.{self.escape_identifier(table_name)}'
         sql_args = []
 
         # process filtering
@@ -94,7 +91,8 @@ class BaseDatabaseAdapter(object):
 
         return self.fetchone(sql, args=sql_args)[0]
 
-    def fetch_rows(self, schema_name, table_name, column_names=None, ordering=None, page=1, page_size=10, search=None, filters=None):
+    def fetch_rows(self, schema_name, table_name, column_names=None, ordering=None, page=1, page_size=10,
+                   search=None, filters=None):
 
         # if no column names are provided get all column_names from the table
         if not column_names:
@@ -104,11 +102,11 @@ class BaseDatabaseAdapter(object):
         escaped_column_names = [self.escape_identifier(column_name) for column_name in column_names]
 
         # init sql string and sql_args list
-        sql = 'SELECT %(columns)s FROM %(schema)s.%(table)s' % {
-            'schema': self.escape_identifier(schema_name),
-            'table': self.escape_identifier(table_name),
-            'columns': ', '.join(escaped_column_names)
-        }
+        sql = 'SELECT {columns} FROM {schema}.{table}'.format(
+            schema=self.escape_identifier(schema_name),
+            table=self.escape_identifier(table_name),
+            columns=', '.join(escaped_column_names),
+        )
         sql_args = []
 
         # process filtering
@@ -119,10 +117,7 @@ class BaseDatabaseAdapter(object):
 
         # process page and page_size
         if page_size > 0:
-            sql += ' LIMIT %(limit)s OFFSET %(offset)s' % {
-                'limit': page_size,
-                'offset': (int(page) - 1) * int(page_size)
-            }
+            sql += f' LIMIT {page_size} OFFSET {(int(page) - 1) * int(page_size)}'
 
         return self.fetchall(sql, args=sql_args)
 
@@ -136,11 +131,11 @@ class BaseDatabaseAdapter(object):
         escaped_column_names = [self.escape_identifier(column_name) for column_name in column_names]
 
         # prepare sql string
-        sql = 'SELECT %(columns)s FROM %(schema)s.%(table)s' % {
-            'schema': self.escape_identifier(schema_name),
-            'table': self.escape_identifier(table_name),
-            'columns': ', '.join(escaped_column_names)
-        }
+        sql = 'SELECT {columns} FROM {schema}.{table}'.format(
+            schema=self.escape_identifier(schema_name),
+            table=self.escape_identifier(table_name),
+            columns=', '.join(escaped_column_names),
+        )
         sql_args = []
 
         # process filtering
@@ -157,9 +152,7 @@ class BaseDatabaseAdapter(object):
         row = self.fetch_row(schema_name, table_name, column_names, search, filters)
 
         if row:
-            return {
-                column_name: value for column_name, value in zip(column_names, row)
-            }
+            return dict(zip(column_names, row))
         else:
             return {}
 
@@ -189,9 +182,7 @@ class BaseDatabaseAdapter(object):
         escaped_schema_name = self.escape_identifier(schema_name)
 
         # prepare sql string
-        sql = 'CREATE SCHEMA IF NOT EXISTS %(schema)s' % {
-            'schema': escaped_schema_name
-        }
+        sql = f'CREATE SCHEMA IF NOT EXISTS {escaped_schema_name}'
 
         # log sql string
         logger.debug('sql = "%s"', sql)
@@ -204,19 +195,20 @@ class BaseDatabaseAdapter(object):
 
         # check column types
         for column in columns:
-            if self.COLUMNTYPES.get(column['datatype'], None) is None:
-                raise TypeError("Column {name} is of type {datatype}. {datatype} is not supported by Postgres, the table can not be created.".format(datatype = column['datatype']))
+            if self.COLUMNTYPES.get(column['datatype']) is None:
+                raise TypeError("Column {name} is of type {datatype}. {datatype} is not ".format(**column) +
+                                "supported by Postgres, the table can not be created.")
 
         # prepare sql string
-        sql = 'CREATE TABLE %(schema)s.%(table)s (%(columns)s);' % {
-            'schema': self.escape_identifier(schema_name),
-            'table': self.escape_identifier(table_name),
-            'columns': ', '.join([
-                '%(column_name)s %(column_type)s' % {
-                    'column_name': self.escape_identifier(column['name']),
-                    'column_type': self.COLUMNTYPES[column['datatype']]
-                } for column in columns])
-        }
+        sql = 'CREATE TABLE {schema}.{table} ({columns});'.format(
+            schema=self.escape_identifier(schema_name),
+            table=self.escape_identifier(table_name),
+            columns=', '.join([
+                '{column_name} {column_type}'.format(
+                    column_name=self.escape_identifier(column['name']),
+                    column_type=self.COLUMNTYPES[column['datatype']],
+                ) for column in columns]),
+        )
 
         # log sql string and execute
         logger.debug('sql = "%s"', sql)
@@ -226,10 +218,7 @@ class BaseDatabaseAdapter(object):
         raise NotImplementedError()
 
     def drop_table(self, schema_name, table_name):
-        sql = 'DROP TABLE IF EXISTS %(schema)s.%(table)s;' % {
-            'schema': self.escape_identifier(schema_name),
-            'table': self.escape_identifier(table_name)
-        }
+        sql = f'DROP TABLE IF EXISTS {self.escape_identifier(schema_name)}.{self.escape_identifier(table_name)};'
 
         # log sql string and execute
         logger.debug('sql = "%s"', sql)
@@ -249,7 +238,7 @@ class BaseDatabaseAdapter(object):
                     escaped_cells.append(self._escape_cell(cell))
 
                 escaped_row = ', '.join(escaped_cells)
-                escaped_rows.append('(%s)' % escaped_row)
+                escaped_rows.append(f'({escaped_row})')
 
         else:
             for row, mask_row in zip(rows, mask):
@@ -259,15 +248,15 @@ class BaseDatabaseAdapter(object):
                     escaped_cells.append(self._escape_cell(cell, mask_cell))
 
                 escaped_row = ', '.join(escaped_cells)
-                escaped_rows.append('(%s)' % escaped_row)
+                escaped_rows.append(f'({escaped_row})')
 
         # prepare sql string
-        sql = 'INSERT INTO %(schema)s.%(table)s (%(columns)s) VALUES %(values)s' % {
-            'schema': self.escape_identifier(schema_name),
-            'table': self.escape_identifier(table_name),
-            'columns': ', '.join(escaped_column_names),
-            'values': ', '.join(escaped_rows)
-        }
+        sql = 'INSERT INTO {schema}.{table} ({columns}) VALUES {values}'.format(
+            schema=self.escape_identifier(schema_name),
+            table=self.escape_identifier(table_name),
+            columns=', '.join(escaped_column_names),
+            values=', '.join(escaped_rows),
+        )
 
         # log sql string and execute
         logger.debug('sql = "%s"', sql)
@@ -279,7 +268,7 @@ class BaseDatabaseAdapter(object):
         where_args = []
 
         if search:
-            # append a OR condition fo every column
+            # append a OR condition for every column
             search_stmts = []
             search_args = []
             for escaped_column_name in escaped_column_names:
@@ -293,7 +282,7 @@ class BaseDatabaseAdapter(object):
 
         if filters:
             for column_name, column_filter in filters.items():
-                # escpae the column_name for this column
+                # escape the column_name for this column
                 escaped_column_name = self.escape_identifier(column_name)
 
                 # check if the filter is a list or a string
@@ -302,9 +291,9 @@ class BaseDatabaseAdapter(object):
                 elif isinstance(column_filter, list):
                     filter_list = column_filter
                 else:
-                    raise RuntimeError('Unsupported filter for column "%s"' % column_name)
+                    raise RuntimeError(f'Unsupported filter for column "{column_name}"')
 
-                # append a OR condition fo every entry in the list
+                # append a OR condition for every entry in the list
                 filter_stmts = []
                 filter_args = []
                 for filter_string in filter_list:
@@ -330,10 +319,7 @@ class BaseDatabaseAdapter(object):
                 escaped_ordering_column, ordering_direction = self.escape_identifier(ordering), 'ASC'
 
             if escaped_ordering_column in escaped_column_names:
-                sql += ' ORDER BY %(column)s %(direction)s' % {
-                    'column': escaped_ordering_column,
-                    'direction': ordering_direction
-                }
+                sql += f' ORDER BY {escaped_ordering_column} {ordering_direction}'
 
         return sql
 
@@ -341,7 +327,7 @@ class BaseDatabaseAdapter(object):
         if mask_cell:
             return 'NULL'
         else:
-            if type(cell) == str: 
+            if isinstance(cell, str):
                 # this is the case for fields datatype="char" and arraysize="*"
                 value = cell
             elif cell.dtype.char == 'S':

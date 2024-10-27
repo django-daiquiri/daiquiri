@@ -1,7 +1,7 @@
 from django.urls import path
 from django.views.generic import TemplateView
 
-from .views import resource, availability, capabilities, authority, web
+from .views import authority, availability, capabilities, resource, web
 
 app_name = 'registry'
 

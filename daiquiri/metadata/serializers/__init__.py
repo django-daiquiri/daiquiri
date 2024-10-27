@@ -1,12 +1,12 @@
 from django.conf import settings
 from django.contrib.auth.models import Group
 
-from daiquiri.core.serializers import JSONListField
-
 from rest_framework import serializers
 
+from daiquiri.core.serializers import JSONListField
+
+from ..models import Column, Function, Schema, Table
 from .validators import PersonListValidator
-from ..models import Schema, Table, Column, Function
 
 
 class GroupSerializer(serializers.ModelSerializer):

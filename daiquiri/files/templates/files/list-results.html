@@ -8,7 +8,7 @@
     <div>
         <h3> {{ result.title | underline:result.match_data }}</h3>
         <a style="textunder" href="{{ result.url }}"> {{ result.url }} </a>
-        <p>{{ result.body | highlight:result.match_data }} </p></br> 
+        <p>{{ result.body | highlight:result.match_data }} </p></br>
     </div>
     {% endfor %}
 </div>

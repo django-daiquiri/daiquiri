@@ -1,6 +1,4 @@
-import ReactCodeMirror from '@uiw/react-codemirror'
 import { EditorView, Decoration} from '@codemirror/view'
-import { sql } from '@codemirror/lang-sql'
 import { StateField, StateEffect } from '@codemirror/state'
 
 const addUnderline = StateEffect.define({

@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from daiquiri.core.utils import import_class, get_date_display
+from daiquiri.core.utils import get_date_display, import_class
 
 
 class ContactMessage(models.Model):
@@ -35,7 +35,7 @@ class ContactMessage(models.Model):
         verbose_name_plural = _('Contact messages')
 
     def __str__(self):
-        return "created=%s; email=%s; subject=%s; status=%s" % (self.created, self.email, self.subject, self.status)
+        return f"created={self.created}; email={self.email}; subject={self.subject}; status={self.status}"
 
     @property
     def status_label(self):
@@ -75,7 +75,7 @@ class AnnouncementMessage(models.Model):
         (ALERT_TYPE_URGENT, "urgent"),
     )
 
-    title = models.CharField(
+    title = models.CharField(  # noqa: DJ001
         max_length=100, blank=True, null=True,
         verbose_name=_("Title")
     )
@@ -112,4 +112,3 @@ class AnnouncementMessage(models.Model):
 
     def get_filter(self):
         return getattr(MessageFilter(), str(self.visibility_filter))
-

@@ -53,7 +53,7 @@ class OaiRenderer(DublincoreRendererMixin, DataciteRendererMixin, VoresourceRend
         self.node('oai:baseURL', {}, base_url)
         self.node('oai:protocolVersion', {}, '2.0')
         self.node('oai:adminEmail', {}, repository_metadata['admin_email'])
-        self.node('oai:earliestDatestamp', {}, repository_metadata.get('earliest_datestamp').strftime('%Y-%m-%dT%H:%M:%SZ'))
+        self.node('oai:earliestDatestamp', {}, repository_metadata.get('earliest_datestamp').strftime('%Y-%m-%dT%H:%M:%SZ'))  # noqa: E501
         self.node('oai:deletedRecord', {}, repository_metadata.get('deleted_record'))
         self.node('oai:granularity', {}, 'YYYY-MM-DDThh:mm:ssZ')
         self.render_identify_description(repository_metadata)

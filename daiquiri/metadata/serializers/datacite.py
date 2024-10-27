@@ -1,8 +1,10 @@
-from daiquiri.core.serializers import JSONListField
-from daiquiri.metadata.models import Schema, Table
 from django.conf import settings
 from django.urls import reverse
+
 from rest_framework import serializers
+
+from daiquiri.core.serializers import JSONListField
+from daiquiri.metadata.models import Schema, Table
 
 
 class DataciteSerializer(serializers.ModelSerializer):
@@ -130,7 +132,7 @@ class DataciteTableSerializer(DataciteSerializer):
         )
 
     def get_title(self, obj):
-        return obj.title or '%s.%s' % (obj.schema.name, obj.name)
+        return obj.title or f'{obj.schema.name}.{obj.name}'
 
     def get_identifier(self, obj):
         return obj.doi or 'tables/%i' % obj.pk

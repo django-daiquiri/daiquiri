@@ -43,7 +43,7 @@ const ShowModal = ({ modal, profile, details }) => {
                 {
                   !isEmpty(details) && !isEmpty(profile.details) && (
                     <>
-                      <div className="modal-seperator"></div>
+                      <div className="modal-separator"></div>
                       <div className="row">
                         {
                           details.map((detail, detailIndex) => (
@@ -67,7 +67,7 @@ const ShowModal = ({ modal, profile, details }) => {
                     </>
                   )
                 }
-                <div className="modal-seperator"></div>
+                <div className="modal-separator"></div>
                 <div className="row">
                   <div className="col-md-6 mb-3 mb-md-0">
                     <dl>

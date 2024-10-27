@@ -1,12 +1,12 @@
 from collections import OrderedDict
 
 from rest_framework import viewsets
-from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
+from rest_framework.response import Response
 
-from daiquiri.core.viewsets import RowViewSetMixin
 from daiquiri.core.adapter import DatabaseAdapter
 from daiquiri.core.utils import fix_for_json
+from daiquiri.core.viewsets import RowViewSetMixin
 from daiquiri.metadata.utils import get_user_columns
 
 from .serializers import ColumnSerializer
@@ -41,7 +41,8 @@ class RowViewSet(RowViewSetMixin, viewsets.GenericViewSet):
             count = adapter.count_rows(schema_name, table_name, column_names, search, filters)
 
             # query the paginated rowset
-            results = adapter.fetch_rows(schema_name, table_name, column_names, ordering, page, page_size, search, filters)
+            results = adapter.fetch_rows(schema_name, table_name, column_names,
+                                         ordering, page, page_size, search, filters)
 
             # return ordered dict to be send as json
             return Response(OrderedDict((
@@ -72,7 +73,7 @@ class ColumnViewSet(viewsets.ViewSet):
             if column_names:
                 columns = [column for column in user_columns if column.name in column_names]
             else:
-                columns = [column for column in user_columns]
+                columns = list(user_columns)
 
             return Response(ColumnSerializer(columns, many=True).data)
 

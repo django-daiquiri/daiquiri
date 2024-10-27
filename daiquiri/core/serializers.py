@@ -47,4 +47,4 @@ class CaseInsensitiveSerializer(serializers.Serializer):
         if 'data' in kwargs:
             kwargs['data'] = make_query_dict_upper_case(kwargs['data'])
 
-        super(CaseInsensitiveSerializer, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)

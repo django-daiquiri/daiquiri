@@ -1,6 +1,7 @@
 from urllib.parse import urlencode
 
 import pytest
+
 from django.urls import reverse
 
 users = (
@@ -11,7 +12,7 @@ users = (
 )
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_public_row_list(db, client, username, password):
     client.login(username=username, password=password)
 
@@ -23,7 +24,7 @@ def test_public_row_list(db, client, username, password):
     assert response.status_code == 200
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_internal_row_list(db, client, username, password):
     client.login(username=username, password=password)
 
@@ -35,7 +36,7 @@ def test_internal_row_list(db, client, username, password):
     assert response.status_code == 404 if username == 'anonymous' else 200
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_private_row_list(db, client, username, password):
     client.login(username=username, password=password)
 
@@ -47,7 +48,7 @@ def test_private_row_list(db, client, username, password):
     assert response.status_code == 200 if username == 'test' else 404
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_non_existing_schema_row_list(db, client, username, password):
     client.login(username=username, password=password)
 
@@ -59,7 +60,7 @@ def test_non_existing_schema_row_list(db, client, username, password):
     assert response.status_code == 404
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_non_existing_table_row_list(db, client, username, password):
     client.login(username=username, password=password)
 
@@ -71,7 +72,7 @@ def test_non_existing_table_row_list(db, client, username, password):
     assert response.status_code == 404
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_non_existing_user_table_row_list(db, client, username, password):
     client.login(username=username, password=password)
 
@@ -83,7 +84,7 @@ def test_non_existing_user_table_row_list(db, client, username, password):
     assert response.status_code == 404
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_public_column_list(db, client, username, password):
     client.login(username=username, password=password)
 
@@ -95,7 +96,7 @@ def test_public_column_list(db, client, username, password):
     assert response.status_code == 200
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_internal_column_list(db, client, username, password):
     client.login(username=username, password=password)
 
@@ -107,7 +108,7 @@ def test_internal_column_list(db, client, username, password):
     assert response.status_code == 404 if username == 'anonymous' else 200
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_private_column_list(db, client, username, password):
     client.login(username=username, password=password)
 
@@ -119,7 +120,7 @@ def test_private_column_list(db, client, username, password):
     assert response.status_code == 200 if username == 'test' else 404
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_non_existing_schema_column_list(db, client, username, password):
     client.login(username=username, password=password)
 
@@ -131,7 +132,7 @@ def test_non_existing_schema_column_list(db, client, username, password):
     assert response.status_code == 404
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_non_existing_table_column_list(db, client, username, password):
     client.login(username=username, password=password)
 
@@ -143,7 +144,7 @@ def test_non_existing_table_column_list(db, client, username, password):
     assert response.status_code == 404
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_non_existing_user_table_column_list(db, client, username, password):
     client.login(username=username, password=password)
 

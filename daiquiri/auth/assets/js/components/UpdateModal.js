@@ -48,7 +48,7 @@ const UpdateModal = ({ modal, values, errors, details, groups, setValues, onSubm
                   {
                     !isEmpty(details) && (
                       <>
-                        <div className="modal-seperator"></div>
+                        <div className="modal-separator"></div>
                         <div className="row">
                           {
                             details.map((detail, detailIndex) => (
@@ -85,7 +85,7 @@ const UpdateModal = ({ modal, values, errors, details, groups, setValues, onSubm
                   {
                     !isEmpty(groups) && (
                       <>
-                        <div className="modal-seperator"></div>
+                        <div className="modal-separator"></div>
                         <strong className="d-block mb-2">{gettext('Groups')}</strong>
                         {
                           groups.map((group, groupIndex) => (

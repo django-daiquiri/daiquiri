@@ -3,8 +3,7 @@ from django.urls import include, path
 from rest_framework import routers
 
 from .views import UsersView
-from .viewsets import ProfileViewSet, GroupViewSet, SettingsViewSet
-
+from .viewsets import GroupViewSet, ProfileViewSet, SettingsViewSet
 
 app_name = 'auth'
 

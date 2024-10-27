@@ -1,4 +1,5 @@
 import pytest
+
 from django.urls import reverse
 
 from ..models import ContactMessage
@@ -37,7 +38,7 @@ urlnames = {
 instances = [1, 2]
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_list(db, client, username, password):
     client.login(username=username, password=password)
 
@@ -50,7 +51,7 @@ def test_list(db, client, username, password):
         assert len(response.json().get('results')) == 2
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('pk', instances)
 def test_detail(db, client, username, password, pk):
     client.login(username=username, password=password)
@@ -64,7 +65,7 @@ def test_detail(db, client, username, password, pk):
         assert response.json().get('email') == instance.email
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_create(db, client, username, password):
     client.login(username=username, password=password)
 
@@ -79,7 +80,7 @@ def test_create(db, client, username, password):
     assert response.status_code == status_map['create'][username], response.json()
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('pk', instances)
 def test_update(db, client, username, password, pk):
     client.login(username=username, password=password)
@@ -100,7 +101,7 @@ def test_update(db, client, username, password, pk):
     assert instance.author == ('Tanja Test' if response.status_code == 200 else instance_author)
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('pk', instances)
 def test_delete(db, client, username, password, pk):
     client.login(username=username, password=password)

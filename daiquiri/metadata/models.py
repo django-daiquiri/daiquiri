@@ -1,16 +1,14 @@
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.db import models
-from django.utils.translation import gettext_lazy as _
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
 from daiquiri.core.constants import ACCESS_LEVEL_CHOICES, ACCESS_LEVEL_PRIVATE
 from daiquiri.core.managers import AccessLevelManager
 
 
 class Schema(models.Model):
-
-    objects = AccessLevelManager()
 
     order = models.IntegerField(
         default=0, null=True, blank=True,
@@ -88,6 +86,8 @@ class Schema(models.Model):
         help_text=_('The groups which have access to the schema.')
     )
 
+    objects = AccessLevelManager()
+
     class Meta:
         ordering = ('order', 'name')
 
@@ -121,8 +121,6 @@ class Table(models.Model):
         (TYPE_TABLE, _('table')),
         (TYPE_VIEW, _('view'))
     )
-
-    objects = AccessLevelManager()
 
     schema = models.ForeignKey(
         Schema, related_name='tables', on_delete=models.CASCADE,
@@ -217,6 +215,8 @@ class Table(models.Model):
         help_text=_('The groups which have access to the table.')
     )
 
+    objects = AccessLevelManager()
+
     class Meta:
         ordering = ('schema__order', 'order', 'name')
 
@@ -244,8 +244,6 @@ class Table(models.Model):
 
 
 class Column(models.Model):
-
-    objects = AccessLevelManager()
 
     table = models.ForeignKey(
         Table, related_name='columns', on_delete=models.CASCADE,
@@ -322,6 +320,8 @@ class Column(models.Model):
         help_text=_('The groups which have access to the column.')
     )
 
+    objects = AccessLevelManager()
+
     class Meta:
         ordering = ('table__schema__order', 'table__order', 'order', 'name')
 
@@ -338,7 +338,9 @@ class Column(models.Model):
     @property
     def indexed_columns(self):
         if self.index_for:
-            return [(self.table.schema.name, self.table.name, name.strip()) for name in self.index_for.split(',')] + [self.name]
+            return [
+                (self.table.schema.name, self.table.name, name.strip()) for name in self.index_for.split(',')
+            ] + [self.name]
         else:
             return None
 
@@ -348,8 +350,6 @@ class Column(models.Model):
 
 
 class Function(models.Model):
-
-    objects = AccessLevelManager()
 
     order = models.IntegerField(
         null=True, blank=True,
@@ -384,6 +384,8 @@ class Function(models.Model):
         verbose_name=_('Groups'),
         help_text=_('The groups which have access to this function.')
     )
+
+    objects = AccessLevelManager()
 
     class Meta:
         ordering = ('order', 'name')

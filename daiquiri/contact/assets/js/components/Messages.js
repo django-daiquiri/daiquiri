@@ -13,9 +13,9 @@ import List from 'daiquiri/core/assets/js/components/list/List'
 import ShowModal from './ShowModal.js'
 
 const Messages = () => {
-  const initalParams = {}
+  const initialParams = {}
 
-  const [params, setParams] = useState(initalParams)
+  const [params, setParams] = useState(initialParams)
 
   const modal = useModal()
   const [values, setValues] = useState({})
@@ -48,7 +48,7 @@ const Messages = () => {
   }
 
   const handleReset = () => {
-    setParams(initalParams)
+    setParams(initialParams)
   }
 
   const handleFilter = (status) => {

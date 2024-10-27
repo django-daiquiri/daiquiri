@@ -5,7 +5,7 @@ const CopyPlugin = require('copy-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
 
-// list of seperate config objects for each django app and their corresponding java script applications
+// list of separate config objects for each django app and their corresponding java script applications
 const configList = [
   {
     name: 'auth',

@@ -11,15 +11,15 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         key = options['queue']
-        hostname = '%s_%s@%%h' % (settings.DAIQUIRI_APP, key)
+        hostname = f'{settings.DAIQUIRI_APP}_{key}@%h'
 
         try:
             queue = next(filter(lambda q: q['key'] == key, settings.QUEUES))
         except StopIteration:
             try:
                 queue = next(filter(lambda q: q['key'] == key, settings.QUERY_QUEUES))
-            except StopIteration:
-                raise CommandError('Queue "%s" does not exist' % key)
+            except StopIteration as e:
+                raise CommandError(f'Queue "{key}" does not exist') from e
 
         args = [
             'celery',

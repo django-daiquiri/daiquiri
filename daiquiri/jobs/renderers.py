@@ -1,4 +1,4 @@
-from daiquiri.core.renderers import XMLRenderer, ErrorRenderer
+from daiquiri.core.renderers import ErrorRenderer, XMLRenderer
 
 from .utils import get_job_url
 

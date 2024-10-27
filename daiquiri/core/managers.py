@@ -1,6 +1,6 @@
 from django.db import models
 
-from .constants import ACCESS_LEVEL_PUBLIC, ACCESS_LEVEL_INTERNAL
+from .constants import ACCESS_LEVEL_INTERNAL, ACCESS_LEVEL_PUBLIC
 
 
 class AccessLevelQuerySet(models.QuerySet):

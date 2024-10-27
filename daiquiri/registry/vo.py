@@ -8,13 +8,13 @@ from daiquiri.core.vo import get_curation
 def get_resource():
     return {
         'service': 'registry',
-        'identifier': 'ivo://%s/registry' % settings.SITE_IDENTIFIER,
-        'title': '%s Registry' % settings.SITE_TITLE,
+        'identifier': f'ivo://{settings.SITE_IDENTIFIER}/registry',
+        'title': f'{settings.SITE_TITLE} Registry',
         'curation': get_curation(),
         'content': {
             'subjects': settings.REGISTRY_SUBJECTS,
             'type': 'Registry',
-            'description': 'The publishing registry for %s.' % settings.SITE_IDENTIFIER,
+            'description': f'The publishing registry for {settings.SITE_IDENTIFIER}.',
             'referenceURL': settings.SITE_URL.rstrip('/') + reverse('registry:root')
         },
         'capabilities': get_capabilities(),
@@ -31,13 +31,13 @@ def get_resource():
 def get_authority_resource():
     return {
         'service': 'authority',
-        'identifier': 'ivo://%s' % settings.SITE_IDENTIFIER,
+        'identifier': f'ivo://{settings.SITE_IDENTIFIER}',
         'title': settings.SITE_IDENTIFIER,
         'curation': get_curation(),
         'content': {
             'subjects': settings.REGISTRY_AUTHORITY_SUBJECTS,
             'type': 'Authority',
-            'description': 'The authority for %s.' % settings.SITE_IDENTIFIER,
+            'description': f'The authority for {settings.SITE_IDENTIFIER}.',
             'referenceURL': settings.SITE_URL.rstrip('/')
         },
         'capabilities': [],
@@ -52,13 +52,13 @@ def get_authority_resource():
 def get_web_resource():
     return {
         'service': 'web',
-        'identifier': 'ivo://%s/web' % settings.SITE_IDENTIFIER,
+        'identifier': f'ivo://{settings.SITE_IDENTIFIER}/web',
         'title': settings.SITE_IDENTIFIER,
         'curation': get_curation(),
         'content': {
             'subjects': settings.REGISTRY_WEB_SUBJECTS,
             'type': 'Catalog',
-            'description': 'The main web service for %s.' % settings.SITE_IDENTIFIER,
+            'description': f'The main web service for {settings.SITE_IDENTIFIER}.',
             'referenceURL': settings.SITE_URL.rstrip('/')
         },
         'capabilities': [

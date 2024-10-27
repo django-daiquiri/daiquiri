@@ -1,22 +1,21 @@
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from daiquiri.auth.models import Profile
-from daiquiri.core.utils import get_referer_path_info, get_next
-from django.views.generic import TemplateView
 from django.http import Http404, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse_lazy
+from django.views.generic import TemplateView
+
 from rest_framework.authtoken.models import Token
 
-from allauth.account.views import (
-    logout as allauth_logout,
-    PasswordChangeView as AllauthPasswordChangeView,
-    PasswordSetView as AllauthPasswordSetView
-)
+from allauth.account.views import PasswordChangeView as AllauthPasswordChangeView
+from allauth.account.views import PasswordSetView as AllauthPasswordSetView
+from allauth.account.views import logout as allauth_logout
 
+from daiquiri.auth.models import Profile
+from daiquiri.core.utils import get_next, get_referer_path_info
 from daiquiri.core.views import CSRFViewMixin, ModelPermissionMixin, StoreIdViewMixin
 
-from .forms import UserForm, ProfileForm
+from .forms import ProfileForm, UserForm
 
 
 @login_required()

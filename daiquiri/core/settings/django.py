@@ -42,14 +42,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 if DATABASES['tap'].get('ENGINE') == 'django.db.backends.postgresql':
     DATABASES['tap']['OPTIONS'] = {
-        'options': '-c search_path=%s' % env.get('TAP_SCHEMA', 'tap_schema')
+        'options': '-c search_path={}'.format(env.get('TAP_SCHEMA', 'tap_schema'))
     }
 elif DATABASES['tap'].get('ENGINE') == 'django.db.backends.mysql':
     DATABASES['tap']['NAME'] = env.get('TAP_SCHEMA', 'tap_schema')
 
 if DATABASES['oai'].get('ENGINE') == 'django.db.backends.postgresql':
     DATABASES['oai']['OPTIONS'] = {
-        'options': '-c search_path=%s' % env.get('OAI_SCHEMA', 'oai_schema')
+        'options': '-c search_path={}'.format(env.get('OAI_SCHEMA', 'oai_schema'))
     }
 elif DATABASES['oai'].get('ENGINE') == 'django.db.backends.mysql':
     DATABASES['oai']['NAME'] = env.get('OAI_SCHEMA', 'oai_schema')

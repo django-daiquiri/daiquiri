@@ -2,9 +2,9 @@ from django import forms
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _
-from django.urls import reverse
 
 from daiquiri.core.forms import HoneypotField
 from daiquiri.core.utils import get_detail_fields, sanitize_str
@@ -29,7 +29,7 @@ class ProfileForm(forms.ModelForm):
         fields = ()
 
     def __init__(self, *args, **kwargs):
-        super(ProfileForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         for key, field in get_detail_fields(settings.AUTH_DETAIL_KEYS):
             if self.instance.details and key in self.instance.details:
@@ -46,7 +46,7 @@ class ProfileForm(forms.ModelForm):
         for detail_key in settings.AUTH_DETAIL_KEYS:
             self.instance.details[detail_key['key']] = self.cleaned_data[detail_key['key']]
 
-        return super(ProfileForm, self).save(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
 
 class SignupForm(ProfileForm):
@@ -59,7 +59,7 @@ class SignupForm(ProfileForm):
     field_order = ['username', 'email', 'password1', 'password2']
 
     def __init__(self, *args, **kwargs):
-        super(SignupForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         # add a consent field, the label is added in the template
         if settings.AUTH_TERMS_OF_USE:

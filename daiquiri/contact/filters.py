@@ -1,5 +1,7 @@
 from django.core.exceptions import ValidationError
+
 from rest_framework import filters
+
 from daiquiri.auth.validators import DaiquiriUsernameValidator
 
 
@@ -22,7 +24,7 @@ class SpamBackend(filters.BaseFilterBackend):
 
 
 
-class DefaultMessageFilter(object):
+class DefaultMessageFilter:
 
     CHOICES = (
         ("no_filter", "Show to all users"),

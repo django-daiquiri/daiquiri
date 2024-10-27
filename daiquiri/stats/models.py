@@ -24,4 +24,4 @@ class Record(models.Model):
         verbose_name_plural = _('Records')
 
     def __str__(self):
-        return '%s %s' % (self.time, self.resource_type)
+        return f'{self.time} {self.resource_type}'

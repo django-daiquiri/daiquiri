@@ -5,11 +5,11 @@ ASYNC = env.get_bool('ASYNC')
 QUEUES = [
     {
         'key': 'default',
-        'concurency': 1
+        'concurrency': 1
     },
     {
         'key': 'download',
-        'concurency': 1
+        'concurrency': 1
     }
 ]
 

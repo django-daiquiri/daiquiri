@@ -15,7 +15,7 @@ class Command(BaseCommand):
 
         vhost = parsed_url.path.lstrip('/')
 
-        print('rabbitmqctl add_user %s %s' % (parsed_url.username, parsed_url.password))
-        print('rabbitmqctl add_vhost %s' % vhost)
-        print('rabbitmqctl set_permissions -p %s %s ".*" ".*" ".*"' % (vhost, parsed_url.username))
-        print('rabbitmqctl set_permissions -p %s admin ".*" ".*" ".*"' % vhost)
+        print(f'rabbitmqctl add_user {parsed_url.username} {parsed_url.password}')
+        print(f'rabbitmqctl add_vhost {vhost}')
+        print(f'rabbitmqctl set_permissions -p {vhost} {parsed_url.username} ".*" ".*" ".*"')
+        print(f'rabbitmqctl set_permissions -p {vhost} admin ".*" ".*" ".*"')

@@ -5,16 +5,16 @@ from django.conf import settings
 from django.core.cache import cache
 from django.utils.translation import gettext as _
 
+from rest_framework.exceptions import ValidationError
+
 from queryparser.adql import ADQLQueryTranslator
 from queryparser.exceptions import QueryError, QuerySyntaxError
-from rest_framework.exceptions import ValidationError
 
 from daiquiri.core.adapter import DatabaseAdapter
 from daiquiri.core.utils import filter_by_access_level
 from daiquiri.metadata.models import Column, Function, Schema, Table
 
-from .utils import (get_default_table_name, get_indexed_objects,
-                    get_max_active_jobs, get_quota, get_user_schema_name)
+from .utils import get_default_table_name, get_indexed_objects, get_max_active_jobs, get_quota, get_user_schema_name
 
 
 def check_quota(job):
@@ -34,7 +34,8 @@ def check_number_of_active_jobs(job):
     max_active_jobs = get_max_active_jobs(job.owner)
     if max_active_jobs and max_active_jobs <= QueryJob.objects.get_active(job.owner).count():
         raise ValidationError({
-            'query': [_('Too many active jobs. Please abort some of your active jobs or wait until they are completed.')]
+            'query': [_('Too many active jobs. Please abort some of your active jobs or '
+                        'wait until they are completed.')]
         })
 
 
@@ -64,8 +65,8 @@ def process_query_language(user, query_language):
     # get the possible query languages for this user and create a map
     query_language_map = {}
     for item in filter_by_access_level(user, settings.QUERY_LANGUAGES):
-        query_language_map['%(key)s-%(version)s' % item] = '%(key)s-%(version)s' % item
-        query_language_map['%(key)s' % item] = '%(key)s-%(version)s' % item
+        query_language_map['{key}-{version}'.format(**item)] = '{key}-{version}'.format(**item)
+        query_language_map['{key}'.format(**item)] = '{key}-{version}'.format(**item)
 
     # check if a query language is set
     if query_language:
@@ -93,11 +94,11 @@ def process_queue(user, queue):
 
         # check if this queue is in the possible queues
         try:
-            next((item for item in queues if item['key'] == queue))
-        except StopIteration:
+            next(item for item in queues if item['key'] == queue)
+        except StopIteration as e:
             raise ValidationError({
                 'queue': [_('This queue is not supported.')]
-            })
+            }) from e
 
         return queue
     else:
@@ -143,14 +144,14 @@ def translate_query(query_language, query):
                     'messages': [_('There has been an error while translating your query.')],
                     'positions': json.dumps(e.syntax_errors),
                 }
-            })
+            }) from e
 
         except QueryError as e:
             raise ValidationError({
                 'query': {
                     'messages': e.messages,
                 }
-            })
+            }) from e
 
     else:
         return query
@@ -197,14 +198,14 @@ def process_query(query):
                 'messages': [_('There has been an error while parsing your query.')],
                 'positions': json.dumps(e.syntax_errors),
             }
-        })
+        }) from e
 
     except QueryError as e:
         raise ValidationError({
             'query': {
                 'messages': e.messages,
             }
-        })
+        }) from e
 
     return processor
 
@@ -215,7 +216,9 @@ def process_display_columns(processor_display_columns):
     for processor_display_column, original_column in processor_display_columns:
         if processor_display_column == '*':
             schema_name, table_name, tmp = original_column
-            columns = Column.objects.filter(table__schema__name=schema_name).filter(table__name=table_name).order_by('order')
+            columns = Column.objects.filter(table__schema__name=schema_name) \
+                                    .filter(table__name=table_name) \
+                                    .order_by('order')
             for column in columns:
                 display_columns.append((column.name, (schema_name, table_name, column.name)))
 
@@ -235,7 +238,7 @@ def process_display_columns(processor_display_columns):
 
     if errors:
         raise ValidationError({
-            'query': [error for error in errors]
+            'query': list(errors)
         })
 
     return OrderedDict(display_columns)
@@ -244,14 +247,16 @@ def process_user_columns(job, processor_tables):
     '''Process the columns of user tables
     '''
     columns = []
-    
+
     # get type from input job itself.
     QueryJob = type(job)
-    
+
     for schema_name, table_name in processor_tables:
         # check if a user table is part of the table list
         if schema_name == get_user_schema_name(job.owner):
-            user_job = QueryJob.objects.filter(owner=job.owner).exclude(phase=QueryJob.PHASE_ARCHIVED).get(table_name=table_name)
+            user_job = QueryJob.objects.filter(owner=job.owner) \
+                                       .exclude(phase=QueryJob.PHASE_ARCHIVED) \
+                                       .get(table_name=table_name)
             columns.extend(user_job.metadata['columns'])
 
     return columns
@@ -259,9 +264,10 @@ def process_user_columns(job, processor_tables):
 def check_permissions(user, keywords, tables, columns, functions):
     messages = []
 
+    # removed, not sure what this was
     # check keywords against whitelist
-    for keywords in keywords:
-        pass
+    # for keywords in keywords:
+    #     pass
 
     # loop over tables to check permissions on schemas/tables
     for schema_name, table_name in tables:
@@ -340,8 +346,8 @@ def check_permissions(user, keywords, tables, columns, functions):
                         columns = Column.objects.filter_by_access_level(user).filter(table=table)
                         actual_columns = DatabaseAdapter().fetch_columns(schema_name, table_name)
 
-                        column_names_set = set([column.name for column in columns])
-                        actual_column_names_set = set([column['name'] for column in actual_columns])
+                        column_names_set = {column.name for column in columns}
+                        actual_column_names_set = {column['name'] for column in actual_columns}
 
                         if column_names_set != actual_column_names_set:
                             messages.append(_('The asterisk (*) is not allowed for this table.'))
@@ -349,7 +355,7 @@ def check_permissions(user, keywords, tables, columns, functions):
 
                     else:
                         try:
-                            column = Column.objects.filter_by_access_level(user).filter(table=table).get(name=column_name)
+                            Column.objects.filter_by_access_level(user).filter(table=table).get(name=column_name)
                         except Column.DoesNotExist:
                             messages.append(_('Column %s not found.') % column_name)
                             continue
@@ -360,7 +366,7 @@ def check_permissions(user, keywords, tables, columns, functions):
         # check permission on function
         queryset = Function.objects.filter(name=function_name)
 
-        # forbit the function if it is in metadata.functions, and the user doesn't have access.
+        # forbid the function if it is in metadata.functions, and the user doesn't have access.
         if queryset and not queryset.filter_by_access_level(user):
             messages.append(_('Function %s is not allowed.') % function_name)
         else:
