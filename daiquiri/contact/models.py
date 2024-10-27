@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from daiquiri.core.utils import import_class
+from daiquiri.core.utils import import_class, get_date_display
 
 
 class ContactMessage(models.Model):
@@ -36,6 +36,14 @@ class ContactMessage(models.Model):
 
     def __str__(self):
         return "created=%s; email=%s; subject=%s; status=%s" % (self.created, self.email, self.subject, self.status)
+
+    @property
+    def status_label(self):
+        return self.get_status_display()
+
+    @property
+    def created_label(self):
+        return get_date_display(self.created)
 
     def set_status_closed(self):
         self.status = self.STATUS_CLOSED

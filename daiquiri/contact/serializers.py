@@ -2,16 +2,12 @@ from django.template.loader import render_to_string
 
 from rest_framework import serializers
 
-from daiquiri.core.serializers import DateTimeLabelField
-
 from .models import ContactMessage
 
 
 class ContactMessageSerializer(serializers.ModelSerializer):
 
-    status_label = serializers.CharField(source='get_status_display')
     mailto = serializers.SerializerMethodField()
-    created_label = DateTimeLabelField(source='created')
 
     class Meta:
         model = ContactMessage

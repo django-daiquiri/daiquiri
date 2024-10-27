@@ -18,6 +18,7 @@ from django.core.mail import EmailMessage, EmailMultiAlternatives
 from django.db.models import Q
 from django.http import HttpResponse
 from django.template import TemplateDoesNotExist
+from django.template.defaultfilters import date
 from django.template.loader import render_to_string
 from django.utils.timezone import localtime
 from django.utils.translation import gettext_lazy as _
@@ -404,3 +405,7 @@ def get_file_size(file_path):
         return os.stat(file_path).st_size
     except (FileNotFoundError, TypeError):
         return 0
+
+
+def get_date_display(value):
+    return date(value, settings.DATETIME_FORMAT)

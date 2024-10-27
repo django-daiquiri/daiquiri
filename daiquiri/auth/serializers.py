@@ -4,13 +4,14 @@ from rest_framework import serializers
 
 from allauth.account.models import EmailAddress
 
-from daiquiri.core.serializers import DateTimeLabelField, JSONDictField
+from daiquiri.core.serializers import JSONDictField
+from daiquiri.core.utils import get_date_display
 
 from .models import Profile
 
 class UserSerializer(serializers.ModelSerializer):
 
-    date_joined_label = DateTimeLabelField(source='date_joined')
+    date_joined_label = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = User
@@ -34,6 +35,9 @@ class UserSerializer(serializers.ModelSerializer):
             'is_staff',
             'date_joined'
         )
+
+    def get_date_joined_label(self, obj):
+        return get_date_display(obj.date_joined)
 
 
 class GroupSerializer(serializers.ModelSerializer):

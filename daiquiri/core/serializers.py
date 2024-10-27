@@ -32,12 +32,6 @@ class JSONListField(serializers.JSONField):
         return data
 
 
-class DateTimeLabelField(serializers.CharField):
-
-    def to_representation(self, value):
-        return date(value, settings.DATETIME_FORMAT)
-
-
 class ChoicesSerializer(serializers.Serializer):
     id = serializers.SerializerMethodField()
     text = serializers.SerializerMethodField()

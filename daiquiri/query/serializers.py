@@ -2,7 +2,6 @@ from django.template.loader import get_template, TemplateDoesNotExist
 
 from rest_framework import serializers
 
-from daiquiri.core.serializers import DateTimeLabelField
 from daiquiri.jobs.serializers import SyncJobSerializer, AsyncJobSerializer
 
 from .models import QueryJob, Example
@@ -77,11 +76,6 @@ class QueryJobIndexSerializer(serializers.ModelSerializer):
 
 
 class QueryJobRetrieveSerializer(serializers.ModelSerializer):
-
-    phase_label = serializers.CharField(source='get_phase_display')
-    creation_time_label = DateTimeLabelField(source='creation_time')
-    start_time_label = DateTimeLabelField(source='start_time')
-    end_time_label = DateTimeLabelField(source='end_time')
 
     sources = serializers.SerializerMethodField()
     columns = serializers.SerializerMethodField()

@@ -15,6 +15,7 @@ from rest_framework.exceptions import ValidationError
 
 from daiquiri.core.adapter import DatabaseAdapter, DownloadAdapter
 from daiquiri.core.constants import ACCESS_LEVEL_CHOICES
+from daiquiri.core.utils import get_date_display
 from daiquiri.files.utils import check_file
 from daiquiri.jobs.managers import JobManager
 from daiquiri.jobs.models import Job
@@ -30,7 +31,7 @@ from .tasks import (abort_databae_query_task, create_download_archive_task,
                     create_download_table_task, drop_database_table_task,
                     rename_database_table_task, run_database_ingest_task,
                     run_database_query_task)
-from .utils import get_format_config, get_job_columns, get_job_sources
+from .utils import get_format_config, get_job_columns
 
 logger = logging.getLogger(__name__)
 query_logger = logging.getLogger('query')
@@ -63,6 +64,22 @@ class QueryJob(Job):
 
         verbose_name = _('QueryJob')
         verbose_name_plural = _('QueryJobs')
+
+    @property
+    def phase_label(self):
+        return self.get_phase_display()
+
+    @property
+    def creation_time_label(self):
+        return get_date_display(self.creation_time)
+
+    @property
+    def start_time_label(self):
+        return get_date_display(self.start_time)
+
+    @property
+    def end_time_label(self):
+        return get_date_display(self.end_time)
 
     @property
     def parameters(self):
