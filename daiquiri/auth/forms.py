@@ -7,7 +7,7 @@ from django.utils.translation import gettext as _
 from django.urls import reverse
 
 from daiquiri.core.forms import HoneypotField
-from daiquiri.core.utils import get_detail_fields
+from daiquiri.core.utils import get_detail_fields, sanitize_str
 
 from .models import Profile
 
@@ -69,7 +69,7 @@ class SignupForm(ProfileForm):
                                                       'data-bs-target="#terms-of-use-modal">terms of use</a>.')
         # add honeypot field
         if settings.HONEYPOT_ENABLED is True:
-            self.fields[settings.HONEYPOT_FIELD_NAME] = HoneypotField()
+            self.fields[sanitize_str(settings.HONEYPOT_FIELD_NAME)] = HoneypotField()
 
     def clean(self):
         if settings.AUTH_TERMS_OF_USE and not self.cleaned_data.get('consent'):

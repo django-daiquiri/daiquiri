@@ -1,13 +1,6 @@
 {% extends 'core/wide.html' %}
 {% load static %}
-{% load compress %}
 {% load i18n %}
-
-{% block headextra %}
-    {% compress css %}
-    <link rel="stylesheet" type="text/x-scss" href="{% static 'tap/css/examples.scss' %}" />
-    {% endcompress css %}
-{% endblock %}
 
 {% block htmlargs %}version="XHTML+RDFa 1.1" xmlns="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"{% endblock %}
 

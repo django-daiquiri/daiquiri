@@ -30,8 +30,7 @@ def test_list(db, client, username, password):
     assert response.status_code == status_map['list'][username], response.json()
 
     if response.status_code == 200:
-        assert len(response.json()) == 1
-        assert response.json()[0].get('guest') is False
+        assert response.json().get('guest') is False
 
 
 @override_settings(QUERY_ANONYMOUS=True)
@@ -41,5 +40,4 @@ def test_list_anonymous(db, client):
     assert response.status_code == 200, response.json()
 
     if response.status_code == 200:
-        assert len(response.json()) == 1
-        assert response.json()[0].get('guest') is True
+        assert response.json().get('guest') is True

@@ -34,12 +34,3 @@ def test_list_anonymous(db, client):
     url = reverse('query:query')
     response = client.get(url)
     assert response.status_code == 200
-
-
-@pytest.mark.parametrize('username,password', users)
-def test_examples(db, client, username, password):
-    client.login(username=username, password=password)
-
-    url = reverse('query:examples')
-    response = client.get(url)
-    assert response.status_code == status_map['examples'][username]

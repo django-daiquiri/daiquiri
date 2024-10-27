@@ -3,6 +3,7 @@ from django.conf import settings
 from django.utils.translation import gettext as _
 
 from daiquiri.core.forms import HoneypotField
+from daiquiri.core.utils import sanitize_str
 
 from .models import ContactMessage
 
@@ -16,7 +17,7 @@ class ContactForm(forms.ModelForm):
 
         # add honeypot field
         if settings.HONEYPOT_ENABLED is True:
-            self.fields[settings.HONEYPOT_FIELD_NAME] = HoneypotField()
+            self.fields[sanitize_str(settings.HONEYPOT_FIELD_NAME)] = HoneypotField()
 
     class Meta:
         model = ContactMessage

@@ -102,7 +102,7 @@ def test_signup_post_user_exists_unverified(db, client):
 
     # check that the signup returns 200 (with validation error)
     assert response.status_code == 200
-    assert b'* A user with that username already exists.' in response.content
+    assert b'A user with that username already exists.' in response.content
 
 
 def test_signup_post_user_exists_verified(db, client):
@@ -118,7 +118,7 @@ def test_signup_post_user_exists_verified(db, client):
 
     # check that the signup returns 200 (with validation error)
     assert response.status_code == 200
-    assert b'* A user with that username already exists.' in response.content
+    assert b'A user with that username already exists.' in response.content
 
 
 def test_profile_get_for_user(db, client):
