@@ -100,27 +100,22 @@ const Messages = () => {
             <i className="bi bi-eye"></i>
           </button>
           {
-            message.status == 'ACTIVE' && (
-              <button className="btn btn-link" onClick={() => handleUpdate(message, 'CLOSED')}>
-                <i className="bi bi-check2-circle"></i>
+            message.status == 'ACTIVE' && <>
+              <button className="btn btn-link" title={gettext('Mark as closed')}
+                      onClick={() => handleUpdate(message, 'CLOSED')}>
+                <i className="bi bi-check-circle"></i>
               </button>
-            )
-          }
-          {
-            message.status == 'CLOSED' && (
-              <button className="btn btn-link" onClick={() => handleUpdate(message, 'ACTIVE')}>
-                <i className="bi bi-circle"></i>
-              </button>
-            )
-          }
-          {
-            message.status == 'SPAM' ? (
-              <button className="btn btn-link" onClick={() => handleUpdate(message, 'ACTIVE')}>
-                <i className="bi bi-octagon"></i>
-              </button>
-            ) : (
-              <button className="btn btn-link" onClick={() => handleUpdate(message, 'SPAM')}>
+              <button className="btn btn-link" title={gettext('Mark as spam')}
+                      onClick={() => handleUpdate(message, 'SPAM')}>
                 <i className="bi bi-exclamation-octagon"></i>
+              </button>
+            </>
+          }
+          {
+            (message.status == 'CLOSED' || message.status == 'SPAM') && (
+              <button className="btn btn-link" title={gettext('Mark as active')}
+                      onClick={() => handleUpdate(message, 'ACTIVE')}>
+                <i className="bi bi-circle"></i>
               </button>
             )
           }
