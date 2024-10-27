@@ -84,9 +84,7 @@ ADDITIONAL_APPS = [
     'rest_framework.authtoken',
     'django_filters',
     'django_extensions',
-    'vendor_files',
     'markdown',
-    'compressor',
     'widget_tweaks',
     'allauth',
     'allauth.account',
@@ -126,10 +124,6 @@ TEMPLATES = [
         },
     },
 ]
-
-COMPRESS_PRECOMPILERS = (
-    ('text/x-scss', 'django_libsass.SassCompiler'),
-)
 
 LANGUAGE_CODE = 'en-us'
 
