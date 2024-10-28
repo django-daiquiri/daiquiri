@@ -15,7 +15,7 @@ from django.contrib.auth.models import Group, Permission, User
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMessage, EmailMultiAlternatives
 from django.db.models import Q
-from django.http import HttpResponse
+from django.http import HttpResponse, QueryDict
 from django.template import TemplateDoesNotExist
 from django.template.loader import render_to_string
 from django.utils.timezone import localtime
@@ -179,33 +179,38 @@ def filter_by_access_level(user, items):
     return filtered_items
 
 
-def human2bytes(string):
+def human2bytes(string: str)-> int:
     if not string:
         return 0
 
     m = re.match(r'([0-9.]+)\s*([A-Za-z]+)', string)
+    if m is None:
+        raise ValueError("Input string is not in the expected format")
+
     number, unit = float(m.group(1)), m.group(2).strip().lower()
 
     if unit == 'kb' or unit == 'k':
-        return number * 1000
+        return int(number * 1000)
     elif unit == 'mb' or unit == 'm':
-        return number * 1000**2
+        return int(number * 1000**2)
     elif unit == 'gb' or unit == 'g':
-        return number * 1000**3
+        return int(number * 1000**3)
     elif unit == 'tb' or unit == 't':
-        return number * 1000**4
+        return int(number * 1000**4)
     elif unit == 'pb' or unit == 'p':
-        return number * 1000**5
+        return int(number * 1000**5)
     elif unit == 'kib':
-        return number * 1024
+        return int(number * 1024)
     elif unit == 'mib':
-        return number * 1024**2
+        return int(number * 1024**2)
     elif unit == 'gib':
-        return number * 1024**3
+        return int(number * 1024**3)
     elif unit == 'tib':
-        return number * 1024**4
+        return int(number * 1024**4)
     elif unit == 'pib':
-        return number * 1024**5
+        return int(number * 1024**5)
+    else:
+        raise ValueError(f"Unrecognized unit: {unit}")
 
 
 def markdown(md):
@@ -223,19 +228,14 @@ def markdown(md):
 
 
 def make_query_dict_upper_case(input_dict):
-    output_dict = input_dict.copy()
+    output_dict = QueryDict(mutable=True)
 
-    for key in input_dict.keys():
-        if key.upper() != key:
-            values = output_dict.getlist(key)
-
-            if key.upper() in output_dict:
-                output_dict.appendlist(key.upper(), values)
-            else:
-                output_dict.setlist(key.upper(), values)
-
-            output_dict.pop(key)
-
+    for key, values in input_dict.lists():
+        uppercase_key = key.upper()
+        if uppercase_key in output_dict:
+            output_dict.appendlist(uppercase_key, values)
+        else:
+            output_dict.setlist(uppercase_key, values)
     return output_dict
 
 
