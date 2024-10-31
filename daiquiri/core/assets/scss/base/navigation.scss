@@ -7,14 +7,22 @@ nav {
         }
     }
 
-    ul.dropdown-menu > li > ul {
-        padding: 0;
+    .dropdown {
+        ul.dropdown-menu {
+            li.dropdown-submenu {
+                position: relative;
 
-        li {
-            list-style: none;
+                ul.dropdown-menu {
+                    position: absolute;
+                    top: 0;
+                    left: calc(100% - 0.66rem);
+                    padding: 0.5rem 0;
+                }
 
-            a {
-                padding-left: 2em;
+                a.dropdown-item:hover + ul.dropdown-menu,
+                ul.dropdown-menu:hover {
+                    display: block;
+                }
             }
         }
     }

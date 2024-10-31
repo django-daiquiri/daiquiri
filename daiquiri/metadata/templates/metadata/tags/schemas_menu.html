@@ -1,8 +1,13 @@
 {% for schema in schemas %}
-<li>
-    <a class="dropdown-item" href="{% url 'metadata:schema' schema.name %}">{{ schema.label }}</a>
+<li class="dropdown-submenu">
+    <a class="dropdown-item" href="{% url 'metadata:schema' schema.name %}">
+        <span class="d-flex">
+            <span class="me-2">{{ schema.label }}</span>
+            <i class="bi bi-chevron-right ms-auto"></i>
+        </span>
+    </a>
 
-    <ul>
+    <ul class="dropdown-menu">
         {% for table in schema.tables %}
         <li>
             <a class="dropdown-item" href="{% url 'metadata:table' schema.name table.name %}">{{ table.label }}</a>
