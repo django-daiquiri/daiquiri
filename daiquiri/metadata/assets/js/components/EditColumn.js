@@ -62,7 +62,7 @@ const EditColumn = ({ values, errors, setValues, onSubmit }) => {
                 help={meta.column.ucd.help_text}
                 value={values.ucd}
                 errors={errors.ucd}
-                onChange={(doi) => setValues({ ...values, doi })} />
+                onChange={(ucd) => setValues({ ...values, ucd })} />
             </div>
             <div className="col-md-3">
               <Input
