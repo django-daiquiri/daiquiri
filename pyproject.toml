@@ -77,11 +77,10 @@ gunicorn = [
   "gunicorn>=23.0",
 ]
 mysql = [
-  "mysqlclient>=2.2,<3.0",
+  "mysqlclient~=2.2.5",
 ]
 postgres = [
-  "psycopg2-binary~=2.9.0"
-  # "psycopg[binary]>=3.1,<4.0",
+  "psycopg[binary]~=3.2.3",
 ]
 pytest = [
   "coverage~=7.2.7",
