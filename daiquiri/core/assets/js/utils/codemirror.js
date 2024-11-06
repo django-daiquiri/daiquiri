@@ -1,4 +1,4 @@
-import { EditorView, Decoration} from '@codemirror/view'
+import { EditorView, Decoration } from '@codemirror/view'
 import { StateField, StateEffect } from '@codemirror/state'
 
 const addUnderline = StateEffect.define({
@@ -30,12 +30,14 @@ export function underlineRange(view, ranges) {
     } else {
       return effects
     }
-  }, [])
+  }, []).map(({from, to}) => addUnderline.of({from, to}))
 
   if (!effects.length) return false
 
   if (!view.state.field(underlineField, false))
     effects.push(StateEffect.appendConfig.of([underlineField]))
-  view.dispatch({effects})
+
+  view.dispatch({ effects })
+
   return true
 }
