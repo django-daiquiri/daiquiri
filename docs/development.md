@@ -134,12 +134,6 @@ psql test_daiquiri_data < ../daiquiri/testing/sql/postgres.sql
 psql test_daiquiri_data < ../daiquiri/testing/sql/postgres_permissions.sql
 ```
 
-Create the front end library vendor bundles:
-
-```
-./manage.py download_vendor_files
-```
-
 Run the tests:
 
 ```

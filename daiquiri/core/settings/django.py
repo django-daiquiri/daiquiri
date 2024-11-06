@@ -156,14 +156,9 @@ MEDIA_ROOT = BASE_DIR / 'media_root/'
 STATIC_URL = BASE_URL + 'static/'
 STATIC_ROOT = BASE_DIR / 'static_root/'
 
-STATICFILES_DIR = BASE_DIR / 'static/'
-STATICFILES_DIRS = [BASE_DIR / 'vendor/']
-STATICFILES_DIRS += [STATICFILES_DIR] if STATICFILES_DIR.exists() else []
-
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    'compressor.finders.CompressorFinder'
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder'
 )
 
 FIXTURE_DIRS = (

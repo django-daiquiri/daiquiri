@@ -73,12 +73,6 @@ cp config/settings/sample.local.py config/settings/local.py
 
 Edit config/settings/local.py for database settings, `ASYNC = True` and `DEBUG = True`.
 
-Create the front end library vendor bundles:
-
-```
-./manage.py download_vendor_files
-```
-
 Next, the differenet users and permissions need to be created on the database. For this purpose, the `sqlcreate` can be used to see what needs to be executed on the database:
 
 ```
