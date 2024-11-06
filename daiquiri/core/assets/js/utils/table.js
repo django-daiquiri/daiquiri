@@ -12,7 +12,7 @@ export const isRefColumn = (column) => column.ucd && column.ucd.includes('meta.r
 
 export const isLinkColumn = (column) => column.ucd && column.ucd.includes('meta.ref.url')
 
-export const isDataLinkColumn = (column) => column.ucd && column.ucd.includes('meta.ref.id')
+export const isDataLinkColumn = (column) => column.ucd && column.ucd.includes('meta.id')
 
 export const isImageColumn = (column) => column.ucd && column.ucd.includes('meta.image')
 
