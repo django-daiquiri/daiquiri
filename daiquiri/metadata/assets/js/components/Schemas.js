@@ -29,7 +29,9 @@ const Schemas = ({ schemas, activeItem, setActiveItem, getTooltip, onDoubleClick
   }, [schemas])
 
   const isActive = (type, item) => {
-    return activeItem && activeItem.type == type && activeItem.id == item.id
+    return activeItem && activeItem.type == type && (
+      isNil(item.id) ? (item.name == activeItem.name) : (activeItem.id == item.id)
+    )
   }
 
   const handleClick = (type, item) => {
