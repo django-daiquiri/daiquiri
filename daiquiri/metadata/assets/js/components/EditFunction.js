@@ -7,8 +7,8 @@ import { useAccessLevelsQuery, useMetaQuery } from '../hooks/queries'
 
 import Checkbox from 'daiquiri/core/assets/js/components/form/Checkbox'
 import Input from 'daiquiri/core/assets/js/components/form/Input'
+import Markdown from 'daiquiri/core/assets/js/components/form/Markdown'
 import Select from 'daiquiri/core/assets/js/components/form/Select'
-import Textarea from 'daiquiri/core/assets/js/components/form/Textarea'
 
 const EditFunction = ({ values, errors, setValues, onSubmit }) => {
   const { data: accessLevels } = useAccessLevelsQuery()
@@ -50,13 +50,6 @@ const EditFunction = ({ values, errors, setValues, onSubmit }) => {
                 onChange={(order) => setValues({ ...values, order })} />
             </div>
           </div>
-
-          <Textarea
-            label={meta.function.description.verbose_name}
-            help={meta.function.description.help_text}
-            value={values.description}
-            errors={errors.description}
-            onChange={(description) => setValues({ ...values, description })} />
 
           <Input
             label={meta.function.query_string.verbose_name}
@@ -103,6 +96,13 @@ const EditFunction = ({ values, errors, setValues, onSubmit }) => {
               ))
             }
           </div>
+
+          <Markdown
+            label={meta.function.description.verbose_name}
+            help={meta.function.description.help_text}
+            value={values.description}
+            errors={errors.description}
+            onChange={(description) => setValues({ ...values, description })} />
         </form>
       </div>
       <div className="card-footer text-end">

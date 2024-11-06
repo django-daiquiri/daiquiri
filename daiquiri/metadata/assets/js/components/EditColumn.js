@@ -8,8 +8,8 @@ import { useAccessLevelsQuery, useMetaQuery } from '../hooks/queries'
 
 import Checkbox from 'daiquiri/core/assets/js/components/form/Checkbox'
 import Input from 'daiquiri/core/assets/js/components/form/Input'
+import Markdown from 'daiquiri/core/assets/js/components/form/Markdown'
 import Select from 'daiquiri/core/assets/js/components/form/Select'
-import Textarea from 'daiquiri/core/assets/js/components/form/Textarea'
 
 const EditColumn = ({ values, errors, setValues, onSubmit }) => {
   const { data: accessLevels } = useAccessLevelsQuery()
@@ -32,13 +32,6 @@ const EditColumn = ({ values, errors, setValues, onSubmit }) => {
       </div>
       <div className="card-body">
         <form onSubmit={(event => event.preventDefault())}>
-          <Textarea
-            label={meta.column.description.verbose_name}
-            help={meta.column.description.help_text}
-            value={values.description}
-            errors={errors.description}
-            onChange={(description) => setValues({ ...values, description })} />
-
           <div className="row">
             <div className="col-md-3">
               <Input
@@ -73,6 +66,13 @@ const EditColumn = ({ values, errors, setValues, onSubmit }) => {
                 onChange={(order) => setValues({ ...values, order })} />
             </div>
           </div>
+
+          <Markdown
+            label={meta.column.description.verbose_name}
+            help={meta.column.description.help_text}
+            value={values.description}
+            errors={errors.description}
+            onChange={(description) => setValues({ ...values, description })} />
 
           <Input
             label={meta.column.index_for.verbose_name}

@@ -9,7 +9,6 @@ import Checkbox from 'daiquiri/core/assets/js/components/form/Checkbox'
 import Input from 'daiquiri/core/assets/js/components/form/Input'
 import Markdown from 'daiquiri/core/assets/js/components/form/Markdown'
 import Select from 'daiquiri/core/assets/js/components/form/Select'
-import Textarea from 'daiquiri/core/assets/js/components/form/Textarea'
 
 import EditName from './EditName'
 
@@ -54,13 +53,6 @@ const EditTable = ({ values, errors, setValues, onSubmit }) => {
                 onChange={(order) => setValues({ ...values, order })} />
             </div>
           </div>
-
-          <Textarea
-            label={meta.table.description.verbose_name}
-            help={meta.table.description.help_text}
-            value={values.description}
-            errors={errors.description}
-            onChange={(description) => setValues({ ...values, description })} />
 
           <div className="row">
             <div className="col-md-4">
@@ -150,6 +142,12 @@ const EditTable = ({ values, errors, setValues, onSubmit }) => {
             }
           </div>
 
+          <Markdown
+            label={meta.table.description.verbose_name}
+            help={meta.table.description.help_text}
+            value={values.description}
+            errors={errors.description}
+            onChange={(description) => setValues({ ...values, description })} />
           <Markdown
             label={meta.table.long_description.verbose_name}
             help={meta.table.long_description.help_text}
