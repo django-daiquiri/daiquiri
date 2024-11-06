@@ -20,7 +20,7 @@ const EditColumn = ({ values, errors, setValues, onSubmit }) => {
     <div className="card">
       <div className="d-flex align-items-center card-header">
         <span className="me-auto">
-          <strong>{gettext('Table')}</strong> {values.label}
+          <strong>{gettext('Column')}</strong> {values.label}
         </span>
 
         <a className="btn btn-secondary btn-sm me-2" href={values.admin_url} target="_blank" rel="noreferrer">
