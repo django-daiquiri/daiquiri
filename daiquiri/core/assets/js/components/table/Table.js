@@ -33,6 +33,11 @@ const Table = ({ columns, rows, pageSizes, params, setParams }) => {
     }
   }, [rows])
 
+  const showModal = ({ rowIndex, columnIndex }) => {
+    updateModal({ rowIndex, columnIndex })
+    modal.show()
+  }
+
   const updateModal = ({ rowIndex, columnIndex }) => {
     const column = columns[columnIndex]
     const value = rows.results[rowIndex][columnIndex]
@@ -49,15 +54,6 @@ const Table = ({ columns, rows, pageSizes, params, setParams }) => {
         right: columns.filter((c, i) => i > columnIndex).some(isModalColumn),
         left: columns.filter((c, i) => i < columnIndex).some(isModalColumn),
       })
-    }
-  }
-
-  const handleClick = (rowIndex, columnIndex) => {
-    setActive({ rowIndex, columnIndex })
-
-    if (isModalColumn(columns[columnIndex])) {
-      updateModal({ rowIndex, columnIndex })
-      modal.show()
     }
   }
 
@@ -102,7 +98,8 @@ const Table = ({ columns, rows, pageSizes, params, setParams }) => {
         params={params}
         active={active}
         setParams={setParams}
-        onClick={handleClick}
+        setActive={setActive}
+        showModal={showModal}
       />
       <TableFooter
         rowCount={rows.count}

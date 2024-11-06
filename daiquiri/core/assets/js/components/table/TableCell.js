@@ -4,25 +4,22 @@ import PropTypes from 'prop-types'
 import { getBasename, getFileUrl, getLinkUrl, getReferenceUrl,
          isModalColumn, isFileColumn, isLinkColumn } from '../../utils/table.js'
 
-const TableCell = ({ column, value, rowIndex, columnIndex, onClick }) => {
-
-  const handleClick = (event) => {
-    event.preventDefault()
-    event.stopPropagation()
-    onClick(rowIndex, columnIndex)
-  }
+const TableCell = ({ column, value, rowIndex, columnIndex, setActive, showModal }) => {
 
   const renderCell = () => {
     if (column.ucd && column.ucd.includes('meta.ref')) {
       if (isModalColumn(column)) {
         // render the modal
         return (
-          <a href={getFileUrl(column, value)} onClick={handleClick}>{value}</a>
+          <a href={getFileUrl(column, value)} onClick={(event) => {
+            event.preventDefault()
+            showModal({ rowIndex, columnIndex })
+          }}>{value}</a>
         )
       } else if (isFileColumn(column)) {
         // render a file link
         return (
-          <a href={getFileUrl(column, value)} target="_blank" rel="noreferrer">{getBasename(value)}</a>
+          <a href={getFileUrl(column, value)} target="_blank" rel="noreferrer">{getBasename(value)}1</a>
         )
       } else if (isLinkColumn(column)) {
         // render a regular link
@@ -42,7 +39,7 @@ const TableCell = ({ column, value, rowIndex, columnIndex, onClick }) => {
   }
 
   return (
-    <div className="dq-table-cell" onClick={handleClick}>
+    <div className="dq-table-cell" onClick={() => setActive({ rowIndex, columnIndex })}>
       {renderCell()}
     </div>
   )
@@ -53,7 +50,8 @@ TableCell.propTypes = {
   value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   rowIndex: PropTypes.number.isRequired,
   columnIndex: PropTypes.number.isRequired,
-  onClick: PropTypes.func.isRequired
+  setActive: PropTypes.func.isRequired,
+  showModal: PropTypes.func.isRequired
 }
 
 export default TableCell
