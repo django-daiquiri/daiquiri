@@ -97,7 +97,7 @@ const EditFunction = ({ values, errors, setValues, onSubmit }) => {
                   onChange={(checked) => setValues({ ...values, groups: checked ? (
                     [ ...values.groups, group.id]
                   ) : (
-                    values.groups.filter(g => g.id !== group.id)
+                    values.groups.filter(group_id => group_id !== group.id)
                   )})}
                 />
               ))
