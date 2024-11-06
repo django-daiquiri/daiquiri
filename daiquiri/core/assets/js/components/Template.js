@@ -4,7 +4,7 @@ import { isNil } from 'lodash'
 
 const Template = ({ template }) => {
   return !isNil(template) && (
-    <div dangerouslySetInnerHTML={{ __html: template }} />
+    <span dangerouslySetInnerHTML={{ __html: template }} />
   )
 }
 
