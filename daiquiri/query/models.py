@@ -83,6 +83,14 @@ class QueryJob(Job):
         return self.get_phase_display()
 
     @property
+    def query_language_label(self):
+        return next(iter(
+            query_language['label']
+            for query_language in settings.QUERY_LANGUAGES
+            if '{key}-{version}'.format(**query_language) == self.query_language
+        ), None)
+
+    @property
     def creation_time_label(self):
         return get_date_display(self.creation_time)
 

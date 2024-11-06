@@ -9,11 +9,11 @@ import Job from './submit/job/Job'
 import Jobs from './submit/Jobs'
 import Status from './submit/Status'
 
-const Submit = ({ formKey, jobId, query, loadForm, loadJob, loadJobs }) => {
+const Submit = ({ formKey, jobId, query, queryLanguage, loadForm, loadJob, loadJobs }) => {
   const getForm = () => {
     switch (formKey) {
       case 'sql':
-        return <FormSql formKey={formKey} loadJob={loadJob} query={query} />
+        return <FormSql formKey={formKey} loadJob={loadJob} query={query} queryLanguage={queryLanguage} />
       case 'upload':
         return <FormUpload formKey={formKey} loadJob={loadJob} />
       default:
@@ -48,6 +48,7 @@ Submit.propTypes = {
   formKey: PropTypes.string,
   jobId: PropTypes.string,
   query: PropTypes.string,
+  queryLanguage: PropTypes.string,
   loadForm: PropTypes.func.isRequired,
   loadJob: PropTypes.func.isRequired,
   loadJobs: PropTypes.func.isRequired,

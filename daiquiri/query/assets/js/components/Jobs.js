@@ -105,7 +105,7 @@ const Jobs = ({ loadForm, loadJob }) => {
             )
           }
           <button className="btn btn-link" title={gettext('Open new query form with this query')}
-                  onClick={() => loadForm('sql', job.query)}>
+                  onClick={() => loadForm('sql', job.query, job.query_language)}>
             <i className="bi bi-play-circle"></i>
           </button>
           {

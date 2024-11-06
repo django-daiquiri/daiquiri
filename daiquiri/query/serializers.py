@@ -102,6 +102,7 @@ class QueryJobRetrieveSerializer(serializers.ModelSerializer):
             'schema_name',
             'table_name',
             'query_language',
+            'query_language_label',
             'query',
             'native_query',
             'actual_query',
