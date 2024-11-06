@@ -43,7 +43,7 @@ class Profile(models.Model):
         return get_full_name(self.user)
 
     def user_admin_url(self):
-        return reverse('admin:auth_user_change', args=[self.id])
+        return reverse('admin:auth_user_change', args=[self.user.id])
 
     def profile_admin_url(self):
         return reverse('admin:daiquiri_auth_profile_change', args=[self.id])

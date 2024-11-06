@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { isEmpty, isNil, omit } from 'lodash'
+import { isUndefined, isNil, omit } from 'lodash'
 
 import { useModal } from 'daiquiri/core/assets/js/hooks/modal'
 import { isStaff, userId } from 'daiquiri/core/assets/js/utils/meta'
@@ -254,7 +254,7 @@ const Users = () => {
     </div>
   )
 
-  return !isEmpty(settings) && !isEmpty(groups) && (
+  return !isUndefined(settings) && !isUndefined(groups) && (
     <div className="messages">
       <List
         columns={columns}
