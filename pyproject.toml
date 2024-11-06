@@ -38,6 +38,7 @@ dependencies = [
   "celery~=5.3.6",
   "Django~=4.2.8",
   "django-allauth~=0.54.0",
+  "python-dotenv~=1.0.1",
   "django-extensions~=3.2.3",
   "django-filter~=23.2",
   "django-honeypot~=1.0.3",
