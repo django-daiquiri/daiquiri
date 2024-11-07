@@ -44,7 +44,7 @@ from .tasks import (
     run_database_ingest_task,
     run_database_query_task,
 )
-from .utils import get_format_config, get_job_columns
+from .utils import get_format_config, get_job_columns, get_query_language_label
 
 logger = logging.getLogger(__name__)
 query_logger = logging.getLogger('query')
@@ -84,11 +84,7 @@ class QueryJob(Job):
 
     @property
     def query_language_label(self):
-        return next(iter(
-            query_language['label']
-            for query_language in settings.QUERY_LANGUAGES
-            if '{key}-{version}'.format(**query_language) == self.query_language
-        ), None)
+        return get_query_language_label(self.query_language)
 
     @property
     def creation_time_label(self):
@@ -658,3 +654,7 @@ class Example(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def query_language_label(self):
+        return get_query_language_label(self.query_language)

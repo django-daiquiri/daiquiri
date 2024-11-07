@@ -368,6 +368,14 @@ def get_query_language_choices():
     ]
 
 
+def get_query_language_label(query_language):
+    return next(iter(
+        ql['label']
+        for ql in settings.QUERY_LANGUAGES
+        if '{key}-{version}'.format(**ql) == query_language
+    ), None)
+
+
 def get_queue_choices():
     return [
         (queue['key'], queue['label']) for queue in settings.QUERY_QUEUES
