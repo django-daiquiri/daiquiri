@@ -11,25 +11,29 @@
 {% endblock %}
 
 {% block page %}
-    <ul class="list-unstyled">
-        {% for schema in schemas %}
-        <li>
-            <h3>
-                <a href="{% url 'metadata:schema' schema.name %}">
-                    {% if schema.title %}
-                    {{ schema.title }} ({{ schema }})
-                    {% else %}
-                    {{ schema }}
-                    {% endif %}
-                </a>
-            </h3>
+    {% for schema in schemas %}
+    <div class="card mb-3">
+        <div class="card-header">
+            <a href="{% url 'metadata:schema' schema.name %}">
+                {% if schema.title %}
+                {{ schema.title }} ({{ schema }})
+                {% else %}
+                {{ schema }}
+                {% endif %}
+            </a>
+        </div>
+        <div class="card-body">
             {% if schema.description %}
-                {{ schema.description | markdown }}
-            {% elif schema.long_description %}
-                {{ schema.long_description | markdown }}
+            {{ schema.description | markdown }}
+            {% else %}
+            {% trans 'No description has been provided for this schema.' %}
             {% endif %}
-        </li>
-        {% endfor %}
-    </ul>
-
+        </div>
+        {% if schema.doi %}
+        <div class="card-footer">
+            DOI: {% doi_link schema.doi %}
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
 {% endblock %}
