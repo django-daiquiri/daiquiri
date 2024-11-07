@@ -372,7 +372,7 @@ def get_query_language_label(query_language):
     return next(iter(
         ql['label']
         for ql in settings.QUERY_LANGUAGES
-        if '{key}-{version}'.format(**ql) == query_language
+        if query_language in [ql['key'], '{key}-{version}'.format(**ql)]
     ), None)
 
 
