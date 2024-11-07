@@ -35,5 +35,5 @@ urlpatterns = [
     path(r'api/', include(router.urls)),
 
     # query interface, needs to be last in list
-    re_path(r'', QueryView.as_view(), name='query'),
+    re_path(r'[A-Za-z0-9-]*/$', QueryView.as_view(), name='query'),
 ]
