@@ -97,7 +97,7 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
     search_arg_template = '%%%s%%'
 
     def fetch_pid(self):
-        return self.connection().connection.get_backend_pid()
+        return self.connection().connection.info.backend_pid
 
     def escape_identifier(self, identifier):
         # escape quotes within the identifier and quote the string
