@@ -5,6 +5,10 @@ from . import ADDITIONAL_APPS, BASE_DIR, DJANGO_APPS
 SITE_URL = 'http://testserver'
 SITE_CREATED = '2020-01-01'
 
+PASSWORD_HASHERS = (
+    "django.contrib.auth.hashers.MD5PasswordHasher",
+)
+
 INSTALLED_APPS = [
     *DJANGO_APPS,
     'daiquiri.auth',
