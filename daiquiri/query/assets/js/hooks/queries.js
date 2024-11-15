@@ -67,6 +67,7 @@ export const useDownloadFormatsQuery = () => {
 }
 
 export const useJobsQuery = (params) => {
+  // this is the query for verbose jobs list
   return useInfiniteQuery({
     queryKey: ['jobs', params],
     queryFn: (context) => QueryApi.fetchJobs({...params, page: context.pageParam})
@@ -77,6 +78,7 @@ export const useJobsQuery = (params) => {
 }
 
 export const useJobsIndexQuery = () => {
+  // this is the query for jobs list in the sidebar of the submit interface
   return useQuery({
     queryKey: ['jobsIndex'],
     queryFn: () => QueryApi.fetchJobsIndex().catch(error => console.log(error)),
@@ -85,6 +87,7 @@ export const useJobsIndexQuery = () => {
 }
 
 export const useJobsTablesQuery = () => {
+  // this is the query for tables in the schema and column browser
   return useQuery({
     queryKey: ['jobsTables'],
     queryFn: () => QueryApi.fetchJobsTables(),
@@ -98,7 +101,7 @@ export const useJobQuery = (jobId) => {
   return useQuery({
     queryKey: ['job', jobId],
     queryFn: () => QueryApi.fetchJob(jobId).then(response => {
-      queryClient.invalidateQueries({ queryKey: ['jobs'] })
+      queryClient.invalidateQueries({ queryKey: ['jobsIndex'] })
       return response
     }).catch(errors => errors),
     placeholderData: keepPreviousData
