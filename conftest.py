@@ -1,6 +1,7 @@
 import os
 
 import pytest
+
 from django.conf import settings
 from django.contrib.admin.utils import flatten
 from django.core.management import call_command
@@ -10,7 +11,7 @@ from daiquiri.core.utils import setup_group
 
 
 @pytest.fixture(scope='session')
-def django_db_setup(django_db_setup, django_db_blocker):
+def django_db_setup(django_db_setup, django_db_blocker):  # noqa: PT004
     from django.test import TestCase
     TestCase.multi_db = True
     TestCase.databases = ('default', 'data', 'tap', 'oai')

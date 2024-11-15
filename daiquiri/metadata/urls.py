@@ -1,10 +1,17 @@
 from django.urls import include, path, re_path
+
 from rest_framework import routers
 
-from .views import ManagementView, SchemaView, SchemasView, TableView
-from .viewsets import (AccessLevelViewSet, ColumnViewSet, FunctionViewSet,
-                       LicenseViewSet, SchemaViewSet,
-                       TableViewSet, MetaViewSet)
+from .views import ManagementView, SchemasView, SchemaView, TableView
+from .viewsets import (
+                       AccessLevelViewSet,
+                       ColumnViewSet,
+                       FunctionViewSet,
+                       LicenseViewSet,
+                       MetaViewSet,
+                       SchemaViewSet,
+                       TableViewSet,
+)
 
 app_name = 'metadata'
 

@@ -45,13 +45,13 @@ def get_capabilities():
 def get_resource():
     return {
         'service': 'datalink',
-        'identifier': 'ivo://%s/datalink' % settings.SITE_IDENTIFIER,
-        'title': '%s Datalink Service' % settings.SITE_TITLE,
+        'identifier': f'ivo://{settings.SITE_IDENTIFIER}/datalink',
+        'title': f'{settings.SITE_TITLE} Datalink Service',
         'curation': get_curation(),
         'content': {
             'subjects': [],
             'type': '',
-            'description': 'The Datalink Service for %s.' % settings.SITE_IDENTIFIER,
+            'description': f'The Datalink Service for {settings.SITE_IDENTIFIER}.',
             'referenceURL': settings.SITE_URL.rstrip('/') + reverse('datalink:root').rstrip('/')
         },
         'capabilities': get_capabilities(),

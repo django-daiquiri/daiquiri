@@ -12,13 +12,13 @@ from .serializers import SchemaSerializer
 def get_resource():
     return {
         'service': 'tap',
-        'identifier': 'ivo://%s/tap' % settings.SITE_IDENTIFIER,
-        'title': '%s TAP Service' % settings.SITE_TITLE,
+        'identifier': f'ivo://{settings.SITE_IDENTIFIER}/tap',
+        'title': f'{settings.SITE_TITLE} TAP Service',
         'curation': get_curation(),
         'content': {
             'subjects': settings.TAP_SUBJECTS,
             'type': 'Catalog',
-            'description': 'The TAP Service registry for %s.' % settings.SITE_IDENTIFIER,
+            'description': f'The TAP Service registry for {settings.SITE_IDENTIFIER}.',
             'referenceURL': settings.SITE_URL.rstrip('/') + reverse('tap:root').rstrip('/')
         },
         'capabilities': get_capabilities(),

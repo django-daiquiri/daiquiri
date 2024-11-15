@@ -4,7 +4,7 @@ import { isEmpty } from 'lodash'
 
 import TableCell from './TableCell'
 
-const TableBody = ({ columns, rows, active, onClick }) => {
+const TableBody = ({ columns, rows, active, setActive, showModal }) => {
   return (
     <tbody>
       {
@@ -24,7 +24,8 @@ const TableBody = ({ columns, rows, active, onClick }) => {
                     value={row[columnIndex]}
                     rowIndex={rowIndex}
                     columnIndex={columnIndex}
-                    onClick={onClick}
+                    setActive={setActive}
+                    showModal={showModal}
                   />
                 </td>
               ))
@@ -40,7 +41,8 @@ TableBody.propTypes = {
   columns: PropTypes.array.isRequired,
   rows: PropTypes.object.isRequired,
   active: PropTypes.object.isRequired,
-  onClick: PropTypes.func.isRequired
+  setActive: PropTypes.func.isRequired,
+  showModal: PropTypes.func.isRequired
 }
 
 export default TableBody

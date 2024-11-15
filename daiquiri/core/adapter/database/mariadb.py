@@ -14,9 +14,9 @@ class MariaDBAdapter(MySQLAdapter):
         }
 
         if max_records is not None:
-            return 'SET STATEMENT max_statement_time=%(timeout)s FOR CREATE TABLE %(schema)s.%(table)s ENGINE=ARIA ( %(query)s ) LIMIT %(max_records)s;' % params
+            return 'SET STATEMENT max_statement_time={timeout} FOR CREATE TABLE {schema}.{table} ENGINE=ARIA ( {query} ) LIMIT {max_records};'.format(**params)  # noqa: E501
         else:
-            return 'SET STATEMENT max_statement_time=%(timeout)s FOR CREATE TABLE %(schema)s.%(table)s ENGINE=ARIA ( %(query)s );' % params
+            return 'SET STATEMENT max_statement_time={timeout} FOR CREATE TABLE {schema}.{table} ENGINE=ARIA ( {query} );'.format(**params)  # noqa: E501
 
     def build_sync_query(self, query, timeout, max_records):
         # construct the actual query
@@ -27,6 +27,6 @@ class MariaDBAdapter(MySQLAdapter):
         }
 
         if max_records is not None:
-            return 'SET STATEMENT max_statement_time=%(timeout)s FOR %(query)s LIMIT %(max_records)s;' % params
+            return 'SET STATEMENT max_statement_time={timeout} FOR {query} LIMIT {max_records};'.format(**params)
         else:
-            return 'SET STATEMENT max_statement_time=%(timeout)s FOR %(query)s;' % params
+            return 'SET STATEMENT max_statement_time={timeout} FOR {query};'.format(**params)

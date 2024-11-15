@@ -2,23 +2,24 @@ from django.conf import settings
 from django.contrib.auth.models import Group
 from django.shortcuts import get_object_or_404
 
-from rest_framework import viewsets, mixins, filters
+from rest_framework import filters, mixins, viewsets
+from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.decorators import action
 from rest_framework.exceptions import MethodNotAllowed
 from rest_framework.response import Response
-from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 
 from django_filters.rest_framework import DjangoFilterBackend
 
-from daiquiri.core.permissions import HasModelPermission
 from daiquiri.core.paginations import ListPagination
+from daiquiri.core.permissions import HasModelPermission
 
 from .models import Profile
-from .serializers import ProfileSerializer, GroupSerializer
 from .permissions import IsAuthManager
+from .serializers import GroupSerializer, ProfileSerializer
 
 
-class ProfileViewSet(mixins.UpdateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+class ProfileViewSet(mixins.UpdateModelMixin, mixins.ListModelMixin,
+                     mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     permission_classes = (HasModelPermission, )
     authentication_classes = (SessionAuthentication, TokenAuthentication)
 

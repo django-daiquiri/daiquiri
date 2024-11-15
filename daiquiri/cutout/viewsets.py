@@ -1,16 +1,16 @@
 from django.utils.timezone import now
 
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.renderers import JSONRenderer
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
+from rest_framework.renderers import JSONRenderer
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from daiquiri.core.utils import get_client_ip
 from daiquiri.stats.models import Record
 
 from .adapter import CutOutAdapter
-from .renderers import CutOutErrorRenderer
 from .permissions import HasPermission
+from .renderers import CutOutErrorRenderer
 
 
 class CutOutViewSet(APIView):

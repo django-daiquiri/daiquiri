@@ -16,23 +16,23 @@ class PgDumpAdapter(BaseDownloadAdapter):
         if data_only:
             self.args += ['--data-only', '--inserts']
 
-        if 'PASSWORD' in self.database_config and self.database_config['PASSWORD']:
-            if 'PORT' in self.database_config and self.database_config['PORT']:
+        if self.database_config.get('PASSWORD'):
+            if self.database_config.get('PORT'):
                 dbname = '--dbname=postgresql://%(USER)s:%(PASSWORD)s@%(HOST)s:%(PORT)s/%(NAME)s'
             else:
                 dbname = '--dbname=postgresql://%(USER)s:%(PASSWORD)s@%(HOST)s/%(NAME)s'
 
             self.args.append(dbname % self.database_config)
         else:
-            if 'USER' in self.database_config and self.database_config['USER']:
-                self.args.append('--user=%(USER)s' % self.database_config)
+            if self.database_config.get('USER'):
+                self.args.append('--user={USER}'.format(**self.database_config))
 
-            if 'HOST' in self.database_config and self.database_config['HOST']:
-                self.args.append('--host=%(HOST)s' % self.database_config)
+            if self.database_config.get('HOST'):
+                self.args.append('--host={HOST}'.format(**self.database_config))
 
-            if 'PORT' in self.database_config and self.database_config['PORT']:
+            if self.database_config.get('PORT'):
                 self.args.append('--port=%(PORT)d' % self.database_config)
 
-            self.args.append('--dbname=%(NAME)s' % self.database_config)
+            self.args.append('--dbname={NAME}'.format(**self.database_config))
 
-        self.args.append('--table="%s"."%s"' % (schema_name, table_name))
+        self.args.append(f'--table="{schema_name}"."{table_name}"')

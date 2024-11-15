@@ -20,7 +20,7 @@ const ShowModal = ({ modal, job, loadForm, loadJob }) => {
                 <JobParameters job={job} />
                 {
                   job.query && <>
-                    <div className="modal-seperator mt-2"></div>
+                    <div className="modal-separator mt-2"></div>
                     <dl className="row mb-0">
                       <dt className="col-md-3 text-md-end">{gettext('Query')}</dt>
                       <dd className="col-md-9 mb-0 ">

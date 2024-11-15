@@ -1,21 +1,20 @@
+import logging
 import os
 import re
 
-import logging
-from django.shortcuts import Http404
-
-from lunr import lunr
-
 from django.conf import settings
+from django.shortcuts import Http404
 from django.utils.html import strip_tags
 from django.utils.text import Truncator
+
+from lunr import lunr
 
 from .utils import get_file_path, read_file_content
 
 logger = logging.getLogger(__name__)
 
 
-class Searcher(object):
+class Searcher:
 
     cms_files = {}
 
@@ -32,7 +31,7 @@ class Searcher(object):
             file_urls = {f["ref"]: f["score"] for f in lunr_results}
             match_data = {f["ref"]: f["match_data"].metadata for f in lunr_results}
             results = [f for _, f in cls.cms_files.items() if f["url"] in file_urls]
-        except:
+        except:  # noqa: E722
             results = []
 
         for res in results:
@@ -61,7 +60,7 @@ class Searcher(object):
 
 
         if len(unique_files) == 0:
-            logger.error(f'No files found in {docs_path}')
+            logger.error('No files found in %s', docs_path)
             raise Http404
 
 
@@ -132,7 +131,7 @@ class Searcher(object):
 
         for result in results:
             result["body"] = result["body"].strip(result["title"])
-            result["match_data"] = list(result["match_data"].keys())[0]
+            result["match_data"] = next(iter(result["match_data"].keys()))
             truncator = Truncator(result["body"])
             if result["match_data"] in result["title"]:
                 result["body"] = truncator.chars(num_chars)
@@ -149,4 +148,3 @@ class Searcher(object):
                     result["body"] = truncator.chars(num_chars)
 
         return results
-

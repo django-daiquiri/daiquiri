@@ -5,8 +5,7 @@ from collections import OrderedDict
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.db import models
-from django.db.utils import (DataError, InternalError, OperationalError,
-                             ProgrammingError)
+from django.db.utils import DataError, InternalError, OperationalError, ProgrammingError
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
@@ -22,16 +21,30 @@ from daiquiri.jobs.models import Job
 from daiquiri.stats.models import Record
 
 from .managers import ExampleManager, QueryJobManager
-from .process import (check_number_of_active_jobs, check_permissions,
-                      check_quota, process_display_columns, process_user_columns, process_query,
-                      process_query_language, process_queue,
-                      process_response_format, process_schema_name,
-                      process_table_name, translate_query)
-from .tasks import (abort_databae_query_task, create_download_archive_task,
-                    create_download_table_task, drop_database_table_task,
-                    rename_database_table_task, run_database_ingest_task,
-                    run_database_query_task)
-from .utils import get_format_config, get_job_columns
+from .process import (
+    check_number_of_active_jobs,
+    check_permissions,
+    check_quota,
+    process_display_columns,
+    process_query,
+    process_query_language,
+    process_queue,
+    process_response_format,
+    process_schema_name,
+    process_table_name,
+    process_user_columns,
+    translate_query,
+)
+from .tasks import (
+    abort_database_query_task,
+    create_download_archive_task,
+    create_download_table_task,
+    drop_database_table_task,
+    rename_database_table_task,
+    run_database_ingest_task,
+    run_database_query_task,
+)
+from .utils import get_format_config, get_job_columns, get_query_language_label
 
 logger = logging.getLogger(__name__)
 query_logger = logging.getLogger('query')
@@ -68,6 +81,10 @@ class QueryJob(Job):
     @property
     def phase_label(self):
         return self.get_phase_display()
+
+    @property
+    def query_language_label(self):
+        return get_query_language_label(self.query_language)
 
     @property
     def creation_time_label(self):
@@ -124,7 +141,7 @@ class QueryJob(Job):
     @property
     def timeout(self):
         if self.queue:
-            return next((queue['timeout'] for queue in settings.QUERY_QUEUES if queue['key'] == self.queue))
+            return next(queue['timeout'] for queue in settings.QUERY_QUEUES if queue['key'] == self.queue)
         else:
             return 10
 
@@ -211,15 +228,15 @@ class QueryJob(Job):
             self.phase = self.PHASE_QUEUED
             self.save()
 
-            # start the submit_query task in a syncronous or asuncronous way
+            # start the submit_query task in a synchronous or asuncronous way
             job_id = str(self.id)
             if not settings.ASYNC:
-                logger.info('job %s submitted (sync)' % self.id)
+                logger.info('job %s submitted (sync)', self.id)
                 run_database_query_task.apply((job_id, ), task_id=job_id, throw=True)
 
             else:
-                queue = 'query_{}'.format(self.queue)
-                logger.info('job %s submitted (async, queue=%s)' % (self.id, queue))
+                queue = f'query_{self.queue}'
+                logger.info('job %s submitted (async, queue=%s)', self.id, queue)
                 run_database_query_task.apply_async((job_id, ), task_id=job_id, queue=queue)
 
         else:
@@ -271,8 +288,8 @@ class QueryJob(Job):
             self.drop_uploads()
             self.drop_table()
 
-        except (OperationalError, ProgrammingError, InternalError, DataError):
-            raise StopIteration()
+        except (OperationalError, ProgrammingError, InternalError, DataError) as e:
+            raise StopIteration from e
 
     def ingest(self, file_path):
         if self.phase == self.PHASE_PENDING:
@@ -343,9 +360,9 @@ class QueryJob(Job):
         task_args = (self.pid, )
 
         if not settings.ASYNC:
-            abort_databae_query_task.apply(task_args, throw=True)
+            abort_database_query_task.apply(task_args, throw=True)
         else:
-            abort_databae_query_task.apply_async(task_args)
+            abort_database_query_task.apply_async(task_args)
 
     def stream(self, format_key):
         if self.phase == self.PHASE_COMPLETED:
@@ -385,7 +402,8 @@ class QueryJob(Job):
                 count = adapter.count_rows(self.schema_name, self.table_name, column_names, search, filters)
 
                 # query the paginated rowset
-                rows = adapter.fetch_rows(self.schema_name, self.table_name, column_names, ordering, page, page_size, search, filters)
+                rows = adapter.fetch_rows(self.schema_name, self.table_name, column_names,
+                                          ordering, page, page_size, search, filters)
 
                 # flatten the list if only one column is retrieved
                 if len(column_names) == 1:
@@ -440,7 +458,7 @@ class DownloadJob(Job):
 
         if format_config:
             directory_name = os.path.join(settings.QUERY_DOWNLOAD_DIR, username)
-            return os.path.join(directory_name, '%s.%s' % (self.query_job.table_name, format_config['extension']))
+            return os.path.join(directory_name, '{}.{}'.format(self.query_job.table_name, format_config['extension']))
         else:
             return None
 
@@ -465,11 +483,11 @@ class DownloadJob(Job):
 
             download_id = str(self.id)
             if not settings.ASYNC:
-                logger.info('download_job %s submitted (sync)' % download_id)
+                logger.info('download_job %s submitted (sync)', download_id)
                 create_download_table_task.apply((download_id, ), task_id=download_id, throw=True)
 
             else:
-                logger.info('download_job %s submitted (async, queue=download)' % download_id)
+                logger.info('download_job %s submitted (async, queue=download)', download_id)
                 create_download_table_task.apply_async((download_id, ), task_id=download_id, queue='download')
 
         else:
@@ -518,7 +536,7 @@ class QueryArchiveJob(Job):
             username = self.owner.username
 
         directory_name = os.path.join(settings.QUERY_DOWNLOAD_DIR, username)
-        return os.path.join(directory_name, '%s.%s.zip' % (self.query_job.table_name, self.column_name))
+        return os.path.join(directory_name, f'{self.query_job.table_name}.{self.column_name}.zip')
 
     def process(self):
         if self.query_job.phase == self.PHASE_COMPLETED:
@@ -539,7 +557,8 @@ class QueryArchiveJob(Job):
             })
 
         # get database adapter and query the paginated rowset
-        rows = DatabaseAdapter().fetch_rows(self.query_job.schema_name, self.query_job.table_name, [self.column_name], page_size=0)
+        rows = DatabaseAdapter().fetch_rows(self.query_job.schema_name, self.query_job.table_name,
+                                            [self.column_name], page_size=0)
 
         # prepare list of files for this job
         files = []
@@ -570,11 +589,11 @@ class QueryArchiveJob(Job):
 
             archive_id = str(self.id)
             if not settings.ASYNC:
-                logger.info('archive_job %s submitted (sync)' % archive_id)
+                logger.info('archive_job %s submitted (sync)', archive_id)
                 create_download_archive_task.apply((archive_id, ), task_id=archive_id, throw=True)
 
             else:
-                logger.info('archive_job %s submitted (async, queue=download)' % archive_id)
+                logger.info('archive_job %s submitted (async, queue=download)', archive_id)
                 create_download_archive_task.apply_async((archive_id, ), task_id=archive_id, queue='download')
 
         else:
@@ -591,8 +610,6 @@ class QueryArchiveJob(Job):
 
 class Example(models.Model):
 
-    objects = ExampleManager()
-
     order = models.IntegerField(
         null=True, blank=True,
         verbose_name=_('Order'),
@@ -603,7 +620,7 @@ class Example(models.Model):
         verbose_name=_('Name'),
         help_text=_('Identifier of the example.')
     )
-    description = models.TextField(
+    description = models.TextField(  # noqa: DJ001
         null=True, blank=True,
         verbose_name=_('Description'),
         help_text=_('A brief description of the example to be displayed in the user interface.')
@@ -627,6 +644,8 @@ class Example(models.Model):
         help_text=_('The groups which have access to the examples.')
     )
 
+    objects = ExampleManager()
+
     class Meta:
         ordering = ('order',)
 
@@ -635,3 +654,7 @@ class Example(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def query_language_label(self):
+        return get_query_language_label(self.query_language)

@@ -12,6 +12,6 @@ class Command(BaseCommand):
             group, created = setup_group(name)
 
             if created:
-                print ('Group "%s" created' % name)
+                print (f'Group "{name}" created')
             else:
-                print ('Group "%s" updated' % name)
+                print (f'Group "{name}" updated')

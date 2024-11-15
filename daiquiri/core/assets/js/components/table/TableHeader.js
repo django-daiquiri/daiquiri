@@ -31,7 +31,6 @@ const TableHeader = ({ pageCount, params, setParams }) => {
     </li>
   )
 
-
   return (
     <div className="dq-table-header d-md-flex">
       <input

@@ -49,7 +49,7 @@ const JobDownload = ({ job }) => {
     case 'ERROR':
       return (
         <p className="text-danger">
-          {gettext('An error occured while creating the file.')}
+          {gettext('An error occurred while creating the file.')}
           {' '}
           {gettext('Please contact the maintainers of this site, if the problem persists.')}
         </p>

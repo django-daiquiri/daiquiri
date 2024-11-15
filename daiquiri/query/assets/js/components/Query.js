@@ -20,9 +20,9 @@ const Query = () => {
     setState({ jobId })
   }
 
-  const loadForm = (formKey, query = null) => {
+  const loadForm = (formKey, query = null, queryLanguage = null) => {
     updateLocation({ formKey })
-    setState({ formKey, query })
+    setState({ formKey, query, queryLanguage })
   }
 
   return state.jobs ? (
@@ -35,6 +35,7 @@ const Query = () => {
       formKey={state.formKey}
       jobId={state.jobId}
       query={state.query}
+      queryLanguage={state.queryLanguage}
       loadJobs={loadJobs}
       loadJob={loadJob}
       loadForm={loadForm}

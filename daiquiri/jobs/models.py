@@ -41,8 +41,8 @@ class Job(models.Model):
     JOB_TYPE_ASYNC = 'ASYNC'
     JOB_TYPE_INTERFACE = 'INTERFACE'
     JOB_TYPE_CHOICES = (
-        (JOB_TYPE_SYNC, _('Syncronous')),
-        (JOB_TYPE_ASYNC, _('Asyncronous')),
+        (JOB_TYPE_SYNC, _('Synchronous')),
+        (JOB_TYPE_ASYNC, _('Asynchronous')),
         (JOB_TYPE_INTERFACE, _('Interface')),
     )
 
@@ -52,7 +52,7 @@ class Job(models.Model):
 
     client_ip = models.GenericIPAddressField(blank=True, null=True)
 
-    response_format = models.CharField(max_length=64, blank=True, null=True)
+    response_format = models.CharField(max_length=64, blank=True, null=True)  # noqa: DJ001
     max_records = models.IntegerField(blank=True, null=True)
     run_id = models.CharField(max_length=64, blank=True, default='', db_index=True)
 
@@ -64,7 +64,7 @@ class Job(models.Model):
     execution_duration = models.PositiveIntegerField(blank=True, default=0)
     destruction_time = models.DateTimeField(blank=True, null=True)
 
-    error_summary = models.TextField(blank=True, null=True)
+    error_summary = models.TextField(blank=True, null=True)  # noqa: DJ001
 
     job_type = models.CharField(max_length=10, choices=JOB_TYPE_CHOICES)
 
@@ -82,7 +82,7 @@ class Job(models.Model):
             self.phase = self.PHASE_PENDING
             self.creation_time = now()
 
-        return super(Job, self).save(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
     @property
     def owner_username(self):

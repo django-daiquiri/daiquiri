@@ -2,9 +2,13 @@ from django.core.management.base import BaseCommand
 
 from daiquiri.metadata.models import Schema
 from daiquiri.tap.models import (
-    Schema as TapSchema,
-    Table as TapTable,
     Column as TapColumn,
+)
+from daiquiri.tap.models import (
+    Schema as TapSchema,
+)
+from daiquiri.tap.models import (
+    Table as TapTable,
 )
 from daiquiri.tap.utils import update_schema
 

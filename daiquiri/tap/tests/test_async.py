@@ -1,17 +1,16 @@
-import pytest
-from django.urls import reverse
+import xml.etree.ElementTree as et
 from unittest import mock
+
+import pytest
 
 from django.conf import settings
 from django.test import override_settings
-
-from daiquiri.query.models import QueryJob
+from django.urls import reverse
+from django.utils.http import urlencode
 
 import iso8601
 
-import xml.etree.ElementTree as et
-
-from django.utils.http import urlencode
+from daiquiri.query.models import QueryJob
 
 users = (
     ('admin', 'admin'),
@@ -58,7 +57,7 @@ uws_ns = '{http://www.ivoa.net/xml/UWS/v1.0}'
 
 
 @override_settings(QUERY_ANONYMOUS=True)
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_get_job_list_xml(db, client, username, password):
     '''
     GET /{jobs} returns the job list as <uws:jobs> xml element. The archived
@@ -80,7 +79,7 @@ def test_get_job_list_xml(db, client, username, password):
 
 
 @override_settings(QUERY_ANONYMOUS=True)
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_get_job_list_xml_phase(db, client, username, password):
     '''
     GET /{jobs}?PHASE=<phase> returns the filtered joblist as <jobs>
@@ -98,7 +97,7 @@ def test_get_job_list_xml_phase(db, client, username, password):
 
 
 @override_settings(QUERY_ANONYMOUS=True)
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_get_job_list_xml_after(db, client, username, password):
     '''
     GET /{jobs}?AFTER=2014-09-10T10:01:02.000 returns jobs with startTimes
@@ -117,7 +116,7 @@ def test_get_job_list_xml_after(db, client, username, password):
 
 
 @override_settings(QUERY_ANONYMOUS=True)
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_get_job_list_xml_last(db, client, username, password):
     '''
     GET /{jobs}?LAST=100 returns the given number of most recent jobs
@@ -135,7 +134,7 @@ def test_get_job_list_xml_last(db, client, username, password):
 
 
 @override_settings(QUERY_ANONYMOUS=True)
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('query', queries_public)
 def test_post_job_list_create_public(db, client, username, password, query):
     '''
@@ -158,7 +157,7 @@ def test_post_job_list_create_public(db, client, username, password, query):
 
 
 @override_settings(QUERY_ANONYMOUS=True)
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('query', queries_internal)
 def test_post_job_list_create_internal(db, client, username, password, query):
     '''
@@ -185,7 +184,7 @@ def test_post_job_list_create_internal(db, client, username, password, query):
 
 
 @override_settings(QUERY_ANONYMOUS=True)
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('query', queries_private)
 def test_post_job_list_create_private(db, client, username, password, query):
     '''
@@ -212,7 +211,7 @@ def test_post_job_list_create_private(db, client, username, password, query):
 
 
 @override_settings(QUERY_ANONYMOUS=True)
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('query', queries_public)
 def test_post_job_list_create_run(db, client, mocker, username, password, query):
     '''
@@ -243,7 +242,7 @@ def test_post_job_list_create_run(db, client, mocker, username, password, query)
 
 
 @override_settings(QUERY_ANONYMOUS=True)
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('pk', instances)
 def test_get_job_detail(db, client, username, password, pk):
     '''
@@ -264,7 +263,7 @@ def test_get_job_detail(db, client, username, password, pk):
 
 
 @override_settings(QUERY_ANONYMOUS=True)
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('pk', instances)
 def test_get_job_results(db, client, username, password, pk):
     '''
@@ -286,7 +285,7 @@ def test_get_job_results(db, client, username, password, pk):
 
 
 @override_settings(QUERY_ANONYMOUS=True)
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('pk', instances)
 def test_get_job_result(db, client, username, password, pk):
     '''
@@ -311,7 +310,7 @@ def test_get_job_result(db, client, username, password, pk):
 
 
 @override_settings(QUERY_ANONYMOUS=True)
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('pk', instances)
 def test_get_job_parameters(db, client, username, password, pk):
     '''
@@ -333,7 +332,7 @@ def test_get_job_parameters(db, client, username, password, pk):
 
 
 @override_settings(QUERY_ANONYMOUS=True)
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('pk', instances)
 def test_get_job_error(db, client, username, password, pk):
     '''
@@ -352,7 +351,7 @@ def test_get_job_error(db, client, username, password, pk):
 
 
 @override_settings(QUERY_ANONYMOUS=True)
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('pk', instances)
 def test_get_job_delete(db, client, username, password, pk):
     '''
@@ -376,7 +375,7 @@ def test_get_job_delete(db, client, username, password, pk):
 
 
 @override_settings(QUERY_ANONYMOUS=True)
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('pk', instances)
 def test_post_job_delete(db, client, username, password, pk):
     '''
@@ -400,7 +399,7 @@ def test_post_job_delete(db, client, username, password, pk):
 
 
 @override_settings(QUERY_ANONYMOUS=True)
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('pk', instances)
 def test_post_job_invalid(db, client, username, password, pk):
     '''
@@ -418,7 +417,7 @@ def test_post_job_invalid(db, client, username, password, pk):
 
 
 @override_settings(QUERY_ANONYMOUS=True)
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('pk', instances)
 def test_post_job_missing(db, client, username, password, pk):
     '''
@@ -436,7 +435,7 @@ def test_post_job_missing(db, client, username, password, pk):
 
 
 @override_settings(QUERY_ANONYMOUS=True)
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('pk', instances)
 def test_get_job_destruction(db, client, username, password, pk):
     '''
@@ -462,7 +461,7 @@ def test_get_job_destruction(db, client, username, password, pk):
 
 
 @override_settings(QUERY_ANONYMOUS=True)
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('pk', instances)
 def test_post_job_destruction(db, client, username, password, pk):
     '''
@@ -475,7 +474,8 @@ def test_post_job_destruction(db, client, username, password, pk):
     destruction_time = '2016-01-01T00:00:00'
 
     url = reverse(url_names['destruction'], kwargs={'pk': pk})
-    response = client.post(url, urlencode({'DESTRUCTION': destruction_time}), content_type='application/x-www-form-urlencoded')
+    response = client.post(url, urlencode({'DESTRUCTION': destruction_time}),
+                           content_type='application/x-www-form-urlencoded')
 
     if username == 'user':
         job = QueryJob.objects.get(pk=pk)
@@ -489,7 +489,7 @@ def test_post_job_destruction(db, client, username, password, pk):
 
 
 @override_settings(QUERY_ANONYMOUS=True)
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('pk', instances)
 def test_post_job_destruction_invalid(db, client, username, password, pk):
     '''
@@ -498,7 +498,8 @@ def test_post_job_destruction_invalid(db, client, username, password, pk):
     client.login(username=username, password=password)
 
     url = reverse(url_names['destruction'], kwargs={'pk': pk})
-    response = client.post(url, urlencode({'DESTRUCTION': 'not_a_date'}), content_type='application/x-www-form-urlencoded')
+    response = client.post(url, urlencode({'DESTRUCTION': 'not_a_date'}),
+                           content_type='application/x-www-form-urlencoded')
 
     if username == 'user':
         assert response.status_code == 400
@@ -507,7 +508,7 @@ def test_post_job_destruction_invalid(db, client, username, password, pk):
 
 
 @override_settings(QUERY_ANONYMOUS=True)
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('pk', instances)
 def test_post_job_destruction_missing(db, client, username, password, pk):
     '''
@@ -525,7 +526,7 @@ def test_post_job_destruction_missing(db, client, username, password, pk):
 
 
 @override_settings(QUERY_ANONYMOUS=True)
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('pk', instances)
 def test_get_job_executionduration(db, client, username, password, pk):
     '''
@@ -546,7 +547,7 @@ def test_get_job_executionduration(db, client, username, password, pk):
 
 
 @override_settings(QUERY_ANONYMOUS=True)
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('pk', instances)
 def test_post_job_executionduration(db, client, username, password, pk):
     '''
@@ -572,7 +573,7 @@ def test_post_job_executionduration(db, client, username, password, pk):
 
 
 @override_settings(QUERY_ANONYMOUS=True)
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('pk', instances)
 def test_post_job_executionduration_invalid(db, client, username, password, pk):
     '''
@@ -581,7 +582,8 @@ def test_post_job_executionduration_invalid(db, client, username, password, pk):
     client.login(username=username, password=password)
 
     url = reverse(url_names['executionduration'], kwargs={'pk': pk})
-    response = client.post(url, urlencode({'EXECUTIONDURATION': 'not_an_integer'}), content_type='application/x-www-form-urlencoded')
+    response = client.post(url, urlencode({'EXECUTIONDURATION': 'not_an_integer'}),
+                           content_type='application/x-www-form-urlencoded')
 
     if username == 'user':
         assert response.status_code == 400
@@ -590,7 +592,7 @@ def test_post_job_executionduration_invalid(db, client, username, password, pk):
 
 
 @override_settings(QUERY_ANONYMOUS=True)
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('pk', instances)
 def test_post_job_executionduration_missing(db, client, username, password, pk):
     '''
@@ -608,7 +610,7 @@ def test_post_job_executionduration_missing(db, client, username, password, pk):
 
 
 @override_settings(QUERY_ANONYMOUS=True)
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('pk', instances)
 def test_get_job_phase(db, client, username, password, pk):
     '''
@@ -629,7 +631,7 @@ def test_get_job_phase(db, client, username, password, pk):
 
 
 @override_settings(QUERY_ANONYMOUS=True)
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('pk', instances)
 def test_post_job_phase_run(db, client, mocker, username, password, pk):
     '''
@@ -664,7 +666,7 @@ def test_post_job_phase_run(db, client, mocker, username, password, pk):
 
 
 @override_settings(QUERY_ANONYMOUS=True)
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('pk', instances)
 def test_post_job_phase_abort(db, client, username, password, pk):
     '''
@@ -694,7 +696,7 @@ def test_post_job_phase_abort(db, client, username, password, pk):
 
 
 @override_settings(QUERY_ANONYMOUS=True)
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('pk', instances)
 def test_post_job_phase_invalid(db, client, username, password, pk):
     '''
@@ -712,7 +714,7 @@ def test_post_job_phase_invalid(db, client, username, password, pk):
 
 
 @override_settings(QUERY_ANONYMOUS=True)
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('pk', instances)
 def test_post_job_phase_missing(db, client, username, password, pk):
     '''
@@ -730,7 +732,7 @@ def test_post_job_phase_missing(db, client, username, password, pk):
 
 
 @override_settings(QUERY_ANONYMOUS=True)
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('pk', instances)
 def test_post_job_phase_unsupported(db, client, username, password, pk):
     '''
@@ -748,7 +750,7 @@ def test_post_job_phase_unsupported(db, client, username, password, pk):
 
 
 @override_settings(QUERY_ANONYMOUS=True)
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('pk', instances)
 def test_get_job_quote(db, client, username, password, pk):
     '''
@@ -767,7 +769,7 @@ def test_get_job_quote(db, client, username, password, pk):
 
 
 @override_settings(QUERY_ANONYMOUS=True)
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('pk', instances)
 def test_get_job_owner(db, client, username, password, pk):
     '''

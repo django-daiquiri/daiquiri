@@ -1,4 +1,5 @@
 from django import template
+
 from daiquiri.contact.models import AnnouncementMessage
 
 register = template.Library()

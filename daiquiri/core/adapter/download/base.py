@@ -1,18 +1,18 @@
-import logging
 import csv
-import subprocess
+import logging
 import re
+import subprocess
 
 from django.apps import apps
 from django.conf import settings
 
-from daiquiri.core.generators import generate_csv, generate_votable, generate_fits
+from daiquiri.core.generators import generate_csv, generate_fits, generate_votable
 from daiquiri.core.utils import get_doi_url
 
 logger = logging.getLogger(__name__)
 
 
-class BaseDownloadAdapter(object):
+class BaseDownloadAdapter:
 
     def __init__(self, database_key, database_config):
         self.database_key = database_key
@@ -53,9 +53,9 @@ class BaseDownloadAdapter(object):
 
     def generate_dump(self):
         # log the arguments
-        logger.debug('execute "%s"' % ' '.join(self.args))
+        logger.debug('execute "%s"', ' '.join(self.args))
 
-        # excecute the subprocess
+        # execute the subprocess
         try:
             process = subprocess.Popen(self.args, stdout=subprocess.PIPE)
 
@@ -64,13 +64,13 @@ class BaseDownloadAdapter(object):
                     yield line.decode()
 
         except subprocess.CalledProcessError as e:
-            logger.error('Command PIPE returned non-zero exit status: %s' % e)
+            logger.error('Command PIPE returned non-zero exit status: %s', e)
 
     def generate_rows(self, prepend=None):
         # log the arguments
-        logger.debug('execute "%s"' % ' '.join(self.args))
+        logger.debug('execute "%s"', ' '.join(self.args))
 
-        # excecute the subprocess
+        # execute the subprocess
         try:
             process = subprocess.Popen(self.args, stdout=subprocess.PIPE)
 
@@ -83,12 +83,15 @@ class BaseDownloadAdapter(object):
                     row = next(reader)
 
                     if prepend:
-                        yield [(prepend[i] + cell if (i in prepend and cell != 'NULL') else cell) for i, cell in enumerate(row)]
+                        yield [
+                            (prepend[i] + cell if (i in prepend and cell != 'NULL') else cell)
+                            for i, cell in enumerate(row)
+                        ]
                     else:
                         yield row
 
         except subprocess.CalledProcessError as e:
-            logger.error('Command PIPE returned non-zero exit status: %s' % e)
+            logger.error('Command PIPE returned non-zero exit status: %s' , e)
 
     def get_prepend(self, columns):
         if not settings.FILES_BASE_URL:
@@ -108,10 +111,7 @@ class BaseDownloadAdapter(object):
         return prepend
 
     def get_table_name(self, schema_name, table_name):
-        return '%(schema_name)s.%(table_name)s' % {
-            'schema_name': schema_name,
-            'table_name': table_name
-        }
+        return f'{schema_name}.{table_name}'
 
     def get_infos(self, query_status, query, query_language, sources):
         infos = [
@@ -121,13 +121,13 @@ class BaseDownloadAdapter(object):
         ]
 
         for source in sources:
-            infos.append(('SOURCE', '%(schema_name)s.%(table_name)s' % source))
+            infos.append(('SOURCE', '{schema_name}.{table_name}'.format(**source)))
 
         return infos
 
     def get_links(self, sources):
         return [(
-            '%(schema_name)s.%(table_name)s' % source,
+            '{schema_name}.{table_name}'.format(**source),
             'doc',
             get_doi_url(source['doi']) if source['doi'] else source['url']
         ) for source in sources]

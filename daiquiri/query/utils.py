@@ -9,7 +9,7 @@ import requests
 from astropy.io.votable import parse_single_table
 
 from daiquiri.core.adapter import DatabaseAdapter
-from daiquiri.core.utils import import_class, handle_file_upload, human2bytes
+from daiquiri.core.utils import handle_file_upload, human2bytes, import_class
 from daiquiri.metadata.models import Column, Table
 
 
@@ -166,7 +166,7 @@ def get_job_sources(job):
                 )
 
                 if settings.METADATA_BASE_URL:
-                    metadata_url = '%s/%s/%s' % (settings.METADATA_BASE_URL.strip('/'), schema_name, table_name)
+                    metadata_url = '{}/{}/{}'.format(settings.METADATA_BASE_URL.strip('/'), schema_name, table_name)
                 else:
                     metadata_url = ''
 
@@ -349,8 +349,8 @@ def ingest_table(schema_name, table_name, file_path, drop_table=False):
 def get_query_form(form_key):
     try:
         return next(form for form in settings.QUERY_FORMS if form.get('key') == form_key)
-    except StopIteration:
-        raise RuntimeError(f'Query form "{form_key}"" not found.')
+    except StopIteration as e:
+        raise RuntimeError(f'Query form "{form_key}"" not found.') from e
 
 
 def get_query_form_adapter(form):
@@ -358,14 +358,22 @@ def get_query_form_adapter(form):
     if adapter_class:
         try:
             return import_class(form['adapter'])()
-        except AttributeError:
-            raise RuntimeError(f'Query form adapter "{adapter_class}"" could not be imported.')
+        except AttributeError as e:
+            raise RuntimeError(f'Query form adapter "{adapter_class}"" could not be imported.') from e
 
 
 def get_query_language_choices():
     return [
         (query_language['key'], query_language['label']) for query_language in settings.QUERY_LANGUAGES
     ]
+
+
+def get_query_language_label(query_language):
+    return next(iter(
+        ql['label']
+        for ql in settings.QUERY_LANGUAGES
+        if query_language in [ql['key'], '{key}-{version}'.format(**ql)]
+    ), None)
 
 
 def get_queue_choices():

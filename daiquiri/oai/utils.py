@@ -28,8 +28,8 @@ def update_records(resource_type, resource):
     if resource_type in adapter.resource_types:
         try:
             resource_id, identifier, datestamp, set_spec, public = adapter.get_record(resource_type, resource)
-        except TypeError:
-            raise RuntimeError('Could not obtain record for %s %s' % (resource_type, resource))
+        except TypeError as e:
+            raise RuntimeError(f'Could not obtain record for {resource_type} {resource}') from e
 
         if public is True:
             for metadata_prefix in adapter.get_metadata_prefixes(resource_type):
@@ -56,8 +56,8 @@ def delete_records(resource_type, resource):
     if resource_type in adapter.resource_types:
         try:
             resource_id, identifier, datestamp, set_spec, public = adapter.get_record(resource_type, resource)
-        except TypeError:
-            raise RuntimeError('Could not obtain record for %s %s' % (resource_type, resource))
+        except TypeError as e:
+            raise RuntimeError(f'Could not obtain record for {resource_type} {resource}') from e
 
         for metadata_prefix in adapter.get_metadata_prefixes(resource_type):
             try:

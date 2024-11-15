@@ -1,10 +1,20 @@
 from django.urls import include, path, re_path
+
 from rest_framework import routers
 
 from .views import QueryView
-from .viewsets import (DropdownViewSet, ExampleViewSet, FormViewSet,
-                       PhaseViewSet, QueryDownloadFormatViewSet, QueryJobViewSet, QueryLanguageViewSet,
-                       QueueViewSet, StatusViewSet, DownloadViewSet)
+from .viewsets import (
+    DownloadViewSet,
+    DropdownViewSet,
+    ExampleViewSet,
+    FormViewSet,
+    PhaseViewSet,
+    QueryDownloadFormatViewSet,
+    QueryJobViewSet,
+    QueryLanguageViewSet,
+    QueueViewSet,
+    StatusViewSet,
+)
 
 app_name = 'query'
 
@@ -25,5 +35,5 @@ urlpatterns = [
     path(r'api/', include(router.urls)),
 
     # query interface, needs to be last in list
-    re_path(r'', QueryView.as_view(), name='query'),
+    re_path(r'[A-Za-z0-9-]*/$', QueryView.as_view(), name='query'),
 ]

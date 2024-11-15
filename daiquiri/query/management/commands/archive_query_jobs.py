@@ -1,5 +1,4 @@
 import re
-
 from datetime import datetime, timedelta
 
 from django.contrib.auth.models import User
@@ -25,8 +24,8 @@ class Command(BaseCommand):
         else:
             try:
                 owner = User.objects.get(username=options['username'])
-            except User.DoesNotExist:
-                raise CommandError('User "%s" does not exist' % options['username'])
+            except User.DoesNotExist as e:
+                raise CommandError('User "{}" does not exist'.format(options['username'])) from e
 
         # parse keep -> before
         if options['keep']:
@@ -48,7 +47,7 @@ class Command(BaseCommand):
                 before = datetime.now() - delta
 
             else:
-                raise CommandError('User "%s" does not exist' % options['username'])
+                raise CommandError('User "{}" does not exist'.format(options['username']))
         else:
             before = None
 
@@ -64,7 +63,7 @@ class Command(BaseCommand):
                 archive = True
             else:
                 print('%i jobs found. Really archive these jobs? [yes/no]:' % jobs.count())
-                archive = raw_input().lower() in ['yes', 'y']
+                archive = input().lower() in ['yes', 'y']
 
             if archive:
                 for job in jobs:

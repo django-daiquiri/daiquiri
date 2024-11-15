@@ -16,7 +16,7 @@ from daiquiri.stats.models import Record
 class RunQueryTask(Task):
 
     def on_failure(self, exc, task_id, args, kwargs, einfo):
-        super(RunQueryTask, self).on_failure(exc, task_id, args, kwargs, einfo)
+        super().on_failure(exc, task_id, args, kwargs, einfo)
 
         # always import daiquiri packages inside the task
         from daiquiri.query.models import QueryJob
@@ -28,7 +28,7 @@ class RunQueryTask(Task):
         job_id = args[0]
 
         # log raised exception
-        logger.error('run_query %s raised an exception (%s)' % (job_id, exc))
+        logger.error('run_query %s raised an exception (%s)', job_id, exc)
 
         # set phase and error_summary of the crashed job
         job = QueryJob.objects.get(pk=job_id)
@@ -42,8 +42,7 @@ def run_database_query_task(job_id):
     # always import daiquiri packages inside the task
     from daiquiri.core.adapter import DatabaseAdapter
     from daiquiri.query.models import QueryJob
-    from daiquiri.query.utils import (get_job_columns, get_job_sources,
-                                      get_quota, ingest_uploads)
+    from daiquiri.query.utils import get_job_columns, get_job_sources, get_quota, ingest_uploads
     from daiquiri.stats.models import Record
 
     # get logger
@@ -76,24 +75,30 @@ def run_database_query_task(job_id):
 
         # set database and start time
         job.pid = adapter.fetch_pid()
-        job.actual_query = adapter.build_query(job.schema_name, job.table_name, job.native_query, job.timeout, job.max_records)
+        job.actual_query = adapter.build_query(
+            job.schema_name,
+            job.table_name,
+            job.native_query,
+            job.timeout,
+            job.max_records
+        )
         job.phase = job.PHASE_EXECUTING
         job.start_time = now()
         job.save()
 
-        logger.info('job %s started' % job.id)
+        logger.info('job %s started', job.id)
 
         # get the actual query and submit the job to the database
         try:
             job.metadata['upload_columns'] = ingest_uploads(job.uploads, job.owner)
 
-            # this is where the work ist done (and the time is spend)
+            # this is where the work is done (and the time is spend)
             adapter.submit_query(job.actual_query)
 
         except (ProgrammingError, InternalError, ValueError) as e:
             job.phase = job.PHASE_ERROR
             job.error_summary = str(e)
-            logger.info('job %s failed (%s)' % (job.id, job.error_summary))
+            logger.info('job %s failed (%s)', job.id, job.error_summary)
 
         except OperationalError as e:
             # load the job again and check if the job was killed
@@ -102,12 +107,12 @@ def run_database_query_task(job_id):
             if job.phase != job.PHASE_ABORTED:
                 job.phase = job.PHASE_ERROR
                 job.error_summary = str(e)
-                logger.info('job %s failed (%s)' % (job.id, job.error_summary))
+                logger.info('job %s failed (%s)', job.id, job.error_summary)
 
         else:
             # get additional information about the completed job
             job.phase = job.PHASE_COMPLETED
-            logger.info('job %s completed' % job.id)
+            logger.info('job %s completed', job.id)
 
         finally:
             # get timing and save the job object
@@ -189,7 +194,7 @@ def run_database_ingest_task(job_id, file_path):
         job.start_time = now()
         job.save()
 
-        logger.info('job %s started' % job.id)
+        logger.info('job %s started', job.id)
 
         # create the table and insert the data
         try:
@@ -198,7 +203,7 @@ def run_database_ingest_task(job_id, file_path):
         except (ProgrammingError, InternalError, ValueError) as e:
             job.phase = job.PHASE_ERROR
             job.error_summary = str(e)
-            logger.info('job %s failed (%s)' % (job.id, job.error_summary))
+            logger.info('job %s failed (%s)', job.id, job.error_summary)
 
         except OperationalError as e:
             # load the job again and check if the job was killed
@@ -207,12 +212,12 @@ def run_database_ingest_task(job_id, file_path):
             if job.phase != job.PHASE_ABORTED:
                 job.phase = job.PHASE_ERROR
                 job.error_summary = str(e)
-                logger.info('job %s failed (%s)' % (job.id, job.error_summary))
+                logger.info('job %s failed (%s)', job.id, job.error_summary)
 
         else:
             # get additional information about the completed job
             job.phase = job.PHASE_COMPLETED
-            logger.info('job %s completed' % job.id)
+            logger.info('job %s completed', job.id)
 
         finally:
             # get timing and save the job object
@@ -259,7 +264,7 @@ def create_download_table_task(download_id):
 
     if download_job.phase == download_job.PHASE_QUEUED:
         # log start
-        logger.info('download_job %s started' % download_job.file_path)
+        logger.info('download_job %s started', download_job.file_path)
 
         # create directory if necessary
         try:
@@ -286,12 +291,12 @@ def create_download_table_task(download_id):
             download_job.phase = download_job.PHASE_ERROR
             download_job.error_summary = str(e)
             download_job.save()
-            logger.info('download_job %s failed (%s)' % (download_job.id, download_job.error_summary))
+            logger.info('download_job %s failed (%s)', download_job.id, download_job.error_summary)
 
             raise e
         else:
             download_job.phase = download_job.PHASE_COMPLETED
-            logger.info('download_job %s completed' % download_job.file_path)
+            logger.info('download_job %s completed', download_job.file_path)
             Record.objects.create(
                 time=download_job.start_time,
                 resource_type='CREATE_FILE',
@@ -321,7 +326,7 @@ def create_download_archive_task(archive_id):
 
     if archive_job.phase == archive_job.PHASE_QUEUED:
         # log start
-        logger.info('create_archive_zip_file %s started' % archive_job.file_path)
+        logger.info('create_archive_zip_file %s started', archive_job.file_path)
 
         # create directory if necessary
         try:
@@ -344,7 +349,7 @@ def create_download_archive_task(archive_id):
             archive_job.phase = archive_job.PHASE_ERROR
             archive_job.error_summary = str(e)
             archive_job.save()
-            logger.info('archive_job %s failed (%s)' % (archive_job.id, archive_job.error_summary))
+            logger.info('archive_job %s failed (%s)', archive_job.id, archive_job.error_summary)
             raise e
 
         archive_job.end_time = now()
@@ -363,7 +368,7 @@ def create_download_archive_task(archive_id):
         )
 
         # log completion
-        logger.info('create_archive_zip_file %s completed' % archive_job.file_path)
+        logger.info('create_archive_zip_file %s completed', archive_job.file_path)
 
 
 @shared_task(base=Task)
@@ -385,7 +390,7 @@ def drop_database_table_task(schema_name, table_name):
 
 
 @shared_task(base=Task)
-def abort_databae_query_task(pid):
+def abort_database_query_task(pid):
     from daiquiri.core.adapter import DatabaseAdapter
 
     # abort the job on the database

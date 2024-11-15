@@ -8,8 +8,8 @@ const TableHandle = ({ columnIndex, widths, setWidths }) => {
     const initialPosition = mouseDownEvent.pageX
 
     const onMouseMove = (mouseMoveEvent) => {
-      const newWiths = initialSize - initialPosition + mouseMoveEvent.pageX
-      setWidths(widths.map((width, index) => (columnIndex == index ? newWiths : width)))
+      const newWidths = initialSize - initialPosition + mouseMoveEvent.pageX
+      setWidths(widths.map((width, index) => (columnIndex == index ? newWidths : width)))
     }
 
     const onMouseUp = () => {

@@ -1,7 +1,7 @@
-import pytest
-
 from pathlib import Path
 from unittest import mock
+
+import pytest
 
 from django.conf import settings
 from django.test import override_settings
@@ -72,7 +72,7 @@ private_queries = [
 format_keys = ('votable', 'csv', 'fits')
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_list(db, client, username, password):
     client.login(username=username, password=password)
 
@@ -98,7 +98,7 @@ def test_list_anonymous(db, client):
         assert response.json()['count'] == 0
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('pk', instances)
 def test_detail(db, client, username, password, pk):
     client.login(username=username, password=password)
@@ -129,7 +129,7 @@ def test_create_public(db, client, mocker, query):
     assert response.status_code == 201, response.json()
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('query', internal_queries)
 def test_create_internal(db, client, mocker, username, password, query):
     mocker.patch(settings.ADAPTER_DATABASE + '.submit_query', mock.Mock())
@@ -148,7 +148,7 @@ def test_create_internal(db, client, mocker, username, password, query):
     assert response.status_code == status_map['create_internal'][username], response.json()
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('query', private_queries)
 def test_create_private(db, client, mocker, username, password, query):
     mocker.patch(settings.ADAPTER_DATABASE + '.submit_query', mock.Mock())
@@ -167,7 +167,7 @@ def test_create_private(db, client, mocker, username, password, query):
     assert response.status_code == status_map['create_private'][username], response.json()
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('pk', instances)
 def test_update(db, client, mocker, username, password, pk):
     mocker.patch(settings.ADAPTER_DATABASE + '.rename_table', mock.Mock())
@@ -186,7 +186,7 @@ def test_update(db, client, mocker, username, password, pk):
     assert instance.table_name == ('renamed' if response.status_code == 200 else instance_table_name)
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('pk', instances)
 def test_delete(db, client, mocker, username, password, pk):
     mocker.patch(settings.ADAPTER_DATABASE + '.drop_table', mock.Mock())
@@ -206,7 +206,7 @@ def test_delete(db, client, mocker, username, password, pk):
         assert instance.phase == instance_phase
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('pk', instances)
 def test_abort(db, client, username, password, pk):
     client.login(username=username, password=password)
@@ -224,7 +224,7 @@ def test_abort(db, client, username, password, pk):
         assert instance.phase == instance_phase
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('pk', instances)
 def test_rows(db, client, username, password, pk):
     client.login(username=username, password=password)
@@ -245,7 +245,7 @@ def test_rows(db, client, username, password, pk):
         assert response.status_code == 404
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('pk', instances)
 def test_columns(db, client, username, password, pk):
     client.login(username=username, password=password)
@@ -342,10 +342,7 @@ def test_stream_executing(db, client, format_key):
 
 
 def get_download_file_name(instance, format_key):
-    file_name = '%(username)s/%(table_name)s' % {
-        'username': instance.owner.username,
-        'table_name': instance.table_name
-    }
+    file_name = f'{instance.owner.username}/{instance.table_name}'
 
     if format_key == 'votable':
         return file_name + '.xml'

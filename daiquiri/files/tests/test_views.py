@@ -1,4 +1,5 @@
 import pytest
+
 from django.urls import reverse
 
 users = (
@@ -24,7 +25,7 @@ status_map = {
 }
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_html(db, client, username, password):
     client.login(username=username, password=password)
 
@@ -35,7 +36,7 @@ def test_html(db, client, username, password):
     assert response.status_code == status_map['html'][username]
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_html_a(db, client, username, password):
     client.login(username=username, password=password)
 
@@ -46,7 +47,7 @@ def test_html_a(db, client, username, password):
     assert response.status_code == status_map['html_a'][username]
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_html_a_a(db, client, username, password):
     client.login(username=username, password=password)
 
@@ -57,7 +58,7 @@ def test_html_a_a(db, client, username, password):
     assert response.status_code == status_map['html_a_a'][username]
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_html_a_b(db, client, username, password):
     client.login(username=username, password=password)
 

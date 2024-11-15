@@ -29,13 +29,16 @@ const JobOverview = ({ job, loadForm }) => {
         job.query && (
           <div className="card mb-3">
             <div className="card-header">
-              {gettext('Query')}
+              <div className="d-flex align-items-center">
+                {gettext('Query')}
+                <span className="badge text-bg-secondary ms-auto">{job.query_language_label}</span>
+              </div>
             </div>
             <div className="card-body">
               <Query query={job.query} />
             </div>
             <div className="card-footer">
-              <button className="btn btn-link" onClick={() => loadForm('sql', job.query)}>
+              <button className="btn btn-link" onClick={() => loadForm('sql', job.query, job.query_language)}>
                 {gettext('Open new query form with this query')}
               </button>
             </div>

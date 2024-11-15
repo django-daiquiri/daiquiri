@@ -1,6 +1,5 @@
-from django.shortcuts import render
 from django.http import Http404
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 
 from daiquiri.metadata.utils import get_user_columns
 

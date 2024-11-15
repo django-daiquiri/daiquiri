@@ -1,4 +1,5 @@
 import pytest
+
 from django.urls import reverse
 
 users = (
@@ -15,7 +16,7 @@ status_map = {
 }
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_users(db, client, username, password):
     client.login(username=username, password=password)
 

@@ -21,7 +21,7 @@ urlnames = {
 }
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_list(db, client, username, password):
     client.login(username=username, password=password)
 

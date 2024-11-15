@@ -9,11 +9,11 @@ from .models import QueryJob
 from .utils import get_quota
 
 
-class TableNameValidator(object):
+class TableNameValidator:
 
     requires_context = True
 
-    message = _('A job with this table name aready exists.')
+    message = _('A job with this table name already exists.')
     message_allowed_chars = _(
         'Please only use letters, numbers, hyphens or underscores.'
     )
@@ -40,7 +40,7 @@ class TableNameValidator(object):
                     pass
 
 
-class UploadFileValidator(object):
+class UploadFileValidator:
 
     requires_context = True
 
@@ -57,7 +57,7 @@ class UploadFileValidator(object):
             })
 
 
-class UploadParamValidator(object):
+class UploadParamValidator:
 
     requires_context = True
 
@@ -69,10 +69,10 @@ class UploadParamValidator(object):
         for upload in uploads:
             try:
                 resource_name, uri = upload.split(',')
-            except ValueError:
+            except ValueError as e:
                 raise ValidationError({
                     'UPLOAD': 'Field is not of the form resource_name:URI'
-                })
+                }) from e
 
             if uri.startswith('param:'):
                 file_name = uri[len('param:'):]
@@ -86,11 +86,11 @@ class UploadParamValidator(object):
                 # check if the file is in the body of the post request
                 if file_name not in request.data:
                     raise ValidationError({
-                        'UPLOAD': 'UPLOAD URI "%s" contains does not match uploaded file' % uri
+                        'UPLOAD': f'UPLOAD URI "{uri}" contains does not match uploaded file'
                     })
 
             elif uri.startswith('http:') or uri.startswith('https:'):
                 URLValidator()(uri)
 
             else:
-                raise ValidationError('UPLOAD URI "%s" is not supported' % uri)
+                raise ValidationError(f'UPLOAD URI "{uri}" is not supported')

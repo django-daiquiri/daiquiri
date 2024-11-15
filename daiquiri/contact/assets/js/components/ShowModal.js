@@ -41,7 +41,7 @@ const ShowModal = ({ modal, message }) => {
                     </dl>
                   </div>
                 </div>
-                <div className="modal-seperator"></div>
+                <div className="modal-separator"></div>
                 <dl>
                     <dt>{gettext('Subject')}</dt>
                     <dd>{message.subject}</dd>

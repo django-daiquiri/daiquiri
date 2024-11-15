@@ -587,7 +587,7 @@
       "table": 2,
       "order": 8,
       "name": "mass",
-      "description": "total mass of the FOF group",
+      "description": "total mass of the FOR group",
       "unit": "h-1.solMass",
       "ucd": "phys.mass",
       "utype": "",

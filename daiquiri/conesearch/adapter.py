@@ -76,7 +76,7 @@ class BaseConeSearchAdapter(BaseServiceAdapter):
                 if self.ranges[key]['min'] <= value <= self.ranges[key]['max']:
                     self.args[key] = value
                 else:
-                    errors[key] = [_('This value must be between %(min)g and %(max)g.' % self.ranges[key])]
+                    errors[key] = [_('This value must be between {min:g} and {max:g}.').format(**self.ranges[key])]
 
             except KeyError:
                 errors[key] = [_('This field may not be blank.')]
@@ -103,21 +103,21 @@ class SimpleConeSearchAdapter(BaseConeSearchAdapter):
         adapter = DatabaseAdapter()
 
         self.sql = '''
-SELECT %(id_field)s, %(ra_field)s, %(dec_field)s
-FROM %(schema)s.%(table)s
+SELECT {id_field}, {ra_field}, {dec_field}
+FROM {schema}.{table}
 WHERE
-    %(ra_field)s BETWEEN (%%(RA)s - 0.5 * %%(SR)s) AND (%%(RA)s + 0.5 * %%(SR)s)
+    {ra_field} BETWEEN (%(RA)s - 0.5 * %(SR)s) AND (%(RA)s + 0.5 * %(SR)s)
 AND
-    %(dec_field)s BETWEEN (%%(DEC)s - 0.5 * %%(SR)s) AND (%%(DEC)s + 0.5 * %%(SR)s)
-LIMIT %(limit)s
-''' % {
-            'id_field': adapter.escape_identifier('id'),
-            'ra_field': adapter.escape_identifier('ra'),
-            'dec_field': adapter.escape_identifier('dec'),
-            'schema': settings.CONESEARCH_SCHEMA,
-            'table': settings.CONESEARCH_TABLE,
-            'limit': self.max_records
-        }
+    {dec_field} BETWEEN (%(DEC)s - 0.5 * %(SR)s) AND (%(DEC)s + 0.5 * %(SR)s)
+LIMIT {limit}
+'''.format(
+            id_field=adapter.escape_identifier('id'),
+            ra_field=adapter.escape_identifier('ra'),
+            dec_field=adapter.escape_identifier('dec'),
+            schema=settings.CONESEARCH_SCHEMA,
+            table=settings.CONESEARCH_TABLE,
+            limit=self.max_records,
+        )
 
         self.args, errors = self.parse_query_dict(request)
 
@@ -144,16 +144,16 @@ class TableConeSearchAdapter(BaseConeSearchAdapter):
         # check if the user is allowed to access the schema
         try:
             schema = Schema.objects.filter_by_access_level(request.user).get(name=schema_name)
-        except Schema.DoesNotExist:
-            raise NotFound
+        except Schema.DoesNotExist as e:
+            raise NotFound from e
 
         # check if the user is allowed to access the table
         try:
             table = Table.objects.filter_by_access_level(request.user).filter(schema=schema).get(name=table_name)
-        except Table.DoesNotExist:
-            raise NotFound
+        except Table.DoesNotExist as e:
+            raise NotFound from e
 
-        # fetch the columns accoring to the verbosity
+        # fetch the columns according to the verbosity
         verb = data.get('VERB', '2')
 
         if verb == '1':
@@ -183,7 +183,7 @@ class TableConeSearchAdapter(BaseConeSearchAdapter):
                 if self.ranges[key]['min'] <= value <= self.ranges[key]['max']:
                     self.args[key] = value
                 else:
-                    errors[key] = [_('This value must be between %(min)g and %(max)g.' % self.ranges[key])]
+                    errors[key] = [_('This value must be between {min:g} and {max:g}.').format(**self.ranges[key])]
 
             except KeyError:
                 errors[key] = [_('This field may not be blank.')]

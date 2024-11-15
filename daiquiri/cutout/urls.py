@@ -2,7 +2,6 @@ from django.urls import re_path
 
 from .viewsets import CutOutViewSet
 
-
 app_name = 'cutout'
 
 urlpatterns = [

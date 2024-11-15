@@ -1,3 +1,6 @@
-// .dq-browser {
-//     --dq-browser-height: 400px;
-// }
+.codemirror {
+    .cm-content,
+    .cm-gutter {
+        min-height: 5rem;
+    }
+}

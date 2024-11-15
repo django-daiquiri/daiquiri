@@ -1,5 +1,5 @@
-import os
 import logging
+import os
 
 from django.conf import settings
 from django.contrib.auth.views import redirect_to_login
@@ -10,13 +10,7 @@ from django.shortcuts import render
 from django.views.generic import View
 
 from .search import Searcher
-from .utils import (
-        get_directory,
-        get_file_path,
-        render_with_layout,
-        send_file
-)
-
+from .utils import get_directory, get_file_path, render_with_layout, send_file
 
 logger = logging.getLogger(__name__)
 
@@ -70,4 +64,3 @@ class SearchView(View):
                 }
 
         return render(request, "files/search-results.html", context)
-

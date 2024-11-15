@@ -1,9 +1,9 @@
 from django.urls import include, path
+
 from rest_framework import routers
 
 from .views import ManagementView
 from .viewsets import RecordViewSet
-
 
 app_name = 'stats'
 

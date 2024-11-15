@@ -6,8 +6,8 @@ Sub-heading
 
 # Alternative heading #
 
-Paragraphs are separated 
+Paragraphs are separated
 by a blank line.
 
-Two spaces at the end of a line  
+Two spaces at the end of a line
 produce a line break.

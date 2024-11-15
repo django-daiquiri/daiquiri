@@ -10,16 +10,16 @@ const ArchiveDownload = ({ columns, onSubmit }) => {
     isImageColumn(column) || isNoteColumn(column) || isFileColumn(column)
   )
 
-  const achiveColumns = columns.filter(column => isArchiveColumn(column))
+  const archiveColumns = columns.filter(column => isArchiveColumn(column))
 
-  return !isEmpty(achiveColumns) && (
+  return !isEmpty(archiveColumns) && (
     <div className="card mb-4">
       <div className="card-header">
         {gettext('Download files')}
       </div>
       <ul className="list-group list-group-flush">
       {
-        achiveColumns.map((column, columnIndex) => (
+        archiveColumns.map((column, columnIndex) => (
           <li key={columnIndex} className="list-group-item">
             <button className="btn btn-link"
                     onClick={() => onSubmit({column_name: column.name})}>

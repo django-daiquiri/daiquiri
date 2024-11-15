@@ -2,7 +2,6 @@ from django.urls import re_path
 
 from .views import FileView, SearchView
 
-
 app_name = 'files'
 
 urlpatterns = [

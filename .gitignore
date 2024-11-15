@@ -29,5 +29,7 @@ build
 dist
 *.egg-info
 
+Makefile
+
 .imdone/
 .on-save.json

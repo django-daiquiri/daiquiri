@@ -20,7 +20,7 @@ import SchemasDropdown from './dropdowns/SchemasDropdown'
 import SimbadDropdown from './dropdowns/SimbadDropdown'
 import VizierDropdown from './dropdowns/VizierDropdown'
 
-const FormSql = ({ formKey, loadJob, query }) => {
+const FormSql = ({ formKey, loadJob, query, queryLanguage }) => {
   const { data: form } = useFormQuery(formKey)
   const { data: queues } = useQueuesQuery()
   const { data: queryLanguages } = useQueryLanguagesQuery()
@@ -29,9 +29,9 @@ const FormSql = ({ formKey, loadJob, query }) => {
 
   const [values, setValues] = useState({
     query: query || '',
+    query_language: queryLanguage || '',
     table_name: '',
     run_id: '',
-    query_language: '',
     queue: '',
   })
   const [errors, setErrors] = useState({})
@@ -210,7 +210,8 @@ const FormSql = ({ formKey, loadJob, query }) => {
 FormSql.propTypes = {
   formKey: PropTypes.string.isRequired,
   loadJob: PropTypes.func.isRequired,
-  query: PropTypes.string
+  query: PropTypes.string,
+  queryLanguage: PropTypes.string,
 }
 
 export default FormSql

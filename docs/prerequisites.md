@@ -163,7 +163,7 @@ yum install -y java-1.8.0-openjdk-headless
 ```
 
 
-debian 9 (strech)
+debian 9 (stretch)
 -----------------
 
 ### Distribution packages

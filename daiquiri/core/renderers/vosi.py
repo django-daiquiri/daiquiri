@@ -9,14 +9,14 @@ class AvailabilityRenderer(XMLRenderer):
             'xmlns:vosi': 'http://www.ivoa.net/xml/VOSITables/v1.0',
             'xmlns:vs': 'http://www.ivoa.net/xml/VODataService/v1.0',
             'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
-            'xsi:schemaLocation': 'http://www.ivoa.net/xml/VOSI/v1.0 http://www.ivoa.net/xml/VOSI/v1.0 http://www.ivoa.net/xml/VODataService/v1.0 http://www.ivoa.net/xml/VODataService/v1.0'
+            'xsi:schemaLocation': 'http://www.ivoa.net/xml/VOSI/v1.0 http://www.ivoa.net/xml/VOSI/v1.0 http://www.ivoa.net/xml/VODataService/v1.0 http://www.ivoa.net/xml/VODataService/v1.0'  # noqa: E501
         })
         self.node('available', {}, data.get('available'))
         self.node('note', {}, data.get('note'))
         self.end('vosi:availability')
 
 
-class CapabilitiesRendererMixin(object):
+class CapabilitiesRendererMixin:
 
     def render_capability(self, capability):
         self.start('capability', {
@@ -118,7 +118,7 @@ class CapabilitiesRenderer(CapabilitiesRendererMixin, XMLRenderer):
         self.end('vosi:capabilities')
 
 
-class TablesetRendererMixin(object):
+class TablesetRendererMixin:
 
     def render_tableset(self, tableset, strict=False):
         for schema in tableset:
@@ -156,7 +156,8 @@ class TablesetRendererMixin(object):
             self.end('schema')
 
     def render_datatype(self, datatype):
-        if datatype in ['boolean', 'bit', 'unsignedByte', 'short', 'int', 'long', 'char', 'unicodeChar', 'float', 'double', 'floatComplex', 'doubleComplex']:
+        if datatype in ['boolean', 'bit', 'unsignedByte', 'short', 'int', 'long', 'char', 'unicodeChar',
+                        'float', 'double', 'floatComplex', 'doubleComplex']:
             self.node('dataType', {'xsi:type': 'vs:VOTableType'}, datatype)
         elif datatype == 'timestamp':
             self.node('dataType', {'xsi:type': 'vs:VOTableType', 'extendedType': 'timestamp'}, 'char')

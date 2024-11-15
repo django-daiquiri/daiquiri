@@ -16,12 +16,12 @@ import RenameModal from 'daiquiri/query/assets/js/components/modals/RenameModal'
 import ShowModal from 'daiquiri/query/assets/js/components/modals/ShowModal'
 
 const Jobs = ({ loadForm, loadJob }) => {
-  const initalParams = {
+  const initialParams = {
     ordering: '-creation_time',
     phase: Object.keys(jobPhases).filter(key => key != 'ARCHIVED')
   }
 
-  const [params, setParams] = useState(initalParams)
+  const [params, setParams] = useState(initialParams)
   const [modalJob, setModalJob] = useState({})
 
   const showModal = useModal()
@@ -49,7 +49,7 @@ const Jobs = ({ loadForm, loadJob }) => {
   }
 
   const handleReset = () => {
-    setParams(initalParams)
+    setParams(initialParams)
   }
 
   const handleFilter = (phase) => {
@@ -105,7 +105,7 @@ const Jobs = ({ loadForm, loadJob }) => {
             )
           }
           <button className="btn btn-link" title={gettext('Open new query form with this query')}
-                  onClick={() => loadForm('sql', job.query)}>
+                  onClick={() => loadForm('sql', job.query, job.query_language)}>
             <i className="bi bi-play-circle"></i>
           </button>
           {

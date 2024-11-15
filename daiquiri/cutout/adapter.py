@@ -1,7 +1,7 @@
 from django.conf import settings
 
-from daiquiri.core.utils import import_class
 from daiquiri.core.adapter.stream import BaseServiceAdapter
+from daiquiri.core.utils import import_class
 
 
 def CutOutAdapter():

@@ -1,15 +1,14 @@
 import React, { useState } from 'react'
 import { renderToString } from 'react-dom/server'
 import PropTypes from 'prop-types'
-import classNames from 'classnames'
 
 import Ordering from 'daiquiri/core/assets/js/components/Ordering'
-import Popover from 'daiquiri/core/assets/js/components/Popover'
+import Template from 'daiquiri/core/assets/js/components/Template'
+import Tooltip from 'daiquiri/core/assets/js/components/Tooltip'
 
 import TableHandle from './TableHandle'
 
 const TableHead = ({ columns, params, setParams }) => {
-  const tooltips = true
   const ordering = params.ordering || ''
 
   const [widths, setWidths] = useState(columns.map(() => 300))
@@ -18,26 +17,28 @@ const TableHead = ({ columns, params, setParams }) => {
     setParams({...params, ordering: (ordering == column.name) ? '-' + column.name : column.name})
   }
 
-  const getPopoverTitle = (column) => renderToString(
-    <b>{column.name}</b>
-  )
+  const getTooltip = (column) => ({
+    placement: 'bottom',
+    title: renderToString(
+      <div>
+        <p className="mb-1">
+          <strong className="mb-1">{column.name}</strong>
+        </p>
+        {column.description && getTooltipParagraph(gettext('Description'), column.description)}
+        {column.unit && getTooltipParagraph(gettext('Unit'), column.unit)}
+        {column.ucd && getTooltipParagraph(gettext('UCD'), column.ucd)}
+        {column.datatype && getTooltipParagraph(gettext('Data type'), column.datatype)}
+        {column.arraysize && getTooltipParagraph(gettext('Array size'), column.arraysize)}
+        {column.principal && getTooltipParagraph(null, gettext('This column is considered a core part of the service.'))}
+        {column.indexed && getTooltipParagraph(null, gettext('This column is indexed.'))}
+        {column.std && getTooltipParagraph(null, gettext('This column is defined by a standard.'))}
+      </div>
+    )
+  })
 
-  const getPopoverContent = (column) => renderToString(
-    <div>
-      {column.description && getPopoverParagraph(gettext('Description'), column.description)}
-      {column.unit && getPopoverParagraph(gettext('Unit'), column.unit)}
-      {column.ucd && getPopoverParagraph(gettext('UCD'), column.ucd)}
-      {column.datatype && getPopoverParagraph(gettext('Data type'), column.datatype)}
-      {column.arraysize && getPopoverParagraph(gettext('Array size'), column.arraysize)}
-      {column.principal && getPopoverParagraph(null, gettext('This column is considered a core part of the service.'))}
-      {column.indexed && getPopoverParagraph(null, gettext('This column is indexed.'))}
-      {column.std && getPopoverParagraph(null, gettext('This column is defined by a standard.'))}
-    </div>
-  )
-
-  const getPopoverParagraph = (label, text) => (
-    <p>
-      {label && <strong>{label}</strong>} {text}
+  const getTooltipParagraph = (label, text) => (
+    <p className="mb-0">
+      {label && <strong>{label}:</strong>} <Template template={text} />
     </p>
   )
 
@@ -62,13 +63,9 @@ const TableHead = ({ columns, params, setParams }) => {
                     )
                   }
                 </div>
-                {
-                  tooltips && (
-                    <Popover title={getPopoverTitle(column)} content={getPopoverContent(column)}>
-                      <i className="bi bi-question-circle text-body-tertiary info me-1"></i>
-                    </Popover>
-                  )
-                }
+                <Tooltip tooltip={getTooltip(column)}>
+                  <i className="bi bi-question-circle text-body-tertiary info me-1"></i>
+                </Tooltip>
                 <Ordering column={column} ordering={ordering} onOrder={handleOrdering} />
                 {
                   columnIndex < (columns.length - 1) && (

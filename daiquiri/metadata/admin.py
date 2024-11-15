@@ -2,7 +2,7 @@ from django import forms
 from django.conf import settings
 from django.contrib import admin
 
-from .models import Schema, Table, Column, Function
+from .models import Column, Function, Schema, Table
 
 
 class SchemaAdminForm(forms.ModelForm):

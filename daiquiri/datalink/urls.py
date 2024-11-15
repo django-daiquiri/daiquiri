@@ -1,6 +1,7 @@
-from daiquiri.jobs.routers import JobRouter
 from django.urls import include, path, re_path
 from django.views.generic import TemplateView
+
+from daiquiri.jobs.routers import JobRouter
 
 from .views import availability, capabilities, datalink, datalink_semantics
 from .viewsets import SyncDatalinkJobViewSet

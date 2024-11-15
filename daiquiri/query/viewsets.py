@@ -1,58 +1,54 @@
 import os
-
 from collections import OrderedDict
+
+from django.conf import settings
+from django.http import FileResponse, Http404
+from django.utils.timezone import now
+
+from rest_framework import filters, mixins, status, viewsets
+from rest_framework.authentication import BasicAuthentication, SessionAuthentication, TokenAuthentication
+from rest_framework.decorators import action
+from rest_framework.exceptions import NotFound, ValidationError
+from rest_framework.response import Response
 
 from django_sendfile import sendfile
 
-from django.conf import settings
-from django.http import Http404, FileResponse
-from django.utils.timezone import now
-
-from rest_framework import viewsets, mixins, filters, status
-from rest_framework.response import Response
-from rest_framework.exceptions import ValidationError, NotFound
-from rest_framework.decorators import action
-from rest_framework.authentication import (
-    SessionAuthentication,
-    BasicAuthentication,
-    TokenAuthentication
-)
-
-from daiquiri.core.viewsets import ChoicesViewSet, RowViewSetMixin
-from daiquiri.core.permissions import HasModelPermission
 from daiquiri.core.paginations import ListPagination
+from daiquiri.core.permissions import HasModelPermission
 from daiquiri.core.utils import (
+    filter_by_access_level,
+    fix_for_json,
     get_client_ip,
     get_file_size,
-    fix_for_json,
-    filter_by_access_level,
     handle_file_upload,
-    import_class
+    import_class,
 )
-from daiquiri.jobs.viewsets import SyncJobViewSet, AsyncJobViewSet
+from daiquiri.core.viewsets import ChoicesViewSet, RowViewSetMixin
+from daiquiri.jobs.viewsets import AsyncJobViewSet, SyncJobViewSet
 from daiquiri.stats.models import Record
 
-from .models import QueryJob, DownloadJob, Example
+from .filters import JobFilterBackend
+from .models import DownloadJob, Example, QueryJob
+from .permissions import HasPermission
 from .serializers import (
+    AsyncQueryJobSerializer,
+    DownloadSerializer,
+    DropdownSerializer,
+    ExampleSerializer,
     FormDetailSerializer,
     FormListSerializer,
-    DropdownSerializer,
-    DownloadSerializer,
     QueryDownloadFormatSerializer,
-    QueryJobSerializer,
-    QueryJobRetrieveSerializer,
     QueryJobCreateSerializer,
     QueryJobFormSerializer,
     QueryJobIndexSerializer,
+    QueryJobRetrieveSerializer,
+    QueryJobSerializer,
     QueryJobUpdateSerializer,
     QueryJobUploadSerializer,
     QueryLanguageSerializer,
-    ExampleSerializer,
-    UserExampleSerializer,
     SyncQueryJobSerializer,
-    AsyncQueryJobSerializer
+    UserExampleSerializer,
 )
-from .permissions import HasPermission
 from .utils import (
     fetch_user_schema_metadata,
     get_download_config,
@@ -60,10 +56,8 @@ from .utils import (
     get_quota,
     get_user_upload_directory,
     handle_upload_param,
-    ingest_uploads
+    ingest_uploads,
 )
-
-from .filters import JobFilterBackend
 
 
 class StatusViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -90,8 +84,8 @@ class FormViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.Gen
     def get_object(self):
         try:
             return next(form for form in self.get_queryset() if form.get('key') == self.kwargs.get('pk'))
-        except StopIteration:
-            raise Http404
+        except StopIteration as e:
+            raise Http404 from e
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -155,7 +149,7 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
         if self.action == 'create':
             self.throttle_scope = 'query.create'
 
-        return super(QueryJobViewSet, self).get_throttles()
+        return super().get_throttles()
 
     def perform_create(self, serializer):
         job = QueryJob(
@@ -241,15 +235,15 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
 
             serializer = QueryJobRetrieveSerializer(instance=job)
             return Response(serializer.data)
-        except QueryJob.DoesNotExist:
-            raise Http404
+        except QueryJob.DoesNotExist as e:
+            raise Http404 from e
 
     @action(detail=True, methods=['get'])
     def rows(self, request, pk=None):
         try:
             job = self.get_queryset().get(pk=pk)
-        except QueryJob.DoesNotExist:
-            raise NotFound
+        except QueryJob.DoesNotExist as e:
+            raise NotFound from e
 
         # get the row query params from the request
         ordering, page, page_size, search, filters = self._get_query_params(job.columns())
@@ -272,8 +266,8 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
     def columns(self, request, pk=None, format_key=None):
         try:
             job = self.get_queryset().get(pk=pk)
-        except QueryJob.DoesNotExist:
-            raise NotFound
+        except QueryJob.DoesNotExist as e:
+            raise NotFound from e
 
         return Response(job.columns())
 
@@ -282,19 +276,19 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
     def download(self, request, pk=None, download_key=None, download_job_id=None):
         try:
             self.get_queryset().get(pk=pk)
-        except QueryJob.DoesNotExist:
-            raise NotFound
+        except QueryJob.DoesNotExist as e:
+            raise NotFound from e
 
         download_config = get_download_config(download_key)
         if download_config is None:
-            raise ValidationError({'download': 'Download key "{}" is not supported.'.format(download_key)})
+            raise ValidationError({'download': f'Download key "{download_key}" is not supported.'})
 
         download_job_model = import_class(download_config['model'])
 
         try:
             download_job = download_job_model.objects.get(query_job=pk, pk=download_job_id)
-        except download_job_model.DoesNotExist:
-            raise NotFound
+        except download_job_model.DoesNotExist as e:
+            raise NotFound from e
 
         if download_job.phase == download_job.PHASE_COMPLETED and request.GET.get('download', True):
             Record.objects.create(
@@ -321,12 +315,12 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
     def create_download(self, request, pk=None, download_key=None):
         try:
             job = self.get_queryset().get(pk=pk)
-        except QueryJob.DoesNotExist:
-            raise NotFound
+        except QueryJob.DoesNotExist as e:
+            raise NotFound from e
 
         download_config = get_download_config(download_key)
         if download_config is None:
-            raise ValidationError({'download': 'Download key "{}" is not supported.'.format(download_key)})
+            raise ValidationError({'download': f'Download key "{download_key}" is not supported.'})
 
         download_job_model = import_class(download_config['model'])
 
@@ -366,13 +360,13 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
     def stream(self, request, pk=None, format_key=None):
         try:
             job = self.get_queryset().get(pk=pk)
-        except QueryJob.DoesNotExist:
-            raise NotFound
+        except QueryJob.DoesNotExist as e:
+            raise NotFound from e
 
         try:
             format_config = get_format_config(format_key)
-        except IndexError:
-            raise ValidationError({'format': "Not supported."})
+        except IndexError as e:
+            raise ValidationError({'format': "Not supported."}) from e
 
         try:
             download_job = DownloadJob.objects.get(query_job=job, format_key=format_key)

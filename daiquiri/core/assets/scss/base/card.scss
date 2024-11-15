@@ -2,7 +2,7 @@
     .card-body {
         padding: 0.5rem 1rem;
 
-        p {
+        p, ul, ol {
             &:last-child {
                 margin-bottom: 0;
             }

@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import TableHead from './TableHead'
 import TableBody from './TableBody'
 
-const TablePane = ({ columns, rows, params, active, setParams, onClick }) => {
+const TablePane = ({ columns, rows, params, active, setParams, setActive, showModal }) => {
 
   return (
     <div className="dq-table-pane">
@@ -18,7 +18,8 @@ const TablePane = ({ columns, rows, params, active, setParams, onClick }) => {
           columns={columns}
           rows={rows}
           active={active}
-          onClick={onClick}
+          setActive={setActive}
+          showModal={showModal}
         />
       </table>
     </div>
@@ -31,7 +32,8 @@ TablePane.propTypes = {
   params: PropTypes.object.isRequired,
   active: PropTypes.object.isRequired,
   setParams: PropTypes.func.isRequired,
-  onClick: PropTypes.func.isRequired
+  setActive: PropTypes.func.isRequired,
+  showModal: PropTypes.func.isRequired
 }
 
 export default TablePane

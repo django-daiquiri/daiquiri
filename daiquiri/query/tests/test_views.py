@@ -20,7 +20,7 @@ status_map = {
 }
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_query(db, client, username, password):
     client.login(username=username, password=password)
 

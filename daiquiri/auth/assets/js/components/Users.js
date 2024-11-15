@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { isEmpty, isNil, omit } from 'lodash'
+import { isUndefined, isNil, omit } from 'lodash'
 
 import { useModal } from 'daiquiri/core/assets/js/hooks/modal'
 import { isStaff, userId } from 'daiquiri/core/assets/js/utils/meta'
@@ -15,11 +15,11 @@ import UpdateModal from './UpdateModal.js'
 import ConfirmModal from './ConfirmModal.js'
 
 const Users = () => {
-  const initalParams = {
+  const initialParams = {
     ordering: '-user__date_joined'
   }
 
-  const [params, setParams] = useState(initalParams)
+  const [params, setParams] = useState(initialParams)
 
   const showModal = useModal()
   const updateModal = useModal()
@@ -61,7 +61,7 @@ const Users = () => {
   }
 
   const handleReset = () => {
-    setParams(initalParams)
+    setParams(initialParams)
   }
 
   const handleOrdering = (column) => {
@@ -254,7 +254,7 @@ const Users = () => {
     </div>
   )
 
-  return !isEmpty(settings) && !isEmpty(groups) && (
+  return !isUndefined(settings) && !isUndefined(groups) && (
     <div className="messages">
       <List
         columns={columns}

@@ -1,4 +1,5 @@
 import pytest
+
 from django.urls import reverse
 
 users = (
@@ -9,7 +10,7 @@ users = (
 )
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_public_table(db, client, username, password):
     client.login(username=username, password=password)
 
@@ -21,7 +22,7 @@ def test_public_table(db, client, username, password):
     assert response.status_code == 200
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_internal_table(db, client, username, password):
     client.login(username=username, password=password)
 
@@ -33,7 +34,7 @@ def test_internal_table(db, client, username, password):
     assert response.status_code == 404 if username == 'anonymous' else 200
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_private_table(db, client, username, password):
     client.login(username=username, password=password)
 
@@ -45,7 +46,7 @@ def test_private_table(db, client, username, password):
     assert response.status_code == 200 if username == 'test' else 404
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_non_existing_schema(db, client, username, password):
     client.login(username=username, password=password)
 
@@ -57,7 +58,7 @@ def test_non_existing_schema(db, client, username, password):
     assert response.status_code == 404
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_non_existing_table(db, client, username, password):
     client.login(username=username, password=password)
 
@@ -69,7 +70,7 @@ def test_non_existing_table(db, client, username, password):
     assert response.status_code == 404
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_non_existing_user_table(db, client, username, password):
     client.login(username=username, password=password)
 

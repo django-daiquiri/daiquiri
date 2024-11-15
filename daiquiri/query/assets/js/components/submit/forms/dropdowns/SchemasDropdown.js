@@ -15,7 +15,7 @@ const SchemasDropdown = ({ onDoubleClick }) => {
 
   const getTooltip = (type, item) => {
     return {
-      title: item.description + (isEmpty(item.unit) ? '' : `</br><b>Unit:</b> ${item.unit}`),
+      title: (item.description || '') + (isEmpty(item.unit) ? '' : `</br><b>Unit:</b> ${item.unit}`),
       placement: 'left'
     }
   }
