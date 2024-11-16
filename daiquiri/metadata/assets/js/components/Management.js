@@ -18,6 +18,7 @@ import EditFunction from './EditFunction'
 
 const Management = () => {
   const [activeItem, setActiveItem] = useState(null)
+  const [success, setSuccess] = useState(null)
   const [values, setValues] = useState({})
   const [errors, setErrors] = useState({})
 
@@ -54,7 +55,7 @@ const Management = () => {
   }
 
   const handleUpdate = () => {
-    updateMutation.mutate({ values, setErrors })
+    updateMutation.mutate({ success, values, setSuccess, setErrors })
   }
 
   return (
@@ -87,6 +88,7 @@ const Management = () => {
           <EditSchema
             values={values}
             errors={errors}
+            success={success}
             setValues={setValues}
             onSave={handleUpdate} />
         )
@@ -96,6 +98,7 @@ const Management = () => {
           <EditTable
             values={values}
             errors={errors}
+            success={success}
             setValues={setValues}
             onDiscover={handleDiscover}
             onSave={handleUpdate} />
@@ -106,6 +109,7 @@ const Management = () => {
           <EditColumn
             values={values}
             errors={errors}
+            success={success}
             setValues={setValues}
             onDiscover={handleDiscover}
             onSave={handleUpdate}
@@ -117,6 +121,7 @@ const Management = () => {
           <EditFunction
             values={values}
             errors={errors}
+            success={success}
             setValues={setValues}
             onSave={handleUpdate} />
         )

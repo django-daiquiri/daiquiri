@@ -46,9 +46,15 @@ export const useUpdateMetadataMutation = () => {
           return MetadataApi.updateFunction(variables.values.id, variables.values)
       }
     },
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['managementSchemas'] })
       queryClient.invalidateQueries({ queryKey: ['managementFunctions'] })
+      variables.setSuccess(true)
+
+      // set the success flag and start the timeout to remove it. the flag is actually
+      // the stored timeout, so we can cancel any old timeout before starting the a new one
+      clearTimeout(variables.success)
+      variables.setSuccess(setTimeout(() => variables.setSuccess(null), 1000))
     },
     onError: (error) => {
       console.log(error)

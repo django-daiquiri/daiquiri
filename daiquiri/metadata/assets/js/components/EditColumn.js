@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import classNames from 'classnames'
 import { isUndefined } from 'lodash'
 
 import { useGroupsQuery } from 'daiquiri/auth/assets/js/hooks/queries'
@@ -11,7 +12,7 @@ import Input from 'daiquiri/core/assets/js/components/form/Input'
 import Markdown from 'daiquiri/core/assets/js/components/form/Markdown'
 import Select from 'daiquiri/core/assets/js/components/form/Select'
 
-const EditColumn = ({ values, errors, setValues, onDiscover, onSave }) => {
+const EditColumn = ({ values, success, errors, setValues, onDiscover, onSave }) => {
   const { data: accessLevels } = useAccessLevelsQuery()
   const { data: meta } = useMetaQuery()
   const { data: groups } = useGroupsQuery()
@@ -21,6 +22,11 @@ const EditColumn = ({ values, errors, setValues, onDiscover, onSave }) => {
       <span className="me-auto">
         <strong>{gettext('Column')}</strong> {values.label}
       </span>
+      <div className={classNames('d-flex align-items-center text-success success-indicator me-2', {
+        show: success
+      })}>
+        <div className="bi bi-check"></div>
+      </div>
       <a className="btn btn-secondary btn-sm me-2" href={values.admin_url} target="_blank" rel="noreferrer">
         {gettext('Admin')}
       </a>
@@ -94,7 +100,7 @@ const EditColumn = ({ values, errors, setValues, onDiscover, onSave }) => {
               <Input
                 label={meta.column.arraysize.verbose_name}
                 help={meta.column.arraysize.help_text}
-                value={values.arraysize}
+                value={values.arraysize || ''}
                 disabled />
             </div>
             <div className="col-md-4">
@@ -178,6 +184,7 @@ const EditColumn = ({ values, errors, setValues, onDiscover, onSave }) => {
 EditColumn.propTypes = {
   values: PropTypes.object,
   errors: PropTypes.object,
+  success: PropTypes.number,
   setValues: PropTypes.func.isRequired,
   onDiscover: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired

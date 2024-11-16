@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import classNames from 'classnames'
 
 import { useGroupsQuery } from 'daiquiri/auth/assets/js/hooks/queries'
 
@@ -12,7 +13,7 @@ import Select from 'daiquiri/core/assets/js/components/form/Select'
 
 import EditName from './EditName'
 
-const EditTable = ({ values, errors, setValues, onDiscover, onSave }) => {
+const EditTable = ({ values, success, errors, setValues, onDiscover, onSave }) => {
   const { data: accessLevels } = useAccessLevelsQuery()
   const { data: licenses } = useLicensesQuery()
   const { data: meta } = useMetaQuery()
@@ -23,7 +24,11 @@ const EditTable = ({ values, errors, setValues, onDiscover, onSave }) => {
       <span className="me-auto">
         <strong>{gettext('Table')}</strong> {values.label}
       </span>
-
+      <div className={classNames('d-flex align-items-center text-success success-indicator me-2', {
+        show: success
+      })}>
+        <div className="bi bi-check"></div>
+      </div>
       <a className="btn btn-secondary btn-sm me-2" href={values.admin_url} target="_blank" rel="noreferrer">
         {gettext('Admin')}
       </a>
@@ -244,6 +249,7 @@ const EditTable = ({ values, errors, setValues, onDiscover, onSave }) => {
 EditTable.propTypes = {
   values: PropTypes.object,
   errors: PropTypes.object,
+  success: PropTypes.number,
   setValues: PropTypes.func.isRequired,
   onDiscover: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired

@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import classNames from 'classnames'
 
 import { useGroupsQuery } from 'daiquiri/auth/assets/js/hooks/queries'
 
@@ -10,7 +11,7 @@ import Input from 'daiquiri/core/assets/js/components/form/Input'
 import Markdown from 'daiquiri/core/assets/js/components/form/Markdown'
 import Select from 'daiquiri/core/assets/js/components/form/Select'
 
-const EditFunction = ({ values, errors, setValues, onSave }) => {
+const EditFunction = ({ values, success, errors, setValues, onSave }) => {
   const { data: accessLevels } = useAccessLevelsQuery()
   const { data: meta } = useMetaQuery()
   const { data: groups } = useGroupsQuery()
@@ -20,6 +21,11 @@ const EditFunction = ({ values, errors, setValues, onSave }) => {
       <span className="me-auto">
         <strong>{gettext('Schema')}</strong> {values.label}
       </span>
+      <div className={classNames('d-flex align-items-center text-success success-indicator me-2', {
+        show: success
+      })}>
+        <div className="bi bi-check"></div>
+      </div>
       <a className="btn btn-secondary btn-sm me-2" href={values.admin_url} target="_blank" rel="noreferrer">
         {gettext('Admin')}
       </a>
@@ -120,6 +126,7 @@ const EditFunction = ({ values, errors, setValues, onSave }) => {
 EditFunction.propTypes = {
   values: PropTypes.object,
   errors: PropTypes.object,
+  success: PropTypes.number,
   setValues: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired
 }
