@@ -24,7 +24,7 @@ const TableModal = ({ modal, modalValues, onNavigation }) => {
               <div className="modal-body">
                 <TableModalNavigation values={modalValues} onClick={onNavigation} />
                 {
-                  dataLinks && <TableModalDatalinks dataLinks={dataLinks} />
+                  dataLinks && <TableModalDatalinks dataLinkId={modalValues.dataLinkId} dataLinks={dataLinks} />
                 }
                 {
                   note && <pre>{note}</pre>

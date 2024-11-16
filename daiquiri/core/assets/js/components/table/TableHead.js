@@ -38,7 +38,7 @@ const TableHead = ({ columns, params, setParams }) => {
 
   const getTooltipParagraph = (label, text) => (
     <p className="mb-0">
-      {label && <strong>{label}:</strong>} <Template template={text} />
+      {label && <strong>{label}:</strong>} <Template template={text.toString()} />
     </p>
   )
 

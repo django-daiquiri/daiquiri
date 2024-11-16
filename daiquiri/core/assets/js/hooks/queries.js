@@ -6,17 +6,15 @@ import CoreApi from '../api/CoreApi'
 export const useDataLinksQuery = (dataLinkId) => {
   return useQuery({
     queryKey: ['dataLinks', dataLinkId],
-    queryFn: () => CoreApi.fetchDataLinks(dataLinkId),
-    placeholderData: keepPreviousData,
-    enabled: !isEmpty(dataLinkId)
+    queryFn: () => isEmpty(dataLinkId) ? Promise.resolve(null) : CoreApi.fetchDataLinks(dataLinkId),
+    placeholderData: keepPreviousData
   })
 }
 
 export const useNoteQuery = (url) => {
   return useQuery({
     queryKey: ['note', url],
-    queryFn: () => CoreApi.fetchNote(url),
-    placeholderData: keepPreviousData,
-    enabled: !isEmpty(url)
+    queryFn: () => isEmpty(url) ? Promise.resolve(null) : CoreApi.fetchNote(url),
+    placeholderData: keepPreviousData
   })
 }

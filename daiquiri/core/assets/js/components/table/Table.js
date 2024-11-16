@@ -33,6 +33,29 @@ const Table = ({ columns, rows, pageSizes, params, setParams }) => {
     }
   }, [rows])
 
+  // use the arrow keys to navigate the modal
+  useEffect(() => {
+    if (!modal.show) {
+      return
+    }
+
+    const handler = (event) => {
+      if (modalValues.up && event.key == 'ArrowUp') {
+        handleNavigation('up')
+      } else if (modalValues.down && event.key == 'ArrowDown') {
+        handleNavigation('down')
+      } else if (modalValues.right && event.key == 'ArrowRight') {
+        handleNavigation('right')
+      } else if (modalValues.left && event.key == 'ArrowLeft') {
+        handleNavigation('left')
+      }
+    }
+
+    document.addEventListener('keydown', handler)
+
+    return () => document.removeEventListener('keydown', handler)
+  }, [modal.show])
+
   const showModal = ({ rowIndex, columnIndex }) => {
     updateModal({ rowIndex, columnIndex })
     modal.show()
@@ -74,12 +97,12 @@ const Table = ({ columns, rows, pageSizes, params, setParams }) => {
       }
     } else if (direction == 'right') {
       const columnIndex = columns.findIndex((c, i) => isModalColumn(c) && i > active.columnIndex)
-      if (columnIndex > 0) {
+      if (columnIndex >= 0) {
         setActive({ ...active, columnIndex})
       }
     } else if (direction == 'left') {
       const columnIndex = columns.findIndex((c, i) => isModalColumn(c) && i < active.columnIndex)
-      if (columnIndex > 0) {
+      if (columnIndex >= 0) {
         setActive({ ...active, columnIndex})
       }
     }
