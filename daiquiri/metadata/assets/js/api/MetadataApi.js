@@ -22,12 +22,20 @@ class MetadataApi extends BaseApi {
     return this.get(`/metadata/api/schemas/${id}/`)
   }
 
+  static createSchema(values) {
+    return this.post('/metadata/api/schemas/', values)
+  }
+
   static updateSchema(id, values) {
     return this.put(`/metadata/api/schemas/${id}/`, values)
   }
 
   static fetchTable(id) {
     return this.get(`/metadata/api/tables/${id}/`)
+  }
+
+  static createTable(values) {
+    return this.post('/metadata/api/tables/', values)
   }
 
   static updateTable(id, values) {
@@ -38,12 +46,20 @@ class MetadataApi extends BaseApi {
     return this.get(`/metadata/api/columns/${id}/`)
   }
 
+  static createColumn(values) {
+    return this.post('/metadata/api/columns/', values)
+  }
+
   static updateColumn(id, values) {
     return this.put(`/metadata/api/columns/${id}/`, values)
   }
 
   static fetchFunction(id) {
     return this.get(`/metadata/api/functions/${id}/`)
+  }
+
+  static createFunction(values) {
+    return this.post('/metadata/api/functions/', values)
   }
 
   static updateFunction(id, values) {

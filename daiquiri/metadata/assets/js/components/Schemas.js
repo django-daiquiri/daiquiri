@@ -12,41 +12,86 @@ const Schemas = ({ schemas, activeItem, setActiveItem, getTooltip, onDoubleClick
   const [visibleTables, setVisibleTables] = useState([])
   const [visibleColumns, setVisibleColumns] = useState([])
 
-  useEffect(() => {
+  const initBrowser = () => {
     if (!isEmpty(schemas)) {
+      const schema = schemas[0]
+      const table = isEmpty(schemas[0].tables) ? null : schemas[0].tables[0]
+
       setVisibleSchemas(schemas)
 
       if (isNil(openSchema)) {
-        setOpenSchema(schemas[0])
-        setVisibleTables(schemas[0].tables)
+        setOpenSchema(schema)
+        setVisibleTables(isNil(schema.tables) ? [] : schema.tables)
       }
 
-      if (isNil(openTable)) {
-        setOpenTable(schemas[0].tables[0])
-        setVisibleColumns(schemas[0].tables[0].columns)
+      if (isNil(openTable) && table) {
+        setOpenTable(table)
+        setVisibleColumns(isNil(table.columns) ? [] : table.columns)
       }
     }
-  }, [schemas])
-
-  const isActive = (type, item) => {
-    return activeItem && activeItem.type == type && (
-      isNil(item.id) ? (item.name == activeItem.name) : (activeItem.id == item.id)
-    )
   }
 
+  const updateBrowser = () => {
+    if (activeItem && activeItem.type) {
+      if (activeItem.type == 'schema') {
+        // search for the schema and get the first table
+        const schema = schemas.find(s => isEqual(s, activeItem))
+        const table = (isNil(schema) || isEmpty(schema.tables)) ? null : schema.tables[0]
+
+        if (schema && !isEqual(schema, openSchema)) {
+          setOpenSchema(schema)
+          setVisibleTables(isNil(schema.tables) ? [] : schema.tables)
+        }
+
+        setOpenTable(table)
+        setVisibleColumns((isNil(table) || isNil(table.columns)) ? [] : table.columns)
+
+      } else if (activeItem.type == 'table') {
+        // search for the schema and table
+        const [schema, table] = schemas.reduce((result, schema) => {
+          const table = (schema.tables || []).find(t => isEqual(t, activeItem))
+          return isNil(table) ? result : [schema, table]
+        }, [])
+
+        if (schema) {
+          setOpenSchema(schema)
+          setVisibleTables(schema.tables)
+        }
+
+        if (table) {
+          setOpenTable(table)
+          setVisibleColumns(table.columns)
+        }
+
+      } else if (activeItem.type == 'column') {
+        // search for the schema and the table for the column
+        const [schema, table] = schemas.reduce((result, schema) => {
+          const table = (schema.tables || []).find(t => (t.columns && t.columns.find(c => isEqual(c, activeItem))))
+          return isNil(table) ? result : [schema, table]
+        }, [])
+
+        if (schema) {
+          setOpenSchema(schema)
+          setVisibleTables(schema.tables)
+        }
+
+        if (table) {
+          setOpenTable(table)
+          setVisibleColumns(table.columns)
+        }
+      }
+    }
+  }
+
+  useEffect(() => initBrowser(), [schemas])
+  useEffect(() => updateBrowser(activeItem), [schemas, activeItem])
+
+  const isEqual = (a, b) => a && b && (isNil(a.id) ? (a.name == b.name) : (a.id == b.id))
+  const isActive = (type, item) => activeItem && activeItem.type == type && isEqual(activeItem, item)
+
   const handleClick = (type, item) => {
-    if (item != activeItem) {
+    if (!isActive(type, item)) {
       setActiveItem({ type, ...item })
-    }
-    if (type == 'schema' && item != openSchema) {
-      setOpenSchema(item)
-      setOpenTable(item.tables[0])
-      setVisibleTables(item.tables)
-      setVisibleColumns(item.tables[0].columns)
-    }
-    if (type == 'table' && item != openTable) {
-      setOpenTable(item)
-      setVisibleColumns(item.columns)
     }
   }
 

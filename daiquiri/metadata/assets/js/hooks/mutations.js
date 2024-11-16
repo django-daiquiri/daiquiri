@@ -2,12 +2,40 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import MetadataApi from '../api/MetadataApi'
 
+export const useCreateMetadataMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (variables) => {
+      switch (variables.values.type) {
+        case 'schema':
+          return MetadataApi.createSchema(variables.values)
+        case 'table':
+          return MetadataApi.createTable(variables.values)
+        case 'column':
+          return MetadataApi.createColumn(variables.values)
+        case 'function':
+          return MetadataApi.createFunction(variables.values)
+      }
+    },
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['managementSchemas'] })
+      queryClient.invalidateQueries({ queryKey: ['managementFunctions'] })
+      variables.setActiveItem({ type: variables.values.type, ...data })
+      variables.modal.hide()
+    },
+    onError: (error) => {
+      console.log(error)
+    }
+  })
+}
+
 export const useUpdateMetadataMutation = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: (variables) => {
-      switch (variables.type) {
+      switch (variables.values.type) {
         case 'schema':
           return MetadataApi.updateSchema(variables.values.id, variables.values)
         case 'table':

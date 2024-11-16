@@ -16,7 +16,7 @@ const EditColumn = ({ values, errors, setValues, onSubmit }) => {
   const { data: meta } = useMetaQuery()
   const { data: groups } = useGroupsQuery()
 
-  return values && meta && groups && (
+  return meta && groups && (
     <div className="card">
       <div className="d-flex align-items-center card-header">
         <span className="me-auto">

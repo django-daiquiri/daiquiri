@@ -31,7 +31,7 @@ const Select = ({ label, value, options, errors, onChange }) => {
 
 Select.propTypes = {
   label: PropTypes.string.isRequired,
-  value: PropTypes.string.isRequired,
+  value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   options: PropTypes.array,
   errors: PropTypes.array,
   onChange: PropTypes.func.isRequired,
