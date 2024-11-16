@@ -94,6 +94,23 @@ const EditTable = ({ values, errors, setValues, onDiscover, onSave }) => {
           <div className="row">
             <div className="col-md-6">
               <Input
+                label={meta.table.nrows.verbose_name}
+                help={meta.table.nrows.help_text}
+                value={values.nrows}
+                disabled />
+            </div>
+            <div className="col-md-6">
+              <Input
+                label={meta.table.size.verbose_name}
+                help={meta.table.size.help_text}
+                value={values.size}
+                disabled />
+            </div>
+          </div>
+
+          <div className="row">
+            <div className="col-md-6">
+              <Input
                 type="date"
                 label={meta.table.published.verbose_name}
                 help={meta.table.published.help_text}

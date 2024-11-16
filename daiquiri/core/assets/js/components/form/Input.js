@@ -5,7 +5,7 @@ import { uniqueId } from 'lodash'
 
 import Errors from './Errors'
 
-const Input = ({ label, type, help, value, errors, onChange }) => {
+const Input = ({ label, type, help, value, disabled, errors, onChange }) => {
   const id = uniqueId('input-')
 
   return (
@@ -16,7 +16,8 @@ const Input = ({ label, type, help, value, errors, onChange }) => {
         type={type}
         className={classNames('form-control', {'is-invalid': errors})}
         value={value}
-        onChange={(event) => onChange(event.target.value)}></input>
+        onChange={(event) => onChange(event.target.value)}
+        disabled={disabled}></input>
       <Errors errors={errors} />
       {
         help && <div className="form-text">{help}</div>
@@ -37,8 +38,9 @@ Input.propTypes = {
     PropTypes.string,
     PropTypes.number
   ]).isRequired,
+  disabled: PropTypes.bool,
   errors: PropTypes.array,
-  onChange: PropTypes.func.isRequired,
+  onChange: PropTypes.func,
 }
 
 export default Input

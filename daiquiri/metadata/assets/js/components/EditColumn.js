@@ -82,12 +82,30 @@ const EditColumn = ({ values, errors, setValues, onDiscover, onSave }) => {
             errors={errors.description}
             onChange={(description) => setValues({ ...values, description })} />
 
-          <Input
-            label={meta.column.index_for.verbose_name}
-            help={meta.column.index_for.help_text}
-            value={values.index_for}
-            errors={errors.index_for}
-            onChange={(index_for) => setValues({ ...values, index_for })} />
+          <div className="row">
+            <div className="col-md-4">
+              <Input
+                label={meta.column.datatype.verbose_name}
+                help={meta.column.datatype.help_text}
+                value={values.datatype}
+                disabled />
+            </div>
+            <div className="col-md-4">
+              <Input
+                label={meta.column.arraysize.verbose_name}
+                help={meta.column.arraysize.help_text}
+                value={values.arraysize}
+                disabled />
+            </div>
+            <div className="col-md-4">
+              <Input
+                label={meta.column.index_for.verbose_name}
+                help={meta.column.index_for.help_text}
+                value={values.index_for}
+                errors={errors.index_for}
+                onChange={(index_for) => setValues({ ...values, index_for })} />
+            </div>
+          </div>
 
           {
             !isUndefined(values.access_level) && !isUndefined(values.metadata_access_level) && !isUndefined(values.groups) && <>
@@ -141,7 +159,7 @@ const EditColumn = ({ values, errors, setValues, onDiscover, onSave }) => {
             label={meta.column.indexed.verbose_name}
             help={meta.column.indexed.help_text}
             checked={values.indexed}
-            onChange={(checked) => setValues({ ...values, indexed: checked})} />
+            disabled />
           <Checkbox
             label={meta.column.std.verbose_name}
             help={meta.column.std.help_text}

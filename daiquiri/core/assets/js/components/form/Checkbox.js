@@ -5,7 +5,7 @@ import { uniqueId } from 'lodash'
 
 import Errors from './Errors'
 
-const Checkbox = ({ label, help, checked, errors, onChange }) => {
+const Checkbox = ({ label, help, checked, disabled, errors, onChange }) => {
   const id = uniqueId('input-')
 
   return (
@@ -16,6 +16,7 @@ const Checkbox = ({ label, help, checked, errors, onChange }) => {
         className={classNames('form-check-input ', {'is-invalid': errors})}
         checked={checked}
         onChange={() => onChange(!checked)}
+        disabled={disabled}
       />
       <label className="form-check-label user-select-none" htmlFor={id}>{label}</label>
       <Errors errors={errors} />
@@ -30,8 +31,9 @@ Checkbox.propTypes = {
   label: PropTypes.string.isRequired,
   help: PropTypes.string,
   checked: PropTypes.bool.isRequired,
+  disabled: PropTypes.bool,
   errors: PropTypes.array,
-  onChange: PropTypes.func.isRequired,
+  onChange: PropTypes.func,
 }
 
 export default Checkbox
