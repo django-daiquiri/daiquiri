@@ -242,6 +242,12 @@ class Table(models.Model):
     def admin_url(self):
         return reverse('admin:daiquiri_metadata_table_change', args=[self.id])
 
+    def discover(self, adapter):
+        metadata = adapter.fetch_table(self.schema.name, self.name)
+        self.type = metadata['type']
+        self.nrows = adapter.fetch_nrows(self.schema.name, self.name)
+        self.size = adapter.fetch_size(self.schema.name, self.name)
+
 
 class Column(models.Model):
 
@@ -347,6 +353,12 @@ class Column(models.Model):
     @property
     def admin_url(self):
         return reverse('admin:daiquiri_metadata_column_change', args=[self.id])
+
+    def discover(self, adapter):
+        metadata = adapter.fetch_column(self.table.schema.name, self.table.name, self.name)
+        self.datatype = metadata.get('datatype', '')
+        self.arraysize = metadata.get('arraysize', None)
+        self.indexed = metadata.get('indexed', False)
 
 
 class Function(models.Model):

@@ -58,6 +58,8 @@ class SchemaViewSet(viewsets.ModelViewSet):
                 table_serializer = TableSerializer(data=table_metadata)
                 if table_serializer.is_valid():
                     table = table_serializer.save()
+                    table.discover(adapter)
+                    table.save()
 
                     for column_order, column_metadata in enumerate(adapter.fetch_columns(schema.name, table.name)):
                         column_metadata['order'] = column_order
@@ -68,7 +70,9 @@ class SchemaViewSet(viewsets.ModelViewSet):
 
                         column_serializer = ColumnSerializer(data=column_metadata)
                         if column_serializer.is_valid():
-                            column_serializer.save()
+                            column = column_serializer.save()
+                            column.discover(adapter)
+                            column.save()
 
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
@@ -121,6 +125,8 @@ class TableViewSet(viewsets.ModelViewSet):
 
         if request.data.get('discover'):
             adapter = DatabaseAdapter()
+            table.discover(adapter)
+            table.save()
 
             for column_order, column_metadata in enumerate(adapter.fetch_columns(table.schema.name, table.name)):
                 column_metadata['order'] = column_order
@@ -131,24 +137,20 @@ class TableViewSet(viewsets.ModelViewSet):
 
                 column_serializer = ColumnSerializer(data=column_metadata)
                 if column_serializer.is_valid():
-                    column_serializer.save()
+                    column = column_serializer.save()
+                    column.discover(adapter)
+                    column.save()
 
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-    @action(detail=False, methods=['get'])
-    def discover(self, request):
-        schema_name = request.GET.get('schema')
-        table_name = request.GET.get('table')
-
-        if schema_name and table_name:
-            adapter = DatabaseAdapter()
-            table_metadata = adapter.fetch_table(schema_name, table_name)
-            table_metadata['nrows'] = adapter.fetch_nrows(schema_name, table_name)
-            table_metadata['size'] = adapter.fetch_size(schema_name, table_name)
-            return Response([table_metadata])
-        else:
-            return Response([])
+    @action(detail=True, methods=['post'])
+    def discover(self, request, pk=None):
+        adapter = DatabaseAdapter()
+        table = self.get_object()
+        table.discover(adapter)
+        table.save()
+        return Response(self.get_serializer(table).data)
 
 
 class ColumnViewSet(viewsets.ModelViewSet):
@@ -171,19 +173,21 @@ class ColumnViewSet(viewsets.ModelViewSet):
         column.order = (column.table.columns.aggregate(order=Max('order'))['order'] or 0) + 1
         column.save()
 
+        if request.data.get('discover'):
+            adapter = DatabaseAdapter()
+            column.discover(adapter)
+            column.save()
+
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-    @action(detail=False, methods=['get'])
-    def discover(self, request):
-        schema_name = request.GET.get('schema')
-        table_name = request.GET.get('table')
-        column_name = request.GET.get('column')
-
-        if schema_name and table_name and column_name:
-            return Response([DatabaseAdapter().fetch_column(schema_name, table_name, column_name)])
-        else:
-            return Response([])
+    @action(detail=True, methods=['post'])
+    def discover(self, request, pk=None):
+        adapter = DatabaseAdapter()
+        column = self.get_object()
+        column.discover(adapter)
+        column.save()
+        return Response(self.get_serializer(column).data)
 
 
 class FunctionViewSet(viewsets.ModelViewSet):

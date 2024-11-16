@@ -55,3 +55,22 @@ export const useUpdateMetadataMutation = () => {
     }
   })
 }
+
+export const useDiscoverMetadataMutation = () => {
+  return useMutation({
+    mutationFn: (variables) => {
+      switch (variables.values.type) {
+        case 'table':
+          return MetadataApi.discoverTable(variables.values.id)
+        case 'column':
+          return MetadataApi.discoverColumn(variables.values.id)
+      }
+    },
+    onSuccess: (data, variables) => {
+      variables.setValues({ type: variables.values.type, ...data })
+    },
+    onError: (error) => {
+      console.log(error)
+    }
+  })
+}

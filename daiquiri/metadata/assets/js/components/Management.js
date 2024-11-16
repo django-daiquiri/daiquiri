@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { isEmpty } from 'lodash'
 
-import { useCreateMetadataMutation, useUpdateMetadataMutation } from '../hooks/mutations'
+import { useCreateMetadataMutation, useUpdateMetadataMutation, useDiscoverMetadataMutation } from '../hooks/mutations'
 import { useMetadataQuery, useManagementFunctionsQuery, useManagementSchemasQuery } from '../hooks/queries'
 
 import { useModal } from 'daiquiri/core/assets/js/hooks/modal'
@@ -30,8 +30,9 @@ const Management = () => {
 
   const createMutation = useCreateMetadataMutation()
   const updateMutation = useUpdateMetadataMutation()
+  const discoverMutation = useDiscoverMetadataMutation()
 
-  useEffect(() => setValues(metadata), [metadata])
+  useEffect(() => setValues({ ...metadata }), [metadata])
 
   const handleModal = (type) => {
     setValues({
@@ -44,11 +45,15 @@ const Management = () => {
     modal.show()
   }
 
-  const handleAdd = () => {
+  const handleCreate = () => {
     createMutation.mutate({ values, modal, setErrors, setActiveItem })
   }
 
-  const handleSubmit = () => {
+  const handleDiscover = () => {
+    discoverMutation.mutate({ values, setValues })
+  }
+
+  const handleUpdate = () => {
     updateMutation.mutate({ values, setErrors })
   }
 
@@ -79,22 +84,41 @@ const Management = () => {
       </div>
       {
         values && values.id && values.type == 'schema' && (
-          <EditSchema values={values} errors={errors} setValues={setValues} onSubmit={handleSubmit}/>
+          <EditSchema
+            values={values}
+            errors={errors}
+            setValues={setValues}
+            onSave={handleUpdate} />
         )
       }
       {
         values && values.id && values.type == 'table' && (
-          <EditTable values={values} errors={errors} setValues={setValues} onSubmit={handleSubmit}/>
+          <EditTable
+            values={values}
+            errors={errors}
+            setValues={setValues}
+            onDiscover={handleDiscover}
+            onSave={handleUpdate} />
         )
       }
       {
         values && values.id && values.type == 'column' && (
-          <EditColumn values={values} errors={errors} setValues={setValues} onSubmit={handleSubmit}/>
+          <EditColumn
+            values={values}
+            errors={errors}
+            setValues={setValues}
+            onDiscover={handleDiscover}
+            onSave={handleUpdate}
+          />
         )
       }
       {
         values && values.id && values.type == 'function' && (
-          <EditFunction values={values} errors={errors} setValues={setValues} onSubmit={handleSubmit}/>
+          <EditFunction
+            values={values}
+            errors={errors}
+            setValues={setValues}
+            onSave={handleUpdate} />
         )
       }
       <AddModal
@@ -110,7 +134,7 @@ const Management = () => {
           label: `${schema.name}.${table.name}`
         }))], [])}
         setValues={setValues}
-        onSubmit={handleAdd}
+        onSubmit={handleCreate}
       />
     </div>
   )

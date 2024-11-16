@@ -42,6 +42,10 @@ class MetadataApi extends BaseApi {
     return this.put(`/metadata/api/tables/${id}/`, values)
   }
 
+  static discoverTable(id) {
+    return this.post(`/metadata/api/tables/${id}/discover/`)
+  }
+
   static fetchColumn(id) {
     return this.get(`/metadata/api/columns/${id}/`)
   }
@@ -52,6 +56,10 @@ class MetadataApi extends BaseApi {
 
   static updateColumn(id, values) {
     return this.put(`/metadata/api/columns/${id}/`, values)
+  }
+
+  static discoverColumn(id) {
+    return this.post(`/metadata/api/columns/${id}/discover/`)
   }
 
   static fetchFunction(id) {

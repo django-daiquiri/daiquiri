@@ -262,11 +262,11 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
             row = self.fetchone(sql)
         except ProgrammingError as e:
             logger.error('Could not fetch %s.%s.%s (%s)', schema_name, table_name, column_name, e)
-            return []
+            return {}
         else:
             if row is None:
                 logger.info('Could not fetch %s.%s.%s. Check if the schema exists.', schema_name, table_name, column_name)  # noqa: E501
-                return []
+                return {}
             else:
                 column = self._parse_column(row)
 

@@ -12,25 +12,34 @@ import Select from 'daiquiri/core/assets/js/components/form/Select'
 
 import EditName from './EditName'
 
-const EditTable = ({ values, errors, setValues, onSubmit }) => {
+const EditTable = ({ values, errors, setValues, onDiscover, onSave }) => {
   const { data: accessLevels } = useAccessLevelsQuery()
   const { data: licenses } = useLicensesQuery()
   const { data: meta } = useMetaQuery()
   const { data: groups } = useGroupsQuery()
 
+  const buttons = (
+    <div className="d-flex align-items-center">
+      <span className="me-auto">
+        <strong>{gettext('Table')}</strong> {values.label}
+      </span>
+
+      <a className="btn btn-secondary btn-sm me-2" href={values.admin_url} target="_blank" rel="noreferrer">
+        {gettext('Admin')}
+      </a>
+      <button className="btn btn-secondary btn-sm me-2" onClick={() => onDiscover('table')}>
+        {gettext('Discover')}
+      </button>
+      <button className="btn btn-primary btn-sm" onClick={() => onSave('table')}>
+        {gettext('Save')}
+      </button>
+    </div>
+  )
+
   return meta && groups && (
     <div className="card">
-      <div className="d-flex align-items-center card-header">
-        <span className="me-auto">
-          <strong>{gettext('Table')}</strong> {values.label}
-        </span>
-
-        <a className="btn btn-secondary btn-sm me-2" href={values.admin_url} target="_blank" rel="noreferrer">
-          {gettext('Admin')}
-        </a>
-        <button className="btn btn-primary btn-sm" onClick={() => onSubmit('table', values)}>
-          {gettext('Save')}
-        </button>
+      <div className="card-header">
+        {buttons}
       </div>
       <div className="card-body">
         <form onSubmit={(event => event.preventDefault())}>
@@ -208,10 +217,8 @@ const EditTable = ({ values, errors, setValues, onSubmit }) => {
           </div>
         </form>
       </div>
-      <div className="card-footer text-end">
-        <button className="btn btn-primary btn-sm" onClick={() => onSubmit('table', values)}>
-          {gettext('Save')}
-        </button>
+      <div className="card-footer">
+        {buttons}
       </div>
     </div>
   )
@@ -221,7 +228,8 @@ EditTable.propTypes = {
   values: PropTypes.object,
   errors: PropTypes.object,
   setValues: PropTypes.func.isRequired,
-  onSubmit: PropTypes.func.isRequired
+  onDiscover: PropTypes.func.isRequired,
+  onSave: PropTypes.func.isRequired
 }
 
 export default EditTable

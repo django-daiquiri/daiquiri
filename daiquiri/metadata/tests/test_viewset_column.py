@@ -117,11 +117,6 @@ def test_delete(db, client, username, password, pk):
 def test_discover(db, client, username, password, pk):
     client.login(username=username, password=password)
 
-    instance = Column.objects.get(pk=pk)
-    url = reverse(urlnames['discover']) + '?' + urlencode({
-        'schema': instance.table.schema.name,
-        'table': instance.table.name,
-        'column': instance.name
-    })
-    response = client.get(url)
+    url = reverse(urlnames['discover'], args=[pk])
+    response = client.post(url)
     assert response.status_code == status_map['discover'][username], response.json()

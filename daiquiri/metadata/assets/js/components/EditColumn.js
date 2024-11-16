@@ -11,24 +11,32 @@ import Input from 'daiquiri/core/assets/js/components/form/Input'
 import Markdown from 'daiquiri/core/assets/js/components/form/Markdown'
 import Select from 'daiquiri/core/assets/js/components/form/Select'
 
-const EditColumn = ({ values, errors, setValues, onSubmit }) => {
+const EditColumn = ({ values, errors, setValues, onDiscover, onSave }) => {
   const { data: accessLevels } = useAccessLevelsQuery()
   const { data: meta } = useMetaQuery()
   const { data: groups } = useGroupsQuery()
 
+  const buttons = (
+    <div className="d-flex align-items-center">
+      <span className="me-auto">
+        <strong>{gettext('Column')}</strong> {values.label}
+      </span>
+      <a className="btn btn-secondary btn-sm me-2" href={values.admin_url} target="_blank" rel="noreferrer">
+        {gettext('Admin')}
+      </a>
+      <button className="btn btn-secondary btn-sm me-2" onClick={() => onDiscover('column')}>
+        {gettext('Discover')}
+      </button>
+      <button className="btn btn-primary btn-sm" onClick={() => onSave('column')}>
+        {gettext('Save')}
+      </button>
+    </div>
+  )
+
   return meta && groups && (
     <div className="card">
-      <div className="d-flex align-items-center card-header">
-        <span className="me-auto">
-          <strong>{gettext('Column')}</strong> {values.label}
-        </span>
-
-        <a className="btn btn-secondary btn-sm me-2" href={values.admin_url} target="_blank" rel="noreferrer">
-          {gettext('Admin')}
-        </a>
-        <button className="btn btn-primary btn-sm" onClick={() => onSubmit('column', values)}>
-          {gettext('Save')}
-        </button>
+      <div className="card-header">
+        {buttons}
       </div>
       <div className="card-body">
         <form onSubmit={(event => event.preventDefault())}>
@@ -142,10 +150,8 @@ const EditColumn = ({ values, errors, setValues, onSubmit }) => {
 
         </form>
       </div>
-      <div className="card-footer text-end">
-        <button className="btn btn-primary btn-sm" onClick={() => onSubmit('column', values)}>
-          {gettext('Save')}
-        </button>
+      <div className="card-footer">
+        {buttons}
       </div>
     </div>
   )
@@ -155,7 +161,8 @@ EditColumn.propTypes = {
   values: PropTypes.object,
   errors: PropTypes.object,
   setValues: PropTypes.func.isRequired,
-  onSubmit: PropTypes.func.isRequired
+  onDiscover: PropTypes.func.isRequired,
+  onSave: PropTypes.func.isRequired
 }
 
 export default EditColumn
