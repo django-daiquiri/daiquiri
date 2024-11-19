@@ -125,7 +125,7 @@ def translate_query(query_language, query):
     adapter = DatabaseAdapter()
 
     # translate adql -> mysql string
-    if query_language == 'adql-2.0':
+    if query_language == 'adql-2.1':
         try:
             translator = cache.get_or_set('translator', ADQLQueryTranslator(), 3600)
             translator.set_query(query)

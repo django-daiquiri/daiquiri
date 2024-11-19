@@ -6,8 +6,8 @@ QUERY_UPLOAD_DIR = env.get_abspath('QUERY_UPLOAD_DIR')
 QUERY_ANONYMOUS = False
 QUERY_USER_SCHEMA_PREFIX = 'daiquiri_user_'
 QUERY_QUOTA = {
-    'anonymous': '100Mb',
-    'user': '10000Mb',
+    'anonymous': '1000Mb',
+    'user': '1000Mb',
     'users': {},
     'groups': {}
 }
@@ -34,8 +34,16 @@ QUERY_QUEUES = [
 QUERY_LANGUAGES = [
     {
         'key': 'adql',
-        'version': 2.0,
-        'label': 'ADQL',
+        'version': 2.1,
+        'ivo-id': 'ivo://ivoa.net/std/adql#v2.1',
+        'label': 'ADQL-2.1',
+        'description': '',
+        'quote_char': '"'
+    },
+    {
+        'key': 'postgresql',
+        'version': 16.2,
+        'label': 'PostgreSQL-16.2',
         'description': '',
         'quote_char': '"'
     }
