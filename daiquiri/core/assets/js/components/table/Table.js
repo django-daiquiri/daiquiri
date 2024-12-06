@@ -65,6 +65,8 @@ const Table = ({ columns, rows, pageSizes, params, setParams }) => {
     const column = columns[columnIndex]
     const value = rows.results[rowIndex][columnIndex]
 
+      console.log(value)
+
     if (isModalColumn(column)) {
       setModalValues({
         title: value,

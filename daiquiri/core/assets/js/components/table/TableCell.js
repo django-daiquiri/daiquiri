@@ -19,7 +19,7 @@ const TableCell = ({ column, value, rowIndex, columnIndex, setActive, showModal 
       } else if (isFileColumn(column)) {
         // render a file link
         return (
-          <a href={getFileUrl(column, value)} target="_blank" rel="noreferrer">{getBasename(value)}1</a>
+          <a href={getFileUrl(column, value)} target="_blank" rel="noreferrer">{getBasename(value)}</a>
         )
       } else if (isLinkColumn(column)) {
         // render a regular link

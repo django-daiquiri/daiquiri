@@ -13,7 +13,7 @@
 {% block page %}
     {% for schema in schemas %}
     <div class="card mb-3">
-        <div class="card-header">
+        <h5 class="card-header">
             <a href="{% url 'metadata:schema' schema.name %}">
                 {% if schema.title %}
                 {{ schema.title }} ({{ schema }})
@@ -21,7 +21,7 @@
                 {{ schema }}
                 {% endif %}
             </a>
-        </div>
+        </h5>
         <div class="card-body">
             {% if schema.description %}
             {{ schema.description | markdown }}
@@ -30,8 +30,10 @@
             {% endif %}
         </div>
         {% if schema.doi %}
-        <div class="card-footer">
+        <div class="card-footer text-muted">
+            <small>
             DOI: {% doi_link schema.doi %}
+            </small>
         </div>
         {% endif %}
     </div>
