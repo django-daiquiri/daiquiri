@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { getBasename, getFileUrl, getLinkUrl, getReferenceUrl,
+import { getBasename, getFileUrl, getLinkUrl, getReferenceUrl, isImageColumn,
          isModalColumn, isFileColumn, isLinkColumn } from '../../utils/table.js'
 
 const TableCell = ({ column, value, rowIndex, columnIndex, setActive, showModal }) => {
@@ -10,6 +10,9 @@ const TableCell = ({ column, value, rowIndex, columnIndex, setActive, showModal 
     if (column.ucd && column.ucd.includes('meta.ref')) {
       if (isModalColumn(column)) {
         // render the modal
+        if (isImageColumn(column)) {
+          value = getBasename(value)
+        }
         return (
           <a href={getFileUrl(column, value)} onClick={(event) => {
             event.preventDefault()
