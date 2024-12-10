@@ -9,6 +9,10 @@ from django.http import Http404
 from django.shortcuts import render
 from django.views.generic import View
 
+
+from rest_framework.views import APIView
+from rest_framework.authentication import BasicAuthentication, SessionAuthentication, TokenAuthentication
+
 from .search import Searcher
 from .utils import (
         get_directory,
@@ -21,7 +25,10 @@ from .utils import (
 logger = logging.getLogger(__name__)
 
 
-class FileView(View):
+class FileView(APIView):
+
+    authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
+    http_method_names = ['get']
 
     root = None
 
