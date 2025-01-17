@@ -204,7 +204,9 @@ class QueryJob(Job):
             )
             if permission_messages:
                 raise ValidationError({
-                    'query': permission_messages
+                    'query': {
+                        'messages': permission_messages,
+                    }
                 })
 
             # initialize metadata and store map of aliases

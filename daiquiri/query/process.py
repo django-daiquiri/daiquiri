@@ -203,7 +203,7 @@ def process_query(query):
     except QueryError as e:
         raise ValidationError({
             'query': {
-                'messages': e.messages,
+                'messages': [e.messages, ],
             }
         }) from e
 
