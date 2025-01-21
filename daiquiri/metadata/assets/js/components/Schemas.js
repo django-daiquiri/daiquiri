@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import { isEmpty, isNil } from 'lodash'
@@ -11,6 +11,9 @@ const Schemas = ({ schemas, activeItem, setActiveItem, getTooltip, onDoubleClick
   const [visibleSchemas, setVisibleSchemas] = useState([])
   const [visibleTables, setVisibleTables] = useState([])
   const [visibleColumns, setVisibleColumns] = useState([])
+
+  const refListTables = useRef(null)
+  const refListColumns = useRef(null)
 
   const initBrowser = () => {
     if (!isEmpty(schemas)) {
@@ -44,7 +47,13 @@ const Schemas = ({ schemas, activeItem, setActiveItem, getTooltip, onDoubleClick
         }
 
         setOpenTable(table)
+        if (refListTables.current) {
+            refListTables.current.scrollTop = 0
+        }
         setVisibleColumns((isNil(table) || isNil(table.columns)) ? [] : table.columns)
+        if (refListColumns.current) {
+            refListColumns.current.scrollTop = 0
+        }
 
       } else if (activeItem.type == 'table') {
         // search for the table
@@ -56,6 +65,9 @@ const Schemas = ({ schemas, activeItem, setActiveItem, getTooltip, onDoubleClick
         if (table) {
           setOpenTable(table)
           setVisibleColumns(table.columns)
+          if (refListColumns.current) {
+              refListColumns.current.scrollTop = 0
+          }
         }
 
       }
@@ -111,7 +123,7 @@ const Schemas = ({ schemas, activeItem, setActiveItem, getTooltip, onDoubleClick
             <div className="dq-browser-title">
               {gettext('Tables')}
             </div>
-            <ul className="dq-browser-list">
+            <ul className="dq-browser-list" ref={refListTables}>
               {
                 visibleTables.map((table, index) => (
                   <li key={index}>
@@ -138,7 +150,7 @@ const Schemas = ({ schemas, activeItem, setActiveItem, getTooltip, onDoubleClick
             <div className="dq-browser-title">
               {gettext('Columns')}
             </div>
-            <ul className="dq-browser-list">
+            <ul className="dq-browser-list" ref={refListColumns}>
               {
                 visibleColumns.map((column, index) => (
                   <li key={index}>
