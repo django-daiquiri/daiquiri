@@ -47,38 +47,17 @@ const Schemas = ({ schemas, activeItem, setActiveItem, getTooltip, onDoubleClick
         setVisibleColumns((isNil(table) || isNil(table.columns)) ? [] : table.columns)
 
       } else if (activeItem.type == 'table') {
-        // search for the schema and table
-        const [schema, table] = schemas.reduce((result, schema) => {
+        // search for the table
+        const table = schemas.reduce((result, schema) => {
           const table = (schema.tables || []).find(t => isEqual(t, activeItem))
-          return isNil(table) ? result : [schema, table]
-        }, [])
-
-        if (schema) {
-          setOpenSchema(schema)
-          setVisibleTables(schema.tables)
-        }
+          return isNil(table) ? result : table
+        }, null )
 
         if (table) {
           setOpenTable(table)
           setVisibleColumns(table.columns)
         }
 
-      } else if (activeItem.type == 'column') {
-        // search for the schema and the table for the column
-        const [schema, table] = schemas.reduce((result, schema) => {
-          const table = (schema.tables || []).find(t => (t.columns && t.columns.find(c => isEqual(c, activeItem))))
-          return isNil(table) ? result : [schema, table]
-        }, [])
-
-        if (schema) {
-          setOpenSchema(schema)
-          setVisibleTables(schema.tables)
-        }
-
-        if (table) {
-          setOpenTable(table)
-          setVisibleColumns(table.columns)
-        }
       }
     }
   }
