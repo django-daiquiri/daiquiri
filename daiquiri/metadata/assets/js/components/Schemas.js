@@ -136,7 +136,7 @@ const Schemas = ({ schemas, activeItem, setActiveItem, getTooltip, onDoubleClick
                       >
                         <div>{schema.name}</div>
                         {
-                          openSchema && (openSchema.id == schema.id) && (
+                          openSchema && (isEqual(openSchema, schema)) && (
                             <div className="ms-auto"><i className="bi bi-chevron-right"></i></div>
                           )
                         }
@@ -163,7 +163,7 @@ const Schemas = ({ schemas, activeItem, setActiveItem, getTooltip, onDoubleClick
                       >
                         <div>{table.name}</div>
                         {
-                          openTable && (openTable.id == table.id) && (
+                          openTable && (isEqual(openTable, table)) && (
                             <div className="ms-auto"><i className="bi bi-chevron-right"></i></div>
                           )
                         }
