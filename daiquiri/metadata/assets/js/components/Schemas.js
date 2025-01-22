@@ -48,28 +48,56 @@ const Schemas = ({ schemas, activeItem, setActiveItem, getTooltip, onDoubleClick
 
         setOpenTable(table)
         if (refListTables.current) {
-            refListTables.current.scrollTop = 0
+          refListTables.current.scrollTop = 0
         }
         setVisibleColumns((isNil(table) || isNil(table.columns)) ? [] : table.columns)
         if (refListColumns.current) {
-            refListColumns.current.scrollTop = 0
+          refListColumns.current.scrollTop = 0
         }
 
       } else if (activeItem.type == 'table') {
-        // search for the table
-        const table = schemas.reduce((result, schema) => {
-          const table = (schema.tables || []).find(t => isEqual(t, activeItem))
-          return isNil(table) ? result : table
-        }, null )
+        if (!isNil(activeItem.schema)) {
+          // this is a newly created table, search for the schema and table
+          const [schema, table] = schemas.reduce((result, schema) => {
+            return schema.id == activeItem.schema ? (
+              [schema, (schema.tables || []).find(t => isEqual(t, activeItem))]
+            ) : result
+          }, [] )
+          if (schema) {
+            setOpenSchema(schema)
+            setVisibleTables(schema.tables)
+          }
 
-        if (table) {
-          setOpenTable(table)
-          setVisibleColumns(table.columns)
+          if (table) {
+            setOpenTable(table)
+            setVisibleColumns(table.columns)
+          }
+        } else {
+          setOpenTable(activeItem)
+          setVisibleColumns(activeItem.columns)
           if (refListColumns.current) {
               refListColumns.current.scrollTop = 0
           }
         }
 
+      } else if (activeItem.type == 'column') {
+        if (!isNil(activeItem.table)) {
+          // this is a newly created column, search for the schema and table
+          const [schema, table] = schemas.reduce((result, schema) => {
+            const table = (schema.tables || []).find(t => (t.id == activeItem.table))
+            return isNil(table) ? result : [schema, table]
+          }, [])
+
+          if (schema) {
+            setOpenSchema(schema)
+            setVisibleTables(schema.tables)
+          }
+
+          if (table) {
+            setOpenTable(table)
+            setVisibleColumns(table.columns)
+          }
+        }
       }
     }
   }
