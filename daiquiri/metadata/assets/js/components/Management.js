@@ -38,8 +38,8 @@ const Management = () => {
   const handleModal = (type) => {
     setValues({
       type,
-      schema: activeItem.type == 'schema' ? activeItem.id : (isEmpty(schemas)? null : schemas[0].id),
-      table: (isEmpty(schemas) || isEmpty(schemas[0].tables)) ? null : (activeItem.type == 'table' ? activeItem.id : schemas[0].tables[0].id),
+      schema: isEmpty(schemas) ? null : (activeItem?.type == 'schema' ? activeItem.id : schemas[0].id),
+      table: (isEmpty(schemas) || isEmpty(schemas[0].tables)) ? null : (activeItem?.type == 'table' ? activeItem.id : schemas[0].tables[0].id),
       query_string: '',
       discover: true
     })
