@@ -37,7 +37,11 @@ const TableCell = ({ column, value, rowIndex, columnIndex, setActive, showModal 
       }
     } else {
       // this is not a reference, just render the value
-      return value
+      if (Array.isArray(value)) {
+        return `[${value.join(', ')}]`
+      } else {
+        return value
+      }
     }
   }
 
