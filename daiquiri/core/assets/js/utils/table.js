@@ -1,11 +1,8 @@
+import { isString } from 'lodash'
 import { baseUrl } from './meta'
 
 export const getBasename = (string) => {
-  if (typeof string === 'string' || string instanceof String){
-    return string.replace(/^.*[\\/]/, '')
-  } else {
-    return string
-  }
+  return isString(string) ? string.replace(/^.*[\\/]/, '') : string
 }
 
 export const getFileUrl = (column, value) => `${baseUrl}/files/${value}`

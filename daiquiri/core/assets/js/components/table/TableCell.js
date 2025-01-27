@@ -22,7 +22,7 @@ const TableCell = ({ column, value, rowIndex, columnIndex, setActive, showModal 
       } else if (isFileColumn(column)) {
         // render a file link
         return (
-          <a href={getFileUrl(column, value)} target="_blank" rel="noreferrer">{getBasename(value)}</a>
+          <a href={getFileUrl(column, value)} rel="noreferrer">{getBasename(value)}</a>
         )
       } else if (isLinkColumn(column)) {
         // render a regular link
@@ -37,11 +37,7 @@ const TableCell = ({ column, value, rowIndex, columnIndex, setActive, showModal 
       }
     } else {
       // this is not a reference, just render the value
-      if (Array.isArray(value)) {
-        return `[${value.join(', ')}]`
-      } else {
-        return value
-      }
+      return Array.isArray(value) ? `[${value.join(', ')}]` : value
     }
   }
 

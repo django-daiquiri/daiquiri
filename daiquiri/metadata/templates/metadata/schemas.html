@@ -13,15 +13,16 @@
 {% block page %}
     {% for schema in schemas %}
     <div class="card mb-3">
-        <h5 class="card-header">
+        <div class="card-header">
             <a href="{% url 'metadata:schema' schema.name %}">
+                <i class="bi bi-database"></i> &nbsp;
                 {% if schema.title %}
                 {{ schema.title }} ({{ schema }})
                 {% else %}
                 {{ schema }}
                 {% endif %}
             </a>
-        </h5>
+        </div>
         <div class="card-body">
             {% if schema.description %}
             {{ schema.description | markdown }}

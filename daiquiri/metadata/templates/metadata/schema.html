@@ -40,15 +40,16 @@
 
     {% for table in tables %}
     <div class="card mb-3">
-        <h5 class="card-header">
+        <div class="card-header">
             <a href="{% url 'metadata:table' schema.name table.name %}">
+                <i class="bi bi-table"></i> &nbsp;
                 {% if table.title %}
                 {{ table.title }} ({{ table }})
                 {% else %}
                 {{ table.name }}
                 {% endif %}
             </a>
-        </h5>
+        </div>
         <div class="card-body">
             {% if table.description %}
             {{ table.description | markdown }}
