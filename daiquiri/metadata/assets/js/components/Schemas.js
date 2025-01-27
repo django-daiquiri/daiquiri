@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import { isEmpty, isNil } from 'lodash'
@@ -11,6 +11,9 @@ const Schemas = ({ schemas, activeItem, setActiveItem, getTooltip, onDoubleClick
   const [visibleSchemas, setVisibleSchemas] = useState([])
   const [visibleTables, setVisibleTables] = useState([])
   const [visibleColumns, setVisibleColumns] = useState([])
+
+  const refListTables = useRef(null)
+  const refListColumns = useRef(null)
 
   const initBrowser = () => {
     if (!isEmpty(schemas)) {
@@ -44,40 +47,57 @@ const Schemas = ({ schemas, activeItem, setActiveItem, getTooltip, onDoubleClick
         }
 
         setOpenTable(table)
+        if (refListTables.current) {
+          refListTables.current.scrollTop = 0
+        }
         setVisibleColumns((isNil(table) || isNil(table.columns)) ? [] : table.columns)
-
-      } else if (activeItem.type == 'table') {
-        // search for the schema and table
-        const [schema, table] = schemas.reduce((result, schema) => {
-          const table = (schema.tables || []).find(t => isEqual(t, activeItem))
-          return isNil(table) ? result : [schema, table]
-        }, [])
-
-        if (schema) {
-          setOpenSchema(schema)
-          setVisibleTables(schema.tables)
+        if (refListColumns.current) {
+          refListColumns.current.scrollTop = 0
         }
 
-        if (table) {
-          setOpenTable(table)
-          setVisibleColumns(table.columns)
+      } else if (activeItem.type == 'table') {
+        if (!isNil(activeItem.schema)) {
+          // this is a newly created table, search for the schema and table
+          const [schema, table] = schemas.reduce((result, schema) => {
+            return schema.id == activeItem.schema ? (
+              [schema, (schema.tables || []).find(t => isEqual(t, activeItem))]
+            ) : result
+          }, [] )
+
+          if (schema) {
+            setOpenSchema(schema)
+            setVisibleTables(schema.tables)
+          }
+
+          if (table) {
+            setOpenTable(table)
+            setVisibleColumns(table.columns)
+          }
+        } else {
+          setOpenTable(activeItem)
+          setVisibleColumns(activeItem.columns)
+          if (refListColumns.current) {
+              refListColumns.current.scrollTop = 0
+          }
         }
 
       } else if (activeItem.type == 'column') {
-        // search for the schema and the table for the column
-        const [schema, table] = schemas.reduce((result, schema) => {
-          const table = (schema.tables || []).find(t => (t.columns && t.columns.find(c => isEqual(c, activeItem))))
-          return isNil(table) ? result : [schema, table]
-        }, [])
+        if (!isNil(activeItem.table)) {
+          // this is a newly created column, search for the schema and table
+          const [schema, table] = schemas.reduce((result, schema) => {
+            const table = (schema.tables || []).find(t => (t.id == activeItem.table))
+            return isNil(table) ? result : [schema, table]
+          }, [])
 
-        if (schema) {
-          setOpenSchema(schema)
-          setVisibleTables(schema.tables)
-        }
+          if (schema) {
+            setOpenSchema(schema)
+            setVisibleTables(schema.tables)
+          }
 
-        if (table) {
-          setOpenTable(table)
-          setVisibleColumns(table.columns)
+          if (table) {
+            setOpenTable(table)
+            setVisibleColumns(table.columns)
+          }
         }
       }
     }
@@ -117,7 +137,7 @@ const Schemas = ({ schemas, activeItem, setActiveItem, getTooltip, onDoubleClick
                       >
                         <div>{schema.name}</div>
                         {
-                          openSchema && (openSchema.id == schema.id) && (
+                          openSchema && (isEqual(openSchema, schema)) && (
                             <div className="ms-auto"><i className="bi bi-chevron-right"></i></div>
                           )
                         }
@@ -132,7 +152,7 @@ const Schemas = ({ schemas, activeItem, setActiveItem, getTooltip, onDoubleClick
             <div className="dq-browser-title">
               {gettext('Tables')}
             </div>
-            <ul className="dq-browser-list">
+            <ul className="dq-browser-list" ref={refListTables}>
               {
                 visibleTables.map((table, index) => (
                   <li key={index}>
@@ -144,7 +164,7 @@ const Schemas = ({ schemas, activeItem, setActiveItem, getTooltip, onDoubleClick
                       >
                         <div>{table.name}</div>
                         {
-                          openTable && (openTable.id == table.id) && (
+                          openTable && (isEqual(openTable, table)) && (
                             <div className="ms-auto"><i className="bi bi-chevron-right"></i></div>
                           )
                         }
@@ -159,7 +179,7 @@ const Schemas = ({ schemas, activeItem, setActiveItem, getTooltip, onDoubleClick
             <div className="dq-browser-title">
               {gettext('Columns')}
             </div>
-            <ul className="dq-browser-list">
+            <ul className="dq-browser-list" ref={refListColumns}>
               {
                 visibleColumns.map((column, index) => (
                   <li key={index}>

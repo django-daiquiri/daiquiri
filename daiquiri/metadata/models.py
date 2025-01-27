@@ -244,7 +244,11 @@ class Table(models.Model):
 
     def discover(self, adapter):
         metadata = adapter.fetch_table(self.schema.name, self.name)
-        self.type = metadata['type']
+        try:
+            self.type = metadata['type']
+        except KeyError:
+            # if the table does not exist in the database then do nothing
+            return
         self.nrows = adapter.fetch_nrows(self.schema.name, self.name)
         self.size = adapter.fetch_size(self.schema.name, self.name)
 
