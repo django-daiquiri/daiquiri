@@ -198,11 +198,15 @@ class MySQLAdapter(BaseDatabaseAdapter):
             logger.error('Could not fetch %s.%s.%s (%s)', schema_name, table_name, column_name, e)
             return {}
         else:
-            return {
-                'name': row[0],
-                'datatype': row[1],
-                'indexed': bool(row[4])
-            }
+            if row is None:
+                logger.info(f'Could not fetch {schema_name}.{table_name}.{column_name}. Check if column, table and schema exist.')
+                return {}
+            else:
+                return {
+                    'name': row[0],
+                    'datatype': row[1],
+                    'indexed': bool(row[4])
+                }
 
     def fetch_column_names(self, schema_name, table_name):
         # prepare sql string

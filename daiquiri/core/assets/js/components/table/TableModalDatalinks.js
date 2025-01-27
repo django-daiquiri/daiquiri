@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import classNames from 'classnames'
-import { isEmpty, upperFirst } from 'lodash'
+import { isEmpty } from 'lodash'
 
 import { baseUrl } from 'daiquiri/core/assets/js/utils/meta'
 
@@ -13,47 +12,49 @@ const TableModalDatalinks = ({ dataLinkId, dataLinks }) => {
       </p>
     )
   } else {
-    const semanticsList = dataLinks.reduce((semanticsList, dataLink) => (
-      semanticsList.includes(dataLink.semantics) ? semanticsList : [...semanticsList, dataLink.semantics]
-    ), [])
+
+    const dlPreview = dataLinks.filter(dataLink => dataLink.semantics == '#preview')
+    const dlThis = dataLinks.filter(dataLink => dataLink.semantics == '#this')
+    const dlPreviewImages = dataLinks.filter(dataLink => dataLink.semantics == '#preview-image' || dataLink.semantics == '#preview-plot')
 
     return (
-      <>
-        {
-          semanticsList.map(semantics => {
-            const label = semantics.split('#')[1]
-
-            return (
-              <div key={semantics} className={classNames({'mt-2': semantics != semanticsList[0]})}>
-                <strong>{label ? upperFirst(label) : semantics}</strong>
-
-                {
-                  semantics == '#preview' ? (
-                    dataLinks.filter(dataLink => dataLink.semantics == semantics).map((dataLink, dataLinkIndex) => (
-                      <img key={dataLinkIndex} src={dataLink.access_url} className="d-block img-fluid" alt={dataLink.description} />
-                    ))
-                  ) : (
-                    <ul className="list-unstyled">
-                    {
-                      dataLinks.filter(dataLink => dataLink.semantics == semantics).map((dataLink, dataLinkIndex) => (
-                        <li key={dataLinkIndex} className="list-group-item">
-                           <a href={dataLink.access_url} target="_blank" rel="noreferrer">{dataLink.description || dataLink.access_url}</a>
-                        </li>
-                      ))
-                    }
-                    </ul>
-                  )
-                }
-              </div>
-            )
-          })
-        }
-        <p className="mt-2">
-          <a href={`${baseUrl}/datalink/${dataLinkId}/`} target="_blank" rel="noreferrer">
-            {interpolate(gettext('Datalink page'), [dataLinkId])}
-          </a>
-        </p>
-      </>
+      <div>
+        <ul className="list-unstyled">
+          {dlPreview.map((dataLink, index) => (
+            <li key={index}>
+              <a className="btn btn-primary btn-sm" href={dataLink.access_url} target="_blank" rel="noreferrer" data-bs-toggle="tooltip" title="Open viewer">
+                <i className="bi bi-eye"></i>
+              </a>
+              &nbsp;&nbsp;{dataLink.description}
+            </li>
+          ))}
+        </ul>
+        <ul className="list-unstyled">
+          {dlThis.map((dataLink, index) => (
+            <li key={index}>
+              <a className="btn btn-primary btn-sm" href={dataLink.access_url} data-bs-toggle="tooltip" title="Download file">
+                <i className="bi bi-download"></i>
+              </a>
+              &nbsp;&nbsp;{dataLink.description}
+            </li>
+          ))}
+        </ul>
+        <ul className="list-unstyled">
+          <li>
+            <a className="btn btn-primary btn-sm" href={`${baseUrl}/datalink/${dataLinkId}/`} target="_blank" rel="noreferrer" data-bs-toggle="tooltip" title="Open DataLink viewer">
+              <i className="bi bi-link-45deg"></i>
+            </a>
+            &nbsp;&nbsp;Show all Data Links
+          </li>
+        </ul>
+        <hr></hr>
+        {dlPreviewImages.map((dataLink, dataLinkIndex) => (
+            <div key={dataLinkIndex}>
+                <h5>{dataLink.description}</h5>
+                <img src={dataLink.access_url} className="d-block img-fluid" alt='Image is missing, please contact the administrator.' />
+            </div>
+        ))}
+      </div>
     )
   }
 }
@@ -64,3 +65,4 @@ TableModalDatalinks.propTypes = {
 }
 
 export default TableModalDatalinks
+

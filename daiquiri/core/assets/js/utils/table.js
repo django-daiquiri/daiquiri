@@ -1,6 +1,12 @@
 import { baseUrl } from './meta'
 
-export const getBasename = (string) => string.replace(/^.*[\\/]/, '')
+export const getBasename = (string) => {
+  if (typeof string === 'string' || string instanceof String){
+    return string.replace(/^.*[\\/]/, '')
+  } else {
+    return string
+  }
+}
 
 export const getFileUrl = (column, value) => `${baseUrl}/files/${value}`
 

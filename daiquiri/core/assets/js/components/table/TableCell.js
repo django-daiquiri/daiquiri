@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { getBasename, getFileUrl, getLinkUrl, getReferenceUrl,
+import { getBasename, getFileUrl, getLinkUrl, getReferenceUrl, isImageColumn,
          isModalColumn, isFileColumn, isLinkColumn } from '../../utils/table.js'
 
 const TableCell = ({ column, value, rowIndex, columnIndex, setActive, showModal }) => {
@@ -10,6 +10,9 @@ const TableCell = ({ column, value, rowIndex, columnIndex, setActive, showModal 
     if (column.ucd && column.ucd.includes('meta.ref')) {
       if (isModalColumn(column)) {
         // render the modal
+        if (isImageColumn(column)) {
+          value = getBasename(value)
+        }
         return (
           <a href={getFileUrl(column, value)} onClick={(event) => {
             event.preventDefault()
@@ -19,7 +22,7 @@ const TableCell = ({ column, value, rowIndex, columnIndex, setActive, showModal 
       } else if (isFileColumn(column)) {
         // render a file link
         return (
-          <a href={getFileUrl(column, value)} target="_blank" rel="noreferrer">{getBasename(value)}1</a>
+          <a href={getFileUrl(column, value)} target="_blank" rel="noreferrer">{getBasename(value)}</a>
         )
       } else if (isLinkColumn(column)) {
         // render a regular link
@@ -34,7 +37,11 @@ const TableCell = ({ column, value, rowIndex, columnIndex, setActive, showModal 
       }
     } else {
       // this is not a reference, just render the value
-      return value
+      if (Array.isArray(value)) {
+        return `[${value.join(', ')}]`
+      } else {
+        return value
+      }
     }
   }
 

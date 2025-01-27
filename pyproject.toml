@@ -10,7 +10,7 @@ keywords = []
 license = {text = "Apache-2.0"}
 authors = [
   {name = "Jochen Klar", email = "mail@jochenklar.de"},
-  {name = "nastasia Galkin", email = "agalkin@aip.de"},
+  {name = "Anastasia Galkin", email = "agalkin@aip.de"},
   {name = "Yori Fournier", email = "y.fournier@aip.de"},
   {name = "Kirill Makan", email = "kmakan@aip.de"},
 ]
@@ -55,7 +55,8 @@ dependencies = [
   "jsonfield~=3.1.0",
   "lunr~=0.6.2",
   "Markdown~=3.4.3",
-  "queryparser-python3~=0.6.1",
+  "Pygments~=2.15.1",
+  "queryparser-python3~=0.7",
   "rules~=3.3",
   "XlsxWriter~=3.1.2",
 ]
