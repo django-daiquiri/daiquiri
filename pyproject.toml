@@ -99,6 +99,9 @@ homepage = "https://django-daiquiri.github.io"
 issues = "https://github.com/django-daiquiri/daiquiri/issues"
 repository = "https://github.com/django-daiquiri/daiquiri.git"
 
+[project.scripts]
+daiquiri-admin = "daiquiri.__main__:main"
+
 [tool.setuptools.packages.find]
 include = ["daiquiri*"]
 exclude = ["*assets*", "*tests*"]
