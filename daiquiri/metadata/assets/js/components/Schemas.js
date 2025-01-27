@@ -63,6 +63,7 @@ const Schemas = ({ schemas, activeItem, setActiveItem, getTooltip, onDoubleClick
               [schema, (schema.tables || []).find(t => isEqual(t, activeItem))]
             ) : result
           }, [] )
+
           if (schema) {
             setOpenSchema(schema)
             setVisibleTables(schema.tables)
