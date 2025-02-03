@@ -5,9 +5,13 @@ from django.utils.translation import gettext_lazy as _
 
 import daiquiri.core.env as env
 
-CONFIG_DIR = Path(find_spec('config').origin).parent
-BASE_DIR = CONFIG_DIR.parent
-DAIQUIRI_APP = BASE_DIR.name.replace('-', '_')
+try:
+    CONFIG_DIR = Path(find_spec('config').origin).parent
+    BASE_DIR = CONFIG_DIR.parent
+    DAIQUIRI_APP = BASE_DIR.name.replace('-', '_')
+except AttributeError:
+    BASE_DIR = Path().cwd()
+    DAIQUIRI_APP = None
 
 BASE_URL = env.get_url('BASE_URL', '/')
 
