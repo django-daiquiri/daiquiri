@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { isEmpty } from 'lodash'
+import { isEmpty, toString } from 'lodash'
 
 import { useModal } from 'daiquiri/core/assets/js/hooks/modal'
 
@@ -63,7 +63,7 @@ const Table = ({ columns, rows, pageSizes, params, setParams }) => {
 
   const updateModal = ({ rowIndex, columnIndex }) => {
     const column = columns[columnIndex]
-    const value = rows.results[rowIndex][columnIndex]
+    const value = toString(rows.results[rowIndex][columnIndex])
 
     if (isModalColumn(column)) {
       setModalValues({
