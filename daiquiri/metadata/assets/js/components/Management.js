@@ -94,7 +94,7 @@ const Management = () => {
         )
       }
       {
-        values && values.id && values.type == 'table' && (
+        values && values.id && (values.type == 'table' || values.type == 'view') && (
           <EditTable
             values={values}
             errors={errors}
