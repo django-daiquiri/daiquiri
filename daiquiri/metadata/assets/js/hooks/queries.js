@@ -44,6 +44,8 @@ export const useMetadataQuery = ({ type, id }) => {
           return MetadataApi.fetchSchema(id).then(response => ({ type, ...response }))
         case 'table':
           return MetadataApi.fetchTable(id).then(response => ({ type, ...response }))
+        case 'view':
+          return MetadataApi.fetchTable(id).then(response => ({ type, ...response }))
         case 'column':
           return MetadataApi.fetchColumn(id).then(response => ({ type, ...response }))
         case 'function':

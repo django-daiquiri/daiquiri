@@ -12,6 +12,8 @@ export const useCreateMetadataMutation = () => {
           return MetadataApi.createSchema(variables.values)
         case 'table':
           return MetadataApi.createTable(variables.values)
+        case 'view':
+          return MetadataApi.createTable(variables.values)
         case 'column':
           return MetadataApi.createColumn(variables.values)
         case 'function':
@@ -39,6 +41,8 @@ export const useUpdateMetadataMutation = () => {
         case 'schema':
           return MetadataApi.updateSchema(variables.values.id, variables.values)
         case 'table':
+          return MetadataApi.updateTable(variables.values.id, variables.values)
+        case 'view':
           return MetadataApi.updateTable(variables.values.id, variables.values)
         case 'column':
           return MetadataApi.updateColumn(variables.values.id, variables.values)
