@@ -68,6 +68,8 @@ export const useDiscoverMetadataMutation = () => {
       switch (variables.values.type) {
         case 'table':
           return MetadataApi.discoverTable(variables.values.id)
+        case 'view':
+          return MetadataApi.discoverTable(variables.values.id)
         case 'column':
           return MetadataApi.discoverColumn(variables.values.id)
       }
