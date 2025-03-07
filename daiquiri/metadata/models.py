@@ -341,6 +341,11 @@ class Column(models.Model):
     def __str__(self):
         return self.table.schema.name + '.' + self.table.name + '.' + self.name
 
+    def get_width(self):
+        return settings.METADATA_COLUMN_WIDTH.get(str(self), None) or \
+            settings.METADATA_COLUMN_WIDTH.get('default', None)
+
+
     @property
     def query_strings(self):
         return [self.name]

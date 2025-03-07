@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { renderToString } from 'react-dom/server'
+import { isNumber } from 'lodash'
 import PropTypes from 'prop-types'
 
 import Ordering from 'daiquiri/core/assets/js/components/Ordering'
@@ -11,7 +12,9 @@ import TableHandle from './TableHandle'
 const TableHead = ({ columns, params, setParams }) => {
   const ordering = params.ordering || ''
 
-  const [widths, setWidths] = useState(columns.map(() => 300))
+  const [widths, setWidths] = useState(columns.map((column) => {
+    return isNumber(column.width) ? column.width : 200
+  }))
 
   const handleOrdering = (column) => {
     setParams({...params, ordering: (ordering == column.name) ? '-' + column.name : column.name})

@@ -5,6 +5,14 @@ import daiquiri.core.env as env
 METADATA_COLUMN_PERMISSIONS = False
 METADATA_BASE_URL = None
 
+# This setting sets the default width of the columns in the results of
+# query and in the 'serve' app. If the column is not found here, then
+# default is used. The key for the specific column is of the form
+# 'schema_name.table_name.column_name'
+METADATA_COLUMN_WIDTH = {
+    'default': 200,
+}
+
 ARCHIVE_BASE_PATH = env.get_abspath('ARCHIVE_BASE_PATH')
 
 LICENSE_NONE = ''

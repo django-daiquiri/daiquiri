@@ -29,6 +29,7 @@ class FunctionSerializer(serializers.ModelSerializer):
 class ColumnSerializer(serializers.ModelSerializer):
 
     label = serializers.CharField(source='__str__', read_only=True)
+    width = serializers.IntegerField(source='get_width', read_only=True)
     admin_url = serializers.CharField(read_only=True)
 
     class Meta:
@@ -55,7 +56,8 @@ class ColumnSerializer(serializers.ModelSerializer):
                 'indexed',
                 'std',
                 'table',
-                'admin_url'
+                'admin_url',
+                'width',
             )
 
 
