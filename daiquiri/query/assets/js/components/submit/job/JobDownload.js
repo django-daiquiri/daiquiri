@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { isNil } from 'lodash'
+import { isNil, isEmpty } from 'lodash'
 
 import { bytes2human } from 'daiquiri/core/assets/js/utils/bytes'
 import { jobPhaseClass, jobPhaseMessage } from 'daiquiri/query/assets/js/constants/job'
@@ -62,9 +62,12 @@ const JobDownload = ({ job }) => {
   return job.phase == 'COMPLETED' ? (
     <div className="query-download">
       <p className="mb-4">
-        {gettext('For further processing of the data, you can download the results table' +
+        {
+          isEmpty(downloads) ? gettext('The download of the results is currently not available.') :
+          gettext('For further processing of the data, you can download the results table' +
                  ' to your local machine. For this file several formats are available.' +
-                 ' Please choose a format for the download from the list below.')}
+                 ' Please choose a format for the download from the list below.')
+        }
       </p>
 
       {
