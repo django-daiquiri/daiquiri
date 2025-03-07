@@ -8,13 +8,16 @@
 
 {% block wide %}
 
-    <h1>{{ schema }}.{{ table }}</h1>
+    <h1>{{ table_title }} ({{ schema_name }}.{{ table_name }}) </h1>
+    <p>
+    {{ table_description | safe }}
+    </p>
 
     <div
         id="app"
         class="serve"
-        data-schema="{{ schema }}"
-        data-table="{{ table}}">
+        data-schema="{{ schema_name}}"
+        data-table="{{ table_name}}">
     </div>
 
 {% endblock %}

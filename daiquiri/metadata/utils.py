@@ -21,3 +21,11 @@ def get_user_columns(user, schema_name, table_name):
         return Column.objects.filter_by_access_level(user).filter(table=table)
     else:
         return Column.objects.filter(table=table)
+
+
+def get_table_metadata(user, schema_name, table_name):
+    try:
+        return Table.objects.filter_by_access_level(user).filter(schema__name=schema_name).get(name=table_name)
+    except Table.DoesNotExist:
+        return None
+
