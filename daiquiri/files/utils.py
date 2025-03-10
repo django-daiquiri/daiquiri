@@ -1,6 +1,7 @@
 import logging
 import os
 from pathlib import Path
+from typing import Union
 from urllib.parse import urljoin
 
 from django.conf import settings
@@ -102,7 +103,7 @@ def send_file(request, file_path, search=None):
     return sendfile(request, absolute_file_path)
 
 
-def get_url_from_file_path(file_path: Path | str) -> str:
+def get_url_from_file_path(file_path: Union[Path, str]) -> str:
     url = urljoin(
         settings.FILES_BASE_URL,
         reverse(
@@ -114,11 +115,11 @@ def get_url_from_file_path(file_path: Path | str) -> str:
     return url
 
 
-def make_file_path_absolute(file_path: Path | str) -> Path:
+def make_file_path_absolute(file_path: Union[Path, str]) -> Path:
     res_path = Path(settings.FILES_BASE_PATH) / Path(file_path)
     return res_path
 
 
-def make_file_path_relative(file_path: Path | str) -> Path:
+def make_file_path_relative(file_path: Union[Path, str]) -> Path:
     res_path = Path(file_path).relative_to(settings.FILES_BASE_PATH)
     return res_path
