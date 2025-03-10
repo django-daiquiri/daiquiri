@@ -26,7 +26,7 @@ def file_exists(file_path: str) -> bool:
     return os.path.isfile(absolute_file_path)
 
 
-def get_file_path(file_path: str) -> str | None:
+def get_file_path(file_path: str) -> Union[Path, str, None]:
     if file_exists(file_path):
         return file_path
     elif not file_path or file_path.endswith("/"):
