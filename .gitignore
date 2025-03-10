@@ -6,6 +6,9 @@ __pycache__/
 *.swp
 .DS_Store
 
+# sometimes gcc dumps core when build fails
+core
+
 /daiquiri/auth/static/
 /daiquiri/contact/static/
 /daiquiri/core/static/
