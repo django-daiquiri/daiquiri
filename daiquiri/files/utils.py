@@ -1,11 +1,15 @@
 import logging
 import os
+from pathlib import Path
+from urllib.parse import urljoin
 
 from django.conf import settings
 from django.shortcuts import render
+from django.urls import reverse
 from django.utils.encoding import force_str
 from django.utils.safestring import mark_safe
 from django.utils.timezone import now
+
 from django_sendfile import sendfile
 
 from daiquiri.core.utils import get_client_ip, markdown
@@ -16,12 +20,12 @@ from .models import Directory
 logger = logging.getLogger(__name__)
 
 
-def file_exists(file_path):
+def file_exists(file_path: str) -> bool:
     absolute_file_path = os.path.join(settings.FILES_BASE_PATH, file_path)
     return os.path.isfile(absolute_file_path)
 
 
-def get_file_path(file_path):
+def get_file_path(file_path: str) -> str | None:
     if file_exists(file_path):
         return file_path
     elif not file_path or file_path.endswith("/"):
@@ -44,9 +48,7 @@ def get_directory(user, file_path):
     for directory in Directory.objects.order_by("-depth"):
         if os.path.normpath(file_path).startswith(directory.path):
             try:
-                return Directory.objects.filter_by_access_level(user).get(
-                    pk=directory.pk
-                )
+                return Directory.objects.filter_by_access_level(user).get(pk=directory.pk)
             except Directory.DoesNotExist:
                 return None
 
@@ -98,3 +100,25 @@ def send_file(request, file_path, search=None):
 
     # send the file to the client
     return sendfile(request, absolute_file_path)
+
+
+def get_url_from_file_path(file_path: Path | str) -> str:
+    url = urljoin(
+        settings.FILES_BASE_URL,
+        reverse(
+            "files:file",
+            kwargs={"file_path": file_path},
+        ),
+    )
+
+    return url
+
+
+def make_file_path_absolute(file_path: Path | str) -> Path:
+    res_path = Path(settings.FILES_BASE_PATH) / Path(file_path)
+    return res_path
+
+
+def make_file_path_relative(file_path: Path | str) -> Path:
+    res_path = Path(file_path).relative_to(settings.FILES_BASE_PATH)
+    return res_path
