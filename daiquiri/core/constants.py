@@ -33,7 +33,8 @@ GROUPS = {
         'daiquiri_metadata.view_function',
         'daiquiri_metadata.add_function',
         'daiquiri_metadata.change_function',
-        'daiquiri_metadata.delete_function'
+        'daiquiri_metadata.delete_function',
+        'auth.view_group'
     ],
     'stats_manager': [
         'daiquiri_stats.view_record'
@@ -42,10 +43,12 @@ GROUPS = {
         'daiquiri_query.view_example',
         'daiquiri_query.add_example',
         'daiquiri_query.change_example',
-        'daiquiri_query.delete_example'
+        'daiquiri_query.delete_example',
+        'auth.view_group'
     ],
     'user_manager': [
         'daiquiri_auth.view_profile',
-        'daiquiri_auth.change_profile'
+        'daiquiri_auth.change_profile',
+        'auth.view_group'
     ]
 }
