@@ -24,13 +24,13 @@ const ExamplesDropdown = ({ onDoubleClick }) => {
       <div className="card">
         <div className="dq-browser">
           <div className="dq-browser-title">
-            {gettext('Columns')}
+            {gettext('Examples')}
           </div>
           <div className="dq-browser-filter">
             <input
               type="text"
               className="form-control"
-              placeholder={gettext('Filter experiments')}
+              placeholder={gettext('Filter examples')}
               value={filterValue}
               onChange={(event) => setFilterValue(event.target.value)}>
             </input>
