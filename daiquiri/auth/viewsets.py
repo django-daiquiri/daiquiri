@@ -14,7 +14,7 @@ from daiquiri.core.paginations import ListPagination
 from daiquiri.core.permissions import HasModelPermission
 
 from .models import Profile
-from .permissions import IsAuthManager
+from .permissions import GroupViewPermission, IsAuthManager
 from .serializers import GroupSerializer, ProfileSerializer
 
 
@@ -103,7 +103,7 @@ class SettingsViewSet(viewsets.GenericViewSet):
 
 
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):
-    permission_classes = (IsAuthManager, )
+    permission_classes = (GroupViewPermission, )
     authentication_classes = (SessionAuthentication, TokenAuthentication)
 
     queryset = Group.objects.order_by('name')
