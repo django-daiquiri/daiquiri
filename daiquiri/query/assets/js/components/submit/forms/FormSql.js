@@ -98,7 +98,7 @@ const FormSql = ({ formKey, loadJob, query, queryLanguage }) => {
   }
 
   const handleReplace = (type, item) => {
-    setValues({...values, query: item.query_string})
+    setValues({...values, query: item.query_string, query_language: item.query_language})
   }
 
   return form && (
