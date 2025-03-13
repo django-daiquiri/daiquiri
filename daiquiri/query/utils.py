@@ -364,7 +364,8 @@ def get_query_form_adapter(form):
 
 def get_query_language_choices():
     return [
-        (query_language['key'], query_language['label']) for query_language in settings.QUERY_LANGUAGES
+        (f"{query_language['key']}-{query_language['version']}", query_language['label']) \
+        for query_language in settings.QUERY_LANGUAGES
     ]
 
 
