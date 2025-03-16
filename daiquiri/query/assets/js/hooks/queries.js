@@ -44,7 +44,7 @@ export const useFormQuery = (formKey) => {
 
 export const useDropdownsQuery = () => {
   return useQuery({
-    queryKey: ['drowdowns'],
+    queryKey: ['dropdowns'],
     queryFn: () => QueryApi.fetchDropdowns(),
     placeholderData: keepPreviousData
   })
@@ -55,6 +55,15 @@ export const useDownloadsQuery = () => {
     queryKey: ['downloads'],
     queryFn: () => QueryApi.fetchDownloads(),
     placeholderData: keepPreviousData
+  })
+}
+
+export const useSubmittedDownloadsQuery = (jobId) => {
+  return useQuery({
+    queryKey: ['submittedDownloads', jobId],
+    queryFn: () => QueryApi.fetchSubmittedDownloads(jobId),
+    staleTime: 0,
+    refetchInterval: 2500,
   })
 }
 
@@ -150,6 +159,7 @@ export const useUserExamplesQuery = () => {
   })
 }
 
+/*
 export const useDownloadJobQuery = (job, downloadKey, downloadJobId) => {
   return useQuery({
     queryKey: ['downloadJob', job.id, downloadKey, downloadJobId],
@@ -163,6 +173,18 @@ export const useDownloadJobQuery = (job, downloadKey, downloadJobId) => {
     }
   })
 }
+
+export const useDownloadFileQuery = (job, downloadKey, downloadId) => {
+  return useQuery({
+    queryKey: ['downloadJob', job.id, downloadKey, downloadId],
+    queryFn: () => QueryApi.fetchDownloadFile(job.id, downloadKey, downloadId),
+    enabled: job.phase == 'COMPLETED' && !isEmpty(downloadId),
+    refetchOnWindowFocus: false,
+    refetchIntervalInBackground: true,
+    refetchInterval: false
+  })
+}
+*/
 
 export const useQueuesQuery = () => {
   return useQuery({

@@ -23,6 +23,10 @@ class QueryApi extends BaseApi {
     return this.get('/query/api/downloads/')
   }
 
+  static fetchSubmittedDownloads(id) {
+    return this.get(`/query/api/jobs/${id}/downloads/`)
+  }
+
   static fetchDownloadFormats() {
     return this.get('/query/api/downloadformats/')
   }
@@ -82,16 +86,6 @@ class QueryApi extends BaseApi {
 
   static submitDownloadJob(id, downloadKey, data) {
     return this.post(`/query/api/jobs/${id}/download/${downloadKey}/`, data)
-  }
-
-  static fetchDownloadJob(id, downloadKey, downloadId) {
-    const url = `/query/api/jobs/${id}/download/${downloadKey}/${downloadId}/`
-    return this.get(`${url}?download=`).then((response) => {
-      if (response.phase === 'COMPLETED') {
-        downloadFile(url)
-      }
-      return response
-    })
   }
 
   static fetchUserExamples() {

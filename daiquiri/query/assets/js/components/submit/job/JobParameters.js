@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import { bytes2human } from 'daiquiri/core/assets/js/utils/bytes'
 import { jobPhaseBadge } from 'daiquiri/query/assets/js/constants/job'
 
 const JobParameters = ({ job }) => {
@@ -43,7 +44,7 @@ const JobParameters = ({ job }) => {
           job.start_time && job.creation_time && (
             <>
               <dt className="col-md-3 text-md-end">{gettext('Time in queue')}</dt>
-              <dd className="col-md-9 mb-0">{job.time_queue} s</dd>
+              <dd className="col-md-9 mb-0">{job.time_queue.toFixed(1)} s</dd>
             </>
           )
         }
@@ -52,7 +53,7 @@ const JobParameters = ({ job }) => {
           job.end_time && job.start_time && (
             <>
               <dt className="col-md-3 text-md-end">{gettext('Time for query')}</dt>
-              <dd className="col-md-9 mb-0">{job.time_query} s</dd>
+              <dd className="col-md-9 mb-0">{job.time_query.toFixed(1)} s</dd>
             </>
           )
         }
@@ -70,7 +71,7 @@ const JobParameters = ({ job }) => {
           job.size !== null && (
             <>
               <dt className="col-md-3 text-md-end">{gettext('Size of the table')}</dt>
-              <dd className="col-md-9 mb-0">{job.size}</dd>
+              <dd className="col-md-9 mb-0">{bytes2human(job.size)}</dd>
             </>
           )
         }
