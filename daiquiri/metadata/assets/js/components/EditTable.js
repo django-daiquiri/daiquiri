@@ -198,9 +198,9 @@ const EditTable = ({ values, success, errors, setValues, onDiscover, onSave }) =
               values.creators.map((creator, creatorIndex) => (
                 <EditName
                   key={creatorIndex}
-                  name={creator}
-                  onChange={(name) => setValues({
-                    ...values, creators: values.creators.map((c, ci) => ci == creatorIndex ? name : c)
+                  person={creator}
+                  onChange={(person) => setValues({
+                    ...values, creators: values.creators.map((c, ci) => ci == creatorIndex ? person : c)
                   })}
                   onRemove={() => setValues({
                     ...values, creators: values.creators.filter((c, ci) => (ci != creatorIndex))
@@ -221,9 +221,9 @@ const EditTable = ({ values, success, errors, setValues, onDiscover, onSave }) =
               values.contributors.map((contributor, contributorIndex) => (
                 <EditName
                   key={contributorIndex}
-                  name={contributor}
-                  onChange={(name) => setValues({
-                    ...values, contributors: values.contributors.map((c, ci) => ci == contributorIndex ? name : c)
+                  person={contributor}
+                  onChange={(person) => setValues({
+                    ...values, contributors: values.contributors.map((c, ci) => ci == contributorIndex ? person : c)
                   })}
                   onRemove={() => setValues({
                     ...values, contributors: values.contributors.filter((c, ci) => (ci != contributorIndex))

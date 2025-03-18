@@ -3,32 +3,32 @@ import PropTypes from 'prop-types'
 
 import Input from 'daiquiri/core/assets/js/components/form/Input'
 
-const EditName = ({ name, onChange, onRemove }) => {
+const EditName = ({ person, onChange, onRemove }) => {
   return (
     <div className="d-flex flex-row">
       <div className="flex-grow-1 me-2">
         <Input
           label={gettext('Name')}
-          value={name.name || ''}
-          onChange={(name) => onChange({ ...name, name })} />
+          value={person.name || ''}
+          onChange={(name) => onChange({ ...person, name })} />
       </div>
       <div className="flex-grow-1 me-2">
         <Input
           label={gettext('First name')}
-          value={name.first_name || ''}
-          onChange={(first_name) => onChange({ ...name, first_name })} />
+          value={person.first_name || ''}
+          onChange={(first_name) => onChange({ ...person, first_name })} />
       </div>
       <div className="flex-grow-1 me-2">
         <Input
           label={gettext('Last name')}
-          value={name.last_name || ''}
-          onChange={(last_name) => onChange({ ...name, last_name })} />
+          value={person.last_name || ''}
+          onChange={(last_name) => onChange({ ...person, last_name })} />
       </div>
       <div className="flex-grow-1 me-2">
         <Input
-          label={gettext('ORCIDiD')}
-          value={name.orcid || ''}
-          onChange={(orcid) => onChange({ ...name, orcid })} />
+          label={gettext('ORCiD')}
+          value={person.orcid || ''}
+          onChange={(orcid) => onChange({ ...person, orcid })} />
       </div>
       <div className="align-self-end">
         <button type="button "className="btn btn-outline-danger mb-3" onClick={onRemove}>
@@ -40,7 +40,7 @@ const EditName = ({ name, onChange, onRemove }) => {
 }
 
 EditName.propTypes = {
-  name: PropTypes.object.isRequired,
+  person: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired,
   onRemove: PropTypes.func.isRequired
 }

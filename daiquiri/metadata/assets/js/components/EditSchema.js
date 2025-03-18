@@ -178,9 +178,9 @@ const EditSchema = ({ values, success, errors, setValues, onSave }) => {
               values.creators.map((creator, creatorIndex) => (
                 <EditName
                   key={creatorIndex}
-                  name={creator}
-                  onChange={(name) => setValues({
-                    ...values, creators: values.creators.map((c, ci) => ci == creatorIndex ? name : c)
+                  person={creator}
+                  onChange={(creator) => setValues({
+                    ...values, creators: values.creators.map((c, ci) => ci == creatorIndex ? creator : c)
                   })}
                   onRemove={() => setValues({
                     ...values, creators: values.creators.filter((c, ci) => (ci != creatorIndex))
@@ -201,9 +201,9 @@ const EditSchema = ({ values, success, errors, setValues, onSave }) => {
               values.contributors.map((contributor, contributorIndex) => (
                 <EditName
                   key={contributorIndex}
-                  name={contributor}
-                  onChange={(name) => setValues({
-                    ...values, contributors: values.contributors.map((c, ci) => ci == contributorIndex ? name : c)
+                  person={contributor}
+                  onChange={(person) => setValues({
+                    ...values, contributors: values.contributors.map((c, ci) => ci == contributorIndex ? person : c)
                   })}
                   onRemove={() => setValues({
                     ...values, contributors: values.contributors.filter((c, ci) => (ci != contributorIndex))
