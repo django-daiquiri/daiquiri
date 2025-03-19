@@ -21,10 +21,8 @@ class Job(models.Model):
     PHASE_RUN = 'RUN'
     PHASE_ABORT = 'ABORT'
     PHASE_ACTIVE = (
-        PHASE_EXECUTING,
-        PHASE_PENDING,
         PHASE_QUEUED,
-        PHASE_RUN
+        PHASE_EXECUTING
     )
     PHASE_CHOICES = (
         (PHASE_PENDING, _('Pending')),

@@ -361,15 +361,6 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
 
         try:
             download_job = download_job_model.objects.get(query_job=job, **params)
-
-            # check if the file was lost
-            if (download_job.phase == download_job.PHASE_COMPLETED and \
-                    not os.path.isfile(download_job.file_path)) or \
-                    download_job.phase == download_job.PHASE_ERROR or \
-                    download_job.phase == download_job.PHASE_ABORTED:
-                # set the phase back to pending so that the file is recreated
-                download_job.phase = download_job.PHASE_PENDING
-
         except download_job_model.DoesNotExist:
             download_job = download_job_model(
                 job_type=QueryJob.JOB_TYPE_INTERFACE,
@@ -380,15 +371,26 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
             )
             download_job.save()
 
-        try:
-            download_job.process()
+        # check if the file was lost
+        # and allow re-run the aborted jobs and jobs exited with an error
+        if (download_job.phase == download_job.PHASE_COMPLETED and \
+                not os.path.isfile(download_job.file_path)) or \
+                download_job.phase == download_job.PHASE_ERROR or \
+                download_job.phase == download_job.PHASE_ABORTED:
+            download_job.phase = download_job.PHASE_PENDING
+            download_job.save()
+
+        if download_job.phase == download_job.PHASE_PENDING:
+            try:
+                download_job.process()
+            except ValidationError as e:
+                download_job.phase = download_job.PHASE_ERROR
+                download_job.error_summary = str(e)
+                download_job.save()
+                raise e
+
             download_job.save()
             download_job.run()
-        except ValidationError as e:
-            download_job.phase = download_job.PHASE_ERROR
-            download_job.error_summary = str(e)
-            download_job.save()
-            raise e
 
         return Response({
             'id': download_job.id,

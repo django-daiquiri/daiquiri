@@ -27,9 +27,9 @@ const JobDownload = ({ job }) => {
       <p className="mb-4">
         {
           isEmpty(downloads) ? gettext('The download of the results is currently not available.') :
-          gettext('For further processing of the data, you can download the results table' +
-                 ' to your local machine. For this file several formats are available.' +
-                 ' Please choose a format for the download from the list below.')
+          gettext('For further processing of the data, you can create a file from the results table' +
+                 ' and then download it to your local machine. For this file several formats are available.' +
+                 ' Please choose a format from the list below.')
         }
       </p>
 
