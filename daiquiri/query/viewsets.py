@@ -288,16 +288,17 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
             download_job_model = import_class(download_config['model'])
             download_jobs = download_job_model.objects.filter(query_job=pk)
             for download_job in download_jobs:
-                tmp = {
+                job_response = {
                     'key': download_key,
                     'id': download_job.id,
                     'phase': download_job.phase,
+                    'error_summary': download_job.error_summary,
                     'size': get_file_size(download_job.file_path),
                 }
                 for par in download_config.get('params', []):
                     if hasattr(download_job, par):
-                        tmp[par] = getattr(download_job, par)
-                response.append(tmp)
+                        job_response[par] = getattr(download_job, par)
+                response.append(job_response)
 
 
         return Response(response)
@@ -366,12 +367,8 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
                     not os.path.isfile(download_job.file_path)) or \
                     download_job.phase == download_job.PHASE_ERROR or \
                     download_job.phase == download_job.PHASE_ABORTED:
-
                 # set the phase back to pending so that the file is recreated
                 download_job.phase = download_job.PHASE_PENDING
-                download_job.process()
-                download_job.save()
-                download_job.run()
 
         except download_job_model.DoesNotExist:
             download_job = download_job_model(
@@ -381,14 +378,23 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
                 query_job=job,
                 **params
             )
+            download_job.save()
+
+        try:
             download_job.process()
             download_job.save()
             download_job.run()
+        except ValidationError as e:
+            download_job.phase = download_job.PHASE_ERROR
+            download_job.error_summary = str(e)
+            download_job.save()
+            raise e
 
         return Response({
             'id': download_job.id,
             'key': download_key
         })
+
 
     @action(detail=True, methods=['get'], url_path=r'stream/(?P<format_key>[A-Za-z0-9\-]+)', url_name='stream')
     def stream(self, request, pk=None, format_key=None):

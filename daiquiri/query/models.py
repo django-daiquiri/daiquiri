@@ -521,7 +521,8 @@ class QueryArchiveJob(Job):
     )
     files = models.JSONField(
         verbose_name=_('Files'),
-        help_text=_('List of files in the archive.')
+        help_text=_('List of files in the archive.'),
+        default=list
     )
 
     class Meta:
@@ -602,6 +603,7 @@ class QueryArchiveJob(Job):
             raise ValidationError({
                 'phase': ['Job is not PENDING.']
             })
+
 
     def delete_file(self):
         try:

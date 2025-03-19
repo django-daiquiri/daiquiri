@@ -51,7 +51,7 @@ const ArchiveDownload = ({ jobId, columns, downloadJobs, onSubmit }) => {
             <span>
             <span className="spinner-border spinner-border-sm">
             </span>
-              {gettext('Pending..')}
+              {gettext(' Pending..')}
             </span>
           </p>
         </div>

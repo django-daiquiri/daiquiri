@@ -54,7 +54,7 @@ const TableDownload = ({ jobId, downloadJobs, onSubmit }) => {
             <span>
             <span className="spinner-border spinner-border-sm">
             </span>
-              {gettext('Queued..')}
+              {gettext(' Queued..')}
             </span>
           </p>
         </div>
@@ -66,7 +66,7 @@ const TableDownload = ({ jobId, downloadJobs, onSubmit }) => {
             <span>
             <span className="spinner-border spinner-border-sm">
             </span>
-              {gettext('Pending..')}
+              {gettext(' Pending..')}
             </span>
           </p>
         </div>
@@ -104,6 +104,8 @@ const TableDownload = ({ jobId, downloadJobs, onSubmit }) => {
         {renderDefault()}
         <p className="text-danger">
           {gettext('An error occurred while creating the file.')}
+          {' '}
+          {interpolate(gettext('Error message: "%s".'), [downloadJob.error_summary])}
           {' '}
           {gettext('Please contact the maintainers of this site, if the problem persists.')}
         </p>
