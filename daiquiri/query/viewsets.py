@@ -271,6 +271,39 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
 
         return Response(job.columns())
 
+    @action(detail=True, methods=['get'], url_name='submitted-downloads',
+            url_path=r'downloads')
+    def get_downloads(self, request, pk=None):
+        try:
+            self.get_queryset().get(pk=pk)
+        except QueryJob.DoesNotExist as e:
+            raise NotFound from e
+
+        response = []
+        for download_key in [query_download['key'] for query_download in settings.QUERY_DOWNLOADS]:
+            download_config = get_download_config(download_key)
+            if download_config is None:
+                raise ValidationError({'download': f'Download key "{download_key}" is not supported.'})
+
+            download_job_model = import_class(download_config['model'])
+            download_jobs = download_job_model.objects.filter(query_job=pk)
+            for download_job in download_jobs:
+                job_response = {
+                    'key': download_key,
+                    'id': download_job.id,
+                    'phase': download_job.phase,
+                    'error_summary': download_job.error_summary,
+                    'size': get_file_size(download_job.file_path),
+                }
+                for par in download_config.get('params', []):
+                    if hasattr(download_job, par):
+                        job_response[par] = getattr(download_job, par)
+                response.append(job_response)
+
+
+        return Response(response)
+
+
     @action(detail=True, methods=['get'], url_name='download',
             url_path=r'download/(?P<download_key>[a-z\-]+)/(?P<download_job_id>[A-Za-z0-9\-]+)')
     def download(self, request, pk=None, download_key=None, download_job_id=None):
@@ -290,7 +323,7 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
         except download_job_model.DoesNotExist as e:
             raise NotFound from e
 
-        if download_job.phase == download_job.PHASE_COMPLETED and request.GET.get('download', True):
+        if download_job.phase == download_job.PHASE_COMPLETED and request.GET.get('download', False):
             Record.objects.create(
                 time=now(),
                 resource_type='DOWNLOAD',
@@ -328,17 +361,6 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
 
         try:
             download_job = download_job_model.objects.get(query_job=job, **params)
-
-            # check if the file was lost
-            if download_job.phase == download_job.PHASE_COMPLETED and \
-                    not os.path.isfile(download_job.file_path):
-
-                # set the phase back to pending so that the file is recreated
-                download_job.phase = download_job.PHASE_PENDING
-                download_job.process()
-                download_job.save()
-                download_job.run()
-
         except download_job_model.DoesNotExist:
             download_job = download_job_model(
                 job_type=QueryJob.JOB_TYPE_INTERFACE,
@@ -347,7 +369,26 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
                 query_job=job,
                 **params
             )
-            download_job.process()
+            download_job.save()
+
+        # check if the file was lost
+        # and allow re-run the aborted jobs and jobs exited with an error
+        if (download_job.phase == download_job.PHASE_COMPLETED and \
+                not os.path.isfile(download_job.file_path)) or \
+                download_job.phase == download_job.PHASE_ERROR or \
+                download_job.phase == download_job.PHASE_ABORTED:
+            download_job.phase = download_job.PHASE_PENDING
+            download_job.save()
+
+        if download_job.phase == download_job.PHASE_PENDING:
+            try:
+                download_job.process()
+            except ValidationError as e:
+                download_job.phase = download_job.PHASE_ERROR
+                download_job.error_summary = str(e)
+                download_job.save()
+                raise e
+
             download_job.save()
             download_job.run()
 
@@ -355,6 +396,7 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
             'id': download_job.id,
             'key': download_key
         })
+
 
     @action(detail=True, methods=['get'], url_path=r'stream/(?P<format_key>[A-Za-z0-9\-]+)', url_name='stream')
     def stream(self, request, pk=None, format_key=None):

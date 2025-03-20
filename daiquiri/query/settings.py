@@ -122,7 +122,7 @@ QUERY_DOWNLOAD_FORMATS = [
         'key': 'votable',
         'extension': 'xml',
         'content_type': 'application/xml',
-        'label': 'IVOA VOTable XML file - TABLEDATA serialization',
+        'label': 'IVOA VOTable',
         'help': 'A XML file using the IVOA VOTable format. Use this option if you intend ' \
                 'to use VO compatible software to further process the data.'
     },
@@ -130,7 +130,7 @@ QUERY_DOWNLOAD_FORMATS = [
         'key': 'csv',
         'extension': 'csv',
         'content_type': 'text/csv',
-        'label': 'Comma separated Values',
+        'label': 'Comma-separated Values',
         'help': 'A text file with a line for each row of the table. The fields are delimited ' \
                 'by a comma and quoted by double quotes. Use this option for a later import ' \
                 'into a spreadsheed application or a custom script. Use this option if you ' \
