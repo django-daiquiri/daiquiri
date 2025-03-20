@@ -1,6 +1,6 @@
 {
   "name": "daiquiri",
-  "version": "1.0.0",
+  "version": "1.0.0dev",
   "scripts": {
     "build:prod": "webpack --config webpack.config.js --mode production",
     "build": "webpack --config webpack.config.js --mode development",
