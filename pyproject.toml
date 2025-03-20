@@ -33,7 +33,7 @@ dynamic = [
   "version",
 ]
 dependencies = [
-  "astropy~=7.0.1",
+  "astropy~=6.1.7",
   "celery~=5.4.0",
   "Django~=4.2.20",
   "django-allauth~=0.54.0",
