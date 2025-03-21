@@ -18,6 +18,5 @@ If you are a maintainer and you want to review a Pull-Request please follow the 
 * Fetch the PR in your local-repository with: `git fetch origin pull/<PR-ID>/head:pr/<PR-ID> && git checkout pr/<PR-ID>`
 * Perform the unit-tests of daiquiri
 * Perform the instance-tests on the test-instance (dq-dev + test-app)
-* Perform the instance-tests on the conserned services (dq-dev + service-app)
+* Perform the instance-tests on the concerned services (dq-dev + service-app)
 * Report any failure to the author of the pull-request
-

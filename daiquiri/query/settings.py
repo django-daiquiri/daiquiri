@@ -44,17 +44,14 @@ QUERY_FORMS = [
     {
         'key': 'sql',
         'label': 'SQL query',
-        'service': 'query/js/forms/sql.js',
         'template': 'query/query_form_sql.html'
     },
     {
         'key': 'upload',
         'label': 'Upload VOTable',
-        'service': 'query/js/forms/upload.js',
         'template': 'query/query_form_upload.html'
     }
 ]
-
 QUERY_PLOTS = [
     {
         'key': 'scatter_plot',
@@ -73,38 +70,49 @@ QUERY_PLOTS = [
     }
 ]
 
-QUERY_DROPDOWN_FUNCTIONS = False;
 QUERY_DROPDOWNS = [
     {
+        'key': 'schemas',
+        'label': 'Database',
+    },
+    {
+        'key': 'columns',
+        'label': 'Columns',
+    },
+    {
+        'key': 'functions',
+        'label': 'Functions',
+    },
+    {
         'key': 'simbad',
-        'service': 'query/js/dropdowns/simbad.js',
-        'template': 'query/query_dropdown_simbad.html',
+        'label': 'Simbad',
         'options': {
             'url': 'http://simbad.u-strasbg.fr/simbad/sim-id'
         }
     },
     {
         'key': 'vizier',
-        'service': 'query/js/dropdowns/vizier.js',
-        'template': 'query/query_dropdown_vizier.html',
+        'label': 'VizieR',
         'options': {
             'url': 'http://vizier.u-strasbg.fr/viz-bin/votable',
             'catalogs': ['I/322A', 'I/259']
         }
+    },
+    {
+        'key': 'examples',
+        'label': 'Examples',
+        'classes': 'ms-auto'
     }
 ]
 QUERY_DOWNLOADS = [
     {
         'key': 'table',
         'model': 'daiquiri.query.models.DownloadJob',
-        'template': 'query/query_download_table.html',
         'params': ['format_key']
     },
     {
         'key': 'archive',
         'model': 'daiquiri.query.models.QueryArchiveJob',
-        'template': 'query/query_download_archive.html',
-        'service': 'query/js/downloads/archive.js',
         'params': ['column_name']
     }
 ]
@@ -114,15 +122,19 @@ QUERY_DOWNLOAD_FORMATS = [
         'key': 'votable',
         'extension': 'xml',
         'content_type': 'application/xml',
-        'label': 'IVOA VOTable XML file - TABLEDATA serialization',
-        'help': 'A XML file using the IVOA VOTable format. Use this option if you intend to use VO compatible software to further process the data.'
+        'label': 'IVOA VOTable',
+        'help': 'A XML file using the IVOA VOTable format. Use this option if you intend ' \
+                'to use VO compatible software to further process the data.'
     },
     {
         'key': 'csv',
         'extension': 'csv',
         'content_type': 'text/csv',
-        'label': 'Comma separated Values',
-        'help': 'A text file with a line for each row of the table. The fields are delimited by a comma and quoted by double quotes. Use this option for a later import into a spreadsheed application or a custom script. Use this option if you are unsure what to use.'
+        'label': 'Comma-separated Values',
+        'help': 'A text file with a line for each row of the table. The fields are delimited ' \
+                'by a comma and quoted by double quotes. Use this option for a later import ' \
+                'into a spreadsheed application or a custom script. Use this option if you ' \
+                'are unsure what to use.'
     },
     {
         'key': 'fits',

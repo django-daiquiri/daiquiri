@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.db.models.functions import ExtractYear
 from django.views.generic import TemplateView
 
 from daiquiri.core.views import ModelPermissionMixin
@@ -12,7 +11,7 @@ class ManagementView(ModelPermissionMixin, TemplateView):
     permission_required = 'daiquiri_stats.view_record'
 
     def get_context_data(self, **kwargs):
-        context = super(ManagementView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
 
         context['resource_types'] = settings.STATS_RESOURCE_TYPES
 

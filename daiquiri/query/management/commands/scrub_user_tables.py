@@ -1,9 +1,6 @@
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
-from django.db.utils import ProgrammingError
-
-from rest_framework.exceptions import ValidationError
 
 from daiquiri.core.adapter import DatabaseAdapter
 from daiquiri.query.models import QueryJob
@@ -19,7 +16,7 @@ class Command(BaseCommand):
         if options['user']:
             usernames = [options['user']]
         else:
-            usernames = ['anonymous'] + list(User.objects.values_list('username', flat=True))
+            usernames = ['anonymous', *list(User.objects.values_list('username', flat=True))]
 
         adapter = DatabaseAdapter()
 
@@ -28,7 +25,7 @@ class Command(BaseCommand):
             schema_name = settings.QUERY_USER_SCHEMA_PREFIX + username
 
             tables = adapter.fetch_tables(schema_name)
-            jobs = QueryJob.objects.filter(schema_name=schema_name)
+            QueryJob.objects.filter(schema_name=schema_name)
 
             for table in tables:
                 job = QueryJob.objects.filter(
@@ -43,7 +40,7 @@ class Command(BaseCommand):
             print('The following database tables have no associated QueryJob:')
 
             for stale_table in stale_tables:
-                print('%s.%s -> %s' % stale_table)
+                print('{}.{} -> {}'.format(*stale_table))
 
             if options['delete']:
                 for schema_name, table_name, phase in stale_tables:

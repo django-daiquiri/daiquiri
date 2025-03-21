@@ -2,9 +2,9 @@ from django.apps import apps
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from daiquiri.metadata.models import Schema, Table, Column
-
+from daiquiri.metadata.models import Column, Schema, Table
 from daiquiri.tap.constants import TAP_SCHEMA_METADATA
+
 
 class Command(BaseCommand):
 
@@ -47,7 +47,7 @@ class Command(BaseCommand):
                 column.save()
 
         if apps.is_installed('daiquiri.datalink'):
-            from daiquiri.datalink.constants import DATALINK_TABLE, DATALINK_FIELDS
+            from daiquiri.datalink.constants import DATALINK_FIELDS, DATALINK_TABLE
 
             table = Table()
             table.schema = schema

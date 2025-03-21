@@ -1,7 +1,7 @@
 # see also https://strongarm.io/blog/multiple-databases-in-django/
 
 
-class DaiquiriRouter(object):
+class DaiquiriRouter:
 
     def db_for_read(self, model, **hints):
         if model._meta.app_label in self.app_labels:
@@ -51,7 +51,7 @@ class OaiRouter(DaiquiriRouter):
     app_labels = ['daiquiri_oai']
 
 
-class DataRouter(object):
+class DataRouter:
 
     def db_for_read(self, model, **hints):
         return None

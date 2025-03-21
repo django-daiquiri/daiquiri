@@ -1,0 +1,25 @@
+.ordering {
+    display: inline-block;
+
+    position: relative;
+    height: 1em;
+    width: 1em;
+    margin-left: 0.2em;
+
+    user-select: none;
+    font-size: 0.8em;
+
+    .ordering-up,
+    .ordering-down {
+        display: inline-block;
+        position: absolute;
+        cursor: pointer;
+    }
+
+    .ordering-up {
+        bottom: 0.1em;
+    }
+    .ordering-down {
+        top: 0.1em;
+    }
+}

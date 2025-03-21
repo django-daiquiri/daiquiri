@@ -33,7 +33,7 @@ def generate_csv(generator, fields):
                     if col.startswith('{') and col.endswith('}'):
                         corrected_col = col.replace('{', '[').replace('}', ']')
 
-                corrected_row = corrected_row + [corrected_col]
+                corrected_row = [*corrected_row, corrected_col]
 
             f = io_class()
             csv.writer(f, quotechar='"').writerow(corrected_row)
@@ -61,23 +61,16 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
 
     for key, value in infos:
         if value is not None:
-            yield '''
-            <INFO name=%(key)s value=%(value)s />''' % {
-                'key': quoteattr(key),
-                'value': quoteattr(value)
-            }
+            yield f'''
+            <INFO name={quoteattr(key)} value={quoteattr(value)} />'''
 
     for title, content_role, href in links:
-        yield '''
-        <LINK title=%(title)s content-role=%(content_role)s href=%(href)s/>''' % {
-            'title': quoteattr(title),
-            'content_role': quoteattr(content_role),
-            'href': quoteattr(href)
-        }
+        yield f'''
+        <LINK title={quoteattr(title)} content-role={quoteattr(content_role)} href={quoteattr(href)}/>'''
 
     if table is not None:
-        yield '''
-        <TABLE name="%s">''' % table
+        yield f'''
+        <TABLE name="{table}">'''
     else:
         yield '''
         <TABLE>'''
@@ -85,13 +78,13 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
     for field in fields:
         attrs = []
         for key in ['name', 'unit', 'ucd', 'utype']:
-            if key in field and field[key]:
+            if field.get(key):
                 value = field[key].replace('&', '&amp;') \
                                   .replace('"', '&quot;') \
                                   .replace("'", '&apos;') \
                                   .replace('<', '&lt;') \
                                   .replace('>', '&gt;')
-                attrs.append('%s="%s"' % (key, value))
+                attrs.append(f'{key}="{value}"')
 
         if field.get('ucd'):
             if 'meta.id' in field['ucd'] and 'meta.ref' in field['ucd']:
@@ -101,17 +94,17 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
             if field.get('datatype') == 'char' and field['arraysize'] is None:
                 attrs.append('arraysize="*"')
             elif field['arraysize']:
-                attrs.append('arraysize="%s"' % field['arraysize'])
+                attrs.append('arraysize="{}"'.format(field['arraysize']))
 
         if 'datatype' in field:
             if field['datatype'] in ['boolean', 'char', 'unsignedByte', 'short', 'int', 'long', 'float', 'double']:
-                attrs.append('datatype="%s"' % field['datatype'])
+                attrs.append('datatype="{}"'.format(field['datatype']))
             else:
-                attrs.append('xtype="%s"' % field['datatype'])
+                attrs.append('xtype="{}"'.format(field['datatype']))
 
         if attrs:
             yield '''
-            <FIELD %s />''' % ' '.join(attrs)
+            <FIELD {} />'''.format(' '.join(attrs))
 
     if not empty:
         yield '''
@@ -122,9 +115,12 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
         for row in generator:
             yield '''
                     <TR>
-                        <TD>%s</TD>
-                    </TR>''' % '''</TD>
-                        <TD>'''.join([('' if cell in ['NULL', None] else correct_col_for_votable(escape(str(cell)))) for cell in row])
+                        <TD>{}</TD>
+                    </TR>'''.format('''</TD>
+                        <TD>'''.join([
+                            ('' if cell in ['NULL', None] else correct_col_for_votable(escape(str(cell))))
+                            for cell in row
+                        ]))
 
         yield '''
                 </TABLEDATA>
@@ -145,7 +141,7 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
         <GROUP name="{name}">'''.format(**group)
             for param in group.get('params', []):
                 yield '''
-            <PARAM name="{name}" datatype="{datatype}" arraysize="{arraysize}" value="{value}" ref="{ref}"/>'''.format(**param)
+            <PARAM name="{name}" datatype="{datatype}" arraysize="{arraysize}" value="{value}" ref="{ref}"/>'''.format(**param)  # noqa: E501
             yield '''
         </GROUP>'''
         yield '''
@@ -205,42 +201,42 @@ def generate_fits(generator, fields, nrows, table_name=None):
     site = str(Site.objects.get_current())[:30]
 
     content = """
-                                                                               
-                                  `,......`                                    
-                               :::.````````...                                 
-                             ::``,:::,`.....``..`                              
-                           ,:.`,``,:::`....`````..                             
-                          .:``:::,``,:`::```...``..                            
-                          :,`::::::,`````,::::::`.:                            
-                          :::::::::::::::::::::::::                            
-         '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''           
-         ,:,,,,,,,,,,,,,,,,,,,,,,,,,,,,,............................           
-           :,,,`````````...,,,,,,,,............................```             
-             ,,,.```````...,,,,,,,,............................`               
-              `,,,``````....,,,,,,,...........................`                
-                :+++,,,,,::::+++++++++++++++++++++++++++++++'                  
-                  \\\\     created with django-daiquiri     //                   
-                    \\\\               v%s//                     
-                      \\\\%s//                       
-                        ,,,.....,,,..................`                         
-                         :++':;;;++++++++++++++++++'                           
-                           ,,,,,,,::::;;;;;;;;''''                             
-                             ,,,................                               
-                               ,,,............                                 
-                                 ,,.........`                                  
-                                  `;;;;;;;:                                    
-                                   ,'` `''                                     
-                                    :: ::                                      
-                                     . .`                                      
-        +++++++++:             ,                       ,          .,           
-         +++    +++           '+'                     '+'         ++.          
-         +++    ,++:  :'+'.  `'+'   ,'';'+ ;'+` .'+' `'+' .++,:+ ;++`          
-         +++    `++; ++  '';  ;'; `''  `''  ''`  ;''  ;''  ;++:,  ++`          
-         +++    ;++. :++''''  ;'; ;''  `''  ''`  ;''  ;''  ;+'    ++`          
-         +++  `+++: .++  '''  ;'' .''  .''  '',  '''  ;''  '+'    ++`          
-        +++++++:     `'+'`+',,+++,  ;+'.++   ;++: +'.,+++,,++++. ++++          
-                                      `+++.                                    
-                                                                          
+
+                                  `,......`
+                               :::.````````...
+                             ::``,:::,`.....``..`
+                           ,:.`,``,:::`....`````..
+                          .:``:::,``,:`::```...``..
+                          :,`::::::,`````,::::::`.:
+                          :::::::::::::::::::::::::
+         '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+         ,:,,,,,,,,,,,,,,,,,,,,,,,,,,,,,............................
+           :,,,`````````...,,,,,,,,............................```
+             ,,,.```````...,,,,,,,,............................`
+              `,,,``````....,,,,,,,...........................`
+                :+++,,,,,::::+++++++++++++++++++++++++++++++'
+                  \\\\     created with django-daiquiri     //
+                    \\\\               v%s//
+                      \\\\%s//
+                        ,,,.....,,,..................`
+                         :++':;;;++++++++++++++++++'
+                           ,,,,,,,::::;;;;;;;;''''
+                             ,,,................
+                               ,,,............
+                                 ,,.........`
+                                  `;;;;;;;:
+                                   ,'` `''
+                                    :: ::
+                                     . .`
+        +++++++++:             ,                       ,          .,
+         +++    +++           '+'                     '+'         ++.
+         +++    ,++:  :'+'.  `'+'   ,'';'+ ;'+` .'+' `'+' .++,:+ ;++`
+         +++    `++; ++  '';  ;'; `''  `''  ''`  ;''  ;''  ;++:,  ++`
+         +++    ;++. :++''''  ;'; ;''  `''  ''`  ;''  ;''  ;+'    ++`
+         +++  `+++: .++  '''  ;'' .''  .''  '',  '''  ;''  '+'    ++`
+        +++++++:     `'+'`+',,+++,  ;+'.++   ;++: +'.,+++,,++++. ++++
+                                      `+++.
+
     """.replace('\x0a', ' ') % (daiquiri_version.ljust(18),
            (' ' * (15 - len(site) // 2) + site).ljust(30))
 
@@ -277,8 +273,7 @@ def generate_fits(generator, fields, nrows, table_name=None):
         ]
     if table_name is not None:
         # table_name needs to be shorter than 68 chars
-        header1.append(("EXTNAME = '%s' / table name" %
-                        str(table_name[:68])).ljust(80))
+        header1.append((f"EXTNAME = '{table_name[:68]!s}' / table name").ljust(80))
 
     h1 = ''.join(header1) % (naxis1, naxis2, tfields)
 
@@ -330,7 +325,7 @@ def generate_fits(generator, fields, nrows, table_name=None):
             h1 += temp
 
     now = datetime.datetime.utcnow().replace(microsecond=0).isoformat()
-    h1 += ("DATE-HDU= '%s' / UTC date of HDU creation" % now).ljust(80)
+    h1 += (f"DATE-HDU= '{now}' / UTC date of HDU creation").ljust(80)
 
     h1 += 'END'.ljust(80)
     h1 += ' ' * (2880 * (len(h1) // 2880 + 1) - len(h1))

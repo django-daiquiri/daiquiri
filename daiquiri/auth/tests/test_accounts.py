@@ -1,5 +1,7 @@
 from django.urls import reverse
 
+from allauth.account.models import EmailAddress
+
 from ..models import Profile
 
 
@@ -14,19 +16,19 @@ def test_login(db, client):
 
 
 def test_login_unverified(db, client):
+    email = EmailAddress.objects.filter(user__username='user').first()
+    email.verified = False
+    email.save()
+
     url = reverse('account_login')
     response = client.post(url, {
-        'login': 'unverified_user',
+        'login': 'user',
         'password': 'user'
     })
 
     # check that the signup redirects to the pending page or the confirm email page
     assert response.status_code == 302
     assert response.url == reverse('account_email_verification_sent')
-
-    # check that a profile is pending
-    profile = Profile.objects.get(user__username='unverified_user')
-    assert profile.is_pending is True
 
 
 def test_invalid(db, client):
@@ -71,12 +73,16 @@ def test_signup_post_email_exists_verified(db, client):
 
 
 def test_signup_post_email_exists_unverified(db, client):
+    email = EmailAddress.objects.filter(user__username='user').first()
+    email.verified = False
+    email.save()
+
     url = reverse('account_signup')
     response = client.post(url, {
-        'email': 'user_unverif@example.com',
-        'username': 'unverified_user_2',
-        'first_name': 'Gregor2',
-        'last_name': 'Unverified',
+        'email': 'user@example.com',
+        'username': 'user2',
+        'first_name': 'Tanja',
+        'last_name': 'Test',
         'password1': 'testing',
         'password2': 'testing'
     })
@@ -90,19 +96,23 @@ def test_signup_post_email_exists_unverified(db, client):
 
 
 def test_signup_post_user_exists_unverified(db, client):
+    email = EmailAddress.objects.filter(user__username='user').first()
+    email.verified = False
+    email.save()
+
     url = reverse('account_signup')
     response = client.post(url, {
-        'email': 'user_unverif@example2.com',
-        'username': 'unverified_user',
-        'first_name': 'Gregor',
-        'last_name': 'Unverified',
+        'email': 'user@example.com',
+        'username': 'user',
+        'first_name': 'Tanja',
+        'last_name': 'Test',
         'password1': 'testing',
         'password2': 'testing'
     })
 
     # check that the signup returns 200 (with validation error)
     assert response.status_code == 200
-    assert b'* A user with that username already exists.' in response.content
+    assert b'A user with that username already exists.' in response.content
 
 
 def test_signup_post_user_exists_verified(db, client):
@@ -118,7 +128,7 @@ def test_signup_post_user_exists_verified(db, client):
 
     # check that the signup returns 200 (with validation error)
     assert response.status_code == 200
-    assert b'* A user with that username already exists.' in response.content
+    assert b'A user with that username already exists.' in response.content
 
 
 def test_profile_get_for_user(db, client):

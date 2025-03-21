@@ -1,18 +1,29 @@
-<!DOCTYPE html>
-<html {% block htmlargs %}{% endblock %}>
+{% load static %}<!DOCTYPE html>
+<html>
 
 <head>
 
 {% include 'core/base_head.html' %}
-{% block headextra %}{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'core/css/bootstrap.css' %}" type="text/css" />
+<link rel="stylesheet" href="{% static 'core/css/base.css' %}" type="text/css" />
+<link rel="stylesheet" href="{% static 'core/css/style.css' %}" type="text/css" />
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'core/js/bootstrap.js' %}" defer="defer"></script>
+{% endblock %}
 
 </head>
 
-<body {% block bodyargs %}{% endblock %}>
+<body>
 
 {% include 'core/base_navigation.html' %}
 
+<div class="content">
 {% block content %}{% endblock %}
+</div>
 
 {% include 'core/base_footer.html' %}
 

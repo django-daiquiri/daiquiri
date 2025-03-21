@@ -1,9 +1,9 @@
 {% load static %}
 {% load i18n %}
 
-<div class="panel panel-default panel-license">
-    <div class="panel-heading">{% trans 'License' %}</div>
-    <div class="panel-body">
+<div class="card mb-3">
+    <div class="card-header">{% trans 'License' %}</div>
+    <div class="card-body">
         <p class="text-center">
             <img src="{% static 'metadata/img' %}/{{ license | lower }}.png" />
         </p>

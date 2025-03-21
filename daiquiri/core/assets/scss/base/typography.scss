@@ -1,0 +1,67 @@
+html {
+    --dq-font-size: 14px;  // sets font-size for <html> and sets what 1rem means
+    font-size: var(--dq-font-size);
+}
+
+h1 {
+    margin-bottom: 2rem;
+}
+h2 {
+    font-size: 1.6rem;
+    margin-bottom: 1rem;
+}
+h3 {
+    font-size: 1.4rem;
+    margin-bottom: 0.5rem;
+}
+h4 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+h5 {
+    // identical to p, but bold
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+h6 {
+    // identical to p
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+a,
+.btn-link {
+    text-decoration: var(--bs-link-decoration);
+
+    &:hover {
+        text-decoration: var(--bs-link-hover-decoration);
+    }
+}
+
+a.btn {
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: none;
+    }
+}
+
+.btn-link {
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+    border: none;
+    text-align: left;
+    font-size: var(--bs-body-font-size);
+    font-weight: var(--bs-body-weight-size);
+    line-height: var(--bs-body-line-height);
+}
+
+.btn-outline-form {
+    --bs-btn-border-color: var(--bs-border-color);
+    --bs-btn-hover-bg: var(--bs-secondary-bg);
+    --bs-btn-hover-border-color: var(--bs-border-color);
+    --bs-btn-active-bg: var(--bs-secondary-bg);
+    --bs-btn-active-border-color: var(--bs-border-color);
+}

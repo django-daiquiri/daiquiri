@@ -1,11 +1,9 @@
 import os
-
 from email.utils import getaddresses
 from urllib.parse import urlparse
 
 import dj_database_url
 
-from django.core.exceptions import ImproperlyConfigured
 
 def get(key, default=None):
     return os.getenv(key, default)
@@ -45,7 +43,7 @@ def get_url(key, default=None):
 
 
 def get_database(key):
-    database_string = os.getenv('DATABASE_%s' % key.upper())
+    database_string = os.getenv(f'DATABASE_{key.upper()}')
     if database_string:
         database_type = urlparse(database_string).scheme
 

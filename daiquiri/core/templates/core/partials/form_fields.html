@@ -1,7 +1,0 @@
-{% for hidden in form.hidden_fields %}
-    {{ hidden }}
-{% endfor %}
-
-{% for field in form.visible_fields %}
-    {% include 'core/partials/form_field.html' with field=field %}
-{% endfor %}

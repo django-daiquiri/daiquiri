@@ -1,9 +1,0 @@
-{% load i18n %}
-
-    {% if request.user.is_staff %}
-    <li>
-        <a href="{% url 'admin:index' %}">{% trans 'Django Admin' %}</a>
-    </li>
-
-    <li role="separator" class="divider"></li>
-    {% endif %}

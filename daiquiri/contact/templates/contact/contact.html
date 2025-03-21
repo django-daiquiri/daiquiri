@@ -8,19 +8,19 @@
     {% if user.is_authenticated %}
         <p>
             {% trans "Please enter your message." %}
-        </p>
-        <p>
-            {% trans "The answer will be sent to " %}<b>{{ user.email }}</b>
+            {% blocktrans with email=user.email trimmed %}
+            The answer will be sent to <b>{{ email }}</b>.
+            {% endblocktrans %}
         </p>
 
         <form method="post" action="{% url 'contact:contact' %}" novalidate>
             {% csrf_token %}
             <input type="hidden" name="next" value="{{ next }}" />
 
-            {% include 'core/partials/form_fields.html' %}
+            {{ form }}
 
             <input type="submit" value="{% trans 'Send message' %}" class="btn {{ submit_danger|yesno:'btn-danger,btn-primary' }}" />
-            <input type="submit" name="cancel" value="{% trans 'Cancel' %}" class="btn btn-default" />
+            <input type="submit" name="cancel" value="{% trans 'Cancel' %}" class="btn btn-outline-secondary" />
         </form>
     {% else %}
         <p>

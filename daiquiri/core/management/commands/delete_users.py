@@ -28,7 +28,7 @@ class Command(BaseCommand):
     def make_user_id_list(self, filename):
         user_ids = []
         try:
-            filecontent = open(filename, "r", encoding="utf-8", newline="")
+            filecontent = open(filename, encoding="utf-8", newline="")
         except Exception as e:
             print("Error reading id list file. " + str(e))
             sys.exit(1)
@@ -45,10 +45,10 @@ class Command(BaseCommand):
             try:
                 u = User.objects.get(id=dic["id"])
                 if dry_run is False:
-                    print("Delete user %s, %s" % (dic["id"], dic["email"]))
+                    print("Delete user {}, {}".format(dic["id"], dic["email"]))
                     u.delete()
                 else:
-                    print("Would have deleted user: %s, %s" % (dic["id"], dic["email"]))
+                    print("Would have deleted user: {}, {}".format(dic["id"], dic["email"]))
             except Exception as e:
                 print("Error deleting user " + str(id) + ". " + str(e))
 

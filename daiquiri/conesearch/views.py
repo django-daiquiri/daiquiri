@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from daiquiri.core.renderers.voresource import VoresourceRenderer
 from daiquiri.core.renderers.vosi import AvailabilityRenderer, CapabilitiesRenderer
 
-from .vo import get_resource, get_availability, get_capabilities
+from .vo import get_availability, get_capabilities, get_resource
 
 
 def resource(request):

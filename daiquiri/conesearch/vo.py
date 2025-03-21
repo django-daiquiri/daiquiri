@@ -9,13 +9,13 @@ from .adapter import ConeSearchAdapter
 def get_resource():
     return {
         'service': 'conesearch',
-        'identifier': 'ivo://%s/conesearch' % settings.SITE_IDENTIFIER,
-        'title': '%s Cone Search Service' % settings.SITE_TITLE,
+        'identifier': f'ivo://{settings.SITE_IDENTIFIER}/conesearch',
+        'title': f'{settings.SITE_TITLE} Cone Search Service',
         'curation': get_curation(),
         'content': {
             'subjects': settings.CONESEARCH_SUBJECTS,
             'type': 'Catalog',
-            'description': 'The Cone Search Service for %s.' % settings.SITE_IDENTIFIER,
+            'description': f'The Cone Search Service for {settings.SITE_IDENTIFIER}.',
             'referenceURL': settings.SITE_URL.rstrip('/')  # + reverse('conesearch:root')
         },
         'capabilities': get_capabilities(),
@@ -73,7 +73,9 @@ def get_capabilities():
                     {
                         'std': 'true',
                         'name': 'VERB',
-                        'description': 'Exhaustiveness of column selection. VERB=1 only returns the most important columns, VERB=2 selects the columns deemed useful to the average user, VERB=3 returns a table with all available columns.',
+                        'description': 'Exhaustiveness of column selection. VERB=1 only returns the most important ' \
+                                       'columns, VERB=2 selects the columns deemed useful to the average user, ' \
+                                       'VERB=3 returns a table with all available columns.',
                         'datatype': 'integer'
                     }
                 ]

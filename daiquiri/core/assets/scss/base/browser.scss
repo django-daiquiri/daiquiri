@@ -1,0 +1,83 @@
+.dq-browser {
+    --dq-browser-height: 200px;
+    --dq-browser-border-color: var(--bs-card-border-color);
+    --dq-browser-border-width: var(--bs-card-border-width);
+    --dq-browser-hover-color: var(--bs-link-color);
+    --dq-browser-hover-bg: var(--bs-secondary-bg);
+    --dq-browser-active-color: #fff;
+    --dq-browser-active-bg: var(--bs-primary-bg);
+
+    .row {
+        div[class^='col'] {
+            border-right: var(--dq-browser-border-width) solid var(--dq-browser-border-color);
+
+            &:last-child {
+                border-right: none;
+            }
+        }
+    }
+
+    .dq-browser-title,
+    .dq-browser-filter,
+    .dq-browser-search {
+        padding: 0.25rem 0.75rem;
+        border-bottom: var(--dq-browser-border-width) solid var(--dq-browser-border-color);
+    }
+
+    .dq-browser-list,
+    .dq-browser-table {
+        height: var(--dq-browser-height);
+        overflow-y: auto;
+    }
+
+    .dq-browser-list {
+        margin: 0;
+        padding: 0;
+
+        li {
+            margin: 0;
+            list-style: none;
+
+            button.btn-link {
+                padding: 0.25rem 0.75rem;
+                border-radius: 0;
+                width: 100%;
+                text-align: left;
+
+                text-decoration: none;
+                cursor: pointer;
+
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+
+                &:hover {
+                    color: var(--dq-browser-hover-color);
+                    background-color: var(--dq-browser-hover-bg);
+                }
+
+                &.active {
+                    color: var(--dq-browser-active-color);
+                    background-color: var(--dq-browser-active-bg);
+                }
+            }
+        }
+    }
+
+    .dq-browser-table {
+        margin-bottom: 0;
+
+        th,
+        td {
+            padding: 0.5rem 0.75rem;
+        }
+
+        tr:last-child {
+            td {
+                border-bottom: none;
+                border-bottom-left-radius: var(--bs-border-radius);
+                border-bottom-right-radius: var(--bs-border-radius);
+            }
+        }
+    }
+}

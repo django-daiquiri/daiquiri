@@ -1,0 +1,22 @@
+.codemirror {
+    .cm-content,
+    .cm-gutter {
+        min-height: 5rem;
+    }
+}
+
+.success-indicator {
+    height: 1rem;
+
+    opacity: 0;
+    transition: opacity 0.3s linear 2s;
+
+    .bi {
+        font-size: 2rem;
+    }
+
+    &.show {
+        opacity: 1;
+        transition: opacity 0.5s ease-in-out;
+    }
+}

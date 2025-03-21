@@ -1,10 +1,14 @@
 {% extends 'core/base.html' %}
 {% block content %}
 
-<main class="container">
-    <section class="wide">
+<div class="container">
+    <hgroup>
+        {% block heading %}{% endblock %}
+    </hgroup>
+
+    <main>
         {% block wide %}{% endblock %}
-    </section>
-</main>
+    </main>
+</div>
 
 {% endblock %}

@@ -4,6 +4,7 @@ from django.urls import reverse
 from daiquiri.core.constants import ACCESS_LEVEL_PUBLIC
 from daiquiri.core.vo import get_curation
 from daiquiri.metadata.models import Schema
+from daiquiri.query.utils import get_quota
 
 from .serializers import SchemaSerializer
 
@@ -11,13 +12,13 @@ from .serializers import SchemaSerializer
 def get_resource():
     return {
         'service': 'tap',
-        'identifier': 'ivo://%s/tap' % settings.SITE_IDENTIFIER,
-        'title': '%s TAP Service' % settings.SITE_TITLE,
+        'identifier': f'ivo://{settings.SITE_IDENTIFIER}/tap',
+        'title': f'{settings.SITE_TITLE} TAP Service',
         'curation': get_curation(),
         'content': {
             'subjects': settings.TAP_SUBJECTS,
             'type': 'Catalog',
-            'description': 'The TAP Service registry for %s.' % settings.SITE_IDENTIFIER,
+            'description': f'The TAP Service registry for {settings.SITE_IDENTIFIER}.',
             'referenceURL': settings.SITE_URL.rstrip('/') + reverse('tap:root').rstrip('/')
         },
         'capabilities': get_capabilities(),
@@ -52,7 +53,12 @@ def get_capabilities():
                 'name': language['key'],
                 'version': language['version'],
                 'description': language['description'],
-            } for language in settings.QUERY_LANGUAGES]
+            } for language in settings.QUERY_LANGUAGES],
+            'upload_methods': [
+                'ivo://ivoa.net/std/TAPRegExt#upload-inline',
+                'ivo://ivoa.net/std/TAPRegExt#upload-https',
+            ] if settings.TAP_UPLOAD else [],
+            'upload_limit': int(get_quota(None, quota_settings='QUERY_UPLOAD_LIMIT'))
         },
         {
             'id': 'ivo://ivoa.net/std/TAP#async-1.1',

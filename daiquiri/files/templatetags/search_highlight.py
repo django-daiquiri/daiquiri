@@ -1,7 +1,8 @@
-from django import template
-from re import IGNORECASE, compile, escape as rescape
-from django.utils.safestring import mark_safe
+from re import IGNORECASE, compile
+from re import escape as rescape
 
+from django import template
+from django.utils.safestring import mark_safe
 
 register = template.Library()
 
@@ -10,7 +11,7 @@ def highlight(text, search):
     rgx = compile(rescape(search), IGNORECASE)
     return mark_safe(
         rgx.sub(
-            lambda m: '<b>{}</b>'.format(m.group()),
+            lambda m: f'<b>{m.group()}</b>',
             text
         )
     )
@@ -20,7 +21,7 @@ def underline(text, search):
     rgx = compile(rescape(search), IGNORECASE)
     return mark_safe(
         rgx.sub(
-            lambda m: '<u>{}</u>'.format(m.group()),
+            lambda m: f'<u>{m.group()}</u>',
             text
         )
     )

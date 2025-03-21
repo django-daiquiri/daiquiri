@@ -1,37 +1,28 @@
-from rest_framework import viewsets, filters, status
-from rest_framework.response import Response
+from django.conf import settings
+from django.db.models import Max
+
+from rest_framework import filters, status, viewsets
+from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.authentication import SessionAuthentication, TokenAuthentication
+from rest_framework.response import Response
 
 from django_filters.rest_framework import DjangoFilterBackend
 
 from daiquiri.core.adapter import DatabaseAdapter
-from daiquiri.core.viewsets import ChoicesViewSet
-from daiquiri.core.permissions import HasModelPermission
 from daiquiri.core.constants import ACCESS_LEVEL_CHOICES
+from daiquiri.core.permissions import HasModelPermission
+from daiquiri.core.utils import get_model_field_meta
+from daiquiri.core.viewsets import ChoicesViewSet
 
-from django.conf import settings
-
-from .models import Schema, Table, Column, Function
-from .serializers import (
-    SchemaSerializer,
-    TableSerializer,
-    ColumnSerializer,
-    FunctionSerializer
-)
-from .serializers.export import (
-    SchemaSerializer as ExportSchemaSerializer,
-    FunctionSerializer as ExportFunctionSerializer
-)
-from .serializers.management import (
-    SchemaSerializer as ManagementSchemaSerializer,
-    FunctionSerializer as ManagementFunctionSerializer
-)
-from .serializers.user import (
-    SchemaSerializer as UserSchemaSerializer,
-    FunctionSerializer as UserFunctionSerializer
-)
+from .models import Column, Function, Schema, Table
+from .serializers import ColumnSerializer, FunctionSerializer, SchemaSerializer, TableSerializer
+from .serializers.export import FunctionSerializer as ExportFunctionSerializer
+from .serializers.export import SchemaSerializer as ExportSchemaSerializer
+from .serializers.management import FunctionSerializer as ManagementFunctionSerializer
+from .serializers.management import SchemaSerializer as ManagementSchemaSerializer
+from .serializers.user import FunctionSerializer as UserFunctionSerializer
+from .serializers.user import SchemaSerializer as UserSchemaSerializer
 
 
 class SchemaViewSet(viewsets.ModelViewSet):
@@ -47,16 +38,18 @@ class SchemaViewSet(viewsets.ModelViewSet):
     ordering_fields = ('name', 'access_level', 'metadata_access_level')
 
     def create(self, request, *args, **kwargs):
-
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         schema = serializer.save()
+        schema.order = (Schema.objects.aggregate(order=Max('order'))['order'] or 0) + 1
+        schema.save()
 
         if request.data.get('discover'):
             adapter = DatabaseAdapter()
 
-            for table_metadata in adapter.fetch_tables(schema.name):
+            for table_order, table_metadata in enumerate(adapter.fetch_tables(schema.name)):
+                table_metadata['order'] = table_order
                 table_metadata['schema'] = schema.id
                 table_metadata['groups'] = [group.id for group in schema.groups.all()]
                 for key in ['license', 'access_level', 'metadata_access_level']:
@@ -65,8 +58,11 @@ class SchemaViewSet(viewsets.ModelViewSet):
                 table_serializer = TableSerializer(data=table_metadata)
                 if table_serializer.is_valid():
                     table = table_serializer.save()
+                    table.discover(adapter)
+                    table.save()
 
-                    for column_metadata in adapter.fetch_columns(schema.name, table.name):
+                    for column_order, column_metadata in enumerate(adapter.fetch_columns(schema.name, table.name)):
+                        column_metadata['order'] = column_order
                         column_metadata['table'] = table.id
                         column_metadata['groups'] = [group.id for group in table.groups.all()]
                         for key in ['access_level', 'metadata_access_level']:
@@ -74,7 +70,9 @@ class SchemaViewSet(viewsets.ModelViewSet):
 
                         column_serializer = ColumnSerializer(data=column_metadata)
                         if column_serializer.is_valid():
-                            column_serializer.save()
+                            column = column_serializer.save()
+                            column.discover(adapter)
+                            column.save()
 
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
@@ -118,16 +116,20 @@ class TableViewSet(viewsets.ModelViewSet):
     ordering_fields = ('name', 'access_level', 'metadata_access_level')
 
     def create(self, request, *args, **kwargs):
-
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         table = serializer.save()
+        table.order = (table.schema.tables.aggregate(order=Max('order'))['order'] or 0) + 1
+        table.save()
 
         if request.data.get('discover'):
             adapter = DatabaseAdapter()
+            table.discover(adapter)
+            table.save()
 
-            for column_metadata in adapter.fetch_columns(table.schema.name, table.name):
+            for column_order, column_metadata in enumerate(adapter.fetch_columns(table.schema.name, table.name)):
+                column_metadata['order'] = column_order
                 column_metadata['table'] = table.id
                 column_metadata['groups'] = [group.id for group in table.groups.all()]
                 for key in ['access_level', 'metadata_access_level']:
@@ -135,24 +137,20 @@ class TableViewSet(viewsets.ModelViewSet):
 
                 column_serializer = ColumnSerializer(data=column_metadata)
                 if column_serializer.is_valid():
-                    column_serializer.save()
+                    column = column_serializer.save()
+                    column.discover(adapter)
+                    column.save()
 
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-    @action(detail=False, methods=['get'])
-    def discover(self, request):
-        schema_name = request.GET.get('schema')
-        table_name = request.GET.get('table')
-
-        if schema_name and table_name:
-            adapter = DatabaseAdapter()
-            table_metadata = adapter.fetch_table(schema_name, table_name)
-            table_metadata['nrows'] = adapter.fetch_nrows(schema_name, table_name)
-            table_metadata['size'] = adapter.fetch_size(schema_name, table_name)
-            return Response([table_metadata])
-        else:
-            return Response([])
+    @action(detail=True, methods=['post'])
+    def discover(self, request, pk=None):
+        adapter = DatabaseAdapter()
+        table = self.get_object()
+        table.discover(adapter)
+        table.save()
+        return Response(self.get_serializer(table).data)
 
 
 class ColumnViewSet(viewsets.ModelViewSet):
@@ -167,16 +165,29 @@ class ColumnViewSet(viewsets.ModelViewSet):
     search_fields = ('name', 'description')
     ordering_fields = ('name', 'access_level', 'metadata_access_level')
 
-    @action(detail=False, methods=['get'])
-    def discover(self, request):
-        schema_name = request.GET.get('schema')
-        table_name = request.GET.get('table')
-        column_name = request.GET.get('column')
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-        if schema_name and table_name and column_name:
-            return Response([DatabaseAdapter().fetch_column(schema_name, table_name, column_name)])
-        else:
-            return Response([])
+        column = serializer.save()
+        column.order = (column.table.columns.aggregate(order=Max('order'))['order'] or 0) + 1
+        column.save()
+
+        if request.data.get('discover'):
+            adapter = DatabaseAdapter()
+            column.discover(adapter)
+            column.save()
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    @action(detail=True, methods=['post'])
+    def discover(self, request, pk=None):
+        adapter = DatabaseAdapter()
+        column = self.get_object()
+        column.discover(adapter)
+        column.save()
+        return Response(self.get_serializer(column).data)
 
 
 class FunctionViewSet(viewsets.ModelViewSet):
@@ -190,6 +201,17 @@ class FunctionViewSet(viewsets.ModelViewSet):
     filterset_fields = ('name', 'access_level', 'metadata_access_level')
     search_fields = ('name', 'description')
     ordering_fields = ('name', 'access_level', 'metadata_access_level')
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        function = serializer.save()
+        function.order = (Function.objects.aggregate(order=Max('order'))['order'] or 0) + 1
+        function.save()
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     @action(detail=False, methods=['get'])
     def management(self, request):
@@ -210,13 +232,6 @@ class FunctionViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-class TableTypeViewSet(ChoicesViewSet):
-    permission_classes = (IsAuthenticated, )
-    authentication_classes = (SessionAuthentication, TokenAuthentication)
-
-    queryset = Table.TYPE_CHOICES
-
-
 class LicenseViewSet(ChoicesViewSet):
     permission_classes = (IsAuthenticated, )
     authentication_classes = (SessionAuthentication, TokenAuthentication)
@@ -229,3 +244,11 @@ class AccessLevelViewSet(ChoicesViewSet):
     authentication_classes = (SessionAuthentication, TokenAuthentication)
 
     queryset = ACCESS_LEVEL_CHOICES
+
+
+class MetaViewSet(viewsets.ViewSet):
+    permission_classes = (IsAuthenticated, )
+    authentication_classes = (SessionAuthentication, TokenAuthentication)
+
+    def list(self, request, *args, **kwargs):
+        return Response(get_model_field_meta(Schema, Table, Column, Function))

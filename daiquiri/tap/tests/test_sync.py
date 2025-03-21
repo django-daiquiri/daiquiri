@@ -1,8 +1,7 @@
 import pytest
-from django.urls import reverse
 
 from django.test import override_settings
-
+from django.urls import reverse
 from django.utils.http import urlencode
 
 users = (
@@ -40,7 +39,7 @@ uws_ns = '{http://www.ivoa.net/xml/UWS/v1.0}'
 
 
 @override_settings(QUERY_ANONYMOUS=True)
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('query', queries_public)
 def test_create_post_public(db, client, username, password, query):
     '''
@@ -59,7 +58,7 @@ def test_create_post_public(db, client, username, password, query):
 
 
 @override_settings(QUERY_ANONYMOUS=True)
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('query', queries_internal)
 def test_create_post_internal(db, client, username, password, query):
     '''
@@ -81,7 +80,7 @@ def test_create_post_internal(db, client, username, password, query):
 
 
 @override_settings(QUERY_ANONYMOUS=True)
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('query', queries_private)
 def test_create_post_private(db, client, username, password, query):
     '''
@@ -103,7 +102,7 @@ def test_create_post_private(db, client, username, password, query):
 
 
 @override_settings(QUERY_ANONYMOUS=True)
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('query', queries_public)
 def test_post_job_list_create_public(db, client, username, password, query):
     '''
@@ -122,7 +121,7 @@ def test_post_job_list_create_public(db, client, username, password, query):
 
 
 @override_settings(QUERY_ANONYMOUS=True)
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('query', queries_internal)
 def test_post_job_list_create_internal(db, client, username, password, query):
     '''
@@ -144,7 +143,7 @@ def test_post_job_list_create_internal(db, client, username, password, query):
 
 
 @override_settings(QUERY_ANONYMOUS=True)
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('query', queries_private)
 def test_post_job_list_create_private(db, client, username, password, query):
     '''

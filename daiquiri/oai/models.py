@@ -34,9 +34,6 @@ class Record(models.Model):
         verbose_name=_('Resource id'),
     )
 
-    def __str__(self):
-        return self.identifier
-
     class Meta:
         db_table = 'records'
 
@@ -44,3 +41,6 @@ class Record(models.Model):
 
         verbose_name = _('Record')
         verbose_name_plural = _('Records')
+
+    def __str__(self):
+        return self.identifier

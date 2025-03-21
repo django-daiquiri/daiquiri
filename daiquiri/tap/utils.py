@@ -1,12 +1,10 @@
 from django.conf import settings
 
-from daiquiri.core.constants import ACCESS_LEVEL_PUBLIC, ACCESS_LEVEL_INTERNAL
+from daiquiri.core.constants import ACCESS_LEVEL_INTERNAL, ACCESS_LEVEL_PUBLIC
 
-from .models import (
-    Schema as TapSchema,
-    Table as TapTable,
-    Column as TapColumn,
-)
+from .models import Column as TapColumn
+from .models import Schema as TapSchema
+from .models import Table as TapTable
 
 
 def check_tap_visibility(obj):
@@ -42,7 +40,7 @@ def update_schema(schema):
             tap_schema = TapSchema.objects.get(pk=schema.id)
             tap_schema.delete()
 
-            # remove tables and colums
+            # remove tables and columns
             for tap_table in tap_schema.tables.all():
                 tap_table.columns.all().delete()
                 tap_table.delete()

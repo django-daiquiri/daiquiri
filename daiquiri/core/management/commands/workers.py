@@ -22,11 +22,11 @@ class Command(BaseCommand):
         queues = [{
             'node': '{}_{}'.format(settings.DAIQUIRI_APP, queue['key']),
             'queue': queue['key'],
-            'concurency': queue.get('concurency', 1)
+            'concurrency': queue.get('concurrency', 1)
         } for queue in settings.QUEUES] + [{
             'node': '{}_query_{}'.format(settings.DAIQUIRI_APP, queue['key']),
             'queue': 'query_{}'.format(queue['key']),
-            'concurency': queue.get('concurency', 1)
+            'concurrency': queue.get('concurrency', 1)
         } for queue in settings.QUERY_QUEUES]
 
         args = [settings.CELERY_BIN, '-A', 'config', 'multi', options['operation']]
@@ -36,16 +36,16 @@ class Command(BaseCommand):
             for queue in queues:
                 args += [
                     '-Q:{}'.format(queue['node']), queue['queue'],
-                    '-c:{}'.format(queue['node']), str(queue['concurency'])
+                    '-c:{}'.format(queue['node']), str(queue['concurrency'])
                 ]
 
         args += [
-            '--pidfile={}/%n.pid'.format(settings.CELERY_PIDFILE_PATH),
-            '--loglevel={}'.format(settings.CELERY_LOG_LEVEL)
+            f'--pidfile={settings.CELERY_PIDFILE_PATH}/%n.pid',
+            f'--loglevel={settings.CELERY_LOG_LEVEL}'
         ]
         if settings.CELERY_LOG_PATH:
             args += [
-                '--logfile={}/%n.log'.format(settings.CELERY_LOG_PATH)
+                f'--logfile={settings.CELERY_LOG_PATH}/%n.log'
             ]
 
         subprocess.call(args)

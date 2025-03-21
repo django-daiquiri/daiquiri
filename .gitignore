@@ -6,6 +6,16 @@ __pycache__/
 *.swp
 .DS_Store
 
+# sometimes gcc dumps core when build fails
+/core
+
+/daiquiri/auth/static/
+/daiquiri/contact/static/
+/daiquiri/core/static/
+/daiquiri/metadata/static/
+/daiquiri/query/static/
+/daiquiri/serve/static/
+
 /testing/config/settings/local.py
 /testing/download
 /testing/upload
@@ -16,10 +26,13 @@ __pycache__/
 /htmlcov
 /env
 /venv
+/node_modules
 
 build
 dist
 *.egg-info
+
+Makefile
 
 .imdone/
 .on-save.json

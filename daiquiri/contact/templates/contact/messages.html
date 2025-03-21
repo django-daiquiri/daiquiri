@@ -1,121 +1,15 @@
 {% extends 'core/wide.html' %}
 {% load static %}
-{% load i18n %}
-{% load compress %}
-{% load vendor_tags %}
 
-{% block bodyargs %}ng-app="messages" ng-controller="MessagesController"{% endblock %}
-
-{% block headextra %}
-    {% vendor 'angular' %}
-    {% vendor 'ng-infinite-scroll' %}
-
-    {% compress css %}
-    <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/list.scss' %}" />
-    <link rel="stylesheet" type="text/x-scss" href="{% static 'contact/css/messages.scss' %}" />
-    {% endcompress css %}
-
-    {% compress js %}
-    <script type="text/javascript" src="{% static 'core/js/core.js' %}" ></script>
-    <script type="text/javascript" src="{% static 'core/js/list.js' %}" ></script>
-    <script type="text/javascript" src="{% static 'core/js/filter.js' %}" ></script>
-    <script type="text/javascript" src="{% static 'core/js/multiCheckbox.js' %}" ></script>
-    <script type="text/javascript" src="{% static 'core/js/byNumber.js' %}" ></script>
-    <script type="text/javascript" src="{% static 'core/js/formgroup.js' %}" ></script>
-
-    <script type="text/javascript" src="{% static 'contact/js/messages.js' %}" ></script>
-    {% endcompress js %}
+{% block js %}
+<script src="{% url 'javascript-catalog' %}"></script>
+<script src="{% static 'contact/js/messages.js' %}" defer="defer"></script>
 {% endblock %}
 
 {% block wide %}
 
-    <div ng-cloak ng-show="service.list.ready">
-        <h1>Contact messages</h1>
+    <h1>Contact messages</h1>
 
-        <div class="daiquiri-list">
-            <div class="row daiquiri-list-header">
-                <form class="col-sm-6" ng-submit="service.list.search()">
-                    <div class="input-group">
-                        <input class="form-control"
-                               id="table-pager-search-input"
-                               placeholder="{% trans 'Search entries' %}"
-                               type="text" ng-model="service.list.search_string">
-                        <a href="" class="input-group-addon" ng-click="service.list.search()">
-                            <span class="fa fa-search"></span>
-                        </a>
-                    </div>
-                </form>
-                <div class="col-sm-6">
-                    <p class="count">
-                        {$ service.list.count $} {% trans 'messages found' %}
-                    </p>
-                    <ul class="pagination pull-right">
-                        <li>
-                            <a href="" ng-click="service.list.reset()">{% trans 'Reset' %}</a>
-                        </li>
-                    </ul>
-                    <ul class="pagination pull-right">
-                        <li>
-                            <a href="" ng-click="service.toggleSpam()">
-                                <span ng-show="!service.list.params.spam">{% trans 'Show spam' %}</span>
-                                <span ng-show="service.list.params.spam">{% trans 'Hide spam' %}</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="table-responsive">
-                <table class="table daiquiri-list-table" infinite-scroll="service.list.fetch()" infinite-scroll-distance="0.2">
-                    <thead>
-                        <th style="width: 20%;" data-order-list="subject">
-                            {% trans 'Subject' %}
-                        </th>
-                        <th style="width: 15%;" data-order-list="author">
-                            {% trans 'Author' %}
-                        </th>
-                        <th style="width: 15%;" data-order-list="email">
-                            {% trans 'Email' %}
-                        </th>
-                        <th style="width: 20%;" data-order-list="created">
-                            {% trans 'Created' %}
-                        </th>
-                        <th style="width: 15%;" data-order-list="status">
-                            {% trans 'Status' %}
-                        </th>
-                        <th style="width: 10%;"></th>
-                    </thead>
-                    <tbody>
-                        <tr ng-repeat="row in service.list.rows">
-                            <td>
-                                <a href="" ng-click="service.modal('show-message-modal', $index)">
-                                    {$ row.subject $}
-                                </a>
-                            </td>
-                            <td>
-                                {$ row.author $}
-                            </td>
-                            <td>
-                                <a href="{% include 'contact/messages_mailto.html' %}">
-                                    {$ row.email $}
-                                </a>
-                            </td>
-                            <td>
-                                {$ row.created | date: 'MMM d, yyyy hh:mm' $}
-                            </td>
-                            <td>
-                                {$ row.status_label $}
-                            </td>
-                            <td class="text-right options">
-                                {% include 'contact/messages_options.html' %}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    {% include 'contact/messages_modal_show.html' %}
+    <div id="app" class="messages"></div>
 
 {% endblock %}

@@ -5,6 +5,7 @@ from django.apps import apps
 from django.conf import settings
 from django.http.request import QueryDict
 from django.utils.http import urlencode
+
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -71,7 +72,7 @@ class OaiView(APIView):
                 if key == 'verb':
                     self.errors.append(('badVerb', 'Found illegal duplicate of verb'))
                 else:
-                    self.errors.append(('badArgument', 'Found illegal duplicate of argument \'%s\'.' % key))
+                    self.errors.append(('badArgument', f'Found illegal duplicate of argument \'{key}\'.'))
             else:
                 arguments[key] = query_dict.get(key)
 
@@ -120,7 +121,9 @@ class OaiView(APIView):
         try:
             record = records.get(metadata_prefix=arguments['metadataPrefix'])
         except Record.DoesNotExist:
-            self.errors.append(('cannotDisseminateFormat', 'No item found for this identifier with this metadataPrefix'))
+            self.errors.append(
+                ('cannotDisseminateFormat', 'No item found for this identifier with this metadataPrefix')
+            )
             return
 
         self.response = {
@@ -229,7 +232,7 @@ class OaiView(APIView):
     def validate_illegal_arguments(self, arguments, valid_keys):
         for key in arguments:
             if key not in valid_keys:
-                self.errors.append(('badArgument', 'Found illegal argument \'%s\'.' % key))
+                self.errors.append(('badArgument', f'Found illegal argument \'{key}\'.'))
         else:
             return None
 
@@ -238,7 +241,7 @@ class OaiView(APIView):
             try:
                 return datetime.strptime(arguments[key], '%Y-%m-%dT%H:%M:%SZ').date()
             except ValueError:
-                self.errors.append(('badArgument', 'Argument \'%s\' does not match format YYYY-MM-DDThh:mm:ssZ' % key))
+                self.errors.append(('badArgument', f'Argument \'{key}\' does not match format YYYY-MM-DDThh:mm:ssZ'))
         else:
             return None
 
@@ -275,7 +278,8 @@ class OaiView(APIView):
             self.errors.append(('badArgument', 'Argument \'metadataPrefix\' required but not supplied.'))
         elif arguments['metadataPrefix'] not in valid_prefixes:
             self.errors.append((
-                'cannotDisseminateFormat', 'The metadataPrefix \'%s\' is not supported by this repository.' % arguments['metadataPrefix']
+                'cannotDisseminateFormat',
+                'The metadataPrefix \'{}\' is not supported by this repository.'.format(arguments['metadataPrefix'])
             ))
 
     def get_header(self, record):
@@ -298,7 +302,7 @@ class OaiView(APIView):
                     'request': self.request
                 })
             else:
-                raise RuntimeError('Could not determine serializer_class for record %s' % record.identifier)
+                raise RuntimeError(f'Could not determine serializer_class for record {record.identifier}')
             return serializer.data
 
     def get_registry(self):

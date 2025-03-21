@@ -1,7 +1,7 @@
+from django.conf import settings
+
 from celery import Celery
 from kombu import Exchange, Queue
-
-from django.conf import settings
 
 
 def get_celery_app():

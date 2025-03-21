@@ -2,10 +2,10 @@ import logging
 
 from django.contrib.auth.models import User
 from django.db import models
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from .signals import (user_activated, user_confirmed, user_disabled,
-                      user_enabled, user_rejected)
+from .signals import user_activated, user_confirmed, user_disabled, user_enabled, user_rejected
 from .utils import get_full_name
 
 logger = logging.getLogger(__name__)
@@ -41,6 +41,12 @@ class Profile(models.Model):
     @property
     def full_name(self):
         return get_full_name(self.user)
+
+    def user_admin_url(self):
+        return reverse('admin:auth_user_change', args=[self.user.id])
+
+    def profile_admin_url(self):
+        return reverse('admin:daiquiri_auth_profile_change', args=[self.id])
 
     def confirm(self, request):
         self.is_confirmed = True

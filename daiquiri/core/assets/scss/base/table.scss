@@ -1,0 +1,105 @@
+$handle-width: 0.5rem;
+
+.dq-table {
+    .dq-table-header {
+        gap: 1rem;
+
+        .page-link {
+            cursor: pointer;
+        }
+    }
+
+    .dq-table-pane {
+        border: 1px solid var(--bs-border-color);
+        border-radius: 4px;
+        width: auto;
+        overflow-x: auto;
+        table-layout: fixed;
+        width: 100%;
+
+        table.table {
+            margin: 0;
+            table-layout: fixed !important;
+
+            th,
+            td {
+                padding: 0;
+                border-right: 1px solid var(--bs-border-color);
+
+                &:last-child,
+                &:last-child {
+                    border-right: none;
+                }
+            }
+            td {
+                .dq-table-cell {
+                    padding: $handle-width 0.5rem;
+                    white-space: nowrap;
+                    overflow: hidden;
+                }
+            }
+
+            th {
+                .dq-table-cell {
+                    display: flex;
+                    align-items: center;
+
+                    padding: 0;
+
+                    user-select: none;
+
+                    .name {
+                        padding-top: 0.5rem;
+                        padding-bottom: 0.5rem;
+                        user-select: text;
+                        overflow: hidden;
+                        flex-grow: 1;
+                    }
+                    .info {
+                        cursor: help;
+                    }
+                    .handle {
+                        width: $handle-width;
+                        padding-top: 0.5rem;
+                        padding-bottom: 0.5rem;
+
+                        &:hover {
+                            cursor: move;
+                        }
+                    }
+                }
+                &:first-child .dq-table-cell {
+                    padding-left: $handle-width;
+                }
+                &:last-child .dq-table-cell {
+                    padding-right: $handle-width;
+                }
+            }
+        }
+    }
+
+    .dq-table-modal {
+        .modal-body {
+            min-height: 6rem;
+        }
+
+        .dq-table-modal-navigation {
+            width: 4rem;
+            height: 4rem;
+
+            background-color: var(--bs-secondary-bg);
+            border-radius: 50%;
+
+            > .position-relative > .position-absolute {
+                height: 1em;
+                width: 1em;
+                line-height: 1em;
+                opacity: 0.5;
+
+                &:hover {
+                    opacity: 1;
+                }
+            }
+        }
+    }
+}

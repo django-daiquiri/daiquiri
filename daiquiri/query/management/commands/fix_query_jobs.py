@@ -33,7 +33,7 @@ class Command(BaseCommand):
 
                     job.process()
 
-                    print('Run %s by %s again.' % (job.id, job.owner))
+                    print(f'Run {job.id} by {job.owner} again.')
 
                     if not options['dry']:
                         job.run()
@@ -48,7 +48,7 @@ class Command(BaseCommand):
                         except TypeError:
                             job.error_summary += ''.join(errors)
 
-                    print('Error for %s by %s: %s' % (job.id, job.owner, job.error_summary))
+                    print(f'Error for {job.id} by {job.owner}: {job.error_summary}')
 
                     if not options['dry']:
                         job.save()

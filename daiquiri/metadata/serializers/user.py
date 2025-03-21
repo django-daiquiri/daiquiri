@@ -2,7 +2,7 @@ from django.conf import settings
 
 from rest_framework import serializers
 
-from ..models import Schema, Table, Column, Function
+from ..models import Column, Function, Schema, Table
 
 
 class ColumnSerializer(serializers.ModelSerializer):

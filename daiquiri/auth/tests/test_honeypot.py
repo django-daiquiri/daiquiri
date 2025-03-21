@@ -20,15 +20,9 @@ testset_signup = {
         "first_name": "Tanja",
         "last_name": "Test",
         "password1": "testing",
-        "password2": "testing",
+        "password2": "testing"
     },
 }
-
-testset_contact = {
-    "url": "contact:contact",
-    "data": {"subject": "Test", "message": "This is a test."},
-}
-
 
 def run_honeypot_test(db, client, testset, honeypot, exp):
     data = testset["data"]
@@ -65,18 +59,3 @@ def test_honeypot_signup_honeypot_field_invalid(db, client):
 
 def test_honeypot_signup_honeypot_field_missing(db, client):
     run_honeypot_test(db, client, testset_signup, None, 400)
-
-
-def test_contact_post(db, client):
-    client.login(username="admin", password="admin")
-    run_honeypot_test(db, client, testset_contact, settings.HONEYPOT_FIELD_VALUE, 200)
-
-
-def test_contact_post_honeypot_field_invalid(db, client):
-    client.login(username="admin", password="admin")
-    run_honeypot_test(db, client, testset_contact, "some_text", 400)
-
-
-def test_contact_post_honeypot_field_missing(db, client):
-    client.login(username="admin", password="admin")
-    run_honeypot_test(db, client, testset_contact, None, 400)

@@ -1,7 +1,5 @@
-from daiquiri.core.serializers import JSONListField
-from daiquiri.metadata.models import Schema, Table
 from django.conf import settings
-from django.urls import reverse
+
 from rest_framework import serializers
 
 

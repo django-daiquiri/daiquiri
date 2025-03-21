@@ -1,9 +1,5 @@
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
-from django.db.utils import ProgrammingError
-
-from rest_framework.exceptions import ValidationError
 
 from daiquiri.core.adapter import DatabaseAdapter
 from daiquiri.query.models import QueryJob
@@ -23,7 +19,7 @@ class Command(BaseCommand):
                 owners = [User.objects.get(username=options['user'])]
 
         else:
-            owners = [None] + list(User.objects.all())
+            owners = [None, *list(User.objects.all())]
 
         adapter = DatabaseAdapter()
 
@@ -40,7 +36,7 @@ class Command(BaseCommand):
 
             for job in stale_jobs:
                 username = job.owner.username if job.owner else 'anonymous'
-                print('%s by %s -> %s.%s' % (job.id, username, job.schema_name, job.table_name))
+                print(f'{job.id} by {username} -> {job.schema_name}.{job.table_name}')
 
             if options['archive']:
                 for job in stale_jobs:

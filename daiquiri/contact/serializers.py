@@ -1,3 +1,5 @@
+from django.template.loader import render_to_string
+
 from rest_framework import serializers
 
 from .models import ContactMessage
@@ -5,7 +7,7 @@ from .models import ContactMessage
 
 class ContactMessageSerializer(serializers.ModelSerializer):
 
-    status_label = serializers.SerializerMethodField()
+    mailto = serializers.SerializerMethodField()
 
     class Meta:
         model = ContactMessage
@@ -17,9 +19,14 @@ class ContactMessageSerializer(serializers.ModelSerializer):
             'status',
             'status_label',
             'created',
+            'created_label',
             'message',
-            'user'
+            'user',
+            'mailto'
         )
 
-    def get_status_label(self, obj):
-        return dict(ContactMessage.STATUS_CHOICES)[obj.status]
+    def get_mailto(self, obj):
+        return render_to_string('contact/messages_mailto.html', {
+            'request': self.context.get('request'),
+            'message': obj
+        })

@@ -18,7 +18,7 @@ class DaiquiriAccountAdapter(DefaultAccountAdapter):
         return url_has_allowed_host_and_scheme(url, allowed_hosts=settings.ALLOWED_HOSTS)
 
     def save_user(self, request, user, form, commit=True):
-        super(DaiquiriAccountAdapter, self).save_user(request, user, form)
+        super().save_user(request, user, form)
 
         if settings.AUTH_WORKFLOW:
             user.save()
@@ -29,7 +29,7 @@ class DaiquiriAccountAdapter(DefaultAccountAdapter):
         if settings.AUTH_WORKFLOW and user.profile.is_pending:
             raise ImmediateHttpResponse(HttpResponseRedirect(reverse('account_pending')))
         else:
-            super(DaiquiriAccountAdapter, self).login(request, user)
+            super().login(request, user)
 
     def is_open_for_signup(self, request):
         return settings.AUTH_SIGNUP
@@ -39,4 +39,4 @@ class DaiquiriSocialAccountAdapter(DefaultSocialAccountAdapter):
 
     def authentication_error(self, request, provider_id, error=None, exception=None, extra_context=None):
         logger.error([provider_id, error, exception])
-        super(DaiquiriSocialAccountAdapter, self).authentication_error(request, provider_id, error, exception, extra_context)
+        super().authentication_error(request, provider_id, error, exception, extra_context)

@@ -39,8 +39,8 @@ class Datalink(models.Model):
         verbose_name=_('Content length'),
     )
 
-    def __str__(self):
-        return self.ID
-
     class Meta:
         db_table = 'datalink'
+
+    def __str__(self):
+        return self.ID

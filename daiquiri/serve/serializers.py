@@ -5,6 +5,8 @@ from daiquiri.metadata.models import Column
 
 class ColumnSerializer(serializers.ModelSerializer):
 
+    width = serializers.IntegerField(source='get_width', read_only=True)
+
     class Meta:
         model = Column
         fields = (
@@ -18,5 +20,6 @@ class ColumnSerializer(serializers.ModelSerializer):
             'arraysize',
             'principal',
             'indexed',
-            'std'
+            'std',
+            'width'
         )

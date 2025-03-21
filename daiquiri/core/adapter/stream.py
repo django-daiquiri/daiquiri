@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from daiquiri.core.utils import make_query_dict_upper_case
 
 
-class BaseServiceAdapter(object):
+class BaseServiceAdapter:
 
     def clean(self, request, resource):
         raise NotImplementedError()
@@ -23,7 +23,7 @@ class BaseServiceAdapter(object):
                 if self.ranges[key]['min'] <= value <= self.ranges[key]['max']:
                     args[key] = value
                 else:
-                    errors[key] = [_('This value must be between %(min)g and %(max)g.' % self.ranges[key])]
+                    errors[key] = [_('This value must be between {min:g} and {max:g}.').format(**self.ranges[key])]
 
             except KeyError:
                 if key in self.defaults:

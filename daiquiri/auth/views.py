@@ -1,25 +1,21 @@
-import json
-
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.urls import reverse
-from daiquiri.auth.models import Profile
-from daiquiri.core.utils import get_referer_path_info, get_next
-from django.views.generic import TemplateView
 from django.http import Http404, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse_lazy
+from django.views.generic import TemplateView
+
 from rest_framework.authtoken.models import Token
 
-from allauth.account.views import (
-    logout as allauth_logout,
-    PasswordChangeView as AllauthPasswordChangeView,
-    PasswordSetView as AllauthPasswordSetView
-)
+from allauth.account.views import PasswordChangeView as AllauthPasswordChangeView
+from allauth.account.views import PasswordSetView as AllauthPasswordSetView
+from allauth.account.views import logout as allauth_logout
 
-from daiquiri.core.views import CSRFViewMixin, ModelPermissionMixin
+from daiquiri.auth.models import Profile
+from daiquiri.core.utils import get_next, get_referer_path_info
+from daiquiri.core.views import CSRFViewMixin, ModelPermissionMixin, StoreIdViewMixin
 
-from .forms import UserForm, ProfileForm
+from .forms import ProfileForm, UserForm
 
 
 @login_required()
@@ -45,8 +41,9 @@ def profile_update(request):
 
 def terms_of_use(request):
     context = {}
-    if settings.AUTH_TERMS_OF_USE == False:
-        raise Http404 
+    if not settings.AUTH_TERMS_OF_USE:
+        raise Http404
+
     if request.user.is_authenticated:
         profile = Profile.objects.get(user=request.user)
         if request.method == 'POST':
@@ -85,28 +82,9 @@ def logout(request, *args, **kwargs):
     return response
 
 
-class UsersView(ModelPermissionMixin, CSRFViewMixin, TemplateView):
+class UsersView(ModelPermissionMixin, CSRFViewMixin, StoreIdViewMixin, TemplateView):
     template_name = 'auth/users.html'
     permission_required = 'daiquiri_auth.view_profile'
-
-    def get_context_data(self, **kwargs):
-        # get urls to the admin interface to be used with angular
-        user_admin_url = reverse('admin:auth_user_change', args=['row.id']).replace('row.id', '{$ row.id $}')
-        profile_admin_url = reverse('admin:daiquiri_auth_profile_change', args=['row.id']).replace('row.id', '{$ row.id $}')
-
-        detail_keys = settings.AUTH_DETAIL_KEYS
-        for detail_key in detail_keys:
-            detail_key['options_json'] = json.dumps(detail_key.get('options', {}))
-            detail_key['model'] = 'service.current_row.details.%s' % detail_key['key']
-            detail_key['errors'] = 'service.errors.%s' % detail_key['key']
-
-        context = super(UsersView, self).get_context_data(**kwargs)
-        context.update({
-            'detail_keys': detail_keys,
-            'user_admin_url': user_admin_url,
-            'profile_admin_url': profile_admin_url
-        })
-        return context
 
 
 class PasswordChangeView(AllauthPasswordChangeView):

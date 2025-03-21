@@ -1,4 +1,4 @@
-class DataciteRendererMixin(object):
+class DataciteRendererMixin:
 
     def render_datacite(self, metadata):
         self.start('resource', {
@@ -122,7 +122,7 @@ class DataciteRendererMixin(object):
             name_type = person.get('name_type')
 
             if not name:
-                name = '{}, {}'.format(last_name, first_name)
+                name = f'{last_name}, {first_name}'
 
             self.node(person_type + 'Name', {'nameType': name_type}, name)
 

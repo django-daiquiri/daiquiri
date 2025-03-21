@@ -1,8 +1,8 @@
-{% load i18n %}mailto:{$ row.email $}?subject=[{{ request.site.name }}] Re: {$ row.subject $}&body=
+{% load i18n %}mailto:{{ message.email }}?subject=[{{ request.site.name }}] Re: {{ message.subject }}&body=
 %0A%0A
-{% blocktrans with author='{$ row.author $}' date='{$ row.created | date:short $}' trimmed %}
+{% blocktrans with author=message.author date=message.created|date:'short' trimmed %}
 On {{ date }}, {{ author }} wrote:
 {% endblocktrans %}
 %0A
-> {$ row.message $}
+> {{ message.message }}
 %0A

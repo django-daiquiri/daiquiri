@@ -4,15 +4,19 @@
 {% load core_tags %}
 {% load metadata_tags %}
 
-{% block page %}
+{% block heading %}
 
-    <h1 class="hide-overflow">
+    <h1 class="overflow-hidden">
         {% if table.title %}
         {{ table.title }} ({{ table }})
         {% else %}
         {{ table }}
         {% endif %}
     </h1>
+
+{% endblock %}
+
+{% block page %}
 
     {% if table.nrows %}
 
@@ -41,7 +45,7 @@
 
     <h2>{% trans 'Columns' %}</h2>
 
-    <div class="table-responsive">
+    <div class="table-responsive mb-3">
         <table class="table">
             <thead>
                 <th style="width: 15%;">{% trans 'Name' %}</th>

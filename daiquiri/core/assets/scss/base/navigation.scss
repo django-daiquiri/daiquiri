@@ -1,0 +1,29 @@
+nav {
+    a {
+        text-decoration: none;
+
+        &:hover {
+            text-decoration: none;
+        }
+    }
+
+    .dropdown {
+        ul.dropdown-menu {
+            li.dropdown-submenu {
+                position: relative;
+
+                ul.dropdown-menu {
+                    position: absolute;
+                    top: 0;
+                    left: calc(100% - 0.66rem);
+                    padding: 0.5rem 0;
+                }
+
+                a.dropdown-item:hover + ul.dropdown-menu,
+                ul.dropdown-menu:hover {
+                    display: block;
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,15 @@
+.modal {
+    .modal-body {
+        :last-child {
+            margin-bottom: 0;
+        }
+        img {
+            width: 100%;
+        }
+    }
+
+    .modal-separator {
+        margin: 0 -14px 14px -14px;
+        border-bottom: 1px solid var(--bs-modal-header-border-color);
+    }
+}

@@ -1,8 +1,7 @@
-from django.shortcuts import render
 from django.http import Http404
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 
-from daiquiri.metadata.utils import get_user_columns
+from daiquiri.metadata.utils import get_user_columns, get_table_metadata
 
 from .utils import get_resolver
 
@@ -10,10 +9,14 @@ from .utils import get_resolver
 def table(request, schema_name, table_name):
 
     if get_user_columns(request.user, schema_name, table_name):
-        return render(request, 'serve/table.html', {
-            'schema': schema_name,
-            'table': table_name
-        })
+        table = get_table_metadata(request.user, schema_name, table_name)
+        context = {}
+        if table is not None:
+            context['table_title'] = table.title
+            context['table_name'] = table.name
+            context['schema_name'] = table.schema.name
+            context['table_description'] = table.long_description
+        return render(request, 'serve/table.html', context)
 
     # if nothing worked, return 404
     raise Http404

@@ -1,0 +1,30 @@
+.form-label {
+    font-size: small;
+    margin-bottom: 0.25rem;
+}
+
+.query-jobs {
+    .list-group {
+        max-height: 400px;
+        overflow-y: auto;
+
+        button.btn-link {
+            background-color: var(--bs-light);
+        }
+    }
+}
+
+.query-form {
+    .codemirror {
+        .cm-content,
+        .cm-gutter {
+            min-height: 15rem;
+        }
+    }
+}
+
+.query-download {
+    h3 {
+        margin-bottom: 1rem;
+    }
+}

@@ -1,13 +1,12 @@
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.http import Http404
 from django.urls import reverse
 
 from daiquiri.core.adapter import DatabaseAdapter
 from daiquiri.core.constants import ACCESS_LEVEL_PUBLIC
 from daiquiri.core.utils import get_doi_url, import_class
 
-from .constants import DATALINK_RELATION_TYPES, DATALINK_FIELDS
+from .constants import DATALINK_FIELDS, DATALINK_RELATION_TYPES
 from .models import Datalink
 
 
@@ -15,7 +14,7 @@ def DatalinkAdapter():
     return import_class(settings.DATALINK_ADAPTER)()
 
 
-class BaseDatalinkAdapter(object):
+class BaseDatalinkAdapter:
     """
     Each datalink adapter needs to configure a set of resource types.
     resource_types are declare as a list(string), i.e.: ['table', 'schema', ...]
@@ -32,10 +31,10 @@ class BaseDatalinkAdapter(object):
 
     There are two further adapters, which do not declare resources:
 
-    * DynamicDatalinkAdapter: the latter does not declare a resource, but will inject on the fly 
+    * DynamicDatalinkAdapter: the latter does not declare a resource, but will inject on the fly
       extra datalink entries according to the method: get_dyn_datalink_links()
 
-    * QueryJobDatalinkAdapterMixin: The latter does not declare a resource either, but it injects 
+    * QueryJobDatalinkAdapterMixin: The latter does not declare a resource either, but it injects
       extra context information for the datalink viewer.
 
     See the mixins below for an example.
@@ -45,25 +44,25 @@ class BaseDatalinkAdapter(object):
 
     def __init__(self):
         for resource_type in self.resource_types:
-            for method in ['get_%s_list' % resource_type,
-                           'get_%s_identifier' % resource_type,
-                           'get_%s_links' % resource_type]:
+            for method in [f'get_{resource_type}_list',
+                           f'get_{resource_type}_identifier',
+                           f'get_{resource_type}_links']:
                 if not hasattr(self, method):
-                    message = '\'%s\' is declared as resource_type, but \'%s\' object has no attribute \'%s\'' % (
-                        resource_type, self.__class__.__name__, method)
+                    message = f'\'{resource_type}\' is declared as resource_type, but \'{self.__class__.__name__}\' ' \
+                               'object has no attribute \'{method}\''
                     raise NotImplementedError(message)
 
     def get_list(self):
         '''This is only used by rebuild_datalink_table, so it needs to gather only the tabular datalink entries.
         '''
         for resource_type in self.resource_types:
-            yield from getattr(self, 'get_%s_list' % resource_type)()
+            yield from getattr(self, f'get_{resource_type}_list')()
 
     def get_identifier(self, resource_type, resource):
-        return getattr(self, 'get_%s_identifier' % resource_type)(resource)
+        return getattr(self, f'get_{resource_type}_identifier')(resource)
 
     def get_links(self, resource_type, resource):
-        return getattr(self, 'get_%s_links' % resource_type)(resource)
+        return getattr(self, f'get_{resource_type}_links')(resource)
 
     def get_context_data(self, request, **kwargs):
         '''Get the datalink related context data for a given request
@@ -71,7 +70,6 @@ class BaseDatalinkAdapter(object):
         context = {}
 
         if 'ID' in kwargs:
-            field_names = [field['name'] for field in DATALINK_FIELDS]
             # more precise would be to use a serializer instead of list(QuerySet.values())
             context['datalinks'] = list(Datalink.objects.filter(ID=kwargs['ID']).order_by('semantics').values())
             context['ID'] = kwargs['ID']
@@ -99,20 +97,20 @@ class BaseDatalinkAdapter(object):
             rows = [[link[key] for key in field_names] for link in datalink_rows]
         except KeyError as e:
             class_name = str(self.__class__)
-            raise KeyError(f"The key '{e.args[0]}' is missing in one of the dictionaries returned by {class_name}.get_dyn_datalink_links(id) or in the Datalink model.")
+            raise KeyError(f"The key '{e.args[0]}' is missing in one of the dictionaries returned by " \
+                           f"{class_name}.get_dyn_datalink_links(id) or in the Datalink model.") from e
         except Exception as e:
             raise e
 
         # check for missing IDs and return error message
         for identifier in identifiers:
             if not any(filter(lambda row: row[0] == identifier, rows)):
-                rows.append((identifier, None, None, 'NotFoundFault: {}'.format(identifier), None, None, None, None))
+                rows.append((identifier, None, None, f'NotFoundFault: {identifier}', None, None, None, None))
 
         return rows
-        
 
 
-class TablesDatalinkAdapterMixin(object):
+class TablesDatalinkAdapterMixin:
     '''
     Gather the datalink entries from Release related Datalink tables (declared in settings.DATALINK_TABLES).
     '''
@@ -143,9 +141,10 @@ class TablesDatalinkAdapterMixin(object):
         ]
 
 
-class MetadataDatalinkAdapterMixin(object):
+class MetadataDatalinkAdapterMixin:
     '''
-    Gather the documentation (metadata-page) and doi datalink entries from the metadata for each PUBLIC schemas and tables
+    Gather the documentation (metadata-page) and doi datalink entries from the metadata
+    for each PUBLIC schemas and tables
     '''
 
     def get_schema_list(self):
@@ -171,7 +170,7 @@ class MetadataDatalinkAdapterMixin(object):
                'access_url': access_url,
                'service_def': '',
                'error_message': '',
-               'description': 'Documentation for the {} schema'.format(schema),
+               'description': f'Documentation for the {schema} schema',
                'semantics': '#documentation',
                'content_type': 'application/html',
                'content_length': None
@@ -183,7 +182,7 @@ class MetadataDatalinkAdapterMixin(object):
                    'access_url': get_doi_url(schema.doi),
                    'service_def': '',
                    'error_message': '',
-                   'description': '{}'.format(schema.title),
+                   'description': f'{schema.title}',
                    'semantics': '#doi',
                    'content_type': 'application/html',
                    'content_length': None
@@ -194,7 +193,7 @@ class MetadataDatalinkAdapterMixin(object):
                     access_url = related_identifier.get('related_identifier')
                     if access_url is not None:
                         description = DATALINK_RELATION_TYPES.get(related_identifier.get('relation_type'), '') \
-                                                             .format('the {} schema'.format(schema)) \
+                                                             .format(f'the {schema} schema') \
                                                              .capitalize()
                         if related_identifier.get('related_identifier_type') == "DOI":
                             access_url = get_doi_url(access_url)
@@ -219,7 +218,7 @@ class MetadataDatalinkAdapterMixin(object):
             yield 'table', table
 
     def get_table_identifier(self, table):
-        return '{}.{}'.format(table.schema.name, table.name)
+        return f'{table.schema.name}.{table.name}'
 
     def get_table_links(self, table):
         table_links = []
@@ -236,7 +235,7 @@ class MetadataDatalinkAdapterMixin(object):
                'access_url': access_url,
                'service_def': '',
                'error_message': '',
-               'description': 'Documentation for the {} table'.format(table),
+               'description': f'Documentation for the {table} table',
                'semantics': '#documentation',
                'content_type': 'application/html',
                'content_length': None
@@ -248,7 +247,7 @@ class MetadataDatalinkAdapterMixin(object):
                    'access_url': get_doi_url(table.doi),
                    'service_def': '',
                    'error_message': '',
-                   'description': '{}'.format(table.title),
+                   'description': f'{table.title}',
                    'semantics': '#doi',
                    'content_type': 'application/html',
                    'content_length': None
@@ -259,7 +258,7 @@ class MetadataDatalinkAdapterMixin(object):
                     access_url = related_identifier.get('related_identifier')
                     if access_url is not None:
                         description = DATALINK_RELATION_TYPES.get(related_identifier.get('relation_type'), '') \
-                                                             .format('the {} table'.format(table)) \
+                                                             .format(f'the {table} table') \
                                                              .capitalize()
 
                         if related_identifier.get('related_identifier_type') == "DOI":
@@ -279,12 +278,12 @@ class MetadataDatalinkAdapterMixin(object):
         return table_links
 
 
-class DynamicDatalinkAdapterMixin(object):
+class DynamicDatalinkAdapterMixin:
     '''Define the interface to dynamically add datalink entries
     '''
 
     def get_dyn_datalink_links(self, IDs, **kwargs):
-        '''No dynamically generated entries. Can be overwriten.
+        '''No dynamically generated entries. Can be overwritten.
 
         this method should return a list of dict with the following keys:
              ID, access_url, service_def, error_message, description, semantics, content_type, content_length
@@ -302,7 +301,7 @@ class DynamicDatalinkAdapterMixin(object):
         return context
 
 
-class QueryJobDatalinkAdapterMixin(object):
+class QueryJobDatalinkAdapterMixin:
     '''
     Injects the query job into the context data for the daiquiri.datalinks.views.datalink view
     '''

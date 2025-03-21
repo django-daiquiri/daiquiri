@@ -1,47 +1,57 @@
+from django.template.loader import TemplateDoesNotExist, get_template
+
 from rest_framework import serializers
 
-from daiquiri.jobs.serializers import SyncJobSerializer, AsyncJobSerializer
+from daiquiri.jobs.serializers import AsyncJobSerializer, SyncJobSerializer
 
-from .models import QueryJob, Example
+from .models import Example, QueryJob
+from .utils import get_query_form, get_query_form_adapter
 from .validators import TableNameValidator, UploadFileValidator, UploadParamValidator
 
 
-class FormSerializer(serializers.Serializer):
+class FormListSerializer(serializers.Serializer):
 
     key = serializers.CharField()
+    label = serializers.CharField()
+
+    # TODO: remove
     form_service = serializers.SerializerMethodField()
 
     def get_form_service(self, obj):
         return obj['key'][0].upper() + obj['key'][1:] + 'FormService'
 
 
+class FormDetailSerializer(serializers.Serializer):
+
+    key = serializers.CharField()
+    label = serializers.CharField()
+    template = serializers.SerializerMethodField(required=False)
+    fields = serializers.SerializerMethodField(method_name='get_adapter_fields')
+    submit = serializers.CharField(default=None)
+
+    def get_template(self, obj):
+        try:
+            return get_template(obj['template']).render(request=self.context.get('request')).strip()
+        except (KeyError, TemplateDoesNotExist):
+            return None
+
+    def get_adapter_fields(self, obj):
+        adapter = get_query_form_adapter(obj)
+        return adapter.get_fields() if adapter else None
+
+
 class DropdownSerializer(serializers.Serializer):
 
     key = serializers.CharField()
-    dropdown_service = serializers.SerializerMethodField()
-    options = serializers.SerializerMethodField()
-
-    def get_dropdown_service(self, obj):
-        return obj['key'][0].upper() + obj['key'][1:] + 'DropdownService'
-
-    def get_options(self, obj):
-        return obj['options']
+    label = serializers.CharField()
+    classes = serializers.CharField(default=None)
+    options = serializers.JSONField(default=None)
 
 
 class DownloadSerializer(serializers.Serializer):
 
     key = serializers.CharField()
-    download_service = serializers.SerializerMethodField()
-    options = serializers.SerializerMethodField()
-
-    def get_download_service(self, obj):
-        if obj.get('service'):
-            return obj['key'][0].upper() + obj['key'][1:] + 'DownloadService'
-        else:
-            return None
-
-    def get_options(self, obj):
-        return obj.get('options', {})
+    form = serializers.JSONField(default=None)
 
 
 class QueryJobSerializer(serializers.ModelSerializer):
@@ -53,14 +63,13 @@ class QueryJobSerializer(serializers.ModelSerializer):
         )
 
 
-class QueryJobListSerializer(serializers.ModelSerializer):
+class QueryJobIndexSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = QueryJob
         fields = (
             'id',
             'table_name',
-            'creation_time',
             'run_id',
             'phase'
         )
@@ -77,9 +86,13 @@ class QueryJobRetrieveSerializer(serializers.ModelSerializer):
             'id',
             'run_id',
             'phase',
+            'phase_label',
             'creation_time',
+            'creation_time_label',
             'start_time',
+            'start_time_label',
             'end_time',
+            'end_time_label',
             'execution_duration',
             'time_queue',
             'time_query',
@@ -89,6 +102,7 @@ class QueryJobRetrieveSerializer(serializers.ModelSerializer):
             'schema_name',
             'table_name',
             'query_language',
+            'query_language_label',
             'query',
             'native_query',
             'actual_query',
@@ -119,7 +133,7 @@ class QueryJobCreateSerializer(serializers.ModelSerializer):
     queue = serializers.CharField(required=False)
     query_language = serializers.CharField(required=True)
     query = serializers.CharField(required=True)
-    run_id = serializers.CharField(default='')
+    run_id = serializers.CharField(default='', allow_blank=True)
 
     class Meta:
         model = QueryJob
@@ -131,6 +145,36 @@ class QueryJobCreateSerializer(serializers.ModelSerializer):
             'query',
             'run_id'
         )
+
+
+class QueryJobFormSerializer(QueryJobCreateSerializer):
+
+    query_language = serializers.SerializerMethodField()
+    query = serializers.SerializerMethodField()
+
+    class Meta:
+        model = QueryJob
+        fields = QueryJobCreateSerializer.Meta.fields
+
+    def __init__(self, *args, **kwargs):
+        form_key = kwargs.pop('form_key')
+        form = get_query_form(form_key)
+
+        self.adapter = get_query_form_adapter(form)
+
+        super().__init__(*args, **kwargs)
+
+        for field in self.adapter.get_fields():
+            if field.get('type') == 'number':
+                self.fields[field['key']] = serializers.FloatField(required=True)
+            else:
+                self.fields[field['key']] = serializers.CharField(required=False)
+
+    def get_query_language(self, obj):
+        return self.adapter.get_query_language(obj)
+
+    def get_query(self, obj):
+        return self.adapter.get_query(obj)
 
 
 class QueryJobUpdateSerializer(serializers.ModelSerializer):
@@ -168,7 +212,18 @@ class QueryLanguageSerializer(serializers.Serializer):
     quote_char = serializers.CharField()
 
     def get_id(self, obj):
-        return '%(key)s-%(version)s' % obj
+        return '{key}-{version}'.format(**obj)
+
+
+
+class QueryDownloadFormatSerializer(serializers.Serializer):
+
+    key = serializers.CharField()
+    extension = serializers.CharField()
+    content_type = serializers.CharField()
+    label = serializers.CharField()
+    help = serializers.CharField()
+
 
 
 class ExampleSerializer(serializers.ModelSerializer):

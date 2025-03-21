@@ -13,7 +13,7 @@ def create_download_archive(file_name, files):
     logger = logging.getLogger(__name__)
 
     # log start
-    logger.info('archive_job %s started' % file_name)
+    logger.info('archive_job %s started', file_name)
 
     # create directory if necessary
     try:
@@ -28,4 +28,4 @@ def create_download_archive(file_name, files):
             z.write(file_path)
 
     # log completion
-    logger.info('archive_job %s completed' % file_name)
+    logger.info('archive_job %s completed', file_name)

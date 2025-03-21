@@ -1,4 +1,5 @@
 import pytest
+
 from django.urls import reverse
 
 users = (
@@ -22,7 +23,7 @@ urlnames = {
 }
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_list(db, client, username, password):
     client.login(username=username, password=password)
 
@@ -34,7 +35,7 @@ def test_list(db, client, username, password):
         assert len(response.json()) == 3
 
 
-@pytest.mark.parametrize('username,password', users)
+@pytest.mark.parametrize(('username', 'password'), users)
 def test_create(db, client, username, password):
     client.login(username=username, password=password)
 

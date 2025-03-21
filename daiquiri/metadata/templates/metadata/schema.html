@@ -4,15 +4,19 @@
 {% load core_tags %}
 {% load metadata_tags %}
 
-{% block page %}
+{% block heading %}
 
-    <h1 class="hide-overflow">
+    <h1 class="overflow-hidden">
         {% if schema.title %}
         {{ schema.title }} ({{ schema }})
         {% else %}
         {{ schema }}
         {% endif %}
     </h1>
+
+{% endblock %}
+
+{% block page %}
 
     {% if schema.long_description %}
 
@@ -34,25 +38,34 @@
 
     <h2>{% trans 'Tables' %}</h2>
 
-    <ul class="list-unstyled">
-        {% for table in tables %}
-        <li>
-            <h4>
-                <a href="{% url 'metadata:table' schema.name table.name %}">
-                    {% if table.title %}
-                    {{ table.title }} ({{ table }})
-                    {% else %}
-                    {{ table }}
-                    {% endif %}
-                </a>
-            </h4>
-
+    {% for table in tables %}
+    <div class="card mb-3">
+        <div class="card-header">
+            <a href="{% url 'metadata:table' schema.name table.name %}">
+                <i class="bi bi-table"></i> &nbsp;
+                {% if table.title %}
+                {{ table.title }} ({{ table }})
+                {% else %}
+                {{ table.name }}
+                {% endif %}
+            </a>
+        </div>
+        <div class="card-body">
             {% if table.description %}
             {{ table.description | markdown }}
+            {% else %}
+            {% trans 'No description has been provided for this table.' %}
             {% endif %}
-        </li>
-        {% endfor %}
-    </ul>
+        </div>
+        {% if table.doi %}
+        <div class="card-footer text-muted">
+            <small>
+            DOI: {% doi_link table.doi %}
+            </small>
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
 
 {% endblock %}
 

@@ -1,0 +1,20 @@
+{% load i18n %}
+
+    <li>
+        <a class="dropdown-item" href="{% url 'account_profile' %}">{% trans 'Update profile' %}</a>
+    </li>
+    <li>
+        <a class="dropdown-item" href="{% url 'account_email' %}">{% trans 'Update email' %}</a>
+    </li>
+    <li>
+        <a class="dropdown-item" href="{% url 'account_change_password' %}">{% trans 'Change password' %}</a>
+    </li>
+    <li>
+        <a class="dropdown-item" href="{% url 'socialaccount_connections' %}">{% trans 'Account connections' %}</a>
+    </li>
+    <li>
+        <a class="dropdown-item" href="{% url 'account_token' %}">{% trans 'API token' %}</a>
+    </li>
+    <li>
+        <hr class="dropdown-divider" />
+    </li>

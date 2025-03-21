@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from daiquiri.core.constants import ACCESS_LEVEL_PUBLIC
-from daiquiri.metadata.models import Schema, Table, Column
+from daiquiri.metadata.models import Column, Schema, Table
 
 
 class ColumnSerializer(serializers.ModelSerializer):

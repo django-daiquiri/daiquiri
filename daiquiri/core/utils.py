@@ -5,6 +5,7 @@ import math
 import os
 import re
 import sys
+from collections import defaultdict
 from datetime import datetime
 from urllib.parse import urlparse
 from xml.dom import minidom
@@ -17,6 +18,7 @@ from django.core.mail import EmailMessage, EmailMultiAlternatives
 from django.db.models import Q
 from django.http import HttpResponse
 from django.template import TemplateDoesNotExist
+from django.template.defaultfilters import date
 from django.template.loader import render_to_string
 from django.utils.timezone import localtime
 from django.utils.translation import gettext_lazy as _
@@ -25,14 +27,12 @@ import xlsxwriter
 from ipware import get_client_ip as ipware_get_client_ip
 from markdown import markdown as markdown_function
 
-from daiquiri.core.constants import (ACCESS_LEVEL_INTERNAL,
-                                     ACCESS_LEVEL_PRIVATE, ACCESS_LEVEL_PUBLIC,
-                                     GROUPS)
+from daiquiri.core.constants import ACCESS_LEVEL_INTERNAL, ACCESS_LEVEL_PRIVATE, ACCESS_LEVEL_PUBLIC, GROUPS
 
 if sys.version_info.major >= 3:
     long_type = int
 else:
-    long_type = long
+    long_type = long  # noqa: F821
 
 
 def import_class(string):
@@ -81,15 +81,15 @@ def get_next(request):
         return get_script_alias(request) + next
 
 
-def get_model_field_meta(model):
-    meta = {}
+def get_model_field_meta(*models):
+    meta = defaultdict(lambda: defaultdict(dict))
 
-    for field in model._meta.get_fields():
-        meta[field.name] = {}
-        if hasattr(field, 'verbose_name'):
-            meta[field.name]['verbose_name'] = field.verbose_name
-        if hasattr(field, 'help_text'):
-            meta[field.name]['help_text'] = field.help_text
+    for model in models:
+        for field in model._meta.get_fields():
+            if hasattr(field, 'verbose_name'):
+                meta[model._meta.model_name][field.name]['verbose_name'] = field.verbose_name
+            if hasattr(field, 'help_text'):
+                meta[model._meta.model_name][field.name]['help_text'] = field.help_text
 
     return meta
 
@@ -153,7 +153,7 @@ def get_permission_emails(permissions):
 
 
 def get_doi_url(doi):
-    return 'https://doi.org/%s' % doi.rstrip('/') if doi else None
+    return 'https://doi.org/{}'.format(doi.rstrip('/')) if doi else None
 
 
 def get_doi(doi_url):
@@ -287,12 +287,12 @@ def send_mail(request, template_prefix, context, to_emails, cc_emails=[], bcc_em
     context['current_site'] = site
 
     # render subject from template and remove superfluous line breaks
-    subject = render_to_string('{0}_subject.txt'.format(template_prefix), context)
+    subject = render_to_string(f'{template_prefix}_subject.txt', context)
     subject = " ".join(subject.splitlines()).strip()
 
     # add site name to subject
     site = get_current_site(request)
-    subject = "[%s] %s" % (site.name, subject)
+    subject = f"[{site.name}] {subject}"
 
     # get from email
     from_email = settings.DEFAULT_FROM_EMAIL
@@ -304,7 +304,7 @@ def send_mail(request, template_prefix, context, to_emails, cc_emails=[], bcc_em
     bodies = {}
     for ext in ['html', 'txt']:
         try:
-            template_name = '{0}_message.{1}'.format(template_prefix, ext)
+            template_name = f'{template_prefix}_message.{ext}'
             bodies[ext] = render_to_string(template_name,
                                            context).strip()
         except TemplateDoesNotExist:
@@ -312,11 +312,13 @@ def send_mail(request, template_prefix, context, to_emails, cc_emails=[], bcc_em
                 # We need at least one body
                 raise
     if 'txt' in bodies:
-        msg = EmailMultiAlternatives(subject, bodies['txt'], from_email, to_emails, cc=cc_emails, bcc=bcc_emails, reply_to=reply_to)
+        msg = EmailMultiAlternatives(subject, bodies['txt'], from_email, to_emails,
+                                     cc=cc_emails, bcc=bcc_emails, reply_to=reply_to)
         if 'html' in bodies:
             msg.attach_alternative(bodies['html'], 'text/html')
     else:
-        msg = EmailMessage(subject, bodies['html'], from_email, to_emails, cc=cc_emails, bcc=bcc_emails, reply_to=reply_to)
+        msg = EmailMessage(subject, bodies['html'], from_email, to_emails,
+                           cc=cc_emails, bcc=bcc_emails, reply_to=reply_to)
         msg.content_subtype = 'html'  # Main content is now text/html
 
     msg.send()
@@ -324,7 +326,7 @@ def send_mail(request, template_prefix, context, to_emails, cc_emails=[], bcc_em
 
 def render_to_csv(request, filename, columns, rows):
     response = HttpResponse(content_type='text/csv', charset='utf-8')
-    response['Content-Disposition'] = ('attachment; filename="%s.csv"' % filename).encode('utf-8')
+    response['Content-Disposition'] = (f'attachment; filename="{filename}.csv"').encode()
 
     writer = csv.writer(response)
 
@@ -337,8 +339,9 @@ def render_to_csv(request, filename, columns, rows):
 
 
 def render_to_xlsx(request, filename, columns, rows):
-    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', charset='utf-8')
-    response['Content-Disposition'] = ('attachment; filename="%s.xlsx"' % filename).encode('utf-8')
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                            charset='utf-8')
+    response['Content-Disposition'] = (f'attachment; filename="{filename}.xlsx"').encode()
 
     workbook = xlsxwriter.Workbook(response, {
         'in_memory': True,
@@ -378,7 +381,7 @@ def render_to_xml(request, renderer, data, filename=None, content_type='applicat
 
     response = HttpResponse(pretty_xml, content_type=content_type)
     if filename:
-        response['Content-Disposition'] = 'filename="%s"' % filename
+        response['Content-Disposition'] = f'filename="{filename}"'
     return response
 
 
@@ -393,5 +396,17 @@ def handle_file_upload(directory, file):
 
     return file_path
 
+
 def sanitize_str(strval):
     return re.sub(r'[^a-zA-Z0-9]', '_', strval.lower())
+
+
+def get_file_size(file_path):
+    try:
+        return os.stat(file_path).st_size
+    except (FileNotFoundError, TypeError):
+        return 0
+
+
+def get_date_display(value):
+    return date(value, settings.DATETIME_FORMAT)

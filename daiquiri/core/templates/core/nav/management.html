@@ -1,0 +1,38 @@
+{% load i18n %}
+{% load rules %}
+
+    {% has_perm 'daiquiri_auth.view_profile' request.user as can_view_view_profile %}
+    {% has_perm 'daiquiri_contact.view_contactmessage' request.user as can_view_contactmessage %}
+    {% has_perm 'daiquiri_metadata.view_schema' request.user as can_view_schema %}
+    {% has_perm 'daiquiri_stats.view_record' request.user as can_view_record %}
+
+    {% if can_view_view_profile or can_view_contactmessage or can_view_schema or can_view_record %}
+
+    {% if can_view_view_profile %}
+    <li>
+        <a class="dropdown-item" href="{% url 'auth:users' %}">{% trans 'User management' %}</a>
+    </li>
+    {% endif %}
+
+    {% if can_view_contactmessage %}
+    <li>
+        <a class="dropdown-item" href="{% url 'contact:messages' %}">{% trans 'Contact messages' %}</a>
+    </li>
+    {% endif %}
+
+    {% if can_view_schema %}
+    <li>
+        <a class="dropdown-item" href="{% url 'metadata:management' %}">{% trans 'Metadata management' %}</a>
+    </li>
+    {% endif %}
+
+    {% if can_view_record %}
+    <li>
+        <a class="dropdown-item" href="{% url 'stats:management' %}">{% trans 'Stats overview' %}</a>
+    </li>
+    {% endif %}
+
+    <li>
+        <hr class="dropdown-divider" />
+    </li>
+    {% endif %}

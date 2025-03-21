@@ -22,7 +22,7 @@ def schemas_menu(context, tables=True):
             'label': schema.title or schema.name,
             'tables': [{
                 'name': table.name,
-                'label': '%s.%s' % (schema.name, table.name)
+                'label': f'{schema.name}.{table.name}'
                 } for table in schema.tables.filter_by_metadata_access_level(context.request.user)
             ] if tables else []
         })
@@ -31,9 +31,9 @@ def schemas_menu(context, tables=True):
 
 
 @register.inclusion_tag('metadata/tags/access_panel.html')
-def access_panel(doi, dataset=_('dataset')):
+def access_panel(doi, dataset=None):
     return {
-        'dataset': dataset
+        'dataset': dataset or _('dataset')
     }
 
 
@@ -44,18 +44,18 @@ def doi_link(doi):
 
 
 @register.inclusion_tag('metadata/tags/doi_panel.html')
-def doi_panel(doi, dataset=_('dataset')):
+def doi_panel(doi, dataset=None):
     return {
         'doi_url': get_doi_url(doi),
-        'dataset': dataset
+        'dataset': dataset or _('dataset')
     }
 
 
 @register.inclusion_tag('metadata/tags/license_panel.html')
-def license_panel(license, dataset=_('dataset')):
+def license_panel(license, dataset=None):
     return {
         'license': license,
         'license_url': settings.LICENSE_URLS[license],
         'license_label': dict(settings.LICENSE_CHOICES)[license],
-        'dataset': dataset
+        'dataset': dataset or _('dataset')
     }

@@ -14,7 +14,7 @@ def OaiAdapter():
     return import_class(settings.OAI_ADAPTER)()
 
 
-class BaseOaiAdapter(object):
+class BaseOaiAdapter:
     """
     Each OAI adapter needs to configure a list of resource_types.
 
@@ -47,12 +47,12 @@ class BaseOaiAdapter(object):
 
     def __init__(self):
         for resource_type in self.resource_types:
-            for method in ['get_%s_list' % resource_type,
-                           'get_%s' % resource_type,
-                           'get_%s_record' % resource_type]:
+            for method in [f'get_{resource_type}_list',
+                           f'get_{resource_type}',
+                           f'get_{resource_type}_record']:
                 if not hasattr(self, method):
-                    message = '\'%s\' is declared as resource_type, but \'%s\' object has no attribute \'%s\'' % (
-                        resource_type, self.__class__.__name__, method)
+                    message = f'\'{resource_type}\' is declared as resource_type, but \'{self.__class__.__name__}\' ' \
+                               'object has no attribute \'{method}\''
                     raise NotImplementedError(message)
 
             for metadata_prefix in self.get_metadata_prefixes(resource_type):
@@ -60,33 +60,33 @@ class BaseOaiAdapter(object):
 
     def get_resource_list(self):
         for resource_type in self.resource_types:
-            yield from getattr(self, 'get_%s_list' % resource_type)()
+            yield from getattr(self, f'get_{resource_type}_list')()
 
     def get_resource(self, record):
-        return getattr(self, 'get_%s' % record.resource_type)(record.resource_id)
+        return getattr(self, f'get_{record.resource_type}')(record.resource_id)
 
     def get_record(self, resource_type, resource):
-        return getattr(self, 'get_%s_record' % resource_type)(resource)
+        return getattr(self, f'get_{resource_type}_record')(resource)
 
     def get_metadata_prefixes(self, resource_type):
-        metadata_prefixes_attribute = '%s_metadata_prefixes' % resource_type
+        metadata_prefixes_attribute = f'{resource_type}_metadata_prefixes'
 
         if hasattr(self, metadata_prefixes_attribute):
             return getattr(self, metadata_prefixes_attribute)
         else:
-            return getattr(self, 'get_%s' % metadata_prefixes_attribute)()
+            return getattr(self, f'get_{metadata_prefixes_attribute}')()
 
     def get_serializer_class(self, metadata_prefix, resource_type):
-        serializer_class_attribute = '%s_%s_serializer_class' % (metadata_prefix, resource_type)
-        serializer_class_attribute_method = 'get_%s' % serializer_class_attribute
+        serializer_class_attribute = f'{metadata_prefix}_{resource_type}_serializer_class'
+        serializer_class_attribute_method = f'get_{serializer_class_attribute}'
 
         if hasattr(self, serializer_class_attribute):
             return getattr(self, serializer_class_attribute)
         elif hasattr(self, serializer_class_attribute_method):
             return getattr(self, serializer_class_attribute_method)()
         else:
-            message = '\'%s\' is declared as resource_type, but \'%s\' object has no attribute \'%s\'' % (
-                        resource_type, self.__class__.__name__, serializer_class_attribute_method)
+            message = f'\'{resource_type}\' is declared as resource_type, but \'{self.__class__.__name__}\' ' \
+                       'object has no attribute \'{serializer_class_attribute_method}\''
             raise NotImplementedError(message)
 
     def get_renderer(self, metadata_prefix):
@@ -111,7 +111,7 @@ class BaseOaiAdapter(object):
             return self.identifier_delimiter.join([self.identifier_schema, 'example'])
 
 
-class MetadataOaiAdapterMixin(object):
+class MetadataOaiAdapterMixin:
 
     schema_metadata_prefixes = ('oai_dc', 'oai_datacite', 'datacite')
     table_metadata_prefixes = ('oai_dc', 'oai_datacite', 'datacite')
@@ -184,7 +184,7 @@ class MetadataOaiAdapterMixin(object):
         return instance
 
     def get_schema_record(self, schema):
-        identifier = self.get_identifier('schemas/{}'.format(schema))
+        identifier = self.get_identifier(f'schemas/{schema}')
         datestamp = schema.updated or schema.published or now().date()
         set_spec = 'schemas'
         public = (schema.metadata_access_level == ACCESS_LEVEL_PUBLIC) \
@@ -193,7 +193,7 @@ class MetadataOaiAdapterMixin(object):
         return schema.pk, identifier, datestamp, set_spec, public
 
     def get_table_record(self, table):
-        identifier = self.get_identifier('tables/{}'.format(table))
+        identifier = self.get_identifier(f'tables/{table}')
         datestamp = table.updated or table.published or now().date()
         set_spec = 'tables'
         public = (table.metadata_access_level == ACCESS_LEVEL_PUBLIC) \
@@ -204,7 +204,7 @@ class MetadataOaiAdapterMixin(object):
         return table.pk, identifier, datestamp, set_spec, public
 
 
-class DatalinkOAIAdapterMixin(object):
+class DatalinkOAIAdapterMixin:
 
     tables = settings.DATALINK_TABLES
 
@@ -220,7 +220,8 @@ class DatalinkOAIAdapterMixin(object):
         return import_class('daiquiri.datalink.serializers.DataciteSerializer')
 
     def get_datalink_list(self):
-        '''This function is used by rebuild_oai_schema only, it only needs to gather the doi objects declared via datalink (no other entries).
+        '''This function is used by rebuild_oai_schema only, it only needs to gather
+           the doi objects declared via datalink (no other entries).
         '''
         for table in self.tables:
             schema_name, table_name = table.split('.')
@@ -231,7 +232,7 @@ class DatalinkOAIAdapterMixin(object):
                 yield 'datalink', {'id': str(ID), 'doi': get_doi(access_url)}
 
     def get_datalink(self, pk):
-    
+
         adapter = DatalinkAdapter()
         # get all datalink entries: DatalinkTables, Metadata and Dynamic
         rows = adapter.get_datalink_rows([pk])
@@ -247,7 +248,7 @@ class DatalinkOAIAdapterMixin(object):
             'related_identifiers': []
         }
         for _, access_url, _, _, description, semantics, content_type, content_length in rows:
-            # doi is a custom datalink semantic which means that it will containt the full URL to the description
+            # doi is a custom datalink semantic which means that it will contain the full URL to the description
             # hence, only the end of the semantics string should be checked for #doi
             if semantics.endswith('#doi'):
                 datalink['doi'] = get_doi(access_url)
@@ -322,9 +323,9 @@ class DatalinkOAIAdapterMixin(object):
         return datalink['id'], identifier, datestamp, set_spec, public
 
 
-class RegistryOaiAdapterMixin(object):
+class RegistryOaiAdapterMixin:
 
-    # services to apear in the registry oai records
+    # services to appear in the registry oai records
     # does not need to be customized, active apps will be discovered automatically
     services = [
         'registry',
@@ -351,7 +352,7 @@ class RegistryOaiAdapterMixin(object):
 
     def get_service(self, pk):
         if pk in self.services:
-            return getattr(self, 'get_%s_service' % pk)()
+            return getattr(self, f'get_{pk}_service')()
 
     def get_service_record(self, service):
         identifier = service['identifier']

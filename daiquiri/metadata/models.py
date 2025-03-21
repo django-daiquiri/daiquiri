@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.db import models
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from daiquiri.core.constants import ACCESS_LEVEL_CHOICES, ACCESS_LEVEL_PRIVATE
@@ -8,8 +9,6 @@ from daiquiri.core.managers import AccessLevelManager
 
 
 class Schema(models.Model):
-
-    objects = AccessLevelManager()
 
     order = models.IntegerField(
         default=0, null=True, blank=True,
@@ -87,6 +86,8 @@ class Schema(models.Model):
         help_text=_('The groups which have access to the schema.')
     )
 
+    objects = AccessLevelManager()
+
     class Meta:
         ordering = ('order', 'name')
 
@@ -108,6 +109,9 @@ class Schema(models.Model):
     def license_url(self):
         return settings.LICENSE_URLS[self.license]
 
+    def admin_url(self):
+        return reverse('admin:daiquiri_metadata_schema_change', args=[self.id])
+
 
 class Table(models.Model):
 
@@ -117,8 +121,6 @@ class Table(models.Model):
         (TYPE_TABLE, _('table')),
         (TYPE_VIEW, _('view'))
     )
-
-    objects = AccessLevelManager()
 
     schema = models.ForeignKey(
         Schema, related_name='tables', on_delete=models.CASCADE,
@@ -213,6 +215,8 @@ class Table(models.Model):
         help_text=_('The groups which have access to the table.')
     )
 
+    objects = AccessLevelManager()
+
     class Meta:
         ordering = ('schema__order', 'order', 'name')
 
@@ -234,10 +238,22 @@ class Table(models.Model):
     def license_url(self):
         return settings.LICENSE_URLS[self.license]
 
+    @property
+    def admin_url(self):
+        return reverse('admin:daiquiri_metadata_table_change', args=[self.id])
+
+    def discover(self, adapter):
+        metadata = adapter.fetch_table(self.schema.name, self.name)
+        try:
+            self.type = metadata['type']
+        except KeyError:
+            # if the table does not exist in the database then do nothing
+            return
+        self.nrows = adapter.fetch_nrows(self.schema.name, self.name)
+        self.size = adapter.fetch_size(self.schema.name, self.name)
+
 
 class Column(models.Model):
-
-    objects = AccessLevelManager()
 
     table = models.ForeignKey(
         Table, related_name='columns', on_delete=models.CASCADE,
@@ -314,6 +330,8 @@ class Column(models.Model):
         help_text=_('The groups which have access to the column.')
     )
 
+    objects = AccessLevelManager()
+
     class Meta:
         ordering = ('table__schema__order', 'table__order', 'order', 'name')
 
@@ -323,6 +341,11 @@ class Column(models.Model):
     def __str__(self):
         return self.table.schema.name + '.' + self.table.name + '.' + self.name
 
+    def get_width(self):
+        return settings.METADATA_COLUMN_WIDTH.get(str(self), None) or \
+            settings.METADATA_COLUMN_WIDTH.get('default', None)
+
+
     @property
     def query_strings(self):
         return [self.name]
@@ -330,14 +353,24 @@ class Column(models.Model):
     @property
     def indexed_columns(self):
         if self.index_for:
-            return [(self.table.schema.name, self.table.name, name.strip()) for name in self.index_for.split(',')] + [self.name]
+            return [
+                (self.table.schema.name, self.table.name, name.strip()) for name in self.index_for.split(',')
+            ] + [self.name]
         else:
             return None
 
+    @property
+    def admin_url(self):
+        return reverse('admin:daiquiri_metadata_column_change', args=[self.id])
+
+    def discover(self, adapter):
+        metadata = adapter.fetch_column(self.table.schema.name, self.table.name, self.name)
+        self.datatype = metadata.get('datatype', '')
+        self.arraysize = metadata.get('arraysize', None)
+        self.indexed = metadata.get('indexed', False)
+
 
 class Function(models.Model):
-
-    objects = AccessLevelManager()
 
     order = models.IntegerField(
         null=True, blank=True,
@@ -373,6 +406,8 @@ class Function(models.Model):
         help_text=_('The groups which have access to this function.')
     )
 
+    objects = AccessLevelManager()
+
     class Meta:
         ordering = ('order', 'name')
 
@@ -381,3 +416,7 @@ class Function(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def admin_url(self):
+        return reverse('admin:daiquiri_metadata_function_change', args=[self.id])

@@ -1,0 +1,10 @@
+{% load i18n %}
+
+    {% if request.user.is_staff %}
+    <li>
+        <a class="dropdown-item" href="{% url 'admin:index' %}">{% trans 'Admin' %}</a>
+    </li>
+    <li>
+        <hr class="dropdown-divider" />
+    </li>
+    {% endif %}

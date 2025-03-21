@@ -1,6 +1,6 @@
 from django.urls import reverse
 
-from daiquiri.core.utils import send_mail, get_admin_emails, get_permission_emails
+from daiquiri.core.utils import get_admin_emails, get_permission_emails, send_mail
 
 
 def get_manager_emails():

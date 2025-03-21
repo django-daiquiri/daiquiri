@@ -1,8 +1,9 @@
-from daiquiri.core.utils import import_class
-from daiquiri.jobs.routers import JobRouter
 from django.conf import settings
 from django.urls import include, re_path
 from django.views.generic import TemplateView
+
+from daiquiri.core.utils import import_class
+from daiquiri.jobs.routers import JobRouter
 
 app_name = 'uws'
 

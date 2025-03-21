@@ -1,4 +1,4 @@
-from rest_framework import viewsets, filters
+from rest_framework import filters, viewsets
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.pagination import PageNumberPagination
 
@@ -7,7 +7,6 @@ from django_filters.rest_framework import DjangoFilterBackend
 from daiquiri.core.permissions import HasModelPermission
 from daiquiri.stats.models import Record
 from daiquiri.stats.serializers import RecordSerializer
-
 
 
 class RecordViewSetPagination(PageNumberPagination):

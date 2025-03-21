@@ -27,7 +27,7 @@ def absolute_url(context, name, *args):
 def next(value, arg):
     try:
         return value[int(arg)+1]
-    except:
+    except (ValueError, IndexError):
         return None
 
 

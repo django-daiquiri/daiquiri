@@ -1,81 +1,20 @@
 {% extends 'core/wide.html' %}
 {% load static %}
-{% load compress %}
-{% load i18n %}
-{% load vendor_tags %}
 
-{% block bodyargs %}ng-app="metadata" ng-controller="MetadataController"{% endblock %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'core/css/bootstrap.css' %}" type="text/css" />
+<link rel="stylesheet" href="{% static 'core/css/base.css' %}" type="text/css" />
+<link rel="stylesheet" href="{% static 'metadata/css/management.css' %}" type="text/css" />
+<link rel="stylesheet" href="{% static 'core/css/style.css' %}" type="text/css" />
+{% endblock %}
 
-{% block headextra %}
-    {% vendor 'angular' %}
-    {% vendor 'ng-infinite-scroll' %}
-    {% vendor 'codemirror' %}
-    {% vendor 'moment' %}
-
-    {% compress css %}
-    <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/browser.scss' %}" />
-    <link rel="stylesheet" type="text/x-scss" href="{% static 'core/css/codemirror.scss' %}" />
-    <link rel="stylesheet" type="text/x-scss" href="{% static 'metadata/css/metadata.scss' %}" />
-    {% endcompress css %}
-
-    {% compress js %}
-    <script type="text/javascript" src="{% static 'core/js/core.js' %}" ></script>
-    <script type="text/javascript" src="{% static 'core/js/filter.js' %}" ></script>
-    <script type="text/javascript" src="{% static 'core/js/multiCheckbox.js' %}" ></script>
-    <script type="text/javascript" src="{% static 'core/js/byNumber.js' %}" ></script>
-    <script type="text/javascript" src="{% static 'core/js/formgroup.js' %}" ></script>
-    <script type="text/javascript" src="{% static 'core/js/browser.js' %}" ></script>
-
-    <script type="text/javascript" src="{% static 'metadata/js/metadata.js' %}" ></script>
-    {% endcompress js %}
+{% block js %}
+<script src="{% url 'javascript-catalog' %}"></script>
+<script src="{% static 'metadata/js/management.js' %}" defer="defer"></script>
 {% endblock %}
 
 {% block wide %}
 
-    <div ng-cloak>
-        <div ng-show="service.ready">
-            <h1>{% trans 'Metadata management' %}</h1>
-
-            <p>
-                {% trans 'Please click on a schema, a table, a column or a function to show or edit its metadata.' %}
-            </p>
-
-            <div class="row">
-                <div class="col-md-9">
-                    <div daiquiri-browser data-browser-id="schemas" class="daiquiri-metadata-browser"></div>
-                </div>
-                <div class="col-md-3">
-                    <div daiquiri-browser data-browser-id="functions" class="daiquiri-metadata-browser"></div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-9">
-                    {% include 'metadata/management_display.html' %}
-                </div>
-                <div class="col-md-3">
-                    {% include 'metadata/management_options.html' %}
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {% include 'metadata/management_modal_form_schemas.html' %}
-    {% include 'metadata/management_modal_form_schemas_description.html' %}
-    {% include 'metadata/management_modal_form_schemas_attribution.html' %}
-    {% include 'metadata/management_modal_form_schemas_creators.html' %}
-    {% include 'metadata/management_modal_form_schemas_contributors.html' %}
-    {% include 'metadata/management_modal_form_tables.html' %}
-    {% include 'metadata/management_modal_form_tables_description.html' %}
-    {% include 'metadata/management_modal_form_tables_attribution.html' %}
-    {% include 'metadata/management_modal_form_tables_creators.html' %}
-    {% include 'metadata/management_modal_form_tables_contributors.html' %}
-    {% include 'metadata/management_modal_form_columns.html' %}
-    {% include 'metadata/management_modal_form_functions.html' %}
-
-    {% include 'metadata/management_modal_delete_schemas.html' %}
-    {% include 'metadata/management_modal_delete_tables.html' %}
-    {% include 'metadata/management_modal_delete_columns.html' %}
-    {% include 'metadata/management_modal_delete_functions.html' %}
+    <div id="app" class="management"></div>
 
 {% endblock %}

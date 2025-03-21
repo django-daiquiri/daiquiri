@@ -1,12 +1,12 @@
 from django.conf import settings
 from django.contrib.auth.models import Group
 
-from daiquiri.core.serializers import JSONListField
-
 from rest_framework import serializers
 
+from daiquiri.core.serializers import JSONListField
+
+from ..models import Column, Function, Schema, Table
 from .validators import PersonListValidator
-from ..models import Schema, Table, Column, Function
 
 
 class GroupSerializer(serializers.ModelSerializer):
@@ -19,6 +19,7 @@ class GroupSerializer(serializers.ModelSerializer):
 class FunctionSerializer(serializers.ModelSerializer):
 
     label = serializers.CharField(source='__str__', read_only=True)
+    admin_url = serializers.CharField(read_only=True)
 
     class Meta:
         model = Function
@@ -28,6 +29,8 @@ class FunctionSerializer(serializers.ModelSerializer):
 class ColumnSerializer(serializers.ModelSerializer):
 
     label = serializers.CharField(source='__str__', read_only=True)
+    width = serializers.IntegerField(source='get_width', read_only=True)
+    admin_url = serializers.CharField(read_only=True)
 
     class Meta:
         model = Column
@@ -52,7 +55,9 @@ class ColumnSerializer(serializers.ModelSerializer):
                 'principal',
                 'indexed',
                 'std',
-                'table'
+                'table',
+                'admin_url',
+                'width',
             )
 
 
@@ -64,6 +69,7 @@ class TableSerializer(serializers.ModelSerializer):
     creators = JSONListField(required=False, validators=[PersonListValidator()])
     contributors = JSONListField(required=False, validators=[PersonListValidator()])
     license = serializers.ChoiceField(choices=settings.LICENSE_CHOICES, default='')
+    admin_url = serializers.CharField(read_only=True)
 
     class Meta:
         model = Table
@@ -78,6 +84,7 @@ class SchemaSerializer(serializers.ModelSerializer):
     creators = JSONListField(required=False, validators=[PersonListValidator()])
     contributors = JSONListField(required=False, validators=[PersonListValidator()])
     license = serializers.ChoiceField(choices=settings.LICENSE_CHOICES, default='', initial='')
+    admin_url = serializers.CharField(read_only=True)
 
     class Meta:
         model = Schema

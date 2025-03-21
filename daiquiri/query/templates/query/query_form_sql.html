@@ -1,95 +1,13 @@
 {% load i18n %}
 
 <p>
-   {% blocktrans %}
-   Place your SQL statement directly in the text area below and submit your request using the button. You can use the dropdown menus to get information about the database, to query external services or to access example queries.
-   {% endblocktrans %}
+    {% blocktrans %}
+    Place your SQL statement directly in the text area below and submit your request using the button. You can use the dropdown menus to get information about the database, to query external services or to access example queries.
+    {% endblocktrans %}
 </p>
 
 <p>
     {% blocktrans %}
-    Optionally, you can specify the name of the resulting database table and/or asign a run id, to group associated queries in the job list. Please choose a queue with a suitable timeout for your query.
+    Optionally, you can specify the name of the resulting database table and/or assign a run id, to group associated queries in the job list. Please choose a queue with a suitable timeout for your query.
     {% endblocktrans %}
-</p>
-
-<div class="daiquiri-query-dropdowns">
-    {% include 'query/query_dropdown_schemas.html' %}
-    {% include 'query/query_dropdown_columns.html' %}
-
-    {% if user.is_authenticated %}
-      {% if settings.QUERY_DROPDOWN_FUNCTIONS %}
-          {% include 'query/query_dropdown_functions.html' %}
-      {% endif %}
-    {% endif %}
-
-    {% for dropdown in settings.QUERY_DROPDOWNS %}
-    {% include dropdown.template %}
-    {% endfor %}
-
-    {% include 'query/query_dropdown_examples.html' %}
-</div>
-
-<div class="daiquiri-query-dropdowns-area" ng-show="service.forms.sql.dropdown">
-
-</div>
-
-<formgroup
-    data-type="codemirror"
-    data-label="{% trans 'SQL query' %}"
-    data-model="service.forms.sql.values.query"
-    data-errors="service.forms.sql.errors.query"
-    data-mode="text/x-sql">
-</formgroup>
-
-<div class="row">
-    <formgroup
-        class="col-md-4"
-        data-type="text"
-        data-label="{% trans 'Table name' %}"
-        data-model="service.forms.sql.values.table_name"
-        data-errors="service.forms.sql.errors.table_name">
-    </formgroup>
-    <formgroup
-        class="col-md-2"
-        data-type="text"
-        data-label="{% trans 'Run id' %}"
-        data-model="service.forms.sql.values.run_id"
-        data-errors="service.forms.sql.errors.run_id">
-    </formgroup>
-    <formgroup
-        class="col-md-3"
-        data-type="select"
-        data-label="{% trans 'Query language' %}"
-        data-model="service.forms.sql.values.query_language"
-        data-errors="service.forms.sql.errors.query_language"
-        data-options="service.query_languages"
-        data-options-label="text">
-    </formgroup>
-    <formgroup
-        class="col-md-3"
-        data-type="select"
-        data-label="{% trans 'Queue' %}"
-        data-model="service.active_queue"
-        data-options="service.queues"
-        data-options-label="text">
-    </formgroup>
-</div>
-
-<div class="form-group">
-    <button class="btn btn-primary" ng-click="service.forms.sql.submit()">
-        {% trans 'Submit new SQL Query' %} <submitting />
-    </button>
-
-    <div class="pull-right">
-        <button class="btn btn-default" ng-click="service.forms.sql.clear_query()">
-            {% trans 'Clear input window' %}
-        </button>
-    </div>
-</div>
-
-<p class="text-danger" ng-show="service.forms.sql.errors.detail">
-    {$ service.forms.sql.errors.detail $}
-</p>
-<p class="text-danger" ng-show="service.forms.sql.errors.server_error">
-    {% trans 'There has been an error on the server. Please contact the maintainers of this site, if the problem persists.' %}
 </p>

@@ -1,7 +1,7 @@
 import io
 
-from django.utils.xmlutils import SimplerXMLGenerator
 from django.utils.encoding import smart_str
+from django.utils.xmlutils import SimplerXMLGenerator
 
 from rest_framework.renderers import BaseRenderer
 
@@ -73,9 +73,9 @@ class ErrorRenderer(VOTableRenderer):
             errors = []
             for parameter, parameter_errors in data.items():
                 if isinstance(parameter_errors, (list, tuple)):
-                    errors.append('%s: %s' % (parameter, ', '.join([str(e) for e in parameter_errors])))
+                    errors.append('{}: {}'.format(parameter, ', '.join([str(e) for e in parameter_errors])))
                 else:
-                    errors.append('%s: %s' % (parameter, parameter_errors))
+                    errors.append(f'{parameter}: {parameter_errors}')
             return '\n'.join(errors)
         elif isinstance(data, (list, tuple)):
             return '\n'.join(data)

@@ -1,4 +1,4 @@
-class DublincoreRendererMixin(object):
+class DublincoreRendererMixin:
 
     def render_dublincore(self, metadata):
         self.start('oai_dc:dc', {

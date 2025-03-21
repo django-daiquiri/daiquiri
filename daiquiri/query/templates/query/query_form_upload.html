@@ -8,44 +8,6 @@
 
 <p>
     {% blocktrans %}
-    Optionally, you can specify the name of the resulting database table and/or asign a run id, as with regular queries.
+    Optionally, you can specify the name of the resulting database table and/or assign a run id, as with regular queries.
     {% endblocktrans %}
-</p>
-
-<formgroup
-    data-type="file"
-    data-label="{% trans 'File (max {$ service.status.upload_limit | bytes $})' %}"
-    data-model="service.forms.upload.values.file"
-    data-errors="service.forms.upload.errors.file"
-    data-help="{% trans 'Drag and drop file or click to open a file browser' %}">
-</formgroup>
-
-<div class="row">
-    <formgroup
-        class="col-md-9"
-        data-type="text"
-        data-label="{% trans 'Table name' %}"
-        data-model="service.forms.upload.values.table_name"
-        data-errors="service.forms.upload.errors.table_name">
-    </formgroup>
-    <formgroup
-        class="col-md-3"
-        data-type="text"
-        data-label="{% trans 'Run id' %}"
-        data-model="service.forms.upload.values.run_id"
-        data-errors="service.forms.upload.errors.run_id">
-    </formgroup>
-</div>
-
-<div class="form-group">
-    <button class="btn btn-primary" ng-click="service.forms.upload.submit()">
-        {% trans 'Upload table' %} <submitting />
-    </button>
-</div>
-
-<p class="text-danger" ng-if="service.forms.upload.errors.detail">
-    {$ service.forms.upload.errors.detail $}
-</p>
-<p class="text-danger" ng-if="service.forms.upload.errors.server_error">
-    {% trans 'There has been an error on the server. Please contact the maintainers of this site, if the problem persists' %}
 </p>
