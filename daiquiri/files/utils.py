@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Union
 from urllib.parse import urljoin
 
+from django.apps import apps
 from django.conf import settings
 from django.shortcuts import render
 from django.urls import reverse
@@ -13,7 +14,6 @@ from django.utils.timezone import now
 from django_sendfile import sendfile
 
 from daiquiri.core.utils import get_client_ip, markdown
-from daiquiri.stats.models import Record
 
 from .models import Directory
 
@@ -91,14 +91,16 @@ def send_file(request, file_path, search=None):
 
     absolute_file_path = os.path.join(settings.FILES_BASE_PATH, file_path)
 
-    Record.objects.create(
-        time=now(),
-        resource_type='FILE',
-        resource=resource,
-        client_ip=get_client_ip(request),
-        user=request.user if request.user.is_authenticated else None,
-        size=os.path.getsize(absolute_file_path),
-    )
+    if apps.is_installed('daiquiri.stats'):
+        from daiquiri.stats.models import Record
+        Record.objects.create(
+            time=now(),
+            resource_type='FILE',
+            resource=resource,
+            client_ip=get_client_ip(request),
+            user=request.user if request.user.is_authenticated else None,
+            size=os.path.getsize(absolute_file_path)
+        )
 
     # send the file to the client
     return sendfile(request, absolute_file_path)
