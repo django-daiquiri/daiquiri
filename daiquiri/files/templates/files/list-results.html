@@ -14,29 +14,31 @@
 </div>
 
 <nav aria-label="...">
-    <ul class="pager">
+    <ul class="pagination">
+
         {% if search_results.has_previous %}
-            <li class="previous">
-                <a href="?q={{ search_string }}&page={{ search_results.previous_page_number }}">
-                    <span aria-hidden="true">&larr;</span> Previous
+            <li class="page-item">
+                <a class="page-link" href="?q={{ search_string }}&page={{ search_results.previous_page_number }}">
+                    <span class="bi bi-arrow-left" aria-hidden="true"></span> Previous
                 </a>
             </li>
         {% else %}
-            <li class="previous disabled">
-                <a><span>&larr;</span> Previous</a>
+            <li class="page-item disabled">
+                <a class="page-link"><span class="bi bi-arrow-left"></span> Previous</a>
             </li>
         {% endif %}
 
         {% if search_results.has_next %}
-            <li class="next">
-                <a href="?q={{ search_string }}&page={{ search_results.next_page_number }}">
-                    Next <span aria-hidden="true">&rarr;</span>
+            <li class="page-item">
+                <a class="page-link" href="?q={{ search_string }}&page={{ search_results.next_page_number }}">
+                    Next <span class="bi bi-arrow-right" aria-hidden="true"></span>
                 </a>
             </li>
         {% else %}
-            <li class="next disabled">
-                <a>Next <span aria-hidden="true">&rarr;</span></a>
+            <li class="page-item disabled">
+                <a class="page-link">Next <span class="bi bi-arrow-right" aria-hidden="true"></span></a>
             </li>
         {% endif %}
+
     </ul>
 </nav>
