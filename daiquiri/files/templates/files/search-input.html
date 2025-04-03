@@ -1,11 +1,9 @@
-<form class="search-input"
-    role="search"
-    method="get"
-    action="{% url 'files:search' %}">
-    <input type="text"
-        name="q"
-        class="form-control"
-        placeholder="Search for..."
-        pattern=".{3,}"
-        required>
+<form class="d-flex" role="search" method="get" action="{% url 'files:search' %}">
+  <input class="form-control me-2 search-input"
+      type="text"
+      name="q"
+      placeholder="Search"
+      pattern=".{3,}"
+      aria-label="Search">
 </form>
+
