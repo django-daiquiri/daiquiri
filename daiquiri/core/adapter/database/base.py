@@ -197,7 +197,7 @@ class BaseDatabaseAdapter:
         for column in columns:
             if self.COLUMNTYPES.get(column['datatype']) is None:
                 raise TypeError("Column {name} is of type {datatype}. {datatype} is not ".format(**column) +
-                                "supported by Postgres, the table can not be created.")
+                                "supported by the database, the table can not be created.")
 
         # prepare sql string
         sql = 'CREATE TABLE {schema}.{table} ({columns});'.format(
@@ -327,8 +327,11 @@ class BaseDatabaseAdapter:
         if mask_cell:
             return 'NULL'
         else:
-            if isinstance(cell, str):
-                # this is the case for fields datatype="char" and arraysize="*"
+            if cell.ndim == 1:
+                # create an array string digestable by postgres
+                value = str(cell).replace('[', '{').replace(']', '}')
+                value = ', '.join(value.split())
+            elif isinstance(cell, str):
                 value = cell
             elif cell.dtype.char == 'S':
                 # chars need to be decoded

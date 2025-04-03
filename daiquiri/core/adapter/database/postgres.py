@@ -299,6 +299,25 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         logger.debug('sql = "%s"', sql)
         return [column[0] for column in self.fetchall(sql)]
 
+    def create_table(self, schema_name, table_name, columns):
+        for column in columns:
+            if self.COLUMNTYPES.get(column['datatype']) is None:
+                raise TypeError("Column {name} is of type {datatype}. {datatype} is not ".format(**column) +
+                                "supported by Postgres, the table can not be created.")
+        sql = 'CREATE TABLE {schema}.{table} ({columns});'.format(
+            schema=self.escape_identifier(schema_name),
+            table=self.escape_identifier(table_name),
+            columns=', '.join([
+                '{column_name} {column_type}{ar}'.format(
+                    column_name=self.escape_identifier(column['name']),
+                    column_type=self.COLUMNTYPES[column['datatype']],
+                    ar='[]' if column['arraysize'] else ''
+                ) for column in columns]),
+        )
+
+        logger.debug('sql = "%s"', sql)
+        self.execute(sql)
+
     def rename_table(self, schema_name, table_name, new_table_name):
         sql = f'ALTER TABLE {self.escape_identifier(schema_name)}.{self.escape_identifier(table_name)} RENAME TO {self.escape_identifier(new_table_name)};'  # noqa: E501
 
