@@ -343,8 +343,8 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
 
         if datatype:
             if '_' in udt_name.lower(): # ARRAY
-                column['datatype'] = datatype['datatype'] # the _ is still needed, will be removed by the serializer.
-                column['arraysize'] = '*'
+                column['datatype'] = datatype['datatype'] + "[]" # the _ is still needed, will be removed by the serializer.
+                column['arraysize'] = None
 
             else:
                 column['datatype'] = datatype['datatype']
