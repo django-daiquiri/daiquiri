@@ -25,6 +25,6 @@ export const isFileColumn = (column) => column.ucd && column.ucd.includes('meta.
 
 export const isRefIDColumn = (column) => column.ucd && column.ucd.includes('meta.ref.id')
 
-export const isModalColumn = (column) => isRefColumn(column) && (
+export const isModalColumn = (column) => isRefIDColumn(column) && (
     isDataLinkColumn(column) || isImageColumn(column) || isNoteColumn(column)
-) && !isRefIDColumn(column)
+)
