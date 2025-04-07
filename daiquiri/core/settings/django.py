@@ -243,7 +243,7 @@ HONEYPOT_FIELD_NAME = 'Phone'
 HONEYPOT_FIELD_VALUE = ''
 HONEYPOT_FIELD_HIDDEN = True
 
-PASSWORD_HASHERS = [
-    'daiquiri.core.hashers.CrypdSHA512PasswordHasher',
-    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
-]
+# PASSWORD_HASHERS = [
+#     'daiquiri.core.hashers.CrypdSHA512PasswordHasher',
+#     'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+# ]
