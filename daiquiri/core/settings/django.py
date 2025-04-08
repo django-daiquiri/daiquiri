@@ -178,7 +178,7 @@ ACCOUNT_SIGNUP_FORM_CLASS = 'daiquiri.auth.forms.SignupForm'
 ACCOUNT_USER_DISPLAY = 'daiquiri.auth.utils.get_full_name'
 ACCOUNT_USERNAME_VALIDATORS = 'daiquiri.auth.validators.username_validators'
 ACCOUNT_USERNAME_MIN_LENGTH = 4
-ACCOUNT_PASSWORD_MIN_LENGTH = 8
+ACCOUNT_PASSWORD_MIN_LENGTH = 4
 ACCOUNT_EMAIL_MAX_LENGTH = 190
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 7
@@ -243,7 +243,7 @@ HONEYPOT_FIELD_NAME = 'Phone'
 HONEYPOT_FIELD_VALUE = ''
 HONEYPOT_FIELD_HIDDEN = True
 
-# PASSWORD_HASHERS = [
-#     'daiquiri.core.hashers.CrypdSHA512PasswordHasher',
-#     'django.contrib.auth.hashers.PBKDF2PasswordHasher',
-# ]
+PASSWORD_HASHERS = [
+    'daiquiri.core.hashers.CrypdSHA512PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+]
