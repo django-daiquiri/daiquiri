@@ -50,10 +50,10 @@ export const useDropdownsQuery = () => {
   })
 }
 
-export const useDownloadsQuery = () => {
+export const useDownloadFormsQuery = (jobId) => {
   return useQuery({
-    queryKey: ['downloads'],
-    queryFn: () => QueryApi.fetchDownloads(),
+    queryKey: ['downloadforms', jobId],
+    queryFn: () => QueryApi.fetchDownloadForms(jobId),
     placeholderData: keepPreviousData
   })
 }
