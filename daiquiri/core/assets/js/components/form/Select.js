@@ -13,6 +13,7 @@ const Select = ({ label, value, options, errors, onChange }) => {
       <label htmlFor={id} className="form-label">{label}</label>
       <select
         id={id}
+        key={id}
         className={classNames('form-control', {'is-invalid': errors})}
         value={value}
         onChange={(event) => onChange(event.target.value)}>
