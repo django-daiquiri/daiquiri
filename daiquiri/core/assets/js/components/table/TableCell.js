@@ -1,6 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import _ from 'lodash'
+
 import { getBasename, getFileUrl, getLinkUrl, getReferenceUrl, isImageColumn,
          isModalColumn, isFileColumn, isLinkColumn } from '../../utils/table.js'
 
@@ -37,7 +39,7 @@ const TableCell = ({ column, value, rowIndex, columnIndex, setActive, showModal 
       }
     } else {
       // this is not a reference, just render the value
-      return Array.isArray(value) ? `[${value.join(', ')}]` : value
+      return Array.isArray(value) ? `[${value.join(', ')}]` : _.toString(value)
     }
   }
 
@@ -50,7 +52,11 @@ const TableCell = ({ column, value, rowIndex, columnIndex, setActive, showModal 
 
 TableCell.propTypes = {
   column: PropTypes.object.isRequired,
-  value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  value: PropTypes.oneOfType([
+    PropTypes.number,
+    PropTypes.string,
+    PropTypes.bool
+  ]),
   rowIndex: PropTypes.number.isRequired,
   columnIndex: PropTypes.number.isRequired,
   setActive: PropTypes.func.isRequired,
