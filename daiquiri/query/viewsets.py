@@ -211,7 +211,10 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
         })
         serializer.is_valid(raise_exception=True)
 
-        file_name = handle_file_upload(get_user_upload_directory(self.request.user), serializer.validated_data['file'])
+        file_name = handle_file_upload(
+            get_user_upload_directory(self.request.user),
+            serializer.validated_data['file']
+        )
 
         job = QueryJob(
             job_type=QueryJob.JOB_TYPE_INTERFACE,

@@ -52,9 +52,7 @@ class UploadFileValidator:
 
         quota = get_quota(user, quota_settings='QUERY_UPLOAD_LIMIT')
         if file.size > quota:
-            raise ValidationError({
-                'file': self.message % quota
-            })
+            raise ValidationError([self.message % quota])
 
 
 class UploadParamValidator:
