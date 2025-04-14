@@ -39,7 +39,9 @@ const TableCell = ({ column, value, rowIndex, columnIndex, setActive, showModal 
       }
     } else {
       // this is not a reference, just render the value
-      return Array.isArray(value) ? `[${value.join(', ')}]` : _.toString(value)
+      return Array.isArray(value)
+        ? `[${value.map(v => v === null || v === undefined ? 'NULL' : _.toString(v)).join(', ')}]`
+        : _.toString(value);
     }
   }
 

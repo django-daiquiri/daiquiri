@@ -329,8 +329,8 @@ class BaseDatabaseAdapter:
         else:
             if cell.ndim == 1:
                 # create an array string digestable by postgres
-                value = str(cell).replace('[', '{').replace(']', '}')
-                value = ', '.join(value.split())
+                value_list = ['NULL' if cell.mask[i] else str(cell[i]) for i in range(len(cell))]
+                value = '{' + ', '.join(value_list) + '}'
             elif isinstance(cell, str):
                 value = cell
             elif cell.dtype.char == 'S':
