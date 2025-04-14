@@ -21,7 +21,7 @@ const TableModalDatalinks = ({ dataLinkId, dataLinks }) => {
       <div>
         <ul className="list-unstyled">
           {dlPreview.map((dataLink, index) => (
-            <li key={index}>
+            <li className="mb-1" key={index}>
               <a className="btn btn-primary btn-sm" href={dataLink.access_url} target="_blank" rel="noreferrer" data-bs-toggle="tooltip" title="Open viewer">
                 <i className="bi bi-eye"></i>
               </a>
@@ -31,7 +31,7 @@ const TableModalDatalinks = ({ dataLinkId, dataLinks }) => {
         </ul>
         <ul className="list-unstyled">
           {dlThis.map((dataLink, index) => (
-            <li key={index}>
+            <li className="mb-1" key={index}>
               <a className="btn btn-primary btn-sm" href={dataLink.access_url} data-bs-toggle="tooltip" title="Download file">
                 <i className="bi bi-download"></i>
               </a>
