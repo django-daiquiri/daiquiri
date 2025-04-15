@@ -13,6 +13,8 @@ nav {
                 position: relative;
 
                 ul.dropdown-menu {
+                    max-height: 50rem;
+                    overflow-y: auto;
                     position: absolute;
                     top: 0;
                     left: calc(100% - 0.66rem);
