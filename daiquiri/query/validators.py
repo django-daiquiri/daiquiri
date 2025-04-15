@@ -5,6 +5,8 @@ from django.utils.translation import gettext_lazy as _
 
 from rest_framework.exceptions import ValidationError
 
+from daiquiri.core.utils import bytes2human
+
 from .models import QueryJob
 from .utils import get_quota
 
@@ -52,7 +54,7 @@ class UploadFileValidator:
 
         quota = get_quota(user, quota_settings='QUERY_UPLOAD_LIMIT')
         if file.size > quota:
-            raise ValidationError([self.message % quota])
+            raise ValidationError([self.message % bytes2human(quota)])
 
 
 class UploadParamValidator:
