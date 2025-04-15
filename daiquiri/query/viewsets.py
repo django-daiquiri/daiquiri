@@ -211,7 +211,10 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
         })
         serializer.is_valid(raise_exception=True)
 
-        file_name = handle_file_upload(get_user_upload_directory(self.request.user), serializer.validated_data['file'])
+        file_name = handle_file_upload(
+            get_user_upload_directory(self.request.user),
+            serializer.validated_data['file']
+        )
 
         job = QueryJob(
             job_type=QueryJob.JOB_TYPE_INTERFACE,
@@ -271,6 +274,30 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
 
         return Response(job.columns())
 
+    @action(detail=True, methods=['get'], url_name='download-forms',
+            url_path=r'downloadforms')
+    def download_forms(self, request, pk=None):
+        """This endpoint returns all download forms that are available for the job.
+        """
+        download_forms = []
+        try:
+            job = self.get_queryset().get(pk=pk)
+        except QueryJob.DoesNotExist as e:
+            raise NotFound from e
+
+        for query_download in settings.QUERY_DOWNLOADS:
+            model = query_download.get('model', None)
+            if model:
+                download_job = import_class(model)
+                if hasattr(download_job, 'get_form'):
+                    form = download_job().get_form(job)
+                    query_download['form'] = form
+            download_forms.append(query_download)
+
+        serializer = DownloadSerializer(download_forms, many=True)
+
+        return Response(serializer.data)
+
     @action(detail=True, methods=['get'], url_name='submitted-downloads',
             url_path=r'downloads')
     def get_downloads(self, request, pk=None):
@@ -300,9 +327,7 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
                         job_response[par] = getattr(download_job, par)
                 response.append(job_response)
 
-
         return Response(response)
-
 
     @action(detail=True, methods=['get'], url_name='download',
             url_path=r'download/(?P<download_key>[a-z\-]+)/(?P<download_job_id>[A-Za-z0-9\-]+)')

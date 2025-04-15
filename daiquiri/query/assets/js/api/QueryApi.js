@@ -19,8 +19,8 @@ class QueryApi extends BaseApi {
     return this.get('/query/api/dropdowns/')
   }
 
-  static fetchDownloads() {
-    return this.get('/query/api/downloads/')
+  static fetchDownloadForms(id) {
+    return this.get(`/query/api/jobs/${id}/downloadforms/`)
   }
 
   static fetchSubmittedDownloads(id) {

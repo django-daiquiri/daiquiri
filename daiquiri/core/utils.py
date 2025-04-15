@@ -208,18 +208,24 @@ def human2bytes(string):
         return number * 1024**5
 
 
+def bytes2human(size, gnu=True):
+    if gnu:
+        for unit in ['B', 'kB', 'MB', 'GB', 'TB', 'PB']:
+            if size < 1000.0 or unit == 'PB':
+                return f"{size:.1f} {unit}"
+            size /= 1000.0
+    else:
+        for unit in ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB']:
+            if size < 1024.0 or unit == 'PiB':
+                return f"{size:.1f} {unit}"
+            size /= 1024.0
+
+
 def markdown(md):
-    return markdown_function(md, extensions=[
-                                    'fenced_code',
-                                    'attr_list',
-                                    'codehilite'
-                                    ],
-                                 extension_configs={
-                                    'codehilite':{
-                                        'guess_lang':'false'
-                                    }
-                                 }
-                             )
+    return markdown_function(md,
+            extensions=['fenced_code', 'attr_list', 'codehilite'],
+            extension_configs={'codehilite':{'guess_lang':'false'}}
+    )
 
 
 def make_query_dict_upper_case(input_dict):

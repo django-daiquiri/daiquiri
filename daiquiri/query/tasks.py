@@ -208,12 +208,17 @@ def run_database_ingest_task(job_id, file_path):
         except OperationalError as e:
             # load the job again and check if the job was killed
             job = QueryJob.objects.get(pk=job_id)
-
             if job.phase != job.PHASE_ABORTED:
                 job.phase = job.PHASE_ERROR
                 job.error_summary = str(e)
                 logger.info('job %s failed (%s)', job.id, job.error_summary)
 
+        except Exception as e:
+            job = QueryJob.objects.get(pk=job_id)
+            if job.phase != job.PHASE_ABORTED:
+                job.phase = job.PHASE_ERROR
+                job.error_summary = 'Unknown error. Please contact the maintainers of this site if the error persists.'
+                logger.info('job %s failed (%s)', job.id, str(e))
         else:
             # get additional information about the completed job
             job.phase = job.PHASE_COMPLETED

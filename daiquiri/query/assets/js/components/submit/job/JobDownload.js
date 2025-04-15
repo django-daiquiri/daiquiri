@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { isNil, isEmpty } from 'lodash'
 
 import { jobPhaseClass, jobPhaseMessage } from 'daiquiri/query/assets/js/constants/job'
-import { useSubmittedDownloadsQuery, useDownloadsQuery } from 'daiquiri/query/assets/js/hooks/queries'
+import { useSubmittedDownloadsQuery, useDownloadFormsQuery } from 'daiquiri/query/assets/js/hooks/queries'
 import { useSubmitDownloadJobMutation } from 'daiquiri/query/assets/js/hooks/mutations'
 
 import ArchiveDownload from './downloads/ArchiveDownload'
@@ -14,7 +14,7 @@ const JobDownload = ({ job }) => {
 
   const mutation = useSubmitDownloadJobMutation()
 
-  const { data: downloads } = useDownloadsQuery()
+  const { data: downloadForms } = useDownloadFormsQuery(job.id)
 
   const { data: downloadJobs } = useSubmittedDownloadsQuery(job.id) || []
 
@@ -26,7 +26,7 @@ const JobDownload = ({ job }) => {
     <div className="query-download">
       <p className="mb-4">
         {
-          isEmpty(downloads) ? gettext('The download of the results is currently not available.') :
+          isEmpty(downloadForms) ? gettext('The download of the results is currently not available.') :
           gettext('For further processing of the data, you can create a file from the results table' +
                  ' and then download it to your local machine. For this file several formats are available.' +
                  ' Please choose a format from the list below.')
@@ -34,8 +34,8 @@ const JobDownload = ({ job }) => {
       </p>
 
       {
-        downloads && downloads.map((download, downloadIndex) => {
-          if (download.key == 'table') {
+        downloadForms && downloadForms.map((downloadForm, downloadIndex) => {
+          if (downloadForm.key == 'table') {
             return (
               <TableDownload
                 key={downloadIndex}
@@ -44,7 +44,7 @@ const JobDownload = ({ job }) => {
                 onSubmit={(data) => handleSubmit('table', data)}
               />
             )
-          } else if (download.key == 'archive') {
+          } else if (downloadForm.key == 'archive') {
             return (
               <ArchiveDownload
                 key={downloadIndex}
@@ -54,12 +54,14 @@ const JobDownload = ({ job }) => {
                 onSubmit={(data) => handleSubmit('archive', data)}
               />
             )
-          } else if (!isNil(download.form)) {
+          } else if (!isNil(downloadForm.form)) {
             return (
               <FormDownload
                 key={downloadIndex}
-                form={download.form}
-                onSubmit={(data) => handleSubmit(download.key, data)}
+                jobId={job.id}
+                downloadForm={downloadForm}
+                downloadJobs={downloadJobs || []}
+                onSubmit={(data) => handleSubmit(downloadForm.key, data)}
               />
             )
           }
