@@ -53,6 +53,7 @@ const TableModalDatalinks = ({ dataLinkId, dataLinks }) => {
                 <h5>{dataLink.description}</h5>
                 <a href={dataLink.access_url}><span><i class="bi bi-download"></i>&nbsp;Download</span></a>
                 <img src={dataLink.access_url} className="d-block img-fluid" alt='Image is missing, please contact the administrator.' />
+                <hr className="mb-4"></hr>
             </div>
         ))}
       </div>
