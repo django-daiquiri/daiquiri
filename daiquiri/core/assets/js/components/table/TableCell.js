@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import _ from 'lodash'
 
 import { getBasename, getFileUrl, getLinkUrl, getReferenceUrl,
-         isImageColumn, isModalColumn, isFileColumn, isLinkColumn, isRefColumn
+         isImageColumn, isModalColumn, isFileColumn, isLinkColumn, isRefColumn, isNoteColumn
        } from '../../utils/table.js'
 
 const TableCell = ({ column, value, rowIndex, columnIndex, setActive, showModal }) => {
@@ -13,7 +13,7 @@ const TableCell = ({ column, value, rowIndex, columnIndex, setActive, showModal 
     if (isRefColumn(column)) {
       if (isModalColumn(column)) {
         // render the modal
-        if (isImageColumn(column)) {
+        if (isImageColumn(column) || isNoteColumn(column)) {
           value = getBasename(value)
         }
         return (
