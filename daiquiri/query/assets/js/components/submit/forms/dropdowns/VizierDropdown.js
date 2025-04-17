@@ -61,7 +61,7 @@ const VizierDropdown = ({ options, onClick }) => {
                             <td>
                               <button
                                 className="btn btn-link"
-                                onClick={() => onClick({query_string: row.id})}
+                                onClick={() => onClick('vizier', {query_string: row.id})}
                               >
                                 {row.id}
                               </button>
@@ -69,14 +69,14 @@ const VizierDropdown = ({ options, onClick }) => {
                             <td>
                               <button
                                 className="btn btn-link"
-                                onClick={() => onClick({query_string: row.ra})}
+                                onClick={() => onClick('vizier', {query_string: row.ra})}
                               >
                                 {row.ra}
                               </button>
                               {' '}
                               <button
                                 className="btn btn-link"
-                                onClick={() => onClick({query_string: row.de})}
+                                onClick={() => onClick('vizier', {query_string: row.de})}
                               >
                                 {row.de}
                               </button>
@@ -84,7 +84,7 @@ const VizierDropdown = ({ options, onClick }) => {
                             <td>
                               <button
                                 className="btn btn-link"
-                                onClick={() => onClick({query_string: row.distance})}
+                                onClick={() => onClick('vizier', {query_string: row.distance})}
                               >
                                 {row.distance}
                               </button>

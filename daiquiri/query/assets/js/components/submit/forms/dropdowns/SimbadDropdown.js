@@ -60,11 +60,11 @@ const SimbadDropdown = ({ options, onClick }) => {
                             <td>{row.object}</td>
                             <td>{row.type}</td>
                             <td>
-                              <button className="btn btn-link" onClick={() => onClick({query_string: row.ra})}>
+                              <button className="btn btn-link" onClick={() => onClick('simbad', {query_string: row.ra})}>
                                 {row.ra}
                               </button>
                               {' '}
-                              <button className="btn btn-link" onClick={() => onClick({query_string: row.de})}>
+                              <button className="btn btn-link" onClick={() => onClick('simbad', {query_string: row.de})}>
                                 {row.de}
                               </button>
                             </td>
