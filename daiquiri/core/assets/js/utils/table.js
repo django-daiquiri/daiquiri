@@ -15,7 +15,7 @@ export const isRefColumn = (column) => column.ucd && column.ucd.includes('meta.r
 
 export const isLinkColumn = (column) => column.ucd && column.ucd.includes('meta.ref.url')
 
-export const isDataLinkColumn = (column) => column.ucd && column.ucd.includes('meta.id')
+export const isDataLinkColumn = (column) => column.ucd && column.ucd.includes('meta.ref.id')
 
 export const isImageColumn = (column) => column.ucd && column.ucd.includes('meta.image')
 
@@ -23,8 +23,8 @@ export const isNoteColumn = (column) => column.ucd && column.ucd.includes('meta.
 
 export const isFileColumn = (column) => column.ucd && column.ucd.includes('meta.file')
 
-export const isRefIDColumn = (column) => column.ucd && column.ucd.includes('meta.ref.id')
-
-export const isModalColumn = (column) => isRefIDColumn(column) && (
-    isDataLinkColumn(column) || isImageColumn(column) || isNoteColumn(column)
+export const isModalColumn = (column) => (column) && (
+  isDataLinkColumn(column) ||
+  (isImageColumn(column) && isRefColumn(column)) ||
+  (isNoteColumn(column) && isRefColumn(column))
 )

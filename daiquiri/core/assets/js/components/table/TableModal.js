@@ -27,11 +27,19 @@ const TableModal = ({ modal, modalValues, onNavigation }) => {
                   dataLinks && <TableModalDatalinks dataLinkId={modalValues.dataLinkId} dataLinks={dataLinks} />
                 }
                 {
-                  note && <pre>{note}</pre>
+                  note && (
+                    <div>
+                    <a href={modalValues.noteUrl}><span><i class="bi bi-download"></i>&nbsp;Download</span></a>
+                    <pre>{note}</pre>
+                    </div>
+                  )
                 }
                 {
                   modalValues.imageSrc && (
+                    <div>
+                    <a href={modalValues.imageSrc}><span><i class="bi bi-download"></i>&nbsp;Download</span></a>
                     <img className="d-block mx-auto" src={modalValues.imageSrc} alt={modalValues.title} />
+                    </div>
                   )
                 }
               </div>
