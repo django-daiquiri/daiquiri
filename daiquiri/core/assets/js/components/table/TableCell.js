@@ -3,16 +3,17 @@ import PropTypes from 'prop-types'
 
 import _ from 'lodash'
 
-import { getBasename, getFileUrl, getLinkUrl, getReferenceUrl, isImageColumn,
-         isModalColumn, isFileColumn, isLinkColumn } from '../../utils/table.js'
+import { getBasename, getFileUrl, getLinkUrl, getReferenceUrl,
+         isImageColumn, isModalColumn, isFileColumn, isLinkColumn, isRefColumn, isNoteColumn
+       } from '../../utils/table.js'
 
 const TableCell = ({ column, value, rowIndex, columnIndex, setActive, showModal }) => {
 
   const renderCell = () => {
-    if (column.ucd && column.ucd.includes('meta.ref')) {
+    if (isRefColumn(column)) {
       if (isModalColumn(column)) {
         // render the modal
-        if (isImageColumn(column)) {
+        if (isImageColumn(column) || isNoteColumn(column)) {
           value = getBasename(value)
         }
         return (
