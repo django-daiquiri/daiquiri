@@ -35,5 +35,7 @@ urlpatterns = [
     path(r'api/', include(router.urls)),
 
     # query interface, needs to be last in list
+    # the default path is required to cover a case with a single trailing slash
+    re_path(r'^$', QueryView.as_view(), name='default'),
     re_path(r'[A-Za-z0-9-]*/$', QueryView.as_view(), name='query'),
 ]
