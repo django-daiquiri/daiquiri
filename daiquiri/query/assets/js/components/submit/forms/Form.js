@@ -68,24 +68,36 @@ const Form = ({ formKey, loadJob }) => {
       <div className="query-form mb-4">
         <h2>{form.label}</h2>
         <Template template={form.template} />
-
         <div className="mt-3">
-          <div className="row">
-          {
-            form.fields.map((field, index) => (
-              <div key={index} className={field.width ? `col-md-${field.width}` : 'col-md-12'}>
-                <Input
-                  label={field.label}
-                  type={field.type || 'text'}
-                  help={field.help}
-                  value={values[field.key] || ''}
-                  errors={errors[field.key]}
-                  onChange={(value) => setValues({...values, [field.key]: value})}
-                />
-              </div>
-            ))
-          }
-          </div>
+        <div className="form-group row mb-2">
+        {
+          form.fields && form.fields.map((field, index) => (
+            <div key={index} className={field.width ? `col-md-${field.width}` : 'col-md-12'}>
+              {
+                ['text', 'number'].includes(field.type) && (
+                  <Input
+                    label={field.label}
+                    type={field.type}
+                    help={field.help}
+                    value={values[field.key]}
+                    onChange={(value) => setValues({...values, [field.key]: value})}
+                  />
+                )
+              }
+              {
+                field.type == 'select' && (
+                  <Select
+                    label={field.label}
+                    help={field.help}
+                    value={values[field.key] || field.default_value}
+                    options={field.options}
+                    onChange={(value) => setValues({...values, [field.key]: value})} />
+                )
+              }
+            </div>
+          ))
+        }
+      </div>
 
           <div className="row">
             <div className="col-md-6">
