@@ -16,6 +16,9 @@ class JobManager(models.Manager):
         return self.filter_by_owner(user).filter(phase__in=self.model.PHASE_ACTIVE)
 
     def get_hash(self, user):
-        jobs = self.filter_by_owner(user).exclude(phase__in=self.model.PHASE_ARCHIVED).values('id', 'phase')
+        jobs = self.filter_by_owner(user)\
+                .exclude(phase=self.model.PHASE_ARCHIVED)\
+                .order_by()\
+                .values('id', 'phase')
         jobs_string = '\n'.join(['{id}-{phase}'.format(**job) for job in jobs])
         return hashlib.sha256(jobs_string.encode()).hexdigest()
