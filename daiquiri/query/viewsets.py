@@ -25,6 +25,7 @@ from daiquiri.core.utils import (
 )
 from daiquiri.core.viewsets import ChoicesViewSet, RowViewSetMixin
 from daiquiri.jobs.viewsets import AsyncJobViewSet, SyncJobViewSet
+from daiquiri.jobs.utils import get_max_records
 from daiquiri.stats.models import Record
 
 from .filters import JobFilterBackend
@@ -60,6 +61,7 @@ from .utils import (
 )
 
 
+
 class StatusViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     permission_classes = (HasPermission, )
     queryset = []
@@ -71,6 +73,7 @@ class StatusViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
             'size': QueryJob.objects.get_size(request.user),
             'hash':  QueryJob.objects.get_hash(request.user),
             'quota': get_quota(request.user),
+            'max_records': get_max_records(request.user),
             'upload_limit': get_quota(request.user, quota_settings='QUERY_UPLOAD_LIMIT')
         })
 
@@ -92,7 +95,6 @@ class FormViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.Gen
             return FormListSerializer
         else:
             return FormDetailSerializer
-
 
 
 class DropdownViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -160,12 +162,12 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
             query_language=serializer.data.get('query_language'),
             query=serializer.data.get('query'),
             queue=serializer.data.get('queue'),
+            max_records=get_max_records(self.request.user),
             client_ip=get_client_ip(self.request)
         )
         job.process()
         job.save()
         job.run()
-
         # inject the job id into the serializers data
         serializer._data['id'] = job.id
 

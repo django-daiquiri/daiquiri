@@ -74,7 +74,6 @@ class QueryJob(Job):
 
     class Meta:
         ordering = ('start_time', )
-
         verbose_name = _('QueryJob')
         verbose_name_plural = _('QueryJobs')
 
@@ -118,7 +117,11 @@ class QueryJob(Job):
 
     @property
     def result_status(self):
-        return 'OK' if self.max_records is None else 'OVERFLOW'
+        # if max_records is not defined then any number of rows is valid
+        if self.max_records is None or self.nrows is None:
+            return 'OK'
+        else:
+            return 'OK' if self.nrows < self.max_records else 'OVERFLOW'
 
     @property
     def quote(self):
@@ -260,6 +263,8 @@ class QueryJob(Job):
         )
 
         adapter.submit_query(self.actual_query)
+        self.nrows = adapter.count_rows(self.schema_name, self.table_name)
+        self.size = adapter.fetch_size(self.schema_name, self.table_name)
 
         # create a stats record for this job
         Record.objects.create(
@@ -271,7 +276,7 @@ class QueryJob(Job):
             },
             client_ip=self.client_ip,
             user=self.owner,
-            size=adapter.fetch_size(self.schema_name, self.table_name)
+            size=self.size
         )
 
         try:

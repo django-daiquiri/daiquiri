@@ -82,7 +82,7 @@ class UWSRenderer(XMLRenderer):
 
 class UWSErrorRenderer(ErrorRenderer):
 
-    media_type = '*/*'
+    media_type = 'application/xml'
 
     def render_votable(self, data, accepted_media_type=None, renderer_context=None):
         self.start('RESOURCE', {

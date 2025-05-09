@@ -10,7 +10,12 @@ const JobParameters = ({ job }) => {
       <dl className="row mb-0">
         <dt className="col-md-3 text-md-end">{gettext('Job status')}</dt>
         <dd className="col-md-9 mb-0">
-          <span className={jobPhaseBadge[job.phase]}>{job.phase_label}</span>
+          <span className={jobPhaseBadge[job.phase]}>{job.phase_label}</span>&nbsp;
+          {
+            job.result_status !== 'OK' ? (
+              <span className="badge text-bg-warning">{job.result_status}</span>
+            ) : ''
+          }
         </dd>
 
         {
@@ -62,7 +67,7 @@ const JobParameters = ({ job }) => {
           job.nrows !== null && (
             <>
               <dt className="col-md-3 text-md-end">{gettext('Number of rows')}</dt>
-              <dd className="col-md-9 mb-0">{job.nrows}</dd>
+            <dd className="col-md-9 mb-0">{job.nrows}{job.result_status !== 'OK' ? (` (${job.result_status})` ) : ''}</dd>
             </>
           )
         }

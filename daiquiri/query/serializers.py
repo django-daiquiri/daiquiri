@@ -107,6 +107,7 @@ class QueryJobRetrieveSerializer(serializers.ModelSerializer):
             'native_query',
             'actual_query',
             'queue',
+            'result_status',
             'nrows',
             'size',
             'sources',
