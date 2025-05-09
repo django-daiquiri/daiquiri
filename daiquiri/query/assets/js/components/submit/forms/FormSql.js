@@ -5,9 +5,11 @@ import { isNil } from 'lodash'
 import { useLsState } from 'daiquiri/core/assets/js/hooks/ls'
 import { useDropdownsQuery, useFormQuery,
          useQueryLanguagesQuery, useQueuesQuery } from 'daiquiri/query/assets/js/hooks/queries'
+import { useStatusQuery } from 'daiquiri/query/assets/js/hooks/queries'
 import { useSubmitJobMutation } from 'daiquiri/query/assets/js/hooks/mutations'
 
 import Template from 'daiquiri/core/assets/js/components/Template'
+import Tooltip from 'daiquiri/core/assets/js/components/Tooltip'
 
 import Input from 'daiquiri/core/assets/js/components/form/Input'
 import Sql from 'daiquiri/core/assets/js/components/form/Sql'
@@ -22,6 +24,7 @@ import VizierDropdown from './dropdowns/VizierDropdown'
 
 const FormSql = ({ formKey, loadJob, query, queryLanguage }) => {
   const { data: form } = useFormQuery(formKey)
+  const { data: status } = useStatusQuery()
   const { data: queues } = useQueuesQuery()
   const { data: queryLanguages } = useQueryLanguagesQuery()
   const { data: dropdowns } = useDropdownsQuery()
@@ -155,6 +158,21 @@ const FormSql = ({ formKey, loadJob, query, queryLanguage }) => {
             onChange={(query) => setValues({...values, query})}
             editorRef={editorRef}
           />
+          { status && status.max_records && (
+            <small className="form-text text-muted">
+              {
+                interpolate(gettext('Maximum rows per query: %s. '),
+                  [status.max_records])
+              }
+              <Tooltip tooltip={{
+                title: interpolate(gettext(`The queries on our service are limited to %s rows. If you need more data,
+                    consider refining your query or retrieving data in smaller batches.`),
+                    [status.max_records]),
+                placement: 'right'}}>
+                <i className="bi bi-info-circle-fill"></i>
+              </Tooltip>
+            </small>
+          )}
         </div>
 
         <div className="row">

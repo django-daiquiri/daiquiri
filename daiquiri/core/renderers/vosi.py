@@ -81,6 +81,12 @@ class CapabilitiesRendererMixin:
         for upload_method in capability.get('upload_methods', []):
             self.node('uploadMethod', {'ivo-id': upload_method})
 
+        if capability.get('output_limit'):
+            self.start('outputLimit')
+            self.node('default', {'unit': 'row'}, capability.get('output_limit'))
+            self.node('hard', {'unit': 'row'}, capability.get('output_limit'))
+            self.end('outputLimit')
+
         if capability.get('upload_limit'):
             self.start('uploadLimit')
             self.node('hard', {'unit': 'byte'}, capability.get('upload_limit'))

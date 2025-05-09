@@ -3,6 +3,7 @@ from django.urls import reverse
 
 from daiquiri.core.constants import ACCESS_LEVEL_PUBLIC
 from daiquiri.core.vo import get_curation
+from daiquiri.jobs.utils import get_max_records
 from daiquiri.metadata.models import Schema
 from daiquiri.query.utils import get_quota
 
@@ -58,7 +59,8 @@ def get_capabilities():
                 'ivo://ivoa.net/std/TAPRegExt#upload-inline',
                 'ivo://ivoa.net/std/TAPRegExt#upload-https',
             ] if settings.TAP_UPLOAD else [],
-            'upload_limit': int(get_quota(None, quota_settings='QUERY_UPLOAD_LIMIT'))
+            'upload_limit': int(get_quota(None, quota_settings='QUERY_UPLOAD_LIMIT')),
+            'output_limit': int(get_max_records(None))
         },
         {
             'id': 'ivo://ivoa.net/std/TAP#async-1.1',

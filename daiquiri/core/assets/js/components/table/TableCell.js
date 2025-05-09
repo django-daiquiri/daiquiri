@@ -56,6 +56,7 @@ const TableCell = ({ column, value, rowIndex, columnIndex, setActive, showModal 
 TableCell.propTypes = {
   column: PropTypes.object.isRequired,
   value: PropTypes.oneOfType([
+    PropTypes.array,
     PropTypes.number,
     PropTypes.string,
     PropTypes.bool

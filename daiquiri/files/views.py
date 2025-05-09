@@ -5,12 +5,21 @@ from django.conf import settings
 from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
-from django.http import Http404
+from django.http import Http404, HttpResponse, HttpResponseForbidden
 from django.shortcuts import render
 from django.views.generic import View
 
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.exceptions import AuthenticationFailed
+
 from .search import Searcher
-from .utils import get_directory, get_file_path, render_with_layout, send_file
+from .utils import (
+    get_directory,
+    get_file_path,
+    render_with_layout,
+    send_file,
+    is_cli_request
+)
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +29,18 @@ class FileView(View):
     root = None
 
     def get(self, request, file_path, **kwargs):
+        if not request.user.is_authenticated:
+            try:
+                credentials = TokenAuthentication().authenticate(request)
+                if credentials is not None:
+                    request.user = credentials[0]
+            except AuthenticationFailed:
+                return HttpResponse(
+                    b"Invalid or missing authentication token.",
+                    status=401,
+                    content_type='text/plain'
+                )
+
         if self.root:
             logger.debug('root=%s', self.root)
             file_path = os.path.join(self.root, file_path)
@@ -32,6 +53,8 @@ class FileView(View):
         directory = get_directory(request.user, file_path)
         if directory is None:
             logger.debug('%s is forbidden', file_path)
+            if is_cli_request(request):
+                return HttpResponseForbidden()
             if request.user.is_authenticated:
                 raise PermissionDenied
             else:

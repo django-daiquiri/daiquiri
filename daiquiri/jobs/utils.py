@@ -1,3 +1,4 @@
+from django.conf import settings
 from rest_framework.reverse import reverse
 
 from django_user_agents.utils import get_user_agent
@@ -28,3 +29,28 @@ def get_job_results(request, job):
 def get_content_type(request, renderer):
     user_agent = get_user_agent(request)
     return 'application/xml' if user_agent.is_pc else renderer.media_type
+
+
+def get_max_records(user, max_records_settings='JOB_MAX_RECORDS'):
+
+    max_records_config = getattr(settings, max_records_settings)
+
+    if user is None or user.is_anonymous:
+        max_records = max_records_config.get('anonymous')
+
+    else:
+        max_records = max_records_config.get('user')
+
+        users = max_records_config.get('users')
+        if users:
+            user_max_records = users.get(user.username)
+            max_records = user_max_records if user_max_records > max_records else max_records
+
+        groups = max_records_config.get('groups')
+        if groups:
+            for group in user.groups.all():
+                group_max_records = groups.get(group.name)
+                max_records = group_max_records if group_max_records > max_records else max_records
+
+    return max_records
+
