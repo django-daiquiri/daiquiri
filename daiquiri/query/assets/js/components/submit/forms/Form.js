@@ -148,7 +148,7 @@ const Form = ({ formKey, loadJob }) => {
           {errors.query && (
             <div>
               <div className="is-invalid"></div>
-              <Errors errors={errors.query} />
+              <Errors errors={errors.query.messages} />
             </div>
           )}
 
