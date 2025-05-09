@@ -28,7 +28,7 @@ def reference(request, key, value):
     if resolver is None:
         raise Http404()
 
-    url = resolver.resolve(key, value)
+    url = resolver.resolve(request, key, value)
     if url is None:
         raise Http404()
 

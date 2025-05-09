@@ -1,6 +1,8 @@
 import { isString } from 'lodash'
 import { baseUrl } from './meta'
 
+import { useServeParams } from 'daiquiri/serve/assets/js/hooks/params'
+
 export const getBasename = (string) => {
   return isString(string) ? string.replace(/^.*[\\/]/, '') : string
 }
@@ -9,7 +11,11 @@ export const getFileUrl = (column, value) => `${baseUrl}/files/${value}`
 
 export const getLinkUrl = (column, value) => value
 
-export const getReferenceUrl = (column, value) => `${baseUrl}/serve/references/${column.name}/${value}`
+export const getReferenceUrl = (column, value) => {
+  const params = useServeParams()
+  const queryParameters = new URLSearchParams(params).toString()
+  return `${baseUrl}/serve/references/${column.name}/${value}?${queryParameters}`
+}
 
 export const isRefColumn = (column) => column.ucd && column.ucd.includes('meta.ref')
 
