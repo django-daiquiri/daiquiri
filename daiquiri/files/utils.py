@@ -126,3 +126,11 @@ def make_file_path_absolute(file_path: Union[Path, str]) -> Path:
 def make_file_path_relative(file_path: Union[Path, str]) -> Path:
     res_path = Path(file_path).relative_to(settings.FILES_BASE_PATH)
     return res_path
+
+
+def is_cli_request(request):
+    user_agent = request.META.get('HTTP_USER_AGENT', '').lower()
+    if 'wget' in user_agent or 'curl' in user_agent:
+        return True
+    return False
+
