@@ -20,7 +20,7 @@ from .serializers import (
     JobUpdateSerializer,
     SyncJobSerializer,
 )
-from .utils import get_content_type, get_job_results, get_job_url
+from .utils import get_content_type, get_job_results, get_job_url, get_max_records
 
 
 class JobViewSet(viewsets.GenericViewSet):
@@ -60,12 +60,17 @@ class SyncJobViewSet(JobViewSet):
         return self.perform_sync_job(request, serializer.validated_data)
 
     def perform_sync_job(self, request, data):
+        maxrec = data.get('MAXREC')
+        max_records = get_max_records(request.user)
+        if maxrec is not None and maxrec < max_records:
+            max_records = maxrec
+
         # create the job objects
         job = self.get_queryset().model(
             job_type=Job.JOB_TYPE_SYNC,
             owner=(None if self.request.user.is_anonymous else self.request.user),
             response_format=data.get('RESPONSEFORMAT'),
-            max_records=data.get('MAXREC'),
+            max_records=max_records,
             run_id=data.get('RUNID'),
             client_ip=get_client_ip(self.request)
         )
@@ -87,6 +92,7 @@ class SyncJobViewSet(JobViewSet):
         except ValidationError as e:
             raise ValidationError(self.rewrite_exception(e)) from e
 
+        return FileResponse(job.run_sync(), content_type='application/xml')
         return FileResponse(job.run_sync(), content_type=job.formats[job.response_format])
 
 
@@ -120,12 +126,17 @@ class AsyncJobViewSet(JobViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
+        maxrec = serializer.validated_data.get('MAXREC')
+        max_records = get_max_records(request.user)
+        if maxrec is not None and maxrec < max_records:
+            max_records = maxrec
+
         # create the job objects
         job = self.get_queryset().model(
             job_type=Job.JOB_TYPE_ASYNC,
             owner=(None if self.request.user.is_anonymous else self.request.user),
             response_format=serializer.validated_data.get('RESPONSEFORMAT'),
-            max_records=serializer.validated_data.get('MAXREC'),
+            max_records=max_records,
             # uploads=handle_uploads(request, serializer.validated_data.get('UPLOAD'), self.get_upload_directory()),
             run_id=serializer.validated_data.get('RUNID'),
             client_ip=get_client_ip(self.request)

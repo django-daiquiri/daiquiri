@@ -1,4 +1,5 @@
 import logging
+import re
 
 from django.conf import settings
 from django.db import OperationalError, ProgrammingError
@@ -108,32 +109,25 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
 
     def build_query(self, schema_name, table_name, query, timeout, max_records):
         # construct the actual query
-        params = {
-            'schema': self.escape_identifier(schema_name),
-            'table': self.escape_identifier(table_name),
-            'query': query,
-            'timeout': int(timeout * 1000),
-            'max_records': max_records,
-            'tablespace': settings.USER_TABLESPACE,
-        }
+        actual_query = f'SET SESSION statement_timeout TO {int(timeout * 1000)};' + \
+                        'COMMIT;' + \
+                        f'CREATE TABLE {self.escape_identifier(schema_name)}' + \
+                        f'.{self.escape_identifier(table_name)}'
 
-        query = 'SET SESSION statement_timeout TO %(timeout)s; COMMIT; CREATE TABLE %(schema)s.%(table)s'
+        if settings.USER_TABLESPACE is not None:
+            actual_query += f' TABLESPACE {settings.USER_TABLESPACE}'
 
-        if params['tablespace'] is not None:
-            query = query + ' TABLESPACE %(tablespace)s AS %(query)s'
+        if max_records is not None:
+            actual_query += f' AS {self.set_max_records(query, max_records)};'
         else:
-            query = query + ' AS %(query)s'
+            actual_query += f' AS {query};'
 
-        if params['max_records'] is not None:
-            query = query + ' LIMIT %(max_records)s'
-
-        query = query + ';'
-
-        return query % params
+        return actual_query
 
 
     def build_sync_query(self, query, timeout, max_records):
-        # construct the actual query
+        # WARNING: This method is currently not used. The sync query is build
+        # using the 'build_query' method.
         params = {
             'query': query,
             'timeout': int(timeout * 1000),
@@ -141,13 +135,24 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         }
 
         if max_records is not None:
-            return 'SET SESSION statement_timeout TO {timeout}; COMMIT; {query} LIMIT {max_records};'.format(**params)
+            return self.set_max_records('SET SESSION statement_timeout TO %(timeout); COMMIT; %(query));').format(**params)
         else:
-            return 'SET SESSION statement_timeout TO {timeout}; COMMIT; {query};'.format(**params)
+            return 'SET SESSION statement_timeout TO %(timeout); COMMIT; %(query);'.format(**params)
 
     def abort_query(self, pid):
         sql = 'select pg_cancel_backend(%(pid)i)' % {'pid': pid}
         self.execute(sql)
+
+    def set_max_records(self, query, max_records):
+        limit_pattern = r'LIMIT\s+(\d+)'
+        match = re.search(limit_pattern, query, flags=re.IGNORECASE)
+        if match:
+            current_limit = int(match.group(1))
+            if current_limit > max_records:
+                query = re.sub(limit_pattern, f'LIMIT {max_records}', query, flags=re.IGNORECASE)
+        else:
+            query += f' LIMIT {max_records}'
+        return query
 
     def fetch_size(self, schema_name, table_name):
         # fetch the size of the table using pg_total_relation_size
