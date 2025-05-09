@@ -1,32 +1,32 @@
-import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
-import { isEmpty, isNil } from 'lodash';
+import React, { useState, useEffect } from 'react'
+import PropTypes from 'prop-types'
+import { isEmpty, isNil } from 'lodash'
 
 import {
   useFormQuery,
   useQueuesQuery,
-} from 'daiquiri/query/assets/js/hooks/queries';
-import { useSubmitJobMutation } from 'daiquiri/query/assets/js/hooks/mutations';
+} from 'daiquiri/query/assets/js/hooks/queries'
+import { useSubmitJobMutation } from 'daiquiri/query/assets/js/hooks/mutations'
 
-import Template from 'daiquiri/core/assets/js/components/Template';
+import Template from 'daiquiri/core/assets/js/components/Template'
 
-import Errors from 'daiquiri/core/assets/js/components/form/Errors';
-import Input from 'daiquiri/core/assets/js/components/form/Input';
-import Select from 'daiquiri/core/assets/js/components/form/Select';
+import Errors from 'daiquiri/core/assets/js/components/form/Errors'
+import Input from 'daiquiri/core/assets/js/components/form/Input'
+import Select from 'daiquiri/core/assets/js/components/form/Select'
 
 const Form = ({ formKey, loadJob }) => {
-  const { data: form } = useFormQuery(formKey);
-  const { data: queues } = useQueuesQuery();
-  const mutation = useSubmitJobMutation();
+  const { data: form } = useFormQuery(formKey)
+  const { data: queues } = useQueuesQuery()
+  const mutation = useSubmitJobMutation()
 
   const [values, setValues] = useState({
     table_name: '',
     run_id: '',
     queue: '',
-  });
-  const [errors, setErrors] = useState({});
+  })
+  const [errors, setErrors] = useState({})
 
-  const getDefaultQueue = () => (isNil(queues) ? '' : queues[0].id);
+  const getDefaultQueue = () => (isNil(queues) ? '' : queues[0].id)
   const getInitialValues = () =>
     isNil(form) || isEmpty(form.fields)
       ? {}
@@ -38,11 +38,11 @@ const Form = ({ formKey, loadJob }) => {
             }),
             {}
           ),
-        };
+        }
 
   const handleSubmit = () => {
-    mutation.mutate({ values, setErrors, loadJob, formKey });
-  };
+    mutation.mutate({ values, setErrors, loadJob, formKey })
+  }
 
   const handleClear = () => {
     setValues({
@@ -50,19 +50,19 @@ const Form = ({ formKey, loadJob }) => {
       run_id: '',
       queue: getDefaultQueue(),
       ...getInitialValues(),
-    });
-  };
+    })
+  }
 
   useEffect(() => {
     setValues({
       ...values,
       queue: values.queue || getDefaultQueue(),
       ...getInitialValues(),
-    });
-  }, [form, queues]);
+    })
+  }, [form, queues])
 
   if (isNil(form)) {
-    return null;
+    return null
   } else if (form.errors) {
     return (
       <p className="text-danger">
@@ -73,7 +73,7 @@ const Form = ({ formKey, loadJob }) => {
           ? form.errors.api.join(', ')
           : gettext('No error message provided.')}
       </p>
-    );
+    )
   } else {
     return (
       <div className="query-form mb-4">
@@ -177,14 +177,14 @@ const Form = ({ formKey, loadJob }) => {
           </div>
         </div>
       </div>
-    );
+    )
   }
-};
+}
 
 Form.propTypes = {
   formKey: PropTypes.string.isRequired,
   loadJob: PropTypes.func.isRequired,
   query: PropTypes.string,
-};
+}
 
-export default Form;
+export default Form
