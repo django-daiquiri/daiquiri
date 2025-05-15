@@ -89,7 +89,21 @@ const configList = [
     },
     output: {
       path: path.resolve(__dirname, './daiquiri/query/static/query/')
-    }
+    },
+    plugins: [
+      new CopyPlugin({
+        patterns: [
+          {
+            from: path.resolve(__dirname, "node_modules/scichart/_wasm/scichart2d.wasm"),
+            to: "scichart2d.wasm"
+          },
+          {
+            from: path.resolve(__dirname, "node_modules/scichart/_wasm/scichart2d.data"),
+            to: "scichart2d.data"
+          }
+        ]
+      })
+    ]
   },
   {
     name: 'serve',

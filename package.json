@@ -32,6 +32,8 @@
     "react-dom": "^18.2.0",
     "react-dropzone": "^14.2.3",
     "react-plotly.js": "^2.6.0",
+    "scichart": "^3.5.759",
+    "scichart-react": "^0.1.9",
     "use-debounce": "^10.0.3"
   },
   "devDependencies": {

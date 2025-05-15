@@ -140,7 +140,7 @@ export const useJobPlotQuery = (job, column) => {
     queryKey: ['jobPlot', job.id, column],
     queryFn: () => {
       if (job.columns.map(column => column.name).includes(column)) {
-        return QueryApi.fetchJobRows(job.id, {column: column, page_size: 10000})
+        return QueryApi.fetchJobRows(job.id, {column: column, page_size: 1000000})
                              .then((response) => response.results)
       } else {
         return null
