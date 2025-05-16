@@ -7,6 +7,7 @@ import { appTheme } from "./theme.js";
 import { SciChartReact } from "scichart-react";
 // import commonClasses from "daiquiri/query/assets/scss/query.scss";
 import { SciChartComponent } from "./JobSciChart.js";
+import { Chart } from "./JobLightningChart.js";
 
 import { useLsState } from 'daiquiri/core/assets/js/hooks/ls'
 import { useJobQuery } from 'daiquiri/query/assets/js/hooks/queries'
@@ -68,6 +69,12 @@ const Job = ({ jobId, loadForm }) => {
             </a>
           </li>
           <li className="nav-item">
+            <a className={classNames('nav-link', {'active': activeTab === 'lchart'})} href="#"
+              onClick={(event) => handleClick(event, 'lchart')}>
+              {gettext('LightningChart')}
+            </a>
+          </li>
+          <li className="nav-item">
             <a className={classNames('nav-link', {'active': activeTab === 'download'})} href="#"
               onClick={(event) => handleClick(event, 'download')}>
               {gettext('Download')}
@@ -86,6 +93,9 @@ const Job = ({ jobId, loadForm }) => {
           }
           {
             activeTab === 'scichart' && <SciChartComponent job={job} />
+          }
+          {
+            activeTab === 'lchart' && <Chart job={job} />
           }
           {
             activeTab === 'download' && <JobDownload job={job} />

@@ -141,7 +141,12 @@ const baseConfig = {
         test: /\.(js|jsx)$/,
         exclude: /(node_modules|bower_components)/,
         loader: 'babel-loader',
-        options: { presets: ['@babel/env','@babel/preset-react'] }
+        options: {
+          presets: [
+            '@babel/env',
+            ['@babel/preset-react', {"runtime": "automatic"}],
+          ]
+        }
       },
       {
         test: /\.s?css$/,
@@ -178,7 +183,8 @@ const developmentConfig = {
   devtool: 'eval',
   plugins: [
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify('development')
+      'process.env.NODE_ENV': JSON.stringify('development'),
+      'process.env.LIGHTNING_CHART_LICENSE': JSON.stringify(process.env.LIGHTNING_CHART_LICENSE)
     })
   ]
 }
