@@ -52,8 +52,8 @@ def test_signup_post_email_exists_verified(db, client):
             'username': 'user2',
             'first_name': 'Tanja',
             'last_name': 'Test',
-            'password1': 'testing',
-            'password2': 'testing',
+            'password1': 'testtest',
+            'password2': 'testtest',
         },
     )
 
@@ -104,8 +104,8 @@ def test_signup_post_user_exists_unverified(db, client):
             'username': 'user',
             'first_name': 'Tanja',
             'last_name': 'Test',
-            'password1': 'testing',
-            'password2': 'testing',
+            'password1': 'testtest',
+            'password2': 'testtest',
         },
     )
 
