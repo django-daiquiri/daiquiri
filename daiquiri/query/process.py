@@ -181,12 +181,19 @@ def process_query(query):
     adapter = DatabaseAdapter()
 
     try:
+        user_defined_functions = None
+
         if adapter.database_config['ENGINE'] == 'django.db.backends.mysql':
             from queryparser.mysql import MySQLQueryProcessor
 
             processor = MySQLQueryProcessor(query)
 
         elif adapter.database_config['ENGINE'] == 'django.db.backends.postgresql':
+            functions = Function.objects.all()
+
+            if len(functions) > 0:
+                user_defined_functions = [f.name for f in functions]
+
             from queryparser.postgresql import PostgreSQLQueryProcessor
 
             if settings.QUERY_PROCESSOR_CACHE:
@@ -198,6 +205,7 @@ def process_query(query):
 
             # first run to replace with get_indexed_objects
             processor.set_query(query)
+
             processor.process_query(
                 indexed_objects=get_indexed_objects(),
                 replace_schema_name={
@@ -206,11 +214,12 @@ def process_query(query):
                     'TAP_UPLOAD': settings.TAP_UPLOAD,
                     'tap_upload': settings.TAP_UPLOAD,
                 },
+                replace_function_names=user_defined_functions,
             )
 
             # second run
             processor.set_query(processor.query)
-            processor.process_query()
+            processor.process_query(replace_function_names=user_defined_functions)
 
         else:
             raise Exception('Unknown database engine')
