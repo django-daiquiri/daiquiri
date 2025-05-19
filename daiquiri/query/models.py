@@ -9,7 +9,6 @@ from django.db.utils import DataError, InternalError, OperationalError, Programm
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
-
 from rest_framework.exceptions import ValidationError
 
 from daiquiri.core.adapter import DatabaseAdapter, DownloadAdapter
@@ -51,7 +50,6 @@ query_logger = logging.getLogger('query')
 
 
 class QueryJob(Job):
-
     objects = QueryJobManager()
 
     schema_name = models.CharField(max_length=256)
@@ -73,7 +71,7 @@ class QueryJob(Job):
     pid = models.IntegerField(null=True, blank=True)
 
     class Meta:
-        ordering = ('start_time', )
+        ordering = ('start_time',)
         verbose_name = _('QueryJob')
         verbose_name_plural = _('QueryJobs')
 
@@ -108,12 +106,15 @@ class QueryJob(Job):
             'actual_query': self.actual_query,
             'queue': self.queue,
             'nrows': self.nrows,
-            'size': self.size
+            'size': self.size,
         }
 
     @property
     def formats(self):
-        return OrderedDict((item['key'], item['content_type']) for item in settings.QUERY_DOWNLOAD_FORMATS)
+        return OrderedDict(
+            (item['key'], item['content_type'])
+            for item in settings.QUERY_DOWNLOAD_FORMATS
+        )
 
     @property
     def result_status(self):
@@ -144,7 +145,11 @@ class QueryJob(Job):
     @property
     def timeout(self):
         if self.queue:
-            return next(queue['timeout'] for queue in settings.QUERY_QUEUES if queue['key'] == self.queue)
+            return next(
+                queue['timeout']
+                for queue in settings.QUERY_QUEUES
+                if queue['key'] == self.queue
+            )
         else:
             return 10
 
@@ -154,7 +159,9 @@ class QueryJob(Job):
 
     def process(self, upload=False):
         # log the query to the query log
-        query_logger.info('"%s" %s %s', self.query, self.query_language, self.owner or 'anonymous')
+        query_logger.info(
+            '"%s" %s %s', self.query, self.query_language, self.owner or 'anonymous'
+        )
 
         # check quota and number of active jobs
         check_quota(self)
@@ -172,7 +179,9 @@ class QueryJob(Job):
             self.execution_duration = 0.0
 
         else:
-            self.query_language = process_query_language(self.owner, self.query_language)
+            self.query_language = process_query_language(
+                self.owner, self.query_language
+            )
             self.queue = process_queue(self.owner, self.queue)
             self.response_format = process_response_format(self.response_format)
 
@@ -203,20 +212,22 @@ class QueryJob(Job):
                 processor.keywords,
                 processor.tables,
                 processor.columns,
-                processor.functions
+                processor.functions,
             )
             if permission_messages:
-                raise ValidationError({
-                    'query': {
-                        'messages': permission_messages,
+                raise ValidationError(
+                    {
+                        'query': {
+                            'messages': permission_messages,
+                        }
                     }
-                })
+                )
 
             # initialize metadata and store map of aliases
             self.metadata = {
                 'display_columns': process_display_columns(processor.display_columns),
                 'user_columns': process_user_columns(self, processor.tables),
-                'tables': processor.tables
+                'tables': processor.tables,
             }
 
             # get the native query from the processor (without trailing semicolon)
@@ -237,17 +248,17 @@ class QueryJob(Job):
             job_id = str(self.id)
             if not settings.ASYNC:
                 logger.info('job %s submitted (sync)', self.id)
-                run_database_query_task.apply((job_id, ), task_id=job_id, throw=True)
+                run_database_query_task.apply((job_id,), task_id=job_id, throw=True)
 
             else:
                 queue = f'query_{self.queue}'
                 logger.info('job %s submitted (async, queue=%s)', self.id, queue)
-                run_database_query_task.apply_async((job_id, ), task_id=job_id, queue=queue)
+                run_database_query_task.apply_async(
+                    (job_id,), task_id=job_id, queue=queue
+                )
 
         else:
-            raise ValidationError({
-                'phase': ['Job is not PENDING.']
-            })
+            raise ValidationError({'phase': ['Job is not PENDING.']})
 
     def run_sync(self):
         adapter = DatabaseAdapter()
@@ -276,21 +287,21 @@ class QueryJob(Job):
             },
             client_ip=self.client_ip,
             user=self.owner,
-            size=self.size
+            size=self.size,
         )
 
         try:
-
             yield from DownloadAdapter().generate(
-                    'votable',
-                    get_job_columns(self),
-                    sources=self.metadata.get("sources", []),
-                    schema_name=self.schema_name,
-                    table_name=self.table_name,
-                    nrows=self.nrows,
-                    query_status=self.result_status,
-                    query=self.native_query,
-                    query_language=self.query_language)
+                'votable',
+                get_job_columns(self),
+                sources=self.metadata.get('sources', []),
+                schema_name=self.schema_name,
+                table_name=self.table_name,
+                nrows=self.nrows,
+                query_status=self.result_status,
+                query=self.native_query,
+                query_language=self.query_language,
+            )
 
             self.drop_uploads()
             self.drop_table()
@@ -306,12 +317,12 @@ class QueryJob(Job):
             if not settings.ASYNC:
                 run_database_ingest_task.apply((self.id, file_path), throw=True)
             else:
-                run_database_ingest_task.apply_async((self.id, file_path), queue='download')
+                run_database_ingest_task.apply_async(
+                    (self.id, file_path), queue='download'
+                )
 
         else:
-            raise ValidationError({
-                'phase': ['Job is not PENDING.']
-            })
+            raise ValidationError({'phase': ['Job is not PENDING.']})
 
     def abort(self):
         current_phase = self.phase
@@ -364,7 +375,7 @@ class QueryJob(Job):
                     drop_database_table_task.apply_async(task_args)
 
     def abort_query(self):
-        task_args = (self.pid, )
+        task_args = (self.pid,)
 
         if not settings.ASYNC:
             abort_database_query_task.apply(task_args, throw=True)
@@ -382,12 +393,10 @@ class QueryJob(Job):
                 nrows=self.nrows,
                 query_status=self.result_status,
                 query=self.query,
-                query_language=self.query_language
+                query_language=self.query_language,
             )
         else:
-            raise ValidationError({
-                'phase': ['Job is not COMPLETED.']
-            })
+            raise ValidationError({'phase': ['Job is not COMPLETED.']})
 
     def rows(self, column_names, ordering, page, page_size, search, filters):
         if self.phase == self.PHASE_COMPLETED:
@@ -406,11 +415,21 @@ class QueryJob(Job):
 
             try:
                 # query the database for the total number of rows
-                count = adapter.count_rows(self.schema_name, self.table_name, column_names, search, filters)
+                count = adapter.count_rows(
+                    self.schema_name, self.table_name, column_names, search, filters
+                )
 
                 # query the paginated rowset
-                rows = adapter.fetch_rows(self.schema_name, self.table_name, column_names,
-                                          ordering, page, page_size, search, filters)
+                rows = adapter.fetch_rows(
+                    self.schema_name,
+                    self.table_name,
+                    column_names,
+                    ordering,
+                    page,
+                    page_size,
+                    search,
+                    filters,
+                )
 
                 # flatten the list if only one column is retrieved
                 if len(column_names) == 1:
@@ -422,9 +441,7 @@ class QueryJob(Job):
                 return 0, []
 
         else:
-            raise ValidationError({
-                'phase': ['Job is not COMPLETED.']
-            })
+            raise ValidationError({'phase': ['Job is not COMPLETED.']})
 
     def columns(self):
         if self.metadata:
@@ -434,22 +451,23 @@ class QueryJob(Job):
 
 
 class DownloadJob(Job):
-
     objects = JobManager()
 
     query_job = models.ForeignKey(
-        QueryJob, related_name='downloads', on_delete=models.CASCADE,
+        QueryJob,
+        related_name='downloads',
+        on_delete=models.CASCADE,
         verbose_name=_('QueryJob'),
-        help_text=_('QueryJob this DownloadJob belongs to.')
+        help_text=_('QueryJob this DownloadJob belongs to.'),
     )
     format_key = models.CharField(
         max_length=32,
         verbose_name=_('Format key'),
-        help_text=_('Format key for this download.')
+        help_text=_('Format key for this download.'),
     )
 
     class Meta:
-        ordering = ('start_time', )
+        ordering = ('start_time',)
 
         verbose_name = _('DownloadJob')
         verbose_name_plural = _('DownloadJobs')
@@ -465,7 +483,10 @@ class DownloadJob(Job):
 
         if format_config:
             directory_name = os.path.join(settings.QUERY_DOWNLOAD_DIR, username)
-            return os.path.join(directory_name, '{}.{}'.format(self.query_job.table_name, format_config['extension']))
+            return os.path.join(
+                directory_name,
+                '{}.{}'.format(self.query_job.table_name, format_config['extension']),
+            )
         else:
             return None
 
@@ -473,9 +494,7 @@ class DownloadJob(Job):
         if self.query_job.phase == self.PHASE_COMPLETED:
             self.owner = self.query_job.owner
         else:
-            raise ValidationError({
-                'phase': ['Job is not COMPLETED.']
-            })
+            raise ValidationError({'phase': ['Job is not COMPLETED.']})
 
         # set clean flag
         self.is_clean = True
@@ -491,16 +510,20 @@ class DownloadJob(Job):
             download_id = str(self.id)
             if not settings.ASYNC:
                 logger.info('download_job %s submitted (sync)', download_id)
-                create_download_table_task.apply((download_id, ), task_id=download_id, throw=True)
+                create_download_table_task.apply(
+                    (download_id,), task_id=download_id, throw=True
+                )
 
             else:
-                logger.info('download_job %s submitted (async, queue=download)', download_id)
-                create_download_table_task.apply_async((download_id, ), task_id=download_id, queue='download')
+                logger.info(
+                    'download_job %s submitted (async, queue=download)', download_id
+                )
+                create_download_table_task.apply_async(
+                    (download_id,), task_id=download_id, queue='download'
+                )
 
         else:
-            raise ValidationError({
-                'phase': ['Job is not PENDING.']
-            })
+            raise ValidationError({'phase': ['Job is not PENDING.']})
 
     def delete_file(self):
         try:
@@ -511,27 +534,28 @@ class DownloadJob(Job):
 
 
 class QueryArchiveJob(Job):
-
     objects = JobManager()
 
     query_job = models.ForeignKey(
-        QueryJob, related_name='archives', on_delete=models.CASCADE,
+        QueryJob,
+        related_name='archives',
+        on_delete=models.CASCADE,
         verbose_name=_('QueryJob'),
-        help_text=_('QueryJob this ArchiveJob belongs to.')
+        help_text=_('QueryJob this ArchiveJob belongs to.'),
     )
     column_name = models.CharField(
         max_length=32,
         verbose_name=_('Column name'),
-        help_text=_('Column name for this download.')
+        help_text=_('Column name for this download.'),
     )
     files = models.JSONField(
         verbose_name=_('Files'),
         help_text=_('List of files in the archive.'),
-        default=list
+        default=list,
     )
 
     class Meta:
-        ordering = ('start_time', )
+        ordering = ('start_time',)
 
         verbose_name = _('QueryArchiveJob')
         verbose_name_plural = _('QueryArchiveJob')
@@ -544,29 +568,31 @@ class QueryArchiveJob(Job):
             username = self.owner.username
 
         directory_name = os.path.join(settings.QUERY_DOWNLOAD_DIR, username)
-        return os.path.join(directory_name, f'{self.query_job.table_name}.{self.column_name}.zip')
+        return os.path.join(
+            directory_name, f'{self.query_job.table_name}.{self.column_name}.zip'
+        )
 
     def process(self):
         if self.query_job.phase == self.PHASE_COMPLETED:
             self.owner = self.query_job.owner
         else:
-            raise ValidationError({
-                'phase': ['Job is not COMPLETED.']
-            })
+            raise ValidationError({'phase': ['Job is not COMPLETED.']})
 
         if not self.column_name:
-            raise ValidationError({
-                'column_name': [_('This field may not be blank.')]
-            })
+            raise ValidationError({'column_name': [_('This field may not be blank.')]})
 
         if self.column_name not in self.query_job.column_names:
-            raise ValidationError({
-                'column_name': [_('Unknown column "%s".') % self.column_name]
-            })
+            raise ValidationError(
+                {'column_name': [_('Unknown column "%s".') % self.column_name]}
+            )
 
         # get database adapter and query the paginated rowset
-        rows = DatabaseAdapter().fetch_rows(self.query_job.schema_name, self.query_job.table_name,
-                                            [self.column_name], page_size=0)
+        rows = DatabaseAdapter().fetch_rows(
+            self.query_job.schema_name,
+            self.query_job.table_name,
+            [self.column_name],
+            page_size=0,
+        )
 
         # prepare list of files for this job
         files = []
@@ -577,9 +603,9 @@ class QueryArchiveJob(Job):
             if file_path and check_file(self.owner, file_path):
                 files.append(file_path)
             else:
-                raise ValidationError({
-                    'files': [_('One or more of the files cannot be found.')]
-                })
+                raise ValidationError(
+                    {'files': [_('One or more of the files cannot be found.')]}
+                )
 
         # set files for this job
         self.files = files
@@ -598,17 +624,20 @@ class QueryArchiveJob(Job):
             archive_id = str(self.id)
             if not settings.ASYNC:
                 logger.info('archive_job %s submitted (sync)', archive_id)
-                create_download_archive_task.apply((archive_id, ), task_id=archive_id, throw=True)
+                create_download_archive_task.apply(
+                    (archive_id,), task_id=archive_id, throw=True
+                )
 
             else:
-                logger.info('archive_job %s submitted (async, queue=download)', archive_id)
-                create_download_archive_task.apply_async((archive_id, ), task_id=archive_id, queue='download')
+                logger.info(
+                    'archive_job %s submitted (async, queue=download)', archive_id
+                )
+                create_download_archive_task.apply_async(
+                    (archive_id,), task_id=archive_id, queue='download'
+                )
 
         else:
-            raise ValidationError({
-                'phase': ['Job is not PENDING.']
-            })
-
+            raise ValidationError({'phase': ['Job is not PENDING.']})
 
     def delete_file(self):
         try:
@@ -618,39 +647,42 @@ class QueryArchiveJob(Job):
 
 
 class Example(models.Model):
-
     order = models.IntegerField(
-        null=True, blank=True,
+        null=True,
+        blank=True,
         verbose_name=_('Order'),
-        help_text=_('Position in lists.')
+        help_text=_('Position in lists.'),
     )
     name = models.CharField(
         max_length=256,
         verbose_name=_('Name'),
-        help_text=_('Identifier of the example.')
+        help_text=_('Identifier of the example.'),
     )
     description = models.TextField(  # noqa: DJ001
-        null=True, blank=True,
+        null=True,
+        blank=True,
         verbose_name=_('Description'),
-        help_text=_('A brief description of the example to be displayed in the user interface.')
+        help_text=_(
+            'A brief description of the example to be displayed in the user interface.'
+        ),
     )
     query_language = models.CharField(
         max_length=16,
         verbose_name=_('Query language'),
-        help_text=_('The query language for this example.')
+        help_text=_('The query language for this example.'),
     )
     query_string = models.TextField(
         verbose_name=_('Query string'),
-        help_text=_('The query string (SQL) for this example.')
+        help_text=_('The query string (SQL) for this example.'),
     )
     access_level = models.CharField(
-        max_length=8, choices=ACCESS_LEVEL_CHOICES,
-        verbose_name=_('Access level')
+        max_length=8, choices=ACCESS_LEVEL_CHOICES, verbose_name=_('Access level')
     )
     groups = models.ManyToManyField(
-        Group, blank=True,
+        Group,
+        blank=True,
         verbose_name=_('Groups'),
-        help_text=_('The groups which have access to the examples.')
+        help_text=_('The groups which have access to the examples.'),
     )
 
     objects = ExampleManager()
