@@ -121,6 +121,8 @@ const Form = ({ formKey, loadJob }) => {
                       value={values[field.key] || field.default_value}
                       options={field.options}
                       width={field.width_subselect}
+                      placeholder={field.placeholder}
+                      placeholder_subselect={field.placeholder_subselect}
                       errors={errors[field.key]}
                       onChange={(value) =>
                         setValues({ ...values, [field.key]: value })

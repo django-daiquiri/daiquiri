@@ -5,7 +5,16 @@ import { uniqueId } from 'lodash'
 
 import Errors from './Errors'
 
-const SubSelect = ({ label, value, width, options = [], errors, onChange }) => {
+const SubSelect = ({
+  label,
+  value,
+  width,
+  placeholder,
+  placeholder_subselect,
+  options = [],
+  errors,
+  onChange,
+}) => {
   const mainId = uniqueId('select-main-')
   const subId = uniqueId('select-sub-')
   const [mainValue, setMainValue] = useState('')
@@ -82,7 +91,7 @@ const SubSelect = ({ label, value, width, options = [], errors, onChange }) => {
             onChange={handleMainSelect}
             aria-describedby={errors ? `${mainId}-errors` : undefined}
           >
-            <option value="">Select an option</option>
+            <option value="">{placeholder || 'Select an option'}</option>
             {options.map((option) => (
               <option key={option.id} value={option.id}>
                 {option.label || option.text}
@@ -100,7 +109,9 @@ const SubSelect = ({ label, value, width, options = [], errors, onChange }) => {
               value={subValue}
               onChange={handleSubSelect}
             >
-              <option value="">Select a sub-option</option>
+              <option value="">
+                {placeholder_subselect || 'Select a sub-option'}
+              </option>
               {currentMainOption.suboptions
                 .filter((sub) => sub.main_id === currentMainOption.id)
                 .map((suboption) => (
@@ -119,8 +130,10 @@ const SubSelect = ({ label, value, width, options = [], errors, onChange }) => {
 
 SubSelect.propTypes = {
   label: PropTypes.string.isRequired,
-  value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+  value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   width: PropTypes.number,
+  placeholder: PropTypes.string,
+  placeholder_subselect: PropTypes.string,
   options: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
