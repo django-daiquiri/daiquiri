@@ -93,7 +93,7 @@ const SubSelect = ({ label, value, options = [], errors, onChange }) => {
 
         {/* Sub Select - Only show if main option has suboptions */}
         {currentMainOption?.suboptions?.length > 0 && (
-          <div className="col-md-3">
+          <div className="col-md-4">
             <select
               id={subId}
               className="form-control"
