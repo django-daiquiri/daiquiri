@@ -3,8 +3,12 @@ import PropTypes from 'prop-types'
 import { isNil } from 'lodash'
 
 import { useLsState } from 'daiquiri/core/assets/js/hooks/ls'
-import { useDropdownsQuery, useFormQuery,
-         useQueryLanguagesQuery, useQueuesQuery } from 'daiquiri/query/assets/js/hooks/queries'
+import {
+  useDropdownsQuery,
+  useFormQuery,
+  useQueryLanguagesQuery,
+  useQueuesQuery,
+} from 'daiquiri/query/assets/js/hooks/queries'
 import { useStatusQuery } from 'daiquiri/query/assets/js/hooks/queries'
 import { useSubmitJobMutation } from 'daiquiri/query/assets/js/hooks/mutations'
 
@@ -41,8 +45,9 @@ const FormSql = ({ formKey, loadJob, query, queryLanguage }) => {
 
   const editorRef = useRef()
 
-  const getDefaultQueryLanguage = () => isNil(queryLanguages) ? '' : queryLanguages[0].id
-  const getDefaultQueue = () => isNil(queues) ? '' : queues[0].id
+  const getDefaultQueryLanguage = () =>
+    isNil(queryLanguages) ? '' : queryLanguages[0].id
+  const getDefaultQueue = () => (isNil(queues) ? '' : queues[0].id)
 
   const [openDropdown, setOpenDropdown] = useLsState('query.openDropdown')
 
@@ -54,11 +59,12 @@ const FormSql = ({ formKey, loadJob, query, queryLanguage }) => {
     setValues({
       ...values,
       queue: values.queue || getDefaultQueue(),
-      query_language: values.query_language || getDefaultQueryLanguage()})
+      query_language: values.query_language || getDefaultQueryLanguage(),
+    })
   }, [queues, queryLanguages])
 
   const handleSubmit = () => {
-    mutation.mutate({values, setErrors, loadJob})
+    mutation.mutate({ values, setErrors, loadJob })
   }
 
   const handleClear = () => {
@@ -76,9 +82,13 @@ const FormSql = ({ formKey, loadJob, query, queryLanguage }) => {
 
     if (isNil(query_string)) {
       const query_language = values.query_language || getDefaultQueryLanguage()
-      const quote_char = queryLanguages.find((ql) => ql.id == query_language).quote_char
+      const quote_char = queryLanguages.find(
+        (ql) => ql.id == query_language
+      ).quote_char
 
-      query_string = item.query_strings.map((qs) => (quote_char + qs + quote_char)).join('.')
+      query_string = item.query_strings
+        .map((qs) => quote_char + qs + quote_char)
+        .join('.')
     }
 
     // see https://codemirror.net/examples/change/
@@ -87,13 +97,17 @@ const FormSql = ({ formKey, loadJob, query, queryLanguage }) => {
       changes: {
         from: editorRef.current.view.state.selection.main.from,
         to: editorRef.current.view.state.selection.main.to,
-        insert: query_string
+        insert: query_string,
       },
       // move the position of the cursor by the length of the pasted query_string
       selection: {
-        anchor: editorRef.current.view.state.selection.main.from + query_string.length,
-        head: editorRef.current.view.state.selection.main.from + query_string.length
-      }
+        anchor:
+          editorRef.current.view.state.selection.main.from +
+          query_string.length,
+        head:
+          editorRef.current.view.state.selection.main.from +
+          query_string.length,
+      },
     })
 
     // re-focus the editor
@@ -101,127 +115,158 @@ const FormSql = ({ formKey, loadJob, query, queryLanguage }) => {
   }
 
   const handleReplace = (type, item) => {
-    setValues({...values, query: item.query_string, query_language: item.query_language})
+    setValues({
+      ...values,
+      query: item.query_string,
+      query_language: item.query_language,
+    })
   }
 
-  return form && (
-    <div className="query-form mb-4">
-      <h2>{form.label}</h2>
-      <Template template={form.template} />
+  return (
+    form && (
+      <div className="query-form mb-4">
+        <h2>{form.label}</h2>
+        <Template template={form.template} />
 
-      <div className="query-dropdowns">
-        <div className="d-md-flex">
-          {
-            dropdowns && dropdowns.map((dropdown, index) => (
-              <button
-                key={index}
-                type="button"
-                className={`btn btn-outline-form dropdown-toggle mb-2 ${dropdown.classes || 'me-2'}`}
-                onClick={() => handleDrowpdown(dropdown.key)}
-              >
-                {dropdown.label}
-              </button>
-            ))
-          }
-        </div>
+        <div className="query-dropdowns">
+          <div className="d-md-flex">
+            {dropdowns &&
+              dropdowns.map((dropdown, index) => (
+                <button
+                  key={index}
+                  type="button"
+                  className={`btn btn-outline-form dropdown-toggle mb-2 ${
+                    dropdown.classes || 'me-2'
+                  }`}
+                  onClick={() => handleDrowpdown(dropdown.key)}
+                >
+                  {dropdown.label}
+                </button>
+              ))}
+          </div>
 
-        {
-          openDropdown == 'schemas' && <SchemasDropdown onDoubleClick={handleInsert} />
-        }
-        {
-          openDropdown == 'columns' && <ColumnsDropdown onDoubleClick={handleInsert} />
-        }
-        {
-          openDropdown == 'functions' && <FunctionsDropdown onDoubleClick={handleInsert} />
-        }
-        {
-          dropdowns && dropdowns.map((dropdown, index) => {
-            if (dropdown.key == 'simbad' && openDropdown == 'simbad') {
-              return <SimbadDropdown key={index} options={dropdown.options} onClick={handleInsert} />
-            } else if ((dropdown.key == 'vizier' && openDropdown == 'vizier')) {
-              return <VizierDropdown key={index} options={dropdown.options} onClick={handleInsert} />
-            }
-          })
-        }
-        {
-          openDropdown == 'examples' && <ExamplesDropdown onDoubleClick={handleReplace} />
-        }
-
-      </div>
-
-      <div className="mt-2">
-        <div className="mb-3">
-          <Sql
-            label={gettext('SQL query')}
-            value={values.query}
-            errors={errors.query}
-            onChange={(query) => setValues({...values, query})}
-            editorRef={editorRef}
-          />
-          { status && status.max_records && (
-            <small className="form-text text-muted">
-              {
-                interpolate(gettext('Maximum rows per query: %s. '),
-                  [status.max_records])
+          {openDropdown == 'schemas' && (
+            <SchemasDropdown onDoubleClick={handleInsert} />
+          )}
+          {openDropdown == 'columns' && (
+            <ColumnsDropdown onDoubleClick={handleInsert} />
+          )}
+          {openDropdown == 'functions' && (
+            <FunctionsDropdown onDoubleClick={handleInsert} />
+          )}
+          {dropdowns &&
+            dropdowns.map((dropdown, index) => {
+              if (dropdown.key == 'simbad' && openDropdown == 'simbad') {
+                return (
+                  <SimbadDropdown
+                    key={index}
+                    options={dropdown.options}
+                    onClick={handleInsert}
+                  />
+                )
+              } else if (dropdown.key == 'vizier' && openDropdown == 'vizier') {
+                return (
+                  <VizierDropdown
+                    key={index}
+                    options={dropdown.options}
+                    onClick={handleInsert}
+                  />
+                )
               }
-              <Tooltip tooltip={{
-                title: interpolate(gettext(`The queries on our service are limited to %s rows. If you need more data,
-                    consider refining your query or retrieving data in smaller batches.`),
-                    [status.max_records]),
-                placement: 'right'}}>
-                <i className="bi bi-info-circle-fill"></i>
-              </Tooltip>
-            </small>
+            })}
+          {openDropdown == 'examples' && (
+            <ExamplesDropdown onDoubleClick={handleReplace} />
           )}
         </div>
 
-        <div className="row">
-          <div className="col-md-4">
-            <Input
-              label={gettext('Table name')}
-              value={values.table_name}
-              errors={errors.table_name}
-              onChange={(table_name) => setValues({...values, table_name})}
+        <div className="mt-2">
+          <div className="mb-3">
+            <Sql
+              label={gettext('SQL query')}
+              value={values.query}
+              errors={errors.query}
+              onChange={(query) => setValues({ ...values, query })}
+              editorRef={editorRef}
             />
+            {status && status.max_records && (
+              <small className="form-text text-muted">
+                {interpolate(gettext('Maximum rows per query: %s. '), [
+                  status.max_records,
+                ])}
+                <Tooltip
+                  tooltip={{
+                    title: interpolate(
+                      gettext(`The queries on our service are limited to %s rows. If you need more data,
+                    consider refining your query or retrieving data in smaller batches.`),
+                      [status.max_records]
+                    ),
+                    placement: 'right',
+                  }}
+                >
+                  <i className="bi bi-info-circle-fill"></i>
+                </Tooltip>
+              </small>
+            )}
           </div>
-          <div className="col-md-2">
-            <Input
-              label={gettext('Run id')}
-              value={values.run_id}
-              errors={errors.run_id}
-              onChange={(run_id) => setValues({...values, run_id})}
-            />
-          </div>
-          <div className="col-md-3">
-            <Select
-              label={gettext('Query language')}
-              value={values.query_language}
-              errors={errors.query_language}
-              options={queryLanguages}
-              onChange={(query_language) => setValues({...values, query_language})}
-            />
-          </div>
-          <div className="col-md-3">
-            <Select
-              label={gettext('Queue')}
-              value={values.queue}
-              errors={errors.queue}
-              options={queues}
-              onChange={(queue) => setValues({...values, queue})}
-            />
-          </div>
-        </div>
 
-        <div className="d-flex mt-2">
-          <button type="button" className="btn btn-primary me-auto" onClick={() => handleSubmit()}>
-            {form.submit || gettext('Submit new SQL query')}
-          </button>
-          <button type="button" className="btn btn-outline-secondary" onClick={() => handleClear()}>
-            {gettext('Clear input window')}
-          </button>
+          <div className="row">
+            <div className="col-md-4">
+              <Input
+                label={gettext('Table name')}
+                value={values.table_name}
+                errors={errors.table_name}
+                onChange={(table_name) => setValues({ ...values, table_name })}
+              />
+            </div>
+            <div className="col-md-2">
+              <Input
+                label={gettext('Run id')}
+                value={values.run_id}
+                errors={errors.run_id}
+                onChange={(run_id) => setValues({ ...values, run_id })}
+              />
+            </div>
+            <div className="col-md-3">
+              <Select
+                label={gettext('Query language')}
+                value={values.query_language}
+                errors={errors.query_language}
+                options={queryLanguages}
+                onChange={(query_language) =>
+                  setValues({ ...values, query_language })
+                }
+              />
+            </div>
+            <div className="col-md-3">
+              <Select
+                label={gettext('Queue')}
+                value={values.queue}
+                errors={errors.queue}
+                options={queues}
+                onChange={(queue) => setValues({ ...values, queue })}
+              />
+            </div>
+          </div>
+
+          <div className="d-flex mt-2">
+            <button
+              type="button"
+              className="btn btn-primary me-auto"
+              onClick={() => handleSubmit()}
+            >
+              {form.submit || gettext('Submit new SQL query')}
+            </button>
+            <button
+              type="button"
+              className="btn btn-outline-secondary"
+              onClick={() => handleClear()}
+            >
+              {gettext('Clear input window')}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    )
   )
 }
 
