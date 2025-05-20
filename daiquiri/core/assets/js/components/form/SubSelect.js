@@ -100,7 +100,7 @@ const SubSelect = ({ label, value, options = [], errors, onChange }) => {
               value={subValue}
               onChange={handleSubSelect}
             >
-              <option value="">Select sub-option</option>
+              <option value="">Select a sub-option</option>
               {currentMainOption.suboptions
                 .filter((sub) => sub.main_id === currentMainOption.id)
                 .map((suboption) => (
