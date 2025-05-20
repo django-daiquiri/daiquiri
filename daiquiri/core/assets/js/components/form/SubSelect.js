@@ -5,7 +5,7 @@ import { uniqueId } from 'lodash'
 
 import Errors from './Errors'
 
-const SubSelect = ({ label, value, options = [], errors, onChange }) => {
+const SubSelect = ({ label, value, width, options = [], errors, onChange }) => {
   const mainId = uniqueId('select-main-')
   const subId = uniqueId('select-sub-')
   const [mainValue, setMainValue] = useState('')
@@ -93,7 +93,7 @@ const SubSelect = ({ label, value, options = [], errors, onChange }) => {
 
         {/* Sub Select - Only show if main option has suboptions */}
         {currentMainOption?.suboptions?.length > 0 && (
-          <div className="col-md-4">
+          <div className={width ? `col-md-${width}` : 'col-md-4'}>
             <select
               id={subId}
               className="form-control"
@@ -120,6 +120,7 @@ const SubSelect = ({ label, value, options = [], errors, onChange }) => {
 SubSelect.propTypes = {
   label: PropTypes.string.isRequired,
   value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+  width: PropTypes.number,
   options: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,

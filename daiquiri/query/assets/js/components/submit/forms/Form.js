@@ -120,6 +120,7 @@ const Form = ({ formKey, loadJob }) => {
                       help={field.help}
                       value={values[field.key] || field.default_value}
                       options={field.options}
+                      width={field.width_subselect}
                       errors={errors[field.key]}
                       onChange={(value) =>
                         setValues({ ...values, [field.key]: value })
