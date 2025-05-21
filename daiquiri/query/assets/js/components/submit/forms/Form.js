@@ -95,7 +95,7 @@ const Form = ({ formKey, loadJob }) => {
                       label={field.label}
                       type={field.type}
                       help={field.help}
-                      value={values[field.key]}
+                      value={values[field.key] || field.default_value}
                       errors={errors[field.key]}
                       onChange={(value) =>
                         setValues({ ...values, [field.key]: value })
