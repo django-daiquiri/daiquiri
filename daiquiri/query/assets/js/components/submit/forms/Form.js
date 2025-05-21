@@ -13,6 +13,7 @@ import Template from 'daiquiri/core/assets/js/components/Template'
 import Errors from 'daiquiri/core/assets/js/components/form/Errors'
 import Input from 'daiquiri/core/assets/js/components/form/Input'
 import Select from 'daiquiri/core/assets/js/components/form/Select'
+import SubSelect from 'daiquiri/core/assets/js/components/form/SubSelect'
 
 const Form = ({ formKey, loadJob }) => {
   const { data: form } = useFormQuery(formKey)
@@ -107,6 +108,21 @@ const Form = ({ formKey, loadJob }) => {
                       help={field.help}
                       value={values[field.key] || field.default_value}
                       options={field.options}
+                      errors={errors[field.key]}
+                      onChange={(value) =>
+                        setValues({ ...values, [field.key]: value })
+                      }
+                    />
+                  )}
+                  {field.type == 'subselect' && (
+                    <SubSelect
+                      label={field.label}
+                      help={field.help}
+                      value={values[field.key] || field.default_value}
+                      options={field.options}
+                      width={field.width_subselect}
+                      placeholder={field.placeholder}
+                      placeholder_subselect={field.placeholder_subselect}
                       errors={errors[field.key]}
                       onChange={(value) =>
                         setValues({ ...values, [field.key]: value })

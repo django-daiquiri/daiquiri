@@ -10,20 +10,22 @@ const Select = ({ label, value, options, errors, onChange }) => {
 
   return (
     <div className="mb-3">
-      <label htmlFor={id} className="form-label">{label}</label>
+      <label htmlFor={id} className="form-label">
+        {label}
+      </label>
       <select
         id={id}
         key={id}
-        className={classNames('form-control', {'is-invalid': errors})}
+        className={classNames('form-control', { 'is-invalid': errors })}
         value={value}
-        onChange={(event) => onChange(event.target.value)}>
-      {
-        options && options.map((option) => (
-          <option key={option.id} value={option.id}>
-            {option.label || option.text}
-          </option>
-        ))
-      }
+        onChange={(event) => onChange(event.target.value)}
+      >
+        {options &&
+          options.map((option) => (
+            <option key={option.id} value={option.id}>
+              {option.label || option.text}
+            </option>
+          ))}
       </select>
       <Errors errors={errors} />
     </div>
