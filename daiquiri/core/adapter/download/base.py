@@ -6,6 +6,7 @@ import subprocess
 from django.apps import apps
 from django.conf import settings
 
+from daiquiri.core.adapter import DatabaseAdapter
 from daiquiri.core.generators import generate_csv, generate_fits, generate_votable
 from daiquiri.core.utils import get_doi_url
 
@@ -57,11 +58,20 @@ class BaseDownloadAdapter:
                 )
 
             elif format_key == 'fits':
+                # We have to check for arrays here
+
+                # We have to check for arrays here
+                schema_table_name = self.get_table_name(schema_name, table_name)
+                fits_arrayinfos = self.get_arraysizes_for_fits(
+                    columns, schema_name, table_name
+                )
+
                 return generate_fits(
                     self.generate_rows(prepend=prepend),
                     columns,
                     nrows,
-                    table_name=self.get_table_name(schema_name, table_name),
+                    table_name=schema_table_name,
+                    array_infos=fits_arrayinfos,
                 )
 
             else:
@@ -167,3 +177,24 @@ class BaseDownloadAdapter:
 
             services.append(get_service())
         return services
+
+    def get_arraysizes_for_fits(self, columns: list, schema_name: str, table_name: str):
+        arraysizes = {}
+        for c in columns:
+            if c['datatype'][-2:] == '[]':
+                column_name = c['name']
+                db = DatabaseAdapter()
+
+                query = f"""
+                    SELECT MAX(array_length({column_name}, 1)) 
+                    FROM "{schema_name}"."{table_name}"
+                    WHERE {column_name} IS NOT NULL
+                """
+
+                # try:
+                result = db.fetchone(query)
+                max_length = result[0]
+
+                arraysizes[column_name] = max_length
+
+        return arraysizes
