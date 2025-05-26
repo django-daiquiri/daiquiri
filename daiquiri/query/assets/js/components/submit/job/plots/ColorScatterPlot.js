@@ -32,6 +32,7 @@ const ColorScatterPlot = ({ columns, values, x, y, z  }) => {
                       }
                     }
                   },
+                  hoverinfo: 'skip'
                 }
               ]}
               layout={{

@@ -12,7 +12,7 @@ export const layout = {
 export const config = {
   displayModeBar: true,
   displaylogo: false,
-  modeBarButtonsToRemove: ['select2d', 'lasso2d']
+  modeBarButtonsToRemove: ['zoomIn', 'zoomOut', 'autoScale']
 }
 
 export const colors = [

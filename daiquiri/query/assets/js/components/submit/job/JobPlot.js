@@ -11,7 +11,7 @@ import Scatter from './plots/Scatter'
 
 import JobPlotType from './JobPlotType'
 
-const JobPlot = ({ job }) => {
+const JobPlot = ({ job, loadJob }) => {
 
   const [type, setType] = useState('scatter')
   const [columns, setColumns] = useState([])
@@ -22,10 +22,13 @@ const JobPlot = ({ job }) => {
   ))), [job])
 
   return job.phase == 'COMPLETED' ? (
+    job.nrows > 1000000 ? (
+      <h3>The plotting tool is available only for the query results with nrows fewer than 1M.</h3>
+    ): (
     <div>
       <JobPlotType type={type} setType={setType} />
       {
-        (type == 'scatter') && <Scatter job={job} columns={columns} />
+        (type == 'scatter') && <Scatter job={job} columns={columns} loadJob={loadJob} />
       }
       {
         (type == 'colorScatter') && <ColorScatter job={job} columns={columns} />
@@ -34,13 +37,15 @@ const JobPlot = ({ job }) => {
         (type == 'histogram') && <Histogram job={job} columns={columns} />
       }
     </div>
+    )
   ) : (
     <p className={jobPhaseClass[job.phase]}>{jobPhaseMessage[job.phase]}</p>
   )
 }
 
 JobPlot.propTypes = {
-  job: PropTypes.object.isRequired
+  job: PropTypes.object.isRequired,
+  loadJob: PropTypes.func.isRequired,
 }
 
 export default JobPlot
