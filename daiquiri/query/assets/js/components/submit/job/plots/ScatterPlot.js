@@ -7,6 +7,7 @@ import { config, layout } from 'daiquiri/query/assets/js/constants/plot'
 import { getColumnLabel } from 'daiquiri/query/assets/js/utils/plot'
 import {
   useFormQuery,
+  useQueryLanguagesQuery,
   useQueuesQuery,
 } from 'daiquiri/query/assets/js/hooks/queries'
 import { useSubmitJobMutation } from 'daiquiri/query/assets/js/hooks/mutations'
@@ -63,6 +64,7 @@ const MemoizedPlot = memo(({ columns, values, x, y, onSelected }) => {
 const ScatterPlot = ({ columns, values, x, y, loadJob, job }) => {
   const { data: form } = useFormQuery('sql')
   const { data: queues } = useQueuesQuery()
+  const { data: queryLanguages } = useQueryLanguagesQuery()
 
   const [isClicked, setIsClicked] = useState(false);
   const [text, setText] = useState('');
@@ -74,7 +76,7 @@ const ScatterPlot = ({ columns, values, x, y, loadJob, job }) => {
     run_id: '',
     queue: '',
     query: '',
-    query_language: job.query_language,
+    query_language:'',
   })
 
   const [isButtonDisabled, setIsButtonDisabled] = useState(true)
@@ -92,6 +94,10 @@ const ScatterPlot = ({ columns, values, x, y, loadJob, job }) => {
     const query = `SELECT *
 FROM "${job.schema_name}"."${job.table_name}" as t
 WHERE POLYGON '(${polyPoints})' @> POINT(t.${values.x.column}, t.${values.y.column});`
+
+    const postgres = queryLanguages.find(language => toString(language.id).includes('postgres'))
+    tableValues.query_language = postgres ? postgres.id : job.query_language
+
     tableValues.query = query
     tableValues.queue = tableValues.queue == '' ?  getDefaultQueue() : ''
 
@@ -113,7 +119,6 @@ WHERE POLYGON '(${polyPoints})' @> POINT(t.${values.x.column}, t.${values.y.colu
         }
 
   const handleSelection = useCallback((event) => {
-    console.log(event)
     if (event && event.lassoPoints && event.lassoPoints.x.length > 0) {
       selectedPointsRef.current = { x: event.lassoPoints.x, y: event.lassoPoints.y, n: event.points.length }
       setIsButtonDisabled(false)
