@@ -3,9 +3,13 @@ import datetime
 import io
 import struct
 import sys
+from pathlib import Path
 from xml.sax.saxutils import escape, quoteattr
 
+import pandas as pd
 from django.contrib.sites.models import Site
+from fastparquet import update_file_custom_metadata, write
+from sqlalchemy import create_engine
 
 from daiquiri import __version__ as daiquiri_version
 
@@ -50,7 +54,7 @@ def correct_col_for_votable(col):
 
 
 def generate_votable(
-    generator, fields, infos=[], links=[], services=[], table=None, empty=None
+    generator, fields, infos=[], links=[], services=[], table=None, empty=False
 ):
     yield """<?xml version="1.0"?>
 <VOTABLE version="1.3"
@@ -192,7 +196,7 @@ def generate_votable(
 
 
 def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
-    # VO format label, FITS format label, size, NULL value, encoded value
+    # VO format label, FITS format label, size in bytes, NULL value, encoded value
 
     formats_dict = {
         'boolean': ('s', 'L', 1, b'\x00', lambda x: b'T' if x == 'true' else b'F'),
@@ -376,7 +380,7 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
             temp += ' ' * (80 - len(temp))
             h1 += temp
 
-    now = datetime.datetime.utcnow().replace(microsecond=0).isoformat()
+    now = datetime.datetime.now(datetime.UTC).replace(microsecond=0).isoformat()
     h1 += (f"DATE-HDU= '{now}' / UTC date of HDU creation").ljust(80)
 
     h1 += 'END'.ljust(80)
@@ -404,3 +408,53 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
     footer = '\x00' * (2880 * (ln // 2880 + 1) - ln)
 
     yield footer.encode()
+
+
+def generate_parquet(
+    schema_name: str,
+    table_name: str,
+    metadata: str,
+    database_config: dict,
+    output_path: Path,
+):
+    if database_config['PORT'] == '':
+        database_config['PORT'] = 5432
+
+    query = f'SELECT * FROM "{schema_name}"."{table_name}"'
+
+    # Use the rust pg2parquet binary if it's there, otherwise use fastparquet
+    if (rust_path := (Path().home() / 'bin' / 'pg2parquet')).is_file():
+        import subprocess
+
+        cmd = f'{rust_path} export --host {database_config["HOST"]} --port {database_config["PORT"]} --user {database_config["USER"]} --password {database_config["PASSWORD"]} --dbname {database_config["NAME"]} --output-file {output_path} --compression-level 4 --table \'"{schema_name}"."{table_name}"\''
+        subprocess.run(cmd, shell=True)
+    else:
+        db_url = f'postgresql+psycopg://{database_config["USER"]}:{database_config["PASSWORD"]}@{database_config["HOST"]}:{database_config["PORT"]}/{database_config["NAME"]}'
+
+        engine = create_engine(db_url)
+        connection = engine.connect().execution_options(stream_results=True)
+
+        i = 0
+        for chunk in pd.read_sql(query, con=connection, chunksize=100000):
+            pqwriter = write(
+                str(output_path),
+                chunk,
+                write_index=False,
+                append=i != 0,
+                compression='ZSTD',
+            )
+            i += 1
+
+        if pqwriter:
+            pqwriter.close()
+
+    # Make this IVOA compliant
+    update_file_custom_metadata(
+        str(output_path),
+        custom_metadata={
+            'IVOA.VOTable-Parquet.version': '1.0',
+            'IVOA.VOTable-Parquet.content': metadata.encode('utf-8'),
+        },
+    )
+
+    return None

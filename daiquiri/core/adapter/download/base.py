@@ -2,12 +2,18 @@ import csv
 import logging
 import re
 import subprocess
+from pathlib import Path
 
 from django.apps import apps
 from django.conf import settings
 
 from daiquiri.core.adapter import DatabaseAdapter
-from daiquiri.core.generators import generate_csv, generate_fits, generate_votable
+from daiquiri.core.generators import (
+    generate_csv,
+    generate_fits,
+    generate_parquet,
+    generate_votable,
+)
 from daiquiri.core.utils import get_doi_url
 
 logger = logging.getLogger(__name__)
@@ -58,9 +64,7 @@ class BaseDownloadAdapter:
                 )
 
             elif format_key == 'fits':
-                # We have to check for arrays here
-
-                # We have to check for arrays here
+                # We have to get the maximum array lengths in case there are arrays in the data
                 schema_table_name = self.get_table_name(schema_name, table_name)
                 fits_arrayinfos = self.get_arraysizes_for_fits(
                     columns, schema_name, table_name
@@ -72,6 +76,34 @@ class BaseDownloadAdapter:
                     nrows,
                     table_name=schema_table_name,
                     array_infos=fits_arrayinfos,
+                )
+
+            elif format_key == 'parquet':
+                votable_meta = generate_votable(
+                    self.generate_rows(prepend=prepend),
+                    columns,
+                    table=self.get_table_name(schema_name, table_name),
+                    infos=self.get_infos(query_status, query, query_language, sources),
+                    links=self.get_links(sources),
+                    services=self.get_services(),
+                    empty=True,
+                )
+                votable_meta_str = ''
+                for line in votable_meta:
+                    votable_meta_str += line
+
+                user_name = schema_name.removeprefix(settings.QUERY_USER_SCHEMA_PREFIX)
+                output_path = (
+                    Path(settings.QUERY_DOWNLOAD_DIR)
+                    / user_name
+                    / f'{table_name}.parquet'
+                )
+                return generate_parquet(
+                    schema_name=schema_name,
+                    table_name=table_name,
+                    metadata=votable_meta_str,
+                    database_config=self.database_config,
+                    output_path=output_path,
                 )
 
             else:
