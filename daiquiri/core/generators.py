@@ -380,7 +380,7 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
             temp += ' ' * (80 - len(temp))
             h1 += temp
 
-    now = datetime.datetime.now(datetime.UTC).replace(microsecond=0).isoformat()
+    now = datetime.datetime.utcnow().replace(microsecond=0).isoformat()
     h1 += (f"DATE-HDU= '{now}' / UTC date of HDU creation").ljust(80)
 
     h1 += 'END'.ljust(80)
