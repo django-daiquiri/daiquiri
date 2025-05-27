@@ -86,15 +86,12 @@ const ScatterPlot = ({ columns, values, x, y, loadJob, job }) => {
 
   const handleSubmit = () => {
     const polyPoints = selectedPointsRef.current.x
-    .map((x, index) => `${x} ${selectedPointsRef.current.y[index]}`)
-    .concat(`${selectedPointsRef.current.x[0]} ${selectedPointsRef.current.y[0]}`)
+    .map((x, index) => `(${x}, ${selectedPointsRef.current.y[index]})`)
+    .concat(`(${selectedPointsRef.current.x[0]}, ${selectedPointsRef.current.y[0]})`)
     .join(', ');
     const query = `SELECT *
 FROM "${job.schema_name}"."${job.table_name}" as t
-WHERE ST_Within(
-    ST_MakePoint(t.${values.x.column}, t.${values.y.column}),
-    ST_GeomFromText('POLYGON((${polyPoints}))')
-);`
+WHERE POLYGON '(${polyPoints})' @> POINT(t.${values.x.column}, t.${values.y.column});`
     tableValues.query = query
     tableValues.queue = tableValues.queue == '' ?  getDefaultQueue() : ''
 
