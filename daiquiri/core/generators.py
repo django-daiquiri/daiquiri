@@ -1,6 +1,7 @@
 import csv
 import datetime
 import io
+import logging
 import struct
 import sys
 from pathlib import Path
@@ -12,6 +13,8 @@ from fastparquet import update_file_custom_metadata, write
 from sqlalchemy import create_engine
 
 from daiquiri import __version__ as daiquiri_version
+
+logger = logging.getLogger(__name__)
 
 
 def generate_csv(generator, fields):
@@ -198,6 +201,8 @@ def generate_votable(
 def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
     # VO format label, FITS format label, size in bytes, NULL value, encoded value
 
+    DEFAULT_CHAR_SIZE = 256
+
     formats_dict = {
         'boolean': ('s', 'L', 1, b'\x00', lambda x: b'T' if x == 'true' else b'F'),
         'short': ('h', 'I', 2, 32767, int),
@@ -210,6 +215,12 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
         'array': ('s', 'A', 64, b'', lambda x: x.encode()),
         'spoint': ('s', 'A', 64, b'', lambda x: x.encode()),
         'unknown': ('s', 'A', 8, b'', lambda x: x.encode()),
+        'short[]': ('h', 'I', 2, 32767, int),
+        'int[]': ('i', 'J', 4, 2147483647, int),
+        'long[]': ('q', 'K', 8, 9223372036854775807, int),
+        'float[]': ('f', 'E', 4, float('nan'), float),
+        'double[]': ('d', 'D', 8, float('nan'), float),
+        'char[]': ('s', 'A', 32, b'', lambda x: x.encode()),
     }
 
     names = [field['name'] for field in fields]
@@ -237,12 +248,19 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
         else:
             ucds.append('')
 
-    naxis1 = sum(
-        [
-            formats_dict[i[0]][2] if not i[1] else i[1]
-            for i in zip(datatypes, arraysizes)
-        ]
-    )
+    naxis1_list = []
+
+    for i in zip(datatypes, arraysizes, names):
+        if '[]' in i[0]:
+            if i[0] == 'char[]':
+                naxis1_list.append(array_infos[i[2]] * DEFAULT_CHAR_SIZE)
+            else:
+                naxis1_list.append(array_infos[i[2]] * formats_dict[i[0]][2])
+        else:
+            naxis1_list.append(formats_dict[i[0]][2] if not i[1] else i[1])
+
+    naxis1 = sum(naxis1_list)
+
     naxis2 = nrows
     tfields = len(names)
 
@@ -345,7 +363,16 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
         temp += ' ' * (80 - len(temp))
         h1 += temp
 
-        ff = (str(d[2]) + formats_dict[d[1]][1]).ljust(8)
+        if '[]' not in d[1]:
+            ff = (str(d[2]) + formats_dict[d[1]][1]).ljust(8)
+        else:
+            if d[1] == 'char[]':
+                ff = str(array_infos[d[0]] * DEFAULT_CHAR_SIZE) + formats_dict[d[1]][
+                    1
+                ].ljust(8)
+            else:
+                ff = str(array_infos[d[0]]) + formats_dict[d[1]][1].ljust(8)
+
         temp = ''.join(((tform[0] % str(i + 1)).ljust(8), tform[1] % ff))[:80].ljust(31)
         temp += '/ format for column %d' % (i + 1)
         temp = temp[:80]
@@ -380,7 +407,7 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
             temp += ' ' * (80 - len(temp))
             h1 += temp
 
-    now = datetime.datetime.utcnow().replace(microsecond=0).isoformat()
+    now = datetime.datetime.now(datetime.UTC).replace(microsecond=0).isoformat()
     h1 += (f"DATE-HDU= '{now}' / UTC date of HDU creation").ljust(80)
 
     h1 += 'END'.ljust(80)
@@ -395,12 +422,38 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
 
     row_count = 0
     for row in generator:
-        r = [
-            formats_dict[i[1]][3] if i[0] == 'NULL' else formats_dict[i[1]][4](i[0])
-            for i in zip(row, datatypes)
-        ]
+        fmt = '>'
+        row_elements = []
+        for i in zip(row, datatypes, arraysizes, names):
+            if i[0] == 'NULL':
+                r = formats_dict[i[1]][3]
+                f = str(i[2]) + formats_dict[i[1]][0]
+                row_elements.append(r)
+            elif i[1][-2:] == '[]':
+                r = []
+                parsed = parse_and_fill_array(i[0], i[1], array_infos[i[3]])
+                for j in parsed:
+                    entry = formats_dict[i[1]][4](j)
+                    r.append(entry)
+                f = str(array_infos[i[3]]) + formats_dict[i[1]][0]
+                if i[1] == 'char[]':
+                    f = (
+                        str(array_infos[i[3]] * DEFAULT_CHAR_SIZE)
+                        + formats_dict[i[1]][0]
+                    )
 
-        yield struct.pack(fmt, *r)
+                if i[1] != 'char[]':
+                    row_elements.extend(r)
+                else:
+                    row_elements.append(b''.join(r))
+
+            else:
+                r = formats_dict[i[1]][4](i[0])
+                f = str(i[2]) + formats_dict[i[1]][0]
+                row_elements.append(r)
+            fmt += f
+
+        yield struct.pack(fmt, *row_elements)
         row_count += 1
 
     # Footer padding (to fill the last block to 2880 bytes) ###################
@@ -408,6 +461,21 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
     footer = '\x00' * (2880 * (ln // 2880 + 1) - ln)
 
     yield footer.encode()
+
+
+def parse_and_fill_array(obj_str: str, obj_type: str, desired_length: int) -> list:
+    array = [i for i in obj_str.strip('{}').split(',')]
+    for i in range(desired_length - len(array)):
+        if obj_type in ['float[]', 'double[]']:
+            array.append('0.0')
+        elif obj_type == 'char[]':
+            array.append('')
+        elif obj_type in ['short[]', 'int[]', 'long[]']:
+            array.append('0')
+        else:
+            raise ValueError(f'Unknown array type: {obj_type}')
+
+    return array
 
 
 def generate_parquet(
@@ -423,12 +491,16 @@ def generate_parquet(
     query = f'SELECT * FROM "{schema_name}"."{table_name}"'
 
     # Use the rust pg2parquet binary if it's there, otherwise use fastparquet
-    if (rust_path := (Path().home() / 'bin' / 'pg2parquet')).is_file():
+    try:
+        rust_path = Path().home() / 'bin' / 'pg2parquet'
         import subprocess
 
         cmd = f'{rust_path} export --host {database_config["HOST"]} --port {database_config["PORT"]} --user {database_config["USER"]} --password {database_config["PASSWORD"]} --dbname {database_config["NAME"]} --output-file {output_path} --compression-level 4 --table \'"{schema_name}"."{table_name}"\''
-        subprocess.run(cmd, shell=True)
-    else:
+        p = subprocess.run(cmd, shell=True, capture_output=True)
+        if p.returncode != 0:
+            raise Exception(f'pg2parquet failed: {p.stderr.decode()}')
+    except Exception as e:
+        logger.warning(f'pg2parquet not found or failed, using fastparquet: {e}')
         db_url = f'postgresql+psycopg://{database_config["USER"]}:{database_config["PASSWORD"]}@{database_config["HOST"]}:{database_config["PORT"]}/{database_config["NAME"]}'
 
         engine = create_engine(db_url)
