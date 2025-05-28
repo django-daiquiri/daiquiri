@@ -199,10 +199,9 @@ def generate_votable(
 
 
 def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
-    # VO format label, FITS format label, size in bytes, NULL value, encoded value
-
     DEFAULT_CHAR_SIZE = 256
 
+    # VO format label, FITS format label, size in bytes, NULL value, encoded value
     formats_dict = {
         'boolean': ('s', 'L', 1, b'\x00', lambda x: b'T' if x == 'true' else b'F'),
         'short': ('h', 'I', 2, 32767, int),
@@ -227,37 +226,39 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
     datatypes = [field['datatype'] for field in fields]
     arraysizes = [field.get('arraysize') or '' for field in fields]
 
-    for i, d in enumerate(zip(datatypes, arraysizes)):
-        if d[0] == 'timestamp':
+    for i, (datatype, arraysize) in enumerate(zip(datatypes, arraysizes)):
+        if datatype == 'timestamp':
             arraysizes[i] = formats_dict['timestamp'][2]
-        elif d[0] in ('char', 'spoint', 'array') and d[1] == '':
-            arraysizes[i] = formats_dict[d[0]][2]
-        elif d[0] is None:
+        elif datatype in ('char', 'spoint', 'array') and arraysize == '':
+            arraysizes[i] = formats_dict[datatype][2]
+        elif datatype is None:
             datatypes[i] = 'unknown'
             arraysizes[i] = formats_dict['unknown'][2]
 
     units = []
     ucds = []
-    for d in fields:
-        if 'unit' in d and d['unit'] is not None:
-            units.append(d['unit'])
+    for field in fields:
+        if 'unit' in field and field['unit'] is not None:
+            units.append(field['unit'])
         else:
             units.append('')
-        if 'ucd' in d and d['ucd'] is not None:
-            ucds.append(d['ucd'])
+        if 'ucd' in field and field['ucd'] is not None:
+            ucds.append(field['ucd'])
         else:
             ucds.append('')
 
     naxis1_list = []
 
-    for i in zip(datatypes, arraysizes, names):
-        if '[]' in i[0]:
-            if i[0] == 'char[]':
-                naxis1_list.append(array_infos[i[2]] * DEFAULT_CHAR_SIZE)
+    for datatype, arraysize, name in zip(datatypes, arraysizes, names):
+        if '[]' in datatype:
+            if datatype == 'char[]':
+                naxis1_list.append(array_infos[name] * DEFAULT_CHAR_SIZE)
             else:
-                naxis1_list.append(array_infos[i[2]] * formats_dict[i[0]][2])
+                naxis1_list.append(array_infos[name] * formats_dict[datatype][2])
         else:
-            naxis1_list.append(formats_dict[i[0]][2] if not i[1] else i[1])
+            naxis1_list.append(
+                formats_dict[datatype][2] if not arraysize else arraysize
+            )
 
     naxis1 = sum(naxis1_list)
 
@@ -354,24 +355,27 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
     tunit = ('TUNIT%s', "= '%s'")
     tucd = ('TUCD%s', "= '%s'")
 
-    for i, d in enumerate(zip(names, datatypes, arraysizes, units, ucds)):
+    for i, (name, datatype, arraysize, unit, ucd) in enumerate(
+        zip(names, datatypes, arraysizes, units, ucds)
+    ):
         temp = ''.join(
-            ((ttype[0] % str(i + 1)).ljust(8), ttype[1] % d[0][:68].ljust(8))
+            ((ttype[0] % str(i + 1)).ljust(8), ttype[1] % name[:68].ljust(8))
         )[:80].ljust(30)
         temp += ' / label for column %d' % (i + 1)
         temp = temp[:80]
         temp += ' ' * (80 - len(temp))
         h1 += temp
 
-        if '[]' not in d[1]:
-            ff = (str(d[2]) + formats_dict[d[1]][1]).ljust(8)
+        if '[]' not in datatype:
+            ff = (str(arraysize) + formats_dict[datatype][1]).ljust(8)
         else:
-            if d[1] == 'char[]':
-                ff = str(array_infos[d[0]] * DEFAULT_CHAR_SIZE) + formats_dict[d[1]][
-                    1
-                ].ljust(8)
+            if datatype == 'char[]':
+                ff = (
+                    str(array_infos[name] * DEFAULT_CHAR_SIZE)
+                    + formats_dict[datatype][1]
+                ).ljust(8)
             else:
-                ff = str(array_infos[d[0]]) + formats_dict[d[1]][1].ljust(8)
+                ff = str(array_infos[name]) + formats_dict[datatype][1].ljust(8)
 
         temp = ''.join(((tform[0] % str(i + 1)).ljust(8), tform[1] % ff))[:80].ljust(31)
         temp += '/ format for column %d' % (i + 1)
@@ -380,27 +384,27 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
         h1 += temp
 
         # NULL values only for int-like types
-        if d[1] in ('short', 'int', 'long'):
+        if datatype in ('short', 'int', 'long'):
             temp = ''.join(
-                ((tnull[0] % str(i + 1)).ljust(8), tnull[1] % formats_dict[d[1]][3])
+                ((tnull[0] % str(i + 1)).ljust(8), tnull[1] % formats_dict[datatype][3])
             )[:80].ljust(31)
             temp += '/ blank value for column %d' % (i + 1)
             temp = temp[:80]
             temp += ' ' * (80 - len(temp))
             h1 += temp
 
-        if d[3]:
+        if unit:
             temp = ''.join(
-                ((tunit[0] % str(i + 1)).ljust(8), tunit[1] % d[3][:68].ljust(8))
+                ((tunit[0] % str(i + 1)).ljust(8), tunit[1] % unit[:68].ljust(8))
             )[:80].ljust(30)
             temp += ' / unit for column %d' % (i + 1)
             temp = temp[:80]
             temp += ' ' * (80 - len(temp))
             h1 += temp
 
-        if d[4]:
+        if ucd:
             temp = ''.join(
-                ((tucd[0] % str(i + 1)).ljust(8), tucd[1] % d[4][:68].ljust(8))
+                ((tucd[0] % str(i + 1)).ljust(8), tucd[1] % ucd[:68].ljust(8))
             )[:80].ljust(30)
             temp += ' / ucd for column %d' % (i + 1)
             temp = temp[:80]
@@ -417,43 +421,50 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
 
     # Data ####################################################################
     fmt = '>' + ''.join(
-        [str(i[1]) + formats_dict[i[0]][0] for i in zip(datatypes, arraysizes)]
+        [
+            str(arraysize) + formats_dict[datatype][0]
+            for datatype, arraysize in zip(datatypes, arraysizes)
+        ]
     )
 
     row_count = 0
+
     for row in generator:
         fmt = '>'
-        row_elements = []
-        for i in zip(row, datatypes, arraysizes, names):
-            if i[0] == 'NULL':
-                r = formats_dict[i[1]][3]
-                f = str(i[2]) + formats_dict[i[1]][0]
-                row_elements.append(r)
-            elif i[1][-2:] == '[]':
+        row_elements_formatted = []
+        for row_element, datatype, arraysize, name in zip(
+            row, datatypes, arraysizes, names
+        ):
+            if row_element == 'NULL':
+                r = formats_dict[datatype][3]
+                f = str(arraysize) + formats_dict[datatype][0]
+                row_elements_formatted.append(r)
+            elif datatype[-2:] == '[]':
                 r = []
-                parsed = parse_and_fill_array(i[0], i[1], array_infos[i[3]])
+                parsed = parse_and_fill_array(row_element, datatype, array_infos[name])
                 for j in parsed:
-                    entry = formats_dict[i[1]][4](j)
+                    entry = formats_dict[datatype][4](j)
                     r.append(entry)
-                f = str(array_infos[i[3]]) + formats_dict[i[1]][0]
-                if i[1] == 'char[]':
+                f = str(array_infos[name]) + formats_dict[datatype][0]
+                if datatype == 'char[]':
                     f = (
-                        str(array_infos[i[3]] * DEFAULT_CHAR_SIZE)
-                        + formats_dict[i[1]][0]
+                        str(array_infos[name] * DEFAULT_CHAR_SIZE)
+                        + formats_dict[datatype][0]
                     )
 
-                if i[1] != 'char[]':
-                    row_elements.extend(r)
+                if datatype != 'char[]':
+                    row_elements_formatted.extend(r)
                 else:
-                    row_elements.append(b''.join(r))
+                    row_elements_formatted.append(b''.join(r))
 
             else:
-                r = formats_dict[i[1]][4](i[0])
-                f = str(i[2]) + formats_dict[i[1]][0]
-                row_elements.append(r)
+                r = formats_dict[datatype][4](row_element)
+                f = str(arraysize) + formats_dict[datatype][0]
+                row_elements_formatted.append(r)
             fmt += f
 
-        yield struct.pack(fmt, *row_elements)
+        yield struct.pack(fmt, *row_elements_formatted)
+
         row_count += 1
 
     # Footer padding (to fill the last block to 2880 bytes) ###################
