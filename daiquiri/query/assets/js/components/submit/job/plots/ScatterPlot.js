@@ -124,8 +124,8 @@ WHERE POLYGON '(${polyPoints})' @> POINT(t.${values.x.column}, t.${values.y.colu
       setIsButtonDisabled(false)
     } else if (event && event.range && event.range.x.length > 0) {
       selectedPointsRef.current = {
-        x: [event.range.x[0], event.range.x[0], event.range.x[1], event.range.x[1], event.range.x[0]],
-        y: [event.range.y[0], event.range.y[1], event.range.y[1], event.range.y[0], event.range.y[0]],
+        x: [event.range.x[0], event.range.x[0], event.range.x[1], event.range.x[1]],
+        y: [event.range.y[0], event.range.y[1], event.range.y[1], event.range.y[0]],
         n: event.points.length }
       setIsButtonDisabled(false)
     } else {
@@ -155,8 +155,7 @@ WHERE POLYGON '(${polyPoints})' @> POINT(t.${values.x.column}, t.${values.y.colu
         {
           isButtonDisabled ?  (
               <div className="card-footer text-secondary">
-              You can run a new query for a subset of the data by
-              selecting the points using the 'Select Lasso' or 'Select Box' tools.
+              Select points with the 'Lasso' or 'Box' tool to run a new query on the selected subset.
               </div>
             ) : (
               <div className="card-footer">

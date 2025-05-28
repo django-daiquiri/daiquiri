@@ -23,7 +23,13 @@ const JobPlot = ({ job, loadJob }) => {
 
   return job.phase == 'COMPLETED' ? (
     job.nrows > 1000000 ? (
-      <h3>The plotting tool is available only for the query results with nrows fewer than 1M.</h3>
+    <div className="card text-center">
+      <div className="card-body d-flex justify-content-center align-items-center" style={{ height: '200px'}}>
+        <h4 className="card-title">
+            The plotting tool is available only for query results with fewer than 1 million rows.
+        </h4>
+      </div>
+    </div>
     ): (
     <div>
       <JobPlotType type={type} setType={setType} />
