@@ -198,7 +198,7 @@ def generate_votable(
 """
 
 
-def generate_fits(generator, fields, nrows, table_name=None):
+def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
     # VO format label, FITS format label, size, NULL value, encoded value
     formats_dict = {
         'boolean': ('s', 'L', 1, b'\x00', lambda x: b'T' if x == 'true' else b'F'),
