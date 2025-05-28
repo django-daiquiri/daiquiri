@@ -1,6 +1,7 @@
 import csv
 import datetime
 import io
+import logging
 import struct
 import sys
 from pathlib import Path
@@ -12,6 +13,8 @@ from fastparquet import update_file_custom_metadata, write
 from sqlalchemy import create_engine
 
 from daiquiri import __version__ as daiquiri_version
+
+logger = logging.getLogger(__name__)
 
 
 def generate_csv(generator, fields):
@@ -195,9 +198,8 @@ def generate_votable(
 """
 
 
-def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
-    # VO format label, FITS format label, size in bytes, NULL value, encoded value
-
+def generate_fits(generator, fields, nrows, table_name=None):
+    # VO format label, FITS format label, size, NULL value, encoded value
     formats_dict = {
         'boolean': ('s', 'L', 1, b'\x00', lambda x: b'T' if x == 'true' else b'F'),
         'short': ('h', 'I', 2, 32767, int),
@@ -423,12 +425,16 @@ def generate_parquet(
     query = f'SELECT * FROM "{schema_name}"."{table_name}"'
 
     # Use the rust pg2parquet binary if it's there, otherwise use fastparquet
-    if (rust_path := (Path().home() / 'bin' / 'pg2parquet')).is_file():
+    try:
+        rust_path = Path().home() / 'bin' / 'pg2parquet'
         import subprocess
 
         cmd = f'{rust_path} export --host {database_config["HOST"]} --port {database_config["PORT"]} --user {database_config["USER"]} --password {database_config["PASSWORD"]} --dbname {database_config["NAME"]} --output-file {output_path} --compression-level 4 --table \'"{schema_name}"."{table_name}"\''
-        subprocess.run(cmd, shell=True)
-    else:
+        p = subprocess.run(cmd, shell=True, capture_output=True)
+        if p.returncode != 0:
+            raise Exception(f'pg2parquet failed: {p.stderr.decode()}')
+    except Exception as e:
+        logger.warning(f'pg2parquet not found or failed, using fastparquet: {e}')
         db_url = f'postgresql+psycopg://{database_config["USER"]}:{database_config["PASSWORD"]}@{database_config["HOST"]}:{database_config["PORT"]}/{database_config["NAME"]}'
 
         engine = create_engine(db_url)
