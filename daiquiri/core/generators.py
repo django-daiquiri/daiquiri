@@ -316,10 +316,10 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
                     + formats_dict[datatype][1]
                 )
             else:
-                format_str = str(array_infos[name]) + formats_dict[datatype][1]
+                format_str = str(array_infos[name]) + formats_dict[datatype][1].ljust(8)
 
         h1 += create_line(
-            f'TTYPE{str(i + 1)}', f"'{name}'", f'label for col {i + 1}    '
+            f'TTYPE{str(i + 1)}', f"'{name.ljust(8)}'", f'label for col {i + 1}    '
         )
         h1 += create_line(
             f'TFORM{str(i + 1)}', f"'{format_str}'", f'format for col {i + 1}    '
