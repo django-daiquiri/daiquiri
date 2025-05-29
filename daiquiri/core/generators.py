@@ -225,6 +225,7 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
     names = [field['name'] for field in fields]
     datatypes = [field['datatype'] for field in fields]
     arraysizes = [field.get('arraysize') or '' for field in fields]
+    descriptions = [field.get('description') or '' for field in fields]
 
     for i, (datatype, arraysize) in enumerate(zip(datatypes, arraysizes)):
         if datatype == 'timestamp':
@@ -354,9 +355,10 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
     tnull = ('TNULL%s', '=  %s')
     tunit = ('TUNIT%s', "= '%s'")
     tucd = ('TUCD%s', "= '%s'")
+    tcomm = ('TCOMM%s', "= '%s'")
 
-    for i, (name, datatype, arraysize, unit, ucd) in enumerate(
-        zip(names, datatypes, arraysizes, units, ucds)
+    for i, (name, datatype, arraysize, unit, ucd, description) in enumerate(
+        zip(names, datatypes, arraysizes, units, ucds, descriptions)
     ):
         temp = ''.join(
             ((ttype[0] % str(i + 1)).ljust(8), ttype[1] % name[:68].ljust(8))
@@ -407,6 +409,15 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
                 ((tucd[0] % str(i + 1)).ljust(8), tucd[1] % ucd[:68].ljust(8))
             )[:80].ljust(30)
             temp += ' / ucd for column %d' % (i + 1)
+            temp = temp[:80]
+            temp += ' ' * (80 - len(temp))
+            h1 += temp
+
+        if description:
+            temp = ''.join(
+                ((tcomm[0] % str(i + 1)).ljust(8), tcomm[1] % description[:68].ljust(8))
+            )[:80].ljust(30)
+            temp += ' / description for column %d' % (i + 1)
             temp = temp[:80]
             temp += ' ' * (80 - len(temp))
             h1 += temp
@@ -476,6 +487,10 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
 
 def parse_and_fill_array(obj_str: str, obj_type: str, desired_length: int) -> list:
     array = [i for i in obj_str.strip('{}').split(',')]
+
+    if obj_type == 'char[]':
+        array = [f'{i}_' for i in array[:-1]] + [array[-1]]
+
     for i in range(desired_length - len(array)):
         if obj_type in ['float[]', 'double[]']:
             array.append('0.0')
