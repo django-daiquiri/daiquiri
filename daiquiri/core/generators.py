@@ -266,65 +266,23 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
     naxis2 = nrows
     tfields = len(names)
 
-    site = str(Site.objects.get_current())[:30]
+    # site = str(Site.objects.get_current())[:30]
 
-    content = (
-        """
-
-                                  `,......`
-                               :::.````````...
-                             ::``,:::,`.....``..`
-                           ,:.`,``,:::`....`````..
-                          .:``:::,``,:`::```...``..
-                          :,`::::::,`````,::::::`.:
-                          :::::::::::::::::::::::::
-         '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-         ,:,,,,,,,,,,,,,,,,,,,,,,,,,,,,,............................
-           :,,,`````````...,,,,,,,,............................```
-             ,,,.```````...,,,,,,,,............................`
-              `,,,``````....,,,,,,,...........................`
-                :+++,,,,,::::+++++++++++++++++++++++++++++++'
-                  \\\\     created with django-daiquiri     //
-                    \\\\               v%s//
-                      \\\\%s//
-                        ,,,.....,,,..................`
-                         :++':;;;++++++++++++++++++'
-                           ,,,,,,,::::;;;;;;;;''''
-                             ,,,................
-                               ,,,............
-                                 ,,.........`
-                                  `;;;;;;;:
-                                   ,'` `''
-                                    :: ::
-                                     . .`
-        +++++++++:             ,                       ,          .,
-         +++    +++           '+'                     '+'         ++.
-         +++    ,++:  :'+'.  `'+'   ,'';'+ ;'+` .'+' `'+' .++,:+ ;++`
-         +++    `++; ++  '';  ;'; `''  `''  ''`  ;''  ;''  ;++:,  ++`
-         +++    ;++. :++''''  ;'; ;''  `''  ''`  ;''  ;''  ;+'    ++`
-         +++  `+++: .++  '''  ;'' .''  .''  '',  '''  ;''  '+'    ++`
-        +++++++:     `'+'`+',,+++,  ;+'.++   ;++: +'.,+++,,++++. ++++
-                                      `+++.
-
-    """.replace('\x0a', ' ')
-        % (daiquiri_version.ljust(18), (' ' * (15 - len(site) // 2) + site).ljust(30))
-    )
+    content = 'bla'
 
     # Main header #############################################################
-    header0 = [
-        i.ljust(80)
-        for i in [
-            'SIMPLE  =                    T / conforms to FITS standard',
-            'BITPIX  =                    8 / array data type',
-            'NAXIS   =                    1 / number of array dimensions',
-            'NAXIS1  =                 2880 / number of characters',
-            'EXTEND  =                    T',
-            'NTABLE  =                    1',
-            'END',
-        ]
+    header0info = [
+        ('SIMPLE', 'T', 'conforms to FITS standard'),
+        ('BITPIX', '8', 'array data type'),
+        ('NAXIS', '1', 'number of array dimensions'),
+        ('NAXIS1', '2880', 'number of characters'),
+        ('EXTEND', 'T', ''),
+        ('NTABLE', '1', ''),
+        ('END', '', ''),
     ]
 
-    h0 = ''.join(header0)
+    # h0 = ''.join(header0)
+    h0 = ''.join([create_line(*entry) for entry in header0info])
     h0 += ' ' * (2880 * (len(h0) // 2880 + 1) - len(h0))
 
     yield h0.encode()
@@ -334,21 +292,22 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
     yield (content + '\x00' * (2880 - len(content))).encode()
 
     # Table header ############################################################
-    header1 = [
-        "XTENSION= 'BINTABLE'           / binary table extension".ljust(80),
-        'BITPIX  =                    8 / array data type'.ljust(80),
-        'NAXIS   =                    2 / number of array dimensions'.ljust(80),
-        'NAXIS1  = %20d / length of dimension 1'.ljust(64),
-        'NAXIS2  = %20d / length of dimension 2'.ljust(64),
-        'PCOUNT  =                    0 / number of group parameters'.ljust(80),
-        'GCOUNT  =                    1 / number of groups'.ljust(80),
-        'TFIELDS = %20d / number of table fields'.ljust(64),
+    header1info = [
+        ('XTENSION', "'BINTABLE'", 'binary table extension    '),
+        ('BITPIX', '8', 'array data type    '),
+        ('NAXIS', '2', 'number of array dimensions    '),
+        ('NAXIS1', f'{naxis1}', 'length of dimension 1    '),
+        ('NAXIS2', f'{naxis2}', 'length of dimension 2    '),
+        ('PCOUNT', '0', 'number of group parameters    '),
+        ('GCOUNT', '1', 'number of groups    '),
+        ('TFIELDS', f'{tfields} ', 'number of table fields    '),
     ]
+
     if table_name is not None:
         # table_name needs to be shorter than 68 chars
-        header1.append((f"EXTNAME = '{table_name[:68]!s}' / table name").ljust(80))
+        header1info.append(('EXTNAME', f"'{table_name[:68]}'", 'table name    '))
 
-    h1 = ''.join(header1) % (naxis1, naxis2, tfields)
+    h1 = ''.join([create_line(*entry) for entry in header1info])
 
     ttype = ('TTYPE%s', "= '%s'")
     tform = ('TFORM%s', "= '%s'")
@@ -483,6 +442,21 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
     footer = '\x00' * (2880 * (ln // 2880 + 1) - ln)
 
     yield footer.encode()
+
+
+def create_line(key, val, comment):
+    key_length = 8
+    line_length = 80
+    value_length = line_length - key_length - 1
+    line = key[:key_length].ljust(key_length)
+    if val != '':
+        line += '=' + f' {val} '[: value_length - 1].rjust(key_length, ' ')
+        line = line[:line_length]
+    if comment != '':
+        line += f' / {comment}'
+
+    line = line[:line_length].ljust(line_length)
+    return line
 
 
 def parse_and_fill_array(obj_str: str, obj_type: str, desired_length: int) -> list:
