@@ -309,82 +309,49 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
 
     h1 = ''.join([create_line(*entry) for entry in header1info])
 
-    ttype = ('TTYPE%s', "= '%s'")
-    tform = ('TFORM%s', "= '%s'")
-    tnull = ('TNULL%s', '=  %s')
-    tunit = ('TUNIT%s', "= '%s'")
-    tucd = ('TUCD%s', "= '%s'")
-    tcomm = ('TCOMM%s', "= '%s'")
-
     for i, (name, datatype, arraysize, unit, ucd, description) in enumerate(
         zip(names, datatypes, arraysizes, units, ucds, descriptions)
     ):
-        temp = ''.join(
-            ((ttype[0] % str(i + 1)).ljust(8), ttype[1] % name[:68].ljust(8))
-        )[:80].ljust(30)
-        temp += ' / label for column %d' % (i + 1)
-        temp = temp[:80]
-        temp += ' ' * (80 - len(temp))
-        h1 += temp
-
         if '[]' not in datatype:
-            ff = (str(arraysize) + formats_dict[datatype][1]).ljust(8)
+            format_str = (str(arraysize) + formats_dict[datatype][1]).ljust(8)
         else:
             if datatype == 'char[]':
-                ff = (
+                format_str = (
                     str(array_infos[name] * DEFAULT_CHAR_SIZE)
                     + formats_dict[datatype][1]
-                ).ljust(8)
+                )
             else:
-                ff = str(array_infos[name]) + formats_dict[datatype][1].ljust(8)
+                format_str = str(array_infos[name]) + formats_dict[datatype][1]
 
-        temp = ''.join(((tform[0] % str(i + 1)).ljust(8), tform[1] % ff))[:80].ljust(31)
-        temp += '/ format for column %d' % (i + 1)
-        temp = temp[:80]
-        temp += ' ' * (80 - len(temp))
-        h1 += temp
+        h1 += create_line(
+            f'TTYPE{str(i + 1)}', f"'{name}'", f'label for col {i + 1}    '
+        )
+        h1 += create_line(
+            f'TFORM{str(i + 1)}', f"'{format_str}'", f'format for col {i + 1}    '
+        )
 
         # NULL values only for int-like types
         if datatype in ('short', 'int', 'long'):
-            temp = ''.join(
-                ((tnull[0] % str(i + 1)).ljust(8), tnull[1] % formats_dict[datatype][3])
-            )[:80].ljust(31)
-            temp += '/ blank value for column %d' % (i + 1)
-            temp = temp[:80]
-            temp += ' ' * (80 - len(temp))
-            h1 += temp
+            h1 += create_line(
+                f'TNULL{str(i + 1)}',
+                formats_dict[datatype][3],
+                f'blank value for col {i + 1}    ',
+            )
 
         if unit:
-            temp = ''.join(
-                ((tunit[0] % str(i + 1)).ljust(8), tunit[1] % unit[:68].ljust(8))
-            )[:80].ljust(30)
-            temp += ' / unit for column %d' % (i + 1)
-            temp = temp[:80]
-            temp += ' ' * (80 - len(temp))
-            h1 += temp
+            h1 += create_line(f'TUNIT{str(i + 1)}', unit, f'unit for col {i + 1}    ')
 
         if ucd:
-            temp = ''.join(
-                ((tucd[0] % str(i + 1)).ljust(8), tucd[1] % ucd[:68].ljust(8))
-            )[:80].ljust(30)
-            temp += ' / ucd for column %d' % (i + 1)
-            temp = temp[:80]
-            temp += ' ' * (80 - len(temp))
-            h1 += temp
+            h1 += create_line(f'TUCD{str(i + 1)}', ucd, f'ucd for col {i + 1}    ')
 
         if description:
-            temp = ''.join(
-                ((tcomm[0] % str(i + 1)).ljust(8), tcomm[1] % description[:68].ljust(8))
-            )[:80].ljust(30)
-            temp += ' / description for column %d' % (i + 1)
-            temp = temp[:80]
-            temp += ' ' * (80 - len(temp))
-            h1 += temp
+            h1 += create_line(
+                f'TCOMM{str(i + 1)}', description, f'desc for col {i + 1}    '
+            )
 
     now = datetime.datetime.now(datetime.UTC).replace(microsecond=0).isoformat()
-    h1 += (f"DATE-HDU= '{now}' / UTC date of HDU creation").ljust(80)
-
-    h1 += 'END'.ljust(80)
+    h1 += create_line('DATE-HDU', now, 'UTC date of HDU creation')
+    h1 += create_line('END', '', '')
     h1 += ' ' * (2880 * (len(h1) // 2880 + 1) - len(h1))
 
     yield h1.encode()
