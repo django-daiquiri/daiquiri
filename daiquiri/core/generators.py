@@ -262,13 +262,10 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
             )
 
     naxis1 = sum(naxis1_list)
-
     naxis2 = nrows
     tfields = len(names)
 
-    # site = str(Site.objects.get_current())[:30]
-
-    content = 'bla'
+    logo = get_daiquiri_logo(str(Site.objects.get_current())[:30], daiquiri_version)
 
     # Main header #############################################################
     header0info = [
@@ -281,15 +278,13 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
         ('END', '', ''),
     ]
 
-    # h0 = ''.join(header0)
     h0 = ''.join([create_line(*entry) for entry in header0info])
     h0 += ' ' * (2880 * (len(h0) // 2880 + 1) - len(h0))
 
     yield h0.encode()
 
     # Main table content - required by some FITS viewers ######################
-
-    yield (content + '\x00' * (2880 - len(content))).encode()
+    yield (logo + '\x00' * (2880 - len(logo))).encode()
 
     # Table header ############################################################
     header1info = [
@@ -424,6 +419,51 @@ def create_line(key, val, comment):
 
     line = line[:line_length].ljust(line_length)
     return line
+
+
+def get_daiquiri_logo(site: str, version: str) -> str:
+    logo = (
+        """
+
+                                  `,......`
+                               :::.````````...
+                             ::``,:::,`.....``..`
+                           ,:.`,``,:::`....`````..
+                          .:``:::,``,:`::```...``..
+                          :,`::::::,`````,::::::`.:
+                          :::::::::::::::::::::::::
+         '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+         ,:,,,,,,,,,,,,,,,,,,,,,,,,,,,,,............................
+           :,,,`````````...,,,,,,,,............................```
+             ,,,.```````...,,,,,,,,............................`
+              `,,,``````....,,,,,,,...........................`
+                :+++,,,,,::::+++++++++++++++++++++++++++++++'
+                  \\\\     created with django-daiquiri     //
+                    \\\\               v%s//
+                      \\\\%s//
+                        ,,,.....,,,..................`
+                         :++':;;;++++++++++++++++++'
+                           ,,,,,,,::::;;;;;;;;''''
+                             ,,,................
+                               ,,,............
+                                 ,,.........`
+                                  `;;;;;;;:
+                                   ,'` `''
+                                    :: ::
+                                     . .`
+        +++++++++:             ,                       ,          .,
+         +++    +++           '+'                     '+'         ++.
+         +++    ,++:  :'+'.  `'+'   ,'';'+ ;'+` .'+' `'+' .++,:+ ;++`
+         +++    `++; ++  '';  ;'; `''  `''  ''`  ;''  ;''  ;++:,  ++`
+         +++    ;++. :++''''  ;'; ;''  `''  ''`  ;''  ;''  ;+'    ++`
+         +++  `+++: .++  '''  ;'' .''  .''  '',  '''  ;''  '+'    ++`
+        +++++++:     `'+'`+',,+++,  ;+'.++   ;++: +'.,+++,,++++. ++++
+                                      `+++.
+
+    """.replace('\x0a', ' ')
+        % (daiquiri_version.ljust(18), (' ' * (15 - len(site) // 2) + site).ljust(30))
+    )
+    return logo
 
 
 def parse_and_fill_array(obj_str: str, obj_type: str, desired_length: int) -> list:
