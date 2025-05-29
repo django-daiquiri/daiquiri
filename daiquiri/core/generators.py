@@ -422,8 +422,8 @@ def create_line(key, val, comment):
 
 
 def get_daiquiri_logo(site: str, version: str) -> str:
-    logo = (
-        """
+    site_str = (' ' * (15 - len(site) // 2) + site).ljust(30)
+    logo = f"""
 
                                   `,......`
                                :::.````````...
@@ -439,8 +439,8 @@ def get_daiquiri_logo(site: str, version: str) -> str:
               `,,,``````....,,,,,,,...........................`
                 :+++,,,,,::::+++++++++++++++++++++++++++++++'
                   \\\\     created with django-daiquiri     //
-                    \\\\               v%s//
-                      \\\\%s//
+                    \\\\               v{version.ljust(18)}//
+                      \\\\{site_str}//
                         ,,,.....,,,..................`
                          :++':;;;++++++++++++++++++'
                            ,,,,,,,::::;;;;;;;;''''
@@ -460,9 +460,7 @@ def get_daiquiri_logo(site: str, version: str) -> str:
         +++++++:     `'+'`+',,+++,  ;+'.++   ;++: +'.,+++,,++++. ++++
                                       `+++.
 
-    """.replace('\x0a', ' ')
-        % (daiquiri_version.ljust(18), (' ' * (15 - len(site) // 2) + site).ljust(30))
-    )
+    """
     return logo
 
 
