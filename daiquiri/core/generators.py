@@ -334,14 +334,18 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
             )
 
         if unit:
-            h1 += create_line(f'TUNIT{str(i + 1)}', unit, f'unit for col {i + 1}    ')
+            h1 += create_line(
+                f'TUNIT{str(i + 1)}', f"'{unit}'", f'unit for col {i + 1}    '
+            )
 
         if ucd:
             h1 += create_line(f'TUCD{str(i + 1)}', ucd, f'ucd for col {i + 1}    ')
 
         if description:
             h1 += create_line(
-                f'TCOMM{str(i + 1)}', description, f'desc for col {i + 1}    '
+                f'TCOMM{str(i + 1)}',
+                f"'{description.ljust(8)}'",
+                f'desc for col {i + 1}    ',
             )
 
     now = datetime.datetime.utcnow().replace(microsecond=0).isoformat()
@@ -409,7 +413,7 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
 def create_line(key, val, comment):
     key_length = 8
     line_length = 80
-    value_length = line_length - key_length - 1
+    value_length = line_length - key_length - len(comment)
     line = key[:key_length].ljust(key_length)
     if val != '':
         line += '=' + f' {val} '[: value_length - 1].rjust(key_length, ' ')
