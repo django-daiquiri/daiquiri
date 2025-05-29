@@ -344,7 +344,7 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
                 f'TCOMM{str(i + 1)}', description, f'desc for col {i + 1}    '
             )
 
-    now = datetime.datetime.now(datetime.UTC).replace(microsecond=0).isoformat()
+    now = datetime.datetime.utcnow().replace(microsecond=0).isoformat()
     h1 += create_line('DATE-HDU', now, 'UTC date of HDU creation')
     h1 += create_line('END', '', '')
     h1 += ' ' * (2880 * (len(h1) // 2880 + 1) - len(h1))
