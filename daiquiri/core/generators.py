@@ -335,17 +335,17 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
 
         if unit:
             h1 += create_line(
-                f'TUNIT{str(i + 1)}', f"'{unit}'", f'unit for col {i + 1}    '
+                f'TUNIT{str(i + 1)}', f"'{unit.ljust(8)}'", f'unit for col {i + 1}    '
             )
 
         if ucd:
-            h1 += create_line(f'TUCD{str(i + 1)}', ucd, f'ucd for col {i + 1}    ')
+            h1 += create_line(
+                f'TUCD{str(i + 1)}', f"'{ucd.ljust(8)}'", f'ucd for col {i + 1}    '
+            )
 
         if description:
             h1 += create_line(
-                f'TCOMM{str(i + 1)}',
-                f"'{description.ljust(8)}'",
-                f'desc for col {i + 1}    ',
+                f'TCOMM{str(i + 1)}', f"'{description}'", f'desc for col {i + 1}    '
             )
 
     now = datetime.datetime.utcnow().replace(microsecond=0).isoformat()
