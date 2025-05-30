@@ -7,8 +7,9 @@ import sys
 from pathlib import Path
 from xml.sax.saxutils import escape, quoteattr
 
-import pandas as pd
 from django.contrib.sites.models import Site
+
+import pandas as pd
 from fastparquet import update_file_custom_metadata, write
 from sqlalchemy import create_engine
 
@@ -56,9 +57,7 @@ def correct_col_for_votable(col):
     return corrected_col
 
 
-def generate_votable(
-    generator, fields, infos=[], links=[], services=[], table=None, empty=False
-):
+def generate_votable(generator, fields, infos=[], links=[], services=[], table=None, empty=False):
     yield """<?xml version="1.0"?>
 <VOTABLE version="1.3"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -154,14 +153,7 @@ def generate_votable(
                     </TR>""".format(
                 """</TD>
                         <TD>""".join(
-                    [
-                        (
-                            ''
-                            if cell in ['NULL', None]
-                            else correct_col_for_votable(escape(str(cell)))
-                        )
-                        for cell in row
-                    ]
+                    [('' if cell in ['NULL', None] else correct_col_for_votable(escape(str(cell)))) for cell in row]
                 )
             )
 
@@ -177,9 +169,7 @@ def generate_votable(
     <RESOURCE type="meta" utype="adhoc:service">"""
         for param in service.get('params', []):
             yield """
-        <PARAM name="{name}" datatype="{datatype}" arraysize="{arraysize}" value="{value}" />""".format(
-                **param
-            )
+        <PARAM name="{name}" datatype="{datatype}" arraysize="{arraysize}" value="{value}" />""".format(**param)
 
         for group in service.get('groups', []):
             yield """
@@ -201,7 +191,13 @@ def generate_votable(
 def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
     # VO format label, FITS format label, size, NULL value, encoded value
     formats_dict = {
-        'boolean': ('s', 'L', 1, b'\x00', lambda x: b'T' if x == 'true' else b'F'),
+        'boolean': (
+            's',
+            'L',
+            1,
+            b'\x00',
+            lambda x: b'T' if x == 'true' else b'F',
+        ),
         'short': ('h', 'I', 2, 32767, int),
         'int': ('i', 'J', 4, 2147483647, int),
         'long': ('q', 'K', 8, 9223372036854775807, int),
@@ -239,12 +235,7 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
         else:
             ucds.append('')
 
-    naxis1 = sum(
-        [
-            formats_dict[i[0]][2] if not i[1] else i[1]
-            for i in zip(datatypes, arraysizes)
-        ]
-    )
+    naxis1 = sum([formats_dict[i[0]][2] if not i[1] else i[1] for i in zip(datatypes, arraysizes)])
     naxis2 = nrows
     tfields = len(names)
 
@@ -289,7 +280,10 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
                                       `+++.
 
     """.replace('\x0a', ' ')
-        % (daiquiri_version.ljust(18), (' ' * (15 - len(site) // 2) + site).ljust(30))
+        % (
+            daiquiri_version.ljust(18),
+            (' ' * (15 - len(site) // 2) + site).ljust(30),
+        )
     )
 
     # Main header #############################################################
@@ -339,9 +333,7 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
     tucd = ('TUCD%s', "= '%s'")
 
     for i, d in enumerate(zip(names, datatypes, arraysizes, units, ucds)):
-        temp = ''.join(
-            ((ttype[0] % str(i + 1)).ljust(8), ttype[1] % d[0][:68].ljust(8))
-        )[:80].ljust(30)
+        temp = ''.join(((ttype[0] % str(i + 1)).ljust(8), ttype[1] % d[0][:68].ljust(8)))[:80].ljust(30)
         temp += ' / label for column %d' % (i + 1)
         temp = temp[:80]
         temp += ' ' * (80 - len(temp))
@@ -357,7 +349,10 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
         # NULL values only for int-like types
         if d[1] in ('short', 'int', 'long'):
             temp = ''.join(
-                ((tnull[0] % str(i + 1)).ljust(8), tnull[1] % formats_dict[d[1]][3])
+                (
+                    (tnull[0] % str(i + 1)).ljust(8),
+                    tnull[1] % formats_dict[d[1]][3],
+                )
             )[:80].ljust(31)
             temp += '/ blank value for column %d' % (i + 1)
             temp = temp[:80]
@@ -366,7 +361,10 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
 
         if d[3]:
             temp = ''.join(
-                ((tunit[0] % str(i + 1)).ljust(8), tunit[1] % d[3][:68].ljust(8))
+                (
+                    (tunit[0] % str(i + 1)).ljust(8),
+                    tunit[1] % d[3][:68].ljust(8),
+                )
             )[:80].ljust(30)
             temp += ' / unit for column %d' % (i + 1)
             temp = temp[:80]
@@ -374,9 +372,7 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
             h1 += temp
 
         if d[4]:
-            temp = ''.join(
-                ((tucd[0] % str(i + 1)).ljust(8), tucd[1] % d[4][:68].ljust(8))
-            )[:80].ljust(30)
+            temp = ''.join(((tucd[0] % str(i + 1)).ljust(8), tucd[1] % d[4][:68].ljust(8)))[:80].ljust(30)
             temp += ' / ucd for column %d' % (i + 1)
             temp = temp[:80]
             temp += ' ' * (80 - len(temp))
@@ -391,16 +387,11 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
     yield h1.encode()
 
     # Data ####################################################################
-    fmt = '>' + ''.join(
-        [str(i[1]) + formats_dict[i[0]][0] for i in zip(datatypes, arraysizes)]
-    )
+    fmt = '>' + ''.join([str(i[1]) + formats_dict[i[0]][0] for i in zip(datatypes, arraysizes)])
 
     row_count = 0
     for row in generator:
-        r = [
-            formats_dict[i[1]][3] if i[0] == 'NULL' else formats_dict[i[1]][4](i[0])
-            for i in zip(row, datatypes)
-        ]
+        r = [formats_dict[i[1]][3] if i[0] == 'NULL' else formats_dict[i[1]][4](i[0]) for i in zip(row, datatypes)]
 
         yield struct.pack(fmt, *r)
         row_count += 1
@@ -429,13 +420,26 @@ def generate_parquet(
         rust_path = Path().home() / 'bin' / 'pg2parquet'
         import subprocess
 
-        cmd = f'{rust_path} export --host {database_config["HOST"]} --port {database_config["PORT"]} --user {database_config["USER"]} --password {database_config["PASSWORD"]} --dbname {database_config["NAME"]} --output-file {output_path} --compression-level 4 --table \'"{schema_name}"."{table_name}"\''
+        cmd = (
+            f'{rust_path} export --host {database_config["HOST"]} '
+            f'--port {database_config["PORT"]} '
+            f'--user {database_config["USER"]} '
+            f'--password {database_config["PASSWORD"]} '
+            f'--dbname {database_config["NAME"]} '
+            f'--output-file {output_path} '
+            f'--compression-level 4 '
+            f'--table \'"{schema_name}"."{table_name}"\''
+        )
         p = subprocess.run(cmd, shell=True, capture_output=True)
         if p.returncode != 0:
             raise Exception(f'pg2parquet failed: {p.stderr.decode()}')
     except Exception as e:
-        logger.warning(f'pg2parquet not found or failed, using fastparquet: {e}')
-        db_url = f'postgresql+psycopg://{database_config["USER"]}:{database_config["PASSWORD"]}@{database_config["HOST"]}:{database_config["PORT"]}/{database_config["NAME"]}'
+        logger.warning('pg2parquet not found or failed, using fastparquet: {e}')
+        db_url = (
+            f'postgresql+psycopg://{database_config["USER"]}:'
+            f'{database_config["PASSWORD"]}@{database_config["HOST"]}:'
+            f'{database_config["PORT"]}/{database_config["NAME"]}'
+        )
 
         engine = create_engine(db_url)
         connection = engine.connect().execution_options(stream_results=True)
