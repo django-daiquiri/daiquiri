@@ -2,6 +2,7 @@ import csv
 import datetime
 import io
 import logging
+import os
 import struct
 import sys
 from pathlib import Path
@@ -417,11 +418,14 @@ def generate_parquet(
 
     # Use the rust pg2parquet binary if it's there, otherwise use fastparquet
     try:
-        rust_path = Path().home() / 'bin' / 'pg2parquet'
+        pg2parquet_path = find_pg2parquet()
+        if pg2parquet_path is None:
+            raise Exception('pg2parquet not found')
+
         import subprocess
 
         cmd = (
-            f'{rust_path} export --host {database_config["HOST"]} '
+            f'{pg2parquet_path} export --host {database_config["HOST"]} '
             f'--port {database_config["PORT"]} '
             f'--user {database_config["USER"]} '
             f'--password {database_config["PASSWORD"]} '
@@ -433,8 +437,9 @@ def generate_parquet(
         p = subprocess.run(cmd, shell=True, capture_output=True)
         if p.returncode != 0:
             raise Exception(f'pg2parquet failed: {p.stderr.decode()}')
+
     except Exception as e:
-        logger.warning('pg2parquet not found or failed, using fastparquet: {e}')
+        logger.warning('pg2parquet not found or failed, using fastparquet: %s', e)
         db_url = (
             f'postgresql+psycopg://{database_config["USER"]}:'
             f'{database_config["PASSWORD"]}@{database_config["HOST"]}:'
@@ -466,5 +471,18 @@ def generate_parquet(
             'IVOA.VOTable-Parquet.content': metadata.encode('utf-8'),
         },
     )
+
+    return None
+
+
+def find_pg2parquet() -> Path | None:
+    """Search PATH environment variable for pg2parquet binary.
+
+    Returns:
+        Path | None: Path to pg2parquet binary if found, None otherwise
+    """
+    for path_dir in os.environ.get('PATH', '').split(os.pathsep):
+        if (bin_path := Path(path_dir) / 'pg2parquet').is_file():
+            return bin_path
 
     return None
