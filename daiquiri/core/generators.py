@@ -6,6 +6,7 @@ import os
 import struct
 import sys
 from pathlib import Path
+from typing import Optional
 from xml.sax.saxutils import escape, quoteattr
 
 from django.contrib.sites.models import Site
@@ -475,11 +476,11 @@ def generate_parquet(
     return None
 
 
-def find_pg2parquet() -> Path | None:
+def find_pg2parquet() -> Optional[Path]:
     """Search PATH environment variable for pg2parquet binary.
 
     Returns:
-        Path | None: Path to pg2parquet binary if found, None otherwise
+        Optional[Path]: Path to pg2parquet binary if found, None otherwise
     """
     for path_dir in os.environ.get('PATH', '').split(os.pathsep):
         if (bin_path := Path(path_dir) / 'pg2parquet').is_file():
