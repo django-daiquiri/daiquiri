@@ -2,13 +2,25 @@ import csv
 import datetime
 import io
 import logging
+<<<<<<< HEAD
 import struct
 import sys
 from pathlib import Path
+=======
+import os
+import struct
+import sys
+from pathlib import Path
+from typing import Optional
+>>>>>>> dev
 from xml.sax.saxutils import escape, quoteattr
 
 import pandas as pd
 from django.contrib.sites.models import Site
+from fastparquet import update_file_custom_metadata, write
+from sqlalchemy import create_engine
+
+import pandas as pd
 from fastparquet import update_file_custom_metadata, write
 from sqlalchemy import create_engine
 
@@ -56,9 +68,13 @@ def correct_col_for_votable(col):
     return corrected_col
 
 
+<<<<<<< HEAD
 def generate_votable(
     generator, fields, infos=[], links=[], services=[], table=None, empty=False
 ):
+=======
+def generate_votable(generator, fields, infos=[], links=[], services=[], table=None, empty=False):
+>>>>>>> dev
     yield """<?xml version="1.0"?>
 <VOTABLE version="1.3"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -501,16 +517,33 @@ def generate_parquet(
 
     # Use the rust pg2parquet binary if it's there, otherwise use fastparquet
     try:
-        rust_path = Path().home() / 'bin' / 'pg2parquet'
+        pg2parquet_path = find_pg2parquet()
+        if pg2parquet_path is None:
+            raise Exception('pg2parquet not found')
+
         import subprocess
 
-        cmd = f'{rust_path} export --host {database_config["HOST"]} --port {database_config["PORT"]} --user {database_config["USER"]} --password {database_config["PASSWORD"]} --dbname {database_config["NAME"]} --output-file {output_path} --compression-level 4 --table \'"{schema_name}"."{table_name}"\''
+        cmd = (
+            f'{pg2parquet_path} export --host {database_config["HOST"]} '
+            f'--port {database_config["PORT"]} '
+            f'--user {database_config["USER"]} '
+            f'--password {database_config["PASSWORD"]} '
+            f'--dbname {database_config["NAME"]} '
+            f'--output-file {output_path} '
+            f'--compression-level 4 '
+            f'--table \'"{schema_name}"."{table_name}"\''
+        )
         p = subprocess.run(cmd, shell=True, capture_output=True)
         if p.returncode != 0:
             raise Exception(f'pg2parquet failed: {p.stderr.decode()}')
+
     except Exception as e:
-        logger.warning(f'pg2parquet not found or failed, using fastparquet: {e}')
-        db_url = f'postgresql+psycopg://{database_config["USER"]}:{database_config["PASSWORD"]}@{database_config["HOST"]}:{database_config["PORT"]}/{database_config["NAME"]}'
+        logger.warning('pg2parquet not found or failed, using fastparquet: %s', e)
+        db_url = (
+            f'postgresql+psycopg://{database_config["USER"]}:'
+            f'{database_config["PASSWORD"]}@{database_config["HOST"]}:'
+            f'{database_config["PORT"]}/{database_config["NAME"]}'
+        )
 
         engine = create_engine(db_url)
         connection = engine.connect().execution_options(stream_results=True)
@@ -537,5 +570,18 @@ def generate_parquet(
             'IVOA.VOTable-Parquet.content': metadata.encode('utf-8'),
         },
     )
+
+    return None
+
+
+def find_pg2parquet() -> Optional[Path]:
+    """Search PATH environment variable for pg2parquet binary.
+
+    Returns:
+        Optional[Path]: Path to pg2parquet binary if found, None otherwise
+    """
+    for path_dir in os.environ.get('PATH', '').split(os.pathsep):
+        if (bin_path := Path(path_dir) / 'pg2parquet').is_file():
+            return bin_path
 
     return None
