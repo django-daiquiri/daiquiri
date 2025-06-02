@@ -140,7 +140,7 @@ WHERE POLYGON '(${polyPoints})' @> POINT(t.${plotValues.x.column}, t.${plotValue
         ) : (
           <div className="card-footer">
             <div className="row">
-              <div className="col-md-6">You have selected {selectedPointsRef.current.n} points. Please click 'Submit Query' to submit a new query for the selected region.</div>
+              <div className="col-md-12">You have selected {selectedPointsRef.current.n} points. Please click 'Submit Query' to submit a new query for the selected region.</div>
             </div>
             <div className="row">
               <div className="col-md-6">
