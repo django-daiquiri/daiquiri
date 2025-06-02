@@ -2,9 +2,11 @@ import csv
 import datetime
 import io
 import logging
+import os
 import struct
 import sys
 from pathlib import Path
+from typing import Optional
 from xml.sax.saxutils import escape, quoteattr
 
 from django.contrib.sites.models import Site
