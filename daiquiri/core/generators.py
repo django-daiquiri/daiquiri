@@ -305,25 +305,25 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
             else:
                 format_str = str(array_infos[name]) + formats_dict[datatype][1].ljust(8)
 
-        h1 += create_line(f'TTYPE{str(i + 1)}', f"'{name.ljust(8)}'", f'label for col {i + 1}    ')
-        h1 += create_line(f'TFORM{str(i + 1)}', f"'{format_str}'", f'format for col {i + 1}    ')
+        h1 += create_line(f'TTYPE{i + 1}', f"'{name.ljust(8)}'", f'label for col {i + 1}    ')
+        h1 += create_line(f'TFORM{i + 1}', f"'{format_str}'", f'format for col {i + 1}    ')
 
         # NULL values only for int-like types
         if datatype in ('short', 'int', 'long'):
             h1 += create_line(
-                f'TNULL{str(i + 1)}',
+                f'TNULL{i + 1}',
                 formats_dict[datatype][3],
                 f'blank value for col {i + 1}    ',
             )
 
         if unit:
-            h1 += create_line(f'TUNIT{str(i + 1)}', f"'{unit.ljust(8)}'", f'unit for col {i + 1}    ')
+            h1 += create_line(f'TUNIT{i + 1}', f"'{unit.ljust(8)}'", f'unit for col {i + 1}    ')
 
         if ucd:
-            h1 += create_line(f'TUCD{str(i + 1)}', f"'{ucd.ljust(8)}'", f'ucd for col {i + 1}    ')
+            h1 += create_line(f'TUCD{i + 1}', f"'{ucd.ljust(8)}'", f'ucd for col {i + 1}    ')
 
         if description:
-            h1 += create_line(f'TCOMM{str(i + 1)}', f"'{description}'", f'desc for col {i + 1}    ')
+            h1 += create_line(f'TCOMM{i + 1}', f"'{description}'", f'desc for col {i + 1}    ')
 
     now = datetime.datetime.utcnow().replace(microsecond=0).isoformat()
     h1 += create_line('DATE-HDU', now, 'UTC date of HDU creation')
@@ -438,14 +438,14 @@ def get_daiquiri_logo(site: str, version: str) -> str:
 
 
 def parse_and_fill_array(obj_str: str, obj_type: str, desired_length: int) -> list:
-    array = [i for i in obj_str.strip('{}').split(',')]
+    array = list(obj_str.strip('{}').split(','))
 
     if obj_type == 'char[]':
         array = [f'{i}_' for i in array[:-1]] + [array[-1]]
 
     for i in range(desired_length - len(array)):
         if obj_type in ['float[]', 'double[]']:
-            array.append('0.0')
+            array.append('nan')
         elif obj_type == 'char[]':
             array.append('')
         elif obj_type in ['short[]', 'int[]', 'long[]']:
