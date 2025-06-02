@@ -13,6 +13,7 @@ authors = [
   {name = "Anastasia Galkin", email = "agalkin@aip.de"},
   {name = "Yori Fournier", email = "y.fournier@aip.de"},
   {name = "Kirill Makan", email = "kmakan@aip.de"},
+  {name = "Simeon Reusch", email = "sreusch@aip.de"},
 ]
 requires-python = ">=3.8"
 classifiers = [
@@ -49,6 +50,7 @@ dependencies = [
   "djangorestframework~=3.15.2",
   "dj-database-url~=2.3.0",
   "drf-extensions~=0.7.1",
+  "fastparquet~=2024.11.0",
   "ipaddress~=1.0.23",
   "iso8601~=2.1.0",
   "jsonfield~=3.1.0",
@@ -57,6 +59,7 @@ dependencies = [
   "Pygments~=2.15.1",
   "queryparser-python3~=0.7.0",
   "rules~=3.5",
+  "sqlalchemy~=2.0.41",
   "XlsxWriter~=3.2.2",
 ]
 
@@ -114,6 +117,10 @@ version = {attr = "daiquiri.__version__"}
 
 [tool.ruff]
 line-length = 120
+indent-width = 4
+
+[tool.ruff.format]
+quote-style = "single"
 
 [tool.ruff.lint]
 select = [
