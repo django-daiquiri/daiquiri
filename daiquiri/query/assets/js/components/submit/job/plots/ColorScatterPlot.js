@@ -6,7 +6,7 @@ import { isNil } from 'lodash'
 import { config, layout } from 'daiquiri/query/assets/js/constants/plot'
 import { getColumnLabel } from 'daiquiri/query/assets/js/utils/plot'
 
-const ColorScatterPlot = ({ columns, values, x, y, z  }) => {
+const ColorScatterPlot = ({ columns, plotValues, x, y, z }) => {
   if (isNil(x) || isNil(y) || isNil(z)) {
     return null
   } else {
@@ -24,10 +24,10 @@ const ColorScatterPlot = ({ columns, values, x, y, z  }) => {
                   marker: {
                     showscale: true,
                     color: z,
-                    colorscale: values.z.cmap,
+                    colorscale: plotValues.z.cmap,
                     colorbar: {
                       title: {
-                        text: getColumnLabel(columns, values.z.column),
+                        text: getColumnLabel(columns, plotValues.z.column),
                         side: 'right'
                       }
                     }
@@ -39,16 +39,16 @@ const ColorScatterPlot = ({ columns, values, x, y, z  }) => {
                 ...layout,
                 xaxis: {
                   title: {
-                    text: getColumnLabel(columns, values.x.column),
+                    text: getColumnLabel(columns, plotValues.x.column),
                   },
                 },
                 yaxis: {
                   title: {
-                    text: getColumnLabel(columns, values.y.column),
+                    text: getColumnLabel(columns, plotValues.y.column),
                   }
                 }
               }}
-              style={{width: '100%'}}
+              style={{ width: '100%' }}
               useResizeHandler={true}
               config={config}
             />
@@ -61,7 +61,7 @@ const ColorScatterPlot = ({ columns, values, x, y, z  }) => {
 
 ColorScatterPlot.propTypes = {
   columns: PropTypes.array.isRequired,
-  values: PropTypes.object.isRequired,
+  plotValues: PropTypes.object.isRequired,
   x: PropTypes.array,
   y: PropTypes.array,
   z: PropTypes.array

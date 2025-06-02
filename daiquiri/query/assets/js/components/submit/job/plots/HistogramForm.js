@@ -4,12 +4,12 @@ import { useDebouncedCallback } from 'use-debounce'
 
 import { operations } from 'daiquiri/query/assets/js/constants/plot'
 
-const HistogramForm = ({ columns, values, setValues }) => {
-  const setBins = useDebouncedCallback((event) => setValues({
-    ...values, bins: event.target.value
+const HistogramForm = ({ columns, plotValues, setPlotValues }) => {
+  const setBins = useDebouncedCallback((event) => setPlotValues({
+    ...plotValues, bins: event.target.value
   }), 500)
-  const setSelectValue = useDebouncedCallback((event) => setValues({
-    ...values, s: {...values.s, value: event.target.value}
+  const setSelectValue = useDebouncedCallback((event) => setPlotValues({
+    ...plotValues, s: { ...plotValues.s, value: event.target.value }
   }), 500)
 
   return (
@@ -22,8 +22,8 @@ const HistogramForm = ({ columns, values, setValues }) => {
             </label>
           </div>
           <div className="col-4">
-            <select className="form-select" id="scatter-plot-column" value={values.x.column} onChange={(event) => {
-              setValues({...values, x: {...values.x, column: event.target.value}})
+            <select className="form-select" id="scatter-plot-column" value={plotValues.x.column} onChange={(event) => {
+              setPlotValues({ ...plotValues, x: { ...plotValues.x, column: event.target.value } })
             }}>
               <option>---</option>
               {
@@ -39,7 +39,7 @@ const HistogramForm = ({ columns, values, setValues }) => {
             </label>
           </div>
           <div className="col-4">
-            <input type="number" className="form-control" defaultValue={values.bins} onChange={setBins} />
+            <input type="number" className="form-control" defaultValue={plotValues.bins} onChange={setBins} />
           </div>
         </div>
         <div className="row mt-1 align-items-center">
@@ -49,8 +49,8 @@ const HistogramForm = ({ columns, values, setValues }) => {
             </label>
           </div>
           <div className="col-4">
-            <select className="form-select" id="scatter-plot-select" value={values.s.column} onChange={(event) => {
-              setValues({...values, s: {...values.s, column: event.target.value}})
+            <select className="form-select" id="scatter-plot-select" value={plotValues.s.column} onChange={(event) => {
+              setPlotValues({ ...plotValues, s: { ...plotValues.s, column: event.target.value } })
             }}>
               <option value="">---</option>
               {
@@ -59,8 +59,8 @@ const HistogramForm = ({ columns, values, setValues }) => {
             </select>
           </div>
           <div className="col-2">
-            <select className="form-select" value={values.s.operation} onChange={(event) => {
-              setValues({...values, s: {...values.s, operation: event.target.value}})
+            <select className="form-select" value={plotValues.s.operation} onChange={(event) => {
+              setPlotValues({ ...plotValues, s: { ...plotValues.s, operation: event.target.value } })
             }}>
               {
                 operations.map((operation, operationIndex) => <option key={operationIndex} value={operation.name}>{operation.name}</option>)
@@ -68,7 +68,7 @@ const HistogramForm = ({ columns, values, setValues }) => {
             </select>
           </div>
           <div className="col-4">
-            <input type="number" className="form-control" defaultValue={values.s.value} onChange={setSelectValue} />
+            <input type="number" className="form-control" defaultValue={plotValues.s.value} onChange={setSelectValue} />
           </div>
         </div>
       </div>
@@ -78,8 +78,8 @@ const HistogramForm = ({ columns, values, setValues }) => {
 
 HistogramForm.propTypes = {
   columns: PropTypes.array.isRequired,
-  values: PropTypes.object.isRequired,
-  setValues: PropTypes.func.isRequired
+  plotValues: PropTypes.object.isRequired,
+  setPlotValues: PropTypes.func.isRequired
 }
 
 export default HistogramForm

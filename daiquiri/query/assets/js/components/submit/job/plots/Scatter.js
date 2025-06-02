@@ -10,7 +10,7 @@ import ScatterPlot from './ScatterPlot'
 
 const Scatter = ({ job, columns, loadJob }) => {
 
-  const [values, setValues] = useState({
+  const [plotValues, setPlotValues] = useState({
     x: {
       column: '',
     },
@@ -21,23 +21,23 @@ const Scatter = ({ job, columns, loadJob }) => {
     }
   })
 
-  useEffect(() => setValues({
-    ...values,
+  useEffect(() => setPlotValues({
+    ...plotValues,
     x: {
-      ...values.x, column: isNil(columns[0]) ? '' : columns[0].name
+      ...plotValues.x, column: isNil(columns[0]) ? '' : columns[0].name
     },
     y: {
-      ...values.y, column: isNil(columns[1]) ? '' : columns[1].name
+      ...plotValues.y, column: isNil(columns[1]) ? '' : columns[1].name
     }
   }), [columns])
 
-  const { data: x } = useJobPlotQuery(job, values.x.column)
-  const { data: y } = useJobPlotQuery(job, values.y.column)
+  const { data: x } = useJobPlotQuery(job, plotValues.x.column)
+  const { data: y } = useJobPlotQuery(job, plotValues.y.column)
 
   return (
     <div>
-      <ScatterForm columns={columns} values={values} setValues={setValues} />
-      { job && <ScatterPlot columns={columns} values={values} x={x} y={y} loadJob={loadJob} job={job}/>}
+      <ScatterForm columns={columns} plotValues={plotValues} setPlotValues={setPlotValues} />
+      {job && <ScatterPlot columns={columns} plotValues={plotValues} x={x} y={y} loadJob={loadJob} job={job} />}
     </div>
   )
 }
