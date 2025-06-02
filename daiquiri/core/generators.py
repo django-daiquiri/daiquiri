@@ -309,7 +309,7 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
         h1 += create_line(f'TFORM{i + 1}', f"'{format_str}'", f'format for col {i + 1}    ')
 
         # NULL values only for int-like types
-        if datatype in ('short', 'int', 'long'):
+        if datatype in ('short', 'int', 'long', 'short[]', 'int[]', 'long[]', 'float[]', 'double[]'):
             h1 += create_line(
                 f'TNULL{i + 1}',
                 formats_dict[datatype][3],
@@ -349,7 +349,12 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
                 row_elements_formatted.append(r)
             elif datatype[-2:] == '[]':
                 r = []
-                parsed = parse_and_fill_array(row_element, datatype, array_infos[name])
+                parsed = parse_and_fill_array(
+                    obj_str=row_element,
+                    obj_type=datatype,
+                    desired_length=array_infos[name],
+                    formats_dict=formats_dict,
+                )
                 for j in parsed:
                     entry = formats_dict[datatype][4](j)
                     r.append(entry)
@@ -379,7 +384,7 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
     yield footer.encode()
 
 
-def create_line(key, val, comment):
+def create_line(key: str, val: str, comment: str) -> str:
     key_length = 8
     line_length = 80
     value_length = line_length - key_length - len(comment)
@@ -437,7 +442,7 @@ def get_daiquiri_logo(site: str, version: str) -> str:
     return logo
 
 
-def parse_and_fill_array(obj_str: str, obj_type: str, desired_length: int) -> list:
+def parse_and_fill_array(obj_str: str, obj_type: str, desired_length: int, formats_dict: dict) -> list:
     array = list(obj_str.strip('{}').split(','))
 
     if obj_type == 'char[]':
@@ -445,11 +450,11 @@ def parse_and_fill_array(obj_str: str, obj_type: str, desired_length: int) -> li
 
     for i in range(desired_length - len(array)):
         if obj_type in ['float[]', 'double[]']:
-            array.append('nan')
+            array.append(formats_dict[obj_type][3])
         elif obj_type == 'char[]':
-            array.append('')
+            array.append(formats_dict[obj_type][3])
         elif obj_type in ['short[]', 'int[]', 'long[]']:
-            array.append('0')
+            array.append(formats_dict[obj_type][3])
         else:
             raise ValueError(f'Unknown array type: {obj_type}')
 
