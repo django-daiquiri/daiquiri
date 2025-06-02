@@ -1,7 +1,8 @@
 import React, { useState, useRef, useCallback, memo } from 'react'
 import PropTypes from 'prop-types'
 import Plot from 'react-plotly.js'
-import { isNil, toString } from 'lodash'
+import { get, isNil, toString } from 'lodash'
+import classNames from 'classnames'
 
 import { config, layout } from 'daiquiri/query/assets/js/constants/plot'
 import { getColumnLabel } from 'daiquiri/query/assets/js/utils/plot'
@@ -91,9 +92,8 @@ WHERE POLYGON '(${polyPoints})' @> POINT(t.${plotValues.x.column}, t.${plotValue
 
     const postgres = queryLanguages.find(language => toString(language.id).includes('postgres'))
     values.query_language = postgres ? postgres.id : job.query_language
-
     values.query = query
-    values.queue = values.queue == '' ? getDefaultQueue() : ''
+    values.queue = values.queue == '' ? getDefaultQueue() : values.queue
 
     mutation.mutate({ values: values, setErrors, loadJob })
   }
@@ -168,11 +168,17 @@ WHERE POLYGON '(${polyPoints})' @> POINT(t.${plotValues.x.column}, t.${plotValue
                   onChange={(queue) => setValues({ ...values, queue })}
                 />
               </div>
-              <div className="col-md-3">
+              <div className="col-md-12">
                 <button
-                  className="btn btn-primary"
+                  className={classNames("btn btn-primary", { 'is-invalid': errors.query })}
                   onClick={() => handleSubmit()}
                 >Submit Query</button>
+                <Errors errors={get(errors.query, 'messages') || errors.query} />
+                {
+                  errors && errors.query && (
+                    <Errors errors={['If the error persists, please contact the website maintainers.']} />
+                  )
+                }
               </div>
             </div>
           </div>
