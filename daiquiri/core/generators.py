@@ -2,23 +2,12 @@ import csv
 import datetime
 import io
 import logging
-<<<<<<< HEAD
 import struct
 import sys
 from pathlib import Path
-=======
-import os
-import struct
-import sys
-from pathlib import Path
-from typing import Optional
->>>>>>> dev
 from xml.sax.saxutils import escape, quoteattr
 
-import pandas as pd
 from django.contrib.sites.models import Site
-from fastparquet import update_file_custom_metadata, write
-from sqlalchemy import create_engine
 
 import pandas as pd
 from fastparquet import update_file_custom_metadata, write
@@ -68,13 +57,7 @@ def correct_col_for_votable(col):
     return corrected_col
 
 
-<<<<<<< HEAD
-def generate_votable(
-    generator, fields, infos=[], links=[], services=[], table=None, empty=False
-):
-=======
 def generate_votable(generator, fields, infos=[], links=[], services=[], table=None, empty=False):
->>>>>>> dev
     yield """<?xml version="1.0"?>
 <VOTABLE version="1.3"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -170,14 +153,7 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
                     </TR>""".format(
                 """</TD>
                         <TD>""".join(
-                    [
-                        (
-                            ''
-                            if cell in ['NULL', None]
-                            else correct_col_for_votable(escape(str(cell)))
-                        )
-                        for cell in row
-                    ]
+                    [('' if cell in ['NULL', None] else correct_col_for_votable(escape(str(cell)))) for cell in row]
                 )
             )
 
@@ -193,9 +169,7 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
     <RESOURCE type="meta" utype="adhoc:service">"""
         for param in service.get('params', []):
             yield """
-        <PARAM name="{name}" datatype="{datatype}" arraysize="{arraysize}" value="{value}" />""".format(
-                **param
-            )
+        <PARAM name="{name}" datatype="{datatype}" arraysize="{arraysize}" value="{value}" />""".format(**param)
 
         for group in service.get('groups', []):
             yield """
@@ -273,9 +247,7 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
             else:
                 naxis1_list.append(array_infos[name] * formats_dict[datatype][2])
         else:
-            naxis1_list.append(
-                formats_dict[datatype][2] if not arraysize else arraysize
-            )
+            naxis1_list.append(formats_dict[datatype][2] if not arraysize else arraysize)
 
     naxis1 = sum(naxis1_list)
     naxis2 = nrows
@@ -327,19 +299,12 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
             format_str = (str(arraysize) + formats_dict[datatype][1]).ljust(8)
         else:
             if datatype == 'char[]':
-                format_str = (
-                    str(array_infos[name] * DEFAULT_CHAR_SIZE)
-                    + formats_dict[datatype][1]
-                )
+                format_str = str(array_infos[name] * DEFAULT_CHAR_SIZE) + formats_dict[datatype][1]
             else:
                 format_str = str(array_infos[name]) + formats_dict[datatype][1].ljust(8)
 
-        h1 += create_line(
-            f'TTYPE{str(i + 1)}', f"'{name.ljust(8)}'", f'label for col {i + 1}    '
-        )
-        h1 += create_line(
-            f'TFORM{str(i + 1)}', f"'{format_str}'", f'format for col {i + 1}    '
-        )
+        h1 += create_line(f'TTYPE{str(i + 1)}', f"'{name.ljust(8)}'", f'label for col {i + 1}    ')
+        h1 += create_line(f'TFORM{str(i + 1)}', f"'{format_str}'", f'format for col {i + 1}    ')
 
         # NULL values only for int-like types
         if datatype in ('short', 'int', 'long'):
@@ -350,19 +315,13 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
             )
 
         if unit:
-            h1 += create_line(
-                f'TUNIT{str(i + 1)}', f"'{unit.ljust(8)}'", f'unit for col {i + 1}    '
-            )
+            h1 += create_line(f'TUNIT{str(i + 1)}', f"'{unit.ljust(8)}'", f'unit for col {i + 1}    ')
 
         if ucd:
-            h1 += create_line(
-                f'TUCD{str(i + 1)}', f"'{ucd.ljust(8)}'", f'ucd for col {i + 1}    '
-            )
+            h1 += create_line(f'TUCD{str(i + 1)}', f"'{ucd.ljust(8)}'", f'ucd for col {i + 1}    ')
 
         if description:
-            h1 += create_line(
-                f'TCOMM{str(i + 1)}', f"'{description}'", f'desc for col {i + 1}    '
-            )
+            h1 += create_line(f'TCOMM{str(i + 1)}', f"'{description}'", f'desc for col {i + 1}    ')
 
     now = datetime.datetime.utcnow().replace(microsecond=0).isoformat()
     h1 += create_line('DATE-HDU', now, 'UTC date of HDU creation')
@@ -373,10 +332,7 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
 
     # Data ####################################################################
     fmt = '>' + ''.join(
-        [
-            str(arraysize) + formats_dict[datatype][0]
-            for datatype, arraysize in zip(datatypes, arraysizes)
-        ]
+        [str(arraysize) + formats_dict[datatype][0] for datatype, arraysize in zip(datatypes, arraysizes)]
     )
 
     row_count = 0
@@ -384,9 +340,7 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
     for row in generator:
         fmt = '>'
         row_elements_formatted = []
-        for row_element, datatype, arraysize, name in zip(
-            row, datatypes, arraysizes, names
-        ):
+        for row_element, datatype, arraysize, name in zip(row, datatypes, arraysizes, names):
             if row_element == 'NULL':
                 r = formats_dict[datatype][3]
                 f = str(arraysize) + formats_dict[datatype][0]
@@ -399,10 +353,7 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
                     r.append(entry)
                 f = str(array_infos[name]) + formats_dict[datatype][0]
                 if datatype == 'char[]':
-                    f = (
-                        str(array_infos[name] * DEFAULT_CHAR_SIZE)
-                        + formats_dict[datatype][0]
-                    )
+                    f = str(array_infos[name] * DEFAULT_CHAR_SIZE) + formats_dict[datatype][0]
 
                 if datatype != 'char[]':
                     row_elements_formatted.extend(r)
