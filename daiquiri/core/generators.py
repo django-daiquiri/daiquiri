@@ -6,7 +6,7 @@ import os
 import struct
 import sys
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
 from xml.sax.saxutils import escape, quoteattr
 
 from django.contrib.sites.models import Site
@@ -394,7 +394,7 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
     yield footer.encode()
 
 
-def create_line(key: str, val: str, comment: str) -> list[str] | str:
+def create_line(key: str, val: str, comment: str) -> Union[list[str], str]:
     key_length = 8
     line_length = 80
     value_length = line_length - key_length - len(comment)
