@@ -491,13 +491,13 @@ def parse_and_fill_array(obj_str: str, obj_type: str, desired_length: int, forma
     array = list(obj_str.strip('{}').split(','))
 
     if obj_type == 'char[]':
-        array = [f'{i}_' for i in array[:-1]] + [array[-1]]
+        array = [f'{i}_' for i in array[:-1]] + [f'{array[-1]}']
 
     for i in range(desired_length - len(array)):
         if obj_type in ['float[]', 'double[]']:
             array.append(formats_dict[obj_type][3])
         elif obj_type == 'char[]':
-            array.append(formats_dict[obj_type][3])
+            array.append('')
         elif obj_type in ['short[]', 'int[]', 'long[]']:
             array.append(formats_dict[obj_type][3])
         else:
