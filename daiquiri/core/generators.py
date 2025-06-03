@@ -265,7 +265,6 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
         ('NAXIS1', '2880', 'number of characters'),
         ('EXTEND', 'T', ''),
         ('NTABLE', '1', ''),
-        ('END', '', ''),
         (
             'LONGSTRN',
             'OGIP 1.0',
@@ -275,6 +274,7 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
         ('COMMENT', 'continued over multiple keywords.  This convention uses the  "&"', ''),
         ('COMMENT', 'character at the end of a string which is then continued', ''),
         ('COMMENT', 'on subsequent keywords whose name = "CONTINUE".', ''),
+        ('END', '', ''),
     ]
 
     h0 = ''.join([create_line(*entry) for entry in header0info])
@@ -382,7 +382,6 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
                 f = str(arraysize) + formats_dict[datatype][0]
                 row_elements_formatted.append(r)
             fmt += f
-
         yield struct.pack(fmt, *row_elements_formatted)
 
         row_count += 1
