@@ -266,6 +266,15 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
         ('EXTEND', 'T', ''),
         ('NTABLE', '1', ''),
         ('END', '', ''),
+        (
+            'LONGSTRN',
+            'OGIP 1.0',
+            'The OGIP long string convention may be used.',
+        ),
+        ('COMMENT', 'This FITS file may contain long string keyword values that are', ''),
+        ('COMMENT', 'continued over multiple keywords.  This convention uses the  "&"', ''),
+        ('COMMENT', 'character at the end of a string which is then continued', ''),
+        ('COMMENT', 'on subsequent keywords whose name = "CONTINUE".', ''),
     ]
 
     h0 = ''.join([create_line(*entry) for entry in header0info])
@@ -309,7 +318,7 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
         h1 += create_line(f'TFORM{i + 1}', f"'{format_str}'", f'format for col {i + 1}    ')
 
         # NULL values only for int-like types
-        if datatype in ('short', 'int', 'long', 'short[]', 'int[]', 'long[]', 'float[]', 'double[]'):
+        if datatype in ('short', 'int', 'long'):  # , 'short[]', 'int[]', 'long[]', 'float[]', 'double[]'):
             h1 += create_line(
                 f'TNULL{i + 1}',
                 formats_dict[datatype][3],
@@ -323,10 +332,11 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
             h1 += create_line(f'TUCD{i + 1}', f"'{ucd.ljust(8)}'", f'ucd for col {i + 1}    ')
 
         if description:
-            h1 += create_line(f'TCOMM{i + 1}', f"'{description}'", f'desc for col {i + 1}    ')
+            for line in create_line(f'TCOMM{i + 1}', f'{description}', f'desc for col {i + 1}    '):
+                h1 += line
 
     now = datetime.datetime.utcnow().replace(microsecond=0).isoformat()
-    h1 += create_line('DATE-HDU', now, 'UTC date of HDU creation')
+    h1 += create_line('DATE-HDU', f"'{now}'", 'UTC date of HDU creation')
     h1 += create_line('END', '', '')
     h1 += ' ' * (2880 * (len(h1) // 2880 + 1) - len(h1))
 
@@ -384,25 +394,61 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
     yield footer.encode()
 
 
-def create_line(key: str, val: str, comment: str) -> str:
+def create_line(key: str, val: str, comment: str) -> list[str] | str:
     key_length = 8
     line_length = 80
     value_length = line_length - key_length - len(comment)
     line = key[:key_length].ljust(key_length)
-    if val != '':
-        line += '=' + f' {val} '[: value_length - 1].rjust(key_length, ' ')
-        line = line[:line_length]
-    if comment != '':
-        line += f' / {comment}'
 
-    line = line[:line_length].ljust(line_length)
-    return line
+    total_size = 13 + len(comment) + len(str(val))
+
+    lines = []
+
+    if not total_size > line_length:
+        if val != '':
+            if 'TCOMM' in key:
+                if val[0] != "'":
+                    val = f"'{val}'"
+            line += '=' + f' {val} '[: value_length - 1].rjust(key_length, ' ')
+
+            line = line[:line_length]
+        if comment != '':
+            line += f' / {comment}'
+        line = line.ljust(line_length)
+        return line
+    else:
+        reststr = val
+        i = 0
+        while len(reststr) > 0:
+            if i == 0:
+                line = key[:key_length].ljust(key_length) + '= '
+            else:
+                line = 'CONTINUE  '
+            line += f"' {reststr[:60]}&'"
+            reststr = reststr[60:]
+            if len(reststr) == 0:
+                if len(comment) < line_length - len(line) - 3:
+                    line = line[:-2] + "'" + f' / {comment}'
+                    line = line.ljust(line_length)
+                    lines.append(line)
+                else:
+                    line = line.ljust(line_length)
+                    lines.append(line)
+                    line = "CONTINUE  '  '"
+                    line += f' / {comment}'
+                    line = line.ljust(line_length)
+                    lines.append(line)
+            else:
+                line = line.ljust(line_length)
+                lines.append(line)
+            i += 1
+
+        return lines
 
 
 def get_daiquiri_logo(site: str, version: str) -> str:
     site_str = (' ' * (15 - len(site) // 2) + site).ljust(30)
     logo = f"""
-
                                   `,......`
                                :::.````````...
                              ::``,:::,`.....``..`
