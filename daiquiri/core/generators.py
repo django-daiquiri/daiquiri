@@ -399,7 +399,7 @@ def create_line(key: str, val: str, comment: str) -> Union[list[str], str]:
     value_length = line_length - key_length - len(comment)
     line = key[:key_length].ljust(key_length)
 
-    total_size = 13 + len(comment) + len(str(val))
+    total_size = 15 + len(comment) + len(str(val))
 
     lines = []
 
@@ -423,7 +423,7 @@ def create_line(key: str, val: str, comment: str) -> Union[list[str], str]:
                 line = key[:key_length].ljust(key_length) + '= '
             else:
                 line = 'CONTINUE  '
-            line += f"' {reststr[:60]}&'"
+            line += f"'{reststr[:60]}&'"
             reststr = reststr[60:]
             if len(reststr) == 0:
                 if len(comment) < line_length - len(line) - 3:
