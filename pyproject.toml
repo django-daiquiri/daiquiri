@@ -57,6 +57,7 @@ dependencies = [
   "lunr~=0.8.0",
   "Markdown~=3.7.0",
   "Pygments~=2.15.1",
+  "pandas~=2.2.3",
   "queryparser-python3~=0.7.0",
   "rules~=3.5",
   "sqlalchemy~=2.0.41",
