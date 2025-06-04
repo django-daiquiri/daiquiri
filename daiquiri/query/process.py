@@ -17,7 +17,7 @@ from .utils import (
     get_indexed_objects,
     get_max_active_jobs,
     get_quota,
-    get_user_schema_name,
+    get_user_schema_name
 )
 
 
@@ -254,24 +254,39 @@ def process_display_columns(processor_display_columns):
     display_columns = []
     for processor_display_column, original_column in processor_display_columns:
         if processor_display_column == '*':
-            schema_name, table_name, tmp = original_column
+            schema_name, table_name, _ = original_column
             columns = (
                 Column.objects.filter(table__schema__name=schema_name)
                 .filter(table__name=table_name)
                 .order_by('order')
             )
-            for column in columns:
-                display_columns.append(
-                    (column.name, (schema_name, table_name, column.name))
-                )
+            if columns.exists():
+                for column in columns:
+                    display_columns.append(
+                        (column.name, (schema_name, table_name, column.name))
+                    )
+            else:
+                from daiquiri.query.models import QueryJob
 
+                queryjob = QueryJob.objects.filter(
+                    schema_name=schema_name, table_name=table_name
+                ).first()
+                if queryjob:
+                    columns = queryjob.metadata['columns']
+                    for column in columns:
+                        display_columns.append(
+                            (
+                                column['name'],
+                                (schema_name, table_name, column['name']),
+                            )
+                        )
         else:
             display_columns.append((processor_display_column, original_column))
 
     # check for duplicate columns in display_columns
     seen = set()
     errors = []
-    for display_column_name, display_column in display_columns:
+    for display_column_name, _ in display_columns:
         if display_column_name not in seen:
             seen.add(display_column_name)
         else:
