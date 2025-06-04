@@ -6,7 +6,7 @@ import os
 import struct
 import sys
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
 from xml.sax.saxutils import escape, quoteattr
 
 from django.contrib.sites.models import Site
@@ -191,15 +191,11 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
 
 
 def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
-    # VO format label, FITS format label, size, NULL value, encoded value
+    DEFAULT_CHAR_SIZE = 256
+
+    # VO format label, FITS format label, size in bytes, NULL value, encoded value
     formats_dict = {
-        'boolean': (
-            's',
-            'L',
-            1,
-            b'\x00',
-            lambda x: b'T' if x == 'true' else b'F',
-        ),
+        'boolean': ('s', 'L', 1, b'\x00', lambda x: b'T' if x == 'true' else b'F'),
         'short': ('h', 'I', 2, 32767, int),
         'int': ('i', 'J', 4, 2147483647, int),
         'long': ('q', 'K', 8, 9223372036854775807, int),
@@ -210,42 +206,248 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
         'array': ('s', 'A', 64, b'', lambda x: x.encode()),
         'spoint': ('s', 'A', 64, b'', lambda x: x.encode()),
         'unknown': ('s', 'A', 8, b'', lambda x: x.encode()),
+        'short[]': ('h', 'I', 2, 32767, int),
+        'int[]': ('i', 'J', 4, 2147483647, int),
+        'long[]': ('q', 'K', 8, 9223372036854775807, int),
+        'float[]': ('f', 'E', 4, float('nan'), float),
+        'double[]': ('d', 'D', 8, float('nan'), float),
+        'char[]': ('s', 'A', 32, b'', lambda x: x.encode()),
     }
 
     names = [field['name'] for field in fields]
     datatypes = [field['datatype'] for field in fields]
     arraysizes = [field.get('arraysize') or '' for field in fields]
+    descriptions = [field.get('description') or '' for field in fields]
 
-    for i, d in enumerate(zip(datatypes, arraysizes)):
-        if d[0] == 'timestamp':
+    for i, (datatype, arraysize) in enumerate(zip(datatypes, arraysizes)):
+        if datatype == 'timestamp':
             arraysizes[i] = formats_dict['timestamp'][2]
-        elif d[0] in ('char', 'spoint', 'array') and d[1] == '':
-            arraysizes[i] = formats_dict[d[0]][2]
-        elif d[0] is None:
+        elif datatype in ('char', 'spoint', 'array') and arraysize == '':
+            arraysizes[i] = formats_dict[datatype][2]
+        elif datatype is None:
             datatypes[i] = 'unknown'
             arraysizes[i] = formats_dict['unknown'][2]
 
     units = []
     ucds = []
-    for d in fields:
-        if 'unit' in d and d['unit'] is not None:
-            units.append(d['unit'])
+    for field in fields:
+        if 'unit' in field and field['unit'] is not None:
+            units.append(field['unit'])
         else:
             units.append('')
-        if 'ucd' in d and d['ucd'] is not None:
-            ucds.append(d['ucd'])
+        if 'ucd' in field and field['ucd'] is not None:
+            ucds.append(field['ucd'])
         else:
             ucds.append('')
 
-    naxis1 = sum([formats_dict[i[0]][2] if not i[1] else i[1] for i in zip(datatypes, arraysizes)])
+    naxis1_list = []
+
+    for datatype, arraysize, name in zip(datatypes, arraysizes, names):
+        if '[]' in datatype:
+            if datatype == 'char[]':
+                naxis1_list.append(array_infos[name] * DEFAULT_CHAR_SIZE)
+            else:
+                naxis1_list.append(array_infos[name] * formats_dict[datatype][2])
+        else:
+            naxis1_list.append(formats_dict[datatype][2] if not arraysize else arraysize)
+
+    naxis1 = sum(naxis1_list)
     naxis2 = nrows
     tfields = len(names)
 
-    site = str(Site.objects.get_current())[:30]
+    logo = get_daiquiri_logo(str(Site.objects.get_current())[:30], daiquiri_version)
 
-    content = (
-        """
+    # Main header #############################################################
+    header0info = [
+        ('SIMPLE', 'T', 'conforms to FITS standard'),
+        ('BITPIX', '8', 'array data type'),
+        ('NAXIS', '1', 'number of array dimensions'),
+        ('NAXIS1', '2880', 'number of characters'),
+        ('EXTEND', 'T', ''),
+        ('NTABLE', '1', ''),
+        (
+            'LONGSTRN',
+            'OGIP 1.0',
+            'The OGIP long string convention may be used.',
+        ),
+        ('COMMENT', 'This FITS file may contain long string keyword values that are', ''),
+        ('COMMENT', 'continued over multiple keywords.  This convention uses the  "&"', ''),
+        ('COMMENT', 'character at the end of a string which is then continued', ''),
+        ('COMMENT', 'on subsequent keywords whose name = "CONTINUE".', ''),
+        ('END', '', ''),
+    ]
 
+    h0 = ''.join([create_line(*entry) for entry in header0info])
+    h0 += ' ' * (2880 * (len(h0) // 2880 + 1) - len(h0))
+
+    yield h0.encode()
+
+    # Main table content - required by some FITS viewers ######################
+    yield (logo + '\x00' * (2880 - len(logo))).encode()
+
+    # Table header ############################################################
+    header1info = [
+        ('XTENSION', "'BINTABLE'", 'binary table extension    '),
+        ('BITPIX', '8', 'array data type    '),
+        ('NAXIS', '2', 'number of array dimensions    '),
+        ('NAXIS1', f'{naxis1}', 'length of dimension 1    '),
+        ('NAXIS2', f'{naxis2}', 'length of dimension 2    '),
+        ('PCOUNT', '0', 'number of group parameters    '),
+        ('GCOUNT', '1', 'number of groups    '),
+        ('TFIELDS', f'{tfields} ', 'number of table fields    '),
+    ]
+
+    if table_name is not None:
+        # table_name needs to be shorter than 68 chars
+        header1info.append(('EXTNAME', f"'{table_name[:68]}'", 'table name    '))
+
+    h1 = ''.join([create_line(*entry) for entry in header1info])
+
+    for i, (name, datatype, arraysize, unit, ucd, description) in enumerate(
+        zip(names, datatypes, arraysizes, units, ucds, descriptions)
+    ):
+        if '[]' not in datatype:
+            format_str = (str(arraysize) + formats_dict[datatype][1]).ljust(8)
+        else:
+            if datatype == 'char[]':
+                format_str = str(array_infos[name] * DEFAULT_CHAR_SIZE) + formats_dict[datatype][1]
+            else:
+                format_str = str(array_infos[name]) + formats_dict[datatype][1].ljust(8)
+
+        h1 += create_line(f'TTYPE{i + 1}', f"'{name.ljust(8)}'", f'label for col {i + 1}    ')
+        h1 += create_line(f'TFORM{i + 1}', f"'{format_str}'", f'format for col {i + 1}    ')
+
+        # NULL values only for int-like types
+        if datatype in ('short', 'int', 'long'):  # , 'short[]', 'int[]', 'long[]', 'float[]', 'double[]'):
+            h1 += create_line(
+                f'TNULL{i + 1}',
+                formats_dict[datatype][3],
+                f'blank value for col {i + 1}    ',
+            )
+
+        if unit:
+            h1 += create_line(f'TUNIT{i + 1}', f"'{unit.ljust(8)}'", f'unit for col {i + 1}    ')
+
+        if ucd:
+            h1 += create_line(f'TUCD{i + 1}', f"'{ucd.ljust(8)}'", f'ucd for col {i + 1}    ')
+
+        if description:
+            for line in create_line(f'TCOMM{i + 1}', f'{description}', f'desc for col {i + 1}    '):
+                h1 += line
+
+    now = datetime.datetime.utcnow().replace(microsecond=0).isoformat()
+    h1 += create_line('DATE-HDU', f"'{now}'", 'UTC date of HDU creation')
+    h1 += create_line('END', '', '')
+    h1 += ' ' * (2880 * (len(h1) // 2880 + 1) - len(h1))
+
+    yield h1.encode()
+
+    # Data ####################################################################
+    fmt = '>' + ''.join(
+        [str(arraysize) + formats_dict[datatype][0] for datatype, arraysize in zip(datatypes, arraysizes)]
+    )
+
+    row_count = 0
+
+    for row in generator:
+        fmt = '>'
+        row_elements_formatted = []
+        for row_element, datatype, arraysize, name in zip(row, datatypes, arraysizes, names):
+            if row_element == 'NULL':
+                r = formats_dict[datatype][3]
+                f = str(arraysize) + formats_dict[datatype][0]
+                row_elements_formatted.append(r)
+            elif datatype[-2:] == '[]':
+                r = []
+                parsed = parse_and_fill_array(
+                    obj_str=row_element,
+                    obj_type=datatype,
+                    desired_length=array_infos[name],
+                    formats_dict=formats_dict,
+                )
+                for j in parsed:
+                    entry = formats_dict[datatype][4](j)
+                    r.append(entry)
+                f = str(array_infos[name]) + formats_dict[datatype][0]
+                if datatype == 'char[]':
+                    f = str(array_infos[name] * DEFAULT_CHAR_SIZE) + formats_dict[datatype][0]
+
+                if datatype != 'char[]':
+                    row_elements_formatted.extend(r)
+                else:
+                    row_elements_formatted.append(b''.join(r))
+
+            else:
+                r = formats_dict[datatype][4](row_element)
+                f = str(arraysize) + formats_dict[datatype][0]
+                row_elements_formatted.append(r)
+            fmt += f
+        yield struct.pack(fmt, *row_elements_formatted)
+
+        row_count += 1
+
+    # Footer padding (to fill the last block to 2880 bytes) ###################
+    ln = naxis1 * row_count
+    footer = '\x00' * (2880 * (ln // 2880 + 1) - ln)
+
+    yield footer.encode()
+
+
+def create_line(key: str, val: str, comment: str) -> Union[list[str], str]:
+    key_length = 8
+    line_length = 80
+    value_length = line_length - key_length - len(comment)
+    line = key[:key_length].ljust(key_length)
+
+    total_size = 15 + len(comment) + len(str(val))
+
+    lines = []
+
+    if not total_size > line_length:
+        if val != '':
+            if 'TCOMM' in key:
+                if val[0] != "'":
+                    val = f"'{val}'"
+            line += '=' + f' {val} '[: value_length - 1].rjust(key_length, ' ')
+
+            line = line[:line_length]
+        if comment != '':
+            line += f' / {comment}'
+        line = line.ljust(line_length)
+        return line
+    else:
+        reststr = val
+        i = 0
+        while len(reststr) > 0:
+            if i == 0:
+                line = key[:key_length].ljust(key_length) + '= '
+            else:
+                line = 'CONTINUE  '
+            line += f"'{reststr[:60]}&'"
+            reststr = reststr[60:]
+            if len(reststr) == 0:
+                if len(comment) < line_length - len(line) - 3:
+                    line = line[:-2] + "'" + f' / {comment}'
+                    line = line.ljust(line_length)
+                    lines.append(line)
+                else:
+                    line = line.ljust(line_length)
+                    lines.append(line)
+                    line = "CONTINUE  '  '"
+                    line += f' / {comment}'
+                    line = line.ljust(line_length)
+                    lines.append(line)
+            else:
+                line = line.ljust(line_length)
+                lines.append(line)
+            i += 1
+
+        return lines
+
+
+def get_daiquiri_logo(site: str, version: str) -> str:
+    site_str = (' ' * (15 - len(site) // 2) + site).ljust(30)
+    logo = f"""
                                   `,......`
                                :::.````````...
                              ::``,:::,`.....``..`
@@ -260,8 +462,8 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
               `,,,``````....,,,,,,,...........................`
                 :+++,,,,,::::+++++++++++++++++++++++++++++++'
                   \\\\     created with django-daiquiri     //
-                    \\\\               v%s//
-                      \\\\%s//
+                    \\\\               v{version.ljust(18)}//
+                      \\\\{site_str}//
                         ,,,.....,,,..................`
                          :++':;;;++++++++++++++++++'
                            ,,,,,,,::::;;;;;;;;''''
@@ -281,128 +483,27 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
         +++++++:     `'+'`+',,+++,  ;+'.++   ;++: +'.,+++,,++++. ++++
                                       `+++.
 
-    """.replace('\x0a', ' ')
-        % (
-            daiquiri_version.ljust(18),
-            (' ' * (15 - len(site) // 2) + site).ljust(30),
-        )
-    )
+    """
+    return logo
 
-    # Main header #############################################################
-    header0 = [
-        i.ljust(80)
-        for i in [
-            'SIMPLE  =                    T / conforms to FITS standard',
-            'BITPIX  =                    8 / array data type',
-            'NAXIS   =                    1 / number of array dimensions',
-            'NAXIS1  =                 2880 / number of characters',
-            'EXTEND  =                    T',
-            'NTABLE  =                    1',
-            'END',
-        ]
-    ]
 
-    h0 = ''.join(header0)
-    h0 += ' ' * (2880 * (len(h0) // 2880 + 1) - len(h0))
+def parse_and_fill_array(obj_str: str, obj_type: str, desired_length: int, formats_dict: dict) -> list:
+    array = list(obj_str.strip('{}').split(','))
 
-    yield h0.encode()
+    if obj_type == 'char[]':
+        array = [f'{i}_' for i in array[:-1]] + [f'{array[-1]}']
 
-    # Main table content - required by some FITS viewers ######################
+    for i in range(desired_length - len(array)):
+        if obj_type in ['float[]', 'double[]']:
+            array.append(formats_dict[obj_type][3])
+        elif obj_type == 'char[]':
+            array.append('')
+        elif obj_type in ['short[]', 'int[]', 'long[]']:
+            array.append(formats_dict[obj_type][3])
+        else:
+            raise ValueError(f'Unknown array type: {obj_type}')
 
-    yield (content + '\x00' * (2880 - len(content))).encode()
-
-    # Table header ############################################################
-    header1 = [
-        "XTENSION= 'BINTABLE'           / binary table extension".ljust(80),
-        'BITPIX  =                    8 / array data type'.ljust(80),
-        'NAXIS   =                    2 / number of array dimensions'.ljust(80),
-        'NAXIS1  = %20d / length of dimension 1'.ljust(64),
-        'NAXIS2  = %20d / length of dimension 2'.ljust(64),
-        'PCOUNT  =                    0 / number of group parameters'.ljust(80),
-        'GCOUNT  =                    1 / number of groups'.ljust(80),
-        'TFIELDS = %20d / number of table fields'.ljust(64),
-    ]
-    if table_name is not None:
-        # table_name needs to be shorter than 68 chars
-        header1.append((f"EXTNAME = '{table_name[:68]!s}' / table name").ljust(80))
-
-    h1 = ''.join(header1) % (naxis1, naxis2, tfields)
-
-    ttype = ('TTYPE%s', "= '%s'")
-    tform = ('TFORM%s', "= '%s'")
-    tnull = ('TNULL%s', '=  %s')
-    tunit = ('TUNIT%s', "= '%s'")
-    tucd = ('TUCD%s', "= '%s'")
-
-    for i, d in enumerate(zip(names, datatypes, arraysizes, units, ucds)):
-        temp = ''.join(((ttype[0] % str(i + 1)).ljust(8), ttype[1] % d[0][:68].ljust(8)))[:80].ljust(30)
-        temp += ' / label for column %d' % (i + 1)
-        temp = temp[:80]
-        temp += ' ' * (80 - len(temp))
-        h1 += temp
-
-        ff = (str(d[2]) + formats_dict[d[1]][1]).ljust(8)
-        temp = ''.join(((tform[0] % str(i + 1)).ljust(8), tform[1] % ff))[:80].ljust(31)
-        temp += '/ format for column %d' % (i + 1)
-        temp = temp[:80]
-        temp += ' ' * (80 - len(temp))
-        h1 += temp
-
-        # NULL values only for int-like types
-        if d[1] in ('short', 'int', 'long'):
-            temp = ''.join(
-                (
-                    (tnull[0] % str(i + 1)).ljust(8),
-                    tnull[1] % formats_dict[d[1]][3],
-                )
-            )[:80].ljust(31)
-            temp += '/ blank value for column %d' % (i + 1)
-            temp = temp[:80]
-            temp += ' ' * (80 - len(temp))
-            h1 += temp
-
-        if d[3]:
-            temp = ''.join(
-                (
-                    (tunit[0] % str(i + 1)).ljust(8),
-                    tunit[1] % d[3][:68].ljust(8),
-                )
-            )[:80].ljust(30)
-            temp += ' / unit for column %d' % (i + 1)
-            temp = temp[:80]
-            temp += ' ' * (80 - len(temp))
-            h1 += temp
-
-        if d[4]:
-            temp = ''.join(((tucd[0] % str(i + 1)).ljust(8), tucd[1] % d[4][:68].ljust(8)))[:80].ljust(30)
-            temp += ' / ucd for column %d' % (i + 1)
-            temp = temp[:80]
-            temp += ' ' * (80 - len(temp))
-            h1 += temp
-
-    now = datetime.datetime.utcnow().replace(microsecond=0).isoformat()
-    h1 += (f"DATE-HDU= '{now}' / UTC date of HDU creation").ljust(80)
-
-    h1 += 'END'.ljust(80)
-    h1 += ' ' * (2880 * (len(h1) // 2880 + 1) - len(h1))
-
-    yield h1.encode()
-
-    # Data ####################################################################
-    fmt = '>' + ''.join([str(i[1]) + formats_dict[i[0]][0] for i in zip(datatypes, arraysizes)])
-
-    row_count = 0
-    for row in generator:
-        r = [formats_dict[i[1]][3] if i[0] == 'NULL' else formats_dict[i[1]][4](i[0]) for i in zip(row, datatypes)]
-
-        yield struct.pack(fmt, *r)
-        row_count += 1
-
-    # Footer padding (to fill the last block to 2880 bytes) ###################
-    ln = naxis1 * row_count
-    footer = '\x00' * (2880 * (ln // 2880 + 1) - ln)
-
-    yield footer.encode()
+    return array
 
 
 def generate_parquet(
