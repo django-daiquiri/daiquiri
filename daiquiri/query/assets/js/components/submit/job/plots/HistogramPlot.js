@@ -6,7 +6,7 @@ import { isNil } from 'lodash'
 import { config, layout, operations } from 'daiquiri/query/assets/js/constants/plot'
 import { getColumnLabel } from 'daiquiri/query/assets/js/utils/plot'
 
-const HistogramPlot = ({ columns, values, x, s }) => {
+const HistogramPlot = ({ columns, plotValues, x, s }) => {
   if (isNil(x)) {
     return null
   } else {
@@ -14,17 +14,17 @@ const HistogramPlot = ({ columns, values, x, s }) => {
       {
         x: x,
         type: 'histogram',
-        nbinsx: values.bins
+        nbinsx: plotValues.bins
       }
     ]
 
     if (!isNil(s)) {
-      const operation = operations.find(operation => operation.name == values.s.operation) || operations[0]
+      const operation = operations.find(operation => operation.name == plotValues.s.operation) || operations[0]
 
       data.push({
-        x: x.filter((value, index) => operation.operation(s[index], values.s.value)),
+        x: x.filter((value, index) => operation.operation(s[index], plotValues.s.value)),
         type: 'histogram',
-        nbinsx: values.bins
+        nbinsx: plotValues.bins
       })
     }
 
@@ -39,7 +39,7 @@ const HistogramPlot = ({ columns, values, x, s }) => {
                 bargap: 0.1,
                 xaxis: {
                   title: {
-                    text: getColumnLabel(columns, values.x.column),
+                    text: getColumnLabel(columns, plotValues.x.column),
                   },
                 },
                 yaxis: {
@@ -48,7 +48,7 @@ const HistogramPlot = ({ columns, values, x, s }) => {
                   }
                 }
               }}
-              style={{width: '100%'}}
+              style={{ width: '100%' }}
               useResizeHandler={true}
               config={config}
             />
@@ -61,7 +61,7 @@ const HistogramPlot = ({ columns, values, x, s }) => {
 
 HistogramPlot.propTypes = {
   columns: PropTypes.array.isRequired,
-  values: PropTypes.object.isRequired,
+  plotValues: PropTypes.object.isRequired,
   x: PropTypes.array,
   s: PropTypes.array,
 }

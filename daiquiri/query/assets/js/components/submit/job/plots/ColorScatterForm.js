@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 import { cmaps } from 'daiquiri/query/assets/js/constants/plot'
 
-const ColorScatterForm = ({ columns, values, setValues }) => {
+const ColorScatterForm = ({ columns, plotValues, setPlotValues }) => {
   return (
     <div className="card mb-2">
       <div className="card-body">
@@ -14,8 +14,8 @@ const ColorScatterForm = ({ columns, values, setValues }) => {
             </label>
           </div>
           <div className="col-4">
-            <select className="form-select" id="scatter-plot-x-axis" value={values.x.column} onChange={(value) => {
-              setValues({...values, x: {...values.x, column: value.target.value}})
+            <select className="form-select" id="scatter-plot-x-axis" value={plotValues.x.column} onChange={(value) => {
+              setPlotValues({ ...plotValues, x: { ...plotValues.x, column: value.target.value } })
             }}>
               <option value="">---</option>
               {
@@ -31,8 +31,8 @@ const ColorScatterForm = ({ columns, values, setValues }) => {
             </label>
           </div>
           <div className="col-4">
-            <select className="form-select" id="scatter-plot-y-axis" value={values.y.column} onChange={(value) => {
-              setValues({...values, y: {...values.y, column: value.target.value}})
+            <select className="form-select" id="scatter-plot-y-axis" value={plotValues.y.column} onChange={(value) => {
+              setPlotValues({ ...plotValues, y: { ...plotValues.y, column: value.target.value } })
             }}>
               <option value="">---</option>
               {
@@ -48,8 +48,8 @@ const ColorScatterForm = ({ columns, values, setValues }) => {
             </label>
           </div>
           <div className="col-4">
-            <select className="form-select" id="scatter-plot-z-axis" value={values.z.column} onChange={(value) => {
-              setValues({...values, z: {...values.z, column: value.target.value}})
+            <select className="form-select" id="scatter-plot-z-axis" value={plotValues.z.column} onChange={(value) => {
+              setPlotValues({ ...plotValues, z: { ...plotValues.z, column: value.target.value } })
             }}>
               <option value="">---</option>
               {
@@ -63,8 +63,8 @@ const ColorScatterForm = ({ columns, values, setValues }) => {
             </label>
           </div>
           <div className="col-4">
-            <select className="form-select" id="scatter-plot-cmap" value={values.z.cmap} onChange={(value) => {
-              setValues({...values, z: {...values.z, cmap: value.target.value}})
+            <select className="form-select" id="scatter-plot-cmap" value={plotValues.z.cmap} onChange={(value) => {
+              setPlotValues({ ...plotValues, z: { ...plotValues.z, cmap: value.target.value } })
             }}>
               {
                 cmaps.map((cmap, cmapIndex) => <option key={cmapIndex} value={cmap}>{cmap}</option>)
@@ -79,8 +79,8 @@ const ColorScatterForm = ({ columns, values, setValues }) => {
 
 ColorScatterForm.propTypes = {
   columns: PropTypes.array.isRequired,
-  values: PropTypes.object.isRequired,
-  setValues: PropTypes.func.isRequired
+  plotValues: PropTypes.object.isRequired,
+  setPlotValues: PropTypes.func.isRequired
 }
 
 export default ColorScatterForm
