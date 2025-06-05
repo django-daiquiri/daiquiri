@@ -18,7 +18,10 @@ class JobManager(models.Manager):
     def get_hash(self, user):
         jobs = self.filter_by_owner(user)\
                 .exclude(phase=self.model.PHASE_ARCHIVED)\
-                .order_by()\
+                .exclude(phase=self.model.PHASE_COMPLETED)\
+                .exclude(phase=self.model.PHASE_ERROR)\
+                .exclude(phase=self.model.PHASE_ABORTED)\
+                .order_by('creation_time')\
                 .values('id', 'phase')
         jobs_string = '\n'.join(['{id}-{phase}'.format(**job) for job in jobs])
         return hashlib.sha256(jobs_string.encode()).hexdigest()
