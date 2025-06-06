@@ -118,6 +118,7 @@ version = {attr = "daiquiri.__version__"}
 
 [tool.ruff]
 indent-width = 4
+line-length = 100
 
 [tool.ruff.format]
 quote-style = "single"

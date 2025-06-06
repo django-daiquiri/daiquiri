@@ -1,12 +1,12 @@
 import csv
-import datetime
 import io
 import logging
 import os
 import struct
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Optional, Union
+from typing import Optional
 from xml.sax.saxutils import escape, quoteattr
 
 from django.contrib.sites.models import Site
@@ -76,7 +76,7 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
 
     for title, content_role, href in links:
         yield f"""
-        <LINK title={quoteattr(title)} content-role={quoteattr(content_role)} href={quoteattr(href)}/>"""
+        <LINK title={quoteattr(title)} content-role={quoteattr(content_role)} href={quoteattr(href)}/>"""  # noqa: E501
 
     if table is not None:
         yield f'''
@@ -142,6 +142,7 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
             yield """
             <FIELD {} />""".format(' '.join(attrs))
 
+    # fmt: off
     if not empty:
         yield """
             <DATA>
@@ -155,7 +156,7 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
                     </TR>""".format(
                 """</TD>
                         <TD>""".join(
-                    [('' if cell in ['NULL', None] else correct_col_for_votable(escape(str(cell)))) for cell in row]
+                    [('' if cell in ['NULL', None] else correct_col_for_votable(escape(str(cell)))) for cell in row] # noqa : E501
                 )
             )
 
@@ -171,16 +172,13 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
     <RESOURCE type="meta" utype="adhoc:service">"""
         for param in service.get('params', []):
             yield """
-        <PARAM name="{name}" datatype="{datatype}" arraysize="{arraysize}" value="{value}" />""".format(**param)
-
+        <PARAM name="{name}" datatype="{datatype}" arraysize="{arraysize}" value="{value}" />""".format(**param) # noqa : E501
         for group in service.get('groups', []):
             yield """
         <GROUP name="{name}">""".format(**group)
             for param in group.get('params', []):
                 yield """
-            <PARAM name="{name}" datatype="{datatype}" arraysize="{arraysize}" value="{value}" ref="{ref}"/>""".format(
-                    **param
-                )  # noqa: E501
+            <PARAM name="{name}" datatype="{datatype}" arraysize="{arraysize}" value="{value}" ref="{ref}"/>""".format(**param) # noqa : E501
             yield """
         </GROUP>"""
         yield """
@@ -190,29 +188,34 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
 """
 
 
+# fmt: on
+
+
 def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
     DEFAULT_CHAR_SIZE = 256
 
     # VO format label, FITS format label, size in bytes, NULL value, encoded value
+    # fmt:off
     formats_dict = {
-        'boolean': ('s', 'L', 1, b'\x00', lambda x: b'T' if x == 'true' else b'F'),
-        'short': ('h', 'I', 2, 32767, int),
-        'int': ('i', 'J', 4, 2147483647, int),
-        'long': ('q', 'K', 8, 9223372036854775807, int),
-        'float': ('f', 'E', 4, float('nan'), float),
-        'double': ('d', 'D', 8, float('nan'), float),
-        'char': ('s', 'A', 32, b'', lambda x: x.encode()),
-        'timestamp': ('s', 'A', 19, b'', lambda x: x.encode()),
-        'array': ('s', 'A', 64, b'', lambda x: x.encode()),
-        'spoint': ('s', 'A', 64, b'', lambda x: x.encode()),
-        'unknown': ('s', 'A', 8, b'', lambda x: x.encode()),
-        'short[]': ('h', 'I', 2, 32767, int),
-        'int[]': ('i', 'J', 4, 2147483647, int),
-        'long[]': ('q', 'K', 8, 9223372036854775807, int),
-        'float[]': ('f', 'E', 4, float('nan'), float),
-        'double[]': ('d', 'D', 8, float('nan'), float),
-        'char[]': ('s', 'A', 32, b'', lambda x: x.encode()),
+        'boolean':   ('s', 'L', 1,  b'\x00',             lambda x: b'T' if x == 'true' else b'F'), #noqa: E501
+        'short':     ('h', 'I', 2,  32767,               int),
+        'int':       ('i', 'J', 4,  2147483647,          int),
+        'long':      ('q', 'K', 8,  9223372036854775807, int),
+        'float':     ('f', 'E', 4,  float('nan'),        float),
+        'double':    ('d', 'D', 8,  float('nan'),        float),
+        'char':      ('s', 'A', 32, b'',                 lambda x: x.encode()),
+        'timestamp': ('s', 'A', 19, b'',                 lambda x: x.encode()),
+        'array':     ('s', 'A', 64, b'',                 lambda x: x.encode()),
+        'spoint':    ('s', 'A', 64, b'',                 lambda x: x.encode()),
+        'unknown':   ('s', 'A', 8,  b'',                 lambda x: x.encode()),
+        'short[]':   ('h', 'I', 2,  32767,               int),
+        'int[]':     ('i', 'J', 4,  2147483647,          int),
+        'long[]':    ('q', 'K', 8,  9223372036854775807, int),
+        'float[]':   ('f', 'E', 4,  float('nan'),        float),
+        'double[]':  ('d', 'D', 8,  float('nan'),        float),
+        'char[]':    ('s', 'A', 32, b'',                 lambda x: x.encode()),
     }
+    # fmt:on
 
     names = [field['name'] for field in fields]
     datatypes = [field['datatype'] for field in fields]
@@ -258,26 +261,24 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
     logo = get_daiquiri_logo(str(Site.objects.get_current())[:30], daiquiri_version)
 
     # Main header #############################################################
+    # fmt:off
     header0info = [
-        ('SIMPLE', 'T', 'conforms to FITS standard'),
-        ('BITPIX', '8', 'array data type'),
-        ('NAXIS', '1', 'number of array dimensions'),
-        ('NAXIS1', '2880', 'number of characters'),
-        ('EXTEND', 'T', ''),
-        ('NTABLE', '1', ''),
-        (
-            'LONGSTRN',
-            'OGIP 1.0',
-            'The OGIP long string convention may be used.',
-        ),
-        ('COMMENT', 'This FITS file may contain long string keyword values that are', ''),
-        ('COMMENT', 'continued over multiple keywords.  This convention uses the  "&"', ''),
+        ('SIMPLE',  'T',       'conforms to FITS standard'),
+        ('BITPIX',  '8',       'array data type'),
+        ('NAXIS',   '1',       'number of array dimensions'),
+        ('NAXIS1',  '2880',    'number of characters'),
+        ('EXTEND',  'T',       ''),
+        ('NTABLE',  '1',       ''),
+        ('LONGSTRN','OGIP 1.0','The OGIP long string convention may be used.'),
+        ('COMMENT', 'This FITS file may contain long string keyword values that are',''),
+        ('COMMENT', 'continued over multiple keywords.  This convention uses the  "&"',''),
         ('COMMENT', 'character at the end of a string which is then continued', ''),
         ('COMMENT', 'on subsequent keywords whose name = "CONTINUE".', ''),
-        ('END', '', ''),
+        ('END',     '',        ''),
     ]
+    # fmt:on
 
-    h0 = ''.join([create_line(*entry) for entry in header0info])
+    h0 = ''.join([create_fits_card(*entry) for entry in header0info])
     h0 += ' ' * (2880 * (len(h0) // 2880 + 1) - len(h0))
 
     yield h0.encode()
@@ -286,22 +287,24 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
     yield (logo + '\x00' * (2880 - len(logo))).encode()
 
     # Table header ############################################################
+    # fmt:off
     header1info = [
         ('XTENSION', "'BINTABLE'", 'binary table extension    '),
-        ('BITPIX', '8', 'array data type    '),
-        ('NAXIS', '2', 'number of array dimensions    '),
-        ('NAXIS1', f'{naxis1}', 'length of dimension 1    '),
-        ('NAXIS2', f'{naxis2}', 'length of dimension 2    '),
-        ('PCOUNT', '0', 'number of group parameters    '),
-        ('GCOUNT', '1', 'number of groups    '),
+        ('BITPIX',   '8',          'array data type    '),
+        ('NAXIS',    '2',          'number of array dimensions    '),
+        ('NAXIS1',  f'{naxis1}',   'length of dimension 1    '),
+        ('NAXIS2',  f'{naxis2}',   'length of dimension 2    '),
+        ('PCOUNT',   '0',          'number of group parameters    '),
+        ('GCOUNT',   '1',          'number of groups    '),
         ('TFIELDS', f'{tfields} ', 'number of table fields    '),
     ]
+    # fmt:on
 
     if table_name is not None:
-        # table_name needs to be shorter than 68 chars
-        header1info.append(('EXTNAME', f"'{table_name[:68]}'", 'table name    '))
+        # table_name needs to be shorter than 50 chars
+        header1info.append(('EXTNAME', f"'{table_name[:50]}'", 'table name '))
 
-    h1 = ''.join([create_line(*entry) for entry in header1info])
+    h1 = ''.join([create_fits_card(*entry) for entry in header1info])
 
     for i, (name, datatype, arraysize, unit, ucd, description) in enumerate(
         zip(names, datatypes, arraysizes, units, ucds, descriptions)
@@ -314,37 +317,48 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
             else:
                 format_str = str(array_infos[name]) + formats_dict[datatype][1].ljust(8)
 
-        h1 += create_line(f'TTYPE{i + 1}', f"'{name.ljust(8)}'", f'label for col {i + 1}    ')
-        h1 += create_line(f'TFORM{i + 1}', f"'{format_str}'", f'format for col {i + 1}    ')
+        h1 += create_fits_card(f'TTYPE{i + 1}', f"'{name.ljust(8)}'", f'label for col {i + 1}    ')
+        h1 += create_fits_card(f'TFORM{i + 1}', f"'{format_str}'", f'format for col {i + 1}    ')
 
         # NULL values only for int-like types
-        if datatype in ('short', 'int', 'long'):  # , 'short[]', 'int[]', 'long[]', 'float[]', 'double[]'):
-            h1 += create_line(
+        if datatype in (
+            'short',
+            'int',
+            'long',
+        ):
+            h1 += create_fits_card(
                 f'TNULL{i + 1}',
                 formats_dict[datatype][3],
                 f'blank value for col {i + 1}    ',
             )
 
         if unit:
-            h1 += create_line(f'TUNIT{i + 1}', f"'{unit.ljust(8)}'", f'unit for col {i + 1}    ')
+            h1 += create_fits_card(
+                f'TUNIT{i + 1}', f"'{unit.ljust(8)}'", f'unit for col {i + 1}    '
+            )
 
         if ucd:
-            h1 += create_line(f'TUCD{i + 1}', f"'{ucd.ljust(8)}'", f'ucd for col {i + 1}    ')
+            h1 += create_fits_card(f'TUCD{i + 1}', f"'{ucd.ljust(8)}'", f'ucd for col {i + 1}    ')
 
         if description:
-            for line in create_line(f'TCOMM{i + 1}', f'{description}', f'desc for col {i + 1}    '):
+            for line in create_fits_card(
+                f'TCOMM{i + 1}', f'{description}', f'desc for col {i + 1}    '
+            ):
                 h1 += line
 
-    now = datetime.datetime.utcnow().replace(microsecond=0).isoformat()
-    h1 += create_line('DATE-HDU', f"'{now}'", 'UTC date of HDU creation')
-    h1 += create_line('END', '', '')
+    now = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+    h1 += create_fits_card('DATE-HDU', f"'{now}'", 'UTC date of HDU creation')
+    h1 += create_fits_card('END', '', '')
     h1 += ' ' * (2880 * (len(h1) // 2880 + 1) - len(h1))
 
     yield h1.encode()
 
     # Data ####################################################################
     fmt = '>' + ''.join(
-        [str(arraysize) + formats_dict[datatype][0] for datatype, arraysize in zip(datatypes, arraysizes)]
+        [
+            str(arraysize) + formats_dict[datatype][0]
+            for datatype, arraysize in zip(datatypes, arraysizes)
+        ]
     )
 
     row_count = 0
@@ -359,7 +373,7 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
                 row_elements_formatted.append(r)
             elif datatype[-2:] == '[]':
                 r = []
-                parsed = parse_and_fill_array(
+                parsed = parse_and_fill_fits_array(
                     obj_str=row_element,
                     obj_type=datatype,
                     desired_length=array_infos[name],
@@ -393,7 +407,7 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
     yield footer.encode()
 
 
-def create_line(key: str, val: str, comment: str) -> Union[list[str], str]:
+def create_fits_card(key: str, val: str, comment: str) -> str:
     key_length = 8
     line_length = 80
     value_length = line_length - key_length - len(comment)
@@ -442,7 +456,7 @@ def create_line(key: str, val: str, comment: str) -> Union[list[str], str]:
                 lines.append(line)
             i += 1
 
-        return lines
+        return ''.join(lines)
 
 
 def get_daiquiri_logo(site: str, version: str) -> str:
@@ -487,13 +501,15 @@ def get_daiquiri_logo(site: str, version: str) -> str:
     return logo
 
 
-def parse_and_fill_array(obj_str: str, obj_type: str, desired_length: int, formats_dict: dict) -> list:
+def parse_and_fill_fits_array(
+    obj_str: str, obj_type: str, desired_length: int, formats_dict: dict
+) -> list:
     array = list(obj_str.strip('{}').split(','))
 
     if obj_type == 'char[]':
         array = [f'{i}_' for i in array[:-1]] + [f'{array[-1]}']
 
-    for i in range(desired_length - len(array)):
+    for _ in range(desired_length - len(array)):
         if obj_type in ['float[]', 'double[]']:
             array.append(formats_dict[obj_type][3])
         elif obj_type == 'char[]':
