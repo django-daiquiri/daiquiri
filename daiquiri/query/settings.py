@@ -5,9 +5,18 @@ QUERY_UPLOAD_DIR = env.get_abspath('QUERY_UPLOAD_DIR')
 
 QUERY_ANONYMOUS = False
 QUERY_USER_SCHEMA_PREFIX = 'daiquiri_user_'
-QUERY_QUOTA = {'anonymous': '100Mb', 'user': '10000Mb', 'users': {}, 'groups': {}}
+
+QUERY_QUOTA = {
+    'anonymous': '100Mb',
+    'user': '10000Mb',
+    'users': {},
+    'groups': {}
+}
+
 QUERY_SYNC_TIMEOUT = 5
+
 QUERY_MAX_ACTIVE_JOBS = {'anonymous': '1'}
+
 QUERY_QUEUES = [
     {
         'key': 'short',
@@ -34,7 +43,11 @@ QUERY_LANGUAGES = [
     }
 ]
 QUERY_FORMS = [
-    {'key': 'sql', 'label': 'SQL query', 'template': 'query/query_form_sql.html'},
+    {
+        'key': 'sql',
+        'label': 'SQL query',
+        'template': 'query/query_form_sql.html',
+    },
     {
         'key': 'upload',
         'label': 'Upload VOTable',
@@ -85,7 +98,11 @@ QUERY_DROPDOWNS = [
             'catalogs': ['I/322A', 'I/259'],
         },
     },
-    {'key': 'examples', 'label': 'Examples', 'classes': 'ms-auto'},
+    {
+        'key': 'examples',
+        'label': 'Examples',
+        'classes': 'ms-auto',
+    },
 ]
 QUERY_DOWNLOADS = [
     {
@@ -115,9 +132,7 @@ QUERY_DOWNLOAD_FORMATS = [
         'content_type': 'text/csv',
         'label': 'Comma-separated Values',
         'help': 'A text file with a line for each row of the table. The fields are delimited '
-        'by a comma and quoted by double quotes. Use this option for a later import '
-        'into a spreadsheed application or a custom script. Use this option if you '
-        'are unsure what to use.',
+        'by a comma and quoted by double quotes.',
     },
     {
         'key': 'fits',
@@ -135,5 +150,9 @@ QUERY_DOWNLOAD_FORMATS = [
     },
 ]
 QUERY_UPLOAD = True
-QUERY_UPLOAD_LIMIT = {'anonymous': '10Mb', 'user': '100Mb', 'users': {}, 'groups': {}}
+QUERY_UPLOAD_LIMIT = {
+    'anonymous': '10Mb',
+    'user': '100Mb', 'users': {},
+    'groups': {}
+}
 QUERY_PROCESSOR_CACHE = True

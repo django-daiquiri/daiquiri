@@ -122,6 +122,7 @@ line-length = 100
 
 [tool.ruff.format]
 quote-style = "single"
+exclude = ["settings.py"]
 
 [tool.ruff.lint]
 select = [

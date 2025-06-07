@@ -37,7 +37,7 @@ def get_email_list(key, default=[]):
     return getaddresses(get_list(key, default))
 
 
-def get_url(key, default=None):
+def get_url(key, default='/'):
     value = os.getenv(key, default)
     return value if value.endswith('/') else value + '/'
 
