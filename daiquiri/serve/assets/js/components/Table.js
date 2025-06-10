@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 
 import { isNil } from 'lodash'
@@ -17,6 +17,19 @@ const Table = ({ schema, table }) => {
 
   const [params, setParams] = useState(initialParams)
 
+  useEffect(() => {
+    // Get URL parameters
+    const urlParams = new URLSearchParams(window.location.search)
+    const columns = urlParams.getAll('column')
+
+    if (columns.length > 0) {
+      setParams(prev => ({
+        ...prev,
+        column: columns
+      }))
+    }
+  }, [])
+
   const setParamsForServe = (params) => {
     if (isNil(params.schema) || isNil(params.table)) {
       params.schema = initialParams.schema
@@ -24,7 +37,6 @@ const Table = ({ schema, table }) => {
     }
     return setParams(params)
   }
-
   const { data: columns } = useTableColumnsQuery(params)
   const { data: rows } = useTableRowsQuery(params)
 

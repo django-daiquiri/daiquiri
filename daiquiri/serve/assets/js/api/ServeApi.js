@@ -4,6 +4,7 @@ import { encodeParams } from 'daiquiri/core/assets/js/utils/api'
 export default class ServeApi extends BaseApi {
 
   static fetchColumns(params) {
+     console.log(params)
     return this.get(`/serve/api/columns/?${encodeParams(params)}`)
   }
 

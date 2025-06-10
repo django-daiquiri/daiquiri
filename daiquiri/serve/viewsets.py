@@ -21,14 +21,14 @@ class RowViewSet(RowViewSetMixin, viewsets.GenericViewSet):
         table_name = self.request.GET.get('table')
         column_names = self.request.GET.getlist('column')
 
-        # get the columns which the user is allowed to access
+        # get the table column names
         user_columns = get_user_columns(self.request.user, schema_name, table_name)
 
         if user_columns:
             # get the row query params from the request
             ordering, page, page_size, search, filters = self._get_query_params(user_columns)
 
-            # filter by input column names by the the allowed columns
+            # filter by the input column names
             if column_names:
                 column_names = [column.name for column in user_columns if column.name in column_names]
             else:
@@ -65,11 +65,11 @@ class ColumnViewSet(viewsets.ViewSet):
         table_name = self.request.GET.get('table')
         column_names = self.request.GET.getlist('column')
 
-        # get the columns which the user is allowed to access
+        # get the table column names
         user_columns = get_user_columns(self.request.user, schema_name, table_name)
 
         if user_columns:
-            # filter by input column names by the the allowed columns
+            
             if column_names:
                 columns = [column for column in user_columns if column.name in column_names]
             else:
