@@ -10,17 +10,18 @@ def table(request, schema_name, table_name):
 
     if get_user_columns(request.user, schema_name, table_name):
         table = get_table_metadata(request.user, schema_name, table_name)
+
         context = {}
         if table is not None:
             context['table_title'] = table.title
             context['table_name'] = table.name
             context['schema_name'] = table.schema.name
             context['table_description'] = table.long_description
+
         return render(request, 'serve/table.html', context)
 
     # if nothing worked, return 404
     raise Http404
-
 
 def reference(request, key, value):
 
