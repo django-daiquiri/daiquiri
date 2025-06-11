@@ -11,6 +11,7 @@ import {
 } from 'daiquiri/query/assets/js/hooks/queries'
 import { useStatusQuery } from 'daiquiri/query/assets/js/hooks/queries'
 import { useSubmitJobMutation } from 'daiquiri/query/assets/js/hooks/mutations'
+import { useUserFunctionsQuery } from 'daiquiri/metadata/assets/js/hooks/queries'
 
 import Template from 'daiquiri/core/assets/js/components/Template'
 import Tooltip from 'daiquiri/core/assets/js/components/Tooltip'
@@ -32,6 +33,7 @@ const FormSql = ({ formKey, loadJob, query, queryLanguage }) => {
   const { data: queues } = useQueuesQuery()
   const { data: queryLanguages } = useQueryLanguagesQuery()
   const { data: dropdowns } = useDropdownsQuery()
+  const { data: functions } = useUserFunctionsQuery()
   const mutation = useSubmitJobMutation()
 
   const [values, setValues] = useState({
@@ -132,16 +134,18 @@ const FormSql = ({ formKey, loadJob, query, queryLanguage }) => {
           <div className="d-md-flex">
             {dropdowns &&
               dropdowns.map((dropdown, index) => (
-                <button
-                  key={index}
-                  type="button"
-                  className={`btn btn-outline-form dropdown-toggle mb-2 ${
-                    dropdown.classes || 'me-2'
-                  }`}
-                  onClick={() => handleDrowpdown(dropdown.key)}
-                >
-                  {dropdown.label}
-                </button>
+                (dropdown.key !== 'functions' || (functions && functions.length > 0)) && (
+                  <button
+                    key={index}
+                    type="button"
+                    className={`btn btn-outline-form dropdown-toggle mb-2 ${
+                      dropdown.classes || 'me-2'
+                    }`}
+                    onClick={() => handleDrowpdown(dropdown.key)}
+                  >
+                    {dropdown.label}
+                  </button>
+                )
               ))}
           </div>
 
