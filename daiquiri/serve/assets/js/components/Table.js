@@ -7,12 +7,13 @@ import { useTableColumnsQuery, useTableRowsQuery } from '../hooks/queries'
 
 import DaiquiriTable from 'daiquiri/core/assets/js/components/table/Table'
 
-const Table = ({ schema, table }) => {
+const Table = ({ schema, table, search }) => {
   const initialParams = {
     schema,
     table,
+    ...(search && { search }),
     page: 1,
-    page_size: 10
+    page_size: 10,
   }
 
   const [params, setParams] = useState(initialParams)
@@ -21,11 +22,18 @@ const Table = ({ schema, table }) => {
     // Get URL parameters
     const urlParams = new URLSearchParams(window.location.search)
     const columns = urlParams.getAll('column')
+    const search = urlParams.get('search')
 
     if (columns.length > 0) {
       setParams(prev => ({
         ...prev,
         column: columns
+      }))
+    }
+    if (search) {
+      setParams(prev => ({
+        ...prev,
+        search
       }))
     }
   }, [])
@@ -34,6 +42,7 @@ const Table = ({ schema, table }) => {
     if (isNil(params.schema) || isNil(params.table)) {
       params.schema = initialParams.schema
       params.table = initialParams.table
+      params.search = initialParams.search
     }
     return setParams(params)
   }
@@ -52,7 +61,8 @@ const Table = ({ schema, table }) => {
 
 Table.propTypes = {
   schema: PropTypes.string.isRequired,
-  table: PropTypes.string.isRequired
+  table: PropTypes.string.isRequired,
+  search: PropTypes.string,
 }
 
 export default Table
