@@ -15,7 +15,7 @@ authors = [
   {name = "Kirill Makan", email = "kmakan@aip.de"},
   {name = "Simeon Reusch", email = "sreusch@aip.de"},
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Environment :: Web Environment",
@@ -61,7 +61,7 @@ dependencies = [
   "queryparser-python3~=0.7.0",
   "rules~=3.5",
   "sqlalchemy~=2.0.41",
-  "XlsxWriter~=3.2.2",
+  "XlsxWriter==3.2.2",
 ]
 
 [project.optional-dependencies]
