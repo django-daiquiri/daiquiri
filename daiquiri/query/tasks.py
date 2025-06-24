@@ -2,11 +2,12 @@ import logging
 import os
 import zipfile
 
-from celery import shared_task
 from django.conf import settings
-from django.db.utils import InternalError, OperationalError, ProgrammingError
+from django.db.utils import DataError, InternalError, OperationalError, ProgrammingError
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
+
+from celery import shared_task
 
 from daiquiri.core.tasks import Task
 from daiquiri.stats.models import Record
@@ -71,9 +72,7 @@ def run_database_query_task(job_id):
         # check if the quota is exceeded
         if QueryJob.objects.get_size(job.owner) > get_quota(job.owner):
             job.phase = job.PHASE_ERROR
-            job.error_summary = str(
-                _('Quota is exceeded. Please remove some of your jobs.')
-            )
+            job.error_summary = str(_('Quota is exceeded. Please remove some of your jobs.'))
             job.save()
 
             return job.phase
@@ -100,7 +99,7 @@ def run_database_query_task(job_id):
             # this is where the work is done (and the time is spend)
             adapter.submit_query(job.actual_query)
 
-        except (ProgrammingError, InternalError, ValueError) as e:
+        except (ProgrammingError, InternalError, ValueError, DataError) as e:
             job.phase = job.PHASE_ERROR
             job.error_summary = str(e)
             logger.info('job %s failed (%s)', job.id, job.error_summary)
@@ -188,9 +187,7 @@ def run_database_ingest_task(job_id, file_path):
         # check if the quota is exceeded
         if QueryJob.objects.get_size(job.owner) > get_quota(job.owner):
             job.phase = job.PHASE_ERROR
-            job.error_summary = str(
-                _('Quota is exceeded. Please remove some of your jobs.')
-            )
+            job.error_summary = str(_('Quota is exceeded. Please remove some of your jobs.'))
             job.save()
 
             return job.phase
@@ -368,9 +365,7 @@ def create_download_archive_task(archive_id):
             archive_job.phase = archive_job.PHASE_ERROR
             archive_job.error_summary = str(e)
             archive_job.save()
-            logger.info(
-                'archive_job %s failed (%s)', archive_job.id, archive_job.error_summary
-            )
+            logger.info('archive_job %s failed (%s)', archive_job.id, archive_job.error_summary)
             raise e
 
         archive_job.end_time = now()
