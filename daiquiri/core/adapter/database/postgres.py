@@ -317,6 +317,26 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         logger.debug('sql = "%s"', sql)
         self.execute(sql)
 
+    def _process_ordering(self, sql, ordering, escaped_column_names):
+        if ordering:
+            if ordering.startswith('-'):
+                escaped_ordering_column, ordering_direction = (
+                    self.escape_identifier(ordering[1:]),
+                    'DESC',
+                )
+            else:
+                escaped_ordering_column, ordering_direction = (
+                    self.escape_identifier(ordering),
+                    'ASC',
+                )
+
+            if escaped_ordering_column in escaped_column_names:
+                sql += f' ORDER BY {escaped_ordering_column} {ordering_direction}'
+        else:
+            sql += ' ORDER BY ctid'
+
+        return sql
+
     def _parse_column(self, row):
         column_name, data_type, udt_name, character_maximum_length, ordinal_position = (
             row
