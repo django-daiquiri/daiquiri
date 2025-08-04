@@ -178,7 +178,7 @@ ACCOUNT_SIGNUP_FORM_CLASS = 'daiquiri.auth.forms.SignupForm'
 ACCOUNT_USER_DISPLAY = 'daiquiri.auth.utils.get_full_name'
 ACCOUNT_USERNAME_VALIDATORS = 'daiquiri.auth.validators.username_validators'
 ACCOUNT_USERNAME_MIN_LENGTH = 4
-ACCOUNT_PASSWORD_MIN_LENGTH = 4
+ACCOUNT_PASSWORD_MIN_LENGTH = 8
 ACCOUNT_EMAIL_MAX_LENGTH = 190
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 7
@@ -208,9 +208,7 @@ SETTINGS_EXPORT = [
 ]
 
 DEFAULT_FROM_EMAIL = env.get('DEFAULT_FROM_EMAIL', 'info@example.com')
-EMAIL_BACKEND = env.get(
-    'EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend'
-)
+EMAIL_BACKEND = env.get('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
 EMAIL_REPLY_TO = env.get('EMAIL_REPLY_TO')
 EMAIL_HOST = env.get('EMAIL_HOST')
 EMAIL_HOST_USER = env.get('EMAIL_HOST_USER')

@@ -3,7 +3,7 @@ import os
 import zipfile
 
 from django.conf import settings
-from django.db.utils import InternalError, OperationalError, ProgrammingError
+from django.db.utils import DataError, InternalError, OperationalError, ProgrammingError
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 
@@ -14,7 +14,6 @@ from daiquiri.stats.models import Record
 
 
 class RunQueryTask(Task):
-
     def on_failure(self, exc, task_id, args, kwargs, einfo):
         super().on_failure(exc, task_id, args, kwargs, einfo)
 
@@ -42,7 +41,12 @@ def run_database_query_task(job_id):
     # always import daiquiri packages inside the task
     from daiquiri.core.adapter import DatabaseAdapter
     from daiquiri.query.models import QueryJob
-    from daiquiri.query.utils import get_job_columns, get_job_sources, get_quota, ingest_uploads
+    from daiquiri.query.utils import (
+        get_job_columns,
+        get_job_sources,
+        get_quota,
+        ingest_uploads,
+    )
     from daiquiri.stats.models import Record
 
     # get logger
@@ -80,7 +84,7 @@ def run_database_query_task(job_id):
             job.table_name,
             job.native_query,
             job.timeout,
-            job.max_records
+            job.max_records,
         )
         job.phase = job.PHASE_EXECUTING
         job.start_time = now()
@@ -95,7 +99,7 @@ def run_database_query_task(job_id):
             # this is where the work is done (and the time is spend)
             adapter.submit_query(job.actual_query)
 
-        except (ProgrammingError, InternalError, ValueError) as e:
+        except (ProgrammingError, InternalError, ValueError, DataError) as e:
             job.phase = job.PHASE_ERROR
             job.error_summary = str(e)
             logger.info('job %s failed (%s)', job.id, job.error_summary)
@@ -145,7 +149,7 @@ def run_database_query_task(job_id):
                 },
                 client_ip=job.client_ip,
                 user=job.owner,
-                size=job.size
+                size=job.size,
             )
 
             job.save()
@@ -234,9 +238,7 @@ def run_database_ingest_task(job_id, file_path):
                 job.size = adapter.fetch_size(job.schema_name, job.table_name)
 
                 # store the metadata for the columns from the VOTable
-                job.metadata = {
-                    'columns': columns
-                }
+                job.metadata = {'columns': columns}
 
             # create a stats record for this job
             Record.objects.create(
@@ -248,7 +250,7 @@ def run_database_ingest_task(job_id, file_path):
                 },
                 client_ip=job.client_ip,
                 user=job.owner,
-                size=job.size
+                size=job.size,
             )
 
             job.save()
@@ -286,17 +288,26 @@ def create_download_table_task(download_id):
             write_label = 'wb'
         else:
             write_label = 'w'
-        try:
 
-            with open(download_job.file_path, write_label) as f:
-                for line in download_job.query_job.stream(download_job.format_key):
-                    f.write(line)
+        try:
+            if download_job.format_key != 'parquet':
+                with open(download_job.file_path, write_label) as f:
+                    for line in download_job.query_job.stream(download_job.format_key):
+                        f.write(line)
+            else:
+                if download_job.query_job.stream(download_job.format_key) is not None:
+                    for f in download_job.query_job.stream(download_job.format_key):
+                        pass
 
         except Exception as e:
             download_job.phase = download_job.PHASE_ERROR
             download_job.error_summary = str(e)
             download_job.save()
-            logger.info('download_job %s failed (%s)', download_job.id, download_job.error_summary)
+            logger.info(
+                'download_job %s failed (%s)',
+                download_job.id,
+                download_job.error_summary,
+            )
 
             raise e
         else:
@@ -308,10 +319,10 @@ def create_download_table_task(download_id):
                 resource={
                     'job_id': download_job.id,
                     'job_type': download_job.job_type,
-                    'file_path': download_job.file_path
+                    'file_path': download_job.file_path,
                 },
                 client_ip=download_job.client_ip,
-                size=os.path.getsize(download_job.file_path)
+                size=os.path.getsize(download_job.file_path),
             )
         finally:
             download_job.end_time = now()
@@ -366,10 +377,10 @@ def create_download_archive_task(archive_id):
             resource={
                 'job_id': archive_job.id,
                 'job_type': archive_job.job_type,
-                'file_path': archive_job.file_path
+                'file_path': archive_job.file_path,
             },
             client_ip=archive_job.client_ip,
-            size=os.path.getsize(archive_job.file_path)
+            size=os.path.getsize(archive_job.file_path),
         )
 
         # log completion

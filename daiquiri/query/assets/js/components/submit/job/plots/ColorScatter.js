@@ -10,7 +10,7 @@ import ColorScatterPlot from './ColorScatterPlot'
 
 const ColorScatter = ({ job, columns }) => {
 
-  const [values, setValues] = useState({
+  const [plotValues, setPlotValues] = useState({
     x: {
       column: ''
     },
@@ -23,27 +23,27 @@ const ColorScatter = ({ job, columns }) => {
     }
   })
 
-  useEffect(() => setValues({
-    ...values,
+  useEffect(() => setPlotValues({
+    ...plotValues,
     x: {
-      ...values.x, column: isNil(columns[0]) ? '' : columns[0].name
+      ...plotValues.x, column: isNil(columns[0]) ? '' : columns[0].name
     },
     y: {
-      ...values.y, column: isNil(columns[1]) ? '' : columns[1].name
+      ...plotValues.y, column: isNil(columns[1]) ? '' : columns[1].name
     },
     z: {
-      ...values.z, column: isNil(columns[2]) ? '' : columns[2].name
+      ...plotValues.z, column: isNil(columns[2]) ? '' : columns[2].name
     }
   }), [columns])
 
-  const { data: x } = useJobPlotQuery(job, values.x.column)
-  const { data: y } = useJobPlotQuery(job, values.y.column)
-  const { data: z } = useJobPlotQuery(job, values.z.column)
+  const { data: x } = useJobPlotQuery(job, plotValues.x.column)
+  const { data: y } = useJobPlotQuery(job, plotValues.y.column)
+  const { data: z } = useJobPlotQuery(job, plotValues.z.column)
 
   return (
     <div>
-      <ColorScatterForm columns={columns} values={values} setValues={setValues} />
-      <ColorScatterPlot columns={columns} values={values} x={x} y={y} z={z} />
+      <ColorScatterForm columns={columns} plotValues={plotValues} setPlotValues={setPlotValues} />
+      <ColorScatterPlot columns={columns} plotValues={plotValues} x={x} y={y} z={z} />
     </div>
   )
 }

@@ -7,7 +7,6 @@ logger = logging.getLogger(__name__)
 
 
 class BaseDatabaseAdapter:
-
     def __init__(self, database_key, database_config):
         self.database_key = database_key
         self.database_config = database_config
@@ -74,32 +73,48 @@ class BaseDatabaseAdapter:
     def abort_query(self, pid):
         raise NotImplementedError()
 
-    def count_rows(self, schema_name, table_name, column_names=None, search=None, filters=None):
+    def count_rows(
+        self, schema_name, table_name, column_names=None, search=None, filters=None
+    ):
         # if no column names are provided get all column_names from the table
         if not column_names:
-            column_names= self.fetch_column_names(schema_name, table_name)
+            column_names = self.fetch_column_names(schema_name, table_name)
 
         # create a list of escaped columns
-        escaped_column_names = [self.escape_identifier(column_name) for column_name in column_names]
+        escaped_column_names = [
+            self.escape_identifier(column_name) for column_name in column_names
+        ]
 
         # prepare sql string
         sql = f'SELECT COUNT(*) FROM {self.escape_identifier(schema_name)}.{self.escape_identifier(table_name)}'
         sql_args = []
 
         # process filtering
-        sql, sql_args = self._process_filtering(sql, sql_args, search, filters, escaped_column_names)
+        sql, sql_args = self._process_filtering(
+            sql, sql_args, search, filters, escaped_column_names
+        )
 
         return self.fetchone(sql, args=sql_args)[0]
 
-    def fetch_rows(self, schema_name, table_name, column_names=None, ordering=None, page=1, page_size=10,
-                   search=None, filters=None):
-
+    def fetch_rows(
+        self,
+        schema_name,
+        table_name,
+        column_names=None,
+        ordering=None,
+        page=1,
+        page_size=10,
+        search=None,
+        filters=None,
+    ):
         # if no column names are provided get all column_names from the table
         if not column_names:
             column_names = self.fetch_column_names(schema_name, table_name)
 
         # create a list of escaped columns
-        escaped_column_names = [self.escape_identifier(column_name) for column_name in column_names]
+        escaped_column_names = [
+            self.escape_identifier(column_name) for column_name in column_names
+        ]
 
         # init sql string and sql_args list
         sql = 'SELECT {columns} FROM {schema}.{table}'.format(
@@ -110,7 +125,9 @@ class BaseDatabaseAdapter:
         sql_args = []
 
         # process filtering
-        sql, sql_args = self._process_filtering(sql, sql_args, search, filters, escaped_column_names)
+        sql, sql_args = self._process_filtering(
+            sql, sql_args, search, filters, escaped_column_names
+        )
 
         # process ordering
         sql = self._process_ordering(sql, ordering, escaped_column_names)
@@ -121,14 +138,17 @@ class BaseDatabaseAdapter:
 
         return self.fetchall(sql, args=sql_args)
 
-    def fetch_row(self, schema_name, table_name, column_names=None, search=None, filters=None):
-
+    def fetch_row(
+        self, schema_name, table_name, column_names=None, search=None, filters=None
+    ):
         # if no column names are provided get all column_names from the table
         if not column_names:
             column_names = self.fetch_column_names(schema_name, table_name)
 
         # create a list of escaped columns
-        escaped_column_names = [self.escape_identifier(column_name) for column_name in column_names]
+        escaped_column_names = [
+            self.escape_identifier(column_name) for column_name in column_names
+        ]
 
         # prepare sql string
         sql = 'SELECT {columns} FROM {schema}.{table}'.format(
@@ -139,12 +159,15 @@ class BaseDatabaseAdapter:
         sql_args = []
 
         # process filtering
-        sql, sql_args = self._process_filtering(sql, sql_args, search, filters, escaped_column_names)
+        sql, sql_args = self._process_filtering(
+            sql, sql_args, search, filters, escaped_column_names
+        )
 
         return self.fetchone(sql, args=sql_args)
 
-    def fetch_dict(self, schema_name, table_name, column_names=None, search=None, filters=None):
-
+    def fetch_dict(
+        self, schema_name, table_name, column_names=None, search=None, filters=None
+    ):
         # if no column names are provided get all column_names from the table
         if not column_names:
             column_names = self.fetch_column_names(schema_name, table_name)
@@ -192,22 +215,29 @@ class BaseDatabaseAdapter:
             self.execute(sql)
 
     def create_table(self, schema_name, table_name, columns):
-
         # check column types
         for column in columns:
             if self.COLUMNTYPES.get(column['datatype']) is None:
-                raise TypeError("Column {name} is of type {datatype}. {datatype} is not ".format(**column) +
-                                "supported by the database, the table can not be created.")
+                raise TypeError(
+                    'Column {name} is of type {datatype}. {datatype} is not '.format(
+                        **column
+                    )
+                    + 'supported by the database, the table can not be created.'
+                )
 
         # prepare sql string
         sql = 'CREATE TABLE {schema}.{table} ({columns});'.format(
             schema=self.escape_identifier(schema_name),
             table=self.escape_identifier(table_name),
-            columns=', '.join([
-                '{column_name} {column_type}'.format(
-                    column_name=self.escape_identifier(column['name']),
-                    column_type=self.COLUMNTYPES[column['datatype']],
-                ) for column in columns]),
+            columns=', '.join(
+                [
+                    '{column_name} {column_type}'.format(
+                        column_name=self.escape_identifier(column['name']),
+                        column_type=self.COLUMNTYPES[column['datatype']],
+                    )
+                    for column in columns
+                ]
+            ),
         )
 
         # log sql string and execute
@@ -226,7 +256,9 @@ class BaseDatabaseAdapter:
 
     def insert_rows(self, schema_name, table_name, columns, rows, mask=None):
         # create a list of escaped columns
-        escaped_column_names = [self.escape_identifier(column['name']) for column in columns]
+        escaped_column_names = [
+            self.escape_identifier(column['name']) for column in columns
+        ]
 
         # create a list of escaped value tuples
         escaped_rows = []
@@ -314,9 +346,15 @@ class BaseDatabaseAdapter:
     def _process_ordering(self, sql, ordering, escaped_column_names):
         if ordering:
             if ordering.startswith('-'):
-                escaped_ordering_column, ordering_direction = self.escape_identifier(ordering[1:]), 'DESC'
+                escaped_ordering_column, ordering_direction = (
+                    self.escape_identifier(ordering[1:]),
+                    'DESC',
+                )
             else:
-                escaped_ordering_column, ordering_direction = self.escape_identifier(ordering), 'ASC'
+                escaped_ordering_column, ordering_direction = (
+                    self.escape_identifier(ordering),
+                    'ASC',
+                )
 
             if escaped_ordering_column in escaped_column_names:
                 sql += f' ORDER BY {escaped_ordering_column} {ordering_direction}'
@@ -329,7 +367,9 @@ class BaseDatabaseAdapter:
         else:
             if cell.ndim == 1:
                 # create an array string digestable by postgres
-                value_list = ['NULL' if cell.mask[i] else str(cell[i]) for i in range(len(cell))]
+                value_list = [
+                    'NULL' if cell.mask[i] else str(cell[i]) for i in range(len(cell))
+                ]
                 value = '{' + ', '.join(value_list) + '}'
             elif isinstance(cell, str):
                 value = cell

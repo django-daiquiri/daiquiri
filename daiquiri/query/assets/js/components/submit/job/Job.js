@@ -11,7 +11,7 @@ import JobResults from './JobResults'
 import JobPlot from './JobPlot'
 import JobDownload from './JobDownload'
 
-const Job = ({ jobId, loadForm }) => {
+const Job = ({ jobId, loadForm, loadJob }) => {
   const { data: job } = useJobQuery(jobId)
 
   const [activeTab, setActiveTab] = useLsState('daiquiri.query.job.activeTab', 'overview')
@@ -71,7 +71,7 @@ const Job = ({ jobId, loadForm }) => {
             activeTab === 'results' && <JobResults job={job} />
           }
           {
-            activeTab === 'plot' && <JobPlot job={job} />
+            activeTab === 'plot' && <JobPlot job={job} loadJob={loadJob}/>
           }
           {
             activeTab === 'download' && <JobDownload job={job} />
@@ -84,7 +84,8 @@ const Job = ({ jobId, loadForm }) => {
 
 Job.propTypes = {
   jobId: PropTypes.string.isRequired,
-  loadForm: PropTypes.func.isRequired
+  loadForm: PropTypes.func.isRequired,
+  loadJob: PropTypes.func.isRequired,
 }
 
 export default Job

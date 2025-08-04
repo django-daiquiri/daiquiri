@@ -36,3 +36,5 @@ Makefile
 
 .imdone/
 .on-save.json
+
+uv.lock

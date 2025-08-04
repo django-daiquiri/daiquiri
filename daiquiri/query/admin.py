@@ -37,6 +37,7 @@ class DownloadJobAdmin(JobAdmin):
     search_fields = [*JobAdmin.search_fields, 'query_job__schema_name', 'query_job__table_name', 'format_key']
     list_display = [*JobAdmin.list_display, 'query_job', 'file_path']
     list_filter = [*JobAdmin.list_filter, 'format_key']
+    raw_id_fields = ('query_job', )
     actions = ['abort_job', 'archive_job']
 
 
@@ -44,6 +45,7 @@ class DownloadJobAdmin(JobAdmin):
 class QueryArchiveJobAdmin(JobAdmin):
     search_fields = [*JobAdmin.search_fields, 'query_job__schema_name', 'query_job__table_name', 'column_name', 'files']
     list_display = [*JobAdmin.list_display, 'query_job', 'file_path']
+    raw_id_fields = ('query_job', )
     actions = ['abort_job', 'archive_job']
 
 

@@ -33,7 +33,7 @@ const Submit = ({ formKey, jobId, query, queryLanguage, loadForm, loadJob, loadJ
         </div>
         <div className="col-lg-9 order-1 order-lg-2">
           {
-            jobId && <Job jobId={jobId} loadForm={loadForm} />
+            jobId && <Job jobId={jobId} loadForm={loadForm} loadJob={loadJob} />
           }
           {
             formKey && getForm()

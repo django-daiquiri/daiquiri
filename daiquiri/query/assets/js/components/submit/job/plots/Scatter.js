@@ -8,55 +8,44 @@ import { useJobPlotQuery } from 'daiquiri/query/assets/js/hooks/queries'
 import ScatterForm from './ScatterForm'
 import ScatterPlot from './ScatterPlot'
 
-const Scatter = ({ job, columns }) => {
+const Scatter = ({ job, columns, loadJob }) => {
 
-  const [values, setValues] = useState({
+  const [plotValues, setPlotValues] = useState({
     x: {
       column: '',
     },
-    y1: {
+    y: {
       column: '',
       color: colors[0].hex,
       symbol: symbols[0].symbol
-    },
-    y2: {
-      column: '',
-      color: colors[1].hex,
-      symbol: symbols[1].symbol
-    },
-    y3: {
-      column: '',
-      color: colors[2].hex,
-      symbol: symbols[2].symbol
     }
   })
 
-  useEffect(() => setValues({
-    ...values,
+  useEffect(() => setPlotValues({
+    ...plotValues,
     x: {
-      ...values.x, column: isNil(columns[0]) ? '' : columns[0].name
+      ...plotValues.x, column: isNil(columns[0]) ? '' : columns[0].name
     },
-    y1: {
-      ...values.y1, column: isNil(columns[1]) ? '' : columns[1].name
+    y: {
+      ...plotValues.y, column: isNil(columns[1]) ? '' : columns[1].name
     }
   }), [columns])
 
-  const { data: x } = useJobPlotQuery(job, values.x.column)
-  const { data: y1 } = useJobPlotQuery(job, values.y1.column)
-  const { data: y2 } = useJobPlotQuery(job, values.y2.column)
-  const { data: y3 } = useJobPlotQuery(job, values.y3.column)
+  const { data: x } = useJobPlotQuery(job, plotValues.x.column)
+  const { data: y } = useJobPlotQuery(job, plotValues.y.column)
 
   return (
     <div>
-      <ScatterForm columns={columns} values={values} setValues={setValues} />
-      <ScatterPlot columns={columns} values={values} x={x} y1={y1} y2={y2} y3={y3} />
+      <ScatterForm columns={columns} plotValues={plotValues} setPlotValues={setPlotValues} />
+      {job && <ScatterPlot columns={columns} plotValues={plotValues} x={x} y={y} loadJob={loadJob} job={job} />}
     </div>
   )
 }
 
 Scatter.propTypes = {
   job: PropTypes.object.isRequired,
-  columns: PropTypes.array.isRequired
+  columns: PropTypes.array.isRequired,
+  loadJob: PropTypes.func.isRequired,
 }
 
 export default Scatter

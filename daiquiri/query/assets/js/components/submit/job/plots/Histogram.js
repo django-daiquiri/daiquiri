@@ -10,7 +10,7 @@ import HistogramPlot from './HistogramPlot'
 
 const Histogram = ({ job, columns }) => {
 
-  const [values, setValues] = useState({
+  const [plotValues, setPlotValues] = useState({
     x: {
       column: ''
     },
@@ -22,20 +22,20 @@ const Histogram = ({ job, columns }) => {
     bins: 20,
   })
 
-  useEffect(() => setValues({
-    ...values,
+  useEffect(() => setPlotValues({
+    ...plotValues,
     x: {
-      ...values.x, column: isNil(columns[0]) ? '' : columns[0].name
+      ...plotValues.x, column: isNil(columns[0]) ? '' : columns[0].name
     }
   }), [columns])
 
-  const { data: x } = useJobPlotQuery(job, values.x.column)
-  const { data: s } = useJobPlotQuery(job, values.s.column)
+  const { data: x } = useJobPlotQuery(job, plotValues.x.column)
+  const { data: s } = useJobPlotQuery(job, plotValues.s.column)
 
   return (
     <div>
-      <HistogramForm columns={columns} values={values} setValues={setValues} />
-      <HistogramPlot columns={columns} values={values} x={x} s={s} />
+      <HistogramForm columns={columns} plotValues={plotValues} setPlotValues={setPlotValues} />
+      <HistogramPlot columns={columns} plotValues={plotValues} x={x} s={s} />
     </div>
   )
 }

@@ -10,6 +10,6 @@ const appElement = document.getElementById('app')
 
 createRoot(appElement).render(
   <QueryClientProvider client={queryClient}>
-    <Table schema={appElement.dataset.schema} table={appElement.dataset.table}/>
+    <Table schema={appElement.dataset.schema} table={appElement.dataset.table} search={appElement.dataset.search}/>
   </QueryClientProvider>
 )
