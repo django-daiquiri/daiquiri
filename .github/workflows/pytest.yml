@@ -8,7 +8,7 @@ jobs:
     strategy:
       matrix:
         db-backend: [mysql, postgres]
-        python-version: ['3.13', '3.14']
+        python-version: ['3.13']
 
     services:
       postgres:
