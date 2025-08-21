@@ -62,6 +62,7 @@ dependencies = [
   "rules~=3.5",
   "sqlalchemy~=2.0.41",
   "XlsxWriter==3.2.2",
+  "passlib>=1.7.4",
 ]
 
 [project.optional-dependencies]
