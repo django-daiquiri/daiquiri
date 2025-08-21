@@ -8,11 +8,11 @@ jobs:
     strategy:
       matrix:
         db-backend: [mysql, postgres]
-        python-version: ['3.9', '3.12']
+        python-version: ['3.13', '3.14']
 
     services:
       postgres:
-        image: postgres:13
+        image: postgres:17
         env:
           POSTGRES_PASSWORD: postgres_password
         ports:
