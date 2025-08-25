@@ -64,7 +64,7 @@ SECRET_KEY = 'this is a not very secret key'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'daiquiri_app',
+        'NAME': 'test_daiquiri_app',
         'USER': 'daiquiri_app',
         'PASSWORD': 'daiquiri_app',
         'HOST': '127.0.0.1',
@@ -74,7 +74,7 @@ DATABASES = {
     },
     'data': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'daiquiri_dataaaaaaaaaaaaaa',
+        'NAME': 'test_daiquiri_data',
         'USER': 'daiquiri_data',
         'PASSWORD': 'daiquiri_data',
         'HOST': '127.0.0.1',
@@ -84,7 +84,7 @@ DATABASES = {
     },
     'tap': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'daiquiri_data',
+        'NAME': 'test_daiquiri_data',
         'USER': 'daiquiri_data',
         'PASSWORD': 'daiquiri_data',
         'HOST': '127.0.0.1',
@@ -94,7 +94,7 @@ DATABASES = {
     },
     'oai': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'daiquiri_data',
+        'NAME': 'test_daiquiri_data',
         'USER': 'daiquiri_data',
         'PASSWORD': 'daiquiri_data',
         'HOST': '127.0.0.1',
