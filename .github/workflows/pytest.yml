@@ -60,15 +60,23 @@ jobs:
         COVERALLS_FLAG_NAME: '${{ matrix.db-backend }}: ${{ matrix.python-version }}'
         COVERALLS_PARALLEL: true
 
+  # coveralls:
+  #   name: Indicate completion to coveralls
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   container: python:3-slim
+  #   steps:
+  #   - name: Run Coveralls finish
+  #     run: |
+  #       pip install coveralls
+  #       coveralls --service=github --finish
+  #     env:
+  #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   coveralls:
-    name: Indicate completion to coveralls
-    needs: build
-    runs-on: ubuntu-latest
-    container: python:3-slim
-    steps:
-    - name: Run Coveralls finish
-      run: |
-        pip install coveralls
-        coveralls --service=github --finish
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Coveralls
+      uses: coverallsapp/github-action@v2
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        service-name: github
+        parallel: true
