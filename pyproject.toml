@@ -179,7 +179,7 @@ django = ["django"]
 rest_framework = ["rest_framework"]
 
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "testing.config.settings"
+DJANGO_SETTINGS_MODULE = "testing.config.settings.base"
 python_files = "test_*.py"
 addopts = '--reuse-db'
 

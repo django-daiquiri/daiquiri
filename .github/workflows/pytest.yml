@@ -40,7 +40,6 @@ jobs:
 
     - name: Prepare testing app
       run: |
-        cp testing/config/settings/postgres.py testing/config/settings/local.py
         mkdir testing/log testing/download
 
     - name: Prepare PostgreSQL database
@@ -68,7 +67,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         COVERALLS_FLAG_NAME: 'postgres: ${{ matrix.python-version }}'
-        DJANGO_SETTINGS_MODULE: testing.config.settings
+        DJANGO_SETTINGS_MODULE: testing.config.settings.base
 
     - name: Publish to coveralls.io
       uses: coverallsapp/github-action@v2

@@ -58,6 +58,8 @@ QUERY_UPLOAD_DIR = os.path.join(BASE_DIR, 'upload')
 
 SERVE_DOWNLOAD_DIR = os.path.join(BASE_DIR, 'files')
 
+SECRET_KEY = 'this is a not very secret key'
+
 # all test databases need to have different name or they will not be picked up by django
 DATABASES = {
     'default': {
@@ -102,9 +104,8 @@ DATABASES = {
     },
 }
 
+ADAPTER_DATABASE = 'daiquiri.core.adapter.database.postgres.PostgreSQLAdapter'
+ADAPTER_DOWNLOAD = 'daiquiri.core.adapter.download.pgdump.PgDumpAdapter'
 
-if 'pytest' in sys.modules:
-    for alias, db_config in DATABASES.items():
-        test_name = db_config.get('TEST', {}).get('NAME')
-        if test_name:
-            DATABASES[alias]['NAME'] = test_name
+TAP_SCHEMA = 'public'
+OAI_SCHEMA = 'public'
