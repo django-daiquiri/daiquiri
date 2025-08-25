@@ -74,8 +74,7 @@ jobs:
   #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   coveralls:
-    name: Coveralls
-    uses: coverallsapp/github-action@v2
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      COVERALLS_PARALLEL: true
+    name: Publish to coveralls.io
+    uses: coverallsapp/github-action@v1.1.2
+    with:
+      github-token: ${{ secrets.GITHUB_TOKEN }}
