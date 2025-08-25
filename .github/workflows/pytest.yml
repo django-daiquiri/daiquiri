@@ -62,7 +62,6 @@ jobs:
       uses: coverallsapp/github-action@v2
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        service-name: github
         parallel: true
 
   # coveralls:
@@ -88,5 +87,4 @@ jobs:
         uses: coverallsapp/github-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          service-name: github
           parallel: true
