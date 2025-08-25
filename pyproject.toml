@@ -85,7 +85,8 @@ pytest = [
   "coverage~=7.10.5",
   "pytest~=8.4.1",
   "pytest-cov~=6.2.0",
-  "pytest-django~=4.11.1",
+  #"pytest-django~=4.11.1",
+  "pytest-django>=4.5.2",
   "pytest-dotenv~=0.5.2",
   "pytest-mock~=3.14.1",
 ]
