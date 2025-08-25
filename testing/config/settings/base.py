@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from . import ADDITIONAL_APPS, BASE_DIR, DJANGO_APPS
+import sys
 
 SITE_URL = 'http://testserver'
 SITE_CREATED = '2020-01-01'
@@ -100,3 +101,10 @@ DATABASES = {
         },
     },
 }
+
+
+if 'pytest' in sys.modules:
+    for alias, db_config in DATABASES.items():
+        test_name = db_config.get('TEST', {}).get('NAME')
+        if test_name:
+            DATABASES[alias]['NAME'] = test_name
