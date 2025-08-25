@@ -54,6 +54,11 @@ jobs:
         psql postgresql://postgres:postgres_password@localhost:5432 -f testing/sql/postgres/setup.sql
         psql postgresql://postgres:postgres_password@localhost:5432/test_daiquiri_data -c 'VACUUM ANALYSE;'
 
+    - name: Grant schema privileges
+      run: |
+        psql postgresql://postgres:postgres_password@localhost:5432 -c "GRANT ALL PRIVILEGES ON SCHEMA public TO daiquiri_app;"
+        psql postgresql://postgres:postgres_password@localhost:5432 -c "ALTER DATABASE test_daiquiri_app OWNER TO daiquiri_app;"
+
     - name: Run tests
       run: |
         uv run pytest --reuse-db --cov=daiquiri
@@ -67,14 +72,14 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         parallel: true
 
-  coveralls:
-    name: Publish to coveralls.io
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+  # coveralls:
+  #   name: Publish to coveralls.io
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
 
-      - name: Publish coverage to coveralls
-        uses: coverallsapp/github-action@v2
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          parallel: true
+  #     - name: Publish coverage to coveralls
+  #       uses: coverallsapp/github-action@v2
+  #       with:
+  #         github-token: ${{ secrets.GITHUB_TOKEN }}
+  #         parallel: true
