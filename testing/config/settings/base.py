@@ -9,6 +9,11 @@ SITE_CREATED = '2020-01-01'
 PASSWORD_HASHERS = ('django.contrib.auth.hashers.MD5PasswordHasher',)
 
 FIXTURE_DIRS = [Path(BASE_DIR) / 'testing' / 'fixtures']
+ARCHIVE_DOWNLOAD_DIR = Path(BASE_DIR) / 'download'
+FILES_BASE_PATH = Path(BASE_DIR) / 'files'
+QUERY_DOWNLOAD_DIR = Path(BASE_DIR) / 'download'
+QUERY_UPLOAD_DIR = Path(BASE_DIR) / 'upload'
+SERVE_DOWNLOAD_DIR = Path(BASE_DIR) / 'files'
 
 INSTALLED_APPS = [
     *DJANGO_APPS,
@@ -35,12 +40,8 @@ REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_RATES': {'query.create': '1000/second'},
 }
 
-ARCHIVE_DOWNLOAD_DIR = os.path.join(BASE_DIR, 'download')
-
 AUTH_SIGNUP = True
 AUTH_WORKFLOW = 'confirmation'
-
-FILES_BASE_PATH = os.path.join(BASE_DIR, 'files')
 
 MEETINGS_PARTICIPANT_DETAIL_KEYS = [
     {'key': 'affiliation', 'label': 'Affiliation', 'data_type': 'text', 'required': True},
@@ -53,10 +54,6 @@ MEETINGS_PARTICIPANT_DETAIL_KEYS = [
     },
 ]
 
-QUERY_DOWNLOAD_DIR = os.path.join(BASE_DIR, 'download')
-QUERY_UPLOAD_DIR = os.path.join(BASE_DIR, 'upload')
-
-SERVE_DOWNLOAD_DIR = os.path.join(BASE_DIR, 'files')
 
 SECRET_KEY = 'this is a not very secret key'
 
@@ -64,7 +61,7 @@ SECRET_KEY = 'this is a not very secret key'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'test_daiquiri_app',
+        'NAME': 'daiquiri_app',
         'USER': 'daiquiri_app',
         'PASSWORD': 'daiquiri_app',
         'HOST': '127.0.0.1',
@@ -74,7 +71,7 @@ DATABASES = {
     },
     'data': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'test_daiquiri_data',
+        'NAME': 'daiquiri_data',
         'USER': 'daiquiri_data',
         'PASSWORD': 'daiquiri_data',
         'HOST': '127.0.0.1',
@@ -84,7 +81,7 @@ DATABASES = {
     },
     'tap': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'test_daiquiri_data',
+        'NAME': 'daiquiri_data',
         'USER': 'daiquiri_data',
         'PASSWORD': 'daiquiri_data',
         'HOST': '127.0.0.1',
@@ -94,12 +91,12 @@ DATABASES = {
     },
     'oai': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'test_daiquiri_data',
+        'NAME': 'daiquiri_data',
         'USER': 'daiquiri_data',
         'PASSWORD': 'daiquiri_data',
         'HOST': '127.0.0.1',
         'TEST': {
-            'NAME': 'test_daiquiri_oai',
+            'NAME': 'daiquiri_oai',
         },
     },
 }
@@ -109,3 +106,9 @@ ADAPTER_DOWNLOAD = 'daiquiri.core.adapter.download.pgdump.PgDumpAdapter'
 
 TAP_SCHEMA = 'public'
 OAI_SCHEMA = 'public'
+
+if 'pytest' in sys.modules:
+    for alias, db_config in DATABASES.items():
+        test_name = db_config.get('TEST', {}).get('NAME')
+        if test_name:
+            DATABASES[alias]['NAME'] = test_name
