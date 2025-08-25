@@ -7,9 +7,7 @@ SITE_CREATED = '2020-01-01'
 
 PASSWORD_HASHERS = ('django.contrib.auth.hashers.MD5PasswordHasher',)
 
-# FIXTURE_DIRS = [Path(BASE_DIR) / '..' / 'testing' / 'fixtures']
-# FIXTURE_DIRS = [Path('/home/runner/work/daiquiri/testing/fixtures')]
-FIXTURE_DIRS = [Path('testing/fixtures')]
+FIXTURE_DIRS = [Path(BASE_DIR) / 'testing' / 'fixtures']
 
 INSTALLED_APPS = [
     *DJANGO_APPS,
