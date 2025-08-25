@@ -61,6 +61,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         COVERALLS_FLAG_NAME: 'postgres: ${{ matrix.python-version }}'
+        DJANGO_SETTINGS_MODULE: testing.config.settings
 
     - name: Publish to coveralls.io
       uses: coverallsapp/github-action@v2
