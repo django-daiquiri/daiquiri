@@ -56,3 +56,47 @@ QUERY_DOWNLOAD_DIR = os.path.join(BASE_DIR, 'download')
 QUERY_UPLOAD_DIR = os.path.join(BASE_DIR, 'upload')
 
 SERVE_DOWNLOAD_DIR = os.path.join(BASE_DIR, 'files')
+
+# all test databases need to have different name or they will not be picked up by django
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'daiquiri_app',
+        'USER': 'daiquiri_app',
+        'PASSWORD': 'daiquiri_app',
+        'HOST': '127.0.0.1',
+        'TEST': {
+            'NAME': 'test_daiquiri_app',
+        },
+    },
+    'data': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'daiquiri_data',
+        'USER': 'daiquiri_data',
+        'PASSWORD': 'daiquiri_data',
+        'HOST': '127.0.0.1',
+        'TEST': {
+            'NAME': 'test_daiquiri_data',
+        },
+    },
+    'tap': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'daiquiri_data',
+        'USER': 'daiquiri_data',
+        'PASSWORD': 'daiquiri_data',
+        'HOST': '127.0.0.1',
+        'TEST': {
+            'NAME': 'test_daiquiri_tap',
+        },
+    },
+    'oai': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'daiquiri_data',
+        'USER': 'daiquiri_data',
+        'PASSWORD': 'daiquiri_data',
+        'HOST': '127.0.0.1',
+        'TEST': {
+            'NAME': 'test_daiquiri_oai',
+        },
+    },
+}
