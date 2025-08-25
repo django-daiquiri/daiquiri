@@ -81,23 +81,23 @@ gunicorn = [
 postgres = [
   "psycopg[binary]~=3.2.9",
 ]
-# pytest = [
-#   "coverage~=7.10.5",
-#   "pytest~=8.4.1",
-#   "pytest-cov~=6.2.0",
-#   "pytest-django~=4.11.1",
-#   "pytest-dotenv~=0.5.2",
-#   "pytest-mock~=3.14.1",
-# ]
 pytest = [
-  "coverage~=7.2.7",
+  "coverage~=7.10.5",
   "pytest~=8.4.1",
-  "pytest-cov~=4.1.0",
-  "pytest-django~=4.5.2",
+  "pytest-cov~=6.2.0",
+  "pytest-django~=4.11.1",
   "pytest-dotenv~=0.5.2",
-  "pytest-mock~=3.11.1",
-  # "pytest-pythonpath~=0.7.4",
+  "pytest-mock~=3.14.1",
 ]
+# pytest = [
+#   "coverage~=7.2.7",
+#   "pytest~=6.2.5",
+#   "pytest-cov~=4.1.0",
+#   "pytest-django~=4.5.2",
+#   "pytest-dotenv~=0.5.2",
+#   "pytest-mock~=3.11.1",
+#   "pytest-pythonpath~=0.7.4",
+# ]
 
 [project.urls]
 documentation = "https://django-daiquiri.github.io"
