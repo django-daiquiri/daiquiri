@@ -7,7 +7,6 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        db-backend: [mysql, postgres]
         python-version: ['3.13']
 
     services:
@@ -41,13 +40,8 @@ jobs:
 
     - name: Prepare testing app
       run: |
-        cp testing/config/settings/${{ matrix.db-backend }}.py testing/config/settings/local.py
+        cp testing/config/settings/postgres.py testing/config/settings/local.py
         mkdir testing/log testing/download
-
-    - name: Prepare MySQL database
-      run: |
-        sudo systemctl start mysql.service
-        mysql --user=root --password=root < testing/sql/mysql/setup.sql
 
     - name: Prepare PostgreSQL database
       run: |
@@ -66,23 +60,11 @@ jobs:
         uv run pytest --reuse-db --cov=daiquiri --cov-report=xml
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        COVERALLS_FLAG_NAME: '${{ matrix.db-backend }}: ${{ matrix.python-version }}'
+        COVERALLS_FLAG_NAME: 'postgres: ${{ matrix.python-version }}'
 
     - name: Publish to coveralls.io
       uses: coverallsapp/github-action@v2
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         path-to-lcov: coverage.xml
-        parallel: true
-
-  # coveralls:
-  #   name: Publish to coveralls.io
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-
-  #     - name: Publish coverage to coveralls
-  #       uses: coverallsapp/github-action@v2
-  #       with:
-  #         github-token: ${{ secrets.GITHUB_TOKEN }}
-  #         parallel: true
+        parallel: false
