@@ -54,11 +54,16 @@ jobs:
     - name: Run tests
       run: |
         pytest --reuse-db --cov=daiquiri
-        coveralls --service=github
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         COVERALLS_FLAG_NAME: '${{ matrix.db-backend }}: ${{ matrix.python-version }}'
         COVERALLS_PARALLEL: true
+    - name: Publish to coveralls.io
+      uses: coverallsapp/github-action@v2
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        service-name: github
+        parallel: true
 
   # coveralls:
   #   name: Indicate completion to coveralls
@@ -83,3 +88,5 @@ jobs:
         uses: coverallsapp/github-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          service-name: github
+          parallel: true
