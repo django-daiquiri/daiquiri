@@ -56,8 +56,8 @@ jobs:
         psql postgresql://postgres:postgres_password@localhost:5432 -c "ALTER DATABASE test_daiquiri_data OWNER TO daiquiri_data;"
 
     - name: Run tests
-      working-directory: daiquiri
       run: |
+        export PYTHONPATH=$(pwd)
         uv run pytest --reuse-db --cov=daiquiri --cov-report=xml
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
