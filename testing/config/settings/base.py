@@ -72,7 +72,7 @@ DATABASES = {
     },
     'data': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'daiquiri_data',
+        'NAME': 'daiquiri_data_LOLOL',
         'USER': 'daiquiri_data',
         'PASSWORD': 'daiquiri_data',
         'HOST': '127.0.0.1',
