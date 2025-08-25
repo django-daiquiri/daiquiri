@@ -63,7 +63,7 @@ jobs:
 
     - name: Run tests
       run: |
-        uv run pytest --reuse-db --cov=daiquiri
+        uv run pytest --reuse-db --cov=daiquiri --cov-report=xml
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         COVERALLS_FLAG_NAME: '${{ matrix.db-backend }}: ${{ matrix.python-version }}'
@@ -72,6 +72,7 @@ jobs:
       uses: coverallsapp/github-action@v2
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
+        path-to-lcov: coverage.xml
         parallel: true
 
   # coveralls:
