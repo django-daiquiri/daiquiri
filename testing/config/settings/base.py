@@ -86,7 +86,7 @@ DATABASES = {
         'PASSWORD': 'daiquiri_data',
         'HOST': '127.0.0.1',
         'TEST': {
-            'NAME': 'test_daiquiri_tap',
+            'NAME': 'test_daiquiri_data',
         },
     },
     'oai': {
@@ -96,7 +96,7 @@ DATABASES = {
         'PASSWORD': 'daiquiri_data',
         'HOST': '127.0.0.1',
         'TEST': {
-            'NAME': 'daiquiri_oai',
+            'NAME': 'test_daiquiri_data',
         },
     },
 }
