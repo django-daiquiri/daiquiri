@@ -75,6 +75,11 @@ jobs:
 
   coveralls:
     name: Publish to coveralls.io
-    uses: coverallsapp/github-action@v1.1.2
-    with:
-      github-token: ${{ secrets.GITHUB_TOKEN }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Publish coverage to coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
