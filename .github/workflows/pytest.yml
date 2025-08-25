@@ -57,7 +57,7 @@ jobs:
 
     - name: Run tests
       run: |
-        export PYTHONPATH=$(pwd)
+        export PYTHONPATH=testing
         uv run pytest --reuse-db --cov=daiquiri --cov-report=xml
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
