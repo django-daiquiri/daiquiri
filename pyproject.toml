@@ -79,7 +79,7 @@ gunicorn = [
   "gunicorn>=23.0",
 ]
 postgres = [
-  "psycopg[binary]~=3.2.ß",
+  "psycopg[binary]~=3.2.9",
 ]
 pytest = [
   "coverage~=7.10.5",
