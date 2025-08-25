@@ -64,7 +64,7 @@ jobs:
     - name: Run tests
       run: |
         export PYTHONPATH=$(pwd)
-        uv run pytest --reuse-db  --create-db --cov=daiquiri --cov-report=xml
+        uv run pytest --reuse-db  --no-create-db --cov=daiquiri --cov-report=xml
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         COVERALLS_FLAG_NAME: 'postgres: ${{ matrix.python-version }}'
