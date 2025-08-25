@@ -55,6 +55,9 @@ jobs:
         psql postgresql://postgres:postgres_password@localhost:5432 -c "ALTER DATABASE test_daiquiri_app OWNER TO daiquiri_app;"
         psql postgresql://postgres:postgres_password@localhost:5432 -c "ALTER DATABASE test_daiquiri_data OWNER TO daiquiri_data;"
 
+    - name: Print current working directory
+      run: pwd && ls -la
+
     - name: Run tests
       run: |
         export PYTHONPATH=$(pwd)
