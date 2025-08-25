@@ -182,7 +182,6 @@ rest_framework = ["rest_framework"]
 DJANGO_SETTINGS_MODULE = "testing.config.settings"
 testpaths = ["daiquiri"]
 python_files = "test_*.py"
-python_paths = ["testing/"]
 addopts = '--reuse-db'
 
 [tool.coverage.run]
