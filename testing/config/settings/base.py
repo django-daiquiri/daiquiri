@@ -112,3 +112,5 @@ if 'pytest' in sys.modules:
         test_name = db_config.get('TEST', {}).get('NAME')
         if test_name:
             DATABASES[alias]['NAME'] = test_name
+
+ROOT_URLCONF = 'testing.config.urls'
