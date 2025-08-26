@@ -8,12 +8,14 @@ SITE_CREATED = '2020-01-01'
 
 PASSWORD_HASHERS = ('django.contrib.auth.hashers.MD5PasswordHasher',)
 
-FIXTURE_DIRS = [Path(BASE_DIR) / 'testing' / 'fixtures']
-ARCHIVE_DOWNLOAD_DIR = Path(BASE_DIR) / 'download'
-FILES_BASE_PATH = Path(BASE_DIR) / 'files'
-QUERY_DOWNLOAD_DIR = Path(BASE_DIR) / 'download'
-QUERY_UPLOAD_DIR = Path(BASE_DIR) / 'upload'
-SERVE_DOWNLOAD_DIR = Path(BASE_DIR) / 'files'
+TEST_DIR = Path(BASE_DIR) / 'testing'
+
+FIXTURE_DIRS = [TEST_DIR / 'fixtures']
+ARCHIVE_DOWNLOAD_DIR = TEST_DIR / 'download'
+FILES_BASE_PATH = TEST_DIR / 'files'
+QUERY_DOWNLOAD_DIR = TEST_DIR / 'download'
+QUERY_UPLOAD_DIR = TEST_DIR / 'upload'
+SERVE_DOWNLOAD_DIR = TEST_DIR / 'files'
 
 INSTALLED_APPS = [
     *DJANGO_APPS,
