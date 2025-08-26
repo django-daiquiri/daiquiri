@@ -40,7 +40,7 @@ jobs:
 
     - name: Prepare testing app
       run: |
-        mkdir -plog download/user
+        mkdir -p log download/user
 
     - name: Prepare PostgreSQL database
       run: |
