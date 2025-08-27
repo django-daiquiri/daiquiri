@@ -62,11 +62,8 @@ instances = [31]
 def test_create(db, client, username, password):
     client.login(username=username, password=password)
     url = reverse(urlnames['list'])
-    table = Table.objects.first()
-    response = client.post(url, {'table': table.id, 'name': 'test', 'discover': True})
-    print(f'table.id: {table.id}')
-    print(response.json())
-    # response = client.post(url, {'table': 3, 'name': 'test', 'discover': True})
+
+    response = client.post(url, {'table': 3, 'name': 'test', 'discover': True})
     assert response.status_code == status_map['create'][username], response.json()
 
 
