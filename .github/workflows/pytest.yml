@@ -54,10 +54,17 @@ jobs:
         psql postgresql://postgres:postgres_password@localhost:5432 -c "ALTER DATABASE test_daiquiri_app OWNER TO daiquiri_app;"
         psql postgresql://postgres:postgres_password@localhost:5432 -c "ALTER DATABASE test_daiquiri_data OWNER TO daiquiri_data;"
 
+    - name: Run Django migrations
+      run: |
+        export PYTHONPATH=$(pwd)
+        uv run django-admin migrate --noinput --settings=testing.config.settings
+        uv run django-admin migrate --database=tap --noinput --settings=testing.config.settings
+        uv run django-admin migrate --database=oai --noinput --settings=testing.config.settings
+
     - name: Run tests
       run: |
         export PYTHONPATH=$(pwd)
-        uv run pytest --reuse-db --migrations --cov=daiquiri --cov-report=xml daiquiri/metadata/tests/test_viewset_column.py
+        uv run pytest --reuse-db --migrations --cov=daiquiri --cov-report=xml
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         COVERALLS_FLAG_NAME: 'postgres: ${{ matrix.python-version }}'
