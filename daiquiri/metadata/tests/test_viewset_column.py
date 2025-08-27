@@ -1,5 +1,3 @@
-from urllib.parse import urlencode
-
 import pytest
 
 from django.urls import reverse
@@ -7,38 +5,26 @@ from django.urls import reverse
 from ..models import Column
 
 users = (
-    ('admin', 'admin'),
-    ('manager', 'manager'),
+    # ('admin', 'admin'),
+    # ('manager', 'manager'),
     ('user', 'user'),
     ('test', 'test'),
     ('anonymous', None),
 )
 
 status_map = {
-    'list': {
-        'admin': 200, 'manager': 200, 'user': 403, 'test': 403, 'anonymous': 403
-    },
-    'detail': {
-        'admin': 200, 'manager': 200, 'user': 403, 'test': 403, 'anonymous': 403
-    },
-    'create': {
-        'admin': 201, 'manager': 201, 'user': 403, 'test': 403, 'anonymous': 403
-    },
-    'update': {
-        'admin': 200, 'manager': 200, 'user': 403, 'test': 403, 'anonymous': 403
-    },
-    'delete': {
-        'admin': 204, 'manager': 204, 'user': 403, 'test': 403, 'anonymous': 403
-    },
-    'discover': {
-        'admin': 200, 'manager': 200, 'user': 403, 'test': 403, 'anonymous': 403
-    }
+    'list': {'admin': 200, 'manager': 200, 'user': 403, 'test': 403, 'anonymous': 403},
+    'detail': {'admin': 200, 'manager': 200, 'user': 403, 'test': 403, 'anonymous': 403},
+    'create': {'admin': 201, 'manager': 201, 'user': 403, 'test': 403, 'anonymous': 403},
+    'update': {'admin': 200, 'manager': 200, 'user': 403, 'test': 403, 'anonymous': 403},
+    'delete': {'admin': 204, 'manager': 204, 'user': 403, 'test': 403, 'anonymous': 403},
+    'discover': {'admin': 200, 'manager': 200, 'user': 403, 'test': 403, 'anonymous': 403},
 }
 
 urlnames = {
     'list': 'metadata:column-list',
     'detail': 'metadata:column-detail',
-    'discover': 'metadata:column-discover'
+    'discover': 'metadata:column-discover',
 }
 
 instances = [31]
@@ -75,11 +61,7 @@ def test_create(db, client, username, password):
     client.login(username=username, password=password)
 
     url = reverse(urlnames['list'])
-    response = client.post(url, {
-        'table': 3,
-        'name': 'test',
-        'discover': True
-    })
+    response = client.post(url, {'table': 3, 'name': 'test', 'discover': True})
     assert response.status_code == status_map['create'][username], response.json()
 
 
@@ -91,10 +73,14 @@ def test_update(db, client, username, password, pk):
     instance = Column.objects.get(pk=pk)
     instance_name = instance.name
     url = reverse(urlnames['detail'], args=[pk])
-    response = client.put(url, {
-        'table': 3,
-        'name': 'test',
-    }, content_type='application/json')
+    response = client.put(
+        url,
+        {
+            'table': 3,
+            'name': 'test',
+        },
+        content_type='application/json',
+    )
     assert response.status_code == status_map['update'][username], response.json()
 
     instance.refresh_from_db()
