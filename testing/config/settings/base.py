@@ -104,4 +104,4 @@ TAP_SCHEMA = 'public'
 OAI_SCHEMA = 'public'
 
 
-# ROOT_URLCONF = 'testing.config.urls'
+ROOT_URLCONF = 'testing.config.urls'
