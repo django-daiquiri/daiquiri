@@ -56,7 +56,7 @@ jobs:
 
     - name: Run tests
       run: |
-        export PYTHONPATH=$(pwd)
+        export PYTHONPATH=$(pwd)/testing
         uv run pytest --reuse-db --migrations --cov=daiquiri --cov-report=xml daiquiri/metadata/tests/test_viewset_column.py
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
