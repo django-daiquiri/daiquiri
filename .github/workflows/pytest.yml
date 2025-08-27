@@ -57,7 +57,7 @@ jobs:
     - name: Run tests
       run: |
         export PYTHONPATH=$(pwd)
-        uv run pytest --reuse-db --migrations --cov=daiquiri --cov-report=xml daiquiri/metadata/tests/test_viewset_column.py
+        uv run pytest --reuse-db --migrations --cov=daiquiri --cov-report=xml
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         COVERALLS_FLAG_NAME: 'postgres: ${{ matrix.python-version }}'

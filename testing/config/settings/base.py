@@ -1,7 +1,5 @@
-import os
 from pathlib import Path
 from . import ADDITIONAL_APPS, BASE_DIR, DJANGO_APPS
-import sys
 
 SITE_URL = 'http://testserver'
 SITE_CREATED = '2020-01-01'
@@ -83,7 +81,7 @@ DATABASES = {
     },
     'tap': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'test_daiquiri_tap',
+        'NAME': 'test_daiquiri_data',
         'USER': 'daiquiri_data',
         'PASSWORD': 'daiquiri_data',
         'HOST': '127.0.0.1',
