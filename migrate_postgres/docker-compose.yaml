@@ -4,8 +4,8 @@ services:
     image: postgres:13
     container_name: pg13
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: daiquiri_app
+      POSTGRES_PASSWORD: daiquiri_app
     ports:
       - "5433:5432"
     volumes:
@@ -16,8 +16,8 @@ services:
     image: postgres:17
     container_name: pg17
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: daiquiri_app
+      POSTGRES_PASSWORD: daiquiri_app
     ports:
       - "5434:5432"
     volumes:
