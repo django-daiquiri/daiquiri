@@ -85,6 +85,9 @@ DATABASES = {
         'USER': 'daiquiri_data',
         'PASSWORD': 'daiquiri_data',
         'HOST': '127.0.0.1',
+        'TEST': {
+            'NAME': 'test_daiquiri_tap',
+        },
     },
     'oai': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -92,6 +95,9 @@ DATABASES = {
         'USER': 'daiquiri_data',
         'PASSWORD': 'daiquiri_data',
         'HOST': '127.0.0.1',
+        'TEST': {
+            'NAME': 'test_daiquiri_oai',
+        },
     },
 }
 
