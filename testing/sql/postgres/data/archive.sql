@@ -1,4 +1,3 @@
-DROP SCHEMA IF EXISTS daiquiri_archive CASCADE;
 CREATE SCHEMA daiquiri_archive;
 
 CREATE TABLE "daiquiri_archive"."files" (

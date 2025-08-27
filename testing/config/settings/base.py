@@ -81,14 +81,14 @@ DATABASES = {
     },
     'tap': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'test_daiquiri_data',
+        'NAME': 'test_daiquiri_tap',
         'USER': 'daiquiri_data',
         'PASSWORD': 'daiquiri_data',
         'HOST': '127.0.0.1',
     },
     'oai': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'test_daiquiri_data',
+        'NAME': 'test_daiquiri_oai',
         'USER': 'daiquiri_data',
         'PASSWORD': 'daiquiri_data',
         'HOST': '127.0.0.1',
