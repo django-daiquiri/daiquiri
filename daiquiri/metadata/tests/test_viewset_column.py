@@ -5,8 +5,8 @@ from django.urls import reverse
 from ..models import Column
 
 users = (
-    # ('admin', 'admin'),
-    # ('manager', 'manager'),
+    ('admin', 'admin'),
+    ('manager', 'manager'),
     ('user', 'user'),
     ('test', 'test'),
     ('anonymous', None),
