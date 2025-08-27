@@ -1,0 +1,25 @@
+services:
+
+  pg13:
+    image: postgres:13
+    container_name: pg13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./old_database:/var/lib/postgresql/data
+      - ./transfer:/transfer
+
+  pg17:
+    image: postgres:17
+    container_name: pg17
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5434:5432"
+    volumes:
+      - ./new_database:/var/lib/postgresql/data
+      - ./transfer:/transfer
