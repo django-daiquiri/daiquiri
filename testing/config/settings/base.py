@@ -8,7 +8,7 @@ SITE_CREATED = '2020-01-01'
 
 PASSWORD_HASHERS = ('django.contrib.auth.hashers.MD5PasswordHasher',)
 
-TEST_DIR = Path(BASE_DIR)  # / 'testing'
+TEST_DIR = Path(BASE_DIR) / 'testing'
 
 FIXTURE_DIRS = [TEST_DIR / 'fixtures']
 ARCHIVE_DOWNLOAD_DIR = TEST_DIR / 'download'
