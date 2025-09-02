@@ -14,14 +14,19 @@ def get_job_results(request, job):
     namespace = request.resolver_match.namespace
     base_name = request.resolver_match.url_name.rsplit('-', 1)[0]
 
-    results = []
+    result_url = reverse(f'{namespace}:{base_name}-result', args=[job.id, 'result'])
+    results = [{
+        'result_type': 'result',
+        'href': request.build_absolute_uri(result_url)
+    },]
     for key in job.formats:
-        url = reverse(f'{namespace}:{base_name}-result', args=[job.id, key])
+        if key in ('votable', 'csv'):
+            url = reverse(f'{namespace}:{base_name}-result', args=[job.id, key])
 
-        results.append({
-            'result_type': key,
-            'href': request.build_absolute_uri(url)
-        })
+            results.append({
+                'result_type': key,
+                'href': request.build_absolute_uri(url)
+            })
 
     return results
 
