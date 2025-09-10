@@ -38,3 +38,4 @@ Makefile
 .on-save.json
 
 uv.lock
+package-lock.json
