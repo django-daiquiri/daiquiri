@@ -1,4 +1,9 @@
-# include settimgs from daiquiri
+import sys
+
+print('>>> SETTINGS LOADING, sys.path =', sys.path)
+
+
+# include settings from daiquiri
 from daiquiri.core.settings.django import *
 from daiquiri.core.settings.daiquiri import *
 from daiquiri.core.settings.logging import *
@@ -21,11 +26,5 @@ from daiquiri.tap.settings import *
 # override settings from base.py (which is checked in to git)
 try:
     from .base import *
-except ImportError:
-    pass
-
-# override settings from local.py (which is not checked in to git)
-try:
-    from .local import *
 except ImportError:
     pass
