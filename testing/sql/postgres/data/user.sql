@@ -1,4 +1,3 @@
-DROP SCHEMA IF EXISTS daiquiri_user_user CASCADE;
 CREATE SCHEMA daiquiri_user_user;
 
 CREATE TABLE "daiquiri_user_user"."test" (

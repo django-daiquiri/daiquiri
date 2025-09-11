@@ -5,16 +5,16 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 
 from allauth.account.adapter import DefaultAccountAdapter
-from allauth.exceptions import ImmediateHttpResponse
+from allauth.core.exceptions import ImmediateHttpResponse
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 
 logger = logging.getLogger(__name__)
 
 
 class DaiquiriAccountAdapter(DefaultAccountAdapter):
-
     def is_safe_url(self, url):
         from django.utils.http import url_has_allowed_host_and_scheme
+
         return url_has_allowed_host_and_scheme(url, allowed_hosts=settings.ALLOWED_HOSTS)
 
     def save_user(self, request, user, form, commit=True):
@@ -36,7 +36,8 @@ class DaiquiriAccountAdapter(DefaultAccountAdapter):
 
 
 class DaiquiriSocialAccountAdapter(DefaultSocialAccountAdapter):
-
-    def authentication_error(self, request, provider_id, error=None, exception=None, extra_context=None):
+    def authentication_error(
+        self, request, provider_id, error=None, exception=None, extra_context=None
+    ):
         logger.error([provider_id, error, exception])
         super().authentication_error(request, provider_id, error, exception, extra_context)
