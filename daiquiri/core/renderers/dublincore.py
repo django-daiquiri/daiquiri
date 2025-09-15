@@ -14,12 +14,18 @@ class DublincoreRendererMixin:
         creators = metadata.get('creators')
         if isinstance(creators, list):
             for creator in creators:
-                self.node('dc:creator', {}, creator.get('name'))
+                name = creator.get('name')
+                if name is None or name == '':
+                    name = f"{creator.get('last_name')}, {creator.get('first_name')}"
+                self.node('dc:creator', {}, name)
 
         contributors = metadata.get('contributors')
         if isinstance(contributors, list):
             for contributor in contributors:
-                self.node('dc:contributor', {}, contributor.get('name'))
+                name = contributor.get('name')
+                if name is None or name == '':
+                    name = f"{contributor.get('last_name')}, {contributor.get('first_name')}"
+                self.node('dc:contributor', {}, name)
 
         for subject in metadata.get('subjects', []):
             self.node('dc:subject', {}, subject.get('subject'))
