@@ -6,5 +6,9 @@ You're receiving this email because you have used this address to connect to an 
 
     {{ activate_url }}
 
+    Your activation code is {{ code }}
+
+{{ code }}
+
 {% trans "Sincerely" %},
     {{ current_site.name }} Admins
