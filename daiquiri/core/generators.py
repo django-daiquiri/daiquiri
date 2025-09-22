@@ -380,7 +380,10 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
                     formats_dict=formats_dict,
                 )
                 for j in parsed:
-                    entry = formats_dict[datatype][4](j)
+                    if j == 'NULL':
+                        entry = formats_dict[datatype][3]
+                    else:
+                        entry = formats_dict[datatype][4](j)
                     r.append(entry)
                 f = str(array_infos[name]) + formats_dict[datatype][0]
                 if datatype == 'char[]':
