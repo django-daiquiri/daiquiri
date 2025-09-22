@@ -593,7 +593,7 @@ def generate_parquet(
         },
     )
 
-    return None
+    return output_path
 
 
 def find_pg2parquet() -> Optional[Path]:
