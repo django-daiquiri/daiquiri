@@ -1,3 +1,4 @@
+from enum import verify
 import os
 import sys
 
@@ -321,7 +322,7 @@ def catch_special_types(field):
 def ingest_table(schema_name, table_name, file_path, drop_table=False):
     adapter = DatabaseAdapter()
 
-    table = parse_single_table(file_path, pedantic=False)
+    table = parse_single_table(file_path, verify='warn')
 
     columns = []
     for field in table.fields:
