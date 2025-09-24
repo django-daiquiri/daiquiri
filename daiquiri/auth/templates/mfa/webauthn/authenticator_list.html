@@ -1,0 +1,59 @@
+{% extends "core/page.html" %}
+{% load i18n %}
+{% load static %}
+{% load allauth %}
+{% load humanize %}
+{% block page %}
+    <h1>{% trans "Passkeys" %}</h1>
+    {% if authenticators|length == 0 %}
+        <p>No passkeys have been added.</p>
+    {% else %}
+        <table class="table">
+            <thead>
+                <th>
+                    {% translate "Key" %}
+                </th>
+                <th>
+                    {% translate "Usage" %}
+                </th>
+                <th>
+                </th>
+            </thead>
+            <tbody>
+                {% for authenticator in authenticators %}
+                    <tr>
+                        <td>
+                            <span class="badge bg-primary">
+                                {{ authenticator }}
+                            </span>
+                        </td>
+                        <td>
+                            {% blocktranslate with created_at=authenticator.created_at|date:"SHORT_DATE_FORMAT" %}Added on {{ created_at }}{% endblocktranslate %}.
+                            {% if authenticator.last_used_at %}
+                                {% blocktranslate with last_used=authenticator.last_used_at|naturaltime %}Last used {{ last_used }}{% endblocktranslate %}
+                            {% else %}
+                                Not used.
+                            {% endif %}
+                        </td>
+                        <td align="right">
+                            {% url 'mfa_edit_webauthn' pk=authenticator.pk as edit_url %}
+                            <a class="btn btn-primary" href="{{ edit_url }}">
+                                {% translate "Edit" %}
+                            </a>
+                            {% url 'mfa_remove_webauthn' pk=authenticator.pk as remove_url %}
+                            <a class="btn btn-danger" href="{{ remove_url }}">
+                                {% translate "Remove" %}
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+    {% url 'mfa_add_webauthn' as add_url %}
+    <a class="btn btn-primary" href="{{ add_url }}">
+        {% translate "Add Passkey" %}
+    </a>
+</li>
+</ul>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "core/page.html" %}
+{% load i18n %}
+{% load static %}
+{% load allauth %}
+{% block page %}
+    <h1>{% trans "Add Passkey" %}</h1>
+    {% url 'mfa_add_webauthn' as action_url %}
+    {% element form form=form method="post" action=action_url %}
+        {% slot body %}
+            {% csrf_token %}
+            {% element fields form=form %}
+            {% endelement %}
+        {% endslot %}
+        {% slot actions %}
+            <input type="button" id="mfa_webauthn_add" class="btn btn-primary" value="{% trans "Add" %}" /></input>
+        {% endslot %}
+    {% endelement %}
+    {% include "mfa/webauthn/snippets/scripts.html" %}
+    {{ js_data|json_script:"js_data" }}
+    <script data-allauth-onload="allauth.webauthn.forms.addForm" type="application/json">{
+    "ids": {
+        "add": "mfa_webauthn_add",
+        "passwordless": "{{ form.passwordless.auto_id }}",
+        "credential": "{{ form.credential.auto_id }}",
+        "data": "js_data"
+    }
+}
+    </script>
+{% endblock %}
