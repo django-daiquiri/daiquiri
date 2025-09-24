@@ -115,6 +115,7 @@ class DataciteTableSerializer(DataciteSerializer):
             'creators',
             'title',
             'publisher',
+            'publisher_properties',
             'publication_year',
             'subjects',
             'contributors',
