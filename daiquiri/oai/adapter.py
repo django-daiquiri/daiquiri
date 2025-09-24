@@ -292,18 +292,11 @@ class DatalinkOaiAdapterMixin:
                     'alternate_identifier_type': 'DOI Landing Page'
                 })
 
-            elif semantics == '#preview-image':
+            elif semantics == '#preview-image' or semantics == '#auxiliary':
                 datalink['related_identifiers'].append({
                     'related_identifier': access_url,
                     'related_identifier_type': 'URL',
                     'relation_type': 'IsSupplementedBy'
-                })
-
-            elif semantics == '#auxiliary':
-                datalink['related_identifiers'].append({
-                    'related_identifier': access_url,
-                    'related_identifier_type': 'URL',
-                    'relation_type': 'References'
                 })
 
         return datalink
