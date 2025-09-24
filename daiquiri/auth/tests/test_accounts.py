@@ -44,6 +44,9 @@ def test_signup_get(db, client):
     assert response.status_code == 200
 
 
+# FIXME: This breaks currently because the mail is not sent I assume (because with passkey
+# signup we send a code, not a link)
+
 # def test_signup_post_email_exists_verified(db, client):
 #     url = reverse('account_signup')
 #     response = client.post(
@@ -65,6 +68,8 @@ def test_signup_get(db, client):
 #     # check that a profile was not created
 #     assert Profile.objects.filter(user__username='user2').exists() is False
 
+# FIXME: This breaks currently because the mail is not sent I assume (because with passkey
+# signup we send a code, not a link)
 
 # def test_signup_post_email_exists_unverified(db, client):
 #     email = EmailAddress.objects.filter(user__username='user').first()
