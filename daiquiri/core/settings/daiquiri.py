@@ -16,7 +16,7 @@ SITE_LICENSE = None
 SITE_CREATOR = None
 SITE_CONTACT = None
 SITE_PUBLISHER = None
-SITE_PUBLISHER_PROPERTIES = None
+SITE_PUBLISHER_PROPERTIES = {}
 # SITE_PUBLISHER_PROPERTIES = {
 #     'publisherIdentifier': 'https://ror.org/<id>',
 #     'publisherIdentifierScheme': 'ROR',
