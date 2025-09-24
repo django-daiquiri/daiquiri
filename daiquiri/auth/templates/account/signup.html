@@ -28,10 +28,10 @@
 
                 <input type="submit" class="btn btn-primary" value="{% trans 'Create account' %}" />
             </form>
-
-            <hr class="my-4">
+            
             {% if PASSKEY_SIGNUP_ENABLED %}
             <div>
+                <hr class="my-4">
                 <p class="text-muted mb-3 text-center">{% trans "Or" %}</p>
                 <a class="btn btn-primary" id="passkey_signup_link" href="{{ signup_by_passkey_url }}"> 
                     {% trans "Sign up using a passkey" %}

@@ -25,6 +25,7 @@
             </div>
         {% endslot %}
     {% endelement %}
+    
     {% include "mfa/webauthn/snippets/scripts.html" %}
     {{ js_data|json_script:"js_data" }}
     <script data-allauth-onload="allauth.webauthn.forms.signupForm" type="application/json">{
