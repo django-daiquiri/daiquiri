@@ -204,7 +204,7 @@ class MetadataOaiAdapterMixin:
         return table.pk, identifier, datestamp, set_spec, public
 
 
-class DatalinkOAIAdapterMixin:
+class DatalinkOaiAdapterMixin:
 
     tables = settings.DATALINK_TABLES
 
@@ -395,7 +395,7 @@ class RegistryOaiAdapterMixin:
 
 class DefaultOaiAdapter(RegistryOaiAdapterMixin,
                         MetadataOaiAdapterMixin,
-                        DatalinkOAIAdapterMixin,
+                        DatalinkOaiAdapterMixin,
                         BaseOaiAdapter):
 
     resource_types = ['service', 'schema', 'table', 'datalink']
