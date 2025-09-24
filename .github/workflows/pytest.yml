@@ -75,4 +75,5 @@ jobs:
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         path-to-lcov: coverage.xml
+        fail-on-error: false
         parallel: false
