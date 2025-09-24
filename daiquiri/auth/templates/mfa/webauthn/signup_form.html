@@ -15,16 +15,15 @@
             {% element fields form=form %}
             {% endelement %}
         {% endslot %}
-        {% slot actions %}
-            <div class="d-flex gap-2">
-                <input type="button" id="mfa_webauthn_signup" class="btn btn-primary" value="{% trans 'Create' %}" />
-                <form method="post" action="{% url 'account_logout' %}" novalidate class="d-inline">
-                    {% csrf_token %}
-                    <input type="submit" class="btn btn-danger" value="{% trans 'Cancel' %}" />
-                </form>
-            </div>
-        {% endslot %}
     {% endelement %}
+    <div class="d-flex gap-2">
+        <input type="button" id="mfa_webauthn_signup" class="btn btn-primary" value="{% trans 'Create' %}" />
+        <form method="post" action="{% url 'account_logout' %}" novalidate class="d-inline">
+            {% csrf_token %}
+            <input type="submit" class="btn btn-danger" value="{% trans 'Cancel' %}" />
+        </form>
+    </div>
+
     
     {% include "mfa/webauthn/snippets/scripts.html" %}
     {{ js_data|json_script:"js_data" }}

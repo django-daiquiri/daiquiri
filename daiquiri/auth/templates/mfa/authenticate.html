@@ -4,13 +4,16 @@
 {% load allauth static %}
 {% block page %}
     <h1>{% trans "Passkey Authentication" %}</h1>
-    <p>{% trans "Additionally, your passkey is required to sign in." %}</p>
+    <p>{% trans "You have a passkey. This is also required to sign in." %}</p>
     {% url 'mfa_authenticate' as action_url %}
     {% if "webauthn" in MFA_SUPPORTED_TYPES %}
 
-        <div class="d-flex gap-2"></div>
+        <div class="d-flex gap-2">
             <input type="button" id="mfa_webauthn_authenticate" class="btn btn-primary" value="{% trans 'Submit passkey' %}" />
-            <input type="submit" class="btn btn-danger" value="{% trans 'Cancel' %}" />
+            <form method="post" action="{% url 'account_logout' %}" novalidate class="d-inline">
+                {% csrf_token %}
+                <input type="submit" class="btn btn-danger" value="{% trans 'Cancel' %}" />
+            </form>
         </div>
             {% element form id="webauthn_form" form=webauthn_form method="post" action=action_url no_visible_fields=True %}
                 {% slot body %}
