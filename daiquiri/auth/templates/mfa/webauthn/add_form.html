@@ -26,4 +26,13 @@
     }
 }
     </script>
+    <script>
+    // Check the passwordless checkbox by default
+    document.addEventListener('DOMContentLoaded', function() {
+        const passwordlessCheckbox = document.getElementById('{{ form.passwordless.auto_id }}');
+        if (passwordlessCheckbox) {
+            passwordlessCheckbox.checked = true;
+        }
+    });
+    </script>
 {% endblock %}

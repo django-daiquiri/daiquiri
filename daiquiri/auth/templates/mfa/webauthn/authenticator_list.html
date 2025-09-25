@@ -11,7 +11,7 @@
         <table class="table">
             <thead>
                 <th>
-                    {% translate "Key" %}
+                    {% translate "Name" %}
                 </th>
                 <th>
                     {% translate "Usage" %}
@@ -23,9 +23,7 @@
                 {% for authenticator in authenticators %}
                     <tr>
                         <td>
-                            <span class="badge bg-primary">
-                                {{ authenticator }}
-                            </span>
+                            {{ authenticator }}
                         </td>
                         <td>
                             {% blocktranslate with created_at=authenticator.created_at|date:"SHORT_DATE_FORMAT" %}Added on {{ created_at }}{% endblocktranslate %}.
