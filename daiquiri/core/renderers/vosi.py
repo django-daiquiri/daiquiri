@@ -69,6 +69,12 @@ class CapabilitiesRendererMixin:
             self.node('description', {}, language.get('description'))
             self.end('language')
 
+        for output_format in capability.get('output_formats', []):
+            self.start('outputFormat')
+            self.node('mime', {}, output_format.get('mime'))
+            self.node('alias', {}, output_format.get('alias'))
+            self.end('outputFormat')
+
         if capability.get('max_sr'):
             self.node('maxSR', {}, capability.get('max_sr'))
 

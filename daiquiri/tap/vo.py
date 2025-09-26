@@ -42,6 +42,7 @@ def get_capabilities():
     return [
         {
             'id': 'ivo://ivoa.net/std/TAP',
+            'type': 'tr:TableAccess',
             'interface': {
                 'type': 'vs:ParamHTTP',
                 'role': 'std',
@@ -55,6 +56,10 @@ def get_capabilities():
                 'version': language['version'],
                 'description': language['description'],
             } for language in settings.QUERY_LANGUAGES],
+            'output_formats': [{
+                'mime': format['content_type'],
+                'alias': format['key'],
+            } for format in settings.QUERY_DOWNLOAD_FORMATS],
             'upload_methods': [
                 'ivo://ivoa.net/std/TAPRegExt#upload-inline',
                 'ivo://ivoa.net/std/TAPRegExt#upload-https',

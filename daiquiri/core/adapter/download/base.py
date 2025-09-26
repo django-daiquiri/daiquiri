@@ -55,7 +55,7 @@ class BaseDownloadAdapter:
             elif format_key == 'votable':
                 return generate_votable(
                     self.generate_rows(prepend=prepend),
-                    columns,
+                    fields=columns,
                     table=self.get_table_name(schema_name, table_name),
                     infos=self.get_infos(query_status, query, query_language, sources),
                     links=self.get_links(sources),
@@ -72,8 +72,8 @@ class BaseDownloadAdapter:
 
                 return generate_fits(
                     self.generate_rows(prepend=prepend),
-                    columns,
-                    nrows,
+                    fields=columns,
+                    nrows=nrows,
                     table_name=schema_table_name,
                     array_infos=fits_arrayinfos,
                 )
@@ -81,7 +81,7 @@ class BaseDownloadAdapter:
             elif format_key == 'parquet':
                 votable_meta = generate_votable(
                     self.generate_rows(prepend=prepend),
-                    columns,
+                    fields=columns,
                     table=self.get_table_name(schema_name, table_name),
                     infos=self.get_infos(query_status, query, query_language, sources),
                     links=self.get_links(sources),
@@ -92,18 +92,12 @@ class BaseDownloadAdapter:
                 for line in votable_meta:
                     votable_meta_str += line
 
-                user_name = schema_name.removeprefix(settings.QUERY_USER_SCHEMA_PREFIX)
-                output_path = (
-                    Path(settings.QUERY_DOWNLOAD_DIR)
-                    / user_name
-                    / f'{table_name}.parquet'
-                )
                 return generate_parquet(
                     schema_name=schema_name,
                     table_name=table_name,
+                    fields=columns,
                     metadata=votable_meta_str,
                     database_config=self.database_config,
-                    output_path=output_path,
                 )
 
             else:
