@@ -1,0 +1,18 @@
+{% extends "core/page.html" %}
+{% load i18n %}
+{% load static %}
+{% load allauth %}
+{% block page %}
+    <h1>{% trans "Edit Security Key" %}</h1>
+    {% url 'mfa_edit_webauthn' as action_url %}
+    {% element form form=form method="post" action=action_url %}
+        {% slot body %}
+            {% csrf_token %}
+            {% element fields form=form %}
+            {% endelement %}
+        {% endslot %}
+        {% slot actions %}
+            <input type="submit" id="mfa_webauthn_edit" class="btn btn-primary" value="{% trans "Save" %}" />
+        {% endslot %}
+    {% endelement %}
+{% endblock %}

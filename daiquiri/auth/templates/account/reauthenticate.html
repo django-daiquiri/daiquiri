@@ -1,0 +1,29 @@
+{% extends "core/page.html" %}
+{% load allauth %}
+{% load i18n %}
+{% block head_title %}
+    {% trans "Confirm Access" %}
+{% endblock head_title %}
+{% block page %}
+    <h1>{% trans "Confirm Access" %}</h1>
+    <p>{% trans "Please reauthenticate to safeguard your account." %}</p>
+    <p>{% trans "Enter your password:" %}</p>
+    {% url 'account_reauthenticate' as action_url %}
+    {% element form form=form method="post" action=action_url %}
+        {% slot body %}
+            {% csrf_token %}
+            {% element fields form=form unlabeled=True %}
+            {% endelement %}
+            {{ redirect_field }}
+        {% endslot %}
+        {% slot actions %}
+            <input type="submit" class="btn btn-primary" value="{% trans "Confirm" %}" />
+        {% endslot %}
+    {% endelement %}
+{% endblock page %}
+
+
+
+
+
+

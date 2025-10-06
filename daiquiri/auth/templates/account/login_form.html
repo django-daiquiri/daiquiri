@@ -1,5 +1,5 @@
 {% load i18n %}
-{% load account %}
+{% load allauth account %}
 {% load socialaccount %}
 
 {% get_providers as socialaccount_providers %}
@@ -13,7 +13,14 @@
 
     {{ form }}
 
-    <input type="submit" class="btn btn-primary" value="{% trans 'Login' %}" />
+    <div class="d-flex gap-2">
+        <input type="submit" class="btn btn-primary" value="{% trans 'Login' %}" />
+        {% if PASSKEY_LOGIN_ENABLED %}
+        <button type="button" class="btn btn-primary" id="passkey_login" form="mfa_login"> 
+            {% trans "Passkey login" %}
+        </button>
+        {% endif %}
+    </div>
 </form>
 
 <p>
@@ -26,7 +33,13 @@
     {% blocktrans %}If you forgot your password and want to reset it, click <a href="{{ reset_url }}">here</a>.{% endblocktrans %}
 </p>
 
+
+{% if PASSKEY_LOGIN_ENABLED %}
+{% include "mfa/webauthn/snippets/login_script.html" with button_id="passkey_login" %}
+{% endif %}
+
 {% if socialaccount_providers %}
+
 
 <p>
     {% blocktrans with site.name as site_name %}Alternatively, you can login using one of the following third party accounts:{% endblocktrans %}

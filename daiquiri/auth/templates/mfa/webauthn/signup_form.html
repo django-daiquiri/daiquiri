@@ -1,0 +1,38 @@
+{% extends 'core/page.html' %}
+{% load i18n %}
+{% load static %}
+{% load allauth %}
+{% block page %}
+    
+    <h1>{% trans "Create Passkey" %}</h1>
+
+    <p>
+        {% blocktranslate %}You are about to create a passkey for your account. As you can add additional keys later on, you can use a descriptive name to tell the keys apart.{% endblocktranslate %}
+    </p>
+     {% element form form=form method="post" action=mfa_signup_webauthn %}
+        {% slot body %}
+            {% csrf_token %}
+            {% element fields form=form %}
+            {% endelement %}
+        {% endslot %}
+    {% endelement %}
+    <div class="d-flex gap-2">
+        <input type="button" id="mfa_webauthn_signup" class="btn btn-primary" value="{% trans 'Create' %}" />
+        <form method="post" action="{% url 'account_logout' %}" novalidate class="d-inline">
+            {% csrf_token %}
+            <input type="submit" class="btn btn-danger" value="{% trans 'Cancel' %}" />
+        </form>
+    </div>
+
+    
+    {% include "mfa/webauthn/snippets/scripts.html" %}
+    {{ js_data|json_script:"js_data" }}
+    <script data-allauth-onload="allauth.webauthn.forms.signupForm" type="application/json">{
+    "ids": {
+        "signup": "mfa_webauthn_signup",
+        "credential": "{{ form.credential.auto_id }}",
+        "data": "js_data"
+    }
+}
+    </script>
+{% endblock %}
