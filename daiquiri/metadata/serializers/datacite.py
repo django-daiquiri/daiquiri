@@ -13,6 +13,7 @@ class DataciteSerializer(serializers.ModelSerializer):
     creators = JSONListField(default=[])
     title = serializers.SerializerMethodField()
     publisher = serializers.ReadOnlyField(default=settings.SITE_PUBLISHER)
+    publisher_properties = serializers.ReadOnlyField(default=settings.SITE_PUBLISHER_PROPERTIES)
     publication_year = serializers.SerializerMethodField()
     subjects = serializers.ReadOnlyField(default=settings.SITE_SUBJECTS)
     contributors = JSONListField(default=[])
@@ -64,6 +65,7 @@ class DataciteSchemaSerializer(DataciteSerializer):
             'creators',
             'title',
             'publisher',
+            'publisher_properties',
             'publication_year',
             'subjects',
             'contributors',
@@ -113,6 +115,7 @@ class DataciteTableSerializer(DataciteSerializer):
             'creators',
             'title',
             'publisher',
+            'publisher_properties',
             'publication_year',
             'subjects',
             'contributors',
