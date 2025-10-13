@@ -1,6 +1,5 @@
 import logging
 import os
-from pathlib import Path
 from collections import OrderedDict
 
 from django.conf import settings
@@ -385,7 +384,7 @@ class QueryJob(Job):
 
     def stream(self, format_key):
         if self.phase == self.PHASE_COMPLETED:
-            result = DownloadAdapter().generate(
+            return DownloadAdapter().generate(
                 format_key,
                 self.metadata.get('columns', []),
                 sources=self.metadata.get('sources', []),
@@ -396,10 +395,6 @@ class QueryJob(Job):
                 query=self.query,
                 query_language=self.query_language,
             )
-            # if 'generate' provides 'Path' as return value, then it's a path to the file
-            if isinstance(result, Path):
-                return open(result, 'rb')
-            return result
         else:
             raise ValidationError({'phase': ['Job is not COMPLETED.']})
 
