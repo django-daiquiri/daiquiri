@@ -10,6 +10,9 @@
         <a class="dropdown-item" href="{% url 'account_change_password' %}">{% trans 'Change password' %}</a>
     </li>
     <li>
+        <a class="dropdown-item" href="{% url 'mfa_list_webauthn' %}">{% trans 'Passkeys' %}</a>
+    </li>
+    <li>
         <a class="dropdown-item" href="{% url 'socialaccount_connections' %}">{% trans 'Account connections' %}</a>
     </li>
     <li>

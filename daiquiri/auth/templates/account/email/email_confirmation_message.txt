@@ -1,10 +1,8 @@
 {% load i18n %}{% trans "Dear" %} {{ user.profile.full_name }},
 
-{% blocktrans trimmed with site_domain=current_site.domain %}
-You're receiving this email because you have used this address to connect to an account on {{ site_domain }}. To confirm this is correct, go to the link below.
-{% endblocktrans %}
+You're receiving this email because you have used this address to connect to an account on {{ current_site.domain }}. 
 
-    {{ activate_url }}
+{% if code %}To confirm this is correct, please enter this code in your browser window: {{ code }}{% else %}To confirm this is correct, go to {{ activate_url }}{% endif %}
 
 {% trans "Sincerely" %},
     {{ current_site.name }} Admins
