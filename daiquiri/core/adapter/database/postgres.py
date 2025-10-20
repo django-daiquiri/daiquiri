@@ -13,7 +13,7 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
     DATATYPES = {
         'character': {'datatype': 'char', 'arraysize': True},
         'varchar': {'datatype': 'char', 'arraysize': True},
-        'text': {'datatype': 'char', 'arraysize': True},
+        'text': {'datatype': 'char', 'arraysize': False},
         'boolean': {'datatype': 'boolean', 'arraysize': False},
         'smallint': {'datatype': 'short', 'arraysize': False},
         'integer': {'datatype': 'int', 'arraysize': False},
@@ -300,7 +300,7 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
                     '{column_name} {column_type}{ar}'.format(
                         column_name=self.escape_identifier(column['name']),
                         column_type=self.COLUMNTYPES[column['datatype']],
-                        ar='[]' if column['arraysize'] else '',
+                        ar='[]' if column['arraysize'] and self.DATATYPES[self.COLUMNTYPES[column['datatype']]]['arraysize'] else '', # noqa: E501
                     )
                     for column in columns
                 ]
