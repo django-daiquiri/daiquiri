@@ -365,7 +365,7 @@ class BaseDatabaseAdapter:
         if mask_cell:
             return 'NULL'
         else:
-            if cell.ndim == 1:
+            if hasattr(cell, 'ndim') and cell.ndim == 1:
                 # create an array string digestable by postgres
                 value_list = [
                     'NULL' if cell.mask[i] else str(cell[i]) for i in range(len(cell))
