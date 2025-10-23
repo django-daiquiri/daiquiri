@@ -98,8 +98,7 @@ ADDITIONAL_APPS = [
     'honeypot',
 ]
 
-MIDDLEWARE = [
-    'daiquiri.core.middleware.MultipleProxyMiddleware',
+DJANGO_MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
@@ -109,7 +108,16 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.contrib.sites.middleware.CurrentSiteMiddleware',
+]
+
+ADDITIONAL_MIDDLEWARE = [
     'allauth.account.middleware.AccountMiddleware',
+]
+
+MIDDLEWARE = [
+    'daiquiri.core.middleware.MultipleProxyMiddleware',
+    *DJANGO_MIDDLEWARE,
+    *ADDITIONAL_MIDDLEWARE,
 ]
 
 TEMPLATES_DIR = BASE_DIR / 'templates/'
