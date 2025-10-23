@@ -441,3 +441,4 @@ def get_file_size(file_path):
 
 def get_date_display(value):
     return date(value, settings.DATETIME_FORMAT)
+
