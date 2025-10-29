@@ -2,7 +2,7 @@ import os
 
 from django import template
 from django.template.defaultfilters import stringfilter
-from django.urls import reverse
+from django.urls import NoReverseMatch, reverse
 from django.utils.encoding import force_str
 from django.utils.safestring import mark_safe
 
@@ -69,3 +69,15 @@ def startswith(text, starts):
     if isinstance(text, str):
         return text.startswith(starts)
     return False
+
+
+@register.simple_tag()
+def safe_url(name, *args, **kwargs):
+    """
+    Safely reverse a URL. Returns the URL if it exists, None otherwise.
+    Usage: {% safe_url 'url_name' as url_var %}
+    """
+    try:
+        return reverse(name, args=args, kwargs=kwargs)
+    except NoReverseMatch:
+        return None

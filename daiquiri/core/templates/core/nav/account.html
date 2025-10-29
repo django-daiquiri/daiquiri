@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load core_tags %}
 
     <li>
         <a class="dropdown-item" href="{% url 'account_profile' %}">{% trans 'Update profile' %}</a>
@@ -9,9 +10,10 @@
     <li>
         <a class="dropdown-item" href="{% url 'account_change_password' %}">{% trans 'Change password' %}</a>
     </li>
+    {% safe_url 'mfa_list_webauthn' as mfa_list_webauthn_url %}
     {% if mfa_list_webauthn_url %}
     <li>
-        <a class="dropdown-item" href="{% url 'mfa_list_webauthn' %}">{% trans 'Passkeys' %}</a>
+        <a class="dropdown-item" href="{{ mfa_list_webauthn_url }}">{% trans 'Passkeys' %}</a>
     </li>
     {% endif %}
     <li>
