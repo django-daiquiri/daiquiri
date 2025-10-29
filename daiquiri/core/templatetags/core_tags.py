@@ -26,7 +26,7 @@ def absolute_url(context, name, *args):
 @register.filter(name='next')
 def next(value, arg):
     try:
-        return value[int(arg)+1]
+        return value[int(arg) + 1]
     except (ValueError, IndexError):
         return None
 
