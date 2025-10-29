@@ -22,8 +22,10 @@ class DataciteSerializer(serializers.Serializer):
             'name': settings.SITE_CREATOR
         }
     ])
+    contributors = serializers.ReadOnlyField(default=[])
     title = serializers.CharField()
     publisher = serializers.ReadOnlyField(default=settings.SITE_PUBLISHER)
+    publisher_properties = serializers.ReadOnlyField(default=settings.SITE_PUBLISHER_PROPERTIES)
     publication_year = serializers.CharField(default=settings.SITE_CREATED.split('-')[0])
     subjects = serializers.ReadOnlyField(default=settings.SITE_SUBJECTS)
     updated = serializers.CharField(default=settings.SITE_UPDATED)
@@ -34,3 +36,4 @@ class DataciteSerializer(serializers.Serializer):
     resource_type = serializers.CharField(default='Dataset')
     alternate_identifiers = serializers.ReadOnlyField(default=[])
     related_identifiers = serializers.ReadOnlyField(default=[])
+    sizes = serializers.ReadOnlyField(default=[])
