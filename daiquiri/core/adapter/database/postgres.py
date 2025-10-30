@@ -292,7 +292,7 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
                     )
                     + 'supported by Postgres, the table can not be created.'
                 )
-        sql = 'CREATE TABLE {schema}.{table} ({columns});'.format(
+        sql = 'CREATE TABLE {schema}.{table} ({columns})'.format(
             schema=self.escape_identifier(schema_name),
             table=self.escape_identifier(table_name),
             columns=', '.join(
@@ -306,6 +306,11 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
                 ]
             ),
         )
+
+        if settings.USER_TABLESPACE is not None:
+            sql += f' TABLESPACE {settings.USER_TABLESPACE}'
+
+        sql += ';'
 
         logger.debug('sql = "%s"', sql)
         self.execute(sql)
