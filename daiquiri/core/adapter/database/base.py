@@ -129,8 +129,11 @@ class BaseDatabaseAdapter:
             sql, sql_args, search, filters, escaped_column_names
         )
 
+
+        table_type = self.fetch_table(schema_name,table_name)['type']
+
         # process ordering
-        sql = self._process_ordering(sql, ordering, escaped_column_names)
+        sql = self._process_ordering(sql, ordering, escaped_column_names, table_type)
 
         # process page and page_size
         if page_size > 0:
@@ -343,7 +346,7 @@ class BaseDatabaseAdapter:
 
         return sql, sql_args
 
-    def _process_ordering(self, sql, ordering, escaped_column_names):
+    def _process_ordering(self, sql, ordering, escaped_column_names, table_type=None):
         if ordering:
             if ordering.startswith('-'):
                 escaped_ordering_column, ordering_direction = (

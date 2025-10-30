@@ -317,7 +317,7 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         logger.debug('sql = "%s"', sql)
         self.execute(sql)
 
-    def _process_ordering(self, sql, ordering, escaped_column_names):
+    def _process_ordering(self, sql, ordering, escaped_column_names, table_type=None):
         if ordering:
             if ordering.startswith('-'):
                 escaped_ordering_column, ordering_direction = (
@@ -333,7 +333,8 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
             if escaped_ordering_column in escaped_column_names:
                 sql += f' ORDER BY {escaped_ordering_column} {ordering_direction}'
         else:
-            sql += ' ORDER BY ctid'
+            if table_type == 'table':
+                sql += ' ORDER BY ctid'
 
         return sql
 
