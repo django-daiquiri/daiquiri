@@ -66,7 +66,7 @@ const Status = () => {
                 </p>
               )
             }
-            {status.active_jobs > 0 && status.max_active_jobs >0 &&(
+            {status.max_active_jobs >0 &&(
               <div>
                 <hr />
                 <p>
