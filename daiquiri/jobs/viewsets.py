@@ -202,7 +202,7 @@ class AsyncJobViewSet(JobViewSet):
 
         if result == 'result':
             return FileResponse(job.stream(job.response_format), content_type=job.formats[job.response_format])
-        elif result in job.formats:
+        elif result in job.formats and result in ('csv', 'votable', 'fits'):
             return FileResponse(job.stream(result), content_type=job.formats[result])
         else:
             raise ValidationError({

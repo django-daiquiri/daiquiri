@@ -11,6 +11,9 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import View
 
 from allauth.account.forms import LoginForm
+
+# from allauth.mfa.base.forms import AuthenticateForm
+# from allauth.mfa.webauthn.forms import AuthenticateWebAuthnForm
 from rules.contrib.views import PermissionRequiredMixin as RulesPermissionRequiredMixin
 
 from daiquiri.core.utils import render_to_xml
@@ -19,9 +22,12 @@ from daiquiri.core.utils import render_to_xml
 def home(request):
     if not request.user.is_authenticated:
         login_form = LoginForm()
+        # auth_form = AuthenticateForm(user='admin')
+        # login_form = AuthenticateWebAuthnForm(user='admin')
         login_form.fields['login'].widget.attrs.pop('autofocus', None)
     else:
         login_form = None
+        # webauth_form = None
 
     return render(request, 'core/home.html', {'form': login_form})
 
