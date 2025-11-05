@@ -31,7 +31,7 @@ class Command(BaseCommand):
                 job = QueryJob.objects.filter(
                     schema_name=schema_name,
                     table_name=table['name']
-                ).first()
+                ).order_by('-creation_time').first()
 
                 if job and job.phase not in [QueryJob.PHASE_EXECUTING, QueryJob.PHASE_COMPLETED]:
                     stale_tables.append((schema_name, table['name'], job.phase if job else None))
