@@ -8,6 +8,8 @@ from daiquiri.query.models import QueryJob
 
 class Command(BaseCommand):
 
+    help = "Finds non active or completed query jobs and optionally deletes associated database tables when --delete is used."
+
     def add_arguments(self, parser):
         parser.add_argument('--user', help='Only scrub jobs for this user.')
         parser.add_argument('--delete', action='store_true', help='Delete stale tables.')
