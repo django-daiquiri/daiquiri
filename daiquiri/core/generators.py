@@ -132,15 +132,15 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
             else:
                 attrs.append('xtype="{}"'.format(field['datatype']))
 
-        description = field.get('description')
-        if description:
-            # Remove HTML tags
-            clean_desc = re.sub(r'<.*?>', '', description)
-            attrs.append(f'description="{clean_desc}"')
-
         if attrs:
-            yield """
-            <FIELD {} />""".format(' '.join(attrs))
+            description = field.get('description')
+            if description:
+                yield """
+                <FIELD {}> <DESCRIPTION>{}</DESCRIPTION> </FIELD>
+                """.format(' '.join(attrs), description)
+            else:
+                yield """
+                <FIELD {} />""".format(' '.join(attrs))
 
     # fmt: off
     if not empty:
