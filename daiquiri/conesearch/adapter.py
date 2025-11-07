@@ -39,6 +39,11 @@ class BaseConeSearchAdapter(BaseServiceAdapter):
         'SR': 10,
     }
 
+    sql_pattern = '''
+        SELECT %(columns)s FROM %(schema)s.%(table)s
+        WHERE pos @ scircle(spoint(RADIANS(%%(RA)s), RADIANS(%%(DEC)s)), RADIANS(%%(SR)s))
+    '''
+
     columns = [
         {
             'name': 'id',
@@ -61,7 +66,7 @@ class BaseConeSearchAdapter(BaseServiceAdapter):
     max_records = 10000
 
     def get_resources(self):
-        raise NotImplementedError()
+         raise NotImplementedError()
 
     def clean(self, request, resource):
         raise NotImplementedError()
@@ -137,6 +142,7 @@ class TableConeSearchAdapter(BaseConeSearchAdapter):
 
         schema_name = resources[resource]['schema_name']
         table_name = resources[resource]['table_name']
+        sql_pattern = self.resources[resource].get('sql_pattern', self.sql_pattern)
 
         data = make_query_dict_upper_case(request.GET)
         errors = {}
@@ -156,14 +162,19 @@ class TableConeSearchAdapter(BaseConeSearchAdapter):
         # fetch the columns according to the verbosity
         verb = data.get('VERB', '2')
 
-        if verb == '1':
-            self.columns = table.columns.filter(name__in=resources[resource]['column_names']).values()
-        elif verb == '2':
-            self.columns = table.columns.filter(principal=True).values()
-        elif verb == '3':
-            self.columns = table.columns.values()
-        else:
-            errors['VERB'] = [_('This field must be 1, 2, or 3.')]
+        if self.resources[resource].get('sql_pattern', None) is not None:  # can be any sql query...
+            self.columns = self.resources[resource][
+                'columns'
+            ]  # need name, description, unit, datatype, ucd
+        else:  # default sql pattern (single table easy)
+            if verb == '1':
+                self.columns = table.columns.filter(name__in=resources[resource]['column_names']).values()
+            elif verb == '2':
+                self.columns = table.columns.filter(principal=True).values()
+            elif verb == '3':
+                self.columns = table.columns.values()
+            else:
+                errors['VERB'] = [_('This field must be 1, 2, or 3.')]
 
         # construct sql query
         adapter = DatabaseAdapter()
@@ -193,3 +204,6 @@ class TableConeSearchAdapter(BaseConeSearchAdapter):
 
         if errors:
             raise ValidationError(errors)
+
+    def get_resources(self):
+        return [settings.CONESEARCH_TABLE]
