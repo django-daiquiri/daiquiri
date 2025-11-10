@@ -8,6 +8,7 @@ from daiquiri.core.adapter import DatabaseAdapter
 from daiquiri.core.adapter.stream import BaseServiceAdapter
 from daiquiri.core.generators import generate_votable
 from daiquiri.core.utils import import_class, make_query_dict_upper_case
+from daiquiri.metadata.models import Schema, Table
 
 
 def ConeSearchAdapter():
@@ -39,11 +40,6 @@ class BaseConeSearchAdapter(BaseServiceAdapter):
         'SR': 10,
     }
 
-    sql_pattern = '''
-        SELECT %(columns)s FROM %(schema)s.%(table)s
-        WHERE pos @ scircle(spoint(RADIANS(%%(RA)s), RADIANS(%%(DEC)s)), RADIANS(%%(SR)s))
-    '''
-
     columns = [
         {
             'name': 'id',
@@ -63,77 +59,19 @@ class BaseConeSearchAdapter(BaseServiceAdapter):
         }
     ]
 
+    sql_pattern = """
+                SELECT %(columns)s,
+                DEGREES(SPOINT(RADIANS(ra), RADIANS(dec)) <-> SPOINT(RADIANS(%%(RA)s), RADIANS(%%(DEC)s))) as angdist
+                FROM %(schema)s.%(table)s
+                WHERE spoint(RADIANS(ra), RADIANS(dec)) @ scircle(spoint(RADIANS(%%(RA)s), RADIANS(%%(DEC)s)), RADIANS(%%(SR)s))
+                """
+
     max_records = 10000
 
     def get_resources(self):
-         raise NotImplementedError()
+        return settings.CONESEARCH_RESOURCES
 
     def clean(self, request, resource):
-        raise NotImplementedError()
-
-    def clean_args(self, data, errors):
-        # parse RA, DEC, and SR arguments
-        self.args = {}
-        for key in ['RA', 'DEC', 'SR']:
-            try:
-                value = float(data[key])
-
-                if self.ranges[key]['min'] <= value <= self.ranges[key]['max']:
-                    self.args[key] = value
-                else:
-                    errors[key] = [_('This value must be between {min:g} and {max:g}.').format(**self.ranges[key])]
-
-            except KeyError:
-                errors[key] = [_('This field may not be blank.')]
-
-            except ValueError:
-                errors[key] = [_('This field must be a float.')]
-
-    def stream(self):
-        return FileResponse(
-            generate_votable(DatabaseAdapter().fetchall(self.sql, self.args), self.columns),
-            content_type='application/xml'
-        )
-
-
-class SimpleConeSearchAdapter(BaseConeSearchAdapter):
-
-    def get_resources(self):
-        return [settings.CONESEARCH_TABLE]
-
-    def clean(self, request, resource):
-        if resource not in self.get_resources():
-            raise NotFound()
-
-        adapter = DatabaseAdapter()
-
-        self.sql = '''
-SELECT {id_field}, {ra_field}, {dec_field}
-FROM {schema}.{table}
-WHERE
-    {ra_field} BETWEEN (%(RA)s - 0.5 * %(SR)s) AND (%(RA)s + 0.5 * %(SR)s)
-AND
-    {dec_field} BETWEEN (%(DEC)s - 0.5 * %(SR)s) AND (%(DEC)s + 0.5 * %(SR)s)
-LIMIT {limit}
-'''.format(
-            id_field=adapter.escape_identifier('id'),
-            ra_field=adapter.escape_identifier('ra'),
-            dec_field=adapter.escape_identifier('dec'),
-            schema=settings.CONESEARCH_SCHEMA,
-            table=settings.CONESEARCH_TABLE,
-            limit=self.max_records,
-        )
-
-        self.args, errors = self.parse_query_dict(request)
-
-        if errors:
-            raise ValidationError(errors)
-
-
-class TableConeSearchAdapter(BaseConeSearchAdapter):
-
-    def clean(self, request, resource):
-        from daiquiri.metadata.models import Schema, Table
 
         resources = self.get_resources()
 
@@ -142,7 +80,6 @@ class TableConeSearchAdapter(BaseConeSearchAdapter):
 
         schema_name = resources[resource]['schema_name']
         table_name = resources[resource]['table_name']
-        sql_pattern = self.resources[resource].get('sql_pattern', self.sql_pattern)
 
         data = make_query_dict_upper_case(request.GET)
         errors = {}
@@ -162,8 +99,8 @@ class TableConeSearchAdapter(BaseConeSearchAdapter):
         # fetch the columns according to the verbosity
         verb = data.get('VERB', '2')
 
-        if self.resources[resource].get('sql_pattern', None) is not None:  # can be any sql query...
-            self.columns = self.resources[resource][
+        if resources[resource].get('sql_pattern', None) is not None:  # can be any sql query...
+            self.columns = resources[resource][
                 'columns'
             ]  # need name, description, unit, datatype, ucd
         else:  # default sql pattern (single table easy)
@@ -205,5 +142,26 @@ class TableConeSearchAdapter(BaseConeSearchAdapter):
         if errors:
             raise ValidationError(errors)
 
-    def get_resources(self):
-        return [settings.CONESEARCH_TABLE]
+    def clean_args(self, data, errors):
+        # parse RA, DEC, and SR arguments
+        self.args = {}
+        for key in ['RA', 'DEC', 'SR']:
+            try:
+                value = float(data[key])
+
+                if self.ranges[key]['min'] <= value <= self.ranges[key]['max']:
+                    self.args[key] = value
+                else:
+                    errors[key] = [_('This value must be between {min:g} and {max:g}.').format(**self.ranges[key])]
+
+            except KeyError:
+                errors[key] = [_('This field may not be blank.')]
+
+            except ValueError:
+                errors[key] = [_('This field must be a float.')]
+
+    def stream(self):
+        return FileResponse(
+            generate_votable(DatabaseAdapter().fetchall(self.sql, self.args), self.columns),
+            content_type='application/xml'
+        )
