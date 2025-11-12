@@ -21,11 +21,14 @@ const HistogramPlot = ({ columns, plotValues, x, s }) => {
     if (!isNil(s)) {
       const operation = operations.find(operation => operation.name == plotValues.s.operation) || operations[0]
 
-      data.push({
-        x: x.filter((value, index) => operation.operation(s[index], plotValues.s.value)),
-        type: 'histogram',
-        nbinsx: plotValues.bins
-      })
+      const filteredX = x.filter((value, index) => operation.operation(s[index], plotValues.s.value));
+      if (filteredX.length > 0) { 
+        data.push({
+          x: filteredX,
+          type: 'histogram',
+          nbinsx: plotValues.bins
+        })
+      }
     }
 
     return (

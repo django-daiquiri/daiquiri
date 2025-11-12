@@ -337,8 +337,6 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
 
             if escaped_ordering_column in escaped_column_names:
                 sql += f' ORDER BY {escaped_ordering_column} {ordering_direction}'
-        else:
-            sql += ' ORDER BY ctid'
 
         return sql
 

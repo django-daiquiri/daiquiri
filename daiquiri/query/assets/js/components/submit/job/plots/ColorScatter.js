@@ -36,9 +36,10 @@ const ColorScatter = ({ job, columns }) => {
     }
   }), [columns])
 
-  const { data: x } = useJobPlotQuery(job, plotValues.x.column)
-  const { data: y } = useJobPlotQuery(job, plotValues.y.column)
-  const { data: z } = useJobPlotQuery(job, plotValues.z.column)
+  const { data = []} = useJobPlotQuery(job, [plotValues.x.column, plotValues.y.column, plotValues.z.column]);
+  const x = (data ?? []).map(row => row[0]);
+  const y = (data ?? []).map(row => row[1]);
+  const z = (data ?? []).map(row => row[2]);
 
   return (
     <div>
