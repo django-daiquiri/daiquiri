@@ -1,3 +1,4 @@
+import re
 import csv
 import io
 import logging
@@ -132,8 +133,14 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
                 attrs.append('xtype="{}"'.format(field['datatype']))
 
         if attrs:
-            yield """
-            <FIELD {} />""".format(' '.join(attrs))
+            description = field.get('description')
+            if description:
+                yield """
+                <FIELD {}> <DESCRIPTION>{}</DESCRIPTION> </FIELD>
+                """.format(' '.join(attrs), description)
+            else:
+                yield """
+                <FIELD {} />""".format(' '.join(attrs))
 
     # fmt: off
     if not empty:
