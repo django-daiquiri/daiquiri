@@ -10,6 +10,7 @@ from daiquiri.core.generators import generate_votable
 from daiquiri.core.utils import import_class, make_query_dict_upper_case
 from daiquiri.metadata.models import Schema, Table
 
+from queryparser.adql import ADQLQueryTranslator
 
 def ConeSearchAdapter():
     return import_class(settings.CONESEARCH_ADAPTER)()
@@ -40,30 +41,10 @@ class BaseConeSearchAdapter(BaseServiceAdapter):
         'SR': 10,
     }
 
-    columns = [
-        {
-            'name': 'id',
-            'ucd': 'meta.id; meta.main',
-            'datatype': 'char',
-            'arraysize': '*'
-        },
-        {
-            'name': 'RA',
-            'ucd': 'pos.eq.ra; meta.main',
-            'datatype': 'double'
-        },
-        {
-            'name': 'DEC',
-            'ucd': 'pos.eq.dec; meta.main',
-            'datatype': 'double'
-        }
-    ]
-
     sql_pattern = """
-                SELECT %(columns)s,
-                DEGREES(SPOINT(RADIANS(ra), RADIANS(dec)) <-> SPOINT(RADIANS(%%(RA)s), RADIANS(%%(DEC)s))) as angdist
-                FROM %(schema)s.%(table)s
-                WHERE spoint(RADIANS(ra), RADIANS(dec)) @ scircle(spoint(RADIANS(%%(RA)s), RADIANS(%%(DEC)s)), RADIANS(%%(SR)s))
+                select {columns}, distance(point(ra, dec), point({RA}, {DEC})) as angdist 
+                from {schema}.{table}
+                where 1=contains(point(ra, dec), circle(point({RA}, {DEC}), {SR}))
                 """
 
     max_records = 10000
@@ -99,51 +80,33 @@ class BaseConeSearchAdapter(BaseServiceAdapter):
         # fetch the columns according to the verbosity
         verb = data.get('VERB', '2')
 
-        if resources[resource].get('sql_pattern', None) is not None:  # can be any sql query...
-            self.columns = resources[resource][
-                'columns'
-            ]  # need name, description, unit, datatype, ucd
-        else:  # default sql pattern (single table easy)
-            if verb == '1':
-                self.columns = table.columns.filter(name__in=resources[resource]['column_names']).values()
-            elif verb == '2':
-                self.columns = table.columns.filter(principal=True).values()
-            elif verb == '3':
-                self.columns = table.columns.values()
-            else:
-                errors['VERB'] = [_('This field must be 1, 2, or 3.')]
+        if verb == '1':
+            self.columns = table.columns.filter(name__in=resources[resource]['column_names']).values()
+        elif verb == '2':
+            self.columns = table.columns.filter(principal=True).values()
+        elif verb == '3':
+            self.columns = table.columns.values()
+        else:
+            errors['VERB'] = [_('This field must be 1, 2, or 3.')]
+
+        # parse RA, DEC, and SR arguments
+        self.clean_args(data, errors)
 
         # construct sql query
         adapter = DatabaseAdapter()
         escaped_column_names = [adapter.escape_identifier(column['name']) for column in self.columns]
-        self.sql = self.sql_pattern % {
-            'schema': adapter.escape_identifier(schema_name),
-            'table': adapter.escape_identifier(table_name),
-            'columns': ', '.join(escaped_column_names)
-        }
+        self.adql = self.sql_pattern.format(schema=adapter.escape_identifier(schema_name),
+                        table = adapter.escape_identifier(table_name),
+                        columns = ', '.join(escaped_column_names),
+                        escaped_column_names = escaped_column_names, **self.args).strip()
 
-        # parse RA, DEC, and SR arguments
-        self.args = {}
-        for key in ['RA', 'DEC', 'SR']:
-            try:
-                value = float(data[key])
-
-                if self.ranges[key]['min'] <= value <= self.ranges[key]['max']:
-                    self.args[key] = value
-                else:
-                    errors[key] = [_('This value must be between {min:g} and {max:g}.').format(**self.ranges[key])]
-
-            except KeyError:
-                errors[key] = [_('This field may not be blank.')]
-
-            except ValueError:
-                errors[key] = [_('This field must be a float.')]
+        self.sql = ADQLQueryTranslator(self.adql)
+        self.sql = self.sql.to_postgresql()
 
         if errors:
             raise ValidationError(errors)
 
     def clean_args(self, data, errors):
-        # parse RA, DEC, and SR arguments
         self.args = {}
         for key in ['RA', 'DEC', 'SR']:
             try:
