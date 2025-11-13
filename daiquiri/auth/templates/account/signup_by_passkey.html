@@ -7,7 +7,7 @@
 <div class="container-fluid">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-8 col-xl-8">
-            <h1>{% trans "Create a new account" %}</h1>
+            <h1>{% trans "Create a new account with passkey" %}</h1>
 
             {% if settings.AUTH_WORKFLOW %}
             <p>
@@ -17,7 +17,7 @@
 
             <p>{% blocktrans %}Already have an account? Then please <a href="{{ login_url }}">sign in</a>.{% endblocktrans %}</p>
 
-            <form method="post" action="{% url 'account_signup' %}" novalidate>
+            <form method="post" action="{% url 'account_signup_by_passkey' %}" novalidate>
                 {% csrf_token %}
 
                 {% if redirect_field_value %}
@@ -28,16 +28,6 @@
 
                 <input type="submit" class="btn btn-primary" value="{% trans 'Create account' %}" />
             </form>
-            
-            {% if PASSKEY_SIGNUP_ENABLED %}
-            <div>
-                <hr class="my-4">
-                <p class="text-muted mb-3 text-center">{% trans "Or" %}</p>
-                <a class="btn btn-primary" id="passkey_signup_link" href="{{ signup_by_passkey_url }}"> 
-                    {% trans "Sign up using a passkey" %}
-                </a>
-            </div>
-            {% endif %}
         </div>
     </div>
 </div>

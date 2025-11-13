@@ -1,0 +1,37 @@
+{% extends "core/page.html" %}
+{% load allauth %}
+{% load i18n %}
+
+{% block page %}
+    <h1>{% trans "Confirm Accessss :D :D" %}</h1>
+    <p>
+        Please reauthenticate to safeguard your account.
+    </p>
+    {% url 'mfa_reauthenticate_webauthn' as action_url %}
+
+    {% element form form=form method="post" action=action_url %}
+        {% slot body %}
+            {% csrf_token %}
+            {% element fields form=form unlabeled=True %}
+            {% endelement %}
+            {{ redirect_field }}
+        {% endslot %}
+        {% slot actions %}
+            <input type="submit" id="mfa_webauthn_reauthenticate" class="btn btn-primary" value="{% trans 'Use a passkey' %}" />
+        {% endslot %}
+    {% endelement %}
+    {{ js_data|json_script:"js_data" }}
+    {% include "mfa/webauthn/snippets/scripts.html" %}
+    <script data-allauth-onload="allauth.webauthn.forms.authenticateForm" type="application/json">{
+        "ids": {
+            "authenticate": "mfa_webauthn_reauthenticate",
+            "credential": "{{ form.credential.auto_id }}",
+            "data": "js_data"
+        }
+    }
+    </script>
+{% endblock page %}
+
+
+
+

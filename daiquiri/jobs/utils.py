@@ -20,12 +20,13 @@ def get_job_results(request, job):
         'href': request.build_absolute_uri(result_url)
     },]
     for key in job.formats:
-        url = reverse(f'{namespace}:{base_name}-result', args=[job.id, key])
+        if key in ('votable', 'csv', 'fits'):
+            url = reverse(f'{namespace}:{base_name}-result', args=[job.id, key])
 
-        results.append({
-            'result_type': key,
-            'href': request.build_absolute_uri(url)
-        })
+            results.append({
+                'result_type': key,
+                'href': request.build_absolute_uri(url)
+            })
 
     return results
 

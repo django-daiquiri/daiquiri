@@ -1,0 +1,43 @@
+{% extends 'core/page.html' %}
+{% load i18n %}
+{% load allauth account %}
+{% block page %}
+    {% setvar form_tags %}
+        entrance,email,verification
+    {% endsetvar %}
+
+    <h1>{% translate "Enter Email Verification Code" %}</h1>
+    
+    <p>
+        We've sent a code to <a href="mailto:{{ email }}">{{ email }}</a>. The code expires shortly, so please enter it soon.
+    </p>
+    {% element form form=verify_form method="post" action=account_email_verification_sent tags=form_tags %}
+        {% slot body %}
+            {% csrf_token %}
+            {% element fields form=verify_form unlabeled=True %}
+            {% endelement %}
+            {{ redirect_field }}
+        {% endslot %}
+        {% slot actions %}
+            {% element button_group %}
+                <div class="d-flex gap-2">
+                    <form method="post" action="{% url 'account_confirm_login_code' %}" novalidate>
+                        {% csrf_token %}
+                        <input type="submit" class="btn btn-primary" value="{% trans 'Confirm' %}" />
+                    </form>
+                    {% if cancel_url %}
+                    <form method="post" action="{{ cancel_url }}" novalidate>
+                        {% csrf_token %}
+                        <input type="submit" class="btn btn-danger" value="{% trans 'Cancel' %}" />
+                    </form>
+                    {% else %}
+                    <form method="post" action="{% url 'account_logout' %}" novalidate>
+                        {% csrf_token %}
+                        <input type="submit" class="btn btn-danger" value="{% trans 'Cancel' %}" />
+                    </form>
+                    {% endif %}
+                </div>
+            {% endelement %}
+        {% endslot %}
+    {% endelement %}
+{% endblock %}

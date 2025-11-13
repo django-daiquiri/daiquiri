@@ -1,0 +1,32 @@
+{% include "mfa/webauthn/snippets/scripts.html" %}
+<form id="mfa_login" action="{% url 'mfa_login_webauthn' %}" method="post">
+    {% csrf_token %}
+    {{ redirect_field }}
+    <input type="hidden" name="credential" id="mfa_credential">
+</form>
+<script data-allauth-onload="allauth.webauthn.forms.loginForm" type="application/json">{
+    "ids": {
+        "login": "passkey_login",
+        "credential": "mfa_credential"
+    }
+}
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    if (!window.PublicKeyCredential) {
+        console.log('WebAuthn not supported');
+        return;
+    }
+    
+    if (navigator.credentials && navigator.credentials.get) {
+        // Automatically trigger passkey authentication
+        const passkeyButton = document.getElementById('{{ button_id }}');
+        if (passkeyButton) {
+            // Simulate a click on the passkey button to trigger authentication
+            setTimeout(() => {
+                passkeyButton.click();
+            }, 100);
+        }
+    }
+});
+</script>
