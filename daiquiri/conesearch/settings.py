@@ -1,6 +1,6 @@
 import daiquiri.core.env as env
 
-CONESEARCH_ADAPTER = 'daiquiri.conesearch.adapter.SimpleConeSearchAdapter'
+CONESEARCH_ADAPTER = 'daiquiri.conesearch.adapter.BaseConeSearchAdapter'
 CONESEARCH_ANONYMOUS = False
 
 #CONESEARCH_SCHEMA = env.get('CONESEARCH_SCHEMA')
