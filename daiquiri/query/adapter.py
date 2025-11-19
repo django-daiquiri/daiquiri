@@ -22,6 +22,7 @@ class ConeSearchQueryFormAdapter(QueryFormAdapter):
                 t in dict.fromkeys(f"{v['schema_name']}.{v['table_name']}" for v in self.get_resources())]
 
     def get_fields(self):
+        tables_list = self.get_tables()
         return [
             {
                 'key': 'table',
@@ -29,7 +30,8 @@ class ConeSearchQueryFormAdapter(QueryFormAdapter):
                 'label': 'Select a Table',
                 'help': 'Choose a Table',
                 'width': 12,
-                'options': self.get_tables(),
+                'options': tables_list,
+                'default_value': tables_list[0]['value']
             },
             {
                 'key': 'ra',
