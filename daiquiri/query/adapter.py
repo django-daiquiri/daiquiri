@@ -19,15 +19,14 @@ class ConeSearchQueryFormAdapter(QueryFormAdapter):
 
     def get_tables(self):
         return [{'id':t, 'value': t, 'label': t} for
-                t in dict.fromkeys(v['table_name'] for v in self.get_resources())]
+                t in dict.fromkeys(f"{v['schema_name']}.{v['table_name']}" for v in self.get_resources())]
 
     def get_fields(self):
         return [
             {
                 'key': 'table',
-                'type': 'subselect',
+                'type': 'select',
                 'label': 'Select a Table',
-                'placeholder': 'Select a table',
                 'help': 'Choose a Table',
                 'width': 12,
                 'options': self.get_tables(),
@@ -68,9 +67,11 @@ class ConeSearchQueryFormAdapter(QueryFormAdapter):
         return 'ADQL' #'postgresql-16.2'
 
     def get_query(self, data):
-        columns = self.get_columns(data['table'])
-        return """
-        select {columns}, distance(point(ra, dec), point({ra}, {dec})) as angdist 
-        from gaiadr3.{table}
-        where 1=contains(point(ra, dec), circle(point({ra}, {dec}), {radius}))
-        """.format(columns=columns, **data).strip()
+        schema_name = data['table'].split('.')[0]
+        table_name = data['table'].split('.')[1]
+        columns = self.get_columns(table_name)
+        return f"""
+        select {columns}, distance(point(ra, dec), point({data['ra']}, {data['dec']})) as angdist 
+        from {schema_name}.{table_name}
+        where 1=contains(point(ra, dec), circle(point({data['ra']}, {data['dec']}), {data['radius']}))
+        """
