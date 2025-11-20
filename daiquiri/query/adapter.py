@@ -86,7 +86,8 @@ class ConeSearchQueryFormAdapter(QueryFormAdapter):
 
         if not ranges['SR']['min'] <= data['radius'] <= ranges['SR']['max']:
             errors['query']['messages'].append(f"Radius must be between {ranges['SR']['min']} and {ranges['SR']['max']}")
-        if errors:
+
+        if errors['query']['messages']:
             raise ValidationError(errors)
 
     def get_query(self, data):
