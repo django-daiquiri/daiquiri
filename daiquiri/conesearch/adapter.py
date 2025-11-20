@@ -20,27 +20,6 @@ class BaseConeSearchAdapter(BaseServiceAdapter):
 
     keys = ['RA', 'DEC', 'SR']
 
-    ranges = {
-        'RA': {
-            'min': 0,
-            'max': 360
-        },
-        'DEC': {
-            'min': -90,
-            'max': 90
-        },
-        'SR': {
-            'min': 0,
-            'max': 10
-        }
-    }
-
-    defaults = {
-        'RA': 20,
-        'DEC': 20,
-        'SR': 10,
-    }
-
     sql_pattern = """
                 select {columns}
                 from {schema}.{table}
@@ -48,6 +27,12 @@ class BaseConeSearchAdapter(BaseServiceAdapter):
                 """
 
     max_records = 10000
+
+    def get_ranges(self):
+        return settings.CONESEARCH_RANGES
+
+    def get_defaults(self):
+        return settings.CONESEARCH_DEFAULTS
 
     def get_resources(self):
         return settings.CONESEARCH_RESOURCES
@@ -107,6 +92,7 @@ class BaseConeSearchAdapter(BaseServiceAdapter):
             raise ValidationError(errors)
 
     def clean_args(self, data, errors):
+        self.ranges = self.get_ranges()
         self.args = {}
         for key in ['RA', 'DEC', 'SR']:
             try:

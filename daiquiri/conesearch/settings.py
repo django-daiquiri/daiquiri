@@ -11,3 +11,24 @@ CONESEARCH_SUBJECTS = [
 ]
 
 CONESEARCH_RESOURCES = {}
+
+CONESEARCH_RANGES = {
+        'RA': {
+            'min': 0,
+            'max': 360
+        },
+        'DEC': {
+            'min': -90,
+            'max': 90
+        },
+        'SR': {
+            'min': 0,
+            'max': 10
+        }
+    }
+
+CONESEARCH_DEFAULTS = {
+        'RA': 20,
+        'DEC': 20,
+        'SR': 10,
+    }
