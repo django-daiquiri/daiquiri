@@ -42,7 +42,7 @@ class BaseConeSearchAdapter(BaseServiceAdapter):
     }
 
     sql_pattern = """
-                select {columns}, distance(point(ra, dec), point({RA}, {DEC})) as angdist 
+                select {columns}
                 from {schema}.{table}
                 where 1=contains(point(ra, dec), circle(point({RA}, {DEC}), {SR}))
                 """
