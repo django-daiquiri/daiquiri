@@ -1,4 +1,7 @@
 from django.conf import settings
+
+from rest_framework.exceptions import ValidationError
+
 from daiquiri.conesearch.adapter import  BaseConeSearchAdapter
 
 
@@ -24,6 +27,7 @@ class ConeSearchQueryFormAdapter(QueryFormAdapter):
 
     def get_fields(self):
         tables_list = self.get_tables()
+        defaults = settings.CONESEARCH_DEFAULTS
         return [
             {
                 'key': 'table',
@@ -39,7 +43,7 @@ class ConeSearchQueryFormAdapter(QueryFormAdapter):
                 'type': 'number',
                 'label': 'RA',
                 'help': 'Right ascension in degrees (decimal form)',
-                'default_value': 200.0,
+                'default_value': defaults['RA'],
                 'width': 4,
             },
             {
@@ -47,7 +51,7 @@ class ConeSearchQueryFormAdapter(QueryFormAdapter):
                 'type': 'number',
                 'label': 'DEC',
                 'help': 'Declination in degrees (decimal form)',
-                'default_value': 45.0,
+                'default_value': defaults['DEC'],
                 'width': 4,
             },
             {
@@ -55,7 +59,7 @@ class ConeSearchQueryFormAdapter(QueryFormAdapter):
                 'type': 'number',
                 'label': 'Radius',
                 'help': 'Radius in degrees',
-                'default_value': 0.05,
+                'default_value': defaults['SR'],
                 'width': 4,
             },
         ]
