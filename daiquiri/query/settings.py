@@ -49,6 +49,13 @@ QUERY_FORMS = [
         'template': 'query/query_form_sql.html',
     },
     {
+        'key': 'cone',
+        'label': 'Cone search',
+        'submit': 'Submit new cone search',
+        'template': 'query/query_form_cone.html',
+        'adapter': 'daiquiri.query.adapter.ConeSearchQueryFormAdapter',
+    },
+    {
         'key': 'upload',
         'label': 'Upload VOTable',
         'template': 'query/query_form_upload.html',
@@ -156,5 +163,3 @@ QUERY_UPLOAD_LIMIT = {
     'groups': {}
 }
 QUERY_PROCESSOR_CACHE = True
-
-CONESEARCH_RESOURCES = {}
