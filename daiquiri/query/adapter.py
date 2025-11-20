@@ -1,4 +1,5 @@
 from django.conf import settings
+from daiquiri.conesearch.adapter import  BaseConeSearchAdapter
 
 
 class QueryFormAdapter:
@@ -72,8 +73,7 @@ class ConeSearchQueryFormAdapter(QueryFormAdapter):
         schema_name = data['table'].split('.')[0]
         table_name = data['table'].split('.')[1]
         columns = self.get_columns(table_name)
-        return f"""
-        select {columns}, distance(point(ra, dec), point({data['ra']}, {data['dec']})) as angdist 
-        from {schema_name}.{table_name}
-        where 1=contains(point(ra, dec), circle(point({data['ra']}, {data['dec']}), {data['radius']}))
-        """
+        return BaseConeSearchAdapter.sql_pattern.format(schema=schema_name,
+                        table = table_name,
+                        columns = columns,
+                        RA=data['ra'], DEC=data['dec'], SR=data['radius']).strip()
