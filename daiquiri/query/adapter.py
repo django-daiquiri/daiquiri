@@ -73,7 +73,24 @@ class ConeSearchQueryFormAdapter(QueryFormAdapter):
     def get_query_language(self, data):
         return 'ADQL' #'postgresql-16.2'
 
+    def validate_input(self, data):
+        ranges = settings.CONESEARCH_RANGES
+        errors = {"query": {"messages": [] }}
+
+        if not ranges['RA']['min'] <= data['ra'] <= ranges['RA']['max']:
+            errors['query']['messages'].append(f"RA must be between {ranges['RA']['min']} and {ranges['RA']['max']}")
+
+        if not ranges['DEC']['min'] <= data['dec'] <= ranges['DEC']['max']:
+            errors['query']['messages'].append(f"DEC must be between {ranges['DEC']['min']} and {ranges['DEC']['max']}")
+
+
+        if not ranges['SR']['min'] <= data['radius'] <= ranges['SR']['max']:
+            errors['query']['messages'].append(f"Radius must be between {ranges['SR']['min']} and {ranges['SR']['max']}")
+        if errors:
+            raise ValidationError(errors)
+
     def get_query(self, data):
+        self.validate_input(data)
         schema_name = data['table'].split('.')[0]
         table_name = data['table'].split('.')[1]
         columns = self.get_columns(table_name)
