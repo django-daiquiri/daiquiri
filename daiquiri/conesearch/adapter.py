@@ -25,14 +25,9 @@ class BaseConeSearchAdapter(BaseServiceAdapter):
                 from {schema}.{table}
                 where 1=contains(point(ra, dec), circle(point({RA}, {DEC}), {SR}))
                 """
-
+    defaults = settings.CONESEARCH_DEFAULTS
+    ranges = settings.CONESEARCH_RANGES
     max_records = 10000
-
-    def get_ranges(self):
-        return settings.CONESEARCH_RANGES
-
-    def get_defaults(self):
-        return settings.CONESEARCH_DEFAULTS
 
     def get_resources(self):
         return settings.CONESEARCH_RESOURCES
@@ -92,7 +87,6 @@ class BaseConeSearchAdapter(BaseServiceAdapter):
             raise ValidationError(errors)
 
     def clean_args(self, data, errors):
-        self.ranges = self.get_ranges()
         self.args = {}
         for key in ['RA', 'DEC', 'SR']:
             try:
