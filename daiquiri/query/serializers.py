@@ -1,4 +1,5 @@
 from django.template.loader import TemplateDoesNotExist, get_template
+from django.conf import settings
 
 from rest_framework import serializers
 
@@ -170,6 +171,34 @@ class QueryJobFormSerializer(QueryJobCreateSerializer):
                 self.fields[field['key']] = serializers.FloatField(required=True)
             else:
                 self.fields[field['key']] = serializers.CharField(required=False)
+
+    def validate(self, data):
+        ranges = settings.CONESEARCH_RANGES
+        messages = []
+
+        ra = data.get('ra')
+        dec = data.get('dec')
+        radius = data.get('radius')
+
+        if not (ranges['RA']['min'] <= ra <= ranges['RA']['max']):
+            messages.append(
+                f"RA must be between {ranges['RA']['min']} and {ranges['RA']['max']}"
+            )
+
+        if not (ranges['DEC']['min'] <= dec <= ranges['DEC']['max']):
+            messages.append(
+                f"DEC must be between {ranges['DEC']['min']} and {ranges['DEC']['max']}"
+            )
+
+        if not (ranges['SR']['min'] <= radius <= ranges['SR']['max']):
+            messages.append(
+                f"Radius must be between {ranges['SR']['min']} and {ranges['SR']['max']}"
+            )
+
+        if messages:
+            raise serializers.ValidationError({"query": {"messages": messages}})
+
+        return data
 
     def get_query_language(self, obj):
         return self.adapter.get_query_language(obj)
