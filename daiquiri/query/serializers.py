@@ -176,24 +176,29 @@ class QueryJobFormSerializer(QueryJobCreateSerializer):
         ranges = settings.CONESEARCH_RANGES
         messages = []
 
+        field_keys = {f['key'] for f in self.adapter.get_fields()}
+
         ra = data.get('ra')
         dec = data.get('dec')
         radius = data.get('radius')
 
-        if not (ranges['RA']['min'] <= ra <= ranges['RA']['max']):
-            messages.append(
-                f"RA must be between {ranges['RA']['min']} and {ranges['RA']['max']}"
-            )
+        if 'ra' in field_keys and ra is not None:
+            if not (ranges['RA']['min'] <= ra <= ranges['RA']['max']):
+                messages.append(
+                    f"RA must be between {ranges['RA']['min']} and {ranges['RA']['max']}"
+                )
 
-        if not (ranges['DEC']['min'] <= dec <= ranges['DEC']['max']):
-            messages.append(
-                f"DEC must be between {ranges['DEC']['min']} and {ranges['DEC']['max']}"
-            )
+        if 'dec' in field_keys and ra is not None:
+            if not (ranges['DEC']['min'] <= dec <= ranges['DEC']['max']):
+                messages.append(
+                    f"DEC must be between {ranges['DEC']['min']} and {ranges['DEC']['max']}"
+                )
 
-        if not (ranges['SR']['min'] <= radius <= ranges['SR']['max']):
-            messages.append(
-                f"Radius must be between {ranges['SR']['min']} and {ranges['SR']['max']}"
-            )
+        if 'radius' in field_keys and ra is not None:
+            if radius is not None and not (ranges['SR']['min'] <= radius <= ranges['SR']['max']):
+                messages.append(
+                    f"Radius must be between {ranges['SR']['min']} and {ranges['SR']['max']}"
+                )
 
         if messages:
             raise serializers.ValidationError({"query": {"messages": messages}})
