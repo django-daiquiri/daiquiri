@@ -247,6 +247,9 @@ class BaseDatabaseAdapter:
     def rename_table(self, schema_name, table_name, new_table_name):
         raise NotImplementedError()
 
+    def trim_table_rows(self, schema_name, table_name, max_records):
+        raise NotImplementedError()
+
     def drop_table(self, schema_name, table_name):
         sql = f'DROP TABLE IF EXISTS {self.escape_identifier(schema_name)}.{self.escape_identifier(table_name)};'
 

@@ -60,6 +60,7 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         return f"'{string}'"
 
     def build_query(self, schema_name, table_name, query, timeout, max_records):
+        # max_records is depricated
         # construct the actual query
         actual_query = (
             f'SET SESSION statement_timeout TO {int(timeout * 1000)};'
@@ -71,12 +72,10 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         if settings.USER_TABLESPACE is not None:
             actual_query += f' TABLESPACE {settings.USER_TABLESPACE}'
 
-        if max_records is not None:
-            actual_query += f' AS {self.set_max_records(query, max_records)};'
-        else:
-            actual_query += f' AS {query};'
+        actual_query += f' AS {query};'
 
         return actual_query
+
 
     def build_sync_query(self, query, timeout, max_records):
         # WARNING: This method is currently not used. The sync query is build
@@ -88,12 +87,16 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         }
 
         if max_records is not None:
-            return self.set_max_records(
-                'SET SESSION statement_timeout TO %(timeout); COMMIT; %(query));'
-            ).format(**params)
+            return (
+                    'SET SESSION statement_timeout TO {timeout};'
+                    + 'COMMIT; {query} LIMIT {max_records};'.format(
+                        **params
+                    )
+                )
         else:
             return (
-                'SET SESSION statement_timeout TO %(timeout); COMMIT; %(query);'.format(
+                'SET SESSION statement_timeout TO {timeout};'
+                + 'COMMIT; %(query);'.format(
                     **params
                 )
             )
@@ -101,19 +104,6 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
     def abort_query(self, pid):
         sql = 'select pg_cancel_backend(%(pid)i)' % {'pid': pid}
         self.execute(sql)
-
-    def set_max_records(self, query, max_records):
-        limit_pattern = r'LIMIT\s+(\d+)'
-        match = re.search(limit_pattern, query, flags=re.IGNORECASE)
-        if match:
-            current_limit = int(match.group(1))
-            if current_limit > max_records:
-                query = re.sub(
-                    limit_pattern, f'LIMIT {max_records}', query, flags=re.IGNORECASE
-                )
-        else:
-            query += f' LIMIT {max_records}'
-        return query
 
     def fetch_size(self, schema_name, table_name):
         # fetch the size of the table using pg_total_relation_size
@@ -321,6 +311,16 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         # log sql string and execute
         logger.debug('sql = "%s"', sql)
         self.execute(sql)
+
+    def trim_table_rows(self, schema_name, table_name, max_records):
+        query = (
+            'DELETE FROM '
+            + f'{self.escape_identifier(schema_name)}.{self.escape_identifier(table_name)} '
+            + 'WHERE ctid NOT IN (SELECT ctid FROM'
+            + f'{self.escape_identifier(schema_name)}.{self.escape_identifier(table_name)} '
+            + f'LIMIT {max_records} );'
+        )
+        self.execute(query)
 
     def _process_ordering(self, sql, ordering, escaped_column_names):
         if ordering:
