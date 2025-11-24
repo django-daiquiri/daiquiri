@@ -316,7 +316,7 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         query = (
             'DELETE FROM '
             + f'{self.escape_identifier(schema_name)}.{self.escape_identifier(table_name)} '
-            + 'WHERE ctid NOT IN (SELECT ctid FROM'
+            + 'WHERE ctid NOT IN (SELECT ctid FROM '
             + f'{self.escape_identifier(schema_name)}.{self.escape_identifier(table_name)} '
             + f'LIMIT {max_records} );'
         )
