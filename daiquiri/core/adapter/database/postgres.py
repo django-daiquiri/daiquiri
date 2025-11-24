@@ -313,6 +313,9 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         self.execute(sql)
 
     def trim_table_rows(self, schema_name, table_name, max_records):
+        if not self.table_exists(schema_name, table_name):
+            return
+
         query = (
             'DELETE FROM '
             + f'{self.escape_identifier(schema_name)}.{self.escape_identifier(table_name)} '
@@ -321,6 +324,17 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
             + f'LIMIT {max_records} );'
         )
         self.execute(query)
+
+    def table_exists(self, schema_name, table_name):
+        check_query = """
+            SELECT EXISTS (
+                SELECT 1
+                FROM information_schema.tables
+                WHERE table_schema = %s AND table_name = %s
+            );
+        """
+        return self.fetchone(check_query, (schema_name, table_name))[0]
+
 
     def _process_ordering(self, sql, ordering, escaped_column_names):
         if ordering:
