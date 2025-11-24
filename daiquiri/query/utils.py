@@ -239,7 +239,7 @@ def get_job_column(job, display_column_name):
 def get_job_columns(job):
     columns = []
 
-    if job.phase == job.PHASE_COMPLETED or job.job_type == job.JOB_TYPE_SYNC:
+    if job.phase == job.PHASE_COMPLETED: # or job.job_type == job.JOB_TYPE_SYNC:
         database_columns = DatabaseAdapter().fetch_columns(
             job.schema_name, job.table_name
         )
@@ -248,6 +248,9 @@ def get_job_columns(job):
             column = get_job_column(job, database_column['name'])
             column.update(database_column)
             columns.append(column)
+    else:
+        for display_column in job.metadata['display_columns']:
+            columns.append(get_job_column(job, display_column))
 
     return columns
 

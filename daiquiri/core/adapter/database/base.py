@@ -43,6 +43,10 @@ class BaseDatabaseAdapter:
         else:
             cursor.execute(sql)
 
+        # allow multiple statements per execution, skip to the last result set
+        while cursor.nextset():
+            pass
+
         if as_dict:
             columns = cursor.description
             return [

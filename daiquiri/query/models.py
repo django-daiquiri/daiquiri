@@ -13,6 +13,7 @@ from rest_framework.exceptions import ValidationError
 
 from daiquiri.core.adapter import DatabaseAdapter, DownloadAdapter
 from daiquiri.core.constants import ACCESS_LEVEL_CHOICES
+from daiquiri.core.generators import generate_votable
 from daiquiri.core.utils import get_date_display
 from daiquiri.files.utils import check_file
 from daiquiri.jobs.managers import JobManager
@@ -43,7 +44,7 @@ from .tasks import (
     run_database_ingest_task,
     run_database_query_task,
 )
-from .utils import get_format_config, get_job_columns, get_query_language_label
+from .utils import get_format_config, get_job_columns, get_query_language_label, get_job_sources
 
 logger = logging.getLogger(__name__)
 query_logger = logging.getLogger('query')
@@ -263,21 +264,20 @@ class QueryJob(Job):
     def run_sync(self):
         adapter = DatabaseAdapter()
 
-        adapter.create_user_schema_if_not_exists(self.schema_name)
-
-        self.actual_query = adapter.build_query(
-            self.schema_name,
-            self.table_name,
+        self.actual_query = adapter.build_sync_query(
             self.native_query,
             settings.QUERY_SYNC_TIMEOUT,
             self.max_records,
         )
 
+        job_sources = get_job_sources(self)
+
         adapter.submit_query(self.actual_query)
-        self.nrows = adapter.count_rows(self.schema_name, self.table_name)
-        self.size = adapter.fetch_size(self.schema_name, self.table_name)
+        # self.nrows = adapter.count_rows(self.schema_name, self.table_name)
+        # self.size = adapter.fetch_size(self.schema_name, self.table_name)
 
         # create a stats record for this job
+        """
         Record.objects.create(
             time=now(),
             resource_type='QUERY',
@@ -289,22 +289,17 @@ class QueryJob(Job):
             user=self.owner,
             size=self.size,
         )
+        """
 
         try:
-            yield from DownloadAdapter().generate(
-                'votable',
-                get_job_columns(self),
-                sources=self.metadata.get('sources', []),
-                schema_name=self.schema_name,
-                table_name=self.table_name,
-                nrows=self.nrows,
-                query_status=self.result_status,
-                query=self.query,
-                query_language=self.query_language,
-            )
+            download_adapter = DownloadAdapter()
 
+            yield from generate_votable(adapter.fetchall(self.actual_query), get_job_columns(self),
+                                        table=download_adapter.get_table_name(self.schema_name, self.table_name),
+                                        infos=download_adapter.get_infos('OK', self.query, self.query_language, job_sources),
+                                        links=download_adapter.get_links(job_sources),
+                                        services=download_adapter.get_services())
             self.drop_uploads()
-            self.drop_table()
 
         except (OperationalError, ProgrammingError, InternalError, DataError) as e:
             raise StopIteration from e

@@ -79,8 +79,6 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         return actual_query
 
     def build_sync_query(self, query, timeout, max_records):
-        # WARNING: This method is currently not used. The sync query is build
-        # using the 'build_query' method.
         params = {
             'query': query,
             'timeout': int(timeout * 1000),
@@ -88,9 +86,10 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         }
 
         if max_records is not None:
-            return self.set_max_records(
-                'SET SESSION statement_timeout TO %(timeout); COMMIT; %(query));'
-            ).format(**params)
+            return (self.set_max_records(
+                f'SET SESSION statement_timeout TO {int(timeout*1000)}; COMMIT; {query};',
+                max_records)
+            )
         else:
             return (
                 'SET SESSION statement_timeout TO %(timeout); COMMIT; %(query);'.format(
