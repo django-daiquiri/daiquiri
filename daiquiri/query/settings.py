@@ -49,7 +49,7 @@ QUERY_FORMS = [
         'template': 'query/query_form_sql.html',
     },
     {
-        'key': 'cone',
+        'key': 'conesearch',
         'label': 'Cone search',
         'submit': 'Submit new cone search',
         'template': 'query/query_form_cone.html',
