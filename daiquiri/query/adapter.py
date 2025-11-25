@@ -1,9 +1,7 @@
 from django.conf import settings
+from django.utils.module_loading import import_string
 
-from rest_framework.exceptions import ValidationError
-
-from daiquiri.conesearch.adapter import  BaseConeSearchAdapter
-
+conesearch_adapter_class = import_string(settings.CONESEARCH_ADAPTER)
 
 class QueryFormAdapter:
     def get_fields(self):
@@ -71,13 +69,13 @@ class ConeSearchQueryFormAdapter(QueryFormAdapter):
         return ', '.join(columns)
 
     def get_query_language(self, data):
-        return 'ADQL' #'postgresql-16.2'
+        return conesearch_adapter_class.get_query_language(data)
 
     def get_query(self, data):
         schema_name = data['table'].split('.')[0]
         table_name = data['table'].split('.')[1]
         columns = self.get_columns(table_name)
-        return BaseConeSearchAdapter.sql_pattern.format(schema=schema_name,
+        return conesearch_adapter_class.sql_pattern.format(schema=schema_name,
                         table = table_name,
                         columns = columns,
                         RA=data['ra'], DEC=data['dec'], SR=data['radius']).strip()
