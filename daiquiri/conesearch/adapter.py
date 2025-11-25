@@ -27,10 +27,13 @@ class BaseConeSearchAdapter(BaseServiceAdapter):
                 """
     defaults = settings.CONESEARCH_DEFAULTS
     ranges = settings.CONESEARCH_RANGES
-    max_records = 10000
+    max_records = settings.MAX_RECORDS
 
     def get_resources(self):
         return settings.CONESEARCH_RESOURCES
+
+    def get_query_language(self):
+        return 'ADQL' #'postgresql-16.2'
 
     def clean(self, request, resource):
 
@@ -75,13 +78,14 @@ class BaseConeSearchAdapter(BaseServiceAdapter):
         # construct sql query
         adapter = DatabaseAdapter()
         escaped_column_names = [adapter.escape_identifier(column['name']) for column in self.columns]
-        self.adql = self.sql_pattern.format(schema=adapter.escape_identifier(schema_name),
+        self.sql = self.sql_pattern.format(schema=adapter.escape_identifier(schema_name),
                         table = adapter.escape_identifier(table_name),
                         columns = ', '.join(escaped_column_names),
                         escaped_column_names = escaped_column_names, **self.args).strip()
 
-        self.sql = ADQLQueryTranslator(self.adql)
-        self.sql = self.sql.to_postgresql()
+        if "ADQL" in self.get_query_language():
+            self.sql = ADQLQueryTranslator(self.sql)
+            self.sql = self.sql.to_postgresql()
 
         if errors:
             raise ValidationError(errors)

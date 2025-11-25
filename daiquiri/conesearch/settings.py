@@ -32,3 +32,4 @@ CONESEARCH_DEFAULTS = {
         'DEC': 20,
         'SR': 10,
     }
+MAX_RECORDS = 10000
