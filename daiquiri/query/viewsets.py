@@ -103,7 +103,7 @@ class FormViewSet(
     def get_queryset(self):
         if not getattr(settings, 'CONESEARCH_RESOURCES', {}):
             logger.debug("ConeSearch Query Form initialization skipped: no resources available.")
-            return [form for form in settings.QUERY_FORMS if form.get('key') != 'cone']
+            return [form for form in settings.QUERY_FORMS if form.get('key') != 'conesearch']
         return settings.QUERY_FORMS
 
     def get_object(self):
