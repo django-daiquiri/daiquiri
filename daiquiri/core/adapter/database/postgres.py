@@ -1,5 +1,4 @@
 import logging
-import re
 
 from django.conf import settings
 from django.db import OperationalError, ProgrammingError
@@ -60,8 +59,7 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         return f"'{string}'"
 
     def build_query(self, schema_name, table_name, query, timeout, max_records):
-        # max_records is depricated
-        # construct the actual query
+        # max_records is now handled by the method trim_table_rows
         actual_query = (
             f'SET SESSION statement_timeout TO {int(timeout * 1000)};'
             + 'COMMIT;'
@@ -76,7 +74,6 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
 
         return actual_query
 
-
     def build_sync_query(self, query, timeout, max_records):
         # WARNING: This method is currently not used. The sync query is build
         # using the 'build_query' method.
@@ -88,35 +85,34 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
 
         if max_records is not None:
             return (
-                    'SET SESSION statement_timeout TO {timeout};'
-                    + 'COMMIT; {query} LIMIT {max_records};'.format(
-                        **params
-                    )
-                )
-        else:
-            return (
                 'SET SESSION statement_timeout TO {timeout};'
-                + 'COMMIT; %(query);'.format(
-                    **params
-                )
+                + 'COMMIT; {query} LIMIT {max_records};'.format(**params)
+            )
+        else:
+            return 'SET SESSION statement_timeout TO {timeout};' + 'COMMIT; %(query);'.format(
+                **params
             )
 
-    def abort_query(self, pid):
-        sql = 'select pg_cancel_backend(%(pid)i)' % {'pid': pid}
+    def abort_query(self, pid: int):
+        sql = f'SELECT pg_cancel_backend({pid})'
         self.execute(sql)
 
     def fetch_size(self, schema_name, table_name):
-        # fetch the size of the table using pg_total_relation_size
-        sql = f"SELECT pg_total_relation_size('{self.escape_identifier(schema_name)}.{self.escape_identifier(table_name)}')"  # noqa: E501
+        sql = (
+            'SELECT pg_total_relation_size('
+            + f"'{self.escape_identifier(schema_name)}.{self.escape_identifier(table_name)}')"
+        )
         size = self.fetchone(sql)[0]
 
-        # log values and return
         logger.debug('size = %d', size)
         return size
 
     def fetch_nrows(self, schema_name, table_name):
         # fetch the size of the table using pg_total_relation_size
-        sql = f"SELECT reltuples::BIGINT FROM pg_class WHERE oid = '{self.escape_identifier(schema_name)}.{self.escape_identifier(table_name)}'::regclass;"  # noqa: E501
+        sql = (
+            'SELECT reltuples::BIGINT FROM pg_class '
+            + f"WHERE oid = '{self.escape_identifier(schema_name)}.{self.escape_identifier(table_name)}'::regclass;"  # noqa: E501
+        )
         nrows = self.fetchone(sql)[0]
 
         # log values and return
@@ -124,16 +120,15 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         return nrows
 
     def fetch_tables(self, schema_name):
-        # escape input
         escaped_schema_name = self.escape_string(schema_name)
 
-        # prepare sql string
-        sql = f'SELECT table_name, table_type FROM information_schema.tables where table_schema = {escaped_schema_name}'
+        sql = (
+            'SELECT table_name, table_type FROM information_schema.tables '
+            + f'WHERE table_schema = {escaped_schema_name}'
+        )
 
-        # log sql string
         logger.debug('sql = "%s"', sql)
 
-        # execute query
         try:
             rows = self.fetchall(sql)
         except OperationalError as e:
@@ -141,18 +136,18 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
             return []
         else:
             return [
-                {'name': row[0], 'type': 'view' if row[1] == 'VIEW' else 'table'}
-                for row in rows
+                {'name': row[0], 'type': 'view' if row[1] == 'VIEW' else 'table'} for row in rows
             ]
 
     def fetch_table(self, schema_name, table_name):
-        # prepare sql string
-        sql = f'SELECT table_name, table_type FROM information_schema.tables where table_schema = {self.escape_string(schema_name)} AND table_name = {self.escape_string(table_name)}'  # noqa: E501
+        sql = (
+            'SELECT table_name, table_type FROM information_schema.tables '
+            + f'WHERE table_schema = {self.escape_string(schema_name)} '
+            + f'AND table_name = {self.escape_string(table_name)}'
+        )
 
-        # log sql string
         logger.debug('sql = "%s"', sql)
 
-        # execute query
         try:
             row = self.fetchone(sql)
         except OperationalError as e:
@@ -172,37 +167,37 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
     def fetch_columns(self, schema_name, table_name):
         logger.debug('fetch_columns %s %s', schema_name, table_name)
 
-        # prepare sql string
-        sql = f'SELECT column_name, data_type, udt_name, character_maximum_length, ordinal_position FROM information_schema.columns WHERE table_schema = {self.escape_string(schema_name)} AND table_name = {self.escape_string(table_name)}'  # noqa: E501
+        sql = (
+            'SELECT column_name, data_type, udt_name, character_maximum_length, ordinal_position '
+            + 'FROM information_schema.columns '
+            + f'WHERE table_schema = {self.escape_string(schema_name)} '
+            + f'AND table_name = {self.escape_string(table_name)}'
+        )
 
-        # log sql string
         logger.debug('sql = "%s"', sql)
 
-        # execute query
         try:
             rows = self.fetchall(sql)
         except ProgrammingError as e:
-            logger.error(
-                'Could not fetch columns from %s.%s (%s)', schema_name, table_name, e
-            )
+            logger.error('Could not fetch columns from %s.%s (%s)', schema_name, table_name, e)
             return []
         else:
             columns = []
             for row in rows:
                 columns.append(self._parse_column(row))
 
-            # check if indexed
-            sql = f'SELECT indexdef FROM pg_indexes WHERE schemaname = {self.escape_string(schema_name)} AND tablename = {self.escape_string(table_name)}'  # noqa: E501
+            sql = (
+                'SELECT indexdef FROM pg_indexes '
+                + f'WHERE schemaname = {self.escape_string(schema_name)} '
+                + f'AND tablename = {self.escape_string(table_name)}'
+            )
 
-            # log sql string
             logger.debug('sql = "%s"', sql)
 
             try:
                 rows = self.fetchall(sql)
             except OperationalError as e:
-                logger.error(
-                    'Could not fetch indexes of %s.%s (%s)', schema_name, table_name, e
-                )
+                logger.error('Could not fetch indexes of %s.%s (%s)', schema_name, table_name, e)
                 return columns
             else:
                 for column in columns:
@@ -212,19 +207,20 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
             return columns
 
     def fetch_column(self, schema_name, table_name, column_name):
-        # prepare sql string
-        sql = f'SELECT column_name, data_type, udt_name, character_maximum_length, ordinal_position FROM information_schema.columns WHERE table_schema = {self.escape_string(schema_name)} AND table_name = {self.escape_string(table_name)} AND column_name = {self.escape_string(column_name)}'  # noqa: E501
+        sql = (
+            'SELECT column_name, data_type, udt_name, character_maximum_length, ordinal_position '
+            + 'FROM information_schema.columns '
+            + f'WHERE table_schema = {self.escape_string(schema_name)} '
+            + f'AND table_name = {self.escape_string(table_name)} '
+            + f'AND column_name = {self.escape_string(column_name)}'
+        )
 
-        # log sql string
         logger.debug('sql = "%s"', sql)
 
-        # execute query
         try:
             row = self.fetchone(sql)
         except ProgrammingError as e:
-            logger.error(
-                'Could not fetch %s.%s.%s (%s)', schema_name, table_name, column_name, e
-            )
+            logger.error('Could not fetch %s.%s.%s (%s)', schema_name, table_name, column_name, e)
             return {}
         else:
             if row is None:
@@ -233,15 +229,17 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
                     schema_name,
                     table_name,
                     column_name,
-                )  # noqa: E501
+                )
                 return {}
             else:
                 column = self._parse_column(row)
 
-            # check if indexed
-            sql = f'SELECT indexdef FROM pg_indexes WHERE schemaname = {self.escape_string(schema_name)} AND tablename = {self.escape_string(table_name)}'  # noqa: E501
+            sql = (
+                'SELECT indexdef FROM pg_indexes '
+                + f'WHERE schemaname = {self.escape_string(schema_name)} '
+                + f'AND tablename = {self.escape_string(table_name)}'
+            )
 
-            # log sql string
             logger.debug('sql = "%s"', sql)
 
             try:
@@ -266,10 +264,12 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         logger.debug('schema_name = "%s"', schema_name)
         logger.debug('table_name = "%s"', table_name)
 
-        # prepare sql string
-        sql = f'SELECT column_name FROM information_schema.columns where table_schema = {self.escape_string(schema_name)} AND table_name = {self.escape_string(table_name)}'  # noqa: E501
+        sql = (
+            'SELECT column_name FROM information_schema.columns '
+            + f'WHERE table_schema = {self.escape_string(schema_name)} '
+            + f'AND table_name = {self.escape_string(table_name)}'
+        )
 
-        # log values and return
         logger.debug('sql = "%s"', sql)
         return [column[0] for column in self.fetchall(sql)]
 
@@ -277,9 +277,7 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         for column in columns:
             if self.COLUMNTYPES.get(column['datatype']) is None:
                 raise TypeError(
-                    'Column {name} is of type {datatype}. {datatype} is not '.format(
-                        **column
-                    )
+                    'Column {name} is of type {datatype}. {datatype} is not '.format(**column)
                     + 'supported by Postgres, the table can not be created.'
                 )
         sql = 'CREATE TABLE {schema}.{table} ({columns})'.format(
@@ -290,7 +288,10 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
                     '{column_name} {column_type}{ar}'.format(
                         column_name=self.escape_identifier(column['name']),
                         column_type=self.COLUMNTYPES[column['datatype']],
-                        ar='[]' if column['arraysize'] and self.DATATYPES[self.COLUMNTYPES[column['datatype']]]['arraysize'] else '', # noqa: E501
+                        ar='[]'
+                        if column['arraysize']
+                        and self.DATATYPES[self.COLUMNTYPES[column['datatype']]]['arraysize']
+                        else '',
                     )
                     for column in columns
                 ]
@@ -306,9 +307,11 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         self.execute(sql)
 
     def rename_table(self, schema_name, table_name, new_table_name):
-        sql = f'ALTER TABLE {self.escape_identifier(schema_name)}.{self.escape_identifier(table_name)} RENAME TO {self.escape_identifier(new_table_name)};'  # noqa: E501
+        sql = (
+            f'ALTER TABLE {self.escape_identifier(schema_name)}.{self.escape_identifier(table_name)} '  # noqa: E501
+            + f'RENAME TO {self.escape_identifier(new_table_name)};'
+        )
 
-        # log sql string and execute
         logger.debug('sql = "%s"', sql)
         self.execute(sql)
 
@@ -326,15 +329,11 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         self.execute(query)
 
     def table_exists(self, schema_name, table_name):
-        check_query = """
-            SELECT EXISTS (
-                SELECT 1
-                FROM information_schema.tables
-                WHERE table_schema = %s AND table_name = %s
-            );
-        """
+        check_query = (
+            'SELECT EXISTS (SELECT 1 FROM information_schema.tables '
+            + 'WHERE table_schema = %s AND table_name = %s);'
+        )
         return self.fetchone(check_query, (schema_name, table_name))[0]
-
 
     def _process_ordering(self, sql, ordering, escaped_column_names):
         if ordering:
@@ -355,20 +354,14 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         return sql
 
     def _parse_column(self, row):
-        column_name, data_type, udt_name, character_maximum_length, ordinal_position = (
-            row
-        )
+        column_name, data_type, udt_name, character_maximum_length, ordinal_position = row
 
         column = {'name': column_name}
 
-        if (
-            udt_name.lower() in self.DATATYPES
-        ):  # universal types: int2, int4, int8, _float8, ...
+        if udt_name.lower() in self.DATATYPES:  # universal types: int2, int4, int8, _float8, ...
             datatype = self.DATATYPES[udt_name.lower()]
 
-        elif (
-            data_type.lower() in self.DATATYPES
-        ):  # postgres types: smallint, bigint, ARRAY, ...
+        elif data_type.lower() in self.DATATYPES:  # postgres types: smallint, bigint, ARRAY, ...
             datatype = self.DATATYPES[data_type.lower()]
 
         else:
@@ -395,7 +388,6 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
 
         column['order'] = ordinal_position
 
-        # log values and return
         logger.debug('row = %s', row)
         logger.debug('column = %s', column)
         return column
