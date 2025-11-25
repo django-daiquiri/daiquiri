@@ -267,7 +267,7 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
                 return column
             else:
                 columnname = '({})'.format(column['name'])
-                if str(rows).find(columnname) > -1:
+                if str(rows).replace('"', '').find(columnname) > -1:
                     column['indexed'] = True
 
             return column
@@ -292,7 +292,7 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
                     )
                     + 'supported by Postgres, the table can not be created.'
                 )
-        sql = 'CREATE TABLE {schema}.{table} ({columns});'.format(
+        sql = 'CREATE TABLE {schema}.{table} ({columns})'.format(
             schema=self.escape_identifier(schema_name),
             table=self.escape_identifier(table_name),
             columns=', '.join(
@@ -306,6 +306,11 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
                 ]
             ),
         )
+
+        if settings.USER_TABLESPACE is not None:
+            sql += f' TABLESPACE {settings.USER_TABLESPACE}'
+
+        sql += ';'
 
         logger.debug('sql = "%s"', sql)
         self.execute(sql)
@@ -332,8 +337,6 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
 
             if escaped_ordering_column in escaped_column_names:
                 sql += f' ORDER BY {escaped_ordering_column} {ordering_direction}'
-        else:
-            sql += ' ORDER BY ctid'
 
         return sql
 

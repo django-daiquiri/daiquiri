@@ -61,6 +61,7 @@ from .utils import (
     get_user_upload_directory,
     handle_upload_param,
     ingest_uploads,
+    get_max_active_jobs
 )
 
 
@@ -69,10 +70,14 @@ class StatusViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = []
 
     def list(self, request):
+        active_jobs = QueryJob.objects.get_active(request.user).count()
+        active_jobs_interface = QueryJob.objects.get_active(request.user).filter(
+            job_type=QueryJob.JOB_TYPE_INTERFACE).count()
+
         return Response(
             {
                 'guest': not request.user.is_authenticated,
-                'queued_jobs': None,
+                'active_jobs': active_jobs,
                 'size': QueryJob.objects.get_size(request.user),
                 'hash': QueryJob.objects.get_hash(request.user),
                 'quota': get_quota(request.user),
@@ -80,8 +85,12 @@ class StatusViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
                 'upload_limit': get_quota(
                     request.user, quota_settings='QUERY_UPLOAD_LIMIT'
                 ),
+                'max_active_jobs': get_max_active_jobs(request.user),
+                'active_jobs_interface': active_jobs_interface,
+                'active_jobs_tap': active_jobs - active_jobs_interface
             }
         )
+
 
 
 class FormViewSet(

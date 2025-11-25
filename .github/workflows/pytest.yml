@@ -7,12 +7,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        db-backend: [mysql, postgres]
-        python-version: ['3.9', '3.12']
+        python-version: ['3.13']
 
     services:
       postgres:
-        image: postgres:13
+        image: postgres:17
         env:
           POSTGRES_PASSWORD: postgres_password
         ports:
@@ -22,53 +21,59 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
+        python-version-file: .python-version
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
 
     - name: Install prerequisites
       run: |
         sudo apt update
         sudo apt install -y libpq-dev postgresql postgresql-client
-        python -m pip install --upgrade pip
 
     - name: Install Daiquiri
       run: |
-        pip install -e .[ci]
+        uv venv --python ${{ matrix.python-version }} && uv pip install -e .[ci]
 
     - name: Prepare testing app
       run: |
-        cp testing/config/settings/${{ matrix.db-backend }}.py testing/config/settings/local.py
-        mkdir testing/log testing/download
-
-    - name: Prepare MySQL database
-      run: |
-        sudo systemctl start mysql.service
-        mysql --user=root --password=root < testing/sql/mysql/setup.sql
+        mkdir -p testing/log testing/download/user
 
     - name: Prepare PostgreSQL database
       run: |
         psql postgresql://postgres:postgres_password@localhost:5432 -f testing/sql/postgres/setup.sql
         psql postgresql://postgres:postgres_password@localhost:5432/test_daiquiri_data -c 'VACUUM ANALYSE;'
 
+    - name: Grant schema privileges
+      run: |
+        psql postgresql://postgres:postgres_password@localhost:5432 -c "GRANT ALL PRIVILEGES ON SCHEMA public TO daiquiri_app;"
+        psql postgresql://postgres:postgres_password@localhost:5432 -c "GRANT ALL PRIVILEGES ON SCHEMA public TO daiquiri_data;"
+        psql postgresql://postgres:postgres_password@localhost:5432 -c "ALTER DATABASE test_daiquiri_app OWNER TO daiquiri_app;"
+        psql postgresql://postgres:postgres_password@localhost:5432 -c "ALTER DATABASE test_daiquiri_data OWNER TO daiquiri_data;"
+
+    - name: Run Django migrations
+      run: |
+        export PYTHONPATH=$(pwd)
+        uv run django-admin migrate --noinput --settings=testing.config.settings
+        uv run django-admin migrate --database=tap --noinput --settings=testing.config.settings
+        uv run django-admin migrate --database=oai --noinput --settings=testing.config.settings
+
     - name: Run tests
       run: |
-        pytest --reuse-db --cov=daiquiri
-        coveralls --service=github
+        export PYTHONPATH=$(pwd)
+        uv run pytest --reuse-db --migrations --cov=daiquiri --cov-report=xml
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        COVERALLS_FLAG_NAME: '${{ matrix.db-backend }}: ${{ matrix.python-version }}'
-        COVERALLS_PARALLEL: true
+        COVERALLS_FLAG_NAME: 'postgres: ${{ matrix.python-version }}'
+        DJANGO_SETTINGS_MODULE: testing.config.settings
 
-  coveralls:
-    name: Indicate completion to coveralls
-    needs: build
-    runs-on: ubuntu-latest
-    container: python:3-slim
-    steps:
-    - name: Run Coveralls finish
-      run: |
-        pip install coveralls
-        coveralls --service=github --finish
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Publish to coveralls.io
+      uses: coverallsapp/github-action@v2
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        path-to-lcov: coverage.xml
+        fail-on-error: false
+        parallel: false

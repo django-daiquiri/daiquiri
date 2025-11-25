@@ -40,6 +40,11 @@ INSTALLED_APPS = DJANGO_APPS + [
     'daiquiri.uws',
 ]
 
+MIDDLEWARE = [
+    'daiquiri.core.middleware.MultipleProxyMiddleware',
+    *DJANGO_MIDDLEWARE,
+]
+
 ROOT_URLCONF = ''
 
 DATABASES = {}

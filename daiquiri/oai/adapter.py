@@ -204,7 +204,7 @@ class MetadataOaiAdapterMixin:
         return table.pk, identifier, datestamp, set_spec, public
 
 
-class DatalinkOAIAdapterMixin:
+class DatalinkOaiAdapterMixin:
 
     tables = settings.DATALINK_TABLES
 
@@ -239,13 +239,14 @@ class DatalinkOAIAdapterMixin:
 
         datalink = {
             'formats': [],
+            'sizes': [],
             'alternate_identifiers': [
                 {
                     'alternate_identifier': pk,
                     'alternate_identifier_type': 'datalink'
                 }
             ],
-            'related_identifiers': []
+            'related_identifiers': [],
         }
         for _, access_url, _, _, description, semantics, content_type, content_length in rows:
             # doi is a custom datalink semantic which means that it will contain the full URL to the description
@@ -257,6 +258,7 @@ class DatalinkOAIAdapterMixin:
             elif semantics == '#this':
                 if content_type not in datalink['formats']:
                     datalink['formats'].append(content_type)
+                datalink['sizes'].append(f'{content_length} bytes')
                 datalink['related_identifiers'].append({
                     'related_identifier': access_url,
                     'related_identifier_type': 'URL',
@@ -292,18 +294,11 @@ class DatalinkOAIAdapterMixin:
                     'alternate_identifier_type': 'DOI Landing Page'
                 })
 
-            elif semantics == '#preview-image':
+            elif semantics == '#preview-image' or semantics == '#auxiliary':
                 datalink['related_identifiers'].append({
                     'related_identifier': access_url,
                     'related_identifier_type': 'URL',
                     'relation_type': 'IsSupplementedBy'
-                })
-
-            elif semantics == '#auxiliary':
-                datalink['related_identifiers'].append({
-                    'related_identifier': access_url,
-                    'related_identifier_type': 'URL',
-                    'relation_type': 'References'
                 })
 
         return datalink
@@ -395,7 +390,7 @@ class RegistryOaiAdapterMixin:
 
 class DefaultOaiAdapter(RegistryOaiAdapterMixin,
                         MetadataOaiAdapterMixin,
-                        DatalinkOAIAdapterMixin,
+                        DatalinkOaiAdapterMixin,
                         BaseOaiAdapter):
 
     resource_types = ['service', 'schema', 'table', 'datalink']

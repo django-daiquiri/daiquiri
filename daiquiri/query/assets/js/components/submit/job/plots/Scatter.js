@@ -31,8 +31,9 @@ const Scatter = ({ job, columns, loadJob }) => {
     }
   }), [columns])
 
-  const { data: x } = useJobPlotQuery(job, plotValues.x.column)
-  const { data: y } = useJobPlotQuery(job, plotValues.y.column)
+  const { data } = useJobPlotQuery(job, [plotValues.x.column, plotValues.y.column]);
+  const x = (data ?? []).map(row => row[0]);
+  const y = (data ?? []).map(row => row[1]);
 
   return (
     <div>

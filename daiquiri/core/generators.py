@@ -1,18 +1,16 @@
+import re
 import csv
 import io
 import logging
-import os
 import struct
-import sys
 from datetime import datetime, timezone
-from pathlib import Path
-from typing import Optional
 from xml.sax.saxutils import escape, quoteattr
 
 from django.contrib.sites.models import Site
 
 import pandas as pd
-from fastparquet import update_file_custom_metadata, write
+import pyarrow as pa
+import pyarrow.parquet as pq
 from sqlalchemy import create_engine
 
 from daiquiri import __version__ as daiquiri_version
@@ -21,12 +19,8 @@ logger = logging.getLogger(__name__)
 
 
 def generate_csv(generator, fields):
-    if sys.version_info.major >= 3:
-        io_class = io.StringIO
-    else:
-        io_class = io.BytesIO
     # write header
-    f = io_class()
+    f = io.StringIO()
     csv.writer(f, quotechar='"').writerow([field['name'] for field in fields])
     yield f.getvalue()
 
@@ -43,7 +37,7 @@ def generate_csv(generator, fields):
 
                 corrected_row = [*corrected_row, corrected_col]
 
-            f = io_class()
+            f = io.StringIO()
             csv.writer(f, quotechar='"').writerow(corrected_row)
 
             yield f.getvalue()
@@ -139,8 +133,14 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
                 attrs.append('xtype="{}"'.format(field['datatype']))
 
         if attrs:
-            yield """
-            <FIELD {} />""".format(' '.join(attrs))
+            description = field.get('description')
+            if description:
+                yield """
+                <FIELD {}> <DESCRIPTION>{}</DESCRIPTION> </FIELD>
+                """.format(' '.join(attrs), description)
+            else:
+                yield """
+                <FIELD {} />""".format(' '.join(attrs))
 
     # fmt: off
     if not empty:
@@ -526,84 +526,98 @@ def parse_and_fill_fits_array(
 
 
 def generate_parquet(
-    schema_name: str,
-    table_name: str,
-    metadata: str,
-    database_config: dict,
-    output_path: Path,
+    schema_name: str, table_name: str, fields: dict, metadata: str, database_config: dict
 ):
+    PQ_TYPE_MAP = {
+        'boolean': pa.bool_(),
+        'short': pa.int16(),
+        'int': pa.int32(),
+        'long': pa.int64(),
+        'float': pa.float32(),
+        'double': pa.float64(),
+        'short[]': pa.list_(pa.int16()),
+        'int[]': pa.list_(pa.int32()),
+        'long[]': pa.list_(pa.int64()),
+        'float[]': pa.list_(pa.float32()),
+        'double[]': pa.list_(pa.float64()),
+        'char': pa.string(),
+        'string': pa.string(),
+        'unicodeChar': pa.string(),
+        'timestamp': pa.timestamp('us'),
+    }
     if database_config['PORT'] == '':
         database_config['PORT'] = 5432
 
     query = f'SELECT * FROM "{schema_name}"."{table_name}"'
 
-    # Use the rust pg2parquet binary if it's there, otherwise use fastparquet
-    try:
-        pg2parquet_path = find_pg2parquet()
-        if pg2parquet_path is None:
-            raise Exception('pg2parquet not found')
-
-        import subprocess
-
-        cmd = (
-            f'{pg2parquet_path} export --host {database_config["HOST"]} '
-            f'--port {database_config["PORT"]} '
-            f'--user {database_config["USER"]} '
-            f'--password {database_config["PASSWORD"]} '
-            f'--dbname {database_config["NAME"]} '
-            f'--output-file {output_path} '
-            f'--compression-level 4 '
-            f'--table \'"{schema_name}"."{table_name}"\''
-        )
-        p = subprocess.run(cmd, shell=True, capture_output=True)
-        if p.returncode != 0:
-            raise Exception(f'pg2parquet failed: {p.stderr.decode()}')
-
-    except Exception as e:
-        logger.warning('pg2parquet not found or failed, using fastparquet: %s', e)
-        db_url = (
-            f'postgresql+psycopg://{database_config["USER"]}:'
-            f'{database_config["PASSWORD"]}@{database_config["HOST"]}:'
-            f'{database_config["PORT"]}/{database_config["NAME"]}'
-        )
-
-        engine = create_engine(db_url)
-        connection = engine.connect().execution_options(stream_results=True)
-
-        i = 0
-        for chunk in pd.read_sql(query, con=connection, chunksize=100000):
-            pqwriter = write(
-                str(output_path),
-                chunk,
-                write_index=False,
-                append=i != 0,
-                compression='ZSTD',
-            )
-            i += 1
-
-        if pqwriter:
-            pqwriter.close()
-
-    # Make this IVOA compliant
-    update_file_custom_metadata(
-        str(output_path),
-        custom_metadata={
-            'IVOA.VOTable-Parquet.version': '1.0',
-            'IVOA.VOTable-Parquet.content': metadata.encode('utf-8'),
-        },
+    db_url = (
+        f'postgresql+psycopg://{database_config["USER"]}:'
+        f'{database_config["PASSWORD"]}@{database_config["HOST"]}:'
+        f'{database_config["PORT"]}/{database_config["NAME"]}'
     )
 
-    return None
+    engine = create_engine(db_url)
+    connection = engine.connect().execution_options(stream_results=True)
+
+    arrow_fields = []
+    for f in fields:
+        dt = f['datatype']
+        if dt not in PQ_TYPE_MAP:
+            dt = pa.string()
+        arrow_fields.append(pa.field(f['name'], PQ_TYPE_MAP[dt]))
+    schema = pa.schema(arrow_fields)
+
+    sink = YieldingWriter()
+    buffer = pa.PythonFile(sink)
+    writer = pq.ParquetWriter(buffer, schema, compression='zstd')
+
+    kv_meta = {
+        b'IVOA.VOTable-Parquet.version': b'1.0',
+        b'IVOA.VOTable-Parquet.content': metadata.encode('utf-8'),
+    }
+    writer.add_key_value_metadata(kv_meta)
+
+    try:
+        for chunk in pd.read_sql(query, con=connection, chunksize=100000):
+            table = pa.Table.from_pandas(chunk, preserve_index=False).cast(schema)
+            writer.write_table(table)
+
+            data = sink.get_and_reset()
+            if data:
+                yield data
+
+        writer.close()
+
+        data = sink.get_and_reset()
+        if data:
+            yield data
+
+    finally:
+        connection.close()
 
 
-def find_pg2parquet() -> Optional[Path]:
-    """Search PATH environment variable for pg2parquet binary.
+class YieldingWriter(io.RawIOBase):
+    """A write-only file-like object that yields bytes progressively."""
 
-    Returns:
-        Optional[Path]: Path to pg2parquet binary if found, None otherwise
-    """
-    for path_dir in os.environ.get('PATH', '').split(os.pathsep):
-        if (bin_path := Path(path_dir) / 'pg2parquet').is_file():
-            return bin_path
+    def __init__(self):
+        self.buffer = bytearray()
+        self.closed_flag = False
 
-    return None
+    def writable(self):
+        return True
+
+    def write(self, b):
+        self.buffer.extend(b)
+        return len(b)
+
+    def close(self):
+        self.closed_flag = True
+        return super().close()
+
+    def get_and_reset(self):
+        """Return accumulated bytes and reset buffer."""
+        if not self.buffer:
+            return b''
+        data = bytes(self.buffer)
+        self.buffer.clear()
+        return data

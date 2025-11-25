@@ -98,7 +98,7 @@ def user_confirmed_handler(sender, **kwargs):
     request = kwargs['request']
     user = kwargs['user']
 
-    logger.info('user \'%s\' confirmed by \'%s\'.', (user.username, request.user.username))
+    logger.info('user \'%s\' confirmed by \'%s\'.', user.username, request.user.username)
     if settings.AUTH_WORKFLOW:
         send_notify_confirmation(request, user)
 
@@ -111,7 +111,7 @@ def user_rejected_handler(sender, **kwargs):
     request = kwargs['request']
     user = kwargs['user']
 
-    logger.info('user \'%s\' rejected by \'%s\'.', (user.username, request.user.username))
+    logger.info('user \'%s\' rejected by \'%s\'.', user.username, request.user.username)
     if settings.AUTH_WORKFLOW:
         send_notify_rejection(request, user)
 
@@ -124,7 +124,7 @@ def user_activated_handler(sender, **kwargs):
     request = kwargs['request']
     user = kwargs['user']
 
-    logger.info('user \'%s\' activated by \'%s\'.', (user.username, request.user.username))
+    logger.info('user \'%s\' activated by \'%s\'.', user.username, request.user.username)
     if settings.AUTH_WORKFLOW:
         send_notify_activation(request, user)
         send_activation(request, user)
@@ -138,7 +138,7 @@ def user_disabled_handler(sender, **kwargs):
     request = kwargs['request']
     user = kwargs['user']
 
-    logger.info('user \'%s\' disabled by \'%s\'.', (user.username, request.user.username))
+    logger.info('user \'%s\' disabled by \'%s\'.', user.username, request.user.username)
 
 
 @receiver(user_enabled)
@@ -149,7 +149,7 @@ def user_enabled_handler(sender, **kwargs):
     request = kwargs['request']
     user = kwargs['user']
 
-    logger.info('user \'%s\' enabled by \'%s\'.', (user.username, request.user.username))
+    logger.info('user \'%s\' enabled by \'%s\'.', user.username, request.user.username)
 
 
 @receiver(password_changed)

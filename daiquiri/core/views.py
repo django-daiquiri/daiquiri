@@ -19,7 +19,7 @@ from daiquiri.core.utils import render_to_xml
 def home(request):
     if not request.user.is_authenticated:
         login_form = LoginForm()
-        login_form.fields['login'].widget.attrs.pop("autofocus", None)
+        login_form.fields['login'].widget.attrs.pop('autofocus', None)
     else:
         login_form = None
 
@@ -43,12 +43,13 @@ def internal_server_error(request):
 
 
 class PermissionRedirectMixin:
-
     def handle_no_permission(self):
         if self.request.user.is_authenticated:
             raise PermissionDenied(self.get_permission_denied_message())
 
-        return redirect_to_login(self.request.get_full_path(), self.get_login_url(), self.get_redirect_field_name())
+        return redirect_to_login(
+            self.request.get_full_path(), self.get_login_url(), self.get_redirect_field_name()
+        )
 
 
 class ModelPermissionMixin(PermissionRedirectMixin, DjangoPermissionRequiredMixin):
@@ -69,7 +70,6 @@ class AnonymousAccessMixin(AccessMixin):
 
 
 class SingleObjectXMLMixin(View):
-
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
 
@@ -86,14 +86,12 @@ class SingleObjectXMLMixin(View):
 
 
 class CSRFViewMixin(View):
-
     @method_decorator(ensure_csrf_cookie)
     def get(self, request, *args, **kwargs):
         return super().get(self, request, *args, **kwargs)
 
 
 class StoreIdViewMixin(View):
-
     def render_to_response(self, context, **response_kwargs):
         response = super().render_to_response(context, **response_kwargs)
         response.set_cookie('storeid', self.get_store_id(), samesite='Lax')
