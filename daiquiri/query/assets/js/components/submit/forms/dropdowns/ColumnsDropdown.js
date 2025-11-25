@@ -44,7 +44,8 @@ const ColumnsDropdown = ({ onDoubleClick }) => {
   }
 
   const getTooltip = (item) => ({
-    title: item.description + isEmpty(item.unit) ? '' : `</br><b>Unit:</b> ${item.unit}`,
+    title: (item.description || '') + 
+            (isEmpty(item.unit) ? '' : `</br><b>Unit:</b> ${item.unit}`),     
     placement: 'left'
   })
 
@@ -74,7 +75,10 @@ const ColumnsDropdown = ({ onDoubleClick }) => {
                       onClick={() => handleClick(column)}
                       onDoubleClick={() => onDoubleClick('column', column)}
                     >
-                      <div>{column.name}</div>
+                      <div>
+                        <i className={`bi bi-rocket text-secondary ${!column.indexed ? 'opacity-0' : ''}`}> </i>
+                        {column.name}
+                      </div>
                     </button>
                   </Tooltip>
                 </li>

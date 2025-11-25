@@ -267,7 +267,7 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
                 return column
             else:
                 columnname = '({})'.format(column['name'])
-                if str(rows).find(columnname) > -1:
+                if str(rows).replace('"', '').find(columnname) > -1:
                     column['indexed'] = True
 
             return column
