@@ -189,7 +189,7 @@ const Schemas = ({ schemas, activeItem, setActiveItem, getTooltip, onDoubleClick
                         onClick={() => handleClick('column', column)}
                         onDoubleClick={() => handleDoubleClick('column', column)}
                       >
-                        {column.indexed && <i class="bi bi-rocket"> </i>}
+                        <i className={`bi bi-rocket text-secondary ${!column.indexed ? 'opacity-0' : ''}`}> </i>
                         {column.name}
                       </button>
                     </Tooltip>

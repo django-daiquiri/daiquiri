@@ -76,7 +76,7 @@ const ColumnsDropdown = ({ onDoubleClick }) => {
                       onDoubleClick={() => onDoubleClick('column', column)}
                     >
                       <div>
-                        {column.indexed && <i class="bi bi-rocket"> </i>}
+                        <i className={`bi bi-rocket text-secondary ${!column.indexed ? 'opacity-0' : ''}`}> </i>
                         {column.name}
                       </div>
                     </button>
