@@ -44,7 +44,8 @@ const ColumnsDropdown = ({ onDoubleClick }) => {
   }
 
   const getTooltip = (item) => ({
-    title: item.description + isEmpty(item.unit) ? '' : `</br><b>Unit:</b> ${item.unit}`,
+    title: (item.description || '') + (item.indexed ? `</br><b>Indexed column</b>` : '') + 
+            (isEmpty(item.unit) ? '' : `</br><b>Unit:</b> ${item.unit}`),     
     placement: 'left'
   })
 
@@ -74,7 +75,10 @@ const ColumnsDropdown = ({ onDoubleClick }) => {
                       onClick={() => handleClick(column)}
                       onDoubleClick={() => onDoubleClick('column', column)}
                     >
-                      <div>{column.name}</div>
+                      <div>
+                        {column.indexed && <i class="bi bi-rocket"> </i>}
+                        {column.name}
+                      </div>
                     </button>
                   </Tooltip>
                 </li>

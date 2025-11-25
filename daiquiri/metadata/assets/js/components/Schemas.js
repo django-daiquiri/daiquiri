@@ -189,6 +189,7 @@ const Schemas = ({ schemas, activeItem, setActiveItem, getTooltip, onDoubleClick
                         onClick={() => handleClick('column', column)}
                         onDoubleClick={() => handleDoubleClick('column', column)}
                       >
+                        {column.indexed && <i class="bi bi-rocket"> </i>}
                         {column.name}
                       </button>
                     </Tooltip>
