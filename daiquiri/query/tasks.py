@@ -114,7 +114,7 @@ def run_database_query_task(job_id):
                 logger.info('job %s failed (%s)', job.id, job.error_summary)
 
         else:
-            # get additional information about the completed job
+            adapter.trim_table_rows(job.schema_name, job.table_name, job.max_records)
             job.phase = job.PHASE_COMPLETED
             logger.info('job %s completed', job.id)
 
