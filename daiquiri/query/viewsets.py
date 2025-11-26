@@ -1,6 +1,7 @@
 import os
 from collections import OrderedDict
 from pathlib import Path
+import logging
 
 from django.conf import settings
 from django.http import FileResponse, Http404
@@ -64,6 +65,7 @@ from .utils import (
     get_max_active_jobs
 )
 
+logger = logging.getLogger(__name__)
 
 class StatusViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     permission_classes = (HasPermission,)
@@ -99,6 +101,9 @@ class FormViewSet(
     permission_classes = (HasPermission,)
 
     def get_queryset(self):
+        if not getattr(settings, 'CONESEARCH_RESOURCES', {}):
+            logger.debug("ConeSearch Query Form initialization skipped: no resources available.")
+            return [form for form in settings.QUERY_FORMS if form.get('key') != 'conesearch']
         return settings.QUERY_FORMS
 
     def get_object(self):
