@@ -1,6 +1,12 @@
 from django.conf import settings
 from django.utils.module_loading import import_string
 
+from rest_framework.exceptions import ValidationError
+
+from daiquiri.metadata.models import Schema, Table
+from daiquiri.conesearch.adapter import ConeSearchAdapter
+
+
 conesearch_adapter_class = import_string(settings.CONESEARCH_ADAPTER)
 
 class QueryFormAdapter:
@@ -14,14 +20,12 @@ class QueryFormAdapter:
         raise NotImplementedError
 
 
-class ConeSearchQueryFormAdapter(QueryFormAdapter):
-
-    def get_resources(self):
-        return settings.CONESEARCH_RESOURCES.values()
+class ConeSearchQueryFormAdapter(conesearch_adapter_class, QueryFormAdapter):
 
     def get_tables(self):
+        resources = self.get_resources().values()
         return [{'id':t, 'value': t, 'label': t} for
-                t in dict.fromkeys(f"{v['schema_name']}.{v['table_name']}" for v in self.get_resources())]
+                t in dict.fromkeys(f"{v['schema_name']}.{v['table_name']}" for v in resources)]
 
     def get_fields(self):
         tables_list = self.get_tables()
@@ -62,20 +66,28 @@ class ConeSearchQueryFormAdapter(QueryFormAdapter):
             },
         ]
 
-    def get_columns(self, table):
-        columns = next(
-        (v['column_names'] for v in self.get_resources()
-         if v['table_name'] == table),[])
-        return ', '.join(columns)
+    def get_columns(self, schema_name, table_name):
 
-    def get_query_language(self, data):
-        return conesearch_adapter_class.get_query_language(data)
+        try:
+            schema = Schema.objects.get(name=schema_name)
+        except Schema.DoesNotExist:
+            raise ValidationError({"query": {"messages": [f"Schema '{schema_name}' does not exist"]}})
+
+        try:
+            table = Table.objects.filter(schema=schema).get(name=table_name)
+        except Table.DoesNotExist:
+            raise ValidationError({"query": {"messages": [f"Table '{table_name}' does not exist"]}})
+
+        columns = list(table.columns.filter(principal=True).values_list('name', flat=True))
+        return columns
 
     def get_query(self, data):
-        schema_name = data['table'].split('.')[0]
-        table_name = data['table'].split('.')[1]
-        columns = self.get_columns(table_name)
-        return conesearch_adapter_class.sql_pattern.format(schema=schema_name,
-                        table = table_name,
-                        columns = columns,
-                        RA=data['ra'], DEC=data['dec'], SR=data['radius']).strip()
+        resources = self.get_resources()
+        schema_name = resources[data['table']]['schema_name']
+        table_name = resources[data['table']]['table_name']
+        columns = self.get_columns(schema_name, table_name)
+
+        return self.sql_pattern.format(schema=schema_name,
+                                        table=table_name,
+                                        columns=', '.join(columns),
+                                        RA=data['ra'], DEC=data['dec'], SR=data['radius']).strip()
