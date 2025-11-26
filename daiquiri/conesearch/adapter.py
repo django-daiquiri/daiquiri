@@ -32,8 +32,36 @@ WHERE 1=CONTAINS(POINT(ra, dec), CIRCLE(POINT({RA}, {DEC}), {SR}))
     def get_resources(self):
         return settings.CONESEARCH_RESOURCES
 
-    def get_query_language(self):
+    def get_query_language(self, data):
         return 'ADQL'  #'postgresql-16.2'
+
+    def get_columns(self, user, schema_name, table_name, column_names, verb='2'):
+
+        errors = {}
+
+        # check if the user is allowed to access the schema
+        try:
+            schema = Schema.objects.filter_by_access_level(user).get(name=schema_name)
+        except Schema.DoesNotExist as e:
+            raise NotFound from e
+
+        # check if the user is allowed to access the table
+        try:
+            table = Table.objects.filter_by_access_level(user).filter(schema=schema).get(name=table_name)
+        except Table.DoesNotExist as e:
+            raise NotFound from e
+
+        if verb == '1':
+            columns =  table.columns.filter(name__in=column_names).values()
+        elif verb == '2':
+            columns = table.columns.filter(principal=True).values()
+        elif verb == '3':
+            columns = table.columns.values()
+        else:
+            errors['VERB'] = [_('This field must be 1, 2, or 3.')]
+
+        return columns, errors
+
 
     def clean(self, request, resource):
         resources = self.get_resources()
@@ -43,39 +71,13 @@ WHERE 1=CONTAINS(POINT(ra, dec), CIRCLE(POINT({RA}, {DEC}), {SR}))
 
         schema_name = resources[resource]['schema_name']
         table_name = resources[resource]['table_name']
+        column_names = resources[resource]['column_names']
 
         data = make_query_dict_upper_case(request.GET)
-        errors = {}
-
-        # check if the user is allowed to access the schema
-        try:
-            schema = Schema.objects.filter_by_access_level(request.user).get(name=schema_name)
-        except Schema.DoesNotExist as e:
-            raise NotFound from e
-
-        # check if the user is allowed to access the table
-        try:
-            table = (
-                Table.objects.filter_by_access_level(request.user)
-                .filter(schema=schema)
-                .get(name=table_name)
-            )
-        except Table.DoesNotExist as e:
-            raise NotFound from e
-
         # fetch the columns according to the verbosity
         verb = data.get('VERB', '2')
 
-        if verb == '1':
-            self.columns = table.columns.filter(
-                name__in=resources[resource]['column_names']
-            ).values()
-        elif verb == '2':
-            self.columns = table.columns.filter(principal=True).values()
-        elif verb == '3':
-            self.columns = table.columns.values()
-        else:
-            errors['VERB'] = [_('This field must be 1, 2, or 3.')]
+        self.columns, errors = self.get_columns(request.user, schema_name, table_name, column_names, verb)
 
         # parse RA, DEC, and SR arguments
         self.clean_args(data, errors)
@@ -93,7 +95,7 @@ WHERE 1=CONTAINS(POINT(ra, dec), CIRCLE(POINT({RA}, {DEC}), {SR}))
             **self.args,
         ).strip()
 
-        if 'ADQL' in self.get_query_language():
+        if 'ADQL' in self.get_query_language(data):
             self.sql = ADQLQueryTranslator(self.sql)
             self.sql = self.sql.to_postgresql()
 
