@@ -6,6 +6,21 @@ CONESEARCH_SUBJECTS = [
 ]
 
 CONESEARCH_RESOURCES = {}
+# EXAMPLE:
+# CONESEARCH_RESOURCES = {
+#       '[schema_name].[table_name]': {
+#           'schema_name': '[schema_name]',
+#           'table_name': '[table_name]',
+#           'column_names': ['source_id', 'ra', 'dec'],
+#           'coordination_columns': {'RA': 'ra', 'DEC': 'dec' },
+#       },
+#       '[schema_name].[table_name]': {
+#           'schema_name': '[schema_name]',
+#           'table_name': '[table_name]',
+#           'column_names': ['source_id', 'ra_component', 'dec_component'],
+#           'coordination_columns': {'RA': 'ra_component', 'DEC': 'dec_component' },
+#       },
+# }
 
 CONESEARCH_RANGES = {
     'RA': {
