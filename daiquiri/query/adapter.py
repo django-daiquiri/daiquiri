@@ -4,10 +4,9 @@ from django.utils.module_loading import import_string
 from rest_framework.exceptions import ValidationError
 
 from daiquiri.metadata.models import Schema, Table
-from daiquiri.conesearch.adapter import ConeSearchAdapter
 
 
-conesearch_adapter_class = import_string(settings.CONESEARCH_ADAPTER)
+ConeSearchBaseClass = import_string(settings.CONESEARCH_ADAPTER)
 
 class QueryFormAdapter:
     def get_fields(self):
@@ -20,7 +19,7 @@ class QueryFormAdapter:
         raise NotImplementedError
 
 
-class ConeSearchQueryFormAdapter(conesearch_adapter_class, QueryFormAdapter):
+class ConeSearchQueryFormAdapter(ConeSearchBaseClass, QueryFormAdapter):
 
     def get_tables(self):
         resources = self.get_resources().values()
@@ -66,26 +65,19 @@ class ConeSearchQueryFormAdapter(conesearch_adapter_class, QueryFormAdapter):
             },
         ]
 
-    def get_columns(self, schema_name, table_name):
+    def get_query(self, data, user):
 
-        try:
-            schema = Schema.objects.get(name=schema_name)
-        except Schema.DoesNotExist:
-            raise ValidationError({"query": {"messages": [f"Schema '{schema_name}' does not exist"]}})
-
-        try:
-            table = Table.objects.filter(schema=schema).get(name=table_name)
-        except Table.DoesNotExist:
-            raise ValidationError({"query": {"messages": [f"Table '{table_name}' does not exist"]}})
-
-        columns = list(table.columns.filter(principal=True).values_list('name', flat=True))
-        return columns
-
-    def get_query(self, data):
         resources = self.get_resources()
         schema_name = resources[data['table']]['schema_name']
         table_name = resources[data['table']]['table_name']
-        columns = self.get_columns(schema_name, table_name)
+        column_names = resources[data['table']]['column_names']
+
+        columns, errors = self.get_columns(user, schema_name, table_name, column_names, '2', True)
+
+        if errors:
+            raise ValidationError({"query": errors})
+
+        columns = [row["name"] if isinstance(row, dict) else row for row in columns]
 
         return self.sql_pattern.format(schema=schema_name,
                                         table=table_name,
