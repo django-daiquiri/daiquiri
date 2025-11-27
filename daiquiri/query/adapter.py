@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.utils.module_loading import import_string
 
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import NotFound, ValidationError
 
 from daiquiri.metadata.models import Schema, Table
 
@@ -72,10 +72,10 @@ class ConeSearchQueryFormAdapter(ConeSearchBaseClass, QueryFormAdapter):
         table_name = resources[data['table']]['table_name']
         column_names = resources[data['table']]['column_names']
 
-        columns, errors = self.get_columns(user, schema_name, table_name, column_names, '2', True)
-
-        if errors:
-            raise ValidationError({"query": errors})
+        try:
+            columns = self.get_columns(user, schema_name, table_name, column_names)
+        except NotFound as e:
+            raise ValidationError({"query": {"messages": [str(e)]}}) from e
 
         columns = [row["name"] if isinstance(row, dict) else row for row in columns]
 

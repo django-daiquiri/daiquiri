@@ -35,27 +35,19 @@ WHERE 1=CONTAINS(POINT(ra, dec), CIRCLE(POINT({RA}, {DEC}), {SR}))
     def get_query_language(self, data):
         return 'ADQL'  #'postgresql-16.2'
 
-    def get_columns(self, user, schema_name, table_name, column_names, verb='2', form=False):
-
-        errors = {}
+    def get_columns(self, user, schema_name, table_name, column_names, verb='2'):
 
         # check if the user is allowed to access the schema
         try:
             schema = Schema.objects.filter_by_access_level(user).get(name=schema_name)
         except Schema.DoesNotExist as e:
-            if form:
-                errors['messages'] = [f"Schema '{schema_name}' does not exist"]
-                return [], errors
-            raise NotFound from e
+            raise NotFound(f"Schema '{schema_name}' does not exist") from e
 
         # check if the user is allowed to access the table
         try:
             table = Table.objects.filter_by_access_level(user).filter(schema=schema).get(name=table_name)
         except Table.DoesNotExist as e:
-            if form:
-                errors['messages'] = [f"Table '{table_name}' does not exist"]
-                return [], errors
-            raise NotFound from e
+            raise NotFound(f"Table '{table_name}' does not exist") from e
 
         if verb == '1':
             columns =  table.columns.filter(name__in=column_names).values()
@@ -64,9 +56,9 @@ WHERE 1=CONTAINS(POINT(ra, dec), CIRCLE(POINT({RA}, {DEC}), {SR}))
         elif verb == '3':
             columns = table.columns.values()
         else:
-            errors['VERB'] = [_('This field must be 1, 2, or 3.')]
+            raise NotFound({'VERB': ['This field must be 1, 2, or 3.']})
 
-        return columns, errors
+        return columns
 
 
     def clean(self, request, resource):
@@ -83,10 +75,16 @@ WHERE 1=CONTAINS(POINT(ra, dec), CIRCLE(POINT({RA}, {DEC}), {SR}))
         # fetch the columns according to the verbosity
         verb = data.get('VERB', '2')
 
-        self.columns, errors = self.get_columns(request.user, schema_name, table_name, column_names, verb)
+        try:
+            self.columns = self.get_columns(request.user, schema_name, table_name, column_names, verb)
+        except NotFound as e:
+            raise ValidationError(str(e)) from e
 
         # parse RA, DEC, and SR arguments
-        self.clean_args(data, errors)
+        try:
+            self.clean_args(data)
+        except NotFound as e:
+            raise ValidationError(str(e)) from e
 
         # construct sql query
         adapter = DatabaseAdapter()
@@ -105,11 +103,9 @@ WHERE 1=CONTAINS(POINT(ra, dec), CIRCLE(POINT({RA}, {DEC}), {SR}))
             self.sql = ADQLQueryTranslator(self.sql)
             self.sql = self.sql.to_postgresql()
 
-        if errors:
-            raise ValidationError(errors)
-
-    def clean_args(self, data, errors):
+    def clean_args(self, data):
         self.args = {}
+        errors = {}
         for key in ['RA', 'DEC', 'SR']:
             try:
                 value = float(data[key])
@@ -117,17 +113,15 @@ WHERE 1=CONTAINS(POINT(ra, dec), CIRCLE(POINT({RA}, {DEC}), {SR}))
                 if self.ranges[key]['min'] <= value <= self.ranges[key]['max']:
                     self.args[key] = value
                 else:
-                    errors[key] = [
-                        _('This value must be between {min:g} and {max:g}.').format(
-                            **self.ranges[key]
-                        )
-                    ]
+                    errors[key]= [f'This value must be between {self.ranges[key]['min']} and {self.ranges[key]['max']}.']
 
             except KeyError:
-                errors[key] = [_('This field may not be blank.')]
+                errors[key]=['This field may not be blank.']
 
             except ValueError:
-                errors[key] = [_('This field must be a float.')]
+               errors[key]=['This field must be a float.']
+        if errors:
+            raise NotFound(errors)
 
     def stream(self):
         return FileResponse(
