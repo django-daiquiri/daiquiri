@@ -41,13 +41,13 @@ WHERE 1=CONTAINS(POINT({ra_column}, {dec_column}), CIRCLE(POINT({RA}, {DEC}), {S
         try:
             schema = Schema.objects.filter_by_access_level(user).get(name=schema_name)
         except Schema.DoesNotExist as e:
-            raise NotFound(f"Schema '{schema_name}' does not exist") from e
+            raise NotFound(_(f"Schema '{schema_name}' does not exist")) from e
 
         # check if the user is allowed to access the table
         try:
             table = Table.objects.filter_by_access_level(user).filter(schema=schema).get(name=table_name)
         except Table.DoesNotExist as e:
-            raise NotFound(f"Table '{table_name}' does not exist") from e
+            raise NotFound(_(f"Table '{table_name}' does not exist")) from e
 
         if verb == '1':
             columns =  table.columns.filter(name__in=column_names).values()
@@ -56,7 +56,7 @@ WHERE 1=CONTAINS(POINT({ra_column}, {dec_column}), CIRCLE(POINT({RA}, {DEC}), {S
         elif verb == '3':
             columns = table.columns.values()
         else:
-            raise NotFound({'VERB': ['This field must be 1, 2, or 3.']})
+            raise NotFound({'VERB': [_('This field must be 1, 2, or 3.')]})
 
         return columns
 
@@ -116,13 +116,17 @@ WHERE 1=CONTAINS(POINT({ra_column}, {dec_column}), CIRCLE(POINT({RA}, {DEC}), {S
                 if self.ranges[key]['min'] <= value <= self.ranges[key]['max']:
                     self.args[key] = value
                 else:
-                    errors[key]= [f'This value must be between {self.ranges[key]['min']} and {self.ranges[key]['max']}.']
+                    errors[key] = [
+                        _('This value must be between {min:g} and {max:g}.').format(
+                            **self.ranges[key]
+                        )
+                    ]
 
             except KeyError:
-                errors[key]=['This field may not be blank.']
+                errors[key] = [_('This field may not be blank.')]
 
             except ValueError:
-               errors[key]=['This field must be a float.']
+               errors[key] = [_('This field must be a float.')]
         if errors:
             raise NotFound(errors)
 
