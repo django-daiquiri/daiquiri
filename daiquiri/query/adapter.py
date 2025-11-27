@@ -3,8 +3,6 @@ from django.utils.module_loading import import_string
 
 from rest_framework.exceptions import NotFound, ValidationError
 
-from daiquiri.metadata.models import Schema, Table
-
 
 ConeSearchBaseClass = import_string(settings.CONESEARCH_ADAPTER)
 
@@ -71,6 +69,8 @@ class ConeSearchQueryFormAdapter(ConeSearchBaseClass, QueryFormAdapter):
         schema_name = resources[data['table']]['schema_name']
         table_name = resources[data['table']]['table_name']
         column_names = resources[data['table']]['column_names']
+        ra_column = resources[data['table']]['coordination_columns']['RA']
+        dec_column = resources[data['table']]['coordination_columns']['DEC']
 
         try:
             columns = self.get_columns(user, schema_name, table_name, column_names)
@@ -82,4 +82,5 @@ class ConeSearchQueryFormAdapter(ConeSearchBaseClass, QueryFormAdapter):
         return self.sql_pattern.format(schema=schema_name,
                                         table=table_name,
                                         columns=', '.join(columns),
+                                        ra_column=ra_column, dec_column=dec_column,
                                         RA=data['ra'], DEC=data['dec'], SR=data['radius']).strip()
