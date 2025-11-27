@@ -35,7 +35,7 @@ WHERE 1=CONTAINS(POINT(ra, dec), CIRCLE(POINT({RA}, {DEC}), {SR}))
     def get_query_language(self, data):
         return 'ADQL'  #'postgresql-16.2'
 
-    def get_columns(self, user, schema_name, table_name, column_names, verb='2'):
+    def get_columns(self, user, schema_name, table_name, column_names, verb='2', form=False):
 
         errors = {}
 
@@ -43,12 +43,18 @@ WHERE 1=CONTAINS(POINT(ra, dec), CIRCLE(POINT({RA}, {DEC}), {SR}))
         try:
             schema = Schema.objects.filter_by_access_level(user).get(name=schema_name)
         except Schema.DoesNotExist as e:
+            if form:
+                errors['messages'] = [f"Schema '{schema_name}' does not exist"]
+                return [], errors
             raise NotFound from e
 
         # check if the user is allowed to access the table
         try:
             table = Table.objects.filter_by_access_level(user).filter(schema=schema).get(name=table_name)
         except Table.DoesNotExist as e:
+            if form:
+                errors['messages'] = [f"Table '{table_name}' does not exist"]
+                return [], errors
             raise NotFound from e
 
         if verb == '1':
