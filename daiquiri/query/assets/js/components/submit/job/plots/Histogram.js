@@ -29,8 +29,15 @@ const Histogram = ({ job, columns }) => {
     }
   }), [columns])
 
-  const { data: x } = useJobPlotQuery(job, plotValues.x.column)
-  const { data: s } = useJobPlotQuery(job, plotValues.s.column)
+  const columnsToFetch = [plotValues.x.column];
+  
+  if (plotValues.s.column) {
+    columnsToFetch.push(plotValues.s.column);
+  }
+
+  const { data } = useJobPlotQuery(job, columnsToFetch);
+  const x = (data ?? []).map(row => row[0]);
+  const s = data ? (data ?? []).map(row => row[1]) : undefined;
 
   return (
     <div>

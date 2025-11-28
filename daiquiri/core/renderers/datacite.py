@@ -4,7 +4,7 @@ class DataciteRendererMixin:
         self.start('resource', {
             'xmlns': 'http://datacite.org/schema/kernel-4',
             'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
-            'xsi:schemaLocation': 'http://datacite.org/schema/kernel-4 http://schema.datacite.org/meta/kernel-4.4/metadata.xsd'
+            'xsi:schemaLocation': 'http://datacite.org/schema/kernel-4 http://schema.datacite.org/meta/kernel-4.6/metadata.xsd'
         })
         self.node('identifier', {'identifierType': 'DOI'}, metadata.get('identifier'))
 
@@ -19,7 +19,7 @@ class DataciteRendererMixin:
         self.node('title', {'xml:lang': 'en'}, metadata.get('title'))
         self.end('titles')
 
-        self.node('publisher', {}, metadata.get('publisher'))
+        self.node('publisher', metadata.get('publisher_properties', {}), metadata.get('publisher'))
         self.node('publicationYear', {}, metadata.get('publication_year'))
 
         self.start('subjects')

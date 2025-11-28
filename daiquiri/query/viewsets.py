@@ -1,6 +1,7 @@
 import os
 from collections import OrderedDict
 from pathlib import Path
+import logging
 
 from django.conf import settings
 from django.http import FileResponse, Http404
@@ -61,18 +62,24 @@ from .utils import (
     get_user_upload_directory,
     handle_upload_param,
     ingest_uploads,
+    get_max_active_jobs
 )
 
+logger = logging.getLogger(__name__)
 
 class StatusViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     permission_classes = (HasPermission,)
     queryset = []
 
     def list(self, request):
+        active_jobs = QueryJob.objects.get_active(request.user).count()
+        active_jobs_interface = QueryJob.objects.get_active(request.user).filter(
+            job_type=QueryJob.JOB_TYPE_INTERFACE).count()
+
         return Response(
             {
                 'guest': not request.user.is_authenticated,
-                'queued_jobs': None,
+                'active_jobs': active_jobs,
                 'size': QueryJob.objects.get_size(request.user),
                 'hash': QueryJob.objects.get_hash(request.user),
                 'quota': get_quota(request.user),
@@ -80,8 +87,12 @@ class StatusViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
                 'upload_limit': get_quota(
                     request.user, quota_settings='QUERY_UPLOAD_LIMIT'
                 ),
+                'max_active_jobs': get_max_active_jobs(request.user),
+                'active_jobs_interface': active_jobs_interface,
+                'active_jobs_tap': active_jobs - active_jobs_interface
             }
         )
+
 
 
 class FormViewSet(
@@ -90,6 +101,9 @@ class FormViewSet(
     permission_classes = (HasPermission,)
 
     def get_queryset(self):
+        if not getattr(settings, 'CONESEARCH_RESOURCES', {}):
+            logger.debug("ConeSearch Query Form initialization skipped: no resources available.")
+            return [form for form in settings.QUERY_FORMS if form.get('key') != 'conesearch']
         return settings.QUERY_FORMS
 
     def get_object(self):
@@ -211,7 +225,7 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
     def forms(self, request, form_key):
         # follows CreateModelMixin.create(request, *args, **kwargs)
         serializer = QueryJobFormSerializer(
-            data=request.data, form_key=form_key, context=self.get_serializer_context()
+            data=request.data, user=request.user, form_key=form_key, context=self.get_serializer_context()
         )
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)

@@ -13,6 +13,15 @@ from ..utils import get_script_alias
 register = template.Library()
 
 
+@register.simple_tag
+def version():
+    try:
+        from daiquiri import __version__
+        return __version__
+    except ImportError:
+        return ''
+
+
 @register.simple_tag(takes_context=True)
 def base_url(context):
     return get_script_alias(context.request) + '/'

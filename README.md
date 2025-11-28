@@ -59,8 +59,8 @@ comprising of the following features:
 Daiquiri is based on [Django](https://www.djangoproject.com/) and is written
 in Python. The following requirements are mandatory:
 
-* Python `>=3.9`
-* PostgreSQL `>=14`, MySQL `>=5.6`
+* Python `>=3.13`
+* PostgreSQL `>=14`
 * RabbitMQ `>=3.5` (for asynchronous tasks like the query queue)
 
 For demonstration, development or testing purposes, Daiquiri can be installed
@@ -68,8 +68,8 @@ on Linux, macOS, or even Windows. If you, however, intent to set up a production
 environment, serving Daiquiri over a Network or the Internet, we strongly suggest
 that you use a recent Linux distribution, namely:
 
-* Debian 11
-* Ubuntu 22.04
+* Debian 13
+* Ubuntu 24.04
 
 ## Scientific Databases Using Daiquiri
 

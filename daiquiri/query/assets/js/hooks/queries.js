@@ -139,9 +139,15 @@ export const useJobPlotQuery = (job, column) => {
   return useQuery({
     queryKey: ['jobPlot', job.id, column],
     queryFn: () => {
-      if (job.columns.map(column => column.name).includes(column)) {
-        return QueryApi.fetchJobRows(job.id, {column: column, page_size: 1000000})
-                             .then((response) => response.results)
+      if (job.columns.map(column => column.name).includes(Array.isArray(column) ? column[0] : column)) {
+        const columnsParam = Array.isArray(column) ? column : [column];
+        return QueryApi.fetchJobRows(job.id, {column: columnsParam, page_size: 1000000})
+                             .then((response) => {
+                              const results= response.results || []
+                              return results.length && !Array.isArray(results[0])
+                                    ? results.map(value => [value])
+                                    : results;
+                                })
       } else {
         return null
       }
@@ -150,8 +156,6 @@ export const useJobPlotQuery = (job, column) => {
     enabled: job.phase == 'COMPLETED'
   })
 }
-
-
 
 export const useUserExamplesQuery = () => {
   return useQuery({

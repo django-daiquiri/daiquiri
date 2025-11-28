@@ -27,7 +27,12 @@ import xlsxwriter
 from ipware import get_client_ip as ipware_get_client_ip
 from markdown import markdown as markdown_function
 
-from daiquiri.core.constants import ACCESS_LEVEL_INTERNAL, ACCESS_LEVEL_PRIVATE, ACCESS_LEVEL_PUBLIC, GROUPS
+from daiquiri.core.constants import (
+    ACCESS_LEVEL_INTERNAL,
+    ACCESS_LEVEL_PRIVATE,
+    ACCESS_LEVEL_PUBLIC,
+    GROUPS,
+)
 
 if sys.version_info.major >= 3:
     long_type = int
@@ -41,7 +46,7 @@ def import_class(string):
 
 
 def get_script_alias(request):
-    return request.path[:-len(request.path_info)]
+    return request.path[: -len(request.path_info)]
 
 
 def get_referer(request, default=None):
@@ -53,9 +58,9 @@ def get_client_ip(request):
 
     if client_ip:
         try:
-            interface = ipaddress.IPv6Interface('%s/%i' % (client_ip, settings.IPV6_PRIVACY_MASK))
+            interface = ipaddress.IPv6Interface(f'{client_ip}/{int(settings.IPV6_PRIVACY_MASK)}')
         except ipaddress.AddressValueError:
-            interface = ipaddress.IPv4Interface('%s/%i' % (client_ip, settings.IPV4_PRIVACY_MASK))
+            interface = ipaddress.IPv4Interface(f'{client_ip}/{int(settings.IPV4_PRIVACY_MASK)}')
 
         return str(interface.network.network_address)
     else:
@@ -68,7 +73,7 @@ def get_referer_path_info(request, default=None):
         return default
 
     script_alias = get_script_alias(request)
-    return urlparse(referer).path[len(script_alias):]
+    return urlparse(referer).path[len(script_alias) :]
 
 
 def get_next(request):
@@ -99,16 +104,19 @@ def get_detail_fields(detail_keys):
 
     # add a field for each detail key
     for detail_key in detail_keys:
-
         if 'options' in detail_key:
             choices = [(option['id'], option['label']) for option in detail_key['options']]
         else:
             choices = []
 
         if detail_key['data_type'] == 'text':
-            field = forms.CharField(widget=forms.TextInput(attrs={'placeholder': detail_key['label']}))
+            field = forms.CharField(
+                widget=forms.TextInput(attrs={'placeholder': detail_key['label']})
+            )
         elif detail_key['data_type'] == 'textarea':
-            field = forms.CharField(widget=forms.Textarea(attrs={'placeholder': detail_key['label']}))
+            field = forms.CharField(
+                widget=forms.Textarea(attrs={'placeholder': detail_key['label']})
+            )
         elif detail_key['data_type'] == 'select':
             field = forms.ChoiceField(choices=choices)
         elif detail_key['data_type'] == 'radio':
@@ -142,11 +150,13 @@ def get_permission_emails(permissions):
     permissions_queryset = Permission.objects
     for permission in permissions:
         app_label, codename = permission.split('.')
-        permissions_queryset = permissions_queryset.filter(content_type__app_label=app_label, codename=codename)
+        permissions_queryset = permissions_queryset.filter(
+            content_type__app_label=app_label, codename=codename
+        )
 
     users = User.objects.filter(
-        Q(groups__permissions__in=permissions_queryset) |
-        Q(user_permissions__in=permissions_queryset)
+        Q(groups__permissions__in=permissions_queryset)
+        | Q(user_permissions__in=permissions_queryset)
     ).distinct()
 
     return [user.email for user in users]
@@ -212,19 +222,20 @@ def bytes2human(size, gnu=True):
     if gnu:
         for unit in ['B', 'kB', 'MB', 'GB', 'TB', 'PB']:
             if size < 1000.0 or unit == 'PB':
-                return f"{size:.1f} {unit}"
+                return f'{size:.1f} {unit}'
             size /= 1000.0
     else:
         for unit in ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB']:
             if size < 1024.0 or unit == 'PiB':
-                return f"{size:.1f} {unit}"
+                return f'{size:.1f} {unit}'
             size /= 1024.0
 
 
 def markdown(md):
-    return markdown_function(md,
-            extensions=['fenced_code', 'attr_list', 'codehilite'],
-            extension_configs={'codehilite':{'guess_lang':'false'}}
+    return markdown_function(
+        md,
+        extensions=['fenced_code', 'attr_list', 'codehilite'],
+        extension_configs={'codehilite': {'guess_lang': 'false'}},
     )
 
 
@@ -273,7 +284,9 @@ def setup_group(name):
     for row in GROUPS[name]:
         app_label, codename = row.split('.')
         try:
-            permission = Permission.objects.get(content_type__app_label=app_label, codename=codename)
+            permission = Permission.objects.get(
+                content_type__app_label=app_label, codename=codename
+            )
             group.permissions.add(permission)
         except Permission.DoesNotExist:
             pass
@@ -282,10 +295,10 @@ def setup_group(name):
 
 
 def send_mail(request, template_prefix, context, to_emails, cc_emails=[], bcc_emails=[]):
-    '''
+    """
     This is heavily inspired by allauth.account.adapter.
     https://github.com/pennersr/django-allauth/blob/master/allauth/account/adapter.py
-    '''
+    """
     # get current site
     site = get_current_site(request)
 
@@ -294,11 +307,11 @@ def send_mail(request, template_prefix, context, to_emails, cc_emails=[], bcc_em
 
     # render subject from template and remove superfluous line breaks
     subject = render_to_string(f'{template_prefix}_subject.txt', context)
-    subject = " ".join(subject.splitlines()).strip()
+    subject = ' '.join(subject.splitlines()).strip()
 
     # add site name to subject
     site = get_current_site(request)
-    subject = f"[{site.name}] {subject}"
+    subject = f'[{site.name}] {subject}'
 
     # get from email
     from_email = settings.DEFAULT_FROM_EMAIL
@@ -311,20 +324,33 @@ def send_mail(request, template_prefix, context, to_emails, cc_emails=[], bcc_em
     for ext in ['html', 'txt']:
         try:
             template_name = f'{template_prefix}_message.{ext}'
-            bodies[ext] = render_to_string(template_name,
-                                           context).strip()
+            bodies[ext] = render_to_string(template_name, context).strip()
         except TemplateDoesNotExist:
             if ext == 'txt' and not bodies:
                 # We need at least one body
                 raise
     if 'txt' in bodies:
-        msg = EmailMultiAlternatives(subject, bodies['txt'], from_email, to_emails,
-                                     cc=cc_emails, bcc=bcc_emails, reply_to=reply_to)
+        msg = EmailMultiAlternatives(
+            subject,
+            bodies['txt'],
+            from_email,
+            to_emails,
+            cc=cc_emails,
+            bcc=bcc_emails,
+            reply_to=reply_to,
+        )
         if 'html' in bodies:
             msg.attach_alternative(bodies['html'], 'text/html')
     else:
-        msg = EmailMessage(subject, bodies['html'], from_email, to_emails,
-                           cc=cc_emails, bcc=bcc_emails, reply_to=reply_to)
+        msg = EmailMessage(
+            subject,
+            bodies['html'],
+            from_email,
+            to_emails,
+            cc=cc_emails,
+            bcc=bcc_emails,
+            reply_to=reply_to,
+        )
         msg.content_subtype = 'html'  # Main content is now text/html
 
     msg.send()
@@ -345,14 +371,13 @@ def render_to_csv(request, filename, columns, rows):
 
 
 def render_to_xlsx(request, filename, columns, rows):
-    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                            charset='utf-8')
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        charset='utf-8',
+    )
     response['Content-Disposition'] = (f'attachment; filename="{filename}.xlsx"').encode()
 
-    workbook = xlsxwriter.Workbook(response, {
-        'in_memory': True,
-        'strings_to_formulas': False
-    })
+    workbook = xlsxwriter.Workbook(response, {'in_memory': True, 'strings_to_formulas': False})
     worksheet = workbook.add_worksheet()
     bold = workbook.add_format({'bold': True})
 
@@ -366,7 +391,7 @@ def render_to_xlsx(request, filename, columns, rows):
             elif isinstance(cell, bool):
                 worksheet.write(i + 1, j, str(_('yes') if cell else _('no')))
             elif isinstance(cell, datetime):
-                worksheet.write(i + 1, j, localtime(cell).strftime("%Y-%m-%d %H:%M:%S"))
+                worksheet.write(i + 1, j, localtime(cell).strftime('%Y-%m-%d %H:%M:%S'))
             else:
                 try:
                     worksheet.write(i + 1, j, unicode(cell))
@@ -416,3 +441,4 @@ def get_file_size(file_path):
 
 def get_date_display(value):
     return date(value, settings.DATETIME_FORMAT)
+

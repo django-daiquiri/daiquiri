@@ -114,7 +114,7 @@ def run_database_query_task(job_id):
                 logger.info('job %s failed (%s)', job.id, job.error_summary)
 
         else:
-            # get additional information about the completed job
+            adapter.trim_table_rows(job.schema_name, job.table_name, job.max_records)
             job.phase = job.PHASE_COMPLETED
             logger.info('job %s completed', job.id)
 
@@ -284,20 +284,15 @@ def create_download_table_task(download_id):
         download_job.save()
 
         # write file using the generator in the adapter
-        if download_job.format_key == 'fits':
+        if download_job.format_key in ('fits', 'parquet'):
             write_label = 'wb'
         else:
             write_label = 'w'
 
         try:
-            if download_job.format_key != 'parquet':
-                with open(download_job.file_path, write_label) as f:
-                    for line in download_job.query_job.stream(download_job.format_key):
-                        f.write(line)
-            else:
-                if download_job.query_job.stream(download_job.format_key) is not None:
-                    for f in download_job.query_job.stream(download_job.format_key):
-                        pass
+            with open(download_job.file_path, write_label) as f:
+                for line in download_job.query_job.stream(download_job.format_key):
+                    f.write(line)
 
         except Exception as e:
             download_job.phase = download_job.PHASE_ERROR

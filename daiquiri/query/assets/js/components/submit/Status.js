@@ -3,6 +3,7 @@ import { isNil, toInteger } from 'lodash'
 
 import { baseUrl } from 'daiquiri/core/assets/js/utils/meta'
 import { bytes2human } from 'daiquiri/core/assets/js/utils/bytes'
+import Tooltip from 'daiquiri/core/assets/js/components/Tooltip'
 
 import { useStatusQuery } from '../../hooks/queries'
 
@@ -27,19 +28,7 @@ const Status = () => {
           </div>
         ) : (
           <div className="card-body">
-            {
-              status.queued_jobs && (
-                <p>
-                  {
-                    interpolate(ngettext(
-                      'There is one job in the queue.',
-                      'There are %s jobs in the queue.',
-                      status.queued_jobs
-                    ), [status.queued_jobs])
-                  }
-                </p>
-              )
-            }
+            
             {
               status.guest && (
                 <p dangerouslySetInnerHTML={{
@@ -77,6 +66,29 @@ const Status = () => {
                 </p>
               )
             }
+            {status.max_active_jobs >0 &&(
+              <div>
+                <hr />
+                <p>
+                  <span className={status.active_jobs >= status.max_active_jobs ? 'text-danger' : ''}>
+                    {interpolate(
+                      gettext('Active Jobs: %s / %s   '),
+                      [status.active_jobs, status.max_active_jobs]
+                    )}
+                  </span>{' '}
+                   <Tooltip
+                    tooltip={{
+                      title: interpolate(
+                        gettext(' Web Interface: %s <br/> TAP: %s'),
+                        [status.active_jobs_interface, status.active_jobs_tap]
+                      ),
+                      placement: 'right',
+                    }}>
+                    <i className="bi bi-info-circle-fill"></i>
+                  </Tooltip>
+                </p>      
+              </div>
+            )}
           </div>
         )
       }

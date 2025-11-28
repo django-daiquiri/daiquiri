@@ -1,4 +1,3 @@
-DROP SCHEMA IF EXISTS daiquiri_data_sim CASCADE;
 CREATE SCHEMA daiquiri_data_sim;
 
 CREATE TABLE "daiquiri_data_sim"."halos" (

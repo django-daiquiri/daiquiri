@@ -98,8 +98,7 @@ ADDITIONAL_APPS = [
     'honeypot',
 ]
 
-MIDDLEWARE = [
-    'daiquiri.core.middleware.MultipleProxyMiddleware',
+DJANGO_MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
@@ -109,6 +108,16 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.contrib.sites.middleware.CurrentSiteMiddleware',
+]
+
+ADDITIONAL_MIDDLEWARE = [
+    'allauth.account.middleware.AccountMiddleware',
+]
+
+MIDDLEWARE = [
+    'daiquiri.core.middleware.MultipleProxyMiddleware',
+    *DJANGO_MIDDLEWARE,
+    *ADDITIONAL_MIDDLEWARE,
 ]
 
 TEMPLATES_DIR = BASE_DIR / 'templates/'
@@ -180,7 +189,7 @@ ACCOUNT_USERNAME_VALIDATORS = 'daiquiri.auth.validators.username_validators'
 ACCOUNT_USERNAME_MIN_LENGTH = 4
 ACCOUNT_PASSWORD_MIN_LENGTH = 8
 ACCOUNT_EMAIL_MAX_LENGTH = 190
-ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 7
 # 'mandatory' or 'optional'
 ACCOUNT_EMAIL_VERIFICATION = env.get('ACCOUNT_EMAIL_VERIFICATION', 'mandatory')
@@ -217,7 +226,8 @@ EMAIL_PORT = env.get('EMAIL_PORT', '25')
 EMAIL_USE_TLS = env.get_bool('EMAIL_USE_TLS')
 
 SENDFILE_BACKEND = env.get('SENDFILE_BACKEND', 'django_sendfile.backends.simple')
-SENDFILE_ROOT = env.get('SENDFILE_ROOT')
+DEFAULT_SENDFILE_ROOT = env.get_abspath('FILES_BASE_PATH', None)
+SENDFILE_ROOT = env.get('SENDFILE_ROOT', DEFAULT_SENDFILE_ROOT)
 SENDFILE_URL = env.get('SENDFILE_URL')
 
 MEMCACHE_KEY_PREFIX = env.get('MEMCACHE_KEY_PREFIX')

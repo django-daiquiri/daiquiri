@@ -299,7 +299,7 @@ class QueryJob(Job):
                 table_name=self.table_name,
                 nrows=self.nrows,
                 query_status=self.result_status,
-                query=self.native_query,
+                query=self.query,
                 query_language=self.query_language,
             )
 
