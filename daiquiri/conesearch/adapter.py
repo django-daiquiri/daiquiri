@@ -2,8 +2,7 @@ from django.conf import settings
 from django.http import FileResponse
 from django.utils.translation import gettext_lazy as _
 
-from rest_framework.exceptions import NotFound, ValidationError
-from rest_framework.exceptions import ErrorDetail
+from rest_framework.exceptions import ErrorDetail, NotFound, ValidationError
 
 from queryparser.adql import ADQLQueryTranslator
 
@@ -17,8 +16,8 @@ from daiquiri.metadata.models import Schema, Table
 def ConeSearchAdapter():
     return import_class(settings.CONESEARCH_ADAPTER)()
 
-def clean_exception_detail(detail):
 
+def clean_exception_detail(detail):
     if isinstance(detail, str):
         return detail
 
@@ -28,14 +27,15 @@ def clean_exception_detail(detail):
             msg_strings = []
             for m in msgs:
                 if isinstance(m, ErrorDetail):
-                    msg_strings.append(m.title())
+                    msg_strings.append(m.capitalize())
                 else:
                     msg_strings.append(str(m))
 
-            parts.append(f"{field}: {msg_strings[0]}")
-        return " ".join(parts)
+            parts.append(f'{field}: {msg_strings[0]}')
+        return ' '.join(parts)
 
     return str(detail)
+
 
 class BaseConeSearchAdapter(BaseServiceAdapter):
     keys = ['RA', 'DEC', 'SR']
@@ -56,21 +56,24 @@ WHERE 1=CONTAINS(POINT({ra_column}, {dec_column}), CIRCLE(POINT({RA}, {DEC}), {S
         return 'ADQL'  #'postgresql-16.2'
 
     def get_columns(self, user, schema_name, table_name, column_names, verb='2'):
-
         # check if the user is allowed to access the schema
         try:
             schema = Schema.objects.filter_by_access_level(user).get(name=schema_name)
         except Schema.DoesNotExist as e:
-            raise NotFound(_(f"Schema '{schema_name}' does not exist")) from e
+            raise NotFound(_('Schema %s does not exist') % schema_name) from e
 
         # check if the user is allowed to access the table
         try:
-            table = Table.objects.filter_by_access_level(user).filter(schema=schema).get(name=table_name)
+            table = (
+                Table.objects.filter_by_access_level(user)
+                .filter(schema=schema)
+                .get(name=table_name)
+            )
         except Table.DoesNotExist as e:
-            raise NotFound(_(f"Table '{table_name}' does not exist")) from e
+            raise NotFound(_('Table %s does not exist') % table_name) from e
 
         if verb == '1':
-            columns =  table.columns.filter(name__in=column_names).values()
+            columns = table.columns.filter(name__in=column_names).values()
         elif verb == '2':
             columns = table.columns.filter(principal=True).values()
         elif verb == '3':
@@ -79,7 +82,6 @@ WHERE 1=CONTAINS(POINT({ra_column}, {dec_column}), CIRCLE(POINT({RA}, {DEC}), {S
             raise NotFound({'VERB': [_('This field must be 1, 2, or 3.')]})
 
         return columns
-
 
     def clean(self, request, resource):
         resources = self.get_resources()
@@ -94,21 +96,24 @@ WHERE 1=CONTAINS(POINT({ra_column}, {dec_column}), CIRCLE(POINT({RA}, {DEC}), {S
         dec_column = resources[resource]['coordinates_columns']['DEC']
 
         data = make_query_dict_upper_case(request.GET)
+
         # fetch the columns according to the verbosity
         verb = data.get('VERB', '2')
 
         try:
-            self.columns = self.get_columns(request.user, schema_name, table_name, column_names, verb)
+            self.columns = self.get_columns(
+                request.user, schema_name, table_name, column_names, verb
+            )
         except NotFound as e:
             details = clean_exception_detail(e.detail)
-            raise ValidationError(details)
+            raise ValidationError(details) from None
 
         # parse RA, DEC, and SR arguments
         try:
             self.clean_args(data)
         except NotFound as e:
             details = clean_exception_detail(e.detail)
-            raise ValidationError(details)
+            raise ValidationError(details) from None
 
         # construct sql query
         adapter = DatabaseAdapter()
@@ -119,7 +124,8 @@ WHERE 1=CONTAINS(POINT({ra_column}, {dec_column}), CIRCLE(POINT({RA}, {DEC}), {S
             schema=adapter.escape_identifier(schema_name),
             table=adapter.escape_identifier(table_name),
             columns=', '.join(escaped_column_names),
-            ra_column=ra_column, dec_column=dec_column,
+            ra_column=ra_column,
+            dec_column=dec_column,
             escaped_column_names=escaped_column_names,
             **self.args,
         ).strip()
@@ -148,7 +154,7 @@ WHERE 1=CONTAINS(POINT({ra_column}, {dec_column}), CIRCLE(POINT({RA}, {DEC}), {S
                 errors[key] = [_('This field may not be blank.')]
 
             except ValueError:
-               errors[key] = [_('This field must be a float.')]
+                errors[key] = [_('This field must be a float.')]
         if errors:
             raise NotFound(errors)
 

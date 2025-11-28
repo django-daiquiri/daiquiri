@@ -3,8 +3,8 @@ from django.utils.module_loading import import_string
 
 from rest_framework.exceptions import NotFound, ValidationError
 
-
 ConeSearchBaseClass = import_string(settings.CONESEARCH_ADAPTER)
+
 
 class QueryFormAdapter:
     def get_fields(self):
@@ -18,11 +18,12 @@ class QueryFormAdapter:
 
 
 class ConeSearchQueryFormAdapter(ConeSearchBaseClass, QueryFormAdapter):
-
     def get_tables(self):
         resources = self.get_resources().values()
-        return [{'id':t, 'value': t, 'label': t} for
-                t in dict.fromkeys(f"{v['schema_name']}.{v['table_name']}" for v in resources)]
+        return [
+            {'id': t, 'value': t, 'label': t}
+            for t in dict.fromkeys(f'{v["schema_name"]}.{v["table_name"]}' for v in resources)
+        ]
 
     def get_fields(self):
         tables_list = self.get_tables()
@@ -35,7 +36,7 @@ class ConeSearchQueryFormAdapter(ConeSearchBaseClass, QueryFormAdapter):
                 'help': 'Choose a Table',
                 'width': 12,
                 'options': tables_list,
-                'default_value': tables_list[0]['value']
+                'default_value': tables_list[0]['value'],
             },
             {
                 'key': 'ra',
@@ -64,7 +65,6 @@ class ConeSearchQueryFormAdapter(ConeSearchBaseClass, QueryFormAdapter):
         ]
 
     def get_query(self, data, user):
-
         resources = self.get_resources()
         schema_name = resources[data['table']]['schema_name']
         table_name = resources[data['table']]['table_name']
@@ -75,12 +75,17 @@ class ConeSearchQueryFormAdapter(ConeSearchBaseClass, QueryFormAdapter):
         try:
             columns = self.get_columns(user, schema_name, table_name, column_names)
         except NotFound as e:
-            raise ValidationError({"query": {"messages": [str(e)]}}) from e
+            raise ValidationError({'query': {'messages': [str(e)]}}) from e
 
-        columns = [row["name"] if isinstance(row, dict) else row for row in columns]
+        columns = [row['name'] if isinstance(row, dict) else row for row in columns]
 
-        return self.sql_pattern.format(schema=schema_name,
-                                        table=table_name,
-                                        columns=', '.join(columns),
-                                        ra_column=ra_column, dec_column=dec_column,
-                                        RA=data['ra'], DEC=data['dec'], SR=data['radius']).strip()
+        return self.sql_pattern.format(
+            schema=schema_name,
+            table=table_name,
+            columns=', '.join(columns),
+            ra_column=ra_column,
+            dec_column=dec_column,
+            RA=data['ra'],
+            DEC=data['dec'],
+            SR=data['radius'],
+        ).strip()
