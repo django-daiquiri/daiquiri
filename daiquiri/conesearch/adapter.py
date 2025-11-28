@@ -70,8 +70,8 @@ WHERE 1=CONTAINS(POINT({ra_column}, {dec_column}), CIRCLE(POINT({RA}, {DEC}), {S
         schema_name = resources[resource]['schema_name']
         table_name = resources[resource]['table_name']
         column_names = resources[resource]['column_names']
-        ra_column = resources[resource]['coordination_columns']['RA']
-        dec_column = resources[resource]['coordination_columns']['DEC']
+        ra_column = resources[resource]['coordinates_columns']['RA']
+        dec_column = resources[resource]['coordinates_columns']['DEC']
 
         data = make_query_dict_upper_case(request.GET)
         # fetch the columns according to the verbosity

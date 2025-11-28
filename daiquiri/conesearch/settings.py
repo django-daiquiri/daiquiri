@@ -12,13 +12,13 @@ CONESEARCH_RESOURCES = {}
 #           'schema_name': '[schema_name]',
 #           'table_name': '[table_name]',
 #           'column_names': ['source_id', 'ra', 'dec'],
-#           'coordination_columns': {'RA': 'ra', 'DEC': 'dec' },
+#           'coordinates_columns': {'RA': 'ra', 'DEC': 'dec' },
 #       },
 #       '[schema_name].[table_name]': {
 #           'schema_name': '[schema_name]',
 #           'table_name': '[table_name]',
 #           'column_names': ['source_id', 'ra_component', 'dec_component'],
-#           'coordination_columns': {'RA': 'ra_component', 'DEC': 'dec_component' },
+#           'coordinates_columns': {'RA': 'ra_component', 'DEC': 'dec_component' },
 #       },
 # }
 

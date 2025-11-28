@@ -69,8 +69,8 @@ class ConeSearchQueryFormAdapter(ConeSearchBaseClass, QueryFormAdapter):
         schema_name = resources[data['table']]['schema_name']
         table_name = resources[data['table']]['table_name']
         column_names = resources[data['table']]['column_names']
-        ra_column = resources[data['table']]['coordination_columns']['RA']
-        dec_column = resources[data['table']]['coordination_columns']['DEC']
+        ra_column = resources[data['table']]['coordinates_columns']['RA']
+        dec_column = resources[data['table']]['coordinates_columns']['DEC']
 
         try:
             columns = self.get_columns(user, schema_name, table_name, column_names)
