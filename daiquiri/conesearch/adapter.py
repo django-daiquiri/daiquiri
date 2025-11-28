@@ -3,6 +3,7 @@ from django.http import FileResponse
 from django.utils.translation import gettext_lazy as _
 
 from rest_framework.exceptions import NotFound, ValidationError
+from rest_framework.exceptions import ErrorDetail
 
 from queryparser.adql import ADQLQueryTranslator
 
@@ -16,6 +17,25 @@ from daiquiri.metadata.models import Schema, Table
 def ConeSearchAdapter():
     return import_class(settings.CONESEARCH_ADAPTER)()
 
+def clean_exception_detail(detail):
+
+    if isinstance(detail, str):
+        return detail
+
+    if isinstance(detail, dict):
+        parts = []
+        for field, msgs in detail.items():
+            msg_strings = []
+            for m in msgs:
+                if isinstance(m, ErrorDetail):
+                    msg_strings.append(m.title())
+                else:
+                    msg_strings.append(str(m))
+
+            parts.append(f"{field}: {msg_strings[0]}")
+        return " ".join(parts)
+
+    return str(detail)
 
 class BaseConeSearchAdapter(BaseServiceAdapter):
     keys = ['RA', 'DEC', 'SR']
@@ -80,13 +100,15 @@ WHERE 1=CONTAINS(POINT({ra_column}, {dec_column}), CIRCLE(POINT({RA}, {DEC}), {S
         try:
             self.columns = self.get_columns(request.user, schema_name, table_name, column_names, verb)
         except NotFound as e:
-            raise ValidationError(str(e)) from e
+            details = clean_exception_detail(e.detail)
+            raise ValidationError(details)
 
         # parse RA, DEC, and SR arguments
         try:
             self.clean_args(data)
         except NotFound as e:
-            raise ValidationError(str(e)) from e
+            details = clean_exception_detail(e.detail)
+            raise ValidationError(details)
 
         # construct sql query
         adapter = DatabaseAdapter()
