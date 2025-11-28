@@ -2,7 +2,7 @@ from django.conf import settings
 from django.http import FileResponse
 from django.utils.translation import gettext_lazy as _
 
-from rest_framework.exceptions import NotFound, ValidationError
+from rest_framework.exceptions import ErrorDetail, NotFound, ValidationError
 
 from queryparser.adql import ADQLQueryTranslator
 
@@ -17,13 +17,33 @@ def ConeSearchAdapter():
     return import_class(settings.CONESEARCH_ADAPTER)()
 
 
+def clean_exception_detail(detail):
+    if isinstance(detail, str):
+        return detail
+
+    if isinstance(detail, dict):
+        parts = []
+        for field, msgs in detail.items():
+            msg_strings = []
+            for m in msgs:
+                if isinstance(m, ErrorDetail):
+                    msg_strings.append(m.capitalize())
+                else:
+                    msg_strings.append(str(m))
+
+            parts.append(f'{field}: {msg_strings[0]}')
+        return ' '.join(parts)
+
+    return str(detail)
+
+
 class BaseConeSearchAdapter(BaseServiceAdapter):
     keys = ['RA', 'DEC', 'SR']
 
     sql_pattern = """
 SELECT {columns}
 FROM {schema}.{table}
-WHERE 1=CONTAINS(POINT(ra, dec), CIRCLE(POINT({RA}, {DEC}), {SR}))
+WHERE 1=CONTAINS(POINT({ra_column}, {dec_column}), CIRCLE(POINT({RA}, {DEC}), {SR}))
 """
     defaults = settings.CONESEARCH_DEFAULTS
     ranges = settings.CONESEARCH_RANGES
@@ -32,8 +52,36 @@ WHERE 1=CONTAINS(POINT(ra, dec), CIRCLE(POINT({RA}, {DEC}), {SR}))
     def get_resources(self):
         return settings.CONESEARCH_RESOURCES
 
-    def get_query_language(self):
+    def get_query_language(self, data):
         return 'ADQL'  #'postgresql-16.2'
+
+    def get_columns(self, user, schema_name, table_name, column_names, verb='2'):
+        # check if the user is allowed to access the schema
+        try:
+            schema = Schema.objects.filter_by_access_level(user).get(name=schema_name)
+        except Schema.DoesNotExist as e:
+            raise NotFound(_('Schema %s does not exist') % schema_name) from e
+
+        # check if the user is allowed to access the table
+        try:
+            table = (
+                Table.objects.filter_by_access_level(user)
+                .filter(schema=schema)
+                .get(name=table_name)
+            )
+        except Table.DoesNotExist as e:
+            raise NotFound(_('Table %s does not exist') % table_name) from e
+
+        if verb == '1':
+            columns = table.columns.filter(name__in=column_names).values()
+        elif verb == '2':
+            columns = table.columns.filter(principal=True).values()
+        elif verb == '3':
+            columns = table.columns.values()
+        else:
+            raise NotFound({'VERB': [_('This field must be 1, 2, or 3.')]})
+
+        return columns
 
     def clean(self, request, resource):
         resources = self.get_resources()
@@ -43,42 +91,29 @@ WHERE 1=CONTAINS(POINT(ra, dec), CIRCLE(POINT({RA}, {DEC}), {SR}))
 
         schema_name = resources[resource]['schema_name']
         table_name = resources[resource]['table_name']
+        column_names = resources[resource]['column_names']
+        ra_column = resources[resource]['coordinates_columns']['RA']
+        dec_column = resources[resource]['coordinates_columns']['DEC']
 
         data = make_query_dict_upper_case(request.GET)
-        errors = {}
-
-        # check if the user is allowed to access the schema
-        try:
-            schema = Schema.objects.filter_by_access_level(request.user).get(name=schema_name)
-        except Schema.DoesNotExist as e:
-            raise NotFound from e
-
-        # check if the user is allowed to access the table
-        try:
-            table = (
-                Table.objects.filter_by_access_level(request.user)
-                .filter(schema=schema)
-                .get(name=table_name)
-            )
-        except Table.DoesNotExist as e:
-            raise NotFound from e
 
         # fetch the columns according to the verbosity
         verb = data.get('VERB', '2')
 
-        if verb == '1':
-            self.columns = table.columns.filter(
-                name__in=resources[resource]['column_names']
-            ).values()
-        elif verb == '2':
-            self.columns = table.columns.filter(principal=True).values()
-        elif verb == '3':
-            self.columns = table.columns.values()
-        else:
-            errors['VERB'] = [_('This field must be 1, 2, or 3.')]
+        try:
+            self.columns = self.get_columns(
+                request.user, schema_name, table_name, column_names, verb
+            )
+        except NotFound as e:
+            details = clean_exception_detail(e.detail)
+            raise ValidationError(details) from None
 
         # parse RA, DEC, and SR arguments
-        self.clean_args(data, errors)
+        try:
+            self.clean_args(data)
+        except NotFound as e:
+            details = clean_exception_detail(e.detail)
+            raise ValidationError(details) from None
 
         # construct sql query
         adapter = DatabaseAdapter()
@@ -89,19 +124,19 @@ WHERE 1=CONTAINS(POINT(ra, dec), CIRCLE(POINT({RA}, {DEC}), {SR}))
             schema=adapter.escape_identifier(schema_name),
             table=adapter.escape_identifier(table_name),
             columns=', '.join(escaped_column_names),
+            ra_column=ra_column,
+            dec_column=dec_column,
             escaped_column_names=escaped_column_names,
             **self.args,
         ).strip()
 
-        if 'ADQL' in self.get_query_language():
+        if 'ADQL' in self.get_query_language(data):
             self.sql = ADQLQueryTranslator(self.sql)
             self.sql = self.sql.to_postgresql()
 
-        if errors:
-            raise ValidationError(errors)
-
-    def clean_args(self, data, errors):
+    def clean_args(self, data):
         self.args = {}
+        errors = {}
         for key in ['RA', 'DEC', 'SR']:
             try:
                 value = float(data[key])
@@ -120,6 +155,8 @@ WHERE 1=CONTAINS(POINT(ra, dec), CIRCLE(POINT({RA}, {DEC}), {SR}))
 
             except ValueError:
                 errors[key] = [_('This field must be a float.')]
+        if errors:
+            raise NotFound(errors)
 
     def stream(self):
         return FileResponse(

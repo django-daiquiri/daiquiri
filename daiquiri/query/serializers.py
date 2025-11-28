@@ -159,6 +159,7 @@ class QueryJobFormSerializer(QueryJobCreateSerializer):
         fields = QueryJobCreateSerializer.Meta.fields
 
     def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None) 
         form_key = kwargs.pop('form_key')
         form = get_query_form(form_key)
 
@@ -209,7 +210,7 @@ class QueryJobFormSerializer(QueryJobCreateSerializer):
         return self.adapter.get_query_language(obj)
 
     def get_query(self, obj):
-        return self.adapter.get_query(obj)
+        return self.adapter.get_query(obj, self.user)
 
 
 class QueryJobUpdateSerializer(serializers.ModelSerializer):

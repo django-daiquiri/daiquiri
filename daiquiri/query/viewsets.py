@@ -225,7 +225,7 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
     def forms(self, request, form_key):
         # follows CreateModelMixin.create(request, *args, **kwargs)
         serializer = QueryJobFormSerializer(
-            data=request.data, form_key=form_key, context=self.get_serializer_context()
+            data=request.data, user=request.user, form_key=form_key, context=self.get_serializer_context()
         )
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
