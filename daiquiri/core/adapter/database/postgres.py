@@ -58,6 +58,20 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
     def escape_string(self, string):
         return f"'{string}'"
 
+    def fetchall_sync(self, sql):
+        cursor = self.connection().cursor()
+        cursor.execute(sql)
+
+        while cursor.nextset():
+            pass
+
+        database_columns = cursor.description
+        columns = self.fetch_columns_sync(database_columns)
+
+        rows = cursor.fetchall()
+
+        return columns, rows
+
     def build_query(self, schema_name, table_name, query, timeout, max_records):
         # max_records is now handled by the method trim_table_rows
         actual_query = (
@@ -75,23 +89,8 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         return actual_query
 
     def build_sync_query(self, query, timeout, max_records):
-        # WARNING: This method is currently not used. The sync query is build
-        # using the 'build_query' method.
-        params = {
-            'query': query,
-            'timeout': int(timeout * 1000),
-            'max_records': max_records,
-        }
-
-        if max_records is not None:
-            return (
-                'SET SESSION statement_timeout TO {timeout};'
-                + 'COMMIT; {query} LIMIT {max_records};'.format(**params)
-            )
-        else:
-            return 'SET SESSION statement_timeout TO {timeout};' + 'COMMIT; %(query);'.format(
-                **params
-            )
+        # max_records is now handled by the method trim_table_rows
+        return f'SET SESSION statement_timeout TO {int(timeout * 1000)}; COMMIT; {query};'
 
     def abort_query(self, pid: int):
         sql = f'SELECT pg_cancel_backend({pid})'
@@ -272,6 +271,40 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
 
         logger.debug('sql = "%s"', sql)
         return [column[0] for column in self.fetchall(sql)]
+
+    def fetch_columns_sync(self, database_columns):
+        cursor = self.connection().cursor()
+
+        type_oids = {col.type_code for col in database_columns}
+
+        sql = f"""
+        SELECT oid, typname, format_type(oid, NULL)
+        FROM pg_type
+        WHERE oid IN ({",".join(str(oid) for oid in type_oids)})
+        """
+
+        cursor.execute(sql)
+
+        type_map = {oid: (typname, data_type) for oid, typname, data_type in cursor.fetchall()}
+
+        columns = []
+        for i, col in enumerate(database_columns, start=1):
+            column_name = col.name
+            type_oid = col.type_code
+
+            udt_name, data_type = type_map[type_oid]
+
+            column_data = (
+                column_name,
+                data_type,
+                udt_name,
+                None,
+                i
+            )
+
+            columns.append(self._parse_column(column_data))
+
+        return columns
 
     def create_table(self, schema_name, table_name, columns):
         for column in columns:
