@@ -263,22 +263,19 @@ class QueryJob(Job):
 
     def run_sync(self):
         adapter = DatabaseAdapter()
+        download_adapter = DownloadAdapter()
 
         self.actual_query = adapter.build_sync_query(
             self.native_query,
             settings.QUERY_SYNC_TIMEOUT,
             self.max_records,
         )
-
         job_sources = get_job_sources(self)
-
         columns, rows = adapter.fetchall_sync(self.actual_query)
 
         try:
-            columns = get_sync_columns(self, columns)
-            download_adapter = DownloadAdapter()
+            columns = get_sync_columns(columns)
             rows = download_adapter.generate_rows_sync(rows)
-            print(rows)
             yield from generate_votable(rows, columns,
                                         table=download_adapter.get_table_name(self.schema_name, self.table_name),
                                         infos=download_adapter.get_infos('OK', self.query, self.query_language, job_sources),

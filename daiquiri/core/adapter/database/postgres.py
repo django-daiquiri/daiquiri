@@ -59,18 +59,19 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         return f"'{string}'"
 
     def fetchall_sync(self, sql):
-        cursor = self.connection().cursor()
-        cursor.execute(sql)
+        conn = self.connection()
+        with conn.cursor() as cursor:
+            cursor.execute(sql)
 
-        while cursor.nextset():
-            pass
+            while cursor.description is None and cursor.nextset():
+                pass
 
-        database_columns = cursor.description
-        columns = self.fetch_columns_sync(database_columns)
+            database_columns = cursor.description
 
-        rows = cursor.fetchall()
+            rows = cursor.fetchall()
+            columns = self.fetch_columns_sync(database_columns)
 
-        return columns, rows
+            return columns, rows
 
     def build_query(self, schema_name, table_name, query, timeout, max_records):
         # max_records is now handled by the method trim_table_rows
@@ -273,7 +274,6 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         return [column[0] for column in self.fetchall(sql)]
 
     def fetch_columns_sync(self, database_columns):
-        cursor = self.connection().cursor()
 
         type_oids = {col.type_code for col in database_columns}
 
@@ -283,28 +283,30 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         WHERE oid IN ({",".join(str(oid) for oid in type_oids)})
         """
 
-        cursor.execute(sql)
+        logger.debug('sql = "%s"', sql)
+        try:
+            type_map = {oid: (typname, data_type) for oid, typname, data_type in self.fetchall(sql)}
+        except ProgrammingError as e:
+            logger.error('Could not fetch (%s)', e)
+            return []
+        else:
+            if type_map is None:
+                logger.info(
+                    'Could not fetch the columns. Check if the schema exists.'
+                )
+                return []
+            else:
+                tm = type_map
+                parse = self._parse_column
+                columns = []
+                append = columns.append
+                none = None
 
-        type_map = {oid: (typname, data_type) for oid, typname, data_type in cursor.fetchall()}
+                for i, col in enumerate(database_columns, start=1):
+                    udt_name, data_type = tm[col.type_code]
+                    append(parse((col.name, data_type, udt_name, none, i)))
 
-        columns = []
-        for i, col in enumerate(database_columns, start=1):
-            column_name = col.name
-            type_oid = col.type_code
-
-            udt_name, data_type = type_map[type_oid]
-
-            column_data = (
-                column_name,
-                data_type,
-                udt_name,
-                None,
-                i
-            )
-
-            columns.append(self._parse_column(column_data))
-
-        return columns
+                return columns
 
     def create_table(self, schema_name, table_name, columns):
         for column in columns:
