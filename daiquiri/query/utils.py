@@ -251,21 +251,19 @@ def get_job_columns(job):
 
     return columns
 
-def get_sync_columns(columns):
+def get_sync_columns(job, columns):
 
     columns_list = []
-    append = columns_list.append
-    user_columns = {c['name']: c for c in columns}
-
+    get_column = get_job_column
     for col in columns:
         name = col['name']
-
-        if name in user_columns:
-            d = user_columns[name].copy()
-            d['name'] = name
-            append(d)
-        else:
-            append(col.copy())
+        column = get_column(job, name)
+        if not column:
+            column = col.copy()
+        if column.get('name') != name:
+            column = column.copy()
+            column['name'] = name
+        columns_list.append(column)
 
     return columns_list
 
