@@ -92,8 +92,21 @@ class SyncJobViewSet(JobViewSet):
         except ValidationError as e:
             raise ValidationError(self.rewrite_exception(e)) from e
 
-        return FileResponse(job.run_sync(), content_type='application/xml')
-        return FileResponse(job.run_sync(), content_type=job.formats[job.response_format])
+        try:
+            generator = job.run_sync()
+            first_item = next(generator, None)
+
+            if first_item is None:
+                return Response({"TAP executing error": ["No data or query timed out"]}, status=400)
+
+            def safe_gen():
+                yield first_item
+                yield from generator
+
+            return FileResponse(safe_gen(), content_type='application/xml')
+
+        except ValidationError as e:
+            return Response(e.detail, status=400)
 
 
 class AsyncJobViewSet(JobViewSet):

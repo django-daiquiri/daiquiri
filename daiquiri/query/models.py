@@ -262,6 +262,7 @@ class QueryJob(Job):
             raise ValidationError({'phase': ['Job is not PENDING.']})
 
     def run_sync(self):
+
         adapter = DatabaseAdapter()
         download_adapter = DownloadAdapter()
 
@@ -271,20 +272,32 @@ class QueryJob(Job):
             self.max_records,
         )
         job_sources = get_job_sources(self)
-        columns, rows = adapter.fetchall_sync(self.actual_query)
 
         try:
-            columns = get_sync_columns(columns)
-            rows = download_adapter.generate_rows_sync(rows)
-            yield from generate_votable(rows, columns,
-                                        table=download_adapter.get_table_name(self.schema_name, self.table_name),
-                                        infos=download_adapter.get_infos('OK', self.query, self.query_language, job_sources),
-                                        links=download_adapter.get_links(job_sources),
-                                        services=download_adapter.get_services())
-            self.drop_uploads()
+            columns, rows_data = adapter.fetchall_sync(self.actual_query)
+
+            if columns is not None:
+                columns = get_sync_columns(self, columns)
+
+            rows = download_adapter.generate_rows_sync(rows_data) if rows_data else []
+
+            if not rows:
+                return
+
+            yield from generate_votable(
+                rows,
+                columns,
+                table=download_adapter.get_table_name(self.schema_name, self.table_name),
+                infos=download_adapter.get_infos('OK', self.query, self.query_language, job_sources),
+                links=download_adapter.get_links(job_sources),
+                services=download_adapter.get_services()
+            )
 
         except (OperationalError, ProgrammingError, InternalError, DataError) as e:
-            raise StopIteration from e
+            raise ValidationError({"TAP executing error": [str(e)]}) from None
+
+        finally:
+            self.drop_uploads()
 
     def ingest(self, file_path):
         if self.phase == self.PHASE_PENDING:
