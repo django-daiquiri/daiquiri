@@ -274,10 +274,9 @@ class QueryJob(Job):
         job_sources = get_job_sources(self)
 
         try:
-            columns, rows_data = adapter.fetchall_sync(self.actual_query)
+            database_columns, rows_data = adapter.fetchall_sync(self.actual_query)
 
-            if columns is not None:
-                columns = get_sync_columns(self, columns)
+            columns = get_sync_columns(self, database_columns) if database_columns else []
 
             rows = download_adapter.generate_rows_sync(rows_data) if rows_data else []
 
