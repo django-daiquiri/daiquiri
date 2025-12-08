@@ -284,7 +284,7 @@ class QueryJob(Job):
             # transform only if there is a list in the rows
             has_list = any(isinstance(x, list) for x in rows_data[0])
             if has_list:
-                rows = download_adapter.generate_rows_sync(rows_data) if rows_data else []
+                rows = download_adapter.generate_rows_sync(rows_data)
                 print("Transformed")
             else:
                 print("Not Transformed")
