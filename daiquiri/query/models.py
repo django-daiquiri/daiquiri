@@ -278,10 +278,17 @@ class QueryJob(Job):
 
             columns = get_sync_columns(self, database_columns) if database_columns else []
 
-            rows = download_adapter.generate_rows_sync(rows_data) if rows_data else []
-
-            if not rows:
+            if not rows_data:
                 return
+
+            # transform only if there is a list in the rows
+            has_list = any(isinstance(x, list) for x in rows_data[0])
+            if has_list:
+                rows = download_adapter.generate_rows_sync(rows_data) if rows_data else []
+                print("Transformed")
+            else:
+                print("Not Transformed")
+                rows = rows_data
 
             yield from generate_votable(
                 rows,
