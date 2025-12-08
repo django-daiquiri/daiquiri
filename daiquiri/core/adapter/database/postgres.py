@@ -59,19 +59,18 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         return f"'{string}'"
 
     def fetchall_sync(self, sql):
-        conn = self.connection()
-        with conn.cursor() as cursor:
-            cursor.execute(sql)
+        cursor = self.connection().cursor()
+        cursor.execute(sql)
 
-            while cursor.description is None and cursor.nextset():
-                pass
+        while cursor.description is None and cursor.nextset():
+            pass
 
-            database_columns = cursor.description
+        database_columns = cursor.description
 
-            rows = cursor.fetchall()
-            columns = self.fetch_columns_sync(database_columns)
+        fetch_rows = cursor.fetchall
+        columns = self._fetch_columns_typs(database_columns)
 
-            return columns, rows
+        return columns, fetch_rows
 
     def build_query(self, schema_name, table_name, query, timeout, max_records):
         # max_records is now handled by the method trim_table_rows
@@ -273,7 +272,7 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         logger.debug('sql = "%s"', sql)
         return [column[0] for column in self.fetchall(sql)]
 
-    def fetch_columns_sync(self, database_columns):
+    def _fetch_columns_typs(self, database_columns):
 
         type_oids = {col.type_code for col in database_columns}
 
@@ -296,15 +295,12 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
                 )
                 return []
             else:
-                tm = type_map
-                parse = self._parse_column
                 columns = []
                 append = columns.append
-                none = None
 
                 for i, col in enumerate(database_columns, start=1):
-                    udt_name, data_type = tm[col.type_code]
-                    append(parse((col.name, data_type, udt_name, none, i)))
+                    udt_name, data_type = type_map[col.type_code]
+                    append(self._parse_column((col.name, data_type, udt_name, None, i)))
 
                 return columns
 

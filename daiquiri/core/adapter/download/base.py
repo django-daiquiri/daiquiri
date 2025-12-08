@@ -149,13 +149,6 @@ class BaseDownloadAdapter:
         except subprocess.CalledProcessError as e:
             logger.error('Command PIPE returned non-zero exit status: %s', e)
 
-    def generate_rows_sync(self, rows):
-        for row in rows:
-            yield tuple(
-                " ".join(map(str, col)) if isinstance(col, (list, tuple)) else col
-                for col in row
-            )
-
     def get_prepend(self, columns):
         if not settings.FILES_BASE_URL:
             return {}

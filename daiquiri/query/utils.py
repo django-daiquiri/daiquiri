@@ -251,13 +251,12 @@ def get_job_columns(job):
 
     return columns
 
-def get_sync_columns(job, columns):
+def get_columns_metadata(job, columns):
 
     columns_list = []
-    get_column = get_job_column
     for col in columns:
         name = col['name']
-        column = get_column(job, name)
+        column = get_job_column(job, name)
         if not column:
             column = col.copy()
         if column.get('name') != name:

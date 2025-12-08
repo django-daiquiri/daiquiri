@@ -203,8 +203,8 @@ class BaseDatabaseAdapter:
     def fetch_column_names(self, schema_name, table_name):
         raise NotImplementedError()
 
-    def fetch_columns_sync(self, database_columns):
-        raise   NotImplementedError()
+    def _fetch_columns_typs(self, database_columns):
+        raise NotImplementedError()
 
     def create_user_schema_if_not_exists(self, schema_name):
         # escape input

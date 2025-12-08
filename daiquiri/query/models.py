@@ -44,7 +44,7 @@ from .tasks import (
     run_database_ingest_task,
     run_database_query_task,
 )
-from .utils import get_format_config, get_job_columns, get_query_language_label, get_job_sources, get_sync_columns
+from .utils import get_format_config, get_job_columns, get_query_language_label, get_job_sources, get_columns_metadata
 
 logger = logging.getLogger(__name__)
 query_logger = logging.getLogger('query')
@@ -274,25 +274,11 @@ class QueryJob(Job):
         job_sources = get_job_sources(self)
 
         try:
-            database_columns, rows_data = adapter.fetchall_sync(self.actual_query)
-
-            columns = get_sync_columns(self, database_columns) if database_columns else []
-
-            if not rows_data:
-                return
-
-            # transform only if there is a list in the rows
-            has_list = any(isinstance(x, list) for x in rows_data[0])
-            if has_list:
-                rows = download_adapter.generate_rows_sync(rows_data)
-                print("Transformed")
-            else:
-                print("Not Transformed")
-                rows = rows_data
+            database_columns, fetch_rows = adapter.fetchall_sync(self.actual_query)
 
             yield from generate_votable(
-                rows,
-                columns,
+                fetch_rows(),
+                get_columns_metadata(self, database_columns),
                 table=download_adapter.get_table_name(self.schema_name, self.table_name),
                 infos=download_adapter.get_infos('OK', self.query, self.query_language, job_sources),
                 links=download_adapter.get_links(job_sources),

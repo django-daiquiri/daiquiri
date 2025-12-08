@@ -50,6 +50,10 @@ def correct_col_for_votable(col):
         # remove {} and replace , with space
         corrected_col = col.replace('{', '').replace('}', '').replace(',', ' ')
 
+    if col.startswith('[') and col.endswith(']'):  # this is an array
+        # remove {} and replace , with space
+        corrected_col = col.replace('[', '').replace(']', '').replace(',', ' ')
+
     return corrected_col
 
 
