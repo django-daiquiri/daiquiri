@@ -67,8 +67,17 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
 
         database_columns = cursor.description
 
-        fetch_rows = cursor.fetchall
         columns = self._fetch_columns_typs(database_columns)
+
+        def fetch_rows():
+            try:
+                while True:
+                    rows = cursor.fetchmany(1000)
+                    if not rows:
+                        break
+                    yield from rows
+            finally:
+                cursor.close()
 
         return columns, fetch_rows
 
