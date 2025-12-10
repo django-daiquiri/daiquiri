@@ -72,6 +72,8 @@ WHERE 1=CONTAINS(POINT(ra, dec), CIRCLE(POINT({RA}, {DEC}), {SR}))
             ).values()
         elif verb == '2':
             self.columns = table.columns.filter(principal=True).values()
+            if not self.columns:
+                raise NotFound(_('There are no principal columns'))
         elif verb == '3':
             self.columns = table.columns.values()
         else:
