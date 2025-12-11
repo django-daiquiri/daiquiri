@@ -35,7 +35,7 @@ dependencies = [
   "celery~=5.5.3",
   "Django~=5.2.5",
   "django-allauth[openid,socialaccount]~=65.11.0",
-  "python-dotenv~=1.1.1",
+  "python-dotenv>=1.1.1,<1.3.0",
   "django-extensions~=4.1",
   "django-filter~=25.1",
   "django-honeypot~=1.3.0",
@@ -51,7 +51,7 @@ dependencies = [
   "iso8601~=2.1.0",
   "jsonfield~=3.2.0",
   "lunr~=0.8.0",
-  "Markdown~=3.8.2",
+  "Markdown>=3.8.2,<3.11.0",
   "pandas~=2.3.2",
   "passlib>=1.7.4",
   "pyarrow>=21.0.0",
@@ -60,7 +60,7 @@ dependencies = [
   "queryparser-python3~=0.7.4",
   "rules~=3.5",
   "sqlalchemy~=2.0.43",
-  "XlsxWriter==3.2.5",
+  "XlsxWriter==3.2.9",
 ]
 
 [project.optional-dependencies]
@@ -84,11 +84,11 @@ postgres = [
 ]
 pytest = [
   "coverage~=7.10.5",
-  "pytest~=8.4.1",
+  "pytest>=8.4.1,<9.1.0",
   "pytest-cov~=6.2.0",
   "pytest-django~=4.11.1",
   "pytest-dotenv~=0.5.2",
-  "pytest-mock~=3.14.1",
+  "pytest-mock>=3.14.1,<3.16.0",
 ]
 
 [project.urls]
