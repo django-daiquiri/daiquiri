@@ -72,10 +72,15 @@ WHERE 1=CONTAINS(POINT({ra_column}, {dec_column}), CIRCLE(POINT({RA}, {DEC}), {S
         except Table.DoesNotExist as e:
             raise NotFound(_('Table %s does not exist') % table_name) from e
 
+        resources_columns = table.columns.filter(name__in=column_names).values()
+
         if verb == '1':
-            columns = table.columns.filter(name__in=column_names).values()
+            columns = resources_columns
+
         elif verb == '2':
-            columns = table.columns.filter(principal=True).values()
+            principal_columns = table.columns.filter(principal=True).exclude(name__in=column_names).values()
+            columns = resources_columns.union(principal_columns)
+
         elif verb == '3':
             columns = table.columns.values()
         else:
