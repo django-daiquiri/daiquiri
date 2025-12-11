@@ -60,7 +60,7 @@ dependencies = [
   "queryparser-python3~=0.7.4",
   "rules~=3.5",
   "sqlalchemy~=2.0.43",
-  "XlsxWriter==3.2.5",
+  "XlsxWriter==3.2.9",
 ]
 
 [project.optional-dependencies]
