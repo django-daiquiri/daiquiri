@@ -83,7 +83,7 @@ postgres = [
   "psycopg[binary]~=3.2.9",
 ]
 pytest = [
-  "coverage~=7.10.5",
+  "coverage>=7.10.5,<7.14.0",
   "pytest>=8.4.1,<9.1.0",
   "pytest-cov~=6.2.0",
   "pytest-django~=4.11.1",
