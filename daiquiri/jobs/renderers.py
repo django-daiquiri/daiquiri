@@ -87,10 +87,10 @@ class UWSRenderer(XMLRenderer):
         if data:
             if data != "":
                 self.start('uws:errorSummary', {
-                    'hasDetail': True,
+                    'hasDetail': "true",
                     'type': "fatal"
                 })
-                self.node("uws:message", text=data)
+                self.node("uws:message",{}, text=data)
                 self.end("uws:errorSummary")
             else:
                 self.node("uws:errorSummary", {}, None)
