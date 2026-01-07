@@ -120,6 +120,7 @@ exclude = ["settings.py"]
 
 [tool.ruff.lint]
 select = [
+  "ARG",  # flake8-unused-arguments
   "B",    # flake8-bugbear
   "C4",   # flake8-comprehensions
   "DJ",   # flake8-django

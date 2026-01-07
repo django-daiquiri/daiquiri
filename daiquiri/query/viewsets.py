@@ -1,12 +1,12 @@
+import logging
 import os
 from collections import OrderedDict
 from pathlib import Path
-import logging
 
 from django.conf import settings
 from django.http import FileResponse, Http404
 from django.utils.timezone import now
-from django_sendfile import sendfile
+
 from rest_framework import filters, mixins, status, viewsets
 from rest_framework.authentication import (
     BasicAuthentication,
@@ -16,6 +16,8 @@ from rest_framework.authentication import (
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.response import Response
+
+from django_sendfile import sendfile
 
 from daiquiri.core.paginations import ListPagination
 from daiquiri.core.permissions import HasModelPermission
@@ -58,11 +60,11 @@ from .utils import (
     fetch_user_schema_metadata,
     get_download_config,
     get_format_config,
+    get_max_active_jobs,
     get_quota,
     get_user_upload_directory,
     handle_upload_param,
     ingest_uploads,
-    get_max_active_jobs
 )
 
 logger = logging.getLogger(__name__)
