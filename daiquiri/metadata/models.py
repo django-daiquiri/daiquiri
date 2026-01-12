@@ -311,11 +311,6 @@ class Column(models.Model):
         verbose_name=_('Standard'),
         help_text=_('Designates whether the column is defined by some standard.')
     )
-    index_for = models.CharField(
-        max_length=256, blank=True, default='',
-        verbose_name=_('Index for'),
-        help_text=_('The columns which this column is an index for (e.g. for pgSphere).')
-    )
     access_level = models.CharField(
         max_length=8, choices=ACCESS_LEVEL_CHOICES, default=ACCESS_LEVEL_PRIVATE,
         verbose_name=_('Access level')
@@ -352,12 +347,7 @@ class Column(models.Model):
 
     @property
     def indexed_columns(self):
-        if self.index_for:
-            return [
-                (self.table.schema.name, self.table.name, name.strip()) for name in self.index_for.split(',')
-            ] + [self.name]
-        else:
-            return None
+        return None
 
     @property
     def admin_url(self):
