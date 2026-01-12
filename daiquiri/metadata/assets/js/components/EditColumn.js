@@ -89,27 +89,19 @@ const EditColumn = ({ values, success, errors, setValues, onDiscover, onSave }) 
             onChange={(description) => setValues({ ...values, description })} />
 
           <div className="row">
-            <div className="col-md-4">
+            <div className="col-md-6">
               <Input
                 label={meta.column.datatype.verbose_name}
                 help={meta.column.datatype.help_text}
                 value={values.datatype}
                 disabled />
             </div>
-            <div className="col-md-4">
+            <div className="col-md-6">
               <Input
                 label={meta.column.arraysize.verbose_name}
                 help={meta.column.arraysize.help_text}
                 value={values.arraysize || ''}
                 disabled />
-            </div>
-            <div className="col-md-4">
-              <Input
-                label={meta.column.index_for.verbose_name}
-                help={meta.column.index_for.help_text}
-                value={values.index_for}
-                errors={errors.index_for}
-                onChange={(index_for) => setValues({ ...values, index_for })} />
             </div>
           </div>
 
