@@ -27,6 +27,7 @@ from .serializers import (
     JobUpdateSerializer,
     SyncJobSerializer,
 )
+from .settings import JOB_DESTRUCTION_TIME
 from .utils import get_content_type, get_job_results, get_job_url, get_max_records
 
 
@@ -158,7 +159,7 @@ class AsyncJobViewSet(JobViewSet):
             job.process()
         except ValidationError as e:
             job.error_summary = str(e)
-            job.destruction_time = timezone.now() - timedelta(days=30)
+            job.destruction_time = timezone.now() - timedelta(days=JOB_DESTRUCTION_TIME)
             job.phase = Job.PHASE_ERROR
 
         job.save()
