@@ -5,3 +5,5 @@ JOB_MAX_RECORDS = {
     'users': {},
     'groups': {}
 }
+
+JOB_DESTRUCTION_TIME = 30 # days
