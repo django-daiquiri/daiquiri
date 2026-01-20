@@ -23,7 +23,7 @@ const Users = () => {
 
   const showModal = useModal()
   const updateModal = useModal()
-  const activateModal = useModal()
+  const approveModal = useModal()
   const enableModal = useModal()
   const disableModal = useModal()
   const confirmModal = useModal()
@@ -188,7 +188,7 @@ const Users = () => {
           {
             settings.AUTH_WORKFLOW == 'activation' && profile.is_pending && <>
               <button className="btn btn-link" title={gettext('Approve user')}
-                      onClick={() => handleModal(activateModal, profile)}>
+                      onClick={() => handleModal(approveModal, profile)}>
                 <i className="bi bi-check-circle"></i>
               </button>
 
@@ -204,7 +204,7 @@ const Users = () => {
               {
                 settings.AUTH_WORKFLOW == 'confirmation' && profile.is_pending && profile.is_confirmed && (
                   <button className="btn btn-link" title={gettext('Approve user')}
-                          onClick={() => handleModal(activateModal, profile)}>
+                          onClick={() => handleModal(approveModal, profile)}>
                     <i className="bi bi-check-circle"></i>
                   </button>
                 )
@@ -280,7 +280,7 @@ const Users = () => {
         setValues={setValues}
         onSubmit={handleUpdate}
       />
-      <ConfirmModal modal={activateModal} label={gettext('Approve user')} action="activate" onSubmit={handleUpdate}/>
+      <ConfirmModal modal={approveModal} label={gettext('Approve user')} action="approve" onSubmit={handleUpdate}/>
       <ConfirmModal modal={disableModal} label={gettext('Disable user')} action="disable" onSubmit={handleUpdate}/>
       <ConfirmModal modal={confirmModal} label={gettext('Confirm user')} action="confirm" onSubmit={handleUpdate}/>
       <ConfirmModal modal={enableModal} label={gettext('Enable user')} action="enable" onSubmit={handleUpdate}/>
