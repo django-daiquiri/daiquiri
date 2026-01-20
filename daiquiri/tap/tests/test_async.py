@@ -173,14 +173,15 @@ def test_post_job_list_create_internal(db, client, username, password, query):
         'QUERY': query
     }), content_type='application/x-www-form-urlencoded')
 
-    if username != 'anonymous':
-        assert response.status_code == 303, response.content
+    assert response.status_code == 303, response.content
 
-        response = client.get(response.url + '/phase')
-        assert response.status_code == 200, response.content
+    response = client.get(response.url + '/phase')
+    assert response.status_code == 200, response.content
+
+    if username != 'anonymous':
         assert response.content.decode() == 'PENDING'
     else:
-        assert response.status_code == 400, response.content
+        assert response.content.decode() == 'ERROR'
 
 
 @override_settings(QUERY_ANONYMOUS=True)
@@ -200,14 +201,15 @@ def test_post_job_list_create_private(db, client, username, password, query):
         'QUERY': query
     }), content_type='application/x-www-form-urlencoded')
 
-    if username == 'test':
-        assert response.status_code == 303, response.content
+    assert response.status_code == 303, response.content
 
-        response = client.get(response.url + '/phase')
-        assert response.status_code == 200, response.content
+    response = client.get(response.url + '/phase')
+    assert response.status_code == 200, response.content
+
+    if username == 'test':
         assert response.content.decode() == 'PENDING'
     else:
-        assert response.status_code == 400, response.content
+        assert response.content.decode() == 'ERROR'
 
 
 @override_settings(QUERY_ANONYMOUS=True)
