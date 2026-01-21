@@ -107,11 +107,6 @@ const Users = () => {
           )
         }
         {
-          profile.user.is_active && !profile.is_pending && !profile.is_confirmed && (
-            <span className="badge text-bg-secondary me-1">{gettext('active')}</span>
-          )
-        }
-        {
           !profile.user.is_active && (
             <span className="badge text-bg-danger me-1">{gettext('disabled')}</span>
           )
