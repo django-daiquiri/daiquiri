@@ -161,6 +161,8 @@ class AsyncJobViewSet(JobViewSet):
             job.error_summary = str(e)
             job.destruction_time = timezone.now() - timedelta(days=JOB_DESTRUCTION_TIME)
             job.phase = Job.PHASE_ERROR
+            job.save()
+            return HttpResponseSeeOther(self.get_success_url(job))
 
         job.save()
 
@@ -276,14 +278,11 @@ class AsyncJobViewSet(JobViewSet):
             if 'PHASE' in serializer.data:
                 phase = serializer.data['PHASE']
                 if phase == job.PHASE_RUN:
-                    if job.phase != job.PHASE_PENDING:
-                        raise ValidationError({'PHASE': 'Job must be in PENDING phase to run.'})
-
                     try:
                         job.process()
                     except ValidationError as e:
                         job.phase = job.PHASE_ERROR
-                        job.error_summary = f'ValidationError: {e}'
+                        job.error_summary = str(e)
                         job.save()
                     else:
                         job.run()

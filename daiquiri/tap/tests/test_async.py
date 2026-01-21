@@ -653,15 +653,15 @@ def test_post_job_phase_run(db, client, mocker, username, password, pk):
     response = client.post(url, urlencode({'PHASE': 'RUN'}), content_type='application/x-www-form-urlencoded')
 
     if username == 'user':
+        redirect_url = 'http://testserver' + reverse(url_names['detail'], kwargs={'pk': pk})
         if job_phase in ['PENDING']:
             job.refresh_from_db()
-            redirect_url = 'http://testserver' + reverse(url_names['detail'], kwargs={'pk': pk})
-
             assert response.status_code == 303
             assert response.url == redirect_url
             assert job.phase == 'COMPLETED'
         else:
-            assert response.status_code == 400
+            assert response.status_code == 303
+            assert response.url == redirect_url
 
     else:
         assert response.status_code == 404
