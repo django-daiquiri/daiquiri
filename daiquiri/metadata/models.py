@@ -346,10 +346,6 @@ class Column(models.Model):
         return [self.name]
 
     @property
-    def indexed_columns(self):
-        return None
-
-    @property
     def admin_url(self):
         return reverse('admin:daiquiri_metadata_column_change', args=[self.id])
 
