@@ -9,6 +9,8 @@ from daiquiri.query.models import QueryJob
 
 class Command(BaseCommand):
 
+    help = "Requeues completed query jobs with missing database tables, optionally limiting to a user or queue, and supporting a dry run to list jobs with missing tables."
+
     def add_arguments(self, parser):
         parser.add_argument('--user', help='Only fix jobs for this user.')
         parser.add_argument('--queue', help='Name of the queue to use.')
