@@ -9,7 +9,6 @@ from django.db.utils import DataError, InternalError, OperationalError, Programm
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
-
 from rest_framework.exceptions import ValidationError
 
 from daiquiri.core.adapter import DatabaseAdapter, DownloadAdapter
@@ -113,7 +112,8 @@ class QueryJob(Job):
     @property
     def formats(self):
         return OrderedDict(
-            (item['key'], item['content_type']) for item in settings.QUERY_DOWNLOAD_FORMATS
+            (item['key'], item['content_type'])
+            for item in settings.QUERY_DOWNLOAD_FORMATS
         )
 
     @property
@@ -146,7 +146,9 @@ class QueryJob(Job):
     def timeout(self):
         if self.queue:
             return next(
-                queue['timeout'] for queue in settings.QUERY_QUEUES if queue['key'] == self.queue
+                queue['timeout']
+                for queue in settings.QUERY_QUEUES
+                if queue['key'] == self.queue
             )
         else:
             return 10
@@ -157,7 +159,9 @@ class QueryJob(Job):
 
     def process(self, upload=False):
         # log the query to the query log
-        query_logger.info('"%s" %s %s', self.query, self.query_language, self.owner or 'anonymous')
+        query_logger.info(
+            '"%s" %s %s', self.query, self.query_language, self.owner or 'anonymous'
+        )
 
         # check quota and number of active jobs
         check_quota(self)
@@ -175,7 +179,9 @@ class QueryJob(Job):
             self.execution_duration = 0.0
 
         else:
-            self.query_language = process_query_language(self.owner, self.query_language)
+            self.query_language = process_query_language(
+                self.owner, self.query_language
+            )
             self.queue = process_queue(self.owner, self.queue)
             self.response_format = process_response_format(self.response_format)
 
@@ -231,14 +237,18 @@ class QueryJob(Job):
             self.is_clean = True
 
     def run(self):
-        if not self.is_clean:
-            raise Exception('job.process() was not called.')
+        try:
+            self.process()
+        except ValidationError as e:
+            self.phase = self.PHASE_ERROR
+            self.error_summary = str(e)
+            self.save()
+            return
 
         if self.phase == self.PHASE_PENDING:
             self.phase = self.PHASE_QUEUED
             self.save()
 
-            # start the submit_query task in a synchronous or asyncronous way
             job_id = str(self.id)
             if not settings.ASYNC:
                 logger.info('job %s submitted (sync)', self.id)
@@ -247,7 +257,9 @@ class QueryJob(Job):
             else:
                 queue = f'query_{self.queue}'
                 logger.info('job %s submitted (async, queue=%s)', self.id, queue)
-                run_database_query_task.apply_async((job_id,), task_id=job_id, queue=queue)
+                run_database_query_task.apply_async(
+                    (job_id,), task_id=job_id, queue=queue
+                )
 
         else:
             raise ValidationError({'phase': ['Job is not PENDING.']})
@@ -309,7 +321,9 @@ class QueryJob(Job):
             if not settings.ASYNC:
                 run_database_ingest_task.apply((self.id, file_path), throw=True)
             else:
-                run_database_ingest_task.apply_async((self.id, file_path), queue='download')
+                run_database_ingest_task.apply_async(
+                    (self.id, file_path), queue='download'
+                )
 
         else:
             raise ValidationError({'phase': ['Job is not PENDING.']})
@@ -500,10 +514,14 @@ class DownloadJob(Job):
             download_id = str(self.id)
             if not settings.ASYNC:
                 logger.info('download_job %s submitted (sync)', download_id)
-                create_download_table_task.apply((download_id,), task_id=download_id, throw=True)
+                create_download_table_task.apply(
+                    (download_id,), task_id=download_id, throw=True
+                )
 
             else:
-                logger.info('download_job %s submitted (async, queue=download)', download_id)
+                logger.info(
+                    'download_job %s submitted (async, queue=download)', download_id
+                )
                 create_download_table_task.apply_async(
                     (download_id,), task_id=download_id, queue='download'
                 )
@@ -554,7 +572,9 @@ class QueryArchiveJob(Job):
             username = self.owner.username
 
         directory_name = os.path.join(settings.QUERY_DOWNLOAD_DIR, username)
-        return os.path.join(directory_name, f'{self.query_job.table_name}.{self.column_name}.zip')
+        return os.path.join(
+            directory_name, f'{self.query_job.table_name}.{self.column_name}.zip'
+        )
 
     def process(self):
         if self.query_job.phase == self.PHASE_COMPLETED:
@@ -566,7 +586,9 @@ class QueryArchiveJob(Job):
             raise ValidationError({'column_name': [_('This field may not be blank.')]})
 
         if self.column_name not in self.query_job.column_names:
-            raise ValidationError({'column_name': [_('Unknown column "%s".') % self.column_name]})
+            raise ValidationError(
+                {'column_name': [_('Unknown column "%s".') % self.column_name]}
+            )
 
         # get database adapter and query the paginated rowset
         rows = DatabaseAdapter().fetch_rows(
@@ -585,7 +607,9 @@ class QueryArchiveJob(Job):
             if file_path and check_file(self.owner, file_path):
                 files.append(file_path)
             else:
-                raise ValidationError({'files': [_('One or more of the files cannot be found.')]})
+                raise ValidationError(
+                    {'files': [_('One or more of the files cannot be found.')]}
+                )
 
         # set files for this job
         self.files = files
@@ -604,10 +628,14 @@ class QueryArchiveJob(Job):
             archive_id = str(self.id)
             if not settings.ASYNC:
                 logger.info('archive_job %s submitted (sync)', archive_id)
-                create_download_archive_task.apply((archive_id,), task_id=archive_id, throw=True)
+                create_download_archive_task.apply(
+                    (archive_id,), task_id=archive_id, throw=True
+                )
 
             else:
-                logger.info('archive_job %s submitted (async, queue=download)', archive_id)
+                logger.info(
+                    'archive_job %s submitted (async, queue=download)', archive_id
+                )
                 create_download_archive_task.apply_async(
                     (archive_id,), task_id=archive_id, queue='download'
                 )
@@ -638,7 +666,9 @@ class Example(models.Model):
         null=True,
         blank=True,
         verbose_name=_('Description'),
-        help_text=_('A brief description of the example to be displayed in the user interface.'),
+        help_text=_(
+            'A brief description of the example to be displayed in the user interface.'
+        ),
     )
     query_language = models.CharField(
         max_length=16,

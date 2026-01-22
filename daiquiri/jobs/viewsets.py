@@ -155,14 +155,8 @@ class AsyncJobViewSet(JobViewSet):
 
         self.handle_upload(job, serializer.validated_data.get('UPLOAD'))
 
-        try:
-            job.process()
-        except ValidationError as e:
-            job.error_summary = str(e)
-            job.destruction_time = timezone.now() - timedelta(days=JOB_DESTRUCTION_TIME)
-            job.phase = Job.PHASE_ERROR
-            job.save()
-            return HttpResponseSeeOther(self.get_success_url(job))
+        """
+        """
 
         job.save()
 
@@ -277,16 +271,8 @@ class AsyncJobViewSet(JobViewSet):
 
             if 'PHASE' in serializer.data:
                 phase = serializer.data['PHASE']
-                if phase == job.PHASE_RUN and job.phase == 'PENDING':
-                    try:
-                        job.process()
-                    except ValidationError as e:
-                        job.phase = job.PHASE_ERROR
-                        job.error_summary = str(e)
-                        job.save()
-                    else:
-                        job.run()
-
+                if phase == job.PHASE_RUN:
+                    job.run()
                     return HttpResponseSeeOther(self.get_success_url())
 
                 elif phase == job.PHASE_ABORT:
