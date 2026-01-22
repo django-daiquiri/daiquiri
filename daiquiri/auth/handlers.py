@@ -9,7 +9,7 @@ from allauth.account.signals import email_confirmed, password_changed, password_
 
 from .models import Profile
 from .signals import (
-    user_activated,
+    user_approved,
     user_confirmed,
     user_created,
     user_deleted,
@@ -116,10 +116,10 @@ def user_rejected_handler(sender, **kwargs):
         send_notify_rejection(request, user)
 
 
-@receiver(user_activated)
-def user_activated_handler(sender, **kwargs):
+@receiver(user_approved)
+def user_approved_handler(sender, **kwargs):
     '''
-    Gets notified when a user was activated by an admin.
+    Gets notified when a user was approved by an admin.
     '''
     request = kwargs['request']
     user = kwargs['user']
