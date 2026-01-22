@@ -277,7 +277,7 @@ class AsyncJobViewSet(JobViewSet):
 
             if 'PHASE' in serializer.data:
                 phase = serializer.data['PHASE']
-                if phase == job.PHASE_RUN:
+                if phase == job.PHASE_RUN and job.phase == 'PENDING':
                     try:
                         job.process()
                     except ValidationError as e:
