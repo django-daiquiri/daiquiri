@@ -125,25 +125,6 @@ def fetch_user_schema_metadata(user, jobs):
     return [schema]
 
 
-def get_indexed_objects():
-    indexed_objects = {}
-
-    for column in Column.objects.exclude(index_for=''):
-        # TODO implement xtype 'spoint' properly
-
-        # if column.datatype not in indexed_objects:
-        #    indexed_objects[column.datatype] = [column.indexed_columns]
-        # else:
-        #    indexed_objects[column.datatype].append(column.indexed_columns)
-
-        if 'spoint' not in indexed_objects:
-            indexed_objects['spoint'] = [column.indexed_columns]
-        else:
-            indexed_objects['spoint'].append(column.indexed_columns)
-
-    return indexed_objects
-
-
 def get_job_sources(job):
     sources = []
 
