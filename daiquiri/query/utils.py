@@ -1,12 +1,12 @@
-from enum import verify
 import os
 import sys
 
-import requests
-from astropy.io.votable import parse_single_table
 from django.conf import settings
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
+
+import requests
+from astropy.io.votable import parse_single_table
 
 from daiquiri.core.adapter import DatabaseAdapter
 from daiquiri.core.utils import handle_file_upload, human2bytes, import_class
@@ -15,9 +15,7 @@ from daiquiri.metadata.models import Column, Table
 
 def get_download_config(download_key):
     try:
-        return next(
-            filter(lambda c: c['key'] == download_key, settings.QUERY_DOWNLOADS)
-        )
+        return next(filter(lambda c: c['key'] == download_key, settings.QUERY_DOWNLOADS))
     except StopIteration:
         return None
 
@@ -125,25 +123,6 @@ def fetch_user_schema_metadata(user, jobs):
     return [schema]
 
 
-def get_indexed_objects():
-    indexed_objects = {}
-
-    for column in Column.objects.exclude(index_for=''):
-        # TODO implement xtype 'spoint' properly
-
-        # if column.datatype not in indexed_objects:
-        #    indexed_objects[column.datatype] = [column.indexed_columns]
-        # else:
-        #    indexed_objects[column.datatype].append(column.indexed_columns)
-
-        if 'spoint' not in indexed_objects:
-            indexed_objects['spoint'] = [column.indexed_columns]
-        else:
-            indexed_objects['spoint'].append(column.indexed_columns)
-
-    return indexed_objects
-
-
 def get_job_sources(job):
     sources = []
 
@@ -153,9 +132,7 @@ def get_job_sources(job):
 
             # fetch additional metadata from the metadata store
             try:
-                original_table = Table.objects.get(
-                    name=table_name, schema__name=schema_name
-                )
+                original_table = Table.objects.get(name=table_name, schema__name=schema_name)
 
                 if settings.METADATA_BASE_URL:
                     metadata_url = '{}/{}/{}'.format(
@@ -185,15 +162,11 @@ def get_job_sources(job):
 
 def get_job_column(job, display_column_name):
     try:
-        schema_name, table_name, column_name = job.metadata['display_columns'][
-            display_column_name
-        ]
+        schema_name, table_name, column_name = job.metadata['display_columns'][display_column_name]
     except (ValueError, KeyError):
         return {}
 
-    if (schema_name == settings.TAP_UPLOAD) or (
-        schema_name == get_user_schema_name(job.owner)
-    ):
+    if (schema_name == settings.TAP_UPLOAD) or (schema_name == get_user_schema_name(job.owner)):
         # for TAP_UPLOAD get the information directly from the database
         column = DatabaseAdapter().fetch_column(schema_name, table_name, column_name)
 
@@ -240,9 +213,7 @@ def get_job_columns(job):
     columns = []
 
     if job.phase == job.PHASE_COMPLETED or job.job_type == job.JOB_TYPE_SYNC:
-        database_columns = DatabaseAdapter().fetch_columns(
-            job.schema_name, job.table_name
-        )
+        database_columns = DatabaseAdapter().fetch_columns(job.schema_name, job.table_name)
 
         for database_column in database_columns:
             column = get_job_column(job, database_column['name'])
@@ -283,9 +254,7 @@ def ingest_uploads(uploads, user):
             else:
                 file_path = location
 
-            columns = ingest_table(
-                settings.TAP_UPLOAD, table_name, file_path, drop_table=True
-            )
+            columns = ingest_table(settings.TAP_UPLOAD, table_name, file_path, drop_table=True)
 
     return columns
 
@@ -308,6 +277,9 @@ def catch_special_types(field):
         if field.name == 'pos' and field.datatype in ('char', 'unicodeChar'):
             datatype = 'spoint'
             arraysize = None
+        elif field.arraysize == '*':
+            datatype = f'{field.datatype}[]'
+            arraysize = field.arraysize
         else:
             datatype = field.datatype
             arraysize = field.arraysize
@@ -351,9 +323,7 @@ def ingest_table(schema_name, table_name, file_path, drop_table=False):
 
 def get_query_form(form_key):
     try:
-        return next(
-            form for form in settings.QUERY_FORMS if form.get('key') == form_key
-        )
+        return next(form for form in settings.QUERY_FORMS if form.get('key') == form_key)
     except StopIteration as e:
         raise RuntimeError(f'Query form "{form_key}"" not found.') from e
 
