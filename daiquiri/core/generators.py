@@ -1,4 +1,3 @@
-import re
 import csv
 import io
 import logging
@@ -140,7 +139,7 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
             if description:
                 yield """
                 <FIELD {}> <DESCRIPTION>{}</DESCRIPTION> </FIELD>
-                """.format(' '.join(attrs), description)
+                """.format(' '.join(attrs), escape(description))
             else:
                 yield """
                 <FIELD {} />""".format(' '.join(attrs))
