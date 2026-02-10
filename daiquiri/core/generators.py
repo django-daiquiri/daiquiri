@@ -66,11 +66,6 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
     yield """
     <RESOURCE type="results">"""
 
-    for key, value in infos:
-        if value is not None:
-            yield f"""
-            <INFO name={quoteattr(key)} value={quoteattr(value)} />"""
-
     for title, content_role, href in links:
         yield f"""
         <LINK title={quoteattr(title)} content-role={quoteattr(content_role)} href={quoteattr(href)}/>"""  # noqa: E501
@@ -153,8 +148,10 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
                 <TABLEDATA>"""
 
         # write rows of the table yielded by the generator
+        overflow = False
         for i, row in enumerate(generator):
             if max_records is not None and  i >= max_records:
+                overflow = True
                 break
             yield """
                     <TR>
@@ -170,7 +167,15 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
                 </TABLEDATA>
             </DATA>"""
     yield """
-        </TABLE>
+        </TABLE>"""
+
+    for key, value in infos:
+        if value is not None:
+            if key == 'QUERY_STATUS' and overflow:
+                value = 'OVERFLOW'
+            yield f"""
+            <INFO name={quoteattr(key)} value={quoteattr(value)} />"""
+    yield """
     </RESOURCE>"""
 
     for service in services:
