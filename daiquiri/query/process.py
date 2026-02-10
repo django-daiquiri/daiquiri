@@ -14,7 +14,6 @@ from daiquiri.metadata.models import Column, Function, Schema, Table
 
 from .utils import (
     get_default_table_name,
-    get_indexed_objects,
     get_max_active_jobs,
     get_quota,
     get_user_schema_name
@@ -202,11 +201,9 @@ def process_query(query):
             else:
                 processor = PostgreSQLQueryProcessor()
 
-            # first run to replace with get_indexed_objects
             processor.set_query(query)
 
             processor.process_query(
-                indexed_objects=get_indexed_objects(),
                 replace_schema_name={
                     'TAP_SCHEMA': settings.TAP_SCHEMA,
                     'tap_schema': settings.TAP_SCHEMA,

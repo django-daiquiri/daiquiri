@@ -1,4 +1,3 @@
-import re
 import csv
 import io
 import logging
@@ -121,6 +120,7 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
                 attrs.append('datatype="{}"'.format(field['datatype']))
 
             elif field['datatype'] in [
+                'char[]',
                 'short[]',
                 'int[]',
                 'long[]',
@@ -141,7 +141,7 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
             if description:
                 yield """
                 <FIELD {}> <DESCRIPTION>{}</DESCRIPTION> </FIELD>
-                """.format(' '.join(attrs), description)
+                """.format(' '.join(attrs), escape(description))
             else:
                 yield """
                 <FIELD {} />""".format(' '.join(attrs))

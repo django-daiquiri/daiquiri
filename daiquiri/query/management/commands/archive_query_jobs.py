@@ -9,6 +9,8 @@ from daiquiri.query.models import QueryJob
 
 class Command(BaseCommand):
 
+    help = "Archives all query jobs for a user and deletes associated database tables, optionally keeping recent jobs using --keep, and skipping prompts with --yes."
+
     pattern = re.compile(r'(\d+)([dsmhw])')
 
     def add_arguments(self, parser):

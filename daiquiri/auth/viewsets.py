@@ -68,12 +68,12 @@ class ProfileViewSet(mixins.UpdateModelMixin, mixins.ListModelMixin,
         return Response(self.get_serializer(profile).data)
 
     @action(detail=True, methods=['put'], permission_classes=[HasModelPermission])
-    def activate(self, request, pk=None):
+    def approve(self, request, pk=None):
         if not settings.AUTH_WORKFLOW:
             raise MethodNotAllowed('put')
 
         profile = get_object_or_404(Profile, pk=pk)
-        profile.activate(request)
+        profile.approve(request)
         return Response(self.get_serializer(profile).data)
 
     @action(detail=True, methods=['put'], permission_classes=[HasModelPermission])
