@@ -127,7 +127,7 @@ class BaseDownloadAdapter:
             process = subprocess.Popen(self.args, stdout=subprocess.PIPE)
 
             for line in process.stdout:
-                insert_pattern = re.compile('^INSERT INTO .*? VALUES \\((.*?)\\);')
+                insert_pattern = re.compile('^INSERT INTO .*? VALUES \\((.*?)\\);\s*$')
                 insert_result = insert_pattern.match(line.decode())
                 if insert_result:
                     line = insert_result.group(1)
