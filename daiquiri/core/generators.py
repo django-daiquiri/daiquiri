@@ -1,4 +1,3 @@
-import re
 import csv
 import io
 import logging
@@ -100,10 +99,8 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
         if 'arraysize' in field:
             if field.get('datatype') == 'char' and field['arraysize'] is None:
                 attrs.append('arraysize="*"')
-        """
             elif field['arraysize']:
                 attrs.append('arraysize="{}"'.format(field['arraysize']))
-        """
 
         if 'datatype' in field:
             if field['datatype'] in [
@@ -140,7 +137,7 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
             if description:
                 yield """
                 <FIELD {}> <DESCRIPTION>{}</DESCRIPTION> </FIELD>
-                """.format(' '.join(attrs), description)
+                """.format(' '.join(attrs), escape(description))
             else:
                 yield """
                 <FIELD {} />""".format(' '.join(attrs))

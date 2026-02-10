@@ -33,8 +33,8 @@ dynamic = [
 dependencies = [
   "astropy>=7.1,<7.3",
   "celery>=5.5.3,<5.7.0",
-  "Django~=5.2.5",
-  "django-allauth[openid,socialaccount]>=65.11,<65.14",
+  "Django>=5.2.5,<5.3.0",
+  "django-allauth[openid,socialaccount]>=65.11,<65.15",
   "python-dotenv>=1.1.1,<1.3.0",
   "django-extensions~=4.1",
   "django-filter~=25.1",
@@ -44,7 +44,7 @@ dependencies = [
   "django-settings-export~=1.2.1",
   "django-user-agents~=0.4.0",
   "django-widget-tweaks~=1.5.0",
-  "djangorestframework~=3.16.1",
+  "djangorestframework>=3.16.1,<3.17.0",
   "dj-database-url>=3.0.1,<3.2.0",
   "drf-extensions~=0.8.0",
   "ipaddress~=1.0.23",
@@ -52,22 +52,21 @@ dependencies = [
   "jsonfield~=3.2.0",
   "lunr~=0.8.0",
   "Markdown>=3.8.2,<3.11.0",
-  "pandas~=2.3.2",
+  "pandas>=2.3.2,<2.4.0",
   "passlib>=1.7.4",
-  "pyarrow>=21.0.0",
+  "pyarrow>=21.0.0,<21.1.0",
   "Pygments~=2.19.2",
   "PyJWT~=2.10.1",
   "queryparser-python3~=0.7.4",
   "rules~=3.5",
-  "sqlalchemy~=2.0.43",
+  "sqlalchemy>=2.0.43,<2.1.0",
   "XlsxWriter==3.2.9",
 ]
 
 [project.optional-dependencies]
 ci = [
   "coveralls",
-  "django-daiquiri[postgres]",
-  "django-daiquiri[pytest]",
+  "django-daiquiri[postgres,pytest]",
 ]
 dev = [
   "build",
@@ -85,7 +84,7 @@ postgres = [
 pytest = [
   "coverage>=7.10.5,<7.14.0",
   "pytest>=8.4.1,<9.1.0",
-  "pytest-cov~=6.2.0",
+  "pytest-cov>=6.2,<7.1",
   "pytest-django~=4.11.1",
   "pytest-dotenv~=0.5.2",
   "pytest-mock>=3.14.1,<3.16.0",
