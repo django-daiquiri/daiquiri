@@ -67,7 +67,7 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
 
         database_columns = cursor.description
 
-        columns = self._fetch_columns_typs(database_columns)
+        columns = self._fetch_column_types(database_columns)
 
         def fetch_rows():
             try:
@@ -281,7 +281,7 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         logger.debug('sql = "%s"', sql)
         return [column[0] for column in self.fetchall(sql)]
 
-    def _fetch_columns_typs(self, database_columns):
+    def _fetch_column_types(self, database_columns):
 
         type_oids = {col.type_code for col in database_columns}
 
