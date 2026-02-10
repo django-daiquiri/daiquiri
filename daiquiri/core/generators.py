@@ -56,7 +56,7 @@ def correct_col_for_votable(col):
     return corrected_col
 
 
-def generate_votable(generator, fields, infos=[], links=[], services=[], table=None, empty=False):
+def generate_votable(generator, fields, infos=[], links=[], services=[], table=None, empty=False, max_records=None):
     yield """<?xml version="1.0"?>
 <VOTABLE version="1.3"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -153,7 +153,9 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
                 <TABLEDATA>"""
 
         # write rows of the table yielded by the generator
-        for row in generator:
+        for i, row in enumerate(generator):
+            if max_records is not None and  i >= max_records:
+                break
             yield """
                     <TR>
                         <TD>{}</TD>

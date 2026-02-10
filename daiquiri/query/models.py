@@ -282,7 +282,8 @@ class QueryJob(Job):
                 table=download_adapter.get_table_name(self.schema_name, self.table_name),
                 infos=download_adapter.get_infos('OK', self.query, self.query_language, job_sources),
                 links=download_adapter.get_links(job_sources),
-                services=download_adapter.get_services()
+                services=download_adapter.get_services(),
+                max_records = self.max_records,
             )
 
         except (OperationalError, ProgrammingError, InternalError, DataError) as e:
