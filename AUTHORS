@@ -1,18 +1,21 @@
-Daiquiri is developed and maintained by the E-Science group at the Leibniz Institute for Astrophysics Potsdam (AIP).
+Daiquiri is developed and maintained by the Research Data Infrastructure group (former E-Science group) at the Leibniz Institute for Astrophysics Potsdam (AIP).
 
-The core developers are:
+Current maintainers:
 
     Jochen Klar <mail@jochenklar.de>
-    Anastasia Galkin <agalkin@aip.de>
-    Yori Fournier <y.fournier@aip.de>
     Kirill Makan <kmakan@aip.de>
+
 
 We appreciate contributions from:
 
+    Wail Ahmed
     Fernando Campos
     Harry Enke
+    Yori Fournier
+    Anastasia Galkin
     Gal Matijevic
     Olaf Michaelis
     Adrian Partl
+    Simeon Reusch
     Kristin Riebe
     Taavi Tuvikene

@@ -68,7 +68,30 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
     def escape_string(self, string):
         return f"'{string}'"
 
-    def build_query(self, schema_name, table_name, query, timeout, max_records):
+    def fetchall_sync(self, sql):
+        cursor = self.connection().cursor()
+        cursor.execute(sql)
+
+        while cursor.description is None and cursor.nextset():
+            pass
+
+        database_columns = cursor.description
+
+        columns = self._fetch_column_types(database_columns)
+
+        def fetch_rows():
+            try:
+                while True:
+                    rows = cursor.fetchmany(1000)
+                    if not rows:
+                        break
+                    yield from rows
+            finally:
+                cursor.close()
+
+        return columns, fetch_rows
+
+    def build_query(self, schema_name, table_name, query, timeout, max_records=None): # max_records DEPRECATED (ignored)
         # max_records is now handled by the method trim_table_rows
         actual_query = (
             f'SET SESSION statement_timeout TO {int(timeout * 1000)};'
@@ -84,24 +107,9 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
 
         return actual_query
 
-    def build_sync_query(self, query, timeout, max_records):
-        # WARNING: This method is currently not used. The sync query is build
-        # using the 'build_query' method.
-        params = {
-            'query': query,
-            'timeout': int(timeout * 1000),
-            'max_records': max_records,
-        }
-
-        if max_records is not None:
-            return (
-                'SET SESSION statement_timeout TO {timeout};'
-                + 'COMMIT; {query} LIMIT {max_records};'.format(**params)
-            )
-        else:
-            return 'SET SESSION statement_timeout TO {timeout};' + 'COMMIT; %(query);'.format(
-                **params
-            )
+    def build_sync_query(self, query, timeout, max_records=None): # max_records DEPRECATED (ignored)
+        # max_records is now handled in the generator
+        return f'SET SESSION statement_timeout TO {int(timeout * 1000)}; COMMIT; {query};'
 
     def abort_query(self, pid: int):
         sql = f'SELECT pg_cancel_backend({pid})'
@@ -282,6 +290,38 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
 
         logger.debug('sql = "%s"', sql)
         return [column[0] for column in self.fetchall(sql)]
+
+    def _fetch_column_types(self, database_columns):
+
+        type_oids = {col.type_code for col in database_columns}
+
+        sql = f"""
+        SELECT oid, typname, format_type(oid, NULL)
+        FROM pg_type
+        WHERE oid IN ({",".join(str(oid) for oid in type_oids)})
+        """
+
+        logger.debug('sql = "%s"', sql)
+        try:
+            type_map = {oid: (typname, data_type) for oid, typname, data_type in self.fetchall(sql)}
+        except ProgrammingError as e:
+            logger.error('Could not fetch (%s)', e)
+            return []
+        else:
+            if type_map is None:
+                logger.info(
+                    'Could not fetch the columns. Check if the schema exists.'
+                )
+                return []
+            else:
+                columns = []
+                append = columns.append
+
+                for i, col in enumerate(database_columns, start=1):
+                    udt_name, data_type = type_map[col.type_code]
+                    append(self._parse_column((col.name, data_type, udt_name, None, i)))
+
+                return columns
 
     def create_table(self, schema_name, table_name, columns):
         for column in columns:

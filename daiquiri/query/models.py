@@ -13,6 +13,7 @@ from rest_framework.exceptions import ValidationError
 
 from daiquiri.core.adapter import DatabaseAdapter, DownloadAdapter
 from daiquiri.core.constants import ACCESS_LEVEL_CHOICES
+from daiquiri.core.generators import generate_votable
 from daiquiri.core.utils import get_date_display
 from daiquiri.files.utils import check_file
 from daiquiri.jobs.managers import JobManager
@@ -43,7 +44,7 @@ from .tasks import (
     run_database_ingest_task,
     run_database_query_task,
 )
-from .utils import get_format_config, get_job_columns, get_query_language_label
+from .utils import get_format_config, get_job_columns, get_query_language_label, get_job_sources, get_columns_metadata
 
 logger = logging.getLogger(__name__)
 query_logger = logging.getLogger('query')
@@ -261,53 +262,35 @@ class QueryJob(Job):
             raise ValidationError({'phase': ['Job is not PENDING.']})
 
     def run_sync(self):
+
         adapter = DatabaseAdapter()
+        download_adapter = DownloadAdapter()
 
-        adapter.create_user_schema_if_not_exists(self.schema_name)
-
-        self.actual_query = adapter.build_query(
-            self.schema_name,
-            self.table_name,
+        self.actual_query = adapter.build_sync_query(
             self.native_query,
             settings.QUERY_SYNC_TIMEOUT,
             self.max_records,
         )
-
-        adapter.submit_query(self.actual_query)
-        self.nrows = adapter.count_rows(self.schema_name, self.table_name)
-        self.size = adapter.fetch_size(self.schema_name, self.table_name)
-
-        # create a stats record for this job
-        Record.objects.create(
-            time=now(),
-            resource_type='QUERY',
-            resource={
-                'job_id': None,
-                'job_type': self.job_type,
-            },
-            client_ip=self.client_ip,
-            user=self.owner,
-            size=self.size,
-        )
+        job_sources = get_job_sources(self)
 
         try:
-            yield from DownloadAdapter().generate(
-                'votable',
-                get_job_columns(self),
-                sources=self.metadata.get('sources', []),
-                schema_name=self.schema_name,
-                table_name=self.table_name,
-                nrows=self.nrows,
-                query_status=self.result_status,
-                query=self.query,
-                query_language=self.query_language,
+            database_columns, fetch_rows = adapter.fetchall_sync(self.actual_query)
+
+            yield from generate_votable(
+                fetch_rows(),
+                get_columns_metadata(self, database_columns),
+                table=download_adapter.get_table_name(self.schema_name, self.table_name),
+                infos=download_adapter.get_infos('OK', self.query, self.query_language, job_sources),
+                links=download_adapter.get_links(job_sources),
+                services=download_adapter.get_services(),
+                max_records = self.max_records,
             )
 
-            self.drop_uploads()
-            self.drop_table()
-
         except (OperationalError, ProgrammingError, InternalError, DataError) as e:
-            raise StopIteration from e
+            raise ValidationError({"TAP executing error": [str(e)]}) from None
+
+        finally:
+            self.drop_uploads()
 
     def ingest(self, file_path):
         if self.phase == self.PHASE_PENDING:

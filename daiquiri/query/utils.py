@@ -212,8 +212,10 @@ def get_job_column(job, display_column_name):
 def get_job_columns(job):
     columns = []
 
-    if job.phase == job.PHASE_COMPLETED or job.job_type == job.JOB_TYPE_SYNC:
-        database_columns = DatabaseAdapter().fetch_columns(job.schema_name, job.table_name)
+    if job.phase == job.PHASE_COMPLETED:
+        database_columns = DatabaseAdapter().fetch_columns(
+            job.schema_name, job.table_name
+        )
 
         for database_column in database_columns:
             column = get_job_column(job, database_column['name'])
@@ -222,6 +224,20 @@ def get_job_columns(job):
 
     return columns
 
+def get_columns_metadata(job, columns):
+
+    columns_list = []
+    for col in columns:
+        name = col['name']
+        column = get_job_column(job, name)
+        if not column:
+            column = col.copy()
+        if column.get('name') != name:
+            column = column.copy()
+            column['name'] = name
+        columns_list.append(column)
+
+    return columns_list
 
 def handle_upload_param(request, upload_param):
     if upload_param:
