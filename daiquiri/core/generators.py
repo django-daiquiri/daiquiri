@@ -49,10 +49,14 @@ def correct_col_for_votable(col):
         # remove {} and replace , with space
         corrected_col = col.replace('{', '').replace('}', '').replace(',', ' ')
 
+    if col.startswith('[') and col.endswith(']'):  # this is an array
+        # remove {} and replace , with space
+        corrected_col = col.replace('[', '').replace(']', '').replace(',', ' ')
+
     return corrected_col
 
 
-def generate_votable(generator, fields, infos=[], links=[], services=[], table=None, empty=False):
+def generate_votable(generator, fields, infos=[], links=[], services=[], table=None, empty=False, max_records=None):
     yield """<?xml version="1.0"?>
 <VOTABLE version="1.3"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -61,11 +65,6 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
 
     yield """
     <RESOURCE type="results">"""
-
-    for key, value in infos:
-        if value is not None:
-            yield f"""
-            <INFO name={quoteattr(key)} value={quoteattr(value)} />"""
 
     for title, content_role, href in links:
         yield f"""
@@ -149,7 +148,11 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
                 <TABLEDATA>"""
 
         # write rows of the table yielded by the generator
-        for row in generator:
+        overflow = False
+        for i, row in enumerate(generator):
+            if max_records is not None and  i >= max_records:
+                overflow = True
+                break
             yield """
                     <TR>
                         <TD>{}</TD>
@@ -164,7 +167,15 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
                 </TABLEDATA>
             </DATA>"""
     yield """
-        </TABLE>
+        </TABLE>"""
+
+    for key, value in infos:
+        if value is not None:
+            if key == 'QUERY_STATUS' and overflow:
+                value = 'OVERFLOW'
+            yield f"""
+            <INFO name={quoteattr(key)} value={quoteattr(value)} />"""
+    yield """
     </RESOURCE>"""
 
     for service in services:
