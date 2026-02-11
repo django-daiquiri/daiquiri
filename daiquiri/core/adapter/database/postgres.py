@@ -91,7 +91,7 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
 
         return columns, fetch_rows
 
-    def build_query(self, schema_name, table_name, query, timeout, max_records):
+    def build_query(self, schema_name, table_name, query, timeout, max_records=None): # max_records DEPRECATED (ignored)
         # max_records is now handled by the method trim_table_rows
         actual_query = (
             f'SET SESSION statement_timeout TO {int(timeout * 1000)};'
@@ -107,8 +107,8 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
 
         return actual_query
 
-    def build_sync_query(self, query, timeout, max_records):
-        # max_records is now handled by the method trim_table_rows
+    def build_sync_query(self, query, timeout, max_records=None): # max_records DEPRECATED (ignored)
+        # max_records is now handled in the generator
         return f'SET SESSION statement_timeout TO {int(timeout * 1000)}; COMMIT; {query};'
 
     def abort_query(self, pid: int):
