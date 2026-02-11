@@ -10,10 +10,7 @@ keywords = []
 license = {text = "Apache-2.0"}
 authors = [
   {name = "Jochen Klar", email = "mail@jochenklar.de"},
-  {name = "Anastasia Galkin", email = "agalkin@aip.de"},
-  {name = "Yori Fournier", email = "y.fournier@aip.de"},
   {name = "Kirill Makan", email = "kmakan@aip.de"},
-  {name = "Simeon Reusch", email = "sreusch@aip.de"},
 ]
 requires-python = ">=3.13"
 classifiers = [
