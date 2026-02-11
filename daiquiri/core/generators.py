@@ -142,13 +142,13 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
                 <FIELD {} />""".format(' '.join(attrs))
 
     # fmt: off
+    overflow = False
     if not empty:
         yield """
             <DATA>
                 <TABLEDATA>"""
 
         # write rows of the table yielded by the generator
-        overflow = False
         for i, row in enumerate(generator):
             if max_records is not None and  i >= max_records:
                 overflow = True
