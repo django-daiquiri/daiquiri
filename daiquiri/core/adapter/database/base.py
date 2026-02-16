@@ -14,8 +14,8 @@ class BaseDatabaseAdapter:
     def connection(self):
         return connections[self.database_key]
 
-    def execute(self, sql):
-        return self.connection().cursor().execute(sql)
+    def execute(self, sql, args=None):
+        return self.connection().cursor().execute(sql, args)
 
     def fetchone(self, sql, args=None, as_dict=False):
         cursor = self.connection().cursor()

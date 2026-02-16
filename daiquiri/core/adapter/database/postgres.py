@@ -369,14 +369,11 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         if not self.table_exists(schema_name, table_name):
             return
 
-        query = (
-            'DELETE FROM '
-            + f'{self.escape_identifier(schema_name)}.{self.escape_identifier(table_name)} '
-            + 'WHERE ctid NOT IN (SELECT ctid FROM '
-            + f'{self.escape_identifier(schema_name)}.{self.escape_identifier(table_name)} '
-            + f'LIMIT {max_records} );'
-        )
-        self.execute(query)
+        user_table = f'{self.escape_identifier(schema_name)}.{self.escape_identifier(table_name)}'
+        query = f"""DELETE FROM  {user_table}
+            WHERE ctid NOT IN (SELECT ctid FROM {user_table} LIMIT %s);
+        """
+        self.execute(query, args=[max_records,])
 
     def table_exists(self, schema_name, table_name):
         check_query = (
