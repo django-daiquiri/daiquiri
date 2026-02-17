@@ -370,8 +370,14 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
             return
 
         user_table = f'{self.escape_identifier(schema_name)}.{self.escape_identifier(table_name)}'
-        query = f"""DELETE FROM  {user_table}
-            WHERE ctid NOT IN (SELECT ctid FROM {user_table} LIMIT %s);
+        query = f"""DELETE FROM {user_table} as t
+        USING (
+            SELECT ctid
+            FROM {user_table}
+            ORDER BY ctid
+            OFFSET %s
+        ) as d
+        WHERE t.ctid = d.ctid;
         """
         self.execute(query, args=[max_records,])
 
