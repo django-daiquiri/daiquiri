@@ -28,6 +28,7 @@ class RunQueryTask(Task):
 
         # log raised exception
         logger.error('run_query %s raised an exception (%s)', job_id, exc)
+        logger.debug('run_query %s failed with an error: %s', job_id, einfo)
 
         # set phase and error_summary of the crashed job
         job = QueryJob.objects.get(pk=job_id)
