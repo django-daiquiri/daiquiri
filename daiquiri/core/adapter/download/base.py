@@ -123,11 +123,10 @@ class BaseDownloadAdapter:
         logger.debug('execute "%s"', ' '.join(self.args))
 
         # execute the subprocess
+        process = subprocess.Popen(self.args, stdout=subprocess.PIPE)
         try:
-            process = subprocess.Popen(self.args, stdout=subprocess.PIPE)
-
+            insert_pattern = re.compile(r'^INSERT INTO .*? VALUES \((.*?)\);\s*$')
             for line in process.stdout:
-                insert_pattern = re.compile(r'^INSERT INTO .*? VALUES \((.*?)\);\s*$')
                 insert_result = insert_pattern.match(line.decode())
                 if insert_result:
                     line = insert_result.group(1)
@@ -148,6 +147,9 @@ class BaseDownloadAdapter:
 
         except subprocess.CalledProcessError as e:
             logger.error('Command PIPE returned non-zero exit status: %s', e)
+        finally:
+            process.stdout.close()
+            _ = process.wait()
 
     def get_prepend(self, columns):
         if not settings.FILES_BASE_URL:
