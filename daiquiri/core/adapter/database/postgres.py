@@ -365,9 +365,10 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         logger.debug('sql = "%s"', sql)
         self.execute(sql)
 
-    def trim_table_rows(self, schema_name, table_name, max_records):
+    def trim_table_rows(self, schema_name, table_name, max_records) -> int:
+        """Trims the table to the max_records and returns the number of deteted rows."""
         if not self.table_exists(schema_name, table_name):
-            return
+            return 0
 
         user_table = f'{self.escape_identifier(schema_name)}.{self.escape_identifier(table_name)}'
         query = f"""DELETE FROM {user_table} as t
@@ -379,7 +380,8 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         ) as d
         WHERE t.ctid = d.ctid;
         """
-        self.execute(query, args=[max_records,])
+        cursor = self.execute(query, args=[max_records,])
+        return cursor.rowcount
 
     def table_exists(self, schema_name, table_name):
         check_query = (

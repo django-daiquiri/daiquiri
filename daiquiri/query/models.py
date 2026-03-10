@@ -65,6 +65,7 @@ class QueryJob(Job):
     queue = models.CharField(max_length=16, blank=True)
     nrows = models.BigIntegerField(null=True, blank=True)
     size = models.BigIntegerField(null=True, blank=True)
+    status = models.CharField(max_length=16, blank=True, default='')
 
     metadata = models.JSONField(null=True, blank=True)
     uploads = models.JSONField(null=True, blank=True)
@@ -119,11 +120,15 @@ class QueryJob(Job):
 
     @property
     def result_status(self):
-        # if max_records is not defined then any number of rows is valid
-        if self.max_records is None or self.nrows is None:
-            return 'OK'
+        if self.status == '':
+            # depricated way of setting the query status
+            # if max_records is not defined then any number of rows is valid
+            if self.max_records is None or self.nrows is None:
+                return 'OK'
+            else:
+                return 'OK' if self.nrows < self.max_records else 'OVERFLOW'
         else:
-            return 'OK' if self.nrows < self.max_records else 'OVERFLOW'
+            return self.status
 
     @property
     def quote(self):
