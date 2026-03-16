@@ -117,13 +117,23 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
 
     def fetch_size(self, schema_name, table_name):
         sql = (
-            'SELECT pg_total_relation_size('
+            'SELECT pg_table_size('
                 + f"'{self.escape_identifier(schema_name)}.{self.escape_identifier(table_name)}'::regclass)"
         )
         size = self.fetchone(sql)[0]
 
-        logger.debug('size = %d', size)
+        logger.debug('table size = %d', size)
         return size
+
+    def fetch_size_user_table(self, schema_name, table_name):
+        user_table = f'{self.escape_identifier(schema_name)}.{self.escape_identifier(table_name)}'
+        sql = f'SELECT sum(pg_column_size(t)) from {user_table} as t;'
+        size = self.fetchone(sql)[0]
+
+        logger.debug('user table size = %d', size)
+
+        return size
+
 
     def fetch_nrows(self, schema_name, table_name):
         # fetch the size of the table using pg_total_relation_size
@@ -381,7 +391,6 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         WHERE t.ctid = d.ctid;
         """
         cursor = self.execute(query, args=[max_records,])
-        self.execute(f'VACUUM FULL {user_table};')
         return cursor.rowcount
 
     def table_exists(self, schema_name, table_name):

@@ -187,6 +187,10 @@ class BaseDatabaseAdapter:
     def fetch_size(self, schema_name, table_name):
         raise NotImplementedError()
 
+    def fetch_size_user_table(self, schema_name, table_name):
+        # overload this if the table size of the user tables must be calculated differently.
+        return self.fetch_size(schema_name, table_name)
+
     def fetch_nrows(self, schema_name, table_name):
         raise NotImplementedError()
 
