@@ -126,6 +126,8 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         return size
 
     def fetch_size_user_table(self, schema_name, table_name):
+        if not self.table_exists(schema_name, table_name):
+            return 0
         user_table = f'{self.escape_identifier(schema_name)}.{self.escape_identifier(table_name)}'
         sql = f'SELECT sum(pg_column_size(t)) from {user_table} as t;'
         size = self.fetchone(sql)[0]
