@@ -37,6 +37,7 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
 
     COLUMNTYPES = {
         'char': 'text',
+        'char[]': 'text',
         'unicodeChar': 'text',
         'boolean[]': 'boolean[]',
         'boolean': 'boolean',
