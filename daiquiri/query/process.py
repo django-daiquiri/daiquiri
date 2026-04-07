@@ -251,7 +251,7 @@ def process_display_columns(processor_display_columns):
     display_columns = []
     for processor_display_column, original_column in processor_display_columns:
         if processor_display_column == '*':
-            schema_name, table_name, _ = original_column
+            schema_name, table_name, _col = original_column
             columns = (
                 Column.objects.filter(table__schema__name=schema_name)
                 .filter(table__name=table_name)
@@ -283,7 +283,7 @@ def process_display_columns(processor_display_columns):
     # check for duplicate columns in display_columns
     seen = set()
     errors = []
-    for display_column_name, _ in display_columns:
+    for display_column_name, _col in display_columns:
         if display_column_name not in seen:
             seen.add(display_column_name)
         else:
