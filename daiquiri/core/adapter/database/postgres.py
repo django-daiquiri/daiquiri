@@ -14,6 +14,7 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         'varchar': {'datatype': 'char', 'arraysize': True},
         'text': {'datatype': 'char', 'arraysize': False},
         'boolean': {'datatype': 'boolean', 'arraysize': False},
+        'boolean[]': {'datatype': 'boolean', 'arraysize': True},
         'smallint': {'datatype': 'short', 'arraysize': False},
         'smallint[]': {'datatype': 'short', 'arraysize': True},
         'integer': {'datatype': 'int', 'arraysize': False},
@@ -37,6 +38,7 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
     COLUMNTYPES = {
         'char': 'text',
         'unicodeChar': 'text',
+        'boolean[]': 'boolean[]',
         'boolean': 'boolean',
         'bit': 'boolean',
         # 'unsignedByte': ???, not supported by Postgres... could be solved with pguint extension
