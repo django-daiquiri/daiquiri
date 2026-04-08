@@ -15,7 +15,9 @@ class BaseDatabaseAdapter:
         return connections[self.database_key]
 
     def execute(self, sql, args=None):
-        return self.connection().cursor().execute(sql, args)
+        cursor = self.connection().cursor()
+        cursor.execute(sql, args)
+        return cursor
 
     def fetchone(self, sql, args=None, as_dict=False):
         cursor = self.connection().cursor()
@@ -185,6 +187,10 @@ class BaseDatabaseAdapter:
     def fetch_size(self, schema_name, table_name):
         raise NotImplementedError()
 
+    def fetch_size_user_table(self, schema_name, table_name):
+        # overload this if the table size of the user tables must be calculated differently.
+        return self.fetch_size(schema_name, table_name)
+
     def fetch_nrows(self, schema_name, table_name):
         raise NotImplementedError()
 
@@ -253,7 +259,7 @@ class BaseDatabaseAdapter:
     def rename_table(self, schema_name, table_name, new_table_name):
         raise NotImplementedError()
 
-    def trim_table_rows(self, schema_name, table_name, max_records):
+    def trim_table_rows(self, schema_name, table_name, max_records) -> int:
         raise NotImplementedError()
 
     def table_exists(self, schema_name, table_name):

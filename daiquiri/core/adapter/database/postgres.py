@@ -14,6 +14,7 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         'varchar': {'datatype': 'char', 'arraysize': True},
         'text': {'datatype': 'char', 'arraysize': False},
         'boolean': {'datatype': 'boolean', 'arraysize': False},
+        'boolean[]': {'datatype': 'boolean', 'arraysize': True},
         'smallint': {'datatype': 'short', 'arraysize': False},
         'smallint[]': {'datatype': 'short', 'arraysize': True},
         'integer': {'datatype': 'int', 'arraysize': False},
@@ -36,7 +37,9 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
 
     COLUMNTYPES = {
         'char': 'text',
+        'char[]': 'text',
         'unicodeChar': 'text',
+        'boolean[]': 'boolean[]',
         'boolean': 'boolean',
         'bit': 'boolean',
         # 'unsignedByte': ???, not supported by Postgres... could be solved with pguint extension
@@ -117,13 +120,25 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
 
     def fetch_size(self, schema_name, table_name):
         sql = (
-            'SELECT pg_total_relation_size('
-            + f"'{self.escape_identifier(schema_name)}.{self.escape_identifier(table_name)}')"
+            'SELECT pg_table_size('
+                + f"'{self.escape_identifier(schema_name)}.{self.escape_identifier(table_name)}'::regclass)"
         )
         size = self.fetchone(sql)[0]
 
-        logger.debug('size = %d', size)
+        logger.debug('table size = %d', size)
         return size
+
+    def fetch_size_user_table(self, schema_name, table_name):
+        if not self.table_exists(schema_name, table_name):
+            return 0
+        user_table = f'{self.escape_identifier(schema_name)}.{self.escape_identifier(table_name)}'
+        sql = f'SELECT sum(pg_column_size(t)) from {user_table} as t;'
+        size = self.fetchone(sql)[0]
+
+        logger.debug('user table size = %d', size)
+
+        return size
+
 
     def fetch_nrows(self, schema_name, table_name):
         # fetch the size of the table using pg_total_relation_size
@@ -365,9 +380,10 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         logger.debug('sql = "%s"', sql)
         self.execute(sql)
 
-    def trim_table_rows(self, schema_name, table_name, max_records):
+    def trim_table_rows(self, schema_name, table_name, max_records) -> int:
+        """Trims the table to the max_records and returns the number of deteted rows."""
         if not self.table_exists(schema_name, table_name):
-            return
+            return 0
 
         user_table = f'{self.escape_identifier(schema_name)}.{self.escape_identifier(table_name)}'
         query = f"""DELETE FROM {user_table} as t
@@ -379,7 +395,8 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         ) as d
         WHERE t.ctid = d.ctid;
         """
-        self.execute(query, args=[max_records,])
+        cursor = self.execute(query, args=[max_records,])
+        return cursor.rowcount
 
     def table_exists(self, schema_name, table_name):
         check_query = (

@@ -115,7 +115,8 @@ def run_database_query_task(job_id):
                 logger.info('job %s failed (%s)', job.id, job.error_summary)
 
         else:
-            adapter.trim_table_rows(job.schema_name, job.table_name, job.max_records)
+            deleted_rows = adapter.trim_table_rows(job.schema_name, job.table_name, job.max_records)
+            job.status = 'OVERFLOW' if deleted_rows > 0 else 'OK'
             job.phase = job.PHASE_COMPLETED
             logger.info('job %s completed', job.id)
 
@@ -126,7 +127,7 @@ def run_database_query_task(job_id):
             # get additional information about the completed job
             if job.phase == job.PHASE_COMPLETED:
                 job.nrows = adapter.count_rows(job.schema_name, job.table_name)
-                job.size = adapter.fetch_size(job.schema_name, job.table_name)
+                job.size = adapter.fetch_size_user_table(job.schema_name, job.table_name)
 
                 # fetch the metadata for used tables
                 job.metadata['sources'] = get_job_sources(job)
