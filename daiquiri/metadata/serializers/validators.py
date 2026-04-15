@@ -34,13 +34,3 @@ class WhitespaceValidator:
     def __call__(self, value):
         if isinstance(value, str) and any(char.isspace() for char in value):
             raise ValidationError("This field cannot contain spaces.")
-
-
-class NonDuplicateValidator:
-    
-    def __init__(self, model):
-        self.model = model
-
-    def __call__(self, value):
-        if self.model.objects.filter(name__iexact=value).exists():
-            raise ValidationError(f"'{value}' already exists.")

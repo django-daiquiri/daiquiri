@@ -4,9 +4,10 @@ from django.contrib.auth.models import Group
 from rest_framework import serializers
 
 from daiquiri.core.serializers import JSONListField
+from rest_framework.validators import UniqueValidator
 
 from ..models import Column, Function, Schema, Table
-from .validators import PersonListValidator, WhitespaceValidator, NonDuplicateValidator
+from .validators import PersonListValidator, WhitespaceValidator
 
 
 class GroupSerializer(serializers.ModelSerializer):
@@ -20,7 +21,8 @@ class FunctionSerializer(serializers.ModelSerializer):
 
     label = serializers.CharField(source='__str__', read_only=True)
 
-    name = serializers.CharField(validators=[WhitespaceValidator(), NonDuplicateValidator(Function)])
+    name = serializers.CharField(validators=[WhitespaceValidator(),
+        UniqueValidator(queryset=Function.objects.all(), lookup='iexact')])
     admin_url = serializers.CharField(read_only=True)
 
     class Meta:
@@ -32,7 +34,8 @@ class ColumnSerializer(serializers.ModelSerializer):
 
     label = serializers.CharField(source='__str__', read_only=True)
 
-    name = serializers.CharField(validators=[WhitespaceValidator(), NonDuplicateValidator(Column)])
+    name = serializers.CharField(validators=[WhitespaceValidator(), 
+        UniqueValidator(queryset=Column.objects.all(), lookup='iexact')])
     width = serializers.IntegerField(source='get_width', read_only=True)
     admin_url = serializers.CharField(read_only=True)
 
@@ -68,7 +71,8 @@ class TableSerializer(serializers.ModelSerializer):
 
     label = serializers.CharField(source='__str__', read_only=True)
 
-    name = serializers.CharField(validators=[WhitespaceValidator(), NonDuplicateValidator(Table)])
+    name = serializers.CharField(validators=[WhitespaceValidator(),
+        UniqueValidator(queryset=Table.objects.all(), lookup='iexact')])
     related_identifiers = JSONListField(required=False)
     creators = JSONListField(required=False, validators=[PersonListValidator()])
     contributors = JSONListField(required=False, validators=[PersonListValidator()])
@@ -84,7 +88,8 @@ class SchemaSerializer(serializers.ModelSerializer):
 
     label = serializers.CharField(source='__str__', read_only=True)
 
-    name = serializers.CharField(validators=[WhitespaceValidator(), NonDuplicateValidator(Schema)])
+    name = serializers.CharField(validators=[WhitespaceValidator(),
+        UniqueValidator(queryset=Schema.objects.all(), lookup='iexact')])
     related_identifiers = JSONListField(required=False)
     creators = JSONListField(required=False, validators=[PersonListValidator()])
     contributors = JSONListField(required=False, validators=[PersonListValidator()])
