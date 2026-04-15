@@ -28,6 +28,8 @@ export const useCreateMetadataMutation = () => {
     },
     onError: (error) => {
       console.log(error)
+      const message = error?.errors?.name?.[0] || 'Something went wrong';
+      alert(message);
     }
   })
 }
@@ -62,6 +64,8 @@ export const useUpdateMetadataMutation = () => {
     },
     onError: (error) => {
       console.log(error)
+      const message = error?.errors?.name?.[0] || 'Something went wrong';
+      alert(message);
     }
   })
 }
@@ -83,6 +87,8 @@ export const useDiscoverMetadataMutation = () => {
     },
     onError: (error) => {
       console.log(error)
+      const message = error?.errors?.name?.[0] || 'Something went wrong';
+      alert(message);
     }
   })
 }
