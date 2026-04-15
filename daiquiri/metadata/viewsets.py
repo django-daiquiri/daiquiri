@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.db.models import Max
 
-from rest_framework import filters, status, viewsets
+from rest_framework import filters, status, viewsets, serializers
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -38,44 +38,48 @@ class SchemaViewSet(viewsets.ModelViewSet):
     ordering_fields = ('name', 'access_level', 'metadata_access_level')
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
 
-        schema = serializer.save()
-        schema.order = (Schema.objects.aggregate(order=Max('order'))['order'] or 0) + 1
-        schema.save()
+            schema = serializer.save()
+            schema.order = (Schema.objects.aggregate(order=Max('order'))['order'] or 0) + 1
+            schema.save()
 
-        if request.data.get('discover'):
-            adapter = DatabaseAdapter()
+            if request.data.get('discover'):
+                adapter = DatabaseAdapter()
 
-            for table_order, table_metadata in enumerate(adapter.fetch_tables(schema.name)):
-                table_metadata['order'] = table_order
-                table_metadata['schema'] = schema.id
-                table_metadata['groups'] = [group.id for group in schema.groups.all()]
-                for key in ['license', 'access_level', 'metadata_access_level']:
-                    table_metadata[key] = getattr(schema, key)
+                for table_order, table_metadata in enumerate(adapter.fetch_tables(schema.name)):
+                    table_metadata['order'] = table_order
+                    table_metadata['schema'] = schema.id
+                    table_metadata['groups'] = [group.id for group in schema.groups.all()]
+                    for key in ['license', 'access_level', 'metadata_access_level']:
+                        table_metadata[key] = getattr(schema, key)
 
-                table_serializer = TableSerializer(data=table_metadata)
-                if table_serializer.is_valid():
-                    table = table_serializer.save()
-                    table.discover(adapter)
-                    table.save()
+                    table_serializer = TableSerializer(data=table_metadata)
+                    if table_serializer.is_valid():
+                        table = table_serializer.save()
+                        table.discover(adapter)
+                        table.save()
 
-                    for column_order, column_metadata in enumerate(adapter.fetch_columns(schema.name, table.name)):
-                        column_metadata['order'] = column_order
-                        column_metadata['table'] = table.id
-                        column_metadata['groups'] = [group.id for group in table.groups.all()]
-                        for key in ['access_level', 'metadata_access_level']:
-                            column_metadata[key] = getattr(table, key)
+                        for column_order, column_metadata in enumerate(adapter.fetch_columns(schema.name, table.name)):
+                            column_metadata['order'] = column_order
+                            column_metadata['table'] = table.id
+                            column_metadata['groups'] = [group.id for group in table.groups.all()]
+                            for key in ['access_level', 'metadata_access_level']:
+                                column_metadata[key] = getattr(table, key)
 
-                        column_serializer = ColumnSerializer(data=column_metadata)
-                        if column_serializer.is_valid():
-                            column = column_serializer.save()
-                            column.discover(adapter)
-                            column.save()
+                            column_serializer = ColumnSerializer(data=column_metadata)
+                            if column_serializer.is_valid():
+                                column = column_serializer.save()
+                                column.discover(adapter)
+                                column.save()
 
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        except serializers.ValidationError as e:
+            print(f"Validation error creating schema: {e.detail}")
+            raise
 
     @action(detail=False)
     def management(self, request):
@@ -116,33 +120,36 @@ class TableViewSet(viewsets.ModelViewSet):
     ordering_fields = ('name', 'access_level', 'metadata_access_level')
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
 
-        table = serializer.save()
-        table.order = (table.schema.tables.aggregate(order=Max('order'))['order'] or 0) + 1
-        table.save()
-
-        if request.data.get('discover'):
-            adapter = DatabaseAdapter()
-            table.discover(adapter)
+            table = serializer.save()
+            table.order = (table.schema.tables.aggregate(order=Max('order'))['order'] or 0) + 1
             table.save()
 
-            for column_order, column_metadata in enumerate(adapter.fetch_columns(table.schema.name, table.name)):
-                column_metadata['order'] = column_order
-                column_metadata['table'] = table.id
-                column_metadata['groups'] = [group.id for group in table.groups.all()]
-                for key in ['access_level', 'metadata_access_level']:
-                    column_metadata[key] = getattr(table, key)
+            if request.data.get('discover'):
+                adapter = DatabaseAdapter()
+                table.discover(adapter)
+                table.save()
 
-                column_serializer = ColumnSerializer(data=column_metadata)
-                if column_serializer.is_valid():
-                    column = column_serializer.save()
-                    column.discover(adapter)
-                    column.save()
+                for column_order, column_metadata in enumerate(adapter.fetch_columns(table.schema.name, table.name)):
+                    column_metadata['order'] = column_order
+                    column_metadata['table'] = table.id
+                    column_metadata['groups'] = [group.id for group in table.groups.all()]
+                    for key in ['access_level', 'metadata_access_level']:
+                        column_metadata[key] = getattr(table, key)
 
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+                    column_serializer = ColumnSerializer(data=column_metadata)
+                    if column_serializer.is_valid():
+                        column = column_serializer.save()
+                        column.discover(adapter)
+                        column.save()
+
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        except serializers.ValidationError as e:
+            raise
 
     @action(detail=True, methods=['post'])
     def discover(self, request, pk=None):
@@ -166,20 +173,23 @@ class ColumnViewSet(viewsets.ModelViewSet):
     ordering_fields = ('name', 'access_level', 'metadata_access_level')
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
 
-        column = serializer.save()
-        column.order = (column.table.columns.aggregate(order=Max('order'))['order'] or 0) + 1
-        column.save()
-
-        if request.data.get('discover'):
-            adapter = DatabaseAdapter()
-            column.discover(adapter)
+            column = serializer.save()
+            column.order = (column.table.columns.aggregate(order=Max('order'))['order'] or 0) + 1
             column.save()
 
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+            if request.data.get('discover'):
+                adapter = DatabaseAdapter()
+                column.discover(adapter)
+                column.save()
+
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        except serializers.ValidationError as e:
+            raise
 
     @action(detail=True, methods=['post'])
     def discover(self, request, pk=None):
@@ -203,15 +213,18 @@ class FunctionViewSet(viewsets.ModelViewSet):
     ordering_fields = ('name', 'access_level', 'metadata_access_level')
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
 
-        function = serializer.save()
-        function.order = (Function.objects.aggregate(order=Max('order'))['order'] or 0) + 1
-        function.save()
+            function = serializer.save()
+            function.order = (Function.objects.aggregate(order=Max('order'))['order'] or 0) + 1
+            function.save()
 
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        except serializers.ValidationError as e:
+            raise
 
     @action(detail=False, methods=['get'])
     def management(self, request):
