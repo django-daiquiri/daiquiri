@@ -6,7 +6,7 @@ from rest_framework import serializers
 from daiquiri.core.serializers import JSONListField
 
 from ..models import Column, Function, Schema, Table
-from .validators import PersonListValidator
+from .validators import PersonListValidator, WhitespaceValidator, NonDuplicateValidator
 
 
 class GroupSerializer(serializers.ModelSerializer):
@@ -19,6 +19,8 @@ class GroupSerializer(serializers.ModelSerializer):
 class FunctionSerializer(serializers.ModelSerializer):
 
     label = serializers.CharField(source='__str__', read_only=True)
+
+    name = serializers.CharField(validators=[WhitespaceValidator(), NonDuplicateValidator(Function)])
     admin_url = serializers.CharField(read_only=True)
 
     class Meta:
@@ -29,6 +31,8 @@ class FunctionSerializer(serializers.ModelSerializer):
 class ColumnSerializer(serializers.ModelSerializer):
 
     label = serializers.CharField(source='__str__', read_only=True)
+
+    name = serializers.CharField(validators=[WhitespaceValidator(), NonDuplicateValidator(Column)])
     width = serializers.IntegerField(source='get_width', read_only=True)
     admin_url = serializers.CharField(read_only=True)
 
@@ -64,6 +68,7 @@ class TableSerializer(serializers.ModelSerializer):
 
     label = serializers.CharField(source='__str__', read_only=True)
 
+    name = serializers.CharField(validators=[WhitespaceValidator(), NonDuplicateValidator(Table)])
     related_identifiers = JSONListField(required=False)
     creators = JSONListField(required=False, validators=[PersonListValidator()])
     contributors = JSONListField(required=False, validators=[PersonListValidator()])
@@ -79,6 +84,7 @@ class SchemaSerializer(serializers.ModelSerializer):
 
     label = serializers.CharField(source='__str__', read_only=True)
 
+    name = serializers.CharField(validators=[WhitespaceValidator(), NonDuplicateValidator(Schema)])
     related_identifiers = JSONListField(required=False)
     creators = JSONListField(required=False, validators=[PersonListValidator()])
     contributors = JSONListField(required=False, validators=[PersonListValidator()])
