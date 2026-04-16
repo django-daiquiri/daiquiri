@@ -78,7 +78,6 @@ class SchemaViewSet(viewsets.ModelViewSet):
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
         except serializers.ValidationError as e:
-            print(f"Validation error creating schema: {e.detail}")
             raise
 
     @action(detail=False)
