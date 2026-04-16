@@ -21,7 +21,8 @@ class FunctionSerializer(serializers.ModelSerializer):
 
     label = serializers.CharField(source='__str__', read_only=True)
 
-    name = serializers.CharField(validators=[WhitespaceValidator()])
+    name = serializers.CharField(validators=[WhitespaceValidator(),
+        UniqueValidator(queryset=Function.objects.all(), lookup='iexact')])
     admin_url = serializers.CharField(read_only=True)
 
     class Meta:
