@@ -1,5 +1,7 @@
 import pytest
 
+import uuid
+
 from django.urls import reverse
 
 from ..models import Schema
@@ -78,7 +80,7 @@ def test_create(db, client, username, password):
 
     url = reverse(urlnames['list'])
     response = client.post(url, {
-        'name': 'daiquiri_data_test',
+        'name': f'daiquiri_data_test_{username}_{uuid.uuid4().hex[:6]}',
         'discover': True
     })
     assert response.status_code == status_map['create'][username], response.json()
