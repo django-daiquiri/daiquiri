@@ -23,11 +23,15 @@ class TableNameValidator:
     def __call__(self, table_name, serializer_field):
         request = serializer_field.parent.context['request']
         user = None if request.user.is_anonymous else request.user
-
+        instance = serializer_field.parent.instance
+        current_table_name = getattr(instance, 'table_name', None) if instance else None
+        
+        """
         if serializer_field.parent.instance:
             current_table_name = serializer_field.parent.instance.table_name
         else:
             current_table_name = None
+        """
 
         if bool(re.search(r'^[0-9a-zA-Z_\-]+$', table_name)) is False:
             raise ValidationError([self.message_allowed_chars])
@@ -35,11 +39,12 @@ class TableNameValidator:
             if current_table_name and table_name == current_table_name:
                 pass
             else:
-                try:
-                    QueryJob.objects.filter(owner=user).exclude(phase=QueryJob.PHASE_ARCHIVED).get(table_name=table_name)
-                    raise ValidationError([self.message])
-                except QueryJob.DoesNotExist:
-                    pass
+                if serializer_field.field_name == 'table_name':
+                    try:
+                        QueryJob.objects.filter(owner=user).exclude(phase=QueryJob.PHASE_ARCHIVED).get(table_name=table_name)
+                        raise ValidationError([self.message])
+                    except QueryJob.DoesNotExist:
+                        pass
 
 
 class UploadFileValidator:
