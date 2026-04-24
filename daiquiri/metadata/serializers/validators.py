@@ -28,9 +28,3 @@ class PersonListValidator:
 
             else:
                 raise ValidationError("affiliations must be a list of JSON Fields")
-
-class WhitespaceValidator:
-    
-    def __call__(self, value):
-        if isinstance(value, str) and any(char.isspace() for char in value):
-            raise ValidationError("This field cannot contain spaces.")
