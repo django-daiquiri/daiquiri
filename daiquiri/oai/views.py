@@ -31,7 +31,7 @@ class OaiView(APIView):
         verb, arguments = self.get_verb_and_arguments(query_dict)
 
         if verb is None:
-            self.errors.append(('badArgument', 'OAI verb missing'))
+            self.errors.append(('badVerb', 'OAI verb missing'))
         elif verb == 'GetRecord':
             self.get_record(arguments)
         elif verb == 'Identify':
