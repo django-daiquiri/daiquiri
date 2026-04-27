@@ -4,11 +4,11 @@ from django.contrib.auth.models import Group
 from rest_framework import serializers
 
 from daiquiri.core.serializers import JSONListField
+from daiquiri.core.validators import AllowedCharsValidator
 from rest_framework.validators import UniqueValidator, UniqueTogetherValidator
 
 from ..models import Column, Function, Schema, Table
 from .validators import PersonListValidator
-from daiquiri.query.validators import TableNameValidator
 
 
 class GroupSerializer(serializers.ModelSerializer):
@@ -22,7 +22,7 @@ class FunctionSerializer(serializers.ModelSerializer):
 
     label = serializers.CharField(source='__str__', read_only=True)
 
-    name = serializers.CharField(validators=[TableNameValidator(),
+    name = serializers.CharField(validators=[AllowedCharsValidator(),
         UniqueValidator(queryset=Function.objects.all(), lookup='iexact')])
     admin_url = serializers.CharField(read_only=True)
 
@@ -35,7 +35,7 @@ class ColumnSerializer(serializers.ModelSerializer):
 
     label = serializers.CharField(source='__str__', read_only=True)
 
-    name = serializers.CharField(validators=[TableNameValidator()])
+    name = serializers.CharField(validators=[AllowedCharsValidator()])
     width = serializers.IntegerField(source='get_width', read_only=True)
     admin_url = serializers.CharField(read_only=True)
 
@@ -86,7 +86,7 @@ class TableSerializer(serializers.ModelSerializer):
 
     label = serializers.CharField(source='__str__', read_only=True)
 
-    name = serializers.CharField(validators=[TableNameValidator()])
+    name = serializers.CharField(validators=[AllowedCharsValidator()])
     related_identifiers = JSONListField(required=False)
     creators = JSONListField(required=False, validators=[PersonListValidator()])
     contributors = JSONListField(required=False, validators=[PersonListValidator()])
@@ -117,7 +117,7 @@ class SchemaSerializer(serializers.ModelSerializer):
 
     label = serializers.CharField(source='__str__', read_only=True)
 
-    name = serializers.CharField(validators=[TableNameValidator(),
+    name = serializers.CharField(validators=[AllowedCharsValidator(),
         UniqueValidator(queryset=Schema.objects.all(), lookup='iexact')])
     related_identifiers = JSONListField(required=False)
     creators = JSONListField(required=False, validators=[PersonListValidator()])
