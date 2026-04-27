@@ -4,22 +4,20 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import ValidationError
 
 from daiquiri.core.utils import bytes2human
-from daiquiri.core.validators import AllowedCharsValidator
+from daiquiri.core.validators import DatabaseObjectNameValidator
 
 from .models import QueryJob
 from .utils import get_quota
 
 
-class TableNameValidator:
+class TableNameValidator(DatabaseObjectNameValidator):
 
     requires_context = True
 
     message = _('A job with this table name already exists.')
 
-    char_validator = AllowedCharsValidator()
-
     def __call__(self, table_name, serializer_field):
-        self.char_validator(table_name)
+        self.validate_name(table_name)
 
         request = serializer_field.parent.context['request']
         user = None if request.user.is_anonymous else request.user
