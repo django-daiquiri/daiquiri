@@ -58,6 +58,15 @@ const Management = () => {
     updateMutation.mutate({ success, values, setSuccess, setErrors })
   }
 
+  const handleCloseModal = () => {
+  createMutation.reset()
+  updateMutation.reset()
+  discoverMutation.reset()
+
+  setErrors({})
+  modal.hide()
+  }
+
   return (
     <div>
       <h1>
@@ -140,6 +149,7 @@ const Management = () => {
         }))], [])}
         setValues={setValues}
         onSubmit={handleCreate}
+        onClose={handleCloseModal}
       />
     </div>
   )

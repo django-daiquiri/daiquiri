@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import Input from 'daiquiri/core/assets/js/components/form/Input'
 import Select from 'daiquiri/core/assets/js/components/form/Select'
 
-const AddModal = ({ modal, values, errors, schemas, tables, setValues, onSubmit }) => {
+const AddModal = ({ modal, values, errors, schemas, tables, setValues, onSubmit, onClose}) => {
   return (
     <div ref={modal.ref} className="modal" id="add-metadata-modal" tabIndex="-1">
       <div className="modal-dialog">
@@ -21,7 +21,7 @@ const AddModal = ({ modal, values, errors, schemas, tables, setValues, onSubmit 
                       label={gettext('Schema')}
                       value={values.schema}
                       options={schemas}
-                      errors={errors.name}
+                      errors={errors.schema}
                       onChange={(schema) => setValues({ ...values, schema })}
                     />
                   )
@@ -53,7 +53,7 @@ const AddModal = ({ modal, values, errors, schemas, tables, setValues, onSubmit 
                 }
               </div>
               <div className="modal-footer">
-                <button type="button" className="btn btn-sm btn-secondary" onClick={modal.hide}>
+                <button type="button" className="btn btn-sm btn-secondary" onClick={onClose}>
                   {gettext('Close')}
                 </button>
                 <button type="button" className="btn btn-sm btn-primary" onClick={onSubmit}>
@@ -75,7 +75,8 @@ AddModal.propTypes = {
   schemas: PropTypes.array,
   tables: PropTypes.array,
   setValues: PropTypes.func.isRequired,
-  onSubmit: PropTypes.func.isRequired
+  onSubmit: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired
 }
 
 export default AddModal
