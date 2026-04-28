@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.db.models import Max
 
-from rest_framework import filters, status, viewsets, serializers
+from rest_framework import filters, status, viewsets
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -168,7 +168,6 @@ class ColumnViewSet(viewsets.ModelViewSet):
     ordering_fields = ('name', 'access_level', 'metadata_access_level')
 
     def create(self, request, *args, **kwargs):
-
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 

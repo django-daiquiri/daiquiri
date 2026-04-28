@@ -17,7 +17,7 @@ class TableNameValidator(DatabaseObjectNameValidator):
     message = _('A job with this table name already exists.')
 
     def __call__(self, table_name, serializer_field):
-        self.validate_name(table_name)
+        super().__call__(table_name, serializer_field)
 
         request = serializer_field.parent.context['request']
         user = None if request.user.is_anonymous else request.user
