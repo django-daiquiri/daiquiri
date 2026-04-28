@@ -103,7 +103,7 @@ def get_capabilities():
             'max_records': settings.OAI_PAGE_SIZE
         },
         {
-            'id': 'ivo://ivoa.net/std/VOSI#availability"',
+            'id': 'ivo://ivoa.net/std/VOSI#availability',
             'interface': {
                 'type': 'vs:ParamHTTP',
                 'role': 'std',
