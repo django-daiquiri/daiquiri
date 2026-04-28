@@ -314,7 +314,7 @@ class QueryJob(Job):
 
     def abort(self):
         current_phase = self.phase
-        if current_phase in self.PHASE_ACTIVE:
+        if current_phase in self.PHASE_ACTIVE or current_phase == self.PHASE_PENDING:
             # next, set the phase to ABORTED
             self.phase = self.PHASE_ABORTED
             self.save()

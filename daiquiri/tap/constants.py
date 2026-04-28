@@ -15,11 +15,11 @@ TAP_SCHEMA_METADATA = {
                     'name': 'id',
                     'description': 'Internal ID of the schema',
                     'order': 1,
-                    'datatype': 'integer',
+                    'datatype': 'int',
                     'arraysize': None,
                     'std': False,
                     'access_level': 'PUBLIC',
-                    'metadata_access_level': 'PUBLIC'
+                    'metadata_access_level': 'PUBLIC',
                 },
                 {
                     'name': 'schema_name',
@@ -29,7 +29,7 @@ TAP_SCHEMA_METADATA = {
                     'arraysize': 256,
                     'std': True,
                     'access_level': 'PUBLIC',
-                    'metadata_access_level': 'PUBLIC'
+                    'metadata_access_level': 'PUBLIC',
                 },
                 {
                     'name': 'utype',
@@ -39,7 +39,7 @@ TAP_SCHEMA_METADATA = {
                     'arraysize': 256,
                     'std': True,
                     'access_level': 'PUBLIC',
-                    'metadata_access_level': 'PUBLIC'
+                    'metadata_access_level': 'PUBLIC',
                 },
                 {
                     'name': 'description',
@@ -49,9 +49,9 @@ TAP_SCHEMA_METADATA = {
                     'arraysize': 256,
                     'std': True,
                     'access_level': 'PUBLIC',
-                    'metadata_access_level': 'PUBLIC'
-                }
-            ]
+                    'metadata_access_level': 'PUBLIC',
+                },
+            ],
         },
         {
             'name': 'tables',
@@ -64,11 +64,11 @@ TAP_SCHEMA_METADATA = {
                     'name': 'id',
                     'description': 'Internal ID of the table',
                     'order': 1,
-                    'datatype': 'integer',
+                    'datatype': 'int',
                     'arraysize': None,
                     'std': False,
                     'access_level': 'PUBLIC',
-                    'metadata_access_level': 'PUBLIC'
+                    'metadata_access_level': 'PUBLIC',
                 },
                 {
                     'name': 'schema_name',
@@ -78,7 +78,7 @@ TAP_SCHEMA_METADATA = {
                     'arraysize': 256,
                     'std': True,
                     'access_level': 'PUBLIC',
-                    'metadata_access_level': 'PUBLIC'
+                    'metadata_access_level': 'PUBLIC',
                 },
                 {
                     'name': 'table_name',
@@ -88,7 +88,7 @@ TAP_SCHEMA_METADATA = {
                     'arraysize': 256,
                     'std': True,
                     'access_level': 'PUBLIC',
-                    'metadata_access_level': 'PUBLIC'
+                    'metadata_access_level': 'PUBLIC',
                 },
                 {
                     'name': 'table_type',
@@ -98,7 +98,7 @@ TAP_SCHEMA_METADATA = {
                     'arraysize': 256,
                     'std': True,
                     'access_level': 'PUBLIC',
-                    'metadata_access_level': 'PUBLIC'
+                    'metadata_access_level': 'PUBLIC',
                 },
                 {
                     'name': 'utype',
@@ -108,7 +108,7 @@ TAP_SCHEMA_METADATA = {
                     'arraysize': 256,
                     'std': True,
                     'access_level': 'PUBLIC',
-                    'metadata_access_level': 'PUBLIC'
+                    'metadata_access_level': 'PUBLIC',
                 },
                 {
                     'name': 'description',
@@ -118,29 +118,29 @@ TAP_SCHEMA_METADATA = {
                     'arraysize': 256,
                     'std': True,
                     'access_level': 'PUBLIC',
-                    'metadata_access_level': 'PUBLIC'
+                    'metadata_access_level': 'PUBLIC',
                 },
                 {
                     'name': 'table_index',
                     'description': 'The ordering index of the table',
                     'order': 7,
-                    'datatype': 'integer',
+                    'datatype': 'int',
                     'arraysize': None,
                     'std': True,
                     'access_level': 'PUBLIC',
-                    'metadata_access_level': 'PUBLIC'
+                    'metadata_access_level': 'PUBLIC',
                 },
                 {
                     'name': 'schema_id',
                     'description': 'The foreign key to the schema of this table',
                     'order': 8,
-                    'datatype': 'integer',
+                    'datatype': 'int',
                     'arraysize': None,
                     'std': False,
                     'access_level': 'PUBLIC',
-                    'metadata_access_level': 'PUBLIC'
-                }
-            ]
+                    'metadata_access_level': 'PUBLIC',
+                },
+            ],
         },
         {
             'name': 'columns',
@@ -153,11 +153,11 @@ TAP_SCHEMA_METADATA = {
                     'name': 'id',
                     'description': 'Internal ID of the column',
                     'order': 1,
-                    'datatype': 'integer',
+                    'datatype': 'int',
                     'arraysize': None,
                     'std': True,
                     'access_level': 'PUBLIC',
-                    'metadata_access_level': 'PUBLIC'
+                    'metadata_access_level': 'PUBLIC',
                 },
                 {
                     'name': 'table_name',
@@ -167,7 +167,7 @@ TAP_SCHEMA_METADATA = {
                     'arraysize': 256,
                     'std': True,
                     'access_level': 'PUBLIC',
-                    'metadata_access_level': 'PUBLIC'
+                    'metadata_access_level': 'PUBLIC',
                 },
                 {
                     'name': 'column_name',
@@ -177,7 +177,7 @@ TAP_SCHEMA_METADATA = {
                     'arraysize': 256,
                     'std': True,
                     'access_level': 'PUBLIC',
-                    'metadata_access_level': 'PUBLIC'
+                    'metadata_access_level': 'PUBLIC',
                 },
                 {
                     'name': 'datatype',
@@ -187,27 +187,27 @@ TAP_SCHEMA_METADATA = {
                     'arraysize': 256,
                     'std': True,
                     'access_level': 'PUBLIC',
-                    'metadata_access_level': 'PUBLIC'
+                    'metadata_access_level': 'PUBLIC',
                 },
                 {
                     'name': 'arraysize',
                     'description': 'The size of the column for variable length datatypes',
                     'order': 5,
-                    'datatype': 'integer',
+                    'datatype': 'int',
                     'arraysize': None,
                     'std': True,
                     'access_level': 'PUBLIC',
-                    'metadata_access_level': 'PUBLIC'
+                    'metadata_access_level': 'PUBLIC',
                 },
                 {
                     'name': 'size',
                     'description': 'The size of the column for variable length datatypes (legacy)',
                     'order': 6,
-                    'datatype': 'integer',
+                    'datatype': 'int',
                     'arraysize': None,
                     'std': True,
                     'access_level': 'PUBLIC',
-                    'metadata_access_level': 'PUBLIC'
+                    'metadata_access_level': 'PUBLIC',
                 },
                 {
                     'name': 'description',
@@ -217,7 +217,7 @@ TAP_SCHEMA_METADATA = {
                     'arraysize': 256,
                     'std': True,
                     'access_level': 'PUBLIC',
-                    'metadata_access_level': 'PUBLIC'
+                    'metadata_access_level': 'PUBLIC',
                 },
                 {
                     'name': 'utype',
@@ -227,7 +227,7 @@ TAP_SCHEMA_METADATA = {
                     'arraysize': 256,
                     'std': True,
                     'access_level': 'PUBLIC',
-                    'metadata_access_level': 'PUBLIC'
+                    'metadata_access_level': 'PUBLIC',
                 },
                 {
                     'name': 'unit',
@@ -237,7 +237,7 @@ TAP_SCHEMA_METADATA = {
                     'arraysize': 256,
                     'std': True,
                     'access_level': 'PUBLIC',
-                    'metadata_access_level': 'PUBLIC'
+                    'metadata_access_level': 'PUBLIC',
                 },
                 {
                     'name': 'ucd',
@@ -247,59 +247,167 @@ TAP_SCHEMA_METADATA = {
                     'arraysize': 256,
                     'std': True,
                     'access_level': 'PUBLIC',
-                    'metadata_access_level': 'PUBLIC'
+                    'metadata_access_level': 'PUBLIC',
                 },
                 {
                     'name': 'principal',
                     'description': 'Designates if the column is considered a core part of the service',
                     'order': 11,
-                    'datatype': 'boolean',
+                    'datatype': 'int',
                     'arraysize': None,
                     'std': True,
                     'access_level': 'PUBLIC',
-                    'metadata_access_level': 'PUBLIC'
+                    'metadata_access_level': 'PUBLIC',
                 },
                 {
                     'name': 'indexed',
                     'description': 'Designates if the column is indexed',
                     'order': 12,
-                    'datatype': 'boolean',
+                    'datatype': 'int',
                     'arraysize': None,
                     'std': True,
                     'access_level': 'PUBLIC',
-                    'metadata_access_level': 'PUBLIC'
+                    'metadata_access_level': 'PUBLIC',
                 },
                 {
                     'name': 'std',
                     'description': 'Designates if the column is defined by some standard',
                     'order': 13,
-                    'datatype': 'boolean',
+                    'datatype': 'int',
                     'arraysize': None,
                     'std': True,
                     'access_level': 'PUBLIC',
-                    'metadata_access_level': 'PUBLIC'
+                    'metadata_access_level': 'PUBLIC',
                 },
                 {
                     'name': 'column_index',
                     'description': 'The ordering index of the column',
                     'order': 14,
-                    'datatype': 'integer',
+                    'datatype': 'int',
                     'arraysize': None,
                     'std': True,
                     'access_level': 'PUBLIC',
-                    'metadata_access_level': 'PUBLIC'
+                    'metadata_access_level': 'PUBLIC',
                 },
                 {
                     'name': 'table_id',
                     'description': 'The foreign key to the table of this column',
                     'order': 15,
-                    'datatype': 'integer',
+                    'datatype': 'int',
                     'arraysize': None,
                     'std': False,
                     'access_level': 'PUBLIC',
-                    'metadata_access_level': 'PUBLIC'
-                }
-            ]
-        }
-    ]
+                    'metadata_access_level': 'PUBLIC',
+                },
+            ],
+        },
+        {
+            'name': 'keys',
+            'description': 'The table of foreign key relations between tables',
+            'order': 4,
+            'access_level': 'PUBLIC',
+            'metadata_access_level': 'PUBLIC',
+            'columns': [
+                {
+                    'name': 'key_id',
+                    'description': 'Unique identifier of the foreign key relationship; used to join with the key_columns table',
+                    'order': 1,
+                    'datatype': 'char',
+                    'arraysize': 256,
+                    'std': True,
+                    'access_level': 'PUBLIC',
+                    'metadata_access_level': 'PUBLIC',
+                },
+                {
+                    'name': 'from_table',
+                    'description': 'Fully qualified name of the table containing the foreign key (i.e. schema.table)',
+                    'order': 2,
+                    'datatype': 'char',
+                    'arraysize': 256,
+                    'std': True,
+                    'access_level': 'PUBLIC',
+                    'metadata_access_level': 'PUBLIC',
+                },
+                {
+                    'name': 'target_table',
+                    'description': 'Fully qualified name of the referenced (target) table',
+                    'order': 3,
+                    'datatype': 'char',
+                    'arraysize': 256,
+                    'std': True,
+                    'access_level': 'PUBLIC',
+                    'metadata_access_level': 'PUBLIC',
+                },
+                {
+                    'name': 'description',
+                    'description': 'Description of the relationship',
+                    'order': 4,
+                    'datatype': 'char',
+                    'arraysize': 256,
+                    'std': True,
+                    'access_level': 'PUBLIC',
+                    'metadata_access_level': 'PUBLIC',
+                },
+                {
+                    'name': 'utype',
+                    'description': 'Optional data model identifier for the relationship',
+                    'order': 4,
+                    'datatype': 'char',
+                    'arraysize': 256,
+                    'std': True,
+                    'access_level': 'PUBLIC',
+                    'metadata_access_level': 'PUBLIC',
+                },
+            ],
+        },
+        {
+            'name': 'key_columns',
+            'description': 'The table of foreign keys for the service',
+            'order': 4,
+            'access_level': 'PUBLIC',
+            'metadata_access_level': 'PUBLIC',
+            'columns': [
+                {
+                    'name': 'id',
+                    'description': 'Internal ID of the key columns',
+                    'order': 1,
+                    'datatype': 'int',
+                    'arraysize': None,
+                    'std': True,
+                    'access_level': 'PUBLIC',
+                    'metadata_access_level': 'PUBLIC',
+                },
+                {
+                    'name': 'key_id',
+                    'description': 'Identifier linking for the corresponding entry in the table keys',
+                    'order': 1,
+                    'datatype': 'char',
+                    'arraysize': 256,
+                    'std': True,
+                    'access_level': 'PUBLIC',
+                    'metadata_access_level': 'PUBLIC',
+                },
+                {
+                    'name': 'from_column',
+                    'description': 'Name of the column in the source table',
+                    'order': 2,
+                    'datatype': 'char',
+                    'arraysize': 256,
+                    'std': True,
+                    'access_level': 'PUBLIC',
+                    'metadata_access_level': 'PUBLIC',
+                },
+                {
+                    'name': 'target_column',
+                    'description': 'Name of the corresponding column in the target table',
+                    'order': 3,
+                    'datatype': 'char',
+                    'arraysize': 256,
+                    'std': True,
+                    'access_level': 'PUBLIC',
+                    'metadata_access_level': 'PUBLIC',
+                },
+            ],
+        },
+    ],
 }

@@ -1,8 +1,14 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import render
 from django.views.generic import TemplateView
 
 from daiquiri.core.utils import get_model_field_meta
-from daiquiri.core.views import AnonymousAccessMixin, CSRFViewMixin, ModelPermissionMixin, StoreIdViewMixin
+from daiquiri.core.views import (
+    AnonymousAccessMixin,
+    CSRFViewMixin,
+    ModelPermissionMixin,
+    StoreIdViewMixin,
+)
 
 from .models import Example, QueryJob
 
@@ -42,3 +48,10 @@ class NewExamplesView(ModelPermissionMixin, CSRFViewMixin, StoreIdViewMixin, Tem
 
     template_name = 'query/new/examples.html'
     permission_required = 'daiquiri_query.view_example'
+
+
+def examples(request):
+    template = 'query/examples.html'
+    return render(
+        request, template, {'examples': Example.objects.filter_by_access_level(request.user)}
+    )

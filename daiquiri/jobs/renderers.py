@@ -5,7 +5,7 @@ from .utils import get_job_url
 
 class UWSRenderer(XMLRenderer):
 
-    media_type = '*/*'
+    media_type = 'application/xml'
 
     root_attrs = {
         'xmlns:uws': 'http://www.ivoa.net/xml/UWS/v1.0',
@@ -76,6 +76,8 @@ class UWSRenderer(XMLRenderer):
 
         for parameter_key, parameter_value in data.items():
             self.node('uws:parameter', {'id': parameter_key}, parameter_value)
+
+        self.node('uws:parameter', {'id': 'request'}, 'doQuery')
 
         self.end('uws:parameters')
 

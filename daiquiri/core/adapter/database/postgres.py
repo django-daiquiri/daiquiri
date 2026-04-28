@@ -42,7 +42,7 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         'boolean[]': 'boolean[]',
         'boolean': 'boolean',
         'bit': 'boolean',
-        # 'unsignedByte': ???, not supported by Postgres... could be solved with pguint extension
+        'unsignedByte': 'short',
         'short': 'smallint',
         'short[]': 'smallint[]',
         'int': 'integer',
@@ -53,8 +53,8 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         'float[]': 'real[]',
         'double': 'double precision',
         'double[]': 'double precision[]',
-        #'floatComplex': ???, not supported by Postgres
-        #'doubleComplex': ???, not supported by Postgres
+        'floatComplex': 'real[]',
+        'doubleComplex': 'double[]',
         'spoint': 'spoint',
     }
 
