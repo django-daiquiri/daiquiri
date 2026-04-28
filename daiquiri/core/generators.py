@@ -1,4 +1,3 @@
-import re
 import csv
 import io
 import logging
@@ -50,10 +49,14 @@ def correct_col_for_votable(col):
         # remove {} and replace , with space
         corrected_col = col.replace('{', '').replace('}', '').replace(',', ' ')
 
+    if col.startswith('[') and col.endswith(']'):  # this is an array
+        # remove {} and replace , with space
+        corrected_col = col.replace('[', '').replace(']', '').replace(',', ' ')
+
     return corrected_col
 
 
-def generate_votable(generator, fields, infos=[], links=[], services=[], table=None, empty=False):
+def generate_votable(generator, fields, infos=[], links=[], services=[], table=None, empty=False, max_records=None):
     yield """<?xml version="1.0"?>
 <VOTABLE version="1.3"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -62,11 +65,6 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
 
     yield """
     <RESOURCE type="results">"""
-
-    for key, value in infos:
-        if value is not None:
-            yield f"""
-            <INFO name={quoteattr(key)} value={quoteattr(value)} />"""
 
     for title, content_role, href in links:
         yield f"""
@@ -117,6 +115,8 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
                 attrs.append('datatype="{}"'.format(field['datatype']))
 
             elif field['datatype'] in [
+                'boolean[]',
+                'char[]',
                 'short[]',
                 'int[]',
                 'long[]',
@@ -137,19 +137,23 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
             if description:
                 yield """
                 <FIELD {}> <DESCRIPTION>{}</DESCRIPTION> </FIELD>
-                """.format(' '.join(attrs), description)
+                """.format(' '.join(attrs), escape(description))
             else:
                 yield """
                 <FIELD {} />""".format(' '.join(attrs))
 
     # fmt: off
+    overflow = False
     if not empty:
         yield """
             <DATA>
                 <TABLEDATA>"""
 
         # write rows of the table yielded by the generator
-        for row in generator:
+        for i, row in enumerate(generator):
+            if max_records is not None and  i >= max_records:
+                overflow = True
+                break
             yield """
                     <TR>
                         <TD>{}</TD>
@@ -164,7 +168,15 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
                 </TABLEDATA>
             </DATA>"""
     yield """
-        </TABLE>
+        </TABLE>"""
+
+    for key, value in infos:
+        if value is not None:
+            if key == 'QUERY_STATUS' and overflow:
+                value = 'OVERFLOW'
+            yield f"""
+            <INFO name={quoteattr(key)} value={quoteattr(value)} />"""
+    yield """
     </RESOURCE>"""
 
     for service in services:
@@ -208,6 +220,7 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
         'array':     ('s', 'A', 64, b'',                 lambda x: x.encode()),
         'spoint':    ('s', 'A', 64, b'',                 lambda x: x.encode()),
         'unknown':   ('s', 'A', 8,  b'',                 lambda x: x.encode()),
+        'boolean[]': ('s', 'L', 1,  b'\x00',             lambda x: b'T' if x == 'true' else b'F'),
         'short[]':   ('h', 'I', 2,  32767,               int),
         'int[]':     ('i', 'J', 4,  2147483647,          int),
         'long[]':    ('q', 'K', 8,  9223372036854775807, int),
@@ -389,10 +402,10 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
                 if datatype == 'char[]':
                     f = str(array_infos[name] * DEFAULT_CHAR_SIZE) + formats_dict[datatype][0]
 
-                if datatype != 'char[]':
-                    row_elements_formatted.extend(r)
-                else:
+                if datatype in ['char[]', 'boolean[]']:
                     row_elements_formatted.append(b''.join(r))
+                else:
+                    row_elements_formatted.extend(r)
 
             else:
                 r = formats_dict[datatype][4](row_element)
@@ -513,12 +526,10 @@ def parse_and_fill_fits_array(
         array = [f'{i}_' for i in array[:-1]] + [f'{array[-1]}']
 
     for _ in range(desired_length - len(array)):
-        if obj_type in ['float[]', 'double[]']:
+        if obj_type in ['float[]', 'double[]', 'short[]', 'int[]', 'long[]']:
             array.append(formats_dict[obj_type][3])
-        elif obj_type == 'char[]':
+        elif obj_type in ['char[]', 'boolean[]']:
             array.append('')
-        elif obj_type in ['short[]', 'int[]', 'long[]']:
-            array.append(formats_dict[obj_type][3])
         else:
             raise ValueError(f'Unknown array type: {obj_type}')
 
@@ -535,6 +546,7 @@ def generate_parquet(
         'long': pa.int64(),
         'float': pa.float32(),
         'double': pa.float64(),
+        'boolean[]': pa.list_(pa.bool_()),
         'short[]': pa.list_(pa.int16()),
         'int[]': pa.list_(pa.int32()),
         'long[]': pa.list_(pa.int64()),

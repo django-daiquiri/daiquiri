@@ -5,7 +5,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from .signals import user_activated, user_confirmed, user_disabled, user_enabled, user_rejected
+from .signals import user_approved, user_confirmed, user_disabled, user_enabled, user_rejected
 from .utils import get_full_name
 
 logger = logging.getLogger(__name__)
@@ -62,12 +62,12 @@ class Profile(models.Model):
 
         user_rejected.send(sender=self.__class__, request=request, user=self.user)
 
-    def activate(self, request):
+    def approve(self, request):
         self.is_confirmed = True
         self.is_pending = False
         self.save()
 
-        user_activated.send(sender=self.__class__, request=request, user=self.user)
+        user_approved.send(sender=self.__class__, request=request, user=self.user)
 
     def disable(self, request):
         self.user.is_active = False

@@ -7,6 +7,6 @@ user_groups_updated = Signal()
 
 user_confirmed = Signal()
 user_rejected = Signal()
-user_activated = Signal()
+user_approved = Signal()
 user_disabled = Signal()
 user_enabled = Signal()

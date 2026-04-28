@@ -2,31 +2,8 @@
 {% load static %}
 {% load i18n %}
 
-{% block htmlargs %}version="XHTML+RDFa 1.1" xmlns="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"{% endblock %}
-
-{% block bodyargs %}vocab="ivo://ivoa.net/std/DALI-examples"{% endblock %}
-
 {% block wide %}
 
-    <h1>{% trans 'Examples' %}</h1>
-
-    <div vocab="http://www.ivoa.net/rdf/examples#">
-        {% for example in examples %}
-        <div id="example-{{ example.id }}" resource="#example-{{ example.id }}" typeof="example" class="card mb-3">
-            <div class="card-header d-flex align-items-center">
-                <span property="name">{{ example.name }}</span>
-                {% if example.query_language_label %}
-                <span class="badge text-bg-secondary ms-auto">{{ example.query_language_label }}</span>
-                {% endif %}
-            </div>
-            <div class="card-body">
-                {% if example.description %}
-                <p property="description" class="card-text">{{ example.description }}</p>
-                {% endif %}
-                <pre class="mb-0"><code property="query">{{ example.query_string }}</code></pre>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
+    {% include 'tap/examples-list.html' %}
 
 {% endblock %}

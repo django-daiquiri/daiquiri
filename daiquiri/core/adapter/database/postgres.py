@@ -14,11 +14,17 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         'varchar': {'datatype': 'char', 'arraysize': True},
         'text': {'datatype': 'char', 'arraysize': False},
         'boolean': {'datatype': 'boolean', 'arraysize': False},
+        'boolean[]': {'datatype': 'boolean', 'arraysize': True},
         'smallint': {'datatype': 'short', 'arraysize': False},
+        'smallint[]': {'datatype': 'short', 'arraysize': True},
         'integer': {'datatype': 'int', 'arraysize': False},
+        'integer[]': {'datatype': 'int', 'arraysize': True},
         'bigint': {'datatype': 'long', 'arraysize': False},
+        'bigint[]': {'datatype': 'long', 'arraysize': True},
         'real': {'datatype': 'float', 'arraysize': False},
+        'real[]': {'datatype': 'float', 'arraysize': True},
         'double precision': {'datatype': 'double', 'arraysize': False},
+        'double precision[]': {'datatype': 'double', 'arraysize': True},
         'spoint': {'datatype': 'char', 'arraysize': True},
         '_int2': {'datatype': 'short', 'arraysize': '*'},
         '_int4': {'datatype': 'int', 'arraysize': '*'},
@@ -31,15 +37,22 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
 
     COLUMNTYPES = {
         'char': 'text',
+        'char[]': 'text',
         'unicodeChar': 'text',
+        'boolean[]': 'boolean[]',
         'boolean': 'boolean',
         'bit': 'boolean',
         # 'unsignedByte': ???, not supported by Postgres... could be solved with pguint extension
         'short': 'smallint',
+        'short[]': 'smallint[]',
         'int': 'integer',
+        'int[]': 'integer[]',
         'long': 'bigint',
+        'long[]': 'bigint[]',
         'float': 'real',
+        'float[]': 'real[]',
         'double': 'double precision',
+        'double[]': 'double precision[]',
         #'floatComplex': ???, not supported by Postgres
         #'doubleComplex': ???, not supported by Postgres
         'spoint': 'spoint',
@@ -58,7 +71,30 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
     def escape_string(self, string):
         return f"'{string}'"
 
-    def build_query(self, schema_name, table_name, query, timeout, max_records):
+    def fetchall_sync(self, sql):
+        cursor = self.connection().cursor()
+        cursor.execute(sql)
+
+        while cursor.description is None and cursor.nextset():
+            pass
+
+        database_columns = cursor.description
+
+        columns = self._fetch_column_types(database_columns)
+
+        def fetch_rows():
+            try:
+                while True:
+                    rows = cursor.fetchmany(1000)
+                    if not rows:
+                        break
+                    yield from rows
+            finally:
+                cursor.close()
+
+        return columns, fetch_rows
+
+    def build_query(self, schema_name, table_name, query, timeout, max_records=None): # max_records DEPRECATED (ignored)
         # max_records is now handled by the method trim_table_rows
         actual_query = (
             f'SET SESSION statement_timeout TO {int(timeout * 1000)};'
@@ -74,24 +110,9 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
 
         return actual_query
 
-    def build_sync_query(self, query, timeout, max_records):
-        # WARNING: This method is currently not used. The sync query is build
-        # using the 'build_query' method.
-        params = {
-            'query': query,
-            'timeout': int(timeout * 1000),
-            'max_records': max_records,
-        }
-
-        if max_records is not None:
-            return (
-                'SET SESSION statement_timeout TO {timeout};'
-                + 'COMMIT; {query} LIMIT {max_records};'.format(**params)
-            )
-        else:
-            return 'SET SESSION statement_timeout TO {timeout};' + 'COMMIT; %(query);'.format(
-                **params
-            )
+    def build_sync_query(self, query, timeout, max_records=None): # max_records DEPRECATED (ignored)
+        # max_records is now handled in the generator
+        return f'SET SESSION statement_timeout TO {int(timeout * 1000)}; COMMIT; {query};'
 
     def abort_query(self, pid: int):
         sql = f'SELECT pg_cancel_backend({pid})'
@@ -99,13 +120,25 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
 
     def fetch_size(self, schema_name, table_name):
         sql = (
-            'SELECT pg_total_relation_size('
-            + f"'{self.escape_identifier(schema_name)}.{self.escape_identifier(table_name)}')"
+            'SELECT pg_table_size('
+                + f"'{self.escape_identifier(schema_name)}.{self.escape_identifier(table_name)}'::regclass)"
         )
         size = self.fetchone(sql)[0]
 
-        logger.debug('size = %d', size)
+        logger.debug('table size = %d', size)
         return size
+
+    def fetch_size_user_table(self, schema_name, table_name):
+        if not self.table_exists(schema_name, table_name):
+            return 0
+        user_table = f'{self.escape_identifier(schema_name)}.{self.escape_identifier(table_name)}'
+        sql = f'SELECT sum(pg_column_size(t)) from {user_table} as t;'
+        size = self.fetchone(sql)[0]
+
+        logger.debug('user table size = %d', size)
+
+        return size
+
 
     def fetch_nrows(self, schema_name, table_name):
         # fetch the size of the table using pg_total_relation_size
@@ -273,6 +306,38 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         logger.debug('sql = "%s"', sql)
         return [column[0] for column in self.fetchall(sql)]
 
+    def _fetch_column_types(self, database_columns):
+
+        type_oids = {col.type_code for col in database_columns}
+
+        sql = f"""
+        SELECT oid, typname, format_type(oid, NULL)
+        FROM pg_type
+        WHERE oid IN ({",".join(str(oid) for oid in type_oids)})
+        """
+
+        logger.debug('sql = "%s"', sql)
+        try:
+            type_map = {oid: (typname, data_type) for oid, typname, data_type in self.fetchall(sql)}
+        except ProgrammingError as e:
+            logger.error('Could not fetch (%s)', e)
+            return []
+        else:
+            if type_map is None:
+                logger.info(
+                    'Could not fetch the columns. Check if the schema exists.'
+                )
+                return []
+            else:
+                columns = []
+                append = columns.append
+
+                for i, col in enumerate(database_columns, start=1):
+                    udt_name, data_type = type_map[col.type_code]
+                    append(self._parse_column((col.name, data_type, udt_name, None, i)))
+
+                return columns
+
     def create_table(self, schema_name, table_name, columns):
         for column in columns:
             if self.COLUMNTYPES.get(column['datatype']) is None:
@@ -315,18 +380,23 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         logger.debug('sql = "%s"', sql)
         self.execute(sql)
 
-    def trim_table_rows(self, schema_name, table_name, max_records):
+    def trim_table_rows(self, schema_name, table_name, max_records) -> int:
+        """Trims the table to the max_records and returns the number of deteted rows."""
         if not self.table_exists(schema_name, table_name):
-            return
+            return 0
 
-        query = (
-            'DELETE FROM '
-            + f'{self.escape_identifier(schema_name)}.{self.escape_identifier(table_name)} '
-            + 'WHERE ctid NOT IN (SELECT ctid FROM '
-            + f'{self.escape_identifier(schema_name)}.{self.escape_identifier(table_name)} '
-            + f'LIMIT {max_records} );'
-        )
-        self.execute(query)
+        user_table = f'{self.escape_identifier(schema_name)}.{self.escape_identifier(table_name)}'
+        query = f"""DELETE FROM {user_table} as t
+        USING (
+            SELECT ctid
+            FROM {user_table}
+            ORDER BY ctid
+            OFFSET %s
+        ) as d
+        WHERE t.ctid = d.ctid;
+        """
+        cursor = self.execute(query, args=[max_records,])
+        return cursor.rowcount
 
     def table_exists(self, schema_name, table_name):
         check_query = (

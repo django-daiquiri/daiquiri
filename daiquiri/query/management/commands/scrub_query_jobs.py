@@ -7,6 +7,8 @@ from daiquiri.query.models import QueryJob
 
 class Command(BaseCommand):
 
+    help = "Finds completed query jobs without associated database tables, optionally limited to a user, and archives them when --archive is used."
+
     def add_arguments(self, parser):
         parser.add_argument('--user', help='Only scrub jobs for this user.')
         parser.add_argument('--archive', action='store_true', help='Archive stale jobs.')

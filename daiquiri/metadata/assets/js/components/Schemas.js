@@ -55,7 +55,7 @@ const Schemas = ({ schemas, activeItem, setActiveItem, getTooltip, onDoubleClick
           refListColumns.current.scrollTop = 0
         }
 
-      } else if (activeItem.type == 'table') {
+      } else if (activeItem.type == 'table' || activeItem.type == 'view') {
         if (!isNil(activeItem.schema)) {
           // this is a newly created table, search for the schema and table
           const [schema, table] = schemas.reduce((result, schema) => {

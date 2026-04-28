@@ -1,0 +1,23 @@
+{% load static %}<!DOCTYPE html>
+<html>
+
+{% block htmlargs %}version="XHTML+RDFa 1.1" xmlns="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"{% endblock %}
+
+{% block bodyargs %}vocab="ivo://ivoa.net/std/DALI-examples"{% endblock %}
+
+<head>
+
+
+{% include 'core/base_head.html' %}
+
+</head>
+
+<body>
+
+<div class="content">
+  {% include 'tap/examples-list.html' %}
+</div>
+
+</body>
+
+</html>

@@ -33,7 +33,7 @@ status_map = {
     'reject': {
         'admin': 200, 'manager': 200, 'user': 403, 'anonymous': 403
     },
-    'activate': {
+    'approve': {
         'admin': 200, 'manager': 200, 'user': 403, 'anonymous': 403
     },
     'disable': {
@@ -49,7 +49,7 @@ urlnames = {
     'detail': 'auth:profile-detail',
     'confirm': 'auth:profile-confirm',
     'reject': 'auth:profile-reject',
-    'activate': 'auth:profile-activate',
+    'approve': 'auth:profile-approve',
     'enable': 'auth:profile-enable',
     'disable': 'auth:profile-disable'
 }
@@ -173,7 +173,7 @@ def test_reject(db, client, username, password, pk):
 
 @pytest.mark.parametrize(('username', 'password'), users)
 @pytest.mark.parametrize('pk', instances)
-def test_activate(db, client, username, password, pk):
+def test_approve(db, client, username, password, pk):
     client.login(username=username, password=password)
 
     instance = Profile.objects.get(pk=pk)
@@ -182,9 +182,9 @@ def test_activate(db, client, username, password, pk):
     instance.user.save()
     instance.save()
 
-    url = reverse(urlnames['activate'], args=[pk])
+    url = reverse(urlnames['approve'], args=[pk])
     response = client.put(url)
-    assert response.status_code == status_map['activate'][username], response.json()
+    assert response.status_code == status_map['approve'][username], response.json()
 
     instance.refresh_from_db()
     assert instance.is_pending is not (response.status_code == 200)
