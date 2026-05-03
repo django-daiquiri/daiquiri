@@ -79,7 +79,8 @@ class Job(models.Model):
 
     def save(self, *args, **kwargs):
         if self.pk is None:
-            self.phase = self.PHASE_PENDING
+            if self.phase != self.PHASE_ERROR:
+                self.phase = self.PHASE_PENDING
             self.creation_time = now()
 
         return super().save(*args, **kwargs)
