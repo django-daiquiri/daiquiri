@@ -687,7 +687,7 @@ def test_post_job_phase_abort(db, client, username, password, pk):
         assert response.status_code == 303
         assert response.url == redirect_url
 
-        if job_phase in ['QUEUED', 'EXECUTING']:
+        if job_phase in ['QUEUED', 'EXECUTING', 'PENDING']:
             assert job.phase == 'ABORTED'
         else:
             assert job.phase == job_phase
