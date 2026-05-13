@@ -26,8 +26,8 @@ export const useCreateMetadataMutation = () => {
       variables.setActiveItem({ type: variables.values.type, ...data })
       variables.modal.hide()
     },
-    onError: (error) => {
-      console.log(error)
+    onError: (error, variables) => {
+      variables.setErrors(error.errors)
     }
   })
 }
@@ -60,8 +60,8 @@ export const useUpdateMetadataMutation = () => {
       clearTimeout(variables.success)
       variables.setSuccess(setTimeout(() => variables.setSuccess(null), 1000))
     },
-    onError: (error) => {
-      console.log(error)
+    onError: (error, variables) => {
+      variables.setErrors(error.errors)
     }
   })
 }
@@ -81,8 +81,8 @@ export const useDiscoverMetadataMutation = () => {
     onSuccess: (data, variables) => {
       variables.setValues({ type: variables.values.type, ...data })
     },
-    onError: (error) => {
-      console.log(error)
+    onError: (error, variables) => {
+      variables.setErrors(error.errors)
     }
   })
 }

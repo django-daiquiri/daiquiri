@@ -132,8 +132,15 @@ def update_column(column):
             tap_column = TapColumn.objects.create(pk=column.id, table=tap_table)
 
         tap_column.table_name = str(column.table)
-        tap_column.column_name = column.name
-        tap_column.datatype = column.datatype
+        if column.name in settings.RESERVED_COLNAMES:
+            tap_column.column_name = f'"{column.name}"'
+        else:
+            tap_column.column_name = column.name
+        if column.datatype.endswith('[]'):
+            dt = column.datatype.replace('[]', '')
+            tap_column.datatype = dt
+        else:
+            tap_column.datatype = column.datatype
         tap_column.arraysize = column.arraysize
         tap_column.size = column.arraysize
         if column.description:

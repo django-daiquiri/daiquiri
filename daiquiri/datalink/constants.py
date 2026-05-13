@@ -8,6 +8,17 @@ DATALINK_TABLE = {
 }
 DATALINK_FIELDS = [
     {
+        'name': 'datalink_id',
+        'order': 0,
+        'description': 'Internal datalink identifier',
+        'ucd': 'meta.id;meta.main',
+        'datatype': 'int',
+        'arraysize': None,
+        'std': True,
+        'access_level': 'PUBLIC',
+        'metadata_access_level': 'PUBLIC'
+    },
+    {
         'name': 'ID',
         'order': 1,
         'description': 'Input identifier.',

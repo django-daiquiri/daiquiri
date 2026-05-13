@@ -66,6 +66,7 @@ class Schema(models.Model):
     )
     published = models.DateField(
         null=True, blank=True,
+        auto_now_add=True,
         verbose_name=_('Published'),
     )
     updated = models.DateField(
@@ -195,6 +196,7 @@ class Table(models.Model):
     )
     published = models.DateField(
         null=True, blank=True,
+        auto_now_add=True,
         verbose_name=_('Published'),
     )
     updated = models.DateField(

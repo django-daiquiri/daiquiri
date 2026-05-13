@@ -4,6 +4,15 @@ ASYNC = env.get_bool('ASYNC')
 
 QUEUES = [{'key': 'default', 'concurrency': 1}, {'key': 'download', 'concurrency': 1}]
 
+
+# If the reserved word is used as column name, then it will be put
+# in double quotes in TAP and OAI metadata
+RESERVED_COLNAMES = {
+    'size',
+    'primary',
+}
+
+
 IPV4_PRIVACY_MASK = 16
 IPV6_PRIVACY_MASK = 32
 

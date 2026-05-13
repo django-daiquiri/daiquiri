@@ -1,5 +1,7 @@
 import pytest
 
+import uuid
+
 from django.urls import reverse
 
 from daiquiri.metadata.models import Table
@@ -63,7 +65,11 @@ def test_create(db, client, username, password):
     client.login(username=username, password=password)
     url = reverse(urlnames['list'])
 
-    response = client.post(url, {'table': 3, 'name': 'test', 'discover': True})
+    response = client.post(url, {
+        'table': 3,
+        'name': f'test_{username}_{uuid.uuid4().hex[:6]}',
+        'discover': True
+    })
     assert response.status_code == status_map['create'][username], response.json()
 
 

@@ -52,7 +52,7 @@ def get_capabilities():
                 }
             },
             'languages': [{
-                'name': language['key'],
+                'name': language['label'],
                 'version': language['version'],
                 'description': language['description'],
             } for language in settings.QUERY_LANGUAGES],
@@ -63,6 +63,7 @@ def get_capabilities():
             'upload_methods': [
                 'ivo://ivoa.net/std/TAPRegExt#upload-inline',
                 'ivo://ivoa.net/std/TAPRegExt#upload-https',
+                'ivo://ivoa.net/std/TAPRegExt#upload-http',
             ] if settings.TAP_UPLOAD else [],
             'upload_limit': int(get_quota(None, quota_settings='QUERY_UPLOAD_LIMIT')),
             'output_limit': int(get_max_records(None))

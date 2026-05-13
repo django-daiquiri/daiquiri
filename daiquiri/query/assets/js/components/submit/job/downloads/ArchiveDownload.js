@@ -4,8 +4,12 @@ import { isEmpty } from 'lodash'
 
 import { bytes2human } from 'daiquiri/core/assets/js/utils/bytes'
 import { isRefColumn, isImageColumn, isNoteColumn, isFileColumn} from 'daiquiri/core/assets/js/utils/table'
+import { useJobQuery, useStatusQuery } from 'daiquiri/query/assets/js/hooks/queries'
 
 const ArchiveDownload = ({ jobId, columns, downloadJobs, onSubmit }) => {
+
+  const { data: queryJob } = useJobQuery(jobId)
+  const { data: queryStatus } = useStatusQuery()
 
   const isArchiveColumn = (column) => isRefColumn(column) && (
     isImageColumn(column) || isNoteColumn(column) || isFileColumn(column)
@@ -16,6 +20,31 @@ const ArchiveDownload = ({ jobId, columns, downloadJobs, onSubmit }) => {
   const handleDownload = (downloadJob) => {
     const url = `/query/api/jobs/${jobId}/download/archive/${downloadJob.id}/?download=true`
     window.location.href = url
+  }
+
+  const renderErrorMaxNrows = () => {
+
+    const columnNames = archiveColumns
+      .map(column => `"${column.name}"`)
+      .join(', ')
+
+    if (queryJob.nrows > queryStatus.archive_max_nrows) {
+      return (
+      <li className="list-group-item">
+        <p className="text-danger mb-0">
+          <i className="bi bi-exclamation-circle"></i>&nbsp;
+          {interpolate(
+            gettext('ZIP archive download is unavailable because the query result contains more than %s rows.'),
+            [queryStatus.archive_max_nrows]
+          )}
+          {interpolate(
+            gettext('Downloadable files were detected in these columns: %s.'),
+            [columnNames]
+          )}
+        </p>
+      </li>
+      )
+    }
   }
 
   const getDownloadJobInfo = (downloadJob, column) => {
@@ -102,6 +131,7 @@ const ArchiveDownload = ({ jobId, columns, downloadJobs, onSubmit }) => {
       </div>
       <ul className="list-group list-group-flush">
       {
+        (queryJob.nrows > queryStatus.archive_max_nrows) ? renderErrorMaxNrows() :
         archiveColumns.map((column, columnIndex) => {
           const downloadJob = downloadJobs?.filter((job) => job.key == 'archive')
                                            .find((job) => job.column_name == column.name)

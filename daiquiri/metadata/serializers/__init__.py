@@ -2,8 +2,10 @@ from django.conf import settings
 from django.contrib.auth.models import Group
 
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
 
 from daiquiri.core.serializers import JSONListField
+from daiquiri.core.validators import DatabaseObjectNameValidator
 
 from ..models import Column, Function, Schema, Table
 from .validators import PersonListValidator
@@ -19,6 +21,9 @@ class GroupSerializer(serializers.ModelSerializer):
 class FunctionSerializer(serializers.ModelSerializer):
 
     label = serializers.CharField(source='__str__', read_only=True)
+
+    name = serializers.CharField(validators=[DatabaseObjectNameValidator(),
+        UniqueValidator(queryset=Function.objects.all(), lookup='iexact')])
     admin_url = serializers.CharField(read_only=True)
 
     class Meta:
@@ -29,6 +34,8 @@ class FunctionSerializer(serializers.ModelSerializer):
 class ColumnSerializer(serializers.ModelSerializer):
 
     label = serializers.CharField(source='__str__', read_only=True)
+
+    name = serializers.CharField(validators=[DatabaseObjectNameValidator()])
     width = serializers.IntegerField(source='get_width', read_only=True)
     admin_url = serializers.CharField(read_only=True)
 
@@ -59,11 +66,27 @@ class ColumnSerializer(serializers.ModelSerializer):
                 'width',
             )
 
+    def validate(self, data):
+        table = data.get('table')
+        name = data.get('name')
+
+        qs = Column.objects.filter(table=table, name__iexact=name)
+
+        if self.instance:
+            qs = qs.exclude(pk=self.instance.pk)
+
+        if qs.exists():
+            raise serializers.ValidationError({
+                'name': 'This column already exists in this table.'
+            })
+
+        return data
 
 class TableSerializer(serializers.ModelSerializer):
 
     label = serializers.CharField(source='__str__', read_only=True)
 
+    name = serializers.CharField(validators=[DatabaseObjectNameValidator()])
     related_identifiers = JSONListField(required=False)
     creators = JSONListField(required=False, validators=[PersonListValidator()])
     contributors = JSONListField(required=False, validators=[PersonListValidator()])
@@ -74,11 +97,28 @@ class TableSerializer(serializers.ModelSerializer):
         model = Table
         fields = '__all__'
 
+    def validate(self, data):
+        schema = data.get('schema')
+        name = data.get('name')
+
+        qs = Table.objects.filter(schema=schema, name__iexact=name)
+
+        if self.instance:
+            qs = qs.exclude(pk=self.instance.pk)
+
+        if qs.exists():
+            raise serializers.ValidationError({
+                'name': 'This table already exists in this schema.'
+            })
+
+        return data
 
 class SchemaSerializer(serializers.ModelSerializer):
 
     label = serializers.CharField(source='__str__', read_only=True)
 
+    name = serializers.CharField(validators=[DatabaseObjectNameValidator(),
+        UniqueValidator(queryset=Schema.objects.all(), lookup='iexact')])
     related_identifiers = JSONListField(required=False)
     creators = JSONListField(required=False, validators=[PersonListValidator()])
     contributors = JSONListField(required=False, validators=[PersonListValidator()])

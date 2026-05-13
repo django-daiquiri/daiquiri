@@ -31,7 +31,7 @@ class OaiView(APIView):
         verb, arguments = self.get_verb_and_arguments(query_dict)
 
         if verb is None:
-            self.errors.append(('badArgument', 'OAI verb missing'))
+            self.errors.append(('badVerb', 'OAI verb missing'))
         elif verb == 'GetRecord':
             self.get_record(arguments)
         elif verb == 'Identify':
@@ -239,9 +239,9 @@ class OaiView(APIView):
     def validate_date(self, key, arguments):
         if key in arguments:
             try:
-                return datetime.strptime(arguments[key], '%Y-%m-%dT%H:%M:%SZ').date()
+                return datetime.strptime(arguments[key], '%Y-%m-%d').date()
             except ValueError:
-                self.errors.append(('badArgument', f'Argument \'{key}\' does not match format YYYY-MM-DDThh:mm:ssZ'))
+                self.errors.append(('badArgument', f'Argument \'{key}\' does not match format YYYY-MM-DD'))
         else:
             return None
 

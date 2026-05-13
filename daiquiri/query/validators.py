@@ -1,45 +1,42 @@
-import re
-
 from django.core.validators import URLValidator
 from django.utils.translation import gettext_lazy as _
 
 from rest_framework.exceptions import ValidationError
 
 from daiquiri.core.utils import bytes2human
+from daiquiri.core.validators import DatabaseObjectNameValidator
 
 from .models import QueryJob
 from .utils import get_quota
 
 
-class TableNameValidator:
+class TableNameValidator(DatabaseObjectNameValidator):
 
     requires_context = True
 
     message = _('A job with this table name already exists.')
-    message_allowed_chars = _(
-        'Please only use letters, numbers, hyphens or underscores.'
-    )
 
     def __call__(self, table_name, serializer_field):
+        super().__call__(table_name, serializer_field)
+
         request = serializer_field.parent.context['request']
         user = None if request.user.is_anonymous else request.user
 
         if serializer_field.parent.instance:
-            current_table_name = serializer_field.parent.instance.table_name
+            current_table_name = getattr(serializer_field.parent.instance, 'table_name', None)
         else:
             current_table_name = None
 
-        if bool(re.search(r'^[0-9a-zA-Z_\-]+$', table_name)) is False:
-            raise ValidationError([self.message_allowed_chars])
         if table_name:
             if current_table_name and table_name == current_table_name:
                 pass
             else:
-                try:
-                    QueryJob.objects.filter(owner=user).exclude(phase=QueryJob.PHASE_ARCHIVED).get(table_name=table_name)
-                    raise ValidationError([self.message])
-                except QueryJob.DoesNotExist:
-                    pass
+                if serializer_field.field_name == 'table_name':
+                    try:
+                        QueryJob.objects.filter(owner=user).exclude(phase=QueryJob.PHASE_ARCHIVED).get(table_name=table_name)
+                        raise ValidationError([self.message])
+                    except QueryJob.DoesNotExist:
+                        pass
 
 
 class UploadFileValidator:

@@ -1,7 +1,11 @@
-from django.http import FileResponse, HttpResponse
+from django.http import FileResponse, Http404, HttpResponse
 
 from rest_framework import viewsets
-from rest_framework.authentication import BasicAuthentication, SessionAuthentication, TokenAuthentication
+from rest_framework.authentication import (
+    BasicAuthentication,
+    SessionAuthentication,
+    TokenAuthentication,
+)
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.parsers import FormParser, MultiPartParser
@@ -123,6 +127,7 @@ class AsyncJobViewSet(JobViewSet):
 
         return get_job_url(self.request, kwargs=kwargs)
 
+
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         serializer = JobListSerializer(queryset, many=True)
@@ -151,7 +156,6 @@ class AsyncJobViewSet(JobViewSet):
             owner=(None if self.request.user.is_anonymous else self.request.user),
             response_format=serializer.validated_data.get('RESPONSEFORMAT'),
             max_records=max_records,
-            # uploads=handle_uploads(request, serializer.validated_data.get('UPLOAD'), self.get_upload_directory()),
             run_id=serializer.validated_data.get('RUNID'),
             client_ip=get_client_ip(self.request)
         )
@@ -185,7 +189,7 @@ class AsyncJobViewSet(JobViewSet):
 
         if 'ACTION' in serializer.data:
             if serializer.data['ACTION'] == 'DELETE':
-                return self.destroy(self, request)
+                return self.destroy(request, *args, **kwargs)
             else:
                 raise ValidationError({
                     'PHASE': 'Unsupported value.'
@@ -222,12 +226,29 @@ class AsyncJobViewSet(JobViewSet):
                 'result': 'Unsupported value.'
             })
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=['get', 'post'])
     def parameters(self, request, pk):
-        rendered_data = UWSRenderer().render({
-            'parameters': self.get_object().parameters
-        }, renderer_context=self.get_renderer_context())
-        return HttpResponse(rendered_data, content_type=get_content_type(request, UWSRenderer))
+        job = self.get_object()
+
+        if request.method == 'GET':
+            rendered_data = UWSRenderer().render({
+                'parameters': job.parameters
+            }, renderer_context=self.get_renderer_context())
+            return HttpResponse(rendered_data, content_type=get_content_type(request, UWSRenderer))
+
+        if job.phase != 'PENDING':
+            raise ValidationError({
+                'PHASE': 'Parameters can only be modified in PENDING phase.'
+            })
+
+        serializer = JobUpdateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        for key, value in serializer.validated_data.items():
+            job.parameters[key] = value
+        job.save()
+
+        return HttpResponseSeeOther(self.get_success_url())
 
     @action(detail=True, methods=['get', 'post'])
     def destruction(self, request, pk):
@@ -240,9 +261,9 @@ class AsyncJobViewSet(JobViewSet):
                     'DESTRUCTION': job.destruction_time
                 })
 
-                return HttpResponse(serializer.data['DESTRUCTION'])
+                return HttpResponse(serializer.data['DESTRUCTION'], content_type="text/plain")
             else:
-                return HttpResponse()
+                return HttpResponse(content_type="text/plain")
         else:
             serializer = JobUpdateSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
@@ -261,7 +282,7 @@ class AsyncJobViewSet(JobViewSet):
         job = self.get_object()
 
         if request.method == 'GET':
-            return HttpResponse(job.execution_duration)
+            return HttpResponse(job.execution_duration,content_type="text/plain")
         else:
             serializer = JobUpdateSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
@@ -280,7 +301,7 @@ class AsyncJobViewSet(JobViewSet):
         job = self.get_object()
 
         if request.method == 'GET':
-            return HttpResponse(job.phase)
+            return HttpResponse(job.phase, content_type="text/plain")
         else:
             serializer = JobUpdateSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
@@ -317,7 +338,7 @@ class AsyncJobViewSet(JobViewSet):
     @action(detail=True, methods=['get'])
     def quote(self, request, pk):
         job = self.get_object()
-        return HttpResponse(job.quote) if job.quote else HttpResponse()
+        return HttpResponse(job.quote, content_type="text/plain") if job.quote else HttpResponse(content_type="text/plain")
 
     @action(detail=True, methods=['get'])
     def owner(self, request, pk):
