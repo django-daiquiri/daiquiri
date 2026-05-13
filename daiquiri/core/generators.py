@@ -5,6 +5,7 @@ import struct
 from datetime import datetime, timezone
 from xml.sax.saxutils import escape, quoteattr
 
+from django.conf import settings
 from django.contrib.sites.models import Site
 
 import pandas as pd
@@ -70,6 +71,11 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
         yield f"""
         <LINK title={quoteattr(title)} content-role={quoteattr(content_role)} href={quoteattr(href)}/>"""  # noqa: E501
 
+    for key, value in infos:
+        if value is not None:
+            yield f"""
+        <INFO name={quoteattr(key)} value={quoteattr(value)} />"""
+
     if table is not None:
         yield f'''
         <TABLE name="{table}">'''
@@ -89,6 +95,9 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
                     .replace('<', '&lt;')
                     .replace('>', '&gt;')
                 )
+                if value in settings.RESERVED_COLNAMES:
+                    value = f'&quot;{value}&quot;'
+
                 attrs.append(f'{key}="{value}"')
 
         if field.get('ucd'):
@@ -167,15 +176,14 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
         yield """
                 </TABLEDATA>
             </DATA>"""
+
     yield """
         </TABLE>"""
 
-    for key, value in infos:
-        if value is not None:
-            if key == 'QUERY_STATUS' and overflow:
-                value = 'OVERFLOW'
-            yield f"""
-            <INFO name={quoteattr(key)} value={quoteattr(value)} />"""
+    if overflow:
+        yield f"""
+        <INFO name={quoteattr('QUERY_STATUS')} value={quoteattr('OVERFLOW')} />"""
+
     yield """
     </RESOURCE>"""
 

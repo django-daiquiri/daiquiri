@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from daiquiri.core.renderers import XMLRenderer
 from daiquiri.core.utils import get_doi_url
 
@@ -151,7 +153,11 @@ class TablesetRendererMixin:
 
                 for column in table['columns']:
                     self.start('column', {'std': 'true'} if column['std'] else {})
-                    self.node('name', {}, column['name'])
+                    column_name = column['name']
+                    if column_name in settings.RESERVED_COLNAMES:
+                        self.node('name', {}, f'"{column_name}"')
+                    else:
+                        self.node('name', {}, column_name)
                     self.node('description', {}, column.get('description') or '')
                     self.node('unit', {}, column.get('unit') or '')
                     self.node('ucd', {}, column.get('ucd') or '')
@@ -169,7 +175,11 @@ class TablesetRendererMixin:
 
     def render_datatype(self, datatype):
         if datatype in ['boolean', 'bit', 'unsignedByte', 'short', 'int', 'long', 'char', 'unicodeChar',
-                        'float', 'double', 'floatComplex', 'doubleComplex']:
+                        'float', 'double', 'floatComplex', 'doubleComplex', 'float[]', 'double[]']:
+            if datatype == 'float[]':
+                datatype = 'floatComplex'
+            elif datatype == 'double[]':
+                datatype = 'doubleComplex'
             self.node('dataType', {'xsi:type': 'vs:VOTableType'}, datatype)
         elif datatype == 'timestamp':
             self.node('dataType', {'xsi:type': 'vs:VOTableType', 'extendedType': 'timestamp'}, 'char')
