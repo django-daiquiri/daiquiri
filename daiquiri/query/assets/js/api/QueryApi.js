@@ -92,6 +92,10 @@ class QueryApi extends BaseApi {
     return this.get('/query/api/examples/user/')
   }
 
+  static fetchQueryExamples() {
+    return this.get('/query/api/examples/')
+  }
+
   static fetchQueues() {
     return this.get('/query/api/queues/')
   }
