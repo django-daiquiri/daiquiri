@@ -1,3 +1,5 @@
+import markdown
+
 from django.template.loader import TemplateDoesNotExist, get_template
 from django.conf import settings
 
@@ -263,6 +265,7 @@ class QueryDownloadFormatSerializer(serializers.Serializer):
 
 
 class ExampleSerializer(serializers.ModelSerializer):
+    highlighted_query = serializers.SerializerMethodField()
 
     class Meta:
         model = Example
@@ -274,8 +277,15 @@ class ExampleSerializer(serializers.ModelSerializer):
             'query_language',
             'query_string',
             'access_level',
-            'groups'
+            'groups',
+            'highlighted_query'
         )
+    def get_highlighted_query(self, obj):
+        # Convert raw SQL string into markdown formatted code block
+        markdown_text = f"```sql\n{obj.query_string}\n```"
+        
+        # Run it through markdown with codehilite enabled to get syntax highlighting
+        return markdown.markdown(markdown_text, extensions=['codehilite', 'fenced_code'])
 
 
 class UserExampleSerializer(serializers.ModelSerializer):

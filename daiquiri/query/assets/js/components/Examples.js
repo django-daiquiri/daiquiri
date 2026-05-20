@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useQueryExamplesQuery } from 'daiquiri/query/assets/js/hooks/queries'
 
-const CodeBlock = ({ queryString }) => {
+const CodeBlock = ({ queryString, highlightedQuery }) => {
   const [copied, setCopied] = useState(false)
 
   const triggerSuccess = () => {
@@ -40,6 +40,18 @@ const CodeBlock = ({ queryString }) => {
 
   return (
     <div className="position-relative border rounded my-2" style={{ backgroundColor: '#f8f9fa' }}>
+      <style>{`
+        .daiquiri-codehilite-wrapper .codehilite,
+        .daiquiri-codehilite-wrapper pre,
+        .daiquiri-codehilite-wrapper code {
+          background: transparent !important;
+          border: none !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          box-shadow: none !important;
+        }
+      `}</style>
+
       <div className="position-absolute" style={{ top: 8, right: 8, zIndex: 10 }}>
         <button
           aria-label="Copy query"
@@ -51,9 +63,18 @@ const CodeBlock = ({ queryString }) => {
         </button>
       </div>
 
-      <pre className="m-0 p-3">
-        <code>{queryString}</code>
-      </pre>
+      <div 
+        className="daiquiri-codehilite-wrapper p-3"
+        style={{ 
+          fontSize: '0.875rem',
+          overflowX: 'auto',
+          paddingRight: '45px',
+          fontFamily: 'SFMono-Regular, Consolas, "Liberation Mono", Menlo, Courier, monospace',
+          lineHeight: '1.5',
+          color: '#212529'
+        }}
+        dangerouslySetInnerHTML={{ __html: highlightedQuery }}
+      />
     </div>
   )
 }
@@ -88,7 +109,10 @@ const Examples = () => {
             {example.description}
           </div>
 
-          <CodeBlock queryString={example.query_string} />
+          <CodeBlock 
+            queryString={example.query_string} 
+            highlightedQuery={example.highlighted_query} 
+          />
         </div>
       ))}
     </div>
