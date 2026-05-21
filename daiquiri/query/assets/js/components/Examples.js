@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useQueryExamplesQuery } from 'daiquiri/query/assets/js/hooks/queries'
+import { useUserExamplesQuery } from 'daiquiri/query/assets/js/hooks/queries'
 
 const CodeBlock = ({ queryString, highlightedQuery }) => {
   const [copied, setCopied] = useState(false)
@@ -80,7 +80,7 @@ const CodeBlock = ({ queryString, highlightedQuery }) => {
 }
 
 const Examples = () => {
-  const { data, isLoading, error } = useQueryExamplesQuery()
+  const { data, isLoading, error } = useUserExamplesQuery()
 
   if (isLoading) {
     return <div className="text-muted">Loading examples...</div>
@@ -90,13 +90,18 @@ const Examples = () => {
     return <div className="alert alert-danger">Error loading examples</div>
   }
 
-  const rows = data?.results ?? []
+  const rows = data ?? []
 
   return (
-    <div>
-      <h1 className="mb-4">Query examples</h1>
+  <div>
+    <h1 className="mb-4">Query examples</h1>
 
-      {rows.map((example) => (
+    {rows.length === 0 ? (
+      <div className="text-muted">
+        No queries found in the database
+      </div>
+    ) : (
+      rows.map((example) => (
         <div key={example.id} className="border rounded p-3 mb-3">
           <div className="d-flex justify-content-between mb-2">
             <strong>{example.name}</strong>
@@ -114,9 +119,10 @@ const Examples = () => {
             highlightedQuery={example.highlighted_query} 
           />
         </div>
-      ))}
-    </div>
-  )
+      ))
+    )}
+  </div>
+)
 }
 
 export default Examples

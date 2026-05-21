@@ -165,13 +165,6 @@ export const useUserExamplesQuery = () => {
   })
 }
 
-export const useQueryExamplesQuery = () => {
-  return useQuery({
-    queryKey: ['examples'],
-    queryFn: () => QueryApi.fetchQueryExamples()
-  })
-}
-
 /*
 export const useDownloadJobQuery = (job, downloadKey, downloadJobId) => {
   return useQuery({

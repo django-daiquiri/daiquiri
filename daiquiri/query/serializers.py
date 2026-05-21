@@ -264,7 +264,7 @@ class QueryDownloadFormatSerializer(serializers.Serializer):
 
 
 
-class ExampleSerializer(serializers.ModelSerializer):
+class UserExampleSerializer(serializers.ModelSerializer):
     highlighted_query = serializers.SerializerMethodField()
 
     class Meta:
@@ -286,21 +286,6 @@ class ExampleSerializer(serializers.ModelSerializer):
         
         # Run it through markdown with codehilite enabled to get syntax highlighting
         return markdown.markdown(markdown_text, extensions=['codehilite', 'fenced_code'])
-
-
-class UserExampleSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Example
-        fields = (
-            'id',
-            'order',
-            'name',
-            'description',
-            'query_string',
-            'query_language',
-            'groups'
-        )
 
 
 class SyncQueryJobSerializer(SyncJobSerializer):

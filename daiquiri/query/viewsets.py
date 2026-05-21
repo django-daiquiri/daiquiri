@@ -41,7 +41,7 @@ from .serializers import (
     AsyncQueryJobSerializer,
     DownloadSerializer,
     DropdownSerializer,
-    ExampleSerializer,
+    UserExampleSerializer,
     FormDetailSerializer,
     FormListSerializer,
     QueryDownloadFormatSerializer,
@@ -54,7 +54,6 @@ from .serializers import (
     QueryJobUploadSerializer,
     QueryLanguageSerializer,
     SyncQueryJobSerializer,
-    UserExampleSerializer,
 )
 from .utils import (
     fetch_user_schema_metadata,
@@ -545,17 +544,18 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
 
 class ExampleViewSet(viewsets.ModelViewSet):
     permission_classes = (HasModelPermission,)
-    serializer_class = ExampleSerializer
+    serializer_class = UserExampleSerializer
     pagination_class = ListPagination
-    queryset = Example.objects.all()
 
     filter_backends = (filters.SearchFilter, filters.OrderingFilter)
     search_fields = ('name', 'description', 'query_string')
 
+    def get_queryset(self):
+        return Example.objects.filter_by_access_level(self.request.user)
+
     @action(detail=False, methods=['get'], permission_classes=(HasPermission,))
     def user(self, request):
-        examples = Example.objects.filter_by_access_level(self.request.user)
-        serializer = UserExampleSerializer(examples, many=True)
+        serializer = self.get_serializer(self.get_queryset(), many=True)
         return Response(serializer.data)
 
 
