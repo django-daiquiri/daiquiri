@@ -273,12 +273,10 @@ class ExampleSerializer(serializers.ModelSerializer):
             'description',
             'query_language',
             'query_string',
-            'access_level',
-            'groups'
+            'access_level'
         )
 
 class UserExampleSerializer(serializers.ModelSerializer):
-    highlighted_query = serializers.SerializerMethodField()
 
     class Meta:
         model = Example
@@ -288,17 +286,9 @@ class UserExampleSerializer(serializers.ModelSerializer):
             'name',
             'description',
             'query_language',
-            'query_string',
-            'access_level',
-            'groups',
-            'highlighted_query'
+            'query_string'
         )
-    def get_highlighted_query(self, obj):
-        # Convert raw SQL string into markdown formatted code block
-        markdown_text = f"```sql\n{obj.query_string}\n```"
-        
-        # Run it through markdown with codehilite enabled to get syntax highlighting
-        return markdown.markdown(markdown_text, extensions=['codehilite', 'fenced_code'])
+
 
 
 class SyncQueryJobSerializer(SyncJobSerializer):

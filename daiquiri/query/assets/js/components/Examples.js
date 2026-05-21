@@ -1,8 +1,11 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { useUserExamplesQuery } from 'daiquiri/query/assets/js/hooks/queries'
 
-const CodeBlock = ({ queryString, highlightedQuery }) => {
+import Sql from 'daiquiri/core/assets/js/components/form/Sql'
+
+const CodeBlock = ({ queryString }) => {
   const [copied, setCopied] = useState(false)
+  const dummyEditorRef = useRef()
 
   const triggerSuccess = () => {
     setCopied(true)
@@ -39,41 +42,30 @@ const CodeBlock = ({ queryString, highlightedQuery }) => {
   }
 
   return (
-    <div className="position-relative border rounded my-2" style={{ backgroundColor: '#f8f9fa' }}>
-      <style>{`
-        .daiquiri-codehilite-wrapper .codehilite,
-        .daiquiri-codehilite-wrapper pre,
-        .daiquiri-codehilite-wrapper code {
-          background: transparent !important;
-          border: none !important;
-          margin: 0 !important;
-          padding: 0 !important;
-          box-shadow: none !important;
-        }
-      `}</style>
-
-      <div className="position-absolute" style={{ top: 8, right: 8, zIndex: 10 }}>
+    <div className="position-relative code-scroll-container">
+      <div className="position-absolute top-0 end-0 p-2 z-3">
         <button
           aria-label="Copy query"
-          className="btn btn-link p-1"
+          className="btn btn-link p-1 text-muted btn-copy-overlay"
           onClick={handleCopy}
           type="button"
         >
-          <i className={`bi ${copied ? 'bi-check-lg' : 'bi-clipboard'}`} />
+          <i className={`bi ${copied ? 'bi-check-lg text-success' : 'bi-clipboard'}`} />
         </button>
       </div>
 
-      <div 
-        className="daiquiri-codehilite-wrapper p-3"
-        style={{ 
-          fontSize: '0.875rem',
-          overflowX: 'auto',
-          paddingRight: '45px',
-          fontFamily: 'SFMono-Regular, Consolas, "Liberation Mono", Menlo, Courier, monospace',
-          lineHeight: '1.5',
-          color: '#212529'
+      <Sql
+        value={queryString}
+        editorRef={dummyEditorRef}
+        height="auto"
+        editable={false}
+        readOnly={true}
+        basicSetup={{
+          lineNumbers: false,
+          foldGutter: false,
+          highlightActiveLine: false,
+          highlightActiveLineGutter: false,
         }}
-        dangerouslySetInnerHTML={{ __html: highlightedQuery }}
       />
     </div>
   )
@@ -93,36 +85,35 @@ const Examples = () => {
   const rows = data ?? []
 
   return (
-  <div>
-    <h1 className="mb-4">Query examples</h1>
+    <div>
+      <h1 className="mb-4">Query examples</h1>
 
-    {rows.length === 0 ? (
-      <div className="text-muted">
-        No queries found in the database
-      </div>
-    ) : (
-      rows.map((example) => (
-        <div key={example.id} className="border rounded p-3 mb-3">
-          <div className="d-flex justify-content-between mb-2">
-            <strong>{example.name}</strong>
-            <span className="badge badge-secondary text-dark text-uppercase">
-              {example.query_language}
-            </span>
-          </div>
-
-          <div className="text-muted mb-2">
-            {example.description}
-          </div>
-
-          <CodeBlock 
-            queryString={example.query_string} 
-            highlightedQuery={example.highlighted_query} 
-          />
+      {rows.length === 0 ? (
+        <div className="text-muted">
+          No examples found in the database
         </div>
-      ))
-    )}
-  </div>
-)
+      ) : (
+        rows.map((example) => (
+          <div key={example.id} className="border rounded p-3 mb-3">
+            <div className="d-flex justify-content-between mb-2">
+              <strong>{example.name}</strong>
+              <span className="badge badge-secondary text-dark text-uppercase">
+                {example.query_language}
+              </span>
+            </div>
+
+            <div className="text-muted mb-2">
+              {example.description}
+            </div>
+
+            <CodeBlock 
+              queryString={example.query_string} 
+            />
+          </div>
+        ))
+      )}
+    </div>
+  )
 }
 
 export default Examples
