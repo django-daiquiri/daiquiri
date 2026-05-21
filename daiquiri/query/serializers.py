@@ -262,7 +262,20 @@ class QueryDownloadFormatSerializer(serializers.Serializer):
     label = serializers.CharField()
     help = serializers.CharField()
 
+class ExampleSerializer(serializers.ModelSerializer):
 
+    class Meta:
+        model = Example
+        fields = (
+            'id',
+            'order',
+            'name',
+            'description',
+            'query_language',
+            'query_string',
+            'access_level',
+            'groups'
+        )
 
 class UserExampleSerializer(serializers.ModelSerializer):
     highlighted_query = serializers.SerializerMethodField()
