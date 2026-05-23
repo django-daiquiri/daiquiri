@@ -281,19 +281,11 @@ class QueryJob(Job):
             prepend = DownloadAdapter().get_prepend(columns)
 
             # We need a wrapper to actually prepend the file base url to the file paths.
+            # For async it's not required because it's handled by generate() while
+            # for sync we are using generate_votable() directly.
             def row_generator(prepend=None):
                 for row in fetch_rows():
-                    if prepend:
-                        yield [
-                            (
-                                prepend[i] + cell
-                                if (i in prepend and cell != 'NULL')
-                                else cell
-                            )
-                            for i, cell in enumerate(row)
-                        ]
-                    else:
-                        yield row
+                    yield from DownloadAdapter().prepend_row_values(row, prepend)
 
             yield from generate_votable(
                 row_generator(prepend),
