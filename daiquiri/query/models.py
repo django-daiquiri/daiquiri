@@ -274,11 +274,22 @@ class QueryJob(Job):
         job_sources = get_job_sources(self)
 
         try:
+            # Get the column metadata and a generator for the rows, this will execute the query
             database_columns, fetch_rows = adapter.fetchall_sync(self.actual_query)
+            columns = get_columns_metadata(self, database_columns)
+            # prepend gets the FILE_BASE_URL to prepend to the file paths accordong to the UCDs.
+            prepend = DownloadAdapter().get_prepend(columns)
+
+            # We need a wrapper to actually prepend the file base url to the file paths.
+            # For async it's not required because it's handled by generate() while
+            # for sync we are using generate_votable() directly.
+            def row_generator(prepend=None):
+                for row in fetch_rows():
+                    yield from DownloadAdapter().prepend_row_values(row, prepend)
 
             yield from generate_votable(
-                fetch_rows(),
-                get_columns_metadata(self, database_columns),
+                row_generator(prepend),
+                columns,
                 table=download_adapter.get_table_name(self.schema_name, self.table_name),
                 infos=download_adapter.get_infos(
                     'OK', self.query, self.query_language, job_sources
