@@ -2,7 +2,7 @@ import csv
 import logging
 import re
 import subprocess
-from pathlib import Path
+from urllib.parse import urljoin
 
 from django.apps import apps
 from django.conf import settings
@@ -157,7 +157,7 @@ class BaseDownloadAdapter:
                     or 'meta.image' in column_ucd
                 )
             ):
-                prepend[i] = Path(settings.FILES_BASE_URL)
+                prepend[i] = settings.FILES_BASE_URL
 
         return prepend
 
@@ -168,7 +168,11 @@ class BaseDownloadAdapter:
         """
         if prepend:
             yield [
-                (prepend[i] / Path(cell) if (i in prepend and cell not in ('NULL', None)) else cell)
+                (
+                    urljoin(prepend[i], cell)
+                    if (i in prepend and cell not in ('NULL', None))
+                    else cell
+                )
                 for i, cell in enumerate(row)
             ]
         else:
