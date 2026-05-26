@@ -28,3 +28,17 @@
         margin-bottom: 1rem;
     }
 }
+
+.code-scroll-container {
+    overflow-x: auto;
+    font-size: 0.875rem;
+    padding-right: 3rem;
+}
+
+.code-scroll-container .cm-gutters {
+    display: none !important;
+}
+
+.code-scroll-container .btn-copy-overlay:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+}

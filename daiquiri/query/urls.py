@@ -2,7 +2,7 @@ from django.urls import include, path, re_path
 
 from rest_framework import routers
 
-from .views import QueryView, examples
+from .views import QueryView
 from .viewsets import (
     DownloadViewSet,
     DropdownViewSet,
@@ -36,7 +36,6 @@ urlpatterns = [
 
     # query interface, needs to be last in list
     # the default path is required to cover a case with a single trailing slash
-    re_path(r'examples^$', examples, name='examples'),
     re_path(r'^$', QueryView.as_view(), name='default'),
     re_path(r'[A-Za-z0-9-]*/$', QueryView.as_view(), name='query'),
 ]

@@ -2,7 +2,7 @@ import csv
 import logging
 import re
 import subprocess
-from pathlib import Path
+from urllib.parse import urljoin
 
 from django.apps import apps
 from django.conf import settings
@@ -66,9 +66,7 @@ class BaseDownloadAdapter:
             elif format_key == 'fits':
                 # We have to get the maximum array lengths in case there are arrays in the data
                 schema_table_name = self.get_table_name(schema_name, table_name)
-                fits_arrayinfos = self.get_arraysizes_for_fits(
-                    columns, schema_name, table_name
-                )
+                fits_arrayinfos = self.get_arraysizes_for_fits(columns, schema_name, table_name)
 
                 return generate_fits(
                     self.generate_rows(prepend=prepend),
@@ -132,18 +130,7 @@ class BaseDownloadAdapter:
                     line = insert_result.group(1)
                     reader = csv.reader([line], quotechar="'", skipinitialspace=True)
                     row = next(reader)
-
-                    if prepend:
-                        yield [
-                            (
-                                prepend[i] + cell
-                                if (i in prepend and cell != 'NULL')
-                                else cell
-                            )
-                            for i, cell in enumerate(row)
-                        ]
-                    else:
-                        yield row
+                    yield from self.prepend_row_values(row, prepend)
 
         except subprocess.CalledProcessError as e:
             logger.error('Command PIPE returned non-zero exit status: %s', e)
@@ -152,6 +139,7 @@ class BaseDownloadAdapter:
             _ = process.wait()
 
     def get_prepend(self, columns):
+        """Returns a dict with prefixes to prepend FILES_BASE_URL to file references in the data"""
         if not settings.FILES_BASE_URL:
             return {}
 
@@ -172,6 +160,23 @@ class BaseDownloadAdapter:
                 prepend[i] = settings.FILES_BASE_URL
 
         return prepend
+
+    def prepend_row_values(self, row, prepend):
+        """Prepend values in rows according to the prepend dict.
+        Used to prepend settings.FILES_BASE_URL to file references in the data,
+        based on the column UCDs.
+        """
+        if prepend:
+            yield [
+                (
+                    urljoin(prepend[i], cell)
+                    if (i in prepend and cell not in ('NULL', None))
+                    else cell
+                )
+                for i, cell in enumerate(row)
+            ]
+        else:
+            yield row
 
     def get_table_name(self, schema_name, table_name):
         return f'{schema_name}.{table_name}'
@@ -214,7 +219,7 @@ class BaseDownloadAdapter:
                 db = DatabaseAdapter()
 
                 query = f"""
-                    SELECT MAX(array_length({column_name}, 1)) 
+                    SELECT MAX(array_length({column_name}, 1))
                     FROM "{schema_name}"."{table_name}"
                     WHERE {column_name} IS NOT NULL
                 """
