@@ -260,8 +260,6 @@ class QueryDownloadFormatSerializer(serializers.Serializer):
     label = serializers.CharField()
     help = serializers.CharField()
 
-
-
 class ExampleSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -273,10 +271,8 @@ class ExampleSerializer(serializers.ModelSerializer):
             'description',
             'query_language',
             'query_string',
-            'access_level',
-            'groups'
+            'access_level'
         )
-
 
 class UserExampleSerializer(serializers.ModelSerializer):
 
@@ -287,10 +283,10 @@ class UserExampleSerializer(serializers.ModelSerializer):
             'order',
             'name',
             'description',
-            'query_string',
             'query_language',
-            'groups'
+            'query_string'
         )
+
 
 
 class SyncQueryJobSerializer(SyncJobSerializer):

@@ -8,8 +8,16 @@ import FormUpload from './submit/forms/FormUpload'
 import Job from './submit/job/Job'
 import Jobs from './submit/Jobs'
 import Status from './submit/Status'
+import Examples from './Examples'
 
 const Submit = ({ formKey, jobId, query, queryLanguage, loadForm, loadJob, loadJobs }) => {
+  if (formKey === 'examples') {
+    return (
+      <div className="query-examples-container">
+        <Examples />
+      </div>
+    )
+  }
   const getForm = () => {
     switch (formKey) {
       case 'sql':

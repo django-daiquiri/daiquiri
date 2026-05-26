@@ -54,7 +54,7 @@ from .serializers import (
     QueryJobUploadSerializer,
     QueryLanguageSerializer,
     SyncQueryJobSerializer,
-    UserExampleSerializer,
+    UserExampleSerializer
 )
 from .utils import (
     fetch_user_schema_metadata,
