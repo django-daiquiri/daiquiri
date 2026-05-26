@@ -1,5 +1,3 @@
-import markdown
-
 from django.template.loader import TemplateDoesNotExist, get_template
 from django.conf import settings
 
