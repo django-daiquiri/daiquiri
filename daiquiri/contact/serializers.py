@@ -1,7 +1,5 @@
 from urllib.parse import quote
 
-from django.template.loader import render_to_string
-
 from rest_framework import serializers
 
 from .models import ContactMessage
@@ -28,12 +26,21 @@ class ContactMessageSerializer(serializers.ModelSerializer):
         )
 
     def get_mailto(self, obj):
-        subject = f"Re: {obj.subject}"
+        subject = f"Re: {obj.subject or ''}"
+
+        created = (
+            obj.created.strftime('%Y-%m-%d %H:%M')
+            if obj.created
+            else ''
+        )
+
+        author = obj.author or 'Unknown'
+        message = obj.message or ''
 
         body = (
             "\n\n"
-            f"On {obj.created.strftime('%Y-%m-%d %H:%M')} {obj.author} wrote:\n"
-            f"> {obj.message}"
+            f"On {created} {author} wrote:\n"
+            f"> {message}"
         )
 
         return (
