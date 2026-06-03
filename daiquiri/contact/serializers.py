@@ -1,3 +1,5 @@
+from urllib.parse import quote
+
 from django.template.loader import render_to_string
 
 from rest_framework import serializers
@@ -26,7 +28,16 @@ class ContactMessageSerializer(serializers.ModelSerializer):
         )
 
     def get_mailto(self, obj):
-        return render_to_string('contact/messages_mailto.html', {
-            'request': self.context.get('request'),
-            'message': obj
-        })
+        subject = f"Re: {obj.subject}"
+
+        body = (
+            "\n\n"
+            f"On {obj.created.strftime('%Y-%m-%d %H:%M')} {obj.author} wrote:\n"
+            f"> {obj.message}"
+        )
+
+        return (
+            f"mailto:{obj.email}"
+            f"?subject={quote(subject)}"
+            f"&body={quote(body)}"
+        )
