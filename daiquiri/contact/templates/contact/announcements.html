@@ -1,8 +1,24 @@
 {% if announcements %}
-    {% for msg in announcements %}
-    <div class="alert alert-{{ msg.announcement_type }}"
-        role="alert">
-        {{ msg.announcement | safe }}
+<div class="container">
+{% for msg in announcements %}
+    <div
+        class="alert alert-{{ msg.announcement_type }} position-relative m-0 py-2 rounded text-center"
+        role="alert"
+        data-announcement-id="{{ msg.id }}"
+    >
+        <div class="d-inline-flex align-items-center pe-5">
+            {{ msg.announcement | safe }}
+        </div>
+
+        <button
+            type="button"
+            class="btn-close close-announcement-btn position-absolute top-50 end-0 translate-middle-y me-3"
+            aria-label="Close"
+            data-announcement-id="{{ msg.id }}"
+        ></button>
     </div>
-    {% endfor %}
+{% endfor %}
+</div>
 {% endif %}
+
+<script src="/static/contact/js/announcements.js"></script>
