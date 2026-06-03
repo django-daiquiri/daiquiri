@@ -1,13 +1,14 @@
 {% if announcements %}
-<div class="container">
-{% for msg in announcements %}
+    {% for msg in announcements %}
     <div
-        class="alert alert-{{ msg.announcement_type }} position-relative m-0 py-2 rounded text-center"
+        class="alert alert-{{ msg.announcement_type }} rounded-0 position-relative m-0 py-2 text-center"
         role="alert"
         data-announcement-id="{{ msg.id }}"
     >
-        <div class="d-inline-flex align-items-center pe-5">
-            {{ msg.announcement | safe }}
+        <div class="container">
+            <div class="d-inline-flex align-items-center pe-5">
+                {{ msg.announcement | safe }}
+            </div>
         </div>
 
         <button
@@ -17,8 +18,7 @@
             data-announcement-id="{{ msg.id }}"
         ></button>
     </div>
-{% endfor %}
-</div>
+    {% endfor %}
 {% endif %}
 
 <script>
