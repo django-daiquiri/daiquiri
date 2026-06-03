@@ -21,4 +21,46 @@
 </div>
 {% endif %}
 
-<script src="/static/contact/js/announcements.js"></script>
+<script>
+(function () {
+    const style = document.createElement('style');
+    let css = '';
+
+    for (let i = 0; i < sessionStorage.length; i++) {
+        const key = sessionStorage.key(i);
+
+        if (key.startsWith('announcementDismissed_')) {
+            const id = key.replace('announcementDismissed_', '');
+
+            css += `
+                [data-announcement-id="${id}"] {
+                    display: none !important;
+                }
+            `;
+        }
+    }
+
+    style.innerHTML = css;
+    document.head.appendChild(style);
+})();
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const closeButtons = document.querySelectorAll('.close-announcement-btn');
+
+    closeButtons.forEach(btn => {
+
+        const id = btn.dataset.announcementId;
+
+        btn.addEventListener('click', function () {
+
+            sessionStorage.setItem(`announcementDismissed_${id}`, 'true');
+
+            document
+                .querySelectorAll(`[data-announcement-id="${id}"]`)
+                .forEach(el => el.remove());
+        });
+    });
+});
+
+</script>
