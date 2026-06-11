@@ -12,6 +12,7 @@ import List from 'daiquiri/core/assets/js/components/list/List'
 
 import AbortModal from 'daiquiri/query/assets/js/components/modals/AbortModal'
 import ArchiveModal from 'daiquiri/query/assets/js/components/modals/ArchiveModal'
+import ArchiveAllModal from 'daiquiri/query/assets/js/components/modals/ArchiveAllModal'
 import RenameModal from 'daiquiri/query/assets/js/components/modals/RenameModal'
 import ShowModal from 'daiquiri/query/assets/js/components/modals/ShowModal'
 
@@ -27,17 +28,24 @@ const Jobs = ({ loadForm, loadJob }) => {
   const showModal = useModal()
   const abortModal = useModal()
   const archiveModal = useModal()
+  const archiveAllModal = useModal()
   const renameModal = useModal()
 
   const { data, fetchNextPage, hasNextPage } = useJobsQuery(params)
 
+  const totalServerCount = isNil(data) ? 0 : data.pages[0].count
+
   const count = isNil(data) ? null : interpolate(ngettext(
-    'One job found.', '%s jobs found', data.pages[0].count
-  ), [data.pages[0].count])
+    'One job found.', '%s jobs found', totalServerCount
+  ), [totalServerCount])
 
   const rows = isNil(data) ? [] : data.pages.reduce((messages, page) => {
     return [...messages, ...page.results]
   }, [])
+
+  const hasArchivableJobs = rows.some(job => 
+    ['COMPLETED', 'ERROR', 'ABORTED'].includes(job.phase)
+  )
 
   const handleModal = (modal, job) => {
     setModalJob(job)
@@ -153,7 +161,16 @@ const Jobs = ({ loadForm, loadJob }) => {
 
   return (
     <div>
-      <h1 className="mb-4">Query jobs</h1>
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h1 className="m-0">Query jobs</h1>
+        <button 
+          className="btn btn-danger" 
+          onClick={archiveAllModal.show}
+          disabled={!hasArchivableJobs}
+        >
+          {gettext('Archive all')}
+        </button>
+      </div>
 
       <List
         columns={columns}
@@ -171,6 +188,7 @@ const Jobs = ({ loadForm, loadJob }) => {
       <RenameModal modal={renameModal} job={modalJob} />
       <AbortModal modal={abortModal} job={modalJob} />
       <ArchiveModal modal={archiveModal} job={modalJob} />
+      <ArchiveAllModal modal={archiveAllModal} archivableCount={totalServerCount} />
     </div>
   )
 }

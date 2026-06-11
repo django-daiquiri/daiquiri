@@ -76,6 +76,10 @@ class QueryApi extends BaseApi {
     return this.delete(`/query/api/jobs/${id}/`)
   }
 
+  static archiveAllJobs() {
+    return this.post('/query/api/jobs/archive-all/')
+  }
+
   static fetchJobColumns(id, params) {
     return this.get(`/query/api/jobs/${id}/columns/?${encodeParams(params)}`)
   }

@@ -178,6 +178,21 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
         else:
             return QueryJobSerializer
 
+    @action(detail=False, methods=['post'], url_path='archive-all')
+    def archive_all(self, request):
+        queryset = self.get_queryset()
+        
+        archivable_jobs = queryset.exclude(
+            phase__in=['EXECUTING', 'PENDING', 'QUEUED', 'ARCHIVED']
+        )
+        
+        count = archivable_jobs.count()
+        
+        for job in archivable_jobs:
+            job.archive()
+            
+        return Response({'archived_count': count}, status=status.HTTP_200_OK)
+
     def get_throttles(self):
         if self.action == 'create':
             self.throttle_scope = 'query.create'
