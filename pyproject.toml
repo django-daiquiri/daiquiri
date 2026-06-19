@@ -28,7 +28,7 @@ dynamic = [
   "version",
 ]
 dependencies = [
-  "astropy>=7.1,<7.3",
+  "astropy>=7.1,<8.1",
   "celery>=5.5.3,<5.7.0",
   "Django>=5.2.5,<5.3.0",
   "django-allauth[openid,socialaccount]>=65.11,<65.18",
