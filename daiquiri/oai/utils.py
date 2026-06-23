@@ -1,6 +1,7 @@
 import logging
 
 from django.conf import settings
+from django.db.utils import ProgrammingError
 
 from daiquiri.core.utils import import_class
 
@@ -37,6 +38,8 @@ def update_records(resource_type, resource):
                     record = Record.objects.get(identifier=identifier, metadata_prefix=metadata_prefix)
                 except Record.DoesNotExist:
                     record = Record(identifier=identifier, metadata_prefix=metadata_prefix)
+                except ProgrammingError:
+                    return
 
                 record.datestamp = datestamp
                 record.set_spec = set_spec
@@ -67,4 +70,6 @@ def delete_records(resource_type, resource):
                 record.deleted = True
                 record.save()
             except Record.DoesNotExist:
+                pass
+            except ProgrammingError:
                 pass

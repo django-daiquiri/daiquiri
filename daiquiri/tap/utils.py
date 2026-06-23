@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.db.utils import ProgrammingError
 
 from daiquiri.core.constants import ACCESS_LEVEL_INTERNAL, ACCESS_LEVEL_PUBLIC
 
@@ -12,16 +13,20 @@ def check_tap_visibility(obj):
     #   (a) PUBLIC or INTERNAL if QUERY_ANONYMOUS is True
     # or
     #   (b) INTERNAL if QUERY_ANONYMOUS is False
-    return (obj.metadata_access_level == ACCESS_LEVEL_PUBLIC) or \
-        (obj.metadata_access_level == ACCESS_LEVEL_INTERNAL and not settings.QUERY_ANONYMOUS)
+    return (obj.metadata_access_level == ACCESS_LEVEL_PUBLIC) or (
+        obj.metadata_access_level == ACCESS_LEVEL_INTERNAL and not settings.QUERY_ANONYMOUS
+    )
 
 
 def update_schema(schema):
-    '''
+    """
     Update or create the schema in the TAP_SCHEMA.
-    '''
+    """
     if check_tap_visibility(schema):
-        tap_schema, created = TapSchema.objects.get_or_create(pk=schema.id)
+        try:
+            tap_schema, created = TapSchema.objects.get_or_create(pk=schema.id)
+        except ProgrammingError:
+            return
 
         tap_schema.schema_name = schema.name
         tap_schema.utype = None
@@ -47,31 +52,37 @@ def update_schema(schema):
 
         except TapSchema.DoesNotExist:
             pass
+        except ProgrammingError:
+            return
 
 
 def delete_schema(schema):
-    '''
+    """
     Remove the schema from the TAP_SCHEMA (if it exists).
-    '''
+    """
     try:
-        TapSchema.objects.get(pk=schema.id).delete()
-    except TapSchema.DoesNotExist:
+        TapSchema.objects.filter(pk=schema.id).delete()
+    except ProgrammingError:
         pass
 
 
 def update_table(table):
-    '''
+    """
     Update or create the table in the TAP_SCHEMA.
-    '''
+    """
 
     # get the schema from the TAP_SCHEMA
     try:
         tap_schema = TapSchema.objects.get(pk=table.schema.id)
     except TapSchema.DoesNotExist:
         tap_schema = None
+    except ProgrammingError:
+        return
 
     if check_tap_visibility(table) and tap_schema:
-        tap_table, created = TapTable.objects.get_or_create(pk=table.id, defaults={'schema': tap_schema})
+        tap_table, created = TapTable.objects.get_or_create(
+            pk=table.id, defaults={'schema': tap_schema}
+        )
 
         tap_table.schema_name = str(table.schema)
         tap_table.table_name = str(table.schema) + '.' + str(table.name)
@@ -100,19 +111,19 @@ def update_table(table):
 
 
 def delete_table(table):
-    '''
+    """
     Remove the table from the TAP_SCHEMA (if it exists).
-    '''
+    """
     try:
-        TapTable.objects.get(pk=table.id).delete()
-    except TapTable.DoesNotExist:
+        TapTable.objects.filter(pk=table.id).delete()
+    except ProgrammingError:
         pass
 
 
 def update_column(column):
-    '''
+    """
     Update or create the column in the TAP_SCHEMA.
-    '''
+    """
     if settings.METADATA_COLUMN_PERMISSIONS:
         tap_visibility = check_tap_visibility(column)
     else:
@@ -123,6 +134,10 @@ def update_column(column):
         tap_table = TapTable.objects.get(pk=column.table.id)
     except TapTable.DoesNotExist:
         tap_table = None
+    # if TAP_SCHEMA doesn't exists do nothing
+    except ProgrammingError:
+        return
+
 
     if tap_visibility and tap_table:
         try:
@@ -156,16 +171,16 @@ def update_column(column):
     else:
         # remove the column from the TAP_SCHEMA (if it exists)
         try:
-            TapColumn.objects.get(pk=column.id).delete()
-        except TapColumn.DoesNotExist:
+            TapColumn.objects.filter(pk=column.id).delete()
+        except ProgrammingError:
             pass
 
 
 def delete_column(column):
-    '''
+    """
     Remove the column from the TAP_SCHEMA (if it exists).
-    '''
+    """
     try:
-        TapColumn.objects.get(pk=column.id).delete()
-    except TapColumn.DoesNotExist:
+        TapColumn.objects.filter(pk=column.id).delete()
+    except ProgrammingError:
         pass
