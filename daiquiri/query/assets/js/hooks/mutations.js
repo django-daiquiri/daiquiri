@@ -62,20 +62,16 @@ export const useArchiveJobMutation = () => {
 }
 
 export const useArchiveAllJobsMutation = () => {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: () => {
-      return QueryApi.archiveAllJobs()
-    },
-    onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['jobs'] })
-      if (variables && typeof variables.onSuccess === 'function') {
-        variables.onSuccess()
+    const queryClient = useQueryClient()
+    return useMutation({
+      mutationFn: (jobs) => {
+        return QueryApi.archiveJob(jobs)
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['jobs'] })
       }
-    }
-  })
-}
+    })
+  }
 
 export const useAbortJobMutation = () => {
   const queryClient = useQueryClient()

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { isNil } from 'lodash'
 
@@ -16,6 +16,8 @@ import ArchiveAllModal from 'daiquiri/query/assets/js/components/modals/ArchiveA
 import RenameModal from 'daiquiri/query/assets/js/components/modals/RenameModal'
 import ShowModal from 'daiquiri/query/assets/js/components/modals/ShowModal'
 
+const ARCHIVABLE_PHASES = ['COMPLETED', 'ERROR', 'ABORTED']
+
 const Jobs = ({ loadForm, loadJob }) => {
   const initialParams = {
     ordering: '-creation_time',
@@ -24,6 +26,7 @@ const Jobs = ({ loadForm, loadJob }) => {
 
   const [params, setParams] = useState(initialParams)
   const [modalJob, setModalJob] = useState({})
+  const [selectedJobs, setSelectedJobs] = useState([])
 
   const showModal = useModal()
   const abortModal = useModal()
@@ -43,9 +46,35 @@ const Jobs = ({ loadForm, loadJob }) => {
     return [...messages, ...page.results]
   }, [])
 
-  const hasArchivableJobs = rows.some(job => 
-    ['COMPLETED', 'ERROR', 'ABORTED'].includes(job.phase)
+  const archivableRows = rows.filter(job =>
+    ARCHIVABLE_PHASES.includes(job.phase)
   )
+
+  const allSelected =
+    archivableRows.length > 0 &&
+    selectedJobs.length === archivableRows.length
+
+  const toggleJobSelection = (job) => {
+    if (!ARCHIVABLE_PHASES.includes(job.phase)) return
+
+    setSelectedJobs(current =>
+      current.includes(job.id)
+        ? current.filter(id => id !== job.id)
+        : [...current, job.id]
+    )
+  }
+
+  const selectAll = () => {
+    setSelectedJobs(archivableRows.map(j => j.id))
+  }
+
+  const clearSelection = () => {
+    setSelectedJobs([])
+  }
+
+  useEffect(() => {
+    setSelectedJobs([])
+  }, [params])
 
   const handleModal = (modal, job) => {
     setModalJob(job)
@@ -72,6 +101,24 @@ const Jobs = ({ loadForm, loadJob }) => {
   }
 
   const columns = [
+      {
+      width: '40px', label: (
+        <Checkbox
+          checked={allSelected}
+          onChange={() => (allSelected ? clearSelection() : selectAll())}
+        />
+      ), formatter: (job) => {
+        const selectable = ARCHIVABLE_PHASES.includes(job.phase)
+
+        return (
+          <Checkbox
+            checked={selectedJobs.includes(job.id)}
+            disabled={!selectable}
+            onChange={() => toggleJobSelection(job)}
+          />
+        )
+      }
+    },
     {
       name: 'id', label: gettext('ID'), width: '30%', onOrder: handleOrdering, formatter: (job) => (
         <button className="btn btn-link" onClick={() => handleModal(showModal, job)}>{job.id}</button>
@@ -165,10 +212,10 @@ const Jobs = ({ loadForm, loadJob }) => {
         <h1 className="m-0">Query jobs</h1>
         <button 
           className="btn btn-danger" 
-          onClick={archiveAllModal.show}
-          disabled={!hasArchivableJobs}
+          disabled={selectedJobs.length === 0}
+          onClick={() => archiveAllModal.show()}
         >
-          {gettext('Archive all')}
+          {gettext('Archive jobs')}
         </button>
       </div>
 
@@ -188,7 +235,7 @@ const Jobs = ({ loadForm, loadJob }) => {
       <RenameModal modal={renameModal} job={modalJob} />
       <AbortModal modal={abortModal} job={modalJob} />
       <ArchiveModal modal={archiveModal} job={modalJob} />
-      <ArchiveAllModal modal={archiveAllModal} archivableCount={totalServerCount} />
+      <ArchiveAllModal modal={archiveAllModal} jobs={selectedJobs} onComplete={clearSelection} />
     </div>
   )
 }
