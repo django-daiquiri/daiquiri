@@ -1,6 +1,7 @@
 import logging
 import os
 import re
+from pathlib import Path
 
 from django.conf import settings
 from django.shortcuts import Http404
@@ -80,7 +81,7 @@ class Searcher:
             previous_mtime = Searcher.cms_files.get(file_path, {}).get("mtime", 0.0)
             if current_mtime != previous_mtime:
                 any_changes = True
-                body = read_file_content(file_path)
+                body = read_file_content(Path(file_path))
                 title = cls.find_title_in_content(body)
                 cls.cms_files[file_path] = {}
                 cls.cms_files[file_path]["mtime"] = current_mtime

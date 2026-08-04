@@ -5,3 +5,7 @@ FILES_BASE_URL = env.get('FILES_BASE_URL')
 
 FILES_DOCS_REL_PATH = env.get('FILES_DOCS_REL_PATH')
 FILES_SEARCH_RESULTS_PER_PAGE = 5
+
+FILES_INDEX_NAMES = ('index.html', 'index.md')
+
+
