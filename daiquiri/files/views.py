@@ -88,22 +88,33 @@ class FileView(View):
                 "woff", "xls", "xlsx", "xml", "yml",
             }
 
-            for child in sorted(filesystem_path.iterdir(), key=lambda item: item.name.casefold()):
+            directories = []
+            files = []
+            for child in filesystem_path.iterdir():
                 child_path = store.relative(child)
+                is_dir = child.is_dir()
 
-                if get_directory(request.user, child_path) is None:
-                    continue
+                if is_dir:
+                    if get_directory(request.user, child_path) is None:
+                        continue
 
-                extension = child.suffix[1:] if child.is_file() else None
-                entries.append({
+                entry = {
                     'name': child.name,
-                    'extension': extension if extension in RENDERED_FILETYPE_EXTENSIONS else None,
+                    'extension': None,
                     'url': reverse('files:file', kwargs={'file_path': child_path}),
                     'is_dir': child.is_dir(),
                     'size': None if child.is_dir() else child.stat().st_size,
-                })
+                }
 
-            return render(request, 'files/directory.html', {'directory': entries})
+                if is_dir:
+                    directories.append(entry)
+                else:
+                    extension = child.suffix[1:] if child.is_file() else None
+                    entry['extension'] = extension if extension in RENDERED_FILETYPE_EXTENSIONS else None
+                    files.append(entry)
+
+
+            return render(request, 'files/directory.html', {'directory': directories + files})
 
         return send_file(request, store, resolved_path)
 
