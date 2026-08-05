@@ -6,7 +6,7 @@ from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.http import Http404, HttpResponse, HttpResponseForbidden
-from django.shortcuts import render, reverse
+from django.shortcuts import render
 from django.views.generic import View
 
 from rest_framework.authentication import TokenAuthentication
@@ -17,6 +17,7 @@ from .storage import FileStore
 from .utils import (
     get_directory,
     is_cli_request,
+    render_directory_listing,
     render_with_layout,
     resolve_content_path,
     resolve_resource_path,
@@ -77,44 +78,8 @@ class FileView(View):
         if requested_directory.layout:
             return render_with_layout(request, store, resolved_path)
 
-        filesystem_path = store.path(resolved_path)
-        if filesystem_path.is_dir():
-            entries = []
-            RENDERED_FILETYPE_EXTENSIONS = {
-                "aac", "ai", "bmp", "cs", "css", "csv", "doc", "docx", "exe", "gif", "heic",
-                "html", "java", "jpg", "js", "json", "jsx", "key", "m4p", "md", "mdx", "mov",
-                "mp3", "mp4", "otf", "pdf", "php", "png", "ppt", "pptx", "psd", "py", "raw",
-                "rb", "sass", "scss", "sh", "sql", "svg", "tiff", "tsx", "ttf", "txt", "wav",
-                "woff", "xls", "xlsx", "xml", "yml",
-            }
-
-            directories = []
-            files = []
-            for child in filesystem_path.iterdir():
-                child_path = store.relative(child)
-                is_dir = child.is_dir()
-
-                if is_dir:
-                    if get_directory(request.user, child_path) is None:
-                        continue
-
-                entry = {
-                    'name': child.name,
-                    'extension': None,
-                    'url': reverse('files:file', kwargs={'file_path': child_path}),
-                    'is_dir': child.is_dir(),
-                    'size': None if child.is_dir() else child.stat().st_size,
-                }
-
-                if is_dir:
-                    directories.append(entry)
-                else:
-                    extension = child.suffix[1:] if child.is_file() else None
-                    entry['extension'] = extension if extension in RENDERED_FILETYPE_EXTENSIONS else None
-                    files.append(entry)
-
-
-            return render(request, 'files/directory.html', {'directory': directories + files})
+        if store.path(resolved_path).is_dir():
+            return render_directory_listing(request, store, resolved_path)
 
         return send_file(request, store, resolved_path)
 

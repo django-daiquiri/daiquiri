@@ -111,11 +111,73 @@ def check_file(user, file_path):
     return get_directory(user, file_path) is not None
 
 
+def render_directory_listing(request, store: FileStore, file_path: str):
+    filesystem_path = store.path(file_path)
+    RENDERED_FILETYPE_EXTENSIONS = {
+        "aac", "ai", "bmp", "cs", "css", "csv", "doc", "docx", "exe", "gif", "heic",
+        "html", "java", "jpg", "js", "json", "jsx", "key", "m4p", "md", "mdx", "mov",
+        "mp3", "mp4", "otf", "pdf", "php", "png", "ppt", "pptx", "psd", "py", "raw",
+        "rb", "sass", "scss", "sh", "sql", "svg", "tiff", "tsx", "ttf", "txt", "wav",
+        "woff", "xls", "xlsx", "xml", "yml",
+    }
+
+    directories = []
+    files = []
+    children = []
+    with os.scandir(filesystem_path) as scan:
+        children = sorted(scan, key=lambda entry: entry.name.casefold())
+    for child in children:
+        child_path = store.relative(Path(child.path))
+        is_dir = child.is_dir()
+
+        if not is_dir and not child.is_file():
+            continue
+
+        if is_dir:
+            if get_directory(request.user, child_path) is None:
+                continue
+
+        entry = {
+            'name': child.name,
+            'extension': None,
+            'url': reverse('files:file', kwargs={'file_path': child_path}),
+            'is_dir': is_dir,
+            'size': None,
+        }
+
+        if is_dir:
+            directories.append(entry)
+        else:
+            extension = os.path.splitext(child.name)[1][1:].lower()
+            entry['extension'] = extension if extension in RENDERED_FILETYPE_EXTENSIONS else None
+            entry['size'] = child.stat().st_size
+            files.append(entry)
+
+    return render(request, 'files/directory.html', {
+        'directory': directories + files,
+        'breadcrumbs': get_breadcrumbs(file_path),
+    })
+
+
 def render_with_layout(request, store: FileStore, file_path: str):
     filesystem_path = store.path(file_path)
     content = read_file_content(filesystem_path)
     context = {'content': content } if content else {}
     return render(request, 'files/layout.html', context)
+
+
+def get_breadcrumbs(file_path: str):
+    breadcrumbs = []
+    for parent in reversed(Path(file_path).parents):
+        breadcrumbs.append({
+            "name": parent.name,
+            "url": reverse('files:file', kwargs={'file_path': parent.as_posix()}),
+        })
+    breadcrumbs.append({
+        "name": Path(file_path).name,
+        "url": reverse('files:file', kwargs={'file_path': file_path}),
+    })
+    return breadcrumbs
 
 
 def read_file_content(filesystem_path: Path):

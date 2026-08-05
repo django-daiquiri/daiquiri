@@ -4,6 +4,7 @@
 {% block content %}
 <div class="container">
     <main>
+    <h5>{% for bc in breadcrumbs %}<a href="{{ bc.url }}">{{ bc.name }}</a> / {% endfor %}</h5>
     <table class="table">
       <tbody>
       {% for dir_content in directory %}
