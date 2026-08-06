@@ -123,38 +123,47 @@ def render_directory_listing(request, store: FileStore, file_path: str):
 
     directories = []
     files = []
-    children = []
+    listing_truncated = False
+    # with os.scandir(filesystem_path) as scan:
+    #     children = sorted(scan, key=lambda entry: entry.name.casefold())
+
     with os.scandir(filesystem_path) as scan:
-        children = sorted(scan, key=lambda entry: entry.name.casefold())
-    for child in children:
-        child_path = store.relative(Path(child.path))
-        is_dir = child.is_dir()
+        for child in scan:
+            child_path = store.relative(Path(child.path))
+            is_dir = child.is_dir()
 
-        if not is_dir and not child.is_file():
-            continue
-
-        if is_dir:
-            if get_directory(request.user, child_path) is None:
+            if not is_dir and not child.is_file():
                 continue
 
-        entry = {
-            'name': child.name,
-            'extension': None,
-            'url': reverse('files:file', kwargs={'file_path': child_path}),
-            'is_dir': is_dir,
-            'size': None,
-        }
+            if is_dir:
+                if get_directory(request.user, child_path) is None:
+                    continue
 
-        if is_dir:
-            directories.append(entry)
-        else:
-            extension = os.path.splitext(child.name)[1][1:].lower()
-            entry['extension'] = extension if extension in RENDERED_FILETYPE_EXTENSIONS else None
-            entry['size'] = child.stat().st_size
-            files.append(entry)
+            if len(directories) + len(files) >= settings.FILES_DIRECTORY_LISTING_MAX_ENTRIES:
+                listing_truncated = True
+                break
+
+            entry = {
+                'name': child.name,
+                'extension': None,
+                'url': reverse('files:file', kwargs={'file_path': child_path}),
+                'is_dir': is_dir,
+                'size': None,
+            }
+
+            if is_dir:
+                directories.append(entry)
+            else:
+                extension = os.path.splitext(child.name)[1][1:].lower()
+                entry['extension'] = extension if extension in RENDERED_FILETYPE_EXTENSIONS else None
+                entry['size'] = child.stat().st_size
+                files.append(entry)
 
     return render(request, 'files/directory.html', {
         'directory': directories + files,
+        'listed_entries_count': len(directories) + len(files),
+        'directory_listing_truncated': listing_truncated,
+        'directory_listing_limit': settings.FILES_DIRECTORY_LISTING_MAX_ENTRIES,
         'breadcrumbs': get_breadcrumbs(file_path),
     })
 
