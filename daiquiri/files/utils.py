@@ -124,9 +124,6 @@ def render_directory_listing(request, store: FileStore, file_path: str):
     directories = []
     files = []
     listing_truncated = False
-    # with os.scandir(filesystem_path) as scan:
-    #     children = sorted(scan, key=lambda entry: entry.name.casefold())
-
     with os.scandir(filesystem_path) as scan:
         for child in scan:
             child_path = store.relative(Path(child.path))
@@ -158,6 +155,11 @@ def render_directory_listing(request, store: FileStore, file_path: str):
                 entry['extension'] = extension if extension in RENDERED_FILETYPE_EXTENSIONS else None
                 entry['size'] = child.stat().st_size
                 files.append(entry)
+
+    if directories:
+        directories.sort(key=lambda entry: entry['name'].casefold())
+    if files:
+        files.sort(key=lambda entry: entry['name'].casefold())
 
     return render(request, 'files/directory.html', {
         'directory': directories + files,
