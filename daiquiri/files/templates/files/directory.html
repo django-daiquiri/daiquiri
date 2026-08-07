@@ -1,0 +1,54 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <main>
+    <p class="fs-5 fw-bold mb-0">
+      {% for bc in breadcrumbs %}
+        {% if forloop.last %}
+          {{ bc.name }}
+        {% else %}
+          <a href="{{ bc.url }}">{{ bc.name }}</a> /
+        {% endif %}
+      {% endfor %}
+    </p>
+    <p class="text-body-secondary mb-1 mt-1">
+      {{ listed_entries_count }} entries
+    </p>
+    {% if directory_listing_truncated %}
+        <div class="text-danger mt-3 mb-3">
+        This directory listing is limited to
+        {{ directory_listing_limit }} entries. It is incomplete and may omit
+        folders or files.
+    </div>
+{% endif %}
+    <table class="table">
+      <tbody>
+      {% for dir_content in directory %}
+      <tr>
+          <td>
+            <a href="{{dir_content.url}}">
+            {% if dir_content.is_dir %}
+            <i class="bi bi-folder-fill"></i>
+            {% else %}
+              {% if dir_content.extension %}
+                <i class="bi bi-filetype-{{dir_content.extension}}"></i>
+              {% else %}
+                <i class="bi bi-file-earmark"></i>
+              {% endif %}
+            {% endif %}
+            {{ dir_content.name }}</a>
+          </td>
+          <td class="text-end">
+            {% if not dir_content.is_dir %}
+              {{ dir_content.size | filesizeformat }}
+            {% endif %}
+          </td>
+      </tr>
+      {% endfor %}
+  </tbody>
+    </table>
+    </main>
+</div>
+{% endblock %}
