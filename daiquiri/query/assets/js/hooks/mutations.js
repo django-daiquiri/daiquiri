@@ -61,6 +61,18 @@ export const useArchiveJobMutation = () => {
   })
 }
 
+export const useArchiveAllJobsMutation = () => {
+    const queryClient = useQueryClient()
+    return useMutation({
+      mutationFn: (jobs) => {
+        return QueryApi.archiveJob(jobs)
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['jobs'] })
+      }
+    })
+  }
+
 export const useAbortJobMutation = () => {
   const queryClient = useQueryClient()
 
