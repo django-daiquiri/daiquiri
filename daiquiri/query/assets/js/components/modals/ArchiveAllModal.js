@@ -8,6 +8,7 @@ const ArchiveAllModal = ({ modal, jobs, onComplete }) => {
 
   const [isRunning, setIsRunning] = useState(false)
   const [processed, setProcessed] = useState(0)
+  const [archiveFailureCount, setArchiveFailureCount] = useState(0)
 
   const progress =
     jobs.length === 0 ? 0 : Math.round((processed / jobs.length) * 100)
@@ -17,15 +18,23 @@ const ArchiveAllModal = ({ modal, jobs, onComplete }) => {
 
     setIsRunning(true)
     setProcessed(0)
+    setArchiveFailureCount(0)
 
+    const failedArchiveJobs = []
     try {
       for (const job of jobs) {
-        await mutation.mutateAsync(job)
-        setProcessed(prev => prev + 1)
+        try {
+          await mutation.mutateAsync(job)
+          setProcessed(prev => prev + 1)
+        } catch (error) {
+          failedArchiveJobs.push(job)
+        }
       }
-
-      onComplete?.()
-      modal.hide()
+      setArchiveFailureCount(failedArchiveJobs.length)
+      onComplete?.(failedArchiveJobs)
+      if (failedArchiveJobs.length === 0) {
+        modal.hide()
+      }
     } finally {
       setIsRunning(false)
     }
@@ -34,6 +43,7 @@ const ArchiveAllModal = ({ modal, jobs, onComplete }) => {
   const handleClose = () => {
     if (isRunning) return
     setProcessed(0)
+    setArchiveFailureCount(0)
     modal.hide()
   }
 
@@ -46,6 +56,8 @@ const ArchiveAllModal = ({ modal, jobs, onComplete }) => {
             <button type="button" className="btn-close" onClick={handleClose} disabled={isRunning} />
           </div>
           <div className="modal-body">
+            {archiveFailureCount === 0 && (
+            <>
             <p dangerouslySetInnerHTML={{
               __html: interpolate(
                 gettext('You are about to archive all <code>%s</code> query jobs.'), 
@@ -55,6 +67,22 @@ const ArchiveAllModal = ({ modal, jobs, onComplete }) => {
             <p className="text-danger">
               {gettext('This action cannot be undone!')}
             </p>
+            </>
+            )}
+            {archiveFailureCount > 0 && (
+              <>
+                <p className="text-danger">
+                  {interpolate(ngettext(
+                    'One job could not be archived. ',
+                    '%s jobs could not be archived.',
+                    archiveFailureCount
+                  ), [archiveFailureCount])}
+                </p>
+                <p className='text-danger'>
+                  {gettext('Please try again. If the problem persists, contact your administrator.')}
+                </p>
+              </>
+            )}
             {isRunning && (
               <>
                 <p dangerouslySetInnerHTML={{
@@ -76,12 +104,14 @@ const ArchiveAllModal = ({ modal, jobs, onComplete }) => {
             <button type="button" className="btn btn-sm btn-secondary" onClick={handleClose} disabled={isRunning}>
               {gettext('Close')}
             </button>
+            {archiveFailureCount === 0 && (
             <button
               type="button" className="btn btn-sm btn-danger" onClick={handleSubmit} disabled={isRunning || jobs.length === 0}>
               {isRunning
                 ? gettext('Archiving...')
                 : gettext('Archive')}
             </button>
+            )}
           </div>
         </div>
       </div>

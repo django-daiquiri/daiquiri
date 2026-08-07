@@ -235,7 +235,7 @@ const Jobs = ({ loadForm, loadJob }) => {
       <RenameModal modal={renameModal} job={modalJob} />
       <AbortModal modal={abortModal} job={modalJob} />
       <ArchiveModal modal={archiveModal} job={modalJob} />
-      <ArchiveAllModal modal={archiveAllModal} jobs={selectedJobs} onComplete={clearSelection} />
+      <ArchiveAllModal modal={archiveAllModal} jobs={selectedJobs} onComplete={setSelectedJobs} />
     </div>
   )
 }
