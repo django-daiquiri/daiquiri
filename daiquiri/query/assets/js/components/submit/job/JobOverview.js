@@ -47,7 +47,10 @@ const JobOverview = ({ job, loadForm }) => {
               </button>
             )}
             {['EXECUTING', 'PENDING', 'QUEUED'].includes(job.phase) ? (
-              <button className="btn btn-outline-danger btn-sm ms-auth" onClick={abortModal.show}>
+              <button
+                className="btn btn-outline-danger btn-sm ms-auto"
+                onClick={abortModal.show}
+              >
                 <i className="bi bi-trash me-2"></i>
                 {gettext('Abort the job')}
               </button>
