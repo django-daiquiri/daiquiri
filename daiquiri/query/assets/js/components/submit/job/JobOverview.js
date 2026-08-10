@@ -86,20 +86,45 @@ const JobOverview = ({ job, loadForm }) => {
         </div>
       </div>
 
-      {job.native_query && (
-        <div className="card mb-3">
-          <div className="card-header">{gettext('Native query')}</div>
-          <div className="card-body">
-            <Query query={job.native_query} />
-          </div>
-        </div>
-      )}
 
-      {job.actual_query && (
+      {(job.actual_query || job.native_query) && (
         <div className="card mb-3">
-          <div className="card-header">{gettext('Actual query')}</div>
-          <div className="card-body">
-            <Query query={job.actual_query} />
+          <div className="card-header p-0">
+            <button
+              type="button"
+              className="btn w-100 border-0 rounded-0 text-start text-body d-flex align-items-center px-3 py-2"
+              data-bs-toggle="collapse"
+              data-bs-target="#technical-queries"
+              aria-expanded="false"
+              aria-controls="technical-queries"
+            >
+            <i className="bi bi-code-slash me-2" />
+            <span>{gettext('Show technical queries')}</span>
+            <span className="text-secondary ms-3">
+              {gettext('Native and actual database queries')}
+            </span>
+            <i className="bi bi-eye ms-auto" />
+            </button>
+          </div>
+          <div id="technical-queries" className="collapse">
+            <div className="card-body">
+            {job.native_query && (
+              <>
+                <h6>{gettext('Native query')}</h6>
+                  <div className="card p-3">
+                    <Query query={job.native_query} />
+                  </div>
+              </>
+            )}
+            {job.actual_query && (
+              <>
+                <h6>{gettext('Actual query')}</h6>
+                  <div className="card p-3">
+                    <Query query={job.actual_query} />
+                  </div>
+              </>
+            )}
+            </div>
           </div>
         </div>
       )}
