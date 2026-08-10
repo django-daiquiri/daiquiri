@@ -26,6 +26,43 @@ const JobOverview = ({ job, loadForm }) => {
         )}
       </p>
 
+      <div className="card mb-3">
+        <div className="card-header">
+          <div className="d-flex align-items-center">
+            {gettext('Job actions')}
+          </div>
+        </div>
+        <div className="card-body d-flex flex-wrap gap-2">
+            <button
+              className="btn btn-outline-primary btn-sm"
+              onClick={() => loadForm('sql', job.query, job.query_language)}
+            >
+              <i className="bi bi-arrow-repeat me-2"></i>
+              {gettext('Reuse query')}
+            </button>
+            {job.phase == 'COMPLETED' && (
+              <button className="btn btn-outline-secondary btn-sm" onClick={renameModal.show}>
+                <i className="bi bi-pencil-square me-2"></i>
+                {gettext("Rename results")}
+              </button>
+            )}
+            {['EXECUTING', 'PENDING', 'QUEUED'].includes(job.phase) ? (
+              <button className="btn btn-outline-danger btn-sm ms-auth" onClick={abortModal.show}>
+                <i className="bi bi-trash me-2"></i>
+                {gettext('Abort the job')}
+              </button>
+            ) : (
+              <button
+                className="btn btn-outline-danger btn-sm ms-auto"
+                onClick={archiveModal.show}
+              >
+                <i className="bi bi-trash me-2"></i>
+                {gettext('Archive job')}
+              </button>
+            )}
+        </div>
+      </div>
+
       {job.query && (
         <div className="card mb-3">
           <div className="card-header">
@@ -39,14 +76,6 @@ const JobOverview = ({ job, loadForm }) => {
           <div className="card-body">
             <Query query={job.query} />
           </div>
-          <div className="card-footer">
-            <button
-              className="btn btn-link"
-              onClick={() => loadForm('sql', job.query, job.query_language)}
-            >
-              {gettext('Open new query form with this query')}
-            </button>
-          </div>
         </div>
       )}
 
@@ -54,26 +83,6 @@ const JobOverview = ({ job, loadForm }) => {
         <div className="card-header">{gettext('Job parameters')}</div>
         <div className="card-body">
           <JobParameters job={job} />
-        </div>
-        <div className="card-footer">
-          {job.phase == 'COMPLETED' && (
-            <button className="btn btn-link d-block" onClick={renameModal.show}>
-              {gettext("Rename the job's result table or run id")}
-            </button>
-          )}
-          {['EXECUTING', 'PENDING', 'QUEUED'].includes(job.phase) ? (
-            <button className="btn btn-link d-block" onClick={abortModal.show}>
-              {gettext('Abort the job')}
-            </button>
-          ) : (
-            <button
-              className="btn btn-link d-block"
-              onClick={archiveModal.show}
-            >
-              <i className="bi bi-archive me-1"></i>
-              {gettext('Archive the job')}
-            </button>
-          )}
         </div>
       </div>
 
