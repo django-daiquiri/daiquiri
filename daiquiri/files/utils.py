@@ -35,7 +35,7 @@ def resolve_content_path(store: FileStore, requested_path: str) -> str | None:
     requested_path = requested_path.rstrip('/')
     filesystem_path = store.path(requested_path)
 
-    if filesystem_path.is_file() and requested_path.endswith(('.html', '.md')):
+    if filesystem_path.is_file():
         return requested_path
 
     for content_path in (

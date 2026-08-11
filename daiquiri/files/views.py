@@ -76,10 +76,11 @@ class FileView(View):
             raise Http404
 
         if requested_directory.layout:
-            return render_with_layout(request, store, resolved_path)
-
-        if store.path(resolved_path).is_dir():
-            return render_directory_listing(request, store, resolved_path)
+            if resolved_path.endswith('.md') or resolved_path.endswith('.html'):
+                return render_with_layout(request, store, resolved_path)
+        else:
+            if store.path(resolved_path).is_dir():
+                return render_directory_listing(request, store, resolved_path)
 
         return send_file(request, store, resolved_path)
 
