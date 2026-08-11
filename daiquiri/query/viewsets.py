@@ -54,7 +54,7 @@ from .serializers import (
     QueryJobUploadSerializer,
     QueryLanguageSerializer,
     SyncQueryJobSerializer,
-    UserExampleSerializer
+    UserExampleSerializer,
 )
 from .utils import (
     fetch_user_schema_metadata,
@@ -196,10 +196,11 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
             max_records=get_max_records(self.request.user),
             client_ip=get_client_ip(self.request),
         )
+        # anonymous jobs must be deleted after JOB_DESTRUCTION_TIME days
         job.process()
         job.save()
         job.run()
-        # inject the job id into the serializers data
+        # inject the job id into the serializer data
         serializer._data['id'] = job.id
 
     def perform_update(self, serializer):

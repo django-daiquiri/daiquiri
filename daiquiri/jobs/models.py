@@ -1,13 +1,15 @@
 import uuid
+from datetime import timedelta
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils import timezone
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 
 
 class Job(models.Model):
-
     PHASE_PENDING = 'PENDING'
     PHASE_QUEUED = 'QUEUED'
     PHASE_EXECUTING = 'EXECUTING'
@@ -20,10 +22,7 @@ class Job(models.Model):
     PHASE_ARCHIVED = 'ARCHIVED'
     PHASE_RUN = 'RUN'
     PHASE_ABORT = 'ABORT'
-    PHASE_ACTIVE = (
-        PHASE_QUEUED,
-        PHASE_EXECUTING
-    )
+    PHASE_ACTIVE = (PHASE_QUEUED, PHASE_EXECUTING)
     PHASE_CHOICES = (
         (PHASE_PENDING, _('Pending')),
         (PHASE_QUEUED, _('Queued')),
@@ -34,7 +33,7 @@ class Job(models.Model):
         (PHASE_UNKNOWN, _('Unknown')),
         (PHASE_HELD, _('Held')),
         (PHASE_SUSPENDED, _('Suspended')),
-        (PHASE_ARCHIVED, _('Archived'))
+        (PHASE_ARCHIVED, _('Archived')),
     )
 
     JOB_TYPE_SYNC = 'SYNC'
@@ -69,7 +68,7 @@ class Job(models.Model):
     job_type = models.CharField(max_length=10, choices=JOB_TYPE_CHOICES)
 
     class Meta:
-        ordering = ('start_time', )
+        ordering = ('start_time',)
 
         verbose_name = _('Job')
         verbose_name_plural = _('Jobs')
@@ -82,7 +81,13 @@ class Job(models.Model):
             self.phase = self.PHASE_PENDING
             self.creation_time = now()
 
+        self._set_default_destruction_time()
+
         return super().save(*args, **kwargs)
+
+    def _set_default_destruction_time(self):
+        if self.destruction_time is None and (self.owner_id is None or self.phase == self.PHASE_ERROR):
+            self.destruction_time = timezone.now() + timedelta(days=settings.JOB_DESTRUCTION_TIME)
 
     @property
     def owner_username(self):
