@@ -54,7 +54,7 @@ class BaseDatabaseAdapter:
         else:
             return cursor.fetchall()
 
-    def fetchall_sync(self, sql):
+    def fetchall_sync(self, sql, args=None):
         raise NotImplementedError()
 
     def fetch_pid(self):
