@@ -1,6 +1,20 @@
 name: pytest
 
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      use_current_workspace:
+        description: Use the existing workspace instead of checking out a ref
+        required: false
+        default: false
+        type: boolean
+      publish_coverage:
+        description: Publish coverage to Coveralls
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   build:
@@ -18,7 +32,9 @@ jobs:
           - 5432:5432
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Check out repository
+      if: ${{ inputs.use_current_workspace != true }}
+      uses: actions/checkout@v4
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
@@ -71,6 +87,7 @@ jobs:
         DJANGO_SETTINGS_MODULE: testing.config.settings
 
     - name: Publish to coveralls.io
+      if: ${{ github.event_name == 'push' || github.event_name == 'pull_request' || inputs.publish_coverage == true }}
       uses: coverallsapp/github-action@v2
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
