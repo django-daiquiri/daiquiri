@@ -101,25 +101,49 @@ reload.
 Run local checks
 ----------------
 
-Install the pre-commit hooks once for the checkout:
+Run the pre-commit checks before every commit. They are the primary local
+checks for day-to-day development. Install them once in the Python environment
+used for development:
 
 .. code-block:: console
 
+   python -m pip install pre-commit
    pre-commit install
 
-Before opening or updating a pull request, run the checks that apply to your
-change:
+Run all configured hooks explicitly before opening or updating a pull request:
 
 .. code-block:: console
 
    pre-commit run --all-files
-   pytest
-   pytest --migrations
 
-The project reuses the test database by default. Use ``--create-db`` when the
-test database needs to be recreated. The migration-enabled test run is the
-closest local equivalent to the database checks performed by continuous
-integration.
+Some hooks can modify files. Review those changes and run the command again
+until it completes successfully.
+
+Continuous integration runs the complete PostgreSQL-backed pytest suite for
+pushes and pull requests. The default ``dq-dev`` container is an application
+development environment, not the test environment used by this suite, so
+running ``pytest`` there is not part of the normal development workflow.
+
+
+Optional: run CI locally with ``act``
+-------------------------------------
+
+If you want to run the CI workflow locally, install `act
+<https://github.com/nektos/act>`_ and make sure Docker Engine is running. From
+the Daiquiri repository root, run:
+
+.. code-block:: console
+
+   act workflow_dispatch \
+      -W .github/workflows/pytest.yml \
+      -j build \
+      --input use_current_workspace=true \
+      --bind
+
+This runs the PostgreSQL-backed workflow against the current working tree.
+Manual workflow runs do not publish coverage by default. The GitHub Actions
+result remains authoritative because ``act`` uses a local runner that is not
+identical to GitHub-hosted Actions.
 
 Full local installation
 ------------------------
@@ -177,11 +201,12 @@ check it out in a separate working tree or branch:
    git fetch origin pull/<PR-ID>/head:pr/<PR-ID>
    git switch pr/<PR-ID>
 
-Run the same local checks described above, including the migration-enabled test
-run. For changes that affect application behavior, deployment, queues,
-database integration, or static assets, also run the relevant ``dq-dev``
-integration tests. When a change is specific to a service application, test
-that service application as well.
+Run ``pre-commit run --all-files`` and rely on CI for the complete pytest suite.
+Use ``act`` when reproducing the CI environment locally is useful. For changes
+that affect application behavior, deployment, queues, database integration, or
+static assets, also run the relevant ``dq-dev`` integration tests. When a
+change is specific to a service application, test that service application as
+well.
 
 Report failures with the command, environment, and relevant logs so that the
 author can reproduce them.

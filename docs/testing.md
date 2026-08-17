@@ -5,17 +5,24 @@ The test suite uses `pytest`, `pytest-django`, and PostgreSQL. The repository's
 `pyproject.toml` configures Django, enables database reuse by default, and
 points pytest at `testing.config.settings`.
 
+Continuous integration runs the complete suite for pushes and pull requests.
+Running it manually is optional and is mainly useful when reproducing a CI
+failure. The default `dq-dev` container uses an application's runtime
+configuration and databases, so it is not a drop-in environment for these
+tests.
+
 
 Set up the test database
 ------------------------
 
-From the root of the Daiquiri checkout, install the test dependencies and
-create the PostgreSQL test databases:
+From the root of the Daiquiri checkout, install Python 3.13 or newer, install
+the test dependencies, and create the PostgreSQL test databases:
 
 ```bash
-uv venv --python 3.13
+python3.13 -m venv .venv
 source .venv/bin/activate
-uv pip install -e '.[ci]'
+python -m pip install --upgrade pip
+python -m pip install -e '.[ci]'
 psql -f testing/sql/postgres/setup.sql
 ```
 
@@ -30,17 +37,17 @@ Run tests
 Run the full suite from the repository root:
 
 ```bash
-pytest
+python -m pytest
 ```
 
 Useful variants are:
 
 ```bash
-pytest --migrations                 # include migration execution
-pytest -x                          # stop after the first failure
-pytest daiquiri/auth               # test one Daiquiri module
-pytest path/to/test_file.py       # test one file
-pytest path/to/test_file.py::test_name
+python -m pytest --migrations                 # include migration execution
+python -m pytest -x                          # stop after the first failure
+python -m pytest daiquiri/auth               # test one Daiquiri module
+python -m pytest path/to/test_file.py        # test one file
+python -m pytest path/to/test_file.py::test_name
 ```
 
 The default `--reuse-db` setting makes repeated test runs faster. Use
@@ -51,8 +58,8 @@ Coverage
 --------
 
 ```bash
-pytest --cov=daiquiri
-pytest --cov=daiquiri --cov-report=html
+python -m pytest --cov=daiquiri
+python -m pytest --cov=daiquiri --cov-report=html
 ```
 
 The HTML report is written to `htmlcov/`.
