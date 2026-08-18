@@ -210,3 +210,60 @@ well.
 
 Report failures with the command, environment, and relevant logs so that the
 author can reproduce them.
+
+
+Release process
+---------------
+
+For a standard release:
+
+1. On ``dev``, update the version in ``daiquiri/__init__.py`` and
+   ``package.json``. With npm installed, synchronize ``package-lock.json``:
+
+   .. code-block:: console
+
+      npm install --package-lock-only
+
+   Commit and push all three version files on ``dev``.
+2. Wait for CI and merge the release pull request into ``main``.
+3. Update the local ``main`` checkout:
+
+   .. code-block:: console
+
+      git switch main
+      git pull --ff-only origin main
+
+4. Make sure the active ``dq-dev`` profile points ``dq_source`` to the
+   Daiquiri checkout, then build and check the package:
+
+   .. code-block:: console
+
+      cd /path/to/dq-dev
+      python manage.py --build-release
+
+   This creates and checks the files in the Daiquiri ``dist/`` directory. It
+   does not upload them.
+5. Upload the checked package manually:
+
+   .. code-block:: console
+
+      cd /path/to/daiquiri
+      twine upload dist/*
+
+6. Test the exact PyPI version with ``dq_source`` disabled in ``dq-dev``.
+   Confirm the application installs Daiquiri from PyPI and works as expected.
+7. Tag the merged ``main`` branch and push the tag:
+
+   .. code-block:: console
+
+      git switch main
+      git pull --ff-only origin main
+      git tag 1.3.9
+      git push origin 1.3.9
+
+8. Create the GitHub release for the tag and clean up the generated release
+   notes.
+
+For optional ``.dev`` releases, PyPI testing, configuration details, and
+troubleshooting, see the `detailed release guide
+<https://django-daiquiri.github.io/docs/release/>`_.
