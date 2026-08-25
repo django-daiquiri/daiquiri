@@ -6,6 +6,7 @@ import os
 import re
 import sys
 from collections import defaultdict
+from copy import copy
 from datetime import datetime
 from urllib.parse import urlparse
 from xml.dom import minidom
@@ -240,7 +241,7 @@ def markdown(md):
 
 
 def make_query_dict_upper_case(input_dict):
-    output_dict = input_dict.copy()
+    output_dict = copy(input_dict)
 
     for key in input_dict.keys():
         if key.upper() != key:
