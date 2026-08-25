@@ -63,7 +63,8 @@ python manage.py -r
 ```
 
 Open <http://localhost:9280> in a browser. The default profile starts the
-Daiquiri application and PostgreSQL containers. Asynchronous workers are
+Daiquiri application and PostgreSQL containers. You can login using the
+username and password `admin`. Asynchronous workers are
 disabled by default.
 
 ### Develop Daiquiri with a local source checkout
