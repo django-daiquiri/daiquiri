@@ -1,10 +1,26 @@
 name: pytest
 
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      use_current_workspace:
+        description: Use the existing workspace instead of checking out a ref
+        required: false
+        default: false
+        type: boolean
+      publish_coverage:
+        description: Publish coverage to Coveralls
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      UV_PROJECT_ENVIRONMENT: /tmp/daiquiri-venv
     strategy:
       matrix:
         python-version: ['3.13']
@@ -18,13 +34,14 @@ jobs:
           - 5432:5432
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Check out repository
+      if: ${{ inputs.use_current_workspace != true }}
+      uses: actions/checkout@v4
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-        python-version-file: .python-version
 
     - name: Install uv
       uses: astral-sh/setup-uv@v6
@@ -36,7 +53,9 @@ jobs:
 
     - name: Install Daiquiri
       run: |
-        uv venv --python ${{ matrix.python-version }} && uv pip install -e .[ci]
+        uv venv --python ${{ matrix.python-version }}
+        export UV_PYTHON="$UV_PROJECT_ENVIRONMENT/bin/python"
+        uv pip install -e ".[ci]"
 
     - name: Prepare testing app
       run: |
@@ -64,16 +83,17 @@ jobs:
     - name: Run tests
       run: |
         export PYTHONPATH=$(pwd)
-        uv run pytest --reuse-db --migrations --cov=daiquiri --cov-report=xml
+        uv run pytest --reuse-db --migrations --cov=daiquiri --cov-report=xml:/tmp/daiquiri-coverage.xml
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         COVERALLS_FLAG_NAME: 'postgres: ${{ matrix.python-version }}'
         DJANGO_SETTINGS_MODULE: testing.config.settings
 
     - name: Publish to coveralls.io
+      if: ${{ github.event_name == 'push' || github.event_name == 'pull_request' || inputs.publish_coverage == true }}
       uses: coverallsapp/github-action@v2
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        path-to-lcov: coverage.xml
+        path-to-lcov: /tmp/daiquiri-coverage.xml
         fail-on-error: false
         parallel: false

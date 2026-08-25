@@ -1,97 +1,109 @@
 # Daiquiri
 
-**A framework for the publication of scientific databases**
-
 [![pytest Workflow Status](https://github.com/django-daiquiri/daiquiri/actions/workflows/pytest.yml/badge.svg)](https://github.com/django-daiquiri/daiquiri/actions/workflows/pytest.yml)
-[![Coverage Status](https://coveralls.io/repos/django-daiquiri/daiquiri/badge.svg?branch=master&service=github)](https://coveralls.io/github/django-daiquiri/daiquiri?branch=master)
-[![License](http://img.shields.io/badge/license-APACHE-blue.svg?style=flat)](https://github.com/django-daiquiri/daiquiri/blob/master/LICENSE)
+[![Coverage Status](https://coveralls.io/repos/django-daiquiri/daiquiri/badge.svg?branch=main&service=github)](https://coveralls.io/github/django-daiquiri/daiquiri?branch=main)
 [![Latest Version](https://img.shields.io/pypi/v/django-daiquiri.svg?style=flat)](https://pypi.org/project/django-daiquiri/)
+[![Python versions](https://img.shields.io/pypi/pyversions/django-daiquiri.svg)](https://pypi.org/project/django-daiquiri/)
+[![Documentation](https://img.shields.io/badge/docs-online-blue)](https://django-daiquiri.github.io/)
+[![License](https://img.shields.io/github/license/django-daiquiri/daiquiri)](https://github.com/django-daiquiri/daiquiri/blob/main/LICENSE)
 
-#### Homepage of the Daiquiri default app
-![daiquiri-default-app](https://github.com/django-daiquiri/daiquiri/assets/45099849/586c9039-9978-4845-9f31-f002576392f6)
+Daiquiri is a Django framework and Python package for building scientific
+data-publication web applications. It provides database query interfaces and
+APIs, metadata management, file downloads, asynchronous jobs, and
+standards-based endpoints such as TAP, Cone Search, and OAI-PMH.
 
-#### Query interface from [Gaia@AIP](https://gaia.aip.de/)
-![daiquiri-gaia-query](https://github.com/django-daiquiri/daiquiri/assets/45099849/fa160b81-b253-4c5c-ad1d-34d4edf529b2)
+## Quick start
 
+### Try the default app with the PyPI package
 
-## Introduction
+The simplest way to try Daiquiri is through [`dq-dev`](https://github.com/django-daiquiri/dq-dev).
+You need Git, Docker Engine, Docker Compose v2, and Python 3.11 or newer.
 
-Today, the publication of research data plays an important role in astronomy
-and astrophysics. On the one hand, dedicated surveys like SDSS and RAVE, data
-intensive instruments like LOFAR, or massive simulations like Millennium and
-MultiDark are initially planned to release their data for the community.
-On the other hand, more traditionally oriented research projects strive to
-publish their data as a key requirement demanded by the funding agencies.
+Clone the default application and the container workflow. You do not need to
+clone the Daiquiri source repository for this setup:
 
-The common approach is to publish this data via dedicated web sites. This
-includes rather simple HTML forms as well as complex query systems such as
-SDSS-CAS. Most of these web sites are tailor made for the particular case and
-are therefore not easily transferable to future projects.
+```bash
+git clone https://github.com/django-daiquiri/app.git
+git clone https://github.com/django-daiquiri/dq-dev.git
 
-At Leibniz-Institute for Astrophysics Potsdam (AIP), we gained experience
-with both the maintenance and the development of such applications.
-It became, however, apparent that already the current plethora of applications
-constitutes a major challenge for maintenance expenses and scalability.
-In order to address these issues, we developed the Daiquiri framework,
-which is particularly designed to allow for different highly customizable web
-applications based on a common easily maintainable code base.
+cd dq-dev
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install .
+python manage.py -c quickstart
+python manage.py -s quickstart
+```
 
-## Features
+Edit `usr/profiles/quickstart/conf.toml` and set the absolute path to the
+default application. Comment out both `dq_source` entries so that `dq-dev`
+installs the released `django-daiquiri` package from PyPI:
 
-Daiquiri enables collaboration and institutions to create customized websites,
-comprising of the following features:
+```toml
+[folders_on_host]
+dq_app = "/absolute/path/to/app"
+# dq_source = "/path/to/daiquiri"
 
-* An interactive Query interface enabling users to perform SQL/ADQL queries against catalog databases. The queries are analyzed using the [queryparser](https://github.com/django-daiquiri/queryparser) and permissions are checked depending on user accounts and groups.
-* Asynchronous database queries, which can take minutes or even hours.
-* Download of the query results in different formats and visualization of the data.
-* A programmatic interface to the database implementing the [IVOA TAP](http://www.ivoa.net/documents/TAP/20180830/PR-TAP-1.1-20180830.html) protocol.
-* A cone search API based on the [IVOA Simple Cone Search](http://www.ivoa.net/documents/latest/ConeSearch.html) recommendation.
-* An integration into to [IVOA registry of registry](http://rofr.ivoa.net/) to make the VO endpoints available in applications like, e.g. [topcat](http://www.star.bris.ac.uk/~mbt/topcat/).
-* A metadata management backend containing information about the database schemas and tables including DOI and UCD.
-* The download of files connected to the database tables, including access restrictions.
-* An OAI-PMH2 endpoint to make the metadata stored in the system available to harvesters.
-* A cut-out API for multi-dimensional data (e.g. data cubes).
-* A sophisticated user management system with customizable registration and confirmation workflows.
-* A contact form connected to the management backend.
+[docker_volume_mountpoints]
+dq_app = "/home/dq/app"
+# dq_source = "/home/dq/source"
+```
 
-## Requirements
+Keep the default development settings:
 
-Daiquiri is based on [Django](https://www.djangoproject.com/) and is written
-in Python. The following requirements are mandatory:
+```toml
+[env.daiquiri]
+debug = true
+enable_gunicorn = false
+```
 
-* Python `>=3.13`
-* PostgreSQL `>=14`
-* RabbitMQ `>=3.5` (for asynchronous tasks like the query queue)
+Start the profile:
 
-For demonstration, development or testing purposes, Daiquiri can be installed
-on Linux, macOS, or even Windows. If you, however, intent to set up a production
-environment, serving Daiquiri over a Network or the Internet, we strongly suggest
-that you use a recent Linux distribution, namely:
+```bash
+python manage.py -r
+```
 
-* Debian 13
-* Ubuntu 24.04
+Open <http://localhost:9280> in a browser. The default profile starts the
+Daiquiri application and PostgreSQL containers. You can login using the
+username and password `admin`. Asynchronous workers are
+disabled by default.
 
-## Scientific Databases Using Daiquiri
+### Develop Daiquiri with a local source checkout
 
-Daiquiri is currently used on several sites hosted and maintained by
-the [Leibniz-Institute for Astrophysics Potsdam (AIP)](http://www.aip.de/):
+If you are developing Daiquiri itself, also clone the source repository:
 
-* [Gaia@AIP Services](https://gaia.aip.de)
-* [APPLAUSE archives](https://www.plate-archive.org)
-* [MUSE-Wide survey](https://musewide.aip.de)
-* [GREGOR project and archive](https://gregor.aip.de)
-* [CLUES – Constrained Local UniversE Simulations project](https://www.clues-project.org)
-* [CosmoSim database](https://www.cosmosim.org)
-* [RAVE Survey](https://www.rave-survey.org)
+```bash
+git clone https://github.com/django-daiquiri/daiquiri.git
+```
 
-## Installation
+Set `dq_source` in the host-side folder configuration to the absolute path of
+that checkout. Keep the container mount point unchanged:
 
-You can find the detailed instractions for the installation of Daiquiri in the
-main documentation.
+```toml
+[folders_on_host]
+dq_app = "/absolute/path/to/app"
+dq_source = "/absolute/path/to/daiquiri"
 
-* [Installation](https://django-daiquiri.github.io/docs/installation/)
+[docker_volume_mountpoints]
+dq_source = "/home/dq/source"
+```
 
+Run the same `dq-dev` profile and edit the Daiquiri source on the host. With
+`debug = true` and `enable_gunicorn = false`, the development server reloads
+Python changes and they can be viewed at <http://localhost:9280>.
+
+See [`CONTRIBUTING.rst`](CONTRIBUTING.rst) for the development and pull-request
+workflow.
 
 ## Documentation
 
-**Main documentation**:  [django-daiquiri.github.io](https://django-daiquiri.github.io)
+- [Full installation](https://django-daiquiri.github.io/docs/installation/)
+- [Deployment](https://django-daiquiri.github.io/docs/deployment/)
+- [Configuration and settings](https://django-daiquiri.github.io/docs/settings/)
+- [Administration](https://django-daiquiri.github.io/docs/administration/)
+- [Daiquiri documentation](https://django-daiquiri.github.io/)
+
+For issues and feature requests, use the [GitHub issue tracker](https://github.com/django-daiquiri/daiquiri/issues).
+
+## License
+
+Daiquiri is released under the [Apache License 2.0](LICENSE).
