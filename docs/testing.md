@@ -1,62 +1,65 @@
 Testing
 =======
 
-Setup tests
------------
+The test suite uses `pytest`, `pytest-django`, and PostgreSQL. The repository's
+`pyproject.toml` configures Django, enables database reuse by default, and
+points pytest at `testing.config.settings`.
 
-First, create a `local.py` file:
+Continuous integration runs the complete suite for pushes and pull requests.
+Running it manually is optional and is mainly useful when reproducing a CI
+failure. The default `dq-dev` container uses an application's runtime
+configuration and databases, so it is not a drop-in environment for these
+tests.
 
 
-```bash
-cp testing/config/settings/sample.local.py testing/config/settings/local.py
-```
+Set up the test database
+------------------------
 
-Afterwards edit the `local.py` as for a regular Daiquiri instance.
-
-The, setup the database:
-
-```bash
-# postgres
-psql < testing/sql/postgres/test.sql
-cat testing/sql/postgres/data/* | psql test_daiquiri_data
-
-# mysql
-mysql < testing/sql/mysql/test.sql
-cat testing/sql/mysql/data/* | mysql
-```
-
-Running tests
--------------
+From the root of the Daiquiri checkout, install Python 3.13 or newer, install
+the test dependencies, and create the PostgreSQL test databases:
 
 ```bash
-# from the root directory of the daiquiri repo
-pytest --reuse-db
-pytest --reuse-db -x                                                       # stop after the first failed test
-pytest --reuse-db daiquiri/auth                                            # test only the auth app
-pytest --reuse-db daiquiri/auth/tests/test_accounts.py                     # run only a specific test file
-pytest --reuse-db daiquiri/auth/tests/test_accounts.py::test_login         # run only a specific test
+python3.13 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -e '.[ci]'
+psql -f testing/sql/postgres/setup.sql
 ```
+
+The SQL script creates the application, data, TAP, and OAI test databases and
+loads the data fixtures used by the tests. Run it with a PostgreSQL role that
+can create roles and databases.
+
+
+Run tests
+---------
+
+Run the full suite from the repository root:
+
+```bash
+python -m pytest
+```
+
+Useful variants are:
+
+```bash
+python -m pytest --migrations                 # include migration execution
+python -m pytest -x                          # stop after the first failure
+python -m pytest daiquiri/auth               # test one Daiquiri module
+python -m pytest path/to/test_file.py        # test one file
+python -m pytest path/to/test_file.py::test_name
+```
+
+The default `--reuse-db` setting makes repeated test runs faster. Use
+`--create-db` when the test database must be recreated.
 
 
 Coverage
 --------
 
 ```bash
-pytest --reuse-db --cov                    # show a coverage report in the terminal
-pytest --reuse-db --cov --cov-report html  # additionally create a browsable coverage report in htmlcov/
-pytest --reuse-db --cov=daiquiri/auth      # only compute coverage for the auth app
+python -m pytest --cov=daiquiri
+python -m pytest --cov=daiquiri --cov-report=html
 ```
 
-Fixtures
---------
-
-The fixtures for testing are created in the following way:
-
-```
-./manage.py dumpdata auth.group auth.user account.emailaddress daiquiri_auth.profile > fixtures/auth.json
-./manage.py dumpdata daiquiri_contact > fixtures/contact.json
-./manage.py dumpdata daiquiri_metadata > fixtures/metadata.json
-./manage.py dumpdata daiquiri_jobs.job > fixtures/jobs.json
-./manage.py dumpdata daiquiri_query.queryjob > fixtures/queryjobs.json
-./manage.py dumpdata daiquiri_query.examples > fixtures/examples.json
-```
+The HTML report is written to `htmlcov/`.

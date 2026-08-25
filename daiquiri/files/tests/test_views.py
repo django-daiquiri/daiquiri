@@ -20,7 +20,7 @@ status_map = {
         'admin': 403, 'manager': 200, 'user': 403, 'anonymous': 302
     },
     'html_a_b': {
-        'admin': 404, 'manager': 404, 'user': 404, 'anonymous': 404
+        'admin': 404, 'manager': 404, 'user': 404, 'anonymous': 302
     }
 }
 

@@ -247,7 +247,7 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
         if datatype == 'timestamp':
             arraysizes[i] = formats_dict['timestamp'][2]
         elif datatype in ('char', 'spoint', 'array') and arraysize == '':
-            arraysizes[i] = formats_dict[datatype][2]
+            arraysizes[i] = DEFAULT_CHAR_SIZE
         elif datatype is None:
             datatypes[i] = 'unknown'
             arraysizes[i] = formats_dict['unknown'][2]
@@ -282,9 +282,10 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
     logo = get_daiquiri_logo(str(Site.objects.get_current())[:30], daiquiri_version)
 
     # Main header #############################################################
+    simple_card = "SIMPLE  =                    T / conforms to FITS standard                      "
+
     # fmt:off
     header0info = [
-        ('SIMPLE',  'T',       'conforms to FITS standard'),
         ('BITPIX',  '8',       'array data type'),
         ('NAXIS',   '1',       'number of array dimensions'),
         ('NAXIS1',  '2880',    'number of characters'),
@@ -299,7 +300,7 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
     ]
     # fmt:on
 
-    h0 = ''.join([create_fits_card(*entry) for entry in header0info])
+    h0 = simple_card + ''.join([create_fits_card(*entry) for entry in header0info])
     h0 += ' ' * (2880 * (len(h0) // 2880 + 1) - len(h0))
 
     yield h0.encode()

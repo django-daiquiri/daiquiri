@@ -1,206 +1,98 @@
-Development setup
-=================
+Development
+===========
 
-Install prerequisites
+This document describes development of the Daiquiri library. Installation and
+deployment of a Daiquiri application are documented in the separate
+[Daiquiri documentation](https://django-daiquiri.github.io/docs/installation/).
+
+
+Preferred development workflow: `dq-dev`
+----------------------------------------
+
+`dq-dev` is the container-based integration workflow. It can install the
+published Daiquiri package, or a local Daiquiri checkout when `dq_source` is
+mounted.
+
+This workflow requires Docker Engine and Docker Compose v2. Current Docker
+Desktop installations commonly include Compose; on other systems, install the
+Docker Compose plugin so that the `docker compose` command is available.
+
+From the `dq-dev` checkout:
+
+```bash
+python manage.py -c dev
+python manage.py -s dev
+```
+
+Edit `usr/profiles/dev/conf.toml` and set the host-side paths for the app and,
+when testing local library changes, the Daiquiri source:
+
+```toml
+[folders_on_host]
+dq_app = "/path/to/app"
+dq_source = "/path/to/daiquiri"
+```
+
+Leave the corresponding container mount points unchanged. Start the profile
+with:
+
+```bash
+python manage.py -r
+```
+
+The default profile exposes the application at
+`http://localhost:9280`. The default configuration runs without asynchronous
+workers; enable the required containers and settings in the profile before
+testing asynchronous behavior. For live Daiquiri development, keep
+`debug = true` and `enable_gunicorn = false` in the Daiquiri environment.
+
+
+Run pre-commit checks
 ---------------------
 
-Install the prerequisites for your Linux distribution as described [here](prerequisites).
+Run the pre-commit checks before every commit. Install the tool once in the
+Python environment used for development:
 
-
-Create user
------------
-
-Either run Daiquiri as your regular Desktop user or create a dedicated user:
-
-```
-useradd -m -d /srv/daiquiri daiquiri -s /bin/bash
-su - daiquiri
+```bash
+python -m pip install pre-commit
+pre-commit install
 ```
 
-Don't run Daiquiri as root!
+Run all configured hooks explicitly with:
 
-
-Obtain repositories
--------------------
-
-Clone the repositories and call them `daiquiri`, `app`, and `queryparser`:
-
-```
-git clone https://github.com/django-daiquiri/daiquiri daiquiri
-git clone https://github.com/django-daiquiri/app app
-git clone https://github.com/django-daiquiri/queryparser queryparser
+```bash
+pre-commit run --all-files
 ```
 
-Build the queryparser
----------------------
+Some hooks can modify files. Review those changes and run the command again
+until it completes successfully.
 
-Change to the queryparser directory, fetch `antlr` and run `make`:
 
-```
-cd queryparser
-wget http://www.antlr.org/download/antlr-4.7.2-complete.jar
-make
-```
+Full test suite
+---------------
 
-Install python dependencies
----------------------------
+Continuous integration runs the complete PostgreSQL-backed pytest suite for
+pushes and pull requests. The default `dq-dev` container is not configured with
+the test settings and databases used by this suite.
 
-Change to the `app` directory and create a virtualenv:
+If you want to reproduce CI locally, use `act` with the workflow command in
+[`CONTRIBUTING.rst`](../CONTRIBUTING.rst). The full manual PostgreSQL setup is
+described in [testing.md](testing.md).
 
-```
-cd ../app
-virtualenv env
-source env/bin/activate
-```
 
-or for `python3`:
+Full local installation
+-----------------------
 
-```
-cd ../app
-python3 -m venv env3
-source env3/bin/activate
-```
+If you prefer to run the library and its dependencies directly on the host,
+Daiquiri requires Python 3.13 or newer. From the root of a checkout, create a
+virtual environment and install the development and PostgreSQL dependencies:
 
-Install the requirements in editable mode:
-
-```
-pip install -e ../daiquiri
-pip install -e ../queryparser
-pip install mysqlclient
-pip install psycopg2-binary
-```
-or for postgres:
-```
-pip install psycopg2
+```bash
+python3.13 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -e '.[dev,postgres]'
 ```
 
-Setup the app
--------------
-
-Create a `log` and a `download` directory:
-
-```
-mkdir log download
-```
-
-Copy the `local.py` settings file:
-
-```
-cp config/settings/sample.local.py config/settings/local.py
-```
-
-Edit config/settings/local.py for database settings, and `DEBUG = True` and add
-
-```
-TESTING_DIR = os.path.join(BASE_DIR, '../daiquiri/testing')
-
-FIXTURE_DIRS = (
-    os.path.join(TESTING_DIR, 'fixtures'),
-)
-
-AUTH_SIGNUP = True
-AUTH_WORKFLOW = 'confirmation'
-
-ARCHIVE_ANONYMOUS = False
-ARCHIVE_BASE_PATH = os.path.join(TESTING_DIR, 'files')
-
-FILES_BASE_PATH = os.path.join(TESTING_DIR, 'files')
-
-SERVE_DOWNLOAD_DIR = os.path.join(TESTING_DIR, 'files')
-```
-
-at the end of the file.
-
-Next, the differenet users and permissions need to be created on the database. For this purpose, the `sqlcreate` can be used to see what needs to be executed on the database:
-
-```
-./manage.py sqlcreate                             # databases, users and permissions to run daiquiri
-./manage.py sqlcreate --test                      # databases, users and permissions to run tests
-./manage.py sqlcreate --schema=daiquiri_data_obs  # databases, users and permissions to use a particular schema with scientific data
-```
-
-Copy the output line by line to a database shell, and create the test databases using the files in `../daiquiri/testing/sql`, for MySQL:
-
-```
-mysql < ../daiquiri/testing/sql/mysql.sql
-```
-
-and for PostgreSQL:
-
-```
-psql daiquiri_data < ../daiquiri/testing/sql/postgres.sql
-psql daiquiri_data < ../daiquiri/testing/sql/postgres_permissions.sql
-psql test_daiquiri_data < ../daiquiri/testing/sql/postgres.sql
-psql test_daiquiri_data < ../daiquiri/testing/sql/postgres_permissions.sql
-```
-
-Run the tests:
-
-```
-./manage.py test daiquiri --keepdb
-```
-
-Run the database migrations:
-
-```
-./manage.py migrate
-./manage.py migrate --database=data
-```
-
-Import the fixtures:
-
-```
-./manage.py loaddata ../daiquiri/testing/fixtures/*
-```
-
-Run the development server:
-
-```
-./manage.py runserver
-```
-
-Go to `http://localhost:8000` in your web browser.
-
-
-Setup the queues
-----------------
-
-Edit config/settings/local.py again, and set `ASYNC = True`.
-
-
-Open three other terminals, go to the `app` directory, activate the virtual environment, and run:
-
-```
-./manage.py runworker
-```
-
-```
-./manage.py runworker query
-```
-
-```
-./manage.py runworker download
-```
-
-to start the different workers.
-
-
-Additioal information
----------------------
-
-MariaDB
-~~~~~~~
-
-The default character set in MariaDB 10.0.27 is utf8b4. This causes a django-error for the migration:
-
-```
-django.db.utils.OperationalError: (1071, 'Specified key was too long; max key length is 767 bytes')
-```
-
-Solution 1: set the django DB settings: [https://docs.djangoproject.com/el/1.10/ref/settings/#charset]
-
-Solution 2: create your database with the utf8 character set.
-
-```
-create database <DBname> CHARACTER SET utf8;
-```
+The project declares all runtime dependencies in `pyproject.toml`, so a
+separate query-parser checkout or manual ANTLR build is not required.

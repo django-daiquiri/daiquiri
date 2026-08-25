@@ -1,8 +1,60 @@
 {% if announcements %}
     {% for msg in announcements %}
-    <div class="alert alert-{{ msg.announcement_type }}"
-        role="alert">
-        {{ msg.announcement | safe }}
+    <div
+        class="alert alert-{{ msg.announcement_type }} rounded-0 position-relative m-0 py-2 text-center"
+        role="alert"
+        data-announcement-id="{{ msg.id }}-{{ msg.updated | date:'U-u' }}"
+    >
+        <div class="container">
+            <div class="d-inline-flex align-items-center pe-5">
+              <p class="mt-0 mb-0">
+                {{ msg.announcement | safe }}
+              </p>
+            </div>
+        </div>
+
+        <button
+            type="button"
+            class="btn-close close-announcement-btn position-absolute top-50 end-0 translate-middle-y me-3"
+            aria-label="Close"
+            data-announcement-id="{{ msg.id }}-{{ msg.updated | date:'U-u' }}"
+        ></button>
     </div>
     {% endfor %}
 {% endif %}
+
+<script>
+(function () {
+    const style = document.createElement('style');
+    let css = '';
+
+    for (let i = 0; i < sessionStorage.length; i++) {
+        const key = sessionStorage.key(i);
+        if (key.startsWith('announcementDismissed_')) {
+            const id = key.replace('announcementDismissed_', '');
+            css += `
+                [data-announcement-id="${id}"] {
+                    display: none !important;
+                }
+            `;
+        }
+    }
+    style.innerHTML = css;
+    document.head.appendChild(style);
+})();
+
+document.addEventListener("DOMContentLoaded", function () {
+    const closeButtons = document.querySelectorAll('.close-announcement-btn');
+
+    closeButtons.forEach(btn => {
+        const id = btn.dataset.announcementId;
+        btn.addEventListener('click', function () {
+            sessionStorage.setItem(`announcementDismissed_${id}`, 'true');
+            document
+                .querySelectorAll(`[data-announcement-id="${id}"]`)
+                .forEach(el => el.remove());
+        });
+    });
+});
+
+</script>

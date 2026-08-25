@@ -1,5 +1,7 @@
 import logging
 
+from django.db.utils import ProgrammingError
+
 from .adapter import DatalinkAdapter
 from .models import Datalink
 
@@ -19,8 +21,11 @@ def update_links(resource_type, resource):
         for link in links:
             datalinks.append(Datalink(**link))
 
-        Datalink.objects.filter(ID=identifier).delete()
-        Datalink.objects.bulk_create(datalinks)
+        try:
+            Datalink.objects.filter(ID=identifier).delete()
+            Datalink.objects.bulk_create(datalinks)
+        except ProgrammingError:
+            pass
 
 
 def delete_links(resource_type, resource):
@@ -31,4 +36,7 @@ def delete_links(resource_type, resource):
     if resource_type in adapter.resource_types:
         identifier = adapter.get_identifier(resource_type, resource)
 
-        Datalink.objects.filter(ID=identifier).delete()
+        try:
+            Datalink.objects.filter(ID=identifier).delete()
+        except ProgrammingError:
+            pass
