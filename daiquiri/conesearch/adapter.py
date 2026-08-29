@@ -164,7 +164,9 @@ WHERE 1=CONTAINS(POINT({ra_column}, {dec_column}), CIRCLE(POINT({RA}, {DEC}), {S
             raise NotFound(errors)
 
     def stream(self):
+        adapter = DatabaseAdapter()
+        _, generator = adapter.fetchall_sync(self.sql, self.args)
         return FileResponse(
-            generate_votable(DatabaseAdapter().fetchall(self.sql, self.args), self.columns),
+            generate_votable(generator(), self.columns, max_records=self.max_records),
             content_type='application/xml',
         )
