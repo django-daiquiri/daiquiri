@@ -122,7 +122,8 @@ const Jobs = ({ jobId, loadJob, loadJobs }) => {
         userId && (
           <div className="card-footer">
             <button className="btn btn-link" onClick={loadJobs}>
-              {gettext('View verbose job list')}
+              <i className="bi bi-card-list me-2"></i>
+              {gettext('Advanced job view')}
             </button>
           </div>
         )
