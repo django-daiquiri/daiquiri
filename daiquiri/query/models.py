@@ -14,6 +14,7 @@ from rest_framework.exceptions import ValidationError
 from daiquiri.core.adapter import DatabaseAdapter, DownloadAdapter
 from daiquiri.core.constants import ACCESS_LEVEL_CHOICES
 from daiquiri.core.generators import generate_votable
+from daiquiri.core.pgsphere import process_result_columns, process_result_row
 from daiquiri.core.utils import get_date_display
 from daiquiri.files.utils import check_file
 from daiquiri.jobs.managers import JobManager
@@ -285,11 +286,12 @@ class QueryJob(Job):
             # for sync we are using generate_votable() directly.
             def row_generator(prepend=None):
                 for row in fetch_rows():
+                    row = process_result_row(row, columns, self.query_language)
                     yield from DownloadAdapter().prepend_row_values(row, prepend)
 
             yield from generate_votable(
                 row_generator(prepend),
-                columns,
+                process_result_columns(columns, self.query_language),
                 table=download_adapter.get_table_name(self.schema_name, self.table_name),
                 infos=download_adapter.get_infos(
                     'OK', self.query, self.query_language, job_sources
@@ -417,13 +419,19 @@ class QueryJob(Job):
                 rows = adapter.fetch_rows(
                     self.schema_name,
                     self.table_name,
-                    column_names,
+                    column_names or self.column_names,
                     ordering,
                     page,
                     page_size,
                     search,
                     filters,
                 )
+
+                columns = {column['name']: column for column in self.metadata['columns']}
+                selected_columns = [columns[name] for name in (column_names or self.column_names)]
+                rows = [
+                    process_result_row(row, selected_columns, self.query_language) for row in rows
+                ]
 
                 # flatten the list if only one column is retrieved
                 if len(column_names) == 1:
@@ -439,7 +447,7 @@ class QueryJob(Job):
 
     def columns(self):
         if self.metadata:
-            return self.metadata.get('columns', [])
+            return process_result_columns(self.metadata.get('columns', []), self.query_language)
         else:
             return []
 

@@ -9,6 +9,7 @@ import requests
 from astropy.io.votable import parse_single_table
 
 from daiquiri.core.adapter import DatabaseAdapter
+from daiquiri.core.pgsphere import PGSPHERE_TYPES
 from daiquiri.core.utils import handle_file_upload, human2bytes, import_class
 from daiquiri.metadata.models import Column, Table
 
@@ -235,6 +236,9 @@ def get_columns_metadata(job, columns):
         if column.get('name') != name:
             column = column.copy()
             column['name'] = name
+        # Geometry identity must come from the cursor, even with older catalog metadata.
+        if col.get('datatype') in PGSPHERE_TYPES or column.get('datatype') in PGSPHERE_TYPES:
+            column = dict(column, datatype=col['datatype'], arraysize=col['arraysize'])
         columns_list.append(column)
 
     return columns_list
