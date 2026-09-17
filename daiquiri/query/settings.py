@@ -38,7 +38,8 @@ QUERY_QUEUES = [
 QUERY_LANGUAGES = [
     {
         'key': 'adql',
-        'version': 2.0,
+        'version': 2.1,
+        'compatible_versions': ['2.0'],
         'label': 'ADQL',
         'description': '',
         'quote_char': '"',

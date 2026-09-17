@@ -17,11 +17,10 @@ from daiquiri.core.generators import (
 from daiquiri.core.pgsphere import (
     ADQL_GEOMETRIES,
     PGSPHERE_TYPES,
-    is_adql,
     process_result_columns,
     process_result_row,
 )
-from daiquiri.core.utils import get_doi_url
+from daiquiri.core.utils import get_doi_url, is_adql
 
 logger = logging.getLogger(__name__)
 

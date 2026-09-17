@@ -370,11 +370,12 @@ def get_query_language_choices():
 
 
 def get_query_language_label(query_language):
+    query_language = (query_language or '').lower().split('-', 1)[0]
     return next(
         iter(
             ql['label']
             for ql in settings.QUERY_LANGUAGES
-            if query_language in [ql['key'], '{key}-{version}'.format(**ql)]
+            if query_language == ql['key'].lower()
         ),
         None,
     )

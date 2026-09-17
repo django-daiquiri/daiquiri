@@ -18,9 +18,9 @@ from daiquiri.core.pgsphere import (
     ADQL_GEOMETRIES,
     PGSPHERE_TYPES,
     convert_geometry_to_adql,
-    is_adql,
     process_result_columns,
 )
+from daiquiri.core.utils import is_adql
 
 logger = logging.getLogger(__name__)
 

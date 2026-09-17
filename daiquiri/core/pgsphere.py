@@ -3,6 +3,8 @@
 import math
 import re
 
+from daiquiri.core.utils import is_adql
+
 PGSPHERE_TYPES = {
     'spoint',
     'scircle',
@@ -22,24 +24,13 @@ ADQL_GEOMETRIES = {
 }
 
 _NUMBER = r'[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?'
-_POINT = rf'\(\s*{_NUMBER}\s*,\s*{_NUMBER}\s*\)'
-_SHAPES = {
-    'spoint': re.compile(_POINT),
-    'scircle': re.compile(rf'<\s*{_POINT}\s*,\s*{_NUMBER}\s*>'),
-    'sbox': re.compile(rf'\(\s*{_POINT}\s*,\s*{_POINT}\s*\)'),
-    'spoly': re.compile(rf'\{{\s*{_POINT}(?:\s*,\s*{_POINT}){{2,}}\s*\}}'),
-}
-
-
-def is_adql(query_language):
-    return (query_language or '').lower().split('-', 1)[0] == 'adql'
 
 
 def convert_geometry_to_adql(value, datatype):
     """Decode pgSphere text in radians into a flat list of angles in degrees."""
     if value is None or value == 'NULL' or (isinstance(value, float) and math.isnan(value)):
         return None
-    if not isinstance(value, str) or not _SHAPES[datatype].fullmatch(value.strip()):
+    if not isinstance(value, str):
         raise ValueError(f'Invalid pgSphere {datatype} result: {value!r}')
     angles = [math.degrees(float(angle)) for angle in re.findall(_NUMBER, value)]
     if not all(math.isfinite(angle) for angle in angles):

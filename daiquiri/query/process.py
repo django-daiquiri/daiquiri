@@ -9,7 +9,7 @@ from queryparser.exceptions import QueryError, QuerySyntaxError
 from rest_framework.exceptions import ValidationError
 
 from daiquiri.core.adapter import DatabaseAdapter
-from daiquiri.core.utils import filter_by_access_level
+from daiquiri.core.utils import filter_by_access_level, is_adql
 from daiquiri.metadata.models import Column, Function, Schema, Table
 
 from .utils import (
@@ -77,10 +77,11 @@ def process_query_language(user, query_language):
     # get the possible query languages for this user and create a map
     query_language_map = {}
     for item in filter_by_access_level(user, settings.QUERY_LANGUAGES):
-        query_language_map['{key}-{version}'.format(**item)] = '{key}-{version}'.format(
-            **item
-        )
-        query_language_map['{key}'.format(**item)] = '{key}-{version}'.format(**item)
+        current_language = '{key}-{version}'.format(**item)
+        query_language_map[current_language] = current_language
+        query_language_map[item['key']] = current_language
+        for version in item.get('compatible_versions', []):
+            query_language_map['{}-{}'.format(item['key'], version)] = current_language
 
     # check if a query language is set
     if query_language:
@@ -95,7 +96,7 @@ def process_query_language(user, query_language):
 
     else:
         # return the default query_language
-        return settings.QUERY_LANGUAGES[0]['key']
+        return '{key}-{version}'.format(**settings.QUERY_LANGUAGES[0])
 
 
 def process_queue(user, queue):
@@ -138,7 +139,7 @@ def translate_query(query_language, query):
     adapter = DatabaseAdapter()
 
     # translate adql -> mysql string
-    if query_language == 'adql-2.0':
+    if is_adql(query_language):
         try:
             translator = cache.get_or_set('translator', ADQLQueryTranslator(), 3600)
             translator.set_query(query)
