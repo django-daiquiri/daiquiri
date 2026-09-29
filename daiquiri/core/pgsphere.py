@@ -45,6 +45,29 @@ def convert_geometry_to_adql(value, datatype):
     return angles
 
 
+def convert_geometry_to_pgsphere(value, datatype):
+    """Encode ADQL geometry angles in degrees as pgSphere text in radians."""
+    angles = [math.radians(float(angle)) for angle in value]
+    if not all(math.isfinite(angle) for angle in angles):
+        raise ValueError(f'Non-finite ADQL {datatype} value: {value!r}')
+    if datatype == 'sbox':
+        longitude, latitude, width, height = angles
+        value = (
+            f'(({longitude - width / 2}, {latitude - height / 2}), '
+            f'({longitude + width / 2}, {latitude + height / 2}))'
+        )
+    elif datatype == 'spoly':
+        value = '{' + ', '.join(
+            f'({longitude}, {latitude})'
+            for longitude, latitude in zip(angles[::2], angles[1::2], strict=True)
+        ) + '}'
+    elif datatype == 'scircle':
+        value = f'<({angles[0]}, {angles[1]}), {angles[2]}>'
+    else:
+        value = f'({angles[0]}, {angles[1]})'
+    return value
+
+
 def process_result_columns(columns, query_language):
     """Return presentation metadata without modifying the stored metadata."""
     if not is_adql(query_language):

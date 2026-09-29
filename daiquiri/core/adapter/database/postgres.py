@@ -57,7 +57,7 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         'double[]': 'double precision[]',
         'floatComplex': 'real[]',
         'doubleComplex': 'double[]',
-        'spoint': 'spoint',
+        **{datatype: datatype for datatype in PGSPHERE_TYPES},
     }
 
     search_stmt_template = '%s::text LIKE %%s'

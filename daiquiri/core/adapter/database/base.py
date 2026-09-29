@@ -3,6 +3,8 @@ import warnings
 
 from django.db import connections
 
+from daiquiri.core.pgsphere import ADQL_GEOMETRIES, convert_geometry_to_pgsphere
+
 logger = logging.getLogger(__name__)
 
 
@@ -283,9 +285,10 @@ class BaseDatabaseAdapter:
         if mask is None:
             for row in rows:
                 # all values are escaped with quotes
-                escaped_cells = []
-                for cell in row:
-                    escaped_cells.append(self._escape_cell(cell))
+                escaped_cells = [
+                    self._escape_cell(cell, datatype=column['datatype'])
+                    for column, cell in zip(columns, row, strict=True)
+                ]
 
                 escaped_row = ', '.join(escaped_cells)
                 escaped_rows.append(f'({escaped_row})')
@@ -293,9 +296,12 @@ class BaseDatabaseAdapter:
         else:
             for row, mask_row in zip(rows, mask):
                 # all values are escaped with quotes
-                escaped_cells = []
-                for cell, mask_cell in zip(row, mask_row):
-                    escaped_cells.append(self._escape_cell(cell, mask_cell))
+                escaped_cells = [
+                    self._escape_cell(
+                        row[column['name']], mask_row[column['name']], column['datatype']
+                    )
+                    for column in columns
+                ]
 
                 escaped_row = ', '.join(escaped_cells)
                 escaped_rows.append(f'({escaped_row})')
@@ -379,17 +385,25 @@ class BaseDatabaseAdapter:
 
         return sql
 
-    def _escape_cell(self, cell, mask_cell=None):
-        if mask_cell:
+    def _escape_cell(self, cell, mask_cell=None, datatype=None):
+        cell_mask = mask_cell if mask_cell is not None else getattr(cell, 'mask', False)
+        if not getattr(cell_mask, 'ndim', 0) and cell_mask:
             return 'NULL'
+        elif datatype in ADQL_GEOMETRIES and getattr(cell, 'ndim', 0) == 1:
+            if getattr(cell_mask, 'ndim', 0) and cell_mask.any():
+                if cell_mask.all():
+                    return 'NULL'
+                raise ValueError(f'Incomplete pgSphere {datatype} value: {cell!r}')
+            value = convert_geometry_to_pgsphere(cell, datatype)
+        elif hasattr(cell, 'ndim') and cell.ndim == 1:
+            # create an array string digestable by postgres
+            value_list = [
+                'NULL' if getattr(cell_mask, 'ndim', 0) and cell_mask[i] else str(cell[i])
+                for i in range(len(cell))
+            ]
+            value = '{' + ', '.join(value_list) + '}'
         else:
-            if hasattr(cell, 'ndim') and cell.ndim == 1:
-                # create an array string digestable by postgres
-                value_list = [
-                    'NULL' if cell.mask[i] else str(cell[i]) for i in range(len(cell))
-                ]
-                value = '{' + ', '.join(value_list) + '}'
-            elif isinstance(cell, str):
+            if isinstance(cell, str):
                 value = cell
             elif cell.dtype.char == 'S':
                 # chars need to be decoded
@@ -400,4 +414,4 @@ class BaseDatabaseAdapter:
             else:
                 value = cell
 
-            return self.escape_string(value)
+        return self.escape_string(value)
