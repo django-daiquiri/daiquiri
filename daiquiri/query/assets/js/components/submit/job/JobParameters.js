@@ -19,6 +19,15 @@ const JobParameters = ({ job }) => {
         </dd>
 
         {
+          job.query_language && !job.query && (
+            <>
+              <dt className="col-md-3 text-md-end">{gettext('Query language')}</dt>
+              <dd className="col-md-9 mb-0">{job.query_language_label}</dd>
+            </>
+          )
+        }
+
+        {
           job.phase == 'ERROR' && (
             <>
               <dt className="col-md-3 text-md-end">{gettext('Error')}</dt>
