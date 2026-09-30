@@ -58,12 +58,12 @@ export const useDownloadFormsQuery = (jobId) => {
   })
 }
 
-export const useSubmittedDownloadsQuery = (jobId) => {
+export const useSubmittedDownloadsQuery = (jobId, pollingInterval = 3000) => {
   return useQuery({
     queryKey: ['submittedDownloads', jobId],
     queryFn: () => QueryApi.fetchSubmittedDownloads(jobId),
     staleTime: 0,
-    refetchInterval: 2500,
+    refetchInterval: pollingInterval,
   })
 }
 

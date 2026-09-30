@@ -88,9 +88,18 @@ export const useAbortJobMutation = () => {
 }
 
 export const useSubmitDownloadJobMutation = () => {
+  const queryClient = useQueryClient()
+
   return useMutation({
     mutationFn: (variables) => {
       return QueryApi.submitDownloadJob(variables.job.id, variables.downloadKey, variables.data)
+    },
+    onSuccess: async (data, variables) => {
+      await queryClient.invalidateQueries({ queryKey: ['submittedDownloads', variables.job.id] })
+      variables.onSuccess?.(data)
+    },
+    onSettled: (data, error, variables) => {
+      variables.onSettled?.()
     }
   })
 }
