@@ -1,5 +1,5 @@
 import BaseApi from 'daiquiri/core/assets/js/api/BaseApi'
-import { downloadFile, encodeParams } from 'daiquiri/core/assets/js/utils/api'
+import { encodeParams } from 'daiquiri/core/assets/js/utils/api'
 
 class QueryApi extends BaseApi {
 
@@ -86,6 +86,10 @@ class QueryApi extends BaseApi {
 
   static submitDownloadJob(id, downloadKey, data) {
     return this.post(`/query/api/jobs/${id}/download/${downloadKey}/`, data)
+  }
+
+  static getDownloadUrl(jobId, downloadKey, downloadJobId) {
+    return `/query/api/jobs/${jobId}/download/${downloadKey}/${downloadJobId}/?download=true`
   }
 
   static fetchUserExamples() {
