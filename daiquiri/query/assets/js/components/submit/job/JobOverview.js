@@ -35,6 +35,7 @@ const JobOverview = ({ job, loadForm }) => {
         <div className="card-body d-flex flex-wrap gap-2">
             <button
               className="btn btn-outline-primary btn-sm"
+              disabled={!job.query}
               onClick={() => loadForm('sql', job.query, job.query_language)}
             >
               <i className="bi bi-arrow-repeat me-2"></i>

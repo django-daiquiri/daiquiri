@@ -123,7 +123,7 @@ const Jobs = ({ jobId, loadJob, loadJobs }) => {
           <div className="card-footer">
             <button className="btn btn-link" onClick={loadJobs}>
               <i className="bi bi-card-list me-2"></i>
-              {gettext('Advanced job view')}
+              {gettext('View all jobs')}
             </button>
           </div>
         )
