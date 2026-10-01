@@ -4,6 +4,7 @@ import { isEmpty } from 'lodash'
 
 import { bytes2human } from 'daiquiri/core/assets/js/utils/bytes'
 import { isRefColumn, isImageColumn, isNoteColumn, isFileColumn} from 'daiquiri/core/assets/js/utils/table'
+import QueryApi from 'daiquiri/query/assets/js/api/QueryApi'
 import { useJobQuery, useStatusQuery } from 'daiquiri/query/assets/js/hooks/queries'
 
 const ArchiveDownload = ({ jobId, columns, downloadJobs, onSubmit }) => {
@@ -18,8 +19,7 @@ const ArchiveDownload = ({ jobId, columns, downloadJobs, onSubmit }) => {
   const archiveColumns = columns.filter(column => isArchiveColumn(column))
 
   const handleDownload = (downloadJob) => {
-    const url = `/query/api/jobs/${jobId}/download/archive/${downloadJob.id}/?download=true`
-    window.location.href = url
+    window.location.href = QueryApi.getDownloadUrl(jobId, 'archive', downloadJob.id)
   }
 
   const renderErrorMaxNrows = () => {
