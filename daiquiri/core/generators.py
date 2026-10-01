@@ -14,6 +14,13 @@ import pyarrow.parquet as pq
 from sqlalchemy import create_engine
 
 from daiquiri import __version__ as daiquiri_version
+from daiquiri.core.pgsphere import (
+    ADQL_GEOMETRIES,
+    PGSPHERE_TYPES,
+    convert_geometry_to_adql,
+    process_result_columns,
+)
+from daiquiri.core.utils import is_adql
 
 logger = logging.getLogger(__name__)
 
@@ -28,10 +35,10 @@ def generate_csv(generator, fields):
         if row:
             # convert curl brace to square brace in all array-like columns
             corrected_row = []
-            for col in row:
+            for col, field in zip(row, fields, strict=True):
                 corrected_col = col
 
-                if isinstance(col, str):
+                if isinstance(col, str) and field.get('datatype') not in PGSPHERE_TYPES:
                     if col.startswith('{') and col.endswith('}'):
                         corrected_col = col.replace('{', '[').replace('}', ']')
 
@@ -43,7 +50,10 @@ def generate_csv(generator, fields):
             yield f.getvalue()
 
 
-def correct_col_for_votable(col):
+def correct_col_for_votable(col, datatype=None):
+    if datatype in PGSPHERE_TYPES:
+        return col
+
     corrected_col = col
 
     if col.startswith('{') and col.endswith('}'):  # this is an array
@@ -84,8 +94,10 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
         <TABLE>"""
 
     for field in fields:
+        if field.get('datatype') in PGSPHERE_TYPES:
+            field = dict(field, datatype='char', arraysize=None, xtype=field['datatype'])
         attrs = []
-        for key in ['name', 'unit', 'ucd', 'utype']:
+        for key in ['name', 'unit', 'ucd', 'utype', 'xtype']:
             if field.get(key):
                 value = (
                     field[key]
@@ -104,7 +116,7 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
             if 'meta.id' in field['ucd'] and 'meta.ref' in field['ucd']:
                 attrs.append('ID="datalinkID"')
 
-        if 'arraysize' in field:
+        if 'arraysize' in field and not (field.get('datatype') or '').endswith('[]'):
             if field.get('datatype') == 'char' and field['arraysize'] is None:
                 attrs.append('arraysize="*"')
             elif field['arraysize']:
@@ -138,7 +150,7 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
                 else:
                     attrs.append('arraysize="*"')
 
-            else:
+            elif not field.get('xtype'):
                 attrs.append('xtype="{}"'.format(field['datatype']))
 
         if attrs:
@@ -169,7 +181,11 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
                     </TR>""".format(
                 """</TD>
                         <TD>""".join(
-                    [('' if cell in ['NULL', None] else correct_col_for_votable(escape(str(cell)))) for cell in row] # noqa : E501
+                    [
+                        '' if cell in ['NULL', None]
+                        else correct_col_for_votable(escape(str(cell)), field.get('datatype'))
+                        for cell, field in zip(row, fields, strict=True)
+                    ]
                 )
             )
 
@@ -226,7 +242,6 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
         'char':      ('s', 'A', 32, b'',                 lambda x: x.encode()),
         'timestamp': ('s', 'A', 19, b'',                 lambda x: x.encode()),
         'array':     ('s', 'A', 64, b'',                 lambda x: x.encode()),
-        'spoint':    ('s', 'A', 64, b'',                 lambda x: x.encode()),
         'unknown':   ('s', 'A', 8,  b'',                 lambda x: x.encode()),
         'boolean[]': ('s', 'L', 1,  b'\x00',             lambda x: b'T' if x == 'true' else b'F'),
         'short[]':   ('h', 'I', 2,  32767,               int),
@@ -244,9 +259,12 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
     descriptions = [field.get('description') or '' for field in fields]
 
     for i, (datatype, arraysize) in enumerate(zip(datatypes, arraysizes)):
-        if datatype == 'timestamp':
+        if datatype in PGSPHERE_TYPES:
+            datatypes[i] = 'char'
+            arraysizes[i] = array_infos.get(names[i], DEFAULT_CHAR_SIZE)
+        elif datatype == 'timestamp':
             arraysizes[i] = formats_dict['timestamp'][2]
-        elif datatype in ('char', 'spoint', 'array') and arraysize == '':
+        elif datatype in ('char', 'array') and arraysize == '':
             arraysizes[i] = DEFAULT_CHAR_SIZE
         elif datatype is None:
             datatypes[i] = 'unknown'
@@ -389,7 +407,15 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
         fmt = '>'
         row_elements_formatted = []
         for row_element, datatype, arraysize, name in zip(row, datatypes, arraysizes, names):
-            if row_element == 'NULL':
+            if datatype == 'double[]' and (
+                row_element is None or isinstance(row_element, list | tuple)
+            ):
+                # Geometry arrays are already decoded; pad variable-length polygons as usual.
+                values = list(row_element or [])
+                values += [float('nan')] * (array_infos[name] - len(values))
+                row_elements_formatted.extend(values)
+                f = str(array_infos[name]) + 'd'
+            elif row_element is None or row_element == 'NULL':
                 r = formats_dict[datatype][3]
                 f = str(arraysize) + formats_dict[datatype][0]
                 row_elements_formatted.append(r)
@@ -546,8 +572,15 @@ def parse_and_fill_fits_array(
 
 
 def generate_parquet(
-    schema_name: str, table_name: str, fields: dict, metadata: str, database_config: dict
+    schema_name: str,
+    table_name: str,
+    fields: dict,
+    metadata: str,
+    database_config: dict,
+    query_language=None,
 ):
+    native_fields = fields
+    fields = process_result_columns(fields, query_language)
     PQ_TYPE_MAP = {
         'boolean': pa.bool_(),
         'short': pa.int16(),
@@ -582,10 +615,8 @@ def generate_parquet(
 
     arrow_fields = []
     for f in fields:
-        dt = f['datatype']
-        if dt not in PQ_TYPE_MAP:
-            dt = pa.string()
-        arrow_fields.append(pa.field(f['name'], PQ_TYPE_MAP[dt]))
+        datatype = PQ_TYPE_MAP.get(f['datatype'], pa.string())
+        arrow_fields.append(pa.field(f['name'], datatype))
     schema = pa.schema(arrow_fields)
 
     sink = YieldingWriter()
@@ -600,6 +631,15 @@ def generate_parquet(
 
     try:
         for chunk in pd.read_sql(query, con=connection, chunksize=100000):
+            if is_adql(query_language):
+                for field in native_fields:
+                    datatype = field['datatype']
+                    if datatype in ADQL_GEOMETRIES:
+                        chunk[field['name']] = chunk[field['name']].map(
+                            lambda value, datatype=datatype: convert_geometry_to_adql(
+                                value, datatype
+                            )
+                        )
             table = pa.Table.from_pandas(chunk, preserve_index=False).cast(schema)
             writer.write_table(table)
 

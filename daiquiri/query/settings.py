@@ -38,9 +38,18 @@ QUERY_QUEUES = [
 QUERY_LANGUAGES = [
     {
         'key': 'adql',
-        'version': 2.0,
+        'version': '2.1',
+        'compatible_versions': ['2.0'],
         'label': 'ADQL',
         'description': '',
+        'quote_char': '"',
+    },
+    {
+        'key': 'postgresql',
+        'version': '16',
+        'compatible_versions': ['14', '14.5', '16.2'],
+        'label': 'PostgreSQL',
+        'description': 'Restricted PostgreSQL/pgSphere subset supported by Daiquiri.',
         'quote_char': '"',
     }
 ]

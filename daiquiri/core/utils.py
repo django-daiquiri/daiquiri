@@ -35,6 +35,11 @@ from daiquiri.core.constants import (
     GROUPS,
 )
 
+
+def is_adql(query_language):
+    return (query_language or '').lower().split('-', 1)[0] == 'adql'
+
+
 if sys.version_info.major >= 3:
     long_type = int
 else:
@@ -442,4 +447,3 @@ def get_file_size(file_path):
 
 def get_date_display(value):
     return date(value, settings.DATETIME_FORMAT)
-

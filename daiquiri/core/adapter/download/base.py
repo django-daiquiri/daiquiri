@@ -14,7 +14,13 @@ from daiquiri.core.generators import (
     generate_parquet,
     generate_votable,
 )
-from daiquiri.core.utils import get_doi_url
+from daiquiri.core.pgsphere import (
+    ADQL_GEOMETRIES,
+    PGSPHERE_TYPES,
+    process_result_columns,
+    process_result_row,
+)
+from daiquiri.core.utils import get_doi_url, is_adql
 
 logger = logging.getLogger(__name__)
 
@@ -48,13 +54,19 @@ class BaseDownloadAdapter:
 
             # prepend strings with settings.FILES_BASE_PATH if they refer to files
             prepend = self.get_prepend(columns)
+            native_columns = columns
+            columns = process_result_columns(native_columns, query_language)
+            rows = (
+                process_result_row(row, native_columns, query_language)
+                for row in self.generate_rows(prepend=prepend)
+            )
 
             if format_key == 'csv':
-                return generate_csv(self.generate_rows(prepend=prepend), columns)
+                return generate_csv(rows, columns)
 
             elif format_key == 'votable':
                 return generate_votable(
-                    self.generate_rows(prepend=prepend),
+                    rows,
                     fields=columns,
                     table=self.get_table_name(schema_name, table_name),
                     infos=self.get_infos(query_status, query, query_language, sources),
@@ -66,10 +78,12 @@ class BaseDownloadAdapter:
             elif format_key == 'fits':
                 # We have to get the maximum array lengths in case there are arrays in the data
                 schema_table_name = self.get_table_name(schema_name, table_name)
-                fits_arrayinfos = self.get_arraysizes_for_fits(columns, schema_name, table_name)
+                fits_arrayinfos = self.get_arraysizes_for_fits(
+                    native_columns, schema_name, table_name, query_language
+                )
 
                 return generate_fits(
-                    self.generate_rows(prepend=prepend),
+                    rows,
                     fields=columns,
                     nrows=nrows,
                     table_name=schema_table_name,
@@ -78,7 +92,7 @@ class BaseDownloadAdapter:
 
             elif format_key == 'parquet':
                 votable_meta = generate_votable(
-                    self.generate_rows(prepend=prepend),
+                    rows,
                     fields=columns,
                     table=self.get_table_name(schema_name, table_name),
                     infos=self.get_infos(query_status, query, query_language, sources),
@@ -93,9 +107,10 @@ class BaseDownloadAdapter:
                 return generate_parquet(
                     schema_name=schema_name,
                     table_name=table_name,
-                    fields=columns,
+                    fields=native_columns,
                     metadata=votable_meta_str,
                     database_config=self.database_config,
+                    query_language=query_language,
                 )
 
             else:
@@ -211,12 +226,26 @@ class BaseDownloadAdapter:
             services.append(get_service())
         return services
 
-    def get_arraysizes_for_fits(self, columns: list, schema_name: str, table_name: str):
+    def get_arraysizes_for_fits(
+        self, columns: list, schema_name: str, table_name: str, query_language=None
+    ):
         arraysizes = {}
+        db = DatabaseAdapter()
         for c in columns:
+            datatype = c['datatype']
+            if datatype in PGSPHERE_TYPES:
+                geometry = ADQL_GEOMETRIES.get(datatype) if is_adql(query_language) else None
+                if geometry and geometry[1] != '*':
+                    arraysizes[c['name']] = geometry[1]
+                    continue
+                column = db.escape_identifier(c['name'])
+                table = f'{db.escape_identifier(schema_name)}.{db.escape_identifier(table_name)}'
+                # Converted polygons need numeric slots; native values need full text width.
+                length = f'2 * npoints({column})' if geometry else f'octet_length({column}::text)'
+                arraysizes[c['name']] = db.fetchone(f'SELECT MAX({length}) FROM {table}')[0] or 1
+                continue
             if c['datatype'][-2:] == '[]':
                 column_name = c['name']
-                db = DatabaseAdapter()
 
                 query = f"""
                     SELECT MAX(array_length({column_name}, 1))

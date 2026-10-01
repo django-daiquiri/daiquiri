@@ -204,7 +204,10 @@ def run_database_ingest_task(job_id, file_path):
 
         # create the table and insert the data
         try:
-            columns = ingest_table(job.schema_name, job.table_name, file_path)
+            columns, query_language = ingest_table(job.schema_name, job.table_name, file_path)
+            languages = {language['key']: language for language in settings.QUERY_LANGUAGES}
+            key = 'adql' if (query_language or '').lower().startswith('adql') else 'postgresql'
+            job.query_language = '{key}-{version}'.format(**languages.get(key, languages['postgresql']))
 
         except (ProgrammingError, InternalError, ValueError) as e:
             job.phase = job.PHASE_ERROR
