@@ -71,9 +71,12 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
     def escape_string(self, string):
         return f"'{string}'"
 
-    def fetchall_sync(self, sql):
+    def fetchall_sync(self, sql, args=None):
         cursor = self.connection().cursor()
-        cursor.execute(sql)
+        if args:
+            cursor.execute(sql, args)
+        else:
+            cursor.execute(sql)
 
         while cursor.description is None and cursor.nextset():
             pass
