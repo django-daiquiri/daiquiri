@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import { bytes2human } from 'daiquiri/core/assets/js/utils/bytes'
 import Input from 'daiquiri/core/assets/js/components/form/Input'
 import Select from 'daiquiri/core/assets/js/components/form/Select'
+import QueryApi from 'daiquiri/query/assets/js/api/QueryApi'
 
 const FormDownload = ({ jobId, downloadForm, downloadJobs, onSubmit }) => {
 
@@ -30,8 +31,7 @@ const FormDownload = ({ jobId, downloadForm, downloadJobs, onSubmit }) => {
   const formDownloadJobs = downloadJobs?.filter((job) => job.key == downloadForm.key)
 
   const handleDownload = (downloadJob) => {
-    const url = `/query/api/jobs/${jobId}/download/${downloadJob.key}/${downloadJob.id}/?download=true`
-    window.location.href = url
+    window.location.href = QueryApi.getDownloadUrl(jobId, downloadJob.key, downloadJob.id)
   }
 
   const renderJob = (downloadJob) => {

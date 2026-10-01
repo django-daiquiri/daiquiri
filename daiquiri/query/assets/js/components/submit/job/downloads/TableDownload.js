@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import { bytes2human } from 'daiquiri/core/assets/js/utils/bytes'
+import QueryApi from 'daiquiri/query/assets/js/api/QueryApi'
 import { useDownloadFormatsQuery } from 'daiquiri/query/assets/js/hooks/queries'
 
 import Tooltip  from 'daiquiri/core/assets/js/components/Tooltip'
@@ -25,8 +26,7 @@ const TableDownload = ({ jobId, downloadJobs, onSubmit }) => {
   }
 
   const handleDownload = (downloadJob) => {
-    const url = `/query/api/jobs/${jobId}/download/table/${downloadJob.id}/?download=true`
-    window.location.href = url
+    window.location.href = QueryApi.getDownloadUrl(jobId, 'table', downloadJob.id)
   }
 
   const getDownloadJobInfo = (downloadJob, downloadFormat) => {
