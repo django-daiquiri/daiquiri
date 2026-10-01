@@ -18,6 +18,7 @@ def query_job_updated_handler(sender, **kwargs):
 @receiver(post_delete, sender=QueryJob)
 def query_job_deleted_handler(sender, **kwargs):
     kwargs['instance'].drop_table()
+    kwargs['instance'].drop_uploads()
 
 
 @receiver(post_delete, sender=DownloadJob)
