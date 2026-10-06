@@ -9,7 +9,14 @@ import RenameModal from 'daiquiri/query/assets/js/components/modals/RenameModal'
 import AbortModal from 'daiquiri/query/assets/js/components/modals/AbortModal'
 import ArchiveModal from 'daiquiri/query/assets/js/components/modals/ArchiveModal'
 
+import Tooltip  from 'daiquiri/core/assets/js/components/Tooltip'
+
 import JobParameters from './JobParameters'
+
+const getTooltip = (title) => ({
+  title,
+  placement: 'bottom'
+})
 
 const JobOverview = ({ job, loadForm }) => {
   const renameModal = useModal()
@@ -33,37 +40,49 @@ const JobOverview = ({ job, loadForm }) => {
           </div>
         </div>
         <div className="card-body d-flex flex-wrap gap-2">
-            <button
-              className="btn btn-outline-primary btn-sm"
-              disabled={!job.query}
-              onClick={() => loadForm('sql', job.query, job.query_language)}
-            >
-              <i className="bi bi-arrow-repeat me-2"></i>
-              {gettext('Reuse query')}
-            </button>
-            {job.phase == 'COMPLETED' && (
+          <Tooltip tooltip={getTooltip(
+            job.query ? gettext('Open a new query form for this query.') : gettext('This job has no query to reuse.')
+          )}>
+            <span className="d-inline-block" tabIndex="0">
+              <button
+                className="btn btn-outline-primary btn-sm"
+                disabled={!job.query}
+                onClick={() => loadForm('sql', job.query, job.query_language)}
+              >
+                <i className="bi bi-arrow-repeat me-2"></i>
+                {gettext('Reuse query')}
+              </button>
+            </span>
+          </Tooltip>
+          {job.phase == 'COMPLETED' && (
+            <Tooltip tooltip={getTooltip(gettext('Change the result table name or run ID.'))}>
               <button className="btn btn-outline-secondary btn-sm" onClick={renameModal.show}>
                 <i className="bi bi-pencil-square me-2"></i>
                 {gettext("Rename results")}
               </button>
-            )}
-            {['EXECUTING', 'PENDING', 'QUEUED'].includes(job.phase) ? (
+            </Tooltip>
+          )}
+          {['EXECUTING', 'PENDING', 'QUEUED'].includes(job.phase) ? (
+            <Tooltip tooltip={getTooltip(gettext('Cancel the job currently in progress.'))}>
               <button
                 className="btn btn-outline-danger btn-sm ms-auto"
                 onClick={abortModal.show}
               >
-                <i className="bi bi-trash me-2"></i>
+                <i className="bi bi-x-circle me-2"></i>
                 {gettext('Abort the job')}
               </button>
-            ) : (
+            </Tooltip>
+          ) : (
+            <Tooltip tooltip={getTooltip(gettext('Archive the job and delete its result table to free up table space.'))}>
               <button
                 className="btn btn-outline-danger btn-sm ms-auto"
                 onClick={archiveModal.show}
               >
-                <i className="bi bi-trash me-2"></i>
+                <i className="bi bi-archive me-2"></i>
                 {gettext('Archive job')}
               </button>
-            )}
+            </Tooltip>
+          )}
         </div>
       </div>
 
@@ -122,7 +141,7 @@ const JobOverview = ({ job, loadForm }) => {
             )}
             {job.actual_query && (
               <>
-                <h6>{gettext('Actual query')}</h6>
+                <h6 className="mt-3">{gettext('Actual query')}</h6>
                   <div className="card p-3">
                     <Query query={job.actual_query} />
                   </div>

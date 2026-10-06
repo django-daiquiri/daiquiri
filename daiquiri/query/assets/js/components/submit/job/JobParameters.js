@@ -11,12 +11,14 @@ const JobParameters = ({ job }) => {
       <div className="row g-0 border rounded overflow-hidden text-center mb-4">
         <div className="col-6 col-md-3 border p-3">
           <div className="fw-bold">{gettext('Status')}</div>
+            <div className="fs-5">
             <span className={jobPhaseBadge[job.phase]}>{job.phase_label}</span>&nbsp;
             {
               job.result_status !== 'OK' ? (
                 <span className="badge text-bg-warning">{job.result_status}</span>
               ) : ''
             }
+            </div>
         </div>
 
         <div className="col-6 col-md-3 border p-3">

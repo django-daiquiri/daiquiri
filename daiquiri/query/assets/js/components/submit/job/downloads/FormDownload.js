@@ -26,9 +26,8 @@ const FormDownload = ({ jobId, downloadForm, downloadJobs, onSubmit }) => {
     setTimeout(() => {setShowSpinner(false)}, 2000)
   }
 
-  const hasIncompleteJobs = downloadJobs.some(job => job.phase != 'COMPLETED' && job.phase != 'ERROR')
-
   const formDownloadJobs = downloadJobs?.filter((job) => job.key == downloadForm.key)
+  const hasIncompleteJobs = formDownloadJobs.some(job => job.phase != 'COMPLETED' && job.phase != 'ERROR')
 
   const handleDownload = (downloadJob) => {
     window.location.href = QueryApi.getDownloadUrl(jobId, downloadJob.key, downloadJob.id)
