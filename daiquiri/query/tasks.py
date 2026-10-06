@@ -13,6 +13,16 @@ from daiquiri.core.tasks import Task
 from daiquiri.stats.models import Record
 
 
+class DownloadJobAborted(Exception):
+    pass
+
+
+def _check_download_aborted(download_job):
+    download_job.refresh_from_db(fields=('phase',))
+    if download_job.phase in (download_job.PHASE_ABORTED, download_job.PHASE_ARCHIVED):
+        raise DownloadJobAborted()
+
+
 class RunQueryTask(Task):
     def on_failure(self, exc, task_id, args, kwargs, einfo):
         super().on_failure(exc, task_id, args, kwargs, einfo)
@@ -284,9 +294,12 @@ def create_download_table_task(download_id):
         except OSError:
             pass
 
-        download_job.phase = download_job.PHASE_EXECUTING
-        download_job.start_time = now()
-        download_job.save()
+        if not DownloadJob.objects.filter(
+            pk=download_job.id, phase=download_job.PHASE_QUEUED
+        ).update(phase=download_job.PHASE_EXECUTING, start_time=now()):
+            return
+
+        download_job.refresh_from_db()
 
         # write file using the generator in the adapter
         if download_job.format_key in ('fits', 'parquet'):
@@ -295,38 +308,59 @@ def create_download_table_task(download_id):
             write_label = 'w'
 
         try:
+            _check_download_aborted(download_job)
             with open(download_job.file_path, write_label) as f:
                 for line in download_job.query_job.stream(download_job.format_key):
+                    _check_download_aborted(download_job)
                     f.write(line)
+                _check_download_aborted(download_job)
 
+        except DownloadJobAborted:
+            download_job.delete_file()
+            logger.info('download_job %s aborted', download_job.id)
         except Exception as e:
-            download_job.phase = download_job.PHASE_ERROR
-            download_job.error_summary = str(e)
-            download_job.save()
-            logger.info(
-                'download_job %s failed (%s)',
-                download_job.id,
-                download_job.error_summary,
-            )
+            download_job.refresh_from_db(fields=('phase',))
+            if download_job.phase in (
+                download_job.PHASE_ABORTED,
+                download_job.PHASE_ARCHIVED,
+            ):
+                download_job.delete_file()
+                logger.info('download_job %s aborted', download_job.id)
+            else:
+                download_job.phase = download_job.PHASE_ERROR
+                download_job.error_summary = str(e)
+                download_job.save()
+                logger.info(
+                    'download_job %s failed (%s)',
+                    download_job.id,
+                    download_job.error_summary,
+                )
 
-            raise e
+                raise e
         else:
-            download_job.phase = download_job.PHASE_COMPLETED
-            logger.info('download_job %s completed', download_job.file_path)
-            Record.objects.create(
-                time=download_job.start_time,
-                resource_type='CREATE_FILE',
-                resource={
-                    'job_id': download_job.id,
-                    'job_type': download_job.job_type,
-                    'file_path': download_job.file_path,
-                },
-                client_ip=download_job.client_ip,
-                size=os.path.getsize(download_job.file_path),
-            )
+            if DownloadJob.objects.filter(
+                pk=download_job.id, phase=download_job.PHASE_EXECUTING
+            ).update(phase=download_job.PHASE_COMPLETED):
+                download_job.phase = download_job.PHASE_COMPLETED
+                logger.info('download_job %s completed', download_job.file_path)
+                Record.objects.create(
+                    time=download_job.start_time,
+                    resource_type='CREATE_FILE',
+                    resource={
+                        'job_id': download_job.id,
+                        'job_type': download_job.job_type,
+                        'file_path': download_job.file_path,
+                    },
+                    client_ip=download_job.client_ip,
+                    size=os.path.getsize(download_job.file_path),
+                )
+            else:
+                download_job.refresh_from_db(fields=('phase',))
+                download_job.delete_file()
+                logger.info('download_job %s aborted', download_job.id)
         finally:
             download_job.end_time = now()
-            download_job.save()
+            download_job.save(update_fields=('end_time',))
 
 
 @shared_task(track_started=True, base=Task)
@@ -350,41 +384,68 @@ def create_download_archive_task(archive_id):
         except OSError:
             pass
 
-        archive_job.phase = archive_job.PHASE_EXECUTING
-        archive_job.start_time = now()
-        archive_job.save()
+        if not QueryArchiveJob.objects.filter(
+            pk=archive_job.id, phase=archive_job.PHASE_QUEUED
+        ).update(phase=archive_job.PHASE_EXECUTING, start_time=now()):
+            return
+
+        archive_job.refresh_from_db()
 
         # create a zipfile with all files
         try:
+            _check_download_aborted(archive_job)
             with zipfile.ZipFile(archive_job.file_path, 'w') as z:
                 os.chdir(settings.FILES_BASE_PATH)
                 for file_path in archive_job.files:
+                    _check_download_aborted(archive_job)
                     z.write(file_path)
+                _check_download_aborted(archive_job)
 
+        except DownloadJobAborted:
+            archive_job.delete_file()
+            logger.info('archive_job %s aborted', archive_job.id)
         except Exception as e:
-            archive_job.phase = archive_job.PHASE_ERROR
-            archive_job.error_summary = str(e)
-            archive_job.save()
-            logger.info('archive_job %s failed (%s)', archive_job.id, archive_job.error_summary)
-            raise e
+            archive_job.refresh_from_db(fields=('phase',))
+            if archive_job.phase in (
+                archive_job.PHASE_ABORTED,
+                archive_job.PHASE_ARCHIVED,
+            ):
+                archive_job.delete_file()
+                logger.info('archive_job %s aborted', archive_job.id)
+            else:
+                archive_job.phase = archive_job.PHASE_ERROR
+                archive_job.error_summary = str(e)
+                archive_job.save()
+                logger.info('archive_job %s failed (%s)', archive_job.id, archive_job.error_summary)
+                raise e
+        else:
+            if QueryArchiveJob.objects.filter(
+                pk=archive_job.id, phase=archive_job.PHASE_EXECUTING
+            ).update(phase=archive_job.PHASE_COMPLETED):
+                archive_job.phase = archive_job.PHASE_COMPLETED
+                archive_job.end_time = now()
+                archive_job.save()
+                Record.objects.create(
+                    time=archive_job.start_time,
+                    resource_type='CREATE_ZIP',
+                    resource={
+                        'job_id': archive_job.id,
+                        'job_type': archive_job.job_type,
+                        'file_path': archive_job.file_path,
+                    },
+                    client_ip=archive_job.client_ip,
+                    size=os.path.getsize(archive_job.file_path),
+                )
+
+                # log completion
+                logger.info('create_archive_zip_file %s completed', archive_job.file_path)
+            else:
+                archive_job.refresh_from_db(fields=('phase',))
+                archive_job.delete_file()
+                logger.info('archive_job %s aborted', archive_job.id)
 
         archive_job.end_time = now()
-        archive_job.phase = archive_job.PHASE_COMPLETED
-        archive_job.save()
-        Record.objects.create(
-            time=archive_job.start_time,
-            resource_type='CREATE_ZIP',
-            resource={
-                'job_id': archive_job.id,
-                'job_type': archive_job.job_type,
-                'file_path': archive_job.file_path,
-            },
-            client_ip=archive_job.client_ip,
-            size=os.path.getsize(archive_job.file_path),
-        )
-
-        # log completion
-        logger.info('create_archive_zip_file %s completed', archive_job.file_path)
+        archive_job.save(update_fields=('end_time',))
 
 
 @shared_task(base=Task)

@@ -88,6 +88,10 @@ class QueryApi extends BaseApi {
     return this.post(`/query/api/jobs/${id}/download/${downloadKey}/`, data)
   }
 
+  static abortDownloadJob(jobId, downloadKey, downloadJobId) {
+    return this.put(`/query/api/jobs/${jobId}/download/${downloadKey}/${downloadJobId}/abort/`)
+  }
+
   static getDownloadUrl(jobId, downloadKey, downloadJobId) {
     return `/query/api/jobs/${jobId}/download/${downloadKey}/${downloadJobId}/?download=true`
   }

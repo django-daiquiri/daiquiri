@@ -333,12 +333,22 @@ class QueryJob(Job):
 
     def archive(self):
         self.abort()
+        self.abort_downloads()
         self.drop_table()
         self.drop_uploads()
         self.phase = self.PHASE_ARCHIVED
         self.nrows = None
         self.size = None
         self.save()
+
+    def abort_downloads(self):
+        for download_jobs in (self.downloads.all(), self.archives.all()):
+            for download_job in download_jobs:
+                download_job.__class__.objects.filter(pk=download_job.id).update(
+                    phase=download_job.PHASE_ARCHIVED
+                )
+                if download_job.phase != download_job.PHASE_EXECUTING:
+                    download_job.delete_file()
 
     def rename_table(self, new_table_name):
         if self.table_name != new_table_name:

@@ -6,7 +6,10 @@ import { downloadFile } from 'daiquiri/core/assets/js/utils/api'
 import QueryApi from 'daiquiri/query/assets/js/api/QueryApi'
 import { jobPhaseClass, jobPhaseMessage } from 'daiquiri/query/assets/js/constants/job'
 import { useSubmittedDownloadsQuery, useDownloadFormsQuery } from 'daiquiri/query/assets/js/hooks/queries'
-import { useSubmitDownloadJobMutation } from 'daiquiri/query/assets/js/hooks/mutations'
+import {
+  useAbortDownloadJobMutation,
+  useSubmitDownloadJobMutation
+} from 'daiquiri/query/assets/js/hooks/mutations'
 
 import ArchiveDownload from './downloads/ArchiveDownload'
 import FormDownload from './downloads/FormDownload'
@@ -17,12 +20,14 @@ const ACTIVE_DOWNLOAD_PHASES = ['QUEUED', 'PENDING', 'EXECUTING']
 const JobDownload = ({ job }) => {
 
   const mutation = useSubmitDownloadJobMutation()
+  const abortMutation = useAbortDownloadJobMutation()
   const requestSequence = useRef(0)
   const pollingTimeout = useRef()
   const [pollingInterval, setPollingInterval] = useState(3000)
   const [latestDownload, setLatestDownload] = useState(null)
   const [requestedDownloads, setRequestedDownloads] = useState([])
   const [pendingRequests, setPendingRequests] = useState(0)
+  const [submittingDownloadKey, setSubmittingDownloadKey] = useState(null)
   const downloadedSequence = useRef(null)
 
   const { data: downloadForms } = useDownloadFormsQuery(job.id)
@@ -40,6 +45,7 @@ const JobDownload = ({ job }) => {
     startFastPolling()
     setLatestDownload(null)
     setPendingRequests((current) => current + 1)
+    setSubmittingDownloadKey(downloadKey)
 
     mutation.mutate({
       job,
@@ -51,7 +57,23 @@ const JobDownload = ({ job }) => {
           setLatestDownload({...download, sequence})
         }
       },
-      onSettled: () => setPendingRequests((current) => current - 1)
+      onSettled: () => {
+        setPendingRequests((current) => current - 1)
+        setSubmittingDownloadKey((current) => current == downloadKey ? null : current)
+      }
+    })
+  }
+
+  const handleAbort = (downloadKey, downloadJobId) => {
+    abortMutation.mutate({
+      job,
+      downloadKey,
+      downloadJobId,
+      onSuccess: () => {
+        if (latestDownload?.id == downloadJobId) {
+          setLatestDownload(null)
+        }
+      }
     })
   }
 
@@ -90,7 +112,7 @@ const JobDownload = ({ job }) => {
           isEmpty(downloadForms) ? gettext('The download of the results is currently not available.') :
           gettext('For further processing of the data, you can create a file from the results table' +
                  ' and then download it to your local machine. For this file several formats are available.' +
-                 ' Please choose a format from the list below.')
+                 ' Please choose a format from the selector below.')
         }
       </p>
 
@@ -103,6 +125,8 @@ const JobDownload = ({ job }) => {
                 jobId={job.id}
                 downloadJobs={downloadJobs || []}
                 onSubmit={(data) => handleSubmit('table', data)}
+                onAbort={handleAbort}
+                isSubmitting={submittingDownloadKey == 'table'}
               />
             )
           } else if (downloadForm.key == 'archive') {
@@ -113,6 +137,7 @@ const JobDownload = ({ job }) => {
                 columns={job.columns}
                 downloadJobs={downloadJobs || []}
                 onSubmit={(data) => handleSubmit('archive', data)}
+                onAbort={handleAbort}
               />
             )
           } else if (!isNil(downloadForm.form)) {

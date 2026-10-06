@@ -27,7 +27,21 @@ const FormDownload = ({ jobId, downloadForm, downloadJobs, onSubmit }) => {
   }
 
   const formDownloadJobs = downloadJobs?.filter((job) => job.key == downloadForm.key)
-  const hasIncompleteJobs = formDownloadJobs.some(job => job.phase != 'COMPLETED' && job.phase != 'ERROR')
+
+  const getDownloadStatus = () => {
+    if (formDownloadJobs.some(job => job.phase == 'EXECUTING')) {
+      return gettext('Creating..')
+    }
+    if (formDownloadJobs.some(job => job.phase == 'QUEUED')) {
+      return gettext('Queued..')
+    }
+    if (formDownloadJobs.some(job => job.phase == 'PENDING')) {
+      return gettext('Pending..')
+    }
+    return showSpinner ? gettext('Pending..') : null
+  }
+
+  const downloadStatus = getDownloadStatus()
 
   const handleDownload = (downloadJob) => {
     window.location.href = QueryApi.getDownloadUrl(jobId, downloadJob.key, downloadJob.id)
@@ -118,12 +132,12 @@ const FormDownload = ({ jobId, downloadForm, downloadJobs, onSubmit }) => {
                 field.type == 'submit' && (
                   <div className="mb-3 d-flex flex-column">
                     <label className="form-label">&nbsp;</label>
-                    { showSpinner || hasIncompleteJobs ? (
+                    { downloadStatus ? (
                       <p className="text-primary">
                         <span>
                         <span className="spinner-border spinner-border-sm">
                         </span>
-                          {gettext(' Creating..')}
+                          {downloadStatus}
                         </span>
                       </p>
                     ) : (

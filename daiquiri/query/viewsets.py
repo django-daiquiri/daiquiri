@@ -446,6 +446,49 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
 
     @action(
         detail=True,
+        methods=['put'],
+        url_name='abort-download',
+        url_path=r'download/(?P<download_key>[a-z\-]+)/(?P<download_job_id>[A-Za-z0-9\-]+)/abort',
+    )
+    def abort_download(self, request, pk=None, download_key=None, download_job_id=None):
+        try:
+            job = self.get_queryset().get(pk=pk)
+        except QueryJob.DoesNotExist as e:
+            raise NotFound from e
+
+        download_config = get_download_config(download_key)
+        if download_config is None:
+            raise ValidationError(
+                {'download': f'Download key "{download_key}" is not supported.'}
+            )
+
+        download_job_model = import_class(download_config['model'])
+
+        try:
+            download_job = download_job_model.objects.get(
+                query_job=job, pk=download_job_id
+            )
+        except download_job_model.DoesNotExist as e:
+            raise NotFound from e
+
+        if (
+            download_job.phase in download_job.PHASE_ACTIVE
+            or download_job.phase == download_job.PHASE_PENDING
+        ):
+            phase = download_job.phase
+            if download_job_model.objects.filter(pk=download_job.id, phase=phase).update(
+                phase=download_job.PHASE_ABORTED
+            ):
+                download_job.phase = download_job.PHASE_ABORTED
+                if phase != download_job.PHASE_EXECUTING:
+                    download_job.delete_file()
+            else:
+                download_job.refresh_from_db(fields=('phase',))
+
+        return Response({'phase': download_job.phase})
+
+    @action(
+        detail=True,
         methods=['post'],
         url_name='create-download',
         url_path=r'download/(?P<download_key>[a-z\-]+)',
@@ -482,7 +525,7 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
             download_job.save()
 
         # check if the file was lost
-        # and allow re-run the aborted jobs and jobs exited with an error
+        # and allow re-run the aborted, archived jobs and jobs exited with an error
         if (
             (
                 download_job.phase == download_job.PHASE_COMPLETED
@@ -490,6 +533,7 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
             )
             or download_job.phase == download_job.PHASE_ERROR
             or download_job.phase == download_job.PHASE_ABORTED
+            or download_job.phase == download_job.PHASE_ARCHIVED
         ):
             download_job.phase = download_job.PHASE_PENDING
             download_job.save()

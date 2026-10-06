@@ -56,6 +56,8 @@ export const useArchiveJobMutation = () => {
     },
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['jobs'] })
+      queryClient.invalidateQueries({ queryKey: ['job', variables.job.id] })
+      queryClient.invalidateQueries({ queryKey: ['submittedDownloads', variables.job.id] })
       variables.onSuccess()
     }
   })
@@ -100,6 +102,22 @@ export const useSubmitDownloadJobMutation = () => {
     },
     onSettled: (data, error, variables) => {
       variables.onSettled?.()
+    }
+  })
+}
+
+export const useAbortDownloadJobMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (variables) => {
+      return QueryApi.abortDownloadJob(
+        variables.job.id, variables.downloadKey, variables.downloadJobId
+      )
+    },
+    onSuccess: async (data, variables) => {
+      await queryClient.invalidateQueries({ queryKey: ['submittedDownloads', variables.job.id] })
+      variables.onSuccess?.(data)
     }
   })
 }

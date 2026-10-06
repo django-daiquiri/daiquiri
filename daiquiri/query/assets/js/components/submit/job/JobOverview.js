@@ -9,7 +9,7 @@ import RenameModal from 'daiquiri/query/assets/js/components/modals/RenameModal'
 import AbortModal from 'daiquiri/query/assets/js/components/modals/AbortModal'
 import ArchiveModal from 'daiquiri/query/assets/js/components/modals/ArchiveModal'
 
-import Tooltip  from 'daiquiri/core/assets/js/components/Tooltip'
+import Tooltip from 'daiquiri/core/assets/js/components/Tooltip'
 
 import JobParameters from './JobParameters'
 
