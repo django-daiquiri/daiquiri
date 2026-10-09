@@ -101,11 +101,18 @@ const JobParameters = ({ job }) => {
               <dt className="col-md-3 text-md-end">{gettext('Source tables')}</dt>
               <dd className="col-md-9 mb-0">
               {
-                job.sources.map((source, sourceIndex) => (
-                  <a key={sourceIndex} className="d-inline-block" href={source.url} target="_blank">
-                    {source.schema_name}.{source.table_name}
-                  </a>
-                ))
+                job.sources.map((source, sourceIndex) => {
+                  const url = source.doi ? `https://doi.org/${source.doi}` : source.url
+                  const name = `${source.schema_name}.${source.table_name}`
+
+                  return url ? (
+                    <a key={sourceIndex} className="d-inline-block" href={url} target="_blank">
+                      {name}
+                    </a>
+                  ) : (
+                    <span key={sourceIndex} className="d-inline-block">{name}</span>
+                  )
+                })
               }
               </dd>
             </>
