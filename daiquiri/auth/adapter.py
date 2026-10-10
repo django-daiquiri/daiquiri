@@ -1,8 +1,10 @@
 import logging
 
 from django.conf import settings
+from django.contrib.sites.shortcuts import get_current_site
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.utils.encoding import force_str
 
 from allauth.account.adapter import DefaultAccountAdapter
 from allauth.core.exceptions import ImmediateHttpResponse
@@ -33,6 +35,11 @@ class DaiquiriAccountAdapter(DefaultAccountAdapter):
 
     def is_open_for_signup(self, request):
         return settings.AUTH_SIGNUP
+
+    def format_email_subject(self, subject):
+        site = get_current_site(self.request)
+        return f'[{site.name}] {force_str(subject)}'
+
 
 
 class DaiquiriSocialAccountAdapter(DefaultSocialAccountAdapter):
