@@ -1,4 +1,4 @@
-from django.http import FileResponse, Http404, HttpResponse
+from django.http import FileResponse, HttpResponse
 
 from rest_framework import viewsets
 from rest_framework.authentication import (

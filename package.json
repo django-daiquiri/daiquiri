@@ -1,6 +1,6 @@
 {
   "name": "daiquiri",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "scripts": {
     "build:prod": "webpack --config webpack.config.js --mode production",
     "build": "webpack --config webpack.config.js --mode development",
@@ -27,7 +27,7 @@
     "js-cookie": "^3.0.7",
     "lodash": "^4.18.1",
     "npm-font-open-sans": "^1.1.0",
-    "plotly.js": "^3.1.0",
+    "plotly.js": "^4.1.2",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-dropzone": "^14.3.8",

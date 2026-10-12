@@ -31,6 +31,7 @@ const TableHead = ({ columns, params, setParams }) => {
         {column.unit && getTooltipParagraph(gettext('Unit'), column.unit)}
         {column.ucd && getTooltipParagraph(gettext('UCD'), column.ucd)}
         {column.datatype && getTooltipParagraph(gettext('Data type'), column.datatype)}
+        {column.xtype && getTooltipParagraph(gettext('Xtype'), column.xtype)}
         {column.arraysize && getTooltipParagraph(gettext('Array size'), column.arraysize)}
         {column.principal && getTooltipParagraph(null, gettext('This column is considered a core part of the service.'))}
         {column.indexed && getTooltipParagraph(null, gettext('This column is indexed.'))}

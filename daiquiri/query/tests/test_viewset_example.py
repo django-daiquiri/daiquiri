@@ -78,7 +78,7 @@ def test_create(db, client, mocker, username, password):
         'name': 'Test',
         'query_string': 'SELECT foo FROM bar',
         'access_level': 'PUBLIC',
-        'query_language': 'adql-2.0'
+        'query_language': 'adql-2.1'
     })
     assert response.status_code == status_map['create'][username], response.json()
 
@@ -95,7 +95,7 @@ def test_update(db, client, mocker, username, password, pk):
         'name': 'Test',
         'query_string': 'SELECT foo FROM bar',
         'access_level': 'PUBLIC',
-        'query_language': 'adql-2.0'
+        'query_language': 'adql-2.1'
     }, content_type='application/json')
     assert response.status_code == status_map['update'][username], response.json()
 

@@ -49,7 +49,7 @@ def test_create_post_public(db, client, username, password, query):
     client.login(username=username, password=password)
 
     url = reverse(url_names['list']) + '?' + urlencode({
-        'LANG': 'adql-2.0',
+        'LANG': 'adql-2.1',
         'QUERY': query
     })
     response = client.get(url)
@@ -68,7 +68,7 @@ def test_create_post_internal(db, client, username, password, query):
     client.login(username=username, password=password)
 
     url = reverse(url_names['list']) + '?' + urlencode({
-        'LANG': 'adql-2.0',
+        'LANG': 'adql-2.1',
         'QUERY': query
     })
     response = client.get(url)
@@ -90,7 +90,7 @@ def test_create_post_private(db, client, username, password, query):
     client.login(username=username, password=password)
 
     url = reverse(url_names['list']) + '?' + urlencode({
-        'LANG': 'adql-2.0',
+        'LANG': 'adql-2.1',
         'QUERY': query
     })
     response = client.get(url)
@@ -113,7 +113,7 @@ def test_post_job_list_create_public(db, client, username, password, query):
 
     url = reverse(url_names['list'])
     response = client.post(url, urlencode({
-        'LANG': 'adql-2.0',
+        'LANG': 'adql-2.1',
         'QUERY': query
     }), content_type='application/x-www-form-urlencoded')
 
@@ -132,7 +132,7 @@ def test_post_job_list_create_internal(db, client, username, password, query):
 
     url = reverse(url_names['list'])
     response = client.post(url, urlencode({
-        'LANG': 'adql-2.0',
+        'LANG': 'adql-2.1',
         'QUERY': query
     }), content_type='application/x-www-form-urlencoded')
 
@@ -154,7 +154,7 @@ def test_post_job_list_create_private(db, client, username, password, query):
 
     url = reverse(url_names['list'])
     response = client.post(url, urlencode({
-        'LANG': 'adql-2.0',
+        'LANG': 'adql-2.1',
         'QUERY': query
     }), content_type='application/x-www-form-urlencoded')
 

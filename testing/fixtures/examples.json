@@ -6,7 +6,7 @@
       "order": 1,
       "name": "Select all stars from daiquiri_data_obs.stars",
       "description": "",
-      "query_language": "adql-2.0",
+      "query_language": "adql-2.1",
       "query_string": "SELECT ra, dec, parallax, id FROM daiquiri_data_obs.stars",
       "access_level": "PUBLIC",
       "groups": []
@@ -19,7 +19,7 @@
       "order": 2,
       "name": "Select all particles from daiquiri_data_sim.particles",
       "description": "",
-      "query_language": "adql-2.0",
+      "query_language": "adql-2.1",
       "query_string": "SELECT x, y, z, vx, vy, vz, id FROM daiquiri_data_sim.halos",
       "access_level": "INTERNAL",
       "groups": []
@@ -32,7 +32,7 @@
       "order": 3,
       "name": "Select all particles from daiquiri_data_test.test",
       "description": "",
-      "query_language": "adql-2.0",
+      "query_language": "adql-2.1",
       "query_string": "SELECT id, \"bool\", \"array\", matrix FROM daiquiri_data_test.test",
       "access_level": "PRIVATE",
       "groups": [
@@ -47,7 +47,7 @@
       "order": 4,
       "name": "Select all particles from daiquiri_archive.files",
       "description": "",
-      "query_language": "adql-2.0",
+      "query_language": "adql-2.1",
       "query_string": "SELECT id, \"timestamp\", file, collection, path, ra, dec FROM daiquiri_archive.files",
       "access_level": "PRIVATE",
       "groups": [

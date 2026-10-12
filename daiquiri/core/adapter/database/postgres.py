@@ -3,6 +3,8 @@ import logging
 from django.conf import settings
 from django.db import OperationalError, ProgrammingError
 
+from daiquiri.core.pgsphere import PGSPHERE_TYPES
+
 from .base import BaseDatabaseAdapter
 
 logger = logging.getLogger(__name__)
@@ -55,7 +57,7 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         'double[]': 'double precision[]',
         'floatComplex': 'real[]',
         'doubleComplex': 'double[]',
-        'spoint': 'spoint',
+        **{datatype: datatype for datatype in PGSPHERE_TYPES},
     }
 
     search_stmt_template = '%s::text LIKE %%s'
@@ -71,9 +73,12 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
     def escape_string(self, string):
         return f"'{string}'"
 
-    def fetchall_sync(self, sql):
+    def fetchall_sync(self, sql, args=None):
         cursor = self.connection().cursor()
-        cursor.execute(sql)
+        if args:
+            cursor.execute(sql, args)
+        else:
+            cursor.execute(sql)
 
         while cursor.description is None and cursor.nextset():
             pass
@@ -437,7 +442,11 @@ class PostgreSQLAdapter(BaseDatabaseAdapter):
         else:
             datatype = None
 
-        if datatype:
+        if udt_name.lower() in PGSPHERE_TYPES:
+            column['datatype'] = udt_name.lower()
+            column['arraysize'] = None
+
+        elif datatype:
             if '_' in udt_name.lower():  # ARRAY
                 column['datatype'] = (
                     datatype['datatype'] + '[]'

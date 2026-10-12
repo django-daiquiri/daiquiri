@@ -142,6 +142,8 @@ LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = env.get('TIME_ZONE', 'UTC')
 
+DATETIME_FORMAT = 'j N Y, H:i T'
+
 LOCALE_PATHS = (BASE_DIR / 'locale/',)
 
 LANGUAGES = (('en', _('English')),)

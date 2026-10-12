@@ -47,8 +47,12 @@ const FormSql = ({ formKey, loadJob, query, queryLanguage }) => {
 
   const editorRef = useRef()
 
-  const getDefaultQueryLanguage = () =>
-    isNil(queryLanguages) ? '' : queryLanguages[0].id
+  const getQueryLanguage = (language) => {
+    const key = language?.toLowerCase().split('-')[0]
+    return queryLanguages?.find(
+      (item) => item.id.toLowerCase().split('-')[0] === key
+    )?.id || language || queryLanguages?.[0]?.id || ''
+  }
   const getDefaultQueue = () => (isNil(queues) ? '' : queues[0].id)
 
   const [openDropdown, setOpenDropdown] = useLsState('query.openDropdown')
@@ -58,12 +62,20 @@ const FormSql = ({ formKey, loadJob, query, queryLanguage }) => {
   }
 
   useEffect(() => {
-    setValues({
-      ...values,
-      queue: values.queue || getDefaultQueue(),
-      query_language: values.query_language || getDefaultQueryLanguage(),
-    })
+    setValues((currentValues) => ({
+      ...currentValues,
+      queue: currentValues.queue || getDefaultQueue(),
+      query_language: getQueryLanguage(currentValues.query_language),
+    }))
   }, [queues, queryLanguages])
+
+  useEffect(() => {
+    setValues((currentValues) => ({
+      ...currentValues,
+      query: query || '',
+      query_language: getQueryLanguage(queryLanguage),
+    }))
+  }, [query, queryLanguage])
 
   const handleSubmit = () => {
     mutation.mutate({ values, setErrors, loadJob })
@@ -74,7 +86,7 @@ const FormSql = ({ formKey, loadJob, query, queryLanguage }) => {
       query: '',
       table_name: '',
       run_id: '',
-      query_language: getDefaultQueryLanguage(),
+      query_language: getQueryLanguage(),
       queue: getDefaultQueue(),
     })
   }
@@ -83,10 +95,10 @@ const FormSql = ({ formKey, loadJob, query, queryLanguage }) => {
     let query_string = item.query_string
 
     if (isNil(query_string)) {
-      const query_language = values.query_language || getDefaultQueryLanguage()
-      const quote_char = queryLanguages.find(
-        (ql) => ql.id == query_language
-      ).quote_char
+      const query_language = getQueryLanguage(values.query_language)
+      const language = queryLanguages?.find((ql) => ql.id == query_language)
+      if (!language) return
+      const quote_char = language.quote_char
 
       query_string = item.query_strings
         .map((qs) => quote_char + qs + quote_char)
@@ -120,7 +132,7 @@ const FormSql = ({ formKey, loadJob, query, queryLanguage }) => {
     setValues({
       ...values,
       query: item.query_string,
-      query_language: item.query_language,
+      query_language: getQueryLanguage(item.query_language),
     })
   }
 
@@ -256,6 +268,7 @@ const FormSql = ({ formKey, loadJob, query, queryLanguage }) => {
             <button
               type="button"
               className="btn btn-primary me-auto"
+              disabled={!queryLanguages?.length}
               onClick={() => handleSubmit()}
             >
               {form.submit || gettext('Submit new SQL query')}

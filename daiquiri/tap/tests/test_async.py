@@ -146,7 +146,7 @@ def test_post_job_list_create_public(db, client, username, password, query):
 
     url = reverse(url_names['list'])
     response = client.post(url, urlencode({
-        'LANG': 'adql-2.0',
+        'LANG': 'adql-2.1',
         'QUERY': query
     }), content_type='application/x-www-form-urlencoded')
     assert response.status_code == 303, response.content
@@ -169,7 +169,7 @@ def test_post_job_list_create_internal(db, client, username, password, query):
 
     url = reverse(url_names['list'])
     response = client.post(url, urlencode({
-        'LANG': 'adql-2.0',
+        'LANG': 'adql-2.1',
         'QUERY': query
     }), content_type='application/x-www-form-urlencoded')
 
@@ -196,7 +196,7 @@ def test_post_job_list_create_private(db, client, username, password, query):
 
     url = reverse(url_names['list'])
     response = client.post(url, urlencode({
-        'LANG': 'adql-2.0',
+        'LANG': 'adql-2.1',
         'QUERY': query
     }), content_type='application/x-www-form-urlencoded')
 
@@ -230,7 +230,7 @@ def test_post_job_list_create_run(db, client, mocker, username, password, query)
 
     url = reverse(url_names['list'])
     response = client.post(url, urlencode({
-        'LANG': 'adql-2.0',
+        'LANG': 'adql-2.1',
         'QUERY': query,
         'PHASE': 'RUN'
     }), content_type='application/x-www-form-urlencoded')

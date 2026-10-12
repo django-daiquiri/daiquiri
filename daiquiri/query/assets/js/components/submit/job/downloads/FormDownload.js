@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import { bytes2human } from 'daiquiri/core/assets/js/utils/bytes'
 import Input from 'daiquiri/core/assets/js/components/form/Input'
 import Select from 'daiquiri/core/assets/js/components/form/Select'
+import QueryApi from 'daiquiri/query/assets/js/api/QueryApi'
 
 const FormDownload = ({ jobId, downloadForm, downloadJobs, onSubmit }) => {
 
@@ -25,13 +26,25 @@ const FormDownload = ({ jobId, downloadForm, downloadJobs, onSubmit }) => {
     setTimeout(() => {setShowSpinner(false)}, 2000)
   }
 
-  const hasIncompleteJobs = downloadJobs.some(job => job.phase != 'COMPLETED' && job.phase != 'ERROR')
-
   const formDownloadJobs = downloadJobs?.filter((job) => job.key == downloadForm.key)
 
+  const getDownloadStatus = () => {
+    if (formDownloadJobs.some(job => job.phase == 'EXECUTING')) {
+      return gettext('Creating..')
+    }
+    if (formDownloadJobs.some(job => job.phase == 'QUEUED')) {
+      return gettext('Queued..')
+    }
+    if (formDownloadJobs.some(job => job.phase == 'PENDING')) {
+      return gettext('Pending..')
+    }
+    return showSpinner ? gettext('Pending..') : null
+  }
+
+  const downloadStatus = getDownloadStatus()
+
   const handleDownload = (downloadJob) => {
-    const url = `/query/api/jobs/${jobId}/download/${downloadJob.key}/${downloadJob.id}/?download=true`
-    window.location.href = url
+    window.location.href = QueryApi.getDownloadUrl(jobId, downloadJob.key, downloadJob.id)
   }
 
   const renderJob = (downloadJob) => {
@@ -119,12 +132,12 @@ const FormDownload = ({ jobId, downloadForm, downloadJobs, onSubmit }) => {
                 field.type == 'submit' && (
                   <div className="mb-3 d-flex flex-column">
                     <label className="form-label">&nbsp;</label>
-                    { showSpinner || hasIncompleteJobs ? (
+                    { downloadStatus ? (
                       <p className="text-primary">
                         <span>
                         <span className="spinner-border spinner-border-sm">
                         </span>
-                          {gettext(' Creating..')}
+                          {downloadStatus}
                         </span>
                       </p>
                     ) : (

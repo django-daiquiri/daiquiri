@@ -1,9 +1,10 @@
 import csv
 import re
-import sys
 
 from django.contrib.auth.models import User
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
+
+from allauth.account.models import EmailAddress
 
 
 class Command(BaseCommand):
@@ -11,7 +12,7 @@ class Command(BaseCommand):
         parser.add_argument(
             'id_list_file',
             type=str,
-            help='required list of user ids to delete in plain text format, '
+            help='required list of user ids to delete in plain text or CSV format, '
             + 'user ids have to be at the beginning of the line, '
             + 'supports commenting lines out: if a line does '
             + 'not start with an integer it will be skipped',
@@ -27,30 +28,53 @@ class Command(BaseCommand):
     def make_user_id_list(self, filename: str):
         user_ids = []
         try:
-            filecontent = open(filename, encoding='utf-8', newline='')
-        except Exception as e:
-            print('Error reading id list file. ' + str(e))
-            sys.exit(1)
-        else:
-            csv_reader = csv.DictReader(filecontent, dialect='unix')
-            for dic in csv_reader:
-                m = re.search(r'^[0-9]+$', dic['id'])
-                if bool(m) is True:
-                    user_ids.append(dic)
+            with open(filename, encoding='utf-8', newline='') as filecontent:
+                first_line = filecontent.readline()
+                filecontent.seek(0)
+                header = next(csv.reader([first_line], dialect='unix'), [])
+                if 'id' in header:
+                    csv_reader = csv.DictReader(filecontent, dialect='unix')
+                    for dic in csv_reader:
+                        user_id = dic.get('id')
+                        if user_id is not None and re.fullmatch(r'[0-9]+', user_id):
+                            user_ids.append({'id': user_id})
+                else:
+                    for line in filecontent:
+                        m = re.search(r'^[0-9]+', line)
+                        if m:
+                            user_ids.append({'id': m.group(0)})
+        except (OSError, UnicodeError, csv.Error) as e:
+            raise CommandError('Error reading id list file. ' + str(e)) from e
         return sorted(user_ids, key=lambda k: k['id'])
 
     def delete_users(self, users: list[dict], dry_run: bool):
+        errors = []
         for user in users:
+            user_str = f"id={user.get('id', '?')}"
             try:
                 u = User.objects.get(id=user['id'])
-                user_str = '{}, {}, {}'.format(user['id'], user['username'], user['email'])
+                emails = list(
+                    EmailAddress.objects.filter(user=u).values_list('email', flat=True)
+                )
+                if u.email:
+                    emails.insert(0, u.email)
+                emails = list(dict.fromkeys(emails))
+                user_str = (
+                    f'{u.id}, {u.username}, {u.first_name}, {u.last_name}, '
+                    f'email(s): {", ".join(emails) or "<none>"}'
+                )
                 if dry_run is False:
                     print(f'Delete user {user_str}')
                     u.delete()
                 else:
                     print(f'Would have deleted user: {user_str}')
             except Exception as e:
-                print('Error deleting user ' + str(id) + '. ' + str(e))
+                errors.append(e)
+                print(f'Error deleting user {user_str}: {e}')
+
+        if errors:
+            raise CommandError(f'{len(errors)} user(s) could not be deleted.')
+
 
     def handle(self, *args, **options):
         user_ids = self.make_user_id_list(options['id_list_file'])

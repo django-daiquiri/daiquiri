@@ -6,9 +6,10 @@ from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 
 import requests
-from astropy.io.votable import parse_single_table
+from astropy.io.votable import parse
 
 from daiquiri.core.adapter import DatabaseAdapter
+from daiquiri.core.pgsphere import ADQL_GEOMETRIES, PGSPHERE_TYPES
 from daiquiri.core.utils import handle_file_upload, human2bytes, import_class
 from daiquiri.metadata.models import Column, Table
 
@@ -171,7 +172,7 @@ def get_job_column(job, display_column_name):
         column = DatabaseAdapter().fetch_column(schema_name, table_name, column_name)
 
         # add the uploads metadata (ucds, units, description)
-        for upload_column in job.metadata['upload_columns']:
+        for upload_column in job.metadata.get('upload_columns', []):
             if upload_column['name'] == column['name']:
                 column.update(upload_column)
                 break
@@ -235,6 +236,9 @@ def get_columns_metadata(job, columns):
         if column.get('name') != name:
             column = column.copy()
             column['name'] = name
+        # Geometry identity must come from the cursor, even with older catalog metadata.
+        if col.get('datatype') in PGSPHERE_TYPES or column.get('datatype') in PGSPHERE_TYPES:
+            column = dict(column, datatype=col['datatype'], arraysize=col['arraysize'])
         columns_list.append(column)
 
     return columns_list
@@ -270,7 +274,7 @@ def ingest_uploads(uploads, user):
             else:
                 file_path = location
 
-            columns = ingest_table(settings.TAP_UPLOAD, table_name, file_path, drop_table=True)
+            columns, _ = ingest_table(settings.TAP_UPLOAD, table_name, file_path, drop_table=True)
 
     return columns
 
@@ -290,8 +294,11 @@ def catch_special_types(field):
     adapter = DatabaseAdapter()
 
     if adapter.database_config['ENGINE'] == 'django.db.backends.postgresql':
-        if field.name == 'pos' and field.datatype in ('char', 'unicodeChar'):
-            datatype = 'spoint'
+        datatype = next(
+            (native for native, (xtype, _) in ADQL_GEOMETRIES.items() if xtype == field.xtype),
+            field.xtype,
+        )
+        if datatype in PGSPHERE_TYPES:
             arraysize = None
         elif field.arraysize == '*':
             datatype = f'{field.datatype}[]'
@@ -310,7 +317,16 @@ def catch_special_types(field):
 def ingest_table(schema_name, table_name, file_path, drop_table=False):
     adapter = DatabaseAdapter()
 
-    table = parse_single_table(file_path, verify='warn')
+    votable = parse(file_path, verify='warn')
+    table = votable.get_first_table()
+    resource = next(
+        resource for resource in votable.resources
+        if any(candidate is table for candidate in resource.iter_tables())
+    )
+    query_language = next(
+        (info.value for info in resource.infos if info.name == 'QUERY_LANGUAGE'),
+        None,
+    )
 
     columns = []
     for field in table.fields:
@@ -334,7 +350,7 @@ def ingest_table(schema_name, table_name, file_path, drop_table=False):
 
     os.remove(file_path)
 
-    return columns
+    return columns, query_language
 
 
 def get_query_form(form_key):
@@ -366,11 +382,12 @@ def get_query_language_choices():
 
 
 def get_query_language_label(query_language):
+    query_language = (query_language or '').lower().split('-', 1)[0]
     return next(
         iter(
             ql['label']
             for ql in settings.QUERY_LANGUAGES
-            if query_language in [ql['key'], '{key}-{version}'.format(**ql)]
+            if query_language == ql['key'].lower()
         ),
         None,
     )
