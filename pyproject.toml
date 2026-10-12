@@ -56,7 +56,7 @@ dependencies = [
   "PyJWT>=2.10.1,<2.14.0",
   "queryparser-python3>=0.8.0",
   "rules~=3.5",
-  "sqlalchemy>=2.0.43,<2.1.0",
+  "sqlalchemy>=2.0.43,<2.2.0",
   "XlsxWriter==3.2.9",
 ]
 
