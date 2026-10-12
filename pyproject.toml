@@ -84,7 +84,7 @@ pytest = [
   "pytest-cov>=6.2,<7.2",
   "pytest-django>=4.11.1,<4.15.0",
   "pytest-dotenv~=0.5.2",
-  "pytest-mock>=3.14.1,<3.16.0",
+  "pytest-mock>=3.14.1,<3.17.0",
 ]
 
 [project.urls]
