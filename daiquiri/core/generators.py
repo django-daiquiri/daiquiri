@@ -461,18 +461,19 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
 def create_fits_card(key: str, val: str, comment: str) -> str:
     key_length = 8
     line_length = 80
+    value_text = str(val)
     value_length = line_length - key_length - len(comment)
     line = key[:key_length].ljust(key_length)
 
-    total_size = 15 + len(comment) + len(str(val))
+    needs_tcomm_quotes = ("TCOMM" in key and value_text != "" and not value_text.startswith("'"))
+    total_size = 15 + len(comment) + len(value_text) + (2 if needs_tcomm_quotes else 0)
 
     lines = []
 
     if not total_size > line_length:
         if val != '':
-            if 'TCOMM' in key:
-                if val[0] != "'":
-                    val = f"'{val}'"
+            if needs_tcomm_quotes:
+                val = f"'{val}'"
             line += '=' + f' {val} '[: value_length - 1].rjust(key_length, ' ')
 
             line = line[:line_length]
