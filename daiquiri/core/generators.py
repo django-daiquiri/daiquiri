@@ -175,12 +175,8 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
             if max_records is not None and  i >= max_records:
                 overflow = True
                 break
-            yield """
-                    <TR>
-                        <TD>{}</TD>
-                    </TR>""".format(
-                """</TD>
-                        <TD>""".join(
+            yield '<TR><TD>{}</TD></TR>'.format(
+                '</TD><TD>'.join(
                     [
                         '' if cell in ['NULL', None]
                         else correct_col_for_votable(escape(str(cell)), field.get('datatype'))
