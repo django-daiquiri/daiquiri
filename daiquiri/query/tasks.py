@@ -310,8 +310,9 @@ def create_download_table_task(download_id):
         try:
             _check_download_aborted(download_job)
             with open(download_job.file_path, write_label) as f:
-                for line in download_job.query_job.stream(download_job.format_key):
-                    _check_download_aborted(download_job)
+                for i, line in enumerate(download_job.query_job.stream(download_job.format_key), 1):
+                    if download_job.format_key not in ('csv', 'votable', 'fits') or i % 1000 == 0:
+                        _check_download_aborted(download_job)
                     f.write(line)
                 _check_download_aborted(download_job)
 
