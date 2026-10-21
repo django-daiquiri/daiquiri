@@ -305,7 +305,7 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
         ('NAXIS1',  '2880',    'number of characters'),
         ('EXTEND',  'T',       ''),
         ('NTABLE',  '1',       ''),
-        ('LONGSTRN','OGIP 1.0','The OGIP long string convention may be used.'),
+        ('LONGSTRN',"'OGIP 1.0'",'The OGIP long string convention may be used.'),
         ('COMMENT', 'This FITS file may contain long string keyword values that are',''),
         ('COMMENT', 'continued over multiple keywords.  This convention uses the  "&"',''),
         ('COMMENT', 'character at the end of a string which is then continued', ''),
