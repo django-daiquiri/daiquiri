@@ -257,6 +257,6 @@ class BaseDownloadAdapter:
                 result = db.fetchone(query)
                 max_length = result[0]
 
-                arraysizes[column_name] = max_length
+                arraysizes[column_name] = max_length or 1
 
         return arraysizes

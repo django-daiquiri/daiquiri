@@ -357,11 +357,7 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
         h1 += create_fits_card(f'TFORM{i + 1}', f"'{format_str}'", f'format for col {i + 1}    ')
 
         # NULL values only for int-like types
-        if datatype in (
-            'short',
-            'int',
-            'long',
-        ):
+        if datatype in ('short', 'int', 'long', 'short[]', 'int[]', 'long[]'):
             h1 += create_fits_card(
                 f'TNULL{i + 1}',
                 formats_dict[datatype][3],
@@ -411,10 +407,6 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
                 values += [float('nan')] * (array_infos[name] - len(values))
                 row_elements_formatted.extend(values)
                 f = str(array_infos[name]) + 'd'
-            elif row_element is None or row_element == 'NULL':
-                r = formats_dict[datatype][3]
-                f = str(arraysize) + formats_dict[datatype][0]
-                row_elements_formatted.append(r)
             elif datatype[-2:] == '[]':
                 r = []
                 parsed = parse_and_fill_fits_array(
@@ -434,10 +426,16 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
                     f = str(array_infos[name] * DEFAULT_CHAR_SIZE) + formats_dict[datatype][0]
 
                 if datatype in ['char[]', 'boolean[]']:
-                    row_elements_formatted.append(b''.join(r))
+                    value = b''.join(r)
+                    if datatype == 'char[]':
+                        value = value.ljust(array_infos[name] * DEFAULT_CHAR_SIZE, b' ')
+                    row_elements_formatted.append(value)
                 else:
                     row_elements_formatted.extend(r)
-
+            elif row_element is None or row_element == 'NULL':
+                r = formats_dict[datatype][3]
+                f = str(arraysize) + formats_dict[datatype][0]
+                row_elements_formatted.append(r)
             else:
                 r = formats_dict[datatype][4](row_element)
                 f = str(arraysize) + formats_dict[datatype][0]
@@ -550,8 +548,10 @@ def get_daiquiri_logo(site: str, version: str) -> str:
 
 
 def parse_and_fill_fits_array(
-    obj_str: str, obj_type: str, desired_length: int, formats_dict: dict
+    obj_str: str | None, obj_type: str, desired_length: int, formats_dict: dict
 ) -> list:
+    if obj_str is None or obj_str == 'NULL':
+        return ['NULL'] * desired_length
     array = list(obj_str.strip('{}').split(','))
 
     if obj_type == 'char[]':
