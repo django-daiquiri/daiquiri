@@ -18,11 +18,6 @@
 
 {% block page %}
 
-    {% if table.nrows %}
-
-    <p>The table has {{ table.nrows }} rows, {{ table.columns.all | length }} columns.</p>
-    {% endif %}
-
     {% if table.long_description %}
 
     <h2>Description</h2>
@@ -44,19 +39,22 @@
     {% endif %}
 
     <h2>{% trans 'Columns' %}</h2>
+    <p class="small text-muted">{% trans 'An asterisk (*) marks an indexed column.' %}</p>
 
     <div class="table-responsive mb-3">
         <table class="table">
             <thead>
+                <th class="p-0" style="width: 1%;" aria-label="{% trans 'Indexed' %}"></th>
                 <th style="width: 15%;">{% trans 'Name' %}</th>
                 <th style="width: 15%;">{% trans 'Type' %}</th>
                 <th style="width: 15%;">{% trans 'UCD' %}</th>
                 <th style="width: 15%;">{% trans 'Unit' %}</th>
-                <th style="width: 40%;">{% trans 'Description' %}</th>
+                <th style="width: 39%;">{% trans 'Description' %}</th>
             </thead>
             <tbody>
                 {% for column in table.columns.all %}
                 <tr>
+                    <td class="text-center px-1">{% if column.indexed %}<span title="{% trans 'Indexed' %}">*</span>{% endif %}</td>
                     <td>
                         {{ column.name }}
                     </td>
@@ -81,6 +79,17 @@
 {% endblock %}
 
 {% block sidebar %}
+
+    <div class="card mb-3">
+        <div class="card-header">{% trans 'Table statistics' %}</div>
+        <div class="card-body">
+            <div class="d-grid column-gap-2 row-gap-1" style="grid-template-columns: max-content minmax(0, 1fr)">
+                {% if table.size is not None %}<span>{% trans 'Size' %}:</span><span class="text-break">{{ table.size|filesizeformat }}</span>{% endif %}
+                {% if table.nrows is not None %}<span>{% trans 'Rows' %}:</span><span class="text-break">{{ table.nrows }}</span>{% endif %}
+                <span>{% trans 'Columns' %}:</span><span class="text-break">{{ table.columns.all | length }}</span>
+            </div>
+        </div>
+    </div>
 
     {% access_panel table _('table') %}
 
