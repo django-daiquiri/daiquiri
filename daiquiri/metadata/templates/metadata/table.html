@@ -39,19 +39,22 @@
     {% endif %}
 
     <h2>{% trans 'Columns' %}</h2>
+    <p class="small text-muted">{% trans 'An asterisk (*) marks an indexed column.' %}</p>
 
     <div class="table-responsive mb-3">
         <table class="table">
             <thead>
+                <th class="p-0" style="width: 1%;" aria-label="{% trans 'Indexed' %}"></th>
                 <th style="width: 15%;">{% trans 'Name' %}</th>
                 <th style="width: 15%;">{% trans 'Type' %}</th>
                 <th style="width: 15%;">{% trans 'UCD' %}</th>
                 <th style="width: 15%;">{% trans 'Unit' %}</th>
-                <th style="width: 40%;">{% trans 'Description' %}</th>
+                <th style="width: 39%;">{% trans 'Description' %}</th>
             </thead>
             <tbody>
                 {% for column in table.columns.all %}
                 <tr>
+                    <td class="text-center px-1">{% if column.indexed %}<span title="{% trans 'Indexed' %}">*</span>{% endif %}</td>
                     <td>
                         {{ column.name }}
                     </td>
