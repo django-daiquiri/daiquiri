@@ -18,11 +18,6 @@
 
 {% block page %}
 
-    {% if table.nrows %}
-
-    <p>The table has {{ table.nrows }} rows, {{ table.columns.all | length }} columns.</p>
-    {% endif %}
-
     {% if table.long_description %}
 
     <h2>Description</h2>
@@ -81,6 +76,17 @@
 {% endblock %}
 
 {% block sidebar %}
+
+    <div class="card mb-3">
+        <div class="card-header">{% trans 'Table statistics' %}</div>
+        <div class="card-body">
+            <div class="d-grid column-gap-2 row-gap-1" style="grid-template-columns: max-content minmax(0, 1fr)">
+                {% if table.size is not None %}<span>{% trans 'Size' %}:</span><span class="text-break">{{ table.size|filesizeformat }}</span>{% endif %}
+                {% if table.nrows is not None %}<span>{% trans 'Rows' %}:</span><span class="text-break">{{ table.nrows }}</span>{% endif %}
+                <span>{% trans 'Columns' %}:</span><span class="text-break">{{ table.columns.all | length }}</span>
+            </div>
+        </div>
+    </div>
 
     {% access_panel table _('table') %}
 

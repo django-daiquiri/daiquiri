@@ -57,10 +57,12 @@
             {% trans 'No description has been provided for this table.' %}
             {% endif %}
         </div>
-        {% if table.doi %}
+        {% if table.doi or table.nrows is not None or table.size is not None %}
         <div class="card-footer text-muted">
-            <small>
-            DOI: {% doi_link table.doi %}
+            <small class="d-flex flex-wrap gap-2">
+            {% if table.size is not None %}<span>{% trans 'Size' %}: {{ table.size|filesizeformat }}</span>{% endif %}
+            {% if table.nrows is not None %}<span>{% trans 'Rows' %}: {{ table.nrows }}</span>{% endif %}
+            {% if table.doi %}<span class="mw-100">DOI: {% doi_link table.doi %}</span>{% endif %}
             </small>
         </div>
         {% endif %}
