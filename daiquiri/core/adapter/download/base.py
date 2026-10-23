@@ -76,9 +76,8 @@ class BaseDownloadAdapter:
                 )
 
             elif format_key == 'fits':
-                # We have to get the maximum array lengths in case there are arrays in the data
                 schema_table_name = self.get_table_name(schema_name, table_name)
-                fits_arrayinfos = self.get_arraysizes_for_fits(
+                fits_field_widths = self.get_arraysizes_for_fits(
                     native_columns, schema_name, table_name, query_language
                 )
 
@@ -87,7 +86,7 @@ class BaseDownloadAdapter:
                     fields=columns,
                     nrows=nrows,
                     table_name=schema_table_name,
-                    array_infos=fits_arrayinfos,
+                    array_infos=fits_field_widths,
                 )
 
             elif format_key == 'parquet':
@@ -229,34 +228,19 @@ class BaseDownloadAdapter:
     def get_arraysizes_for_fits(
         self, columns: list, schema_name: str, table_name: str, query_language=None
     ):
-        arraysizes = {}
+        """Return fixed text widths needed for native pgSphere FITS fields."""
+        field_widths = {}
         db = DatabaseAdapter()
         for c in columns:
             datatype = c['datatype']
             if datatype in PGSPHERE_TYPES:
                 geometry = ADQL_GEOMETRIES.get(datatype) if is_adql(query_language) else None
-                if geometry and geometry[1] != '*':
-                    arraysizes[c['name']] = geometry[1]
+                if geometry:
                     continue
                 column = db.escape_identifier(c['name'])
                 table = f'{db.escape_identifier(schema_name)}.{db.escape_identifier(table_name)}'
-                # Converted polygons need numeric slots; native values need full text width.
-                length = f'2 * npoints({column})' if geometry else f'octet_length({column}::text)'
-                arraysizes[c['name']] = db.fetchone(f'SELECT MAX({length}) FROM {table}')[0] or 1
-                continue
-            if c['datatype'][-2:] == '[]':
-                column_name = c['name']
+                # Native pgSphere values are written as fixed-width text.
+                length = f'octet_length({column}::text)'
+                field_widths[c['name']] = db.fetchone(f'SELECT MAX({length}) FROM {table}')[0] or 1
 
-                query = f"""
-                    SELECT MAX(array_length({column_name}, 1))
-                    FROM "{schema_name}"."{table_name}"
-                    WHERE {column_name} IS NOT NULL
-                """
-
-                # try:
-                result = db.fetchone(query)
-                max_length = result[0]
-
-                arraysizes[column_name] = max_length or 1
-
-        return arraysizes
+        return field_widths
