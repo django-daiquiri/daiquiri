@@ -9,7 +9,7 @@ import Tooltip  from 'daiquiri/core/assets/js/components/Tooltip'
 
 const ACTIVE_DOWNLOAD_PHASES = ['QUEUED', 'PENDING', 'EXECUTING']
 
-const TableDownload = ({ jobId, downloadJobs, onSubmit, onAbort, isSubmitting }) => {
+const TableDownload = ({ jobId, nrows, downloadJobs, onSubmit, onAbort, isSubmitting }) => {
 
   const { data: downloadFormats } = useDownloadFormatsQuery()
   const [selectedFormatKey, setSelectedFormatKey] = useState()
@@ -67,21 +67,6 @@ const TableDownload = ({ jobId, downloadJobs, onSubmit, onAbort, isSubmitting })
       return renderCancel(downloadJob)
     }
 
-    if (downloadJob.phase == 'ERROR') {
-      return (
-        <div>
-          {renderCreate()}
-          <p className="text-danger">
-            {gettext('An error occurred while creating the file.')}
-            {' '}
-            {interpolate(gettext('Error message: "%s".'), [downloadJob.error_summary])}
-            {' '}
-            {gettext('Please contact the maintainers of this site, if the problem persists.')}
-          </p>
-        </div>
-      )
-    }
-
     return renderCreate()
   }
 
@@ -100,10 +85,17 @@ const TableDownload = ({ jobId, downloadJobs, onSubmit, onAbort, isSubmitting })
     }
 
     if (downloadJob.phase == 'EXECUTING') {
+      const hasProgress = downloadJob.format_key != 'sql' && nrows > 0 && downloadJob.processed_rows != null
+      const status = hasProgress && (downloadJob.processed_rows >= nrows
+        ? gettext('Finalizing file')
+        : interpolate(gettext('Rows processed: %s'), [
+            `${Math.floor(100 * downloadJob.processed_rows / nrows)}%`
+          ]))
       return (
         <span className="text-primary">
           <span className="spinner-border spinner-border-sm"></span>
-          {downloadJob.size > 0 && ` ${bytes2human(downloadJob.size)}`}
+          {` ${status || gettext('Creating file')}`}
+          {!hasProgress && downloadJob.size > 0 && ` (${bytes2human(downloadJob.size)})`}
         </span>
       )
     }
@@ -156,6 +148,15 @@ const TableDownload = ({ jobId, downloadJobs, onSubmit, onAbort, isSubmitting })
             </div>
           </div>
         </div>
+        {downloadJob?.phase == 'ERROR' && (
+          <p className="text-danger mt-3 mb-0">
+            {gettext('An error occurred while creating the file.')}
+            {' '}
+            {interpolate(gettext('Error message: "%s".'), [downloadJob.error_summary])}
+            {' '}
+            {gettext('Please contact the maintainers of this site, if the problem persists.')}
+          </p>
+        )}
       </div>
     </div>
   )
@@ -163,6 +164,7 @@ const TableDownload = ({ jobId, downloadJobs, onSubmit, onAbort, isSubmitting })
 
 TableDownload.propTypes = {
   jobId: PropTypes.string.isRequired,
+  nrows: PropTypes.number,
   downloadJobs: PropTypes.array.isRequired,
   onSubmit: PropTypes.func.isRequired,
   onAbort: PropTypes.func.isRequired,

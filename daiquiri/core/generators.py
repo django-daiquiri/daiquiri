@@ -2,6 +2,7 @@ import csv
 import io
 import logging
 import struct
+import tempfile
 from datetime import datetime, timezone
 from xml.sax.saxutils import escape, quoteattr
 
@@ -223,7 +224,23 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
 # fmt: on
 
 
+def _is_array_datatype(datatype):
+    return bool(datatype and datatype.endswith('[]'))
+
+
 def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
+    if any(_is_array_datatype(field.get('datatype')) for field in fields):
+        with tempfile.TemporaryFile() as rows_file, tempfile.TemporaryFile() as heap_file:
+            yield from _generate_fits(
+                generator, fields, nrows, table_name, array_infos, rows_file, heap_file
+            )
+    else:
+        yield from _generate_fits(generator, fields, nrows, table_name, array_infos)
+
+
+def _generate_fits(
+    generator, fields, nrows, table_name, field_widths, rows_file=None, heap_file=None
+):
     DEFAULT_CHAR_SIZE = 256
 
     # VO format label, FITS format label, size in bytes, NULL value, encoded value
@@ -239,7 +256,7 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
         'timestamp': ('s', 'A', 19, b'',                 lambda x: x.encode()),
         'array':     ('s', 'A', 64, b'',                 lambda x: x.encode()),
         'unknown':   ('s', 'A', 8,  b'',                 lambda x: x.encode()),
-        'boolean[]': ('s', 'L', 1,  b'\x00',             lambda x: b'T' if x == 'true' else b'F'),
+        'boolean[]': ('s', 'L', 1,  b'\x00',             lambda x: b'T' if str(x).lower() in ('t', 'true') else b'F'), # noqa: E501
         'short[]':   ('h', 'I', 2,  32767,               int),
         'int[]':     ('i', 'J', 4,  2147483647,          int),
         'long[]':    ('q', 'K', 8,  9223372036854775807, int),
@@ -257,7 +274,7 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
     for i, (datatype, arraysize) in enumerate(zip(datatypes, arraysizes)):
         if datatype in PGSPHERE_TYPES:
             datatypes[i] = 'char'
-            arraysizes[i] = array_infos.get(names[i], DEFAULT_CHAR_SIZE)
+            arraysizes[i] = field_widths.get(names[i], DEFAULT_CHAR_SIZE)
         elif datatype == 'timestamp':
             arraysizes[i] = formats_dict['timestamp'][2]
         elif datatype in ('char', 'array') and arraysize == '':
@@ -278,19 +295,19 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
         else:
             ucds.append('')
 
-    naxis1_list = []
-
-    for datatype, arraysize, name in zip(datatypes, arraysizes, names):
-        if '[]' in datatype:
-            if datatype == 'char[]':
-                naxis1_list.append(array_infos[name] * DEFAULT_CHAR_SIZE)
-            else:
-                naxis1_list.append(array_infos[name] * formats_dict[datatype][2])
-        else:
-            naxis1_list.append(formats_dict[datatype][2] if not arraysize else arraysize)
-
-    naxis1 = sum(naxis1_list)
-    naxis2 = nrows
+    # Q descriptors occupy 16 bytes.
+    naxis1 = sum(
+        16 if _is_array_datatype(datatype) else (arraysize or formats_dict[datatype][2])
+        for datatype, arraysize in zip(datatypes, arraysizes)
+    )
+    if rows_file is not None:
+        naxis2, pcount = _stage_fits_rows(
+            generator, datatypes, arraysizes, formats_dict, rows_file, heap_file
+        )
+        if rows_file.tell() != naxis1 * naxis2:
+            raise ValueError('FITS row size does not match NAXIS1')
+    else:
+        naxis2, pcount = nrows, 0
     tfields = len(names)
 
     logo = get_daiquiri_logo(str(Site.objects.get_current())[:30], daiquiri_version)
@@ -305,7 +322,7 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
         ('NAXIS1',  '2880',    'number of characters'),
         ('EXTEND',  'T',       ''),
         ('NTABLE',  '1',       ''),
-        ('LONGSTRN','OGIP 1.0','The OGIP long string convention may be used.'),
+        ('LONGSTRN',"'OGIP 1.0'",'The OGIP long string convention may be used.'),
         ('COMMENT', 'This FITS file may contain long string keyword values that are',''),
         ('COMMENT', 'continued over multiple keywords.  This convention uses the  "&"',''),
         ('COMMENT', 'character at the end of a string which is then continued', ''),
@@ -330,7 +347,7 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
         ('NAXIS',    '2',          'number of array dimensions    '),
         ('NAXIS1',  f'{naxis1}',   'length of dimension 1    '),
         ('NAXIS2',  f'{naxis2}',   'length of dimension 2    '),
-        ('PCOUNT',   '0',          'number of group parameters    '),
+        ('PCOUNT',   f'{pcount}',  'number of group parameters    '),
         ('GCOUNT',   '1',          'number of groups    '),
         ('TFIELDS', f'{tfields} ', 'number of table fields    '),
     ]
@@ -345,23 +362,16 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
     for i, (name, datatype, arraysize, unit, ucd, description) in enumerate(
         zip(names, datatypes, arraysizes, units, ucds, descriptions)
     ):
-        if '[]' not in datatype:
+        if not _is_array_datatype(datatype):
             format_str = (str(arraysize) + formats_dict[datatype][1]).ljust(8)
         else:
-            if datatype == 'char[]':
-                format_str = str(array_infos[name] * DEFAULT_CHAR_SIZE) + formats_dict[datatype][1]
-            else:
-                format_str = str(array_infos[name]) + formats_dict[datatype][1].ljust(8)
+            format_str = '1Q' + formats_dict[datatype][1]
 
         h1 += create_fits_card(f'TTYPE{i + 1}', f"'{name.ljust(8)}'", f'label for col {i + 1}    ')
         h1 += create_fits_card(f'TFORM{i + 1}', f"'{format_str}'", f'format for col {i + 1}    ')
 
         # NULL values only for int-like types
-        if datatype in (
-            'short',
-            'int',
-            'long',
-        ):
+        if datatype in ('short', 'int', 'long'):
             h1 += create_fits_card(
                 f'TNULL{i + 1}',
                 formats_dict[datatype][3],
@@ -385,73 +395,83 @@ def generate_fits(generator, fields, nrows, table_name=None, array_infos={}):
     now = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
     h1 += create_fits_card('DATE-HDU', f"'{now}'", 'UTC date of HDU creation')
     h1 += create_fits_card('END', '', '')
-    h1 += ' ' * (2880 * (len(h1) // 2880 + 1) - len(h1))
+    h1 += ' ' * (-len(h1) % 2880)
 
     yield h1.encode()
 
     # Data ####################################################################
-    fmt = '>' + ''.join(
-        [
+    if rows_file is not None:
+        for staged_file in (rows_file, heap_file):
+            staged_file.seek(0)
+            while chunk := staged_file.read(65536):
+                yield chunk
+        data_size = naxis1 * naxis2 + pcount
+    else:
+        fmt = '>' + ''.join(
             str(arraysize) + formats_dict[datatype][0]
             for datatype, arraysize in zip(datatypes, arraysizes)
-        ]
-    )
-
-    row_count = 0
-
-    for row in generator:
-        fmt = '>'
-        row_elements_formatted = []
-        for row_element, datatype, arraysize, name in zip(row, datatypes, arraysizes, names):
-            if datatype == 'double[]' and (
-                row_element is None or isinstance(row_element, list | tuple)
-            ):
-                # Geometry arrays are already decoded; pad variable-length polygons as usual.
-                values = list(row_element or [])
-                values += [float('nan')] * (array_infos[name] - len(values))
-                row_elements_formatted.extend(values)
-                f = str(array_infos[name]) + 'd'
-            elif row_element is None or row_element == 'NULL':
-                r = formats_dict[datatype][3]
-                f = str(arraysize) + formats_dict[datatype][0]
-                row_elements_formatted.append(r)
-            elif datatype[-2:] == '[]':
-                r = []
-                parsed = parse_and_fill_fits_array(
-                    obj_str=row_element,
-                    obj_type=datatype,
-                    desired_length=array_infos[name],
-                    formats_dict=formats_dict,
-                )
-                for j in parsed:
-                    if j == 'NULL':
-                        entry = formats_dict[datatype][3]
-                    else:
-                        entry = formats_dict[datatype][4](j)
-                    r.append(entry)
-                f = str(array_infos[name]) + formats_dict[datatype][0]
-                if datatype == 'char[]':
-                    f = str(array_infos[name] * DEFAULT_CHAR_SIZE) + formats_dict[datatype][0]
-
-                if datatype in ['char[]', 'boolean[]']:
-                    row_elements_formatted.append(b''.join(r))
+        )
+        row_count = 0
+        for row in generator:
+            encoded_row = []
+            for value, datatype in zip(row, datatypes):
+                if value is None or value == 'NULL':
+                    encoded = formats_dict[datatype][3]
                 else:
-                    row_elements_formatted.extend(r)
+                    encoded = formats_dict[datatype][4](value)
+                encoded_row.append(encoded)
+            yield struct.pack(fmt, *encoded_row)
+            row_count += 1
+        data_size = naxis1 * row_count
 
+    padding = -data_size % 2880
+    if padding:
+        yield b'\x00' * padding
+
+
+def _stage_fits_rows(generator, datatypes, arraysizes, formats_dict, rows_file, heap_file):
+    row_count = 0
+    for row in generator:
+        row_data = bytearray()
+        for value, datatype, arraysize in zip(row, datatypes, arraysizes):
+            if _is_array_datatype(datatype):
+                element_count, payload = _encode_fits_array(value, datatype, formats_dict)
+                heap_offset = heap_file.tell() if element_count else 0
+                heap_file.write(payload)
+                row_data.extend(struct.pack('>qq', element_count, heap_offset))
             else:
-                r = formats_dict[datatype][4](row_element)
-                f = str(arraysize) + formats_dict[datatype][0]
-                row_elements_formatted.append(r)
-            fmt += f
-        yield struct.pack(fmt, *row_elements_formatted)
-
+                if value is None or value == 'NULL':
+                    encoded = formats_dict[datatype][3]
+                else:
+                    encoded = formats_dict[datatype][4](value)
+                scalar_fmt = '>' + str(arraysize) + formats_dict[datatype][0]
+                row_data.extend(struct.pack(scalar_fmt, encoded))
+        rows_file.write(row_data)
         row_count += 1
+    return row_count, heap_file.tell()
 
-    # Footer padding (to fill the last block to 2880 bytes) ###################
-    ln = naxis1 * row_count
-    footer = '\x00' * (2880 * (ln // 2880 + 1) - ln)
 
-    yield footer.encode()
+def _encode_fits_array(value, datatype, formats_dict):
+    values = parse_fits_array(value, datatype)
+    if datatype in ('char[]', 'boolean[]'):
+        if any(item is None or item == 'NULL' for item in values):
+            raise ValueError(f'NULL elements in FITS {datatype} columns are not supported')
+        payload = b''.join(formats_dict[datatype][4](item) for item in values)
+        return (len(payload) if datatype == 'char[]' else len(values)), payload
+
+    encoded = []
+    for item in values:
+        if item is None or item == 'NULL':
+            if datatype not in ('float[]', 'double[]'):
+                raise ValueError(f'NULL elements in FITS {datatype} columns are not supported')
+            encoded.append(float('nan'))
+        else:
+            encoded.append(formats_dict[datatype][4](item))
+    if encoded:
+        payload = struct.pack('>' + str(len(encoded)) + formats_dict[datatype][0], *encoded)
+    else:
+        payload = b''
+    return len(encoded), payload
 
 
 def create_fits_card(key: str, val: str, comment: str) -> str:
@@ -549,22 +569,15 @@ def get_daiquiri_logo(site: str, version: str) -> str:
     return logo
 
 
-def parse_and_fill_fits_array(
-    obj_str: str, obj_type: str, desired_length: int, formats_dict: dict
-) -> list:
-    array = list(obj_str.strip('{}').split(','))
+def parse_fits_array(obj_str: str | list | tuple | None, obj_type: str) -> list:
+    if obj_str is None or obj_str == 'NULL' or obj_str == '{}':
+        return []
+    if isinstance(obj_str, list | tuple):
+        return list(obj_str)
 
+    array = obj_str.strip('{}').split(',')
     if obj_type == 'char[]':
-        array = [f'{i}_' for i in array[:-1]] + [f'{array[-1]}']
-
-    for _ in range(desired_length - len(array)):
-        if obj_type in ['float[]', 'double[]', 'short[]', 'int[]', 'long[]']:
-            array.append(formats_dict[obj_type][3])
-        elif obj_type in ['char[]', 'boolean[]']:
-            array.append('')
-        else:
-            raise ValueError(f'Unknown array type: {obj_type}')
-
+        array = [f'{item}_' for item in array[:-1]] + [array[-1]]
     return array
 
 
@@ -575,6 +588,7 @@ def generate_parquet(
     metadata: str,
     database_config: dict,
     query_language=None,
+    on_row_count=None,
 ):
     native_fields = fields
     fields = process_result_columns(fields, query_language)
@@ -626,8 +640,9 @@ def generate_parquet(
     }
     writer.add_key_value_metadata(kv_meta)
 
+    processed_rows = 0
     try:
-        for chunk in pd.read_sql(query, con=connection, chunksize=100000):
+        for chunk in pd.read_sql(query, con=connection, chunksize=10000):
             if is_adql(query_language):
                 for field in native_fields:
                     datatype = field['datatype']
@@ -639,6 +654,9 @@ def generate_parquet(
                         )
             table = pa.Table.from_pandas(chunk, preserve_index=False).cast(schema)
             writer.write_table(table)
+            if on_row_count:
+                processed_rows += len(chunk)
+                on_row_count(processed_rows)
 
             data = sink.get_and_reset()
             if data:

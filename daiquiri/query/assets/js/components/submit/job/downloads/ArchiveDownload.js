@@ -67,6 +67,8 @@ const ArchiveDownload = ({ jobId, columns, downloadJobs, onSubmit, onAbort }) =>
       return renderDefault()
     }
 
+    const hasProgress = queryJob.nrows > 0 && downloadJob.processed_rows != null
+
     switch (downloadJob.phase) {
     case 'QUEUED':
       return (
@@ -101,8 +103,13 @@ const ArchiveDownload = ({ jobId, columns, downloadJobs, onSubmit, onAbort }) =>
             <span>
             <span className="spinner-border spinner-border-sm">
             </span>
-              {gettext(' Creating.. ')}
-              {interpolate(gettext('(%s).'), [bytes2human(downloadJob.size)])}
+              &nbsp;
+              {hasProgress ? (downloadJob.processed_rows >= queryJob.nrows
+                ? gettext('Finalizing file')
+                : interpolate(gettext('Rows processed: %s'), [
+                    `${Math.floor(100 * downloadJob.processed_rows / queryJob.nrows)}%`
+                  ])) : gettext('Creating file')}
+              {!hasProgress && downloadJob.size > 0 && ` (${bytes2human(downloadJob.size)})`}
             </span>
             {renderCancel(downloadJob)}
           </p>

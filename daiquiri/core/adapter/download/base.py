@@ -25,6 +25,18 @@ from daiquiri.core.utils import get_doi_url, is_adql
 logger = logging.getLogger(__name__)
 
 
+def _report_rows(rows, on_row_count):
+    count = 0
+    for row in rows:
+        yield row
+        # The consumer has finished this row when iteration resumes.
+        count += 1
+        if count % 1000 == 0:
+            on_row_count(count)
+    if count % 1000:
+        on_row_count(count)
+
+
 class BaseDownloadAdapter:
     def __init__(self, database_key, database_config):
         self.database_key = database_key
@@ -41,6 +53,7 @@ class BaseDownloadAdapter:
         query_status=None,
         query=None,
         query_language=None,
+        on_row_count=None,
     ):
         # create the final list of arguments subprocess.Popen
         if format_key == 'sql':
@@ -60,6 +73,8 @@ class BaseDownloadAdapter:
                 process_result_row(row, native_columns, query_language)
                 for row in self.generate_rows(prepend=prepend)
             )
+            if on_row_count:
+                rows = _report_rows(rows, on_row_count)
 
             if format_key == 'csv':
                 return generate_csv(rows, columns)
@@ -76,9 +91,8 @@ class BaseDownloadAdapter:
                 )
 
             elif format_key == 'fits':
-                # We have to get the maximum array lengths in case there are arrays in the data
                 schema_table_name = self.get_table_name(schema_name, table_name)
-                fits_arrayinfos = self.get_arraysizes_for_fits(
+                fits_field_widths = self.get_arraysizes_for_fits(
                     native_columns, schema_name, table_name, query_language
                 )
 
@@ -87,7 +101,7 @@ class BaseDownloadAdapter:
                     fields=columns,
                     nrows=nrows,
                     table_name=schema_table_name,
-                    array_infos=fits_arrayinfos,
+                    array_infos=fits_field_widths,
                 )
 
             elif format_key == 'parquet':
@@ -111,6 +125,7 @@ class BaseDownloadAdapter:
                     metadata=votable_meta_str,
                     database_config=self.database_config,
                     query_language=query_language,
+                    on_row_count=on_row_count,
                 )
 
             else:
@@ -229,34 +244,19 @@ class BaseDownloadAdapter:
     def get_arraysizes_for_fits(
         self, columns: list, schema_name: str, table_name: str, query_language=None
     ):
-        arraysizes = {}
+        """Return fixed text widths needed for native pgSphere FITS fields."""
+        field_widths = {}
         db = DatabaseAdapter()
         for c in columns:
             datatype = c['datatype']
             if datatype in PGSPHERE_TYPES:
                 geometry = ADQL_GEOMETRIES.get(datatype) if is_adql(query_language) else None
-                if geometry and geometry[1] != '*':
-                    arraysizes[c['name']] = geometry[1]
+                if geometry:
                     continue
                 column = db.escape_identifier(c['name'])
                 table = f'{db.escape_identifier(schema_name)}.{db.escape_identifier(table_name)}'
-                # Converted polygons need numeric slots; native values need full text width.
-                length = f'2 * npoints({column})' if geometry else f'octet_length({column}::text)'
-                arraysizes[c['name']] = db.fetchone(f'SELECT MAX({length}) FROM {table}')[0] or 1
-                continue
-            if c['datatype'][-2:] == '[]':
-                column_name = c['name']
+                # Native pgSphere values are written as fixed-width text.
+                length = f'octet_length({column}::text)'
+                field_widths[c['name']] = db.fetchone(f'SELECT MAX({length}) FROM {table}')[0] or 1
 
-                query = f"""
-                    SELECT MAX(array_length({column_name}, 1))
-                    FROM "{schema_name}"."{table_name}"
-                    WHERE {column_name} IS NOT NULL
-                """
-
-                # try:
-                result = db.fetchone(query)
-                max_length = result[0]
-
-                arraysizes[column_name] = max_length
-
-        return arraysizes
+        return field_widths
