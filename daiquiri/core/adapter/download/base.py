@@ -25,6 +25,18 @@ from daiquiri.core.utils import get_doi_url, is_adql
 logger = logging.getLogger(__name__)
 
 
+def _report_rows(rows, on_row_count):
+    count = 0
+    for row in rows:
+        yield row
+        # The consumer has finished this row when iteration resumes.
+        count += 1
+        if count % 1000 == 0:
+            on_row_count(count)
+    if count % 1000:
+        on_row_count(count)
+
+
 class BaseDownloadAdapter:
     def __init__(self, database_key, database_config):
         self.database_key = database_key
@@ -41,6 +53,7 @@ class BaseDownloadAdapter:
         query_status=None,
         query=None,
         query_language=None,
+        on_row_count=None,
     ):
         # create the final list of arguments subprocess.Popen
         if format_key == 'sql':
@@ -60,6 +73,8 @@ class BaseDownloadAdapter:
                 process_result_row(row, native_columns, query_language)
                 for row in self.generate_rows(prepend=prepend)
             )
+            if on_row_count:
+                rows = _report_rows(rows, on_row_count)
 
             if format_key == 'csv':
                 return generate_csv(rows, columns)
@@ -110,6 +125,7 @@ class BaseDownloadAdapter:
                     metadata=votable_meta_str,
                     database_config=self.database_config,
                     query_language=query_language,
+                    on_row_count=on_row_count,
                 )
 
             else:

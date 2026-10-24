@@ -588,6 +588,7 @@ def generate_parquet(
     metadata: str,
     database_config: dict,
     query_language=None,
+    on_row_count=None,
 ):
     native_fields = fields
     fields = process_result_columns(fields, query_language)
@@ -639,6 +640,7 @@ def generate_parquet(
     }
     writer.add_key_value_metadata(kv_meta)
 
+    processed_rows = 0
     try:
         for chunk in pd.read_sql(query, con=connection, chunksize=10000):
             if is_adql(query_language):
@@ -652,6 +654,9 @@ def generate_parquet(
                         )
             table = pa.Table.from_pandas(chunk, preserve_index=False).cast(schema)
             writer.write_table(table)
+            if on_row_count:
+                processed_rows += len(chunk)
+                on_row_count(processed_rows)
 
             data = sink.get_and_reset()
             if data:
