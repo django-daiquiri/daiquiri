@@ -25,6 +25,30 @@ from daiquiri.core.utils import is_adql
 
 logger = logging.getLogger(__name__)
 
+VOTABLE_PLAIN_DATATYPES = frozenset({
+    'boolean',
+    'unsignedByte',
+    'short',
+    'int',
+    'long',
+    'float',
+    'double'
+})
+VOTABLE_TEXT_DATATYPES = frozenset({
+    'char'
+})
+VOTABLE_ARRAY_DATATYPES = frozenset({
+    'boolean[]',
+    'char[]',
+    'short[]',
+    'int[]',
+    'long[]',
+    'float[]',
+    'double[]'
+})
+
+VOTABLE_DATATYPES = VOTABLE_PLAIN_DATATYPES | VOTABLE_TEXT_DATATYPES | VOTABLE_ARRAY_DATATYPES
+
 
 def generate_csv(generator, fields):
     # write header
@@ -124,33 +148,15 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
                 attrs.append('arraysize="{}"'.format(field['arraysize']))
 
         if 'datatype' in field:
-            if field['datatype'] in [
-                'boolean',
-                'char',
-                'unsignedByte',
-                'short',
-                'int',
-                'long',
-                'float',
-                'double',
-            ]:
-                attrs.append('datatype="{}"'.format(field['datatype']))
-
-            elif field['datatype'] in [
-                'boolean[]',
-                'char[]',
-                'short[]',
-                'int[]',
-                'long[]',
-                'float[]',
-                'double[]',
-            ]:
-                attrs.append(f'datatype="{field["datatype"].rstrip("[]")}"')
-                if field['arraysize']:
-                    attrs.append(f'arraysize="{field["arraysize"]}"')
+            if field['datatype'] in VOTABLE_DATATYPES:
+                if field['datatype'] in VOTABLE_ARRAY_DATATYPES:
+                    attrs.append(f'datatype="{field["datatype"].rstrip("[]")}"')
+                    if field['arraysize']:
+                        attrs.append(f'arraysize="{field["arraysize"]}"')
+                    else:
+                        attrs.append('arraysize="*"')
                 else:
-                    attrs.append('arraysize="*"')
-
+                    attrs.append('datatype="{}"'.format(field['datatype']))
             elif not field.get('xtype'):
                 attrs.append('xtype="{}"'.format(field['datatype']))
 
@@ -171,6 +177,7 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
             <DATA>
                 <TABLEDATA>"""
 
+        plain_fields = [field.get('datatype') in VOTABLE_PLAIN_DATATYPES for field in fields]
         # write rows of the table yielded by the generator
         for i, row in enumerate(generator):
             if max_records is not None and  i >= max_records:
@@ -180,8 +187,9 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
                 '</TD><TD>'.join(
                     [
                         '' if cell in ['NULL', None]
+                        else str(cell) if plain
                         else correct_col_for_votable(escape(str(cell)), field.get('datatype'))
-                        for cell, field in zip(row, fields, strict=True)
+                        for cell, field, plain in zip(row, fields, plain_fields, strict=True)
                     ]
                 )
             )

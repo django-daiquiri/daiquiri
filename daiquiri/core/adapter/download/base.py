@@ -69,10 +69,11 @@ class BaseDownloadAdapter:
             prepend = self.get_prepend(columns)
             native_columns = columns
             columns = process_result_columns(native_columns, query_language)
-            rows = (
-                process_result_row(row, native_columns, query_language)
-                for row in self.generate_rows(prepend=prepend)
-            )
+            rows = self.generate_rows(prepend=prepend)
+            if is_adql(query_language) and any(
+                column.get('datatype') in ADQL_GEOMETRIES for column in native_columns
+            ):
+                rows = (process_result_row(row, native_columns, query_language) for row in rows)
             if on_row_count:
                 rows = _report_rows(rows, on_row_count)
 
@@ -160,7 +161,10 @@ class BaseDownloadAdapter:
                     line = insert_result.group(1)
                     reader = csv.reader([line], quotechar="'", skipinitialspace=True)
                     row = next(reader)
-                    yield from self.prepend_row_values(row, prepend)
+                    if prepend:
+                        yield from self.prepend_row_values(row, prepend)
+                    else:
+                        yield row
 
         except subprocess.CalledProcessError as e:
             logger.error('Command PIPE returned non-zero exit status: %s', e)
