@@ -40,7 +40,7 @@ def access_panel(doi, dataset=None):
 @register.simple_tag()
 def doi_link(doi):
     url = get_doi_url(doi)
-    return format_html('<a class="break" href="{}">{}</a>', url, url)
+    return format_html('<a class="text-break" href="{}">{}</a>', url, doi.rstrip('/'))
 
 
 @register.inclusion_tag('metadata/tags/doi_panel.html')
