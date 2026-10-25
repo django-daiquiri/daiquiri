@@ -54,6 +54,7 @@ class BaseDownloadAdapter:
         query=None,
         query_language=None,
         on_row_count=None,
+        on_error=None,
     ):
         # create the final list of arguments subprocess.Popen
         if format_key == 'sql':
@@ -89,6 +90,7 @@ class BaseDownloadAdapter:
                     links=self.get_links(sources),
                     services=self.get_services(),
                     empty=(nrows == 0),
+                    on_error=on_error,
                 )
 
             elif format_key == 'fits':

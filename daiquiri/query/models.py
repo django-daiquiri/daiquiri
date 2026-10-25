@@ -388,7 +388,7 @@ class QueryJob(Job):
         else:
             abort_database_query_task.apply_async(task_args)
 
-    def stream(self, format_key, on_row_count=None):
+    def stream(self, format_key, on_row_count=None, on_error=None):
         if self.phase == self.PHASE_COMPLETED:
             return DownloadAdapter().generate(
                 format_key,
@@ -401,6 +401,7 @@ class QueryJob(Job):
                 query=self.query,
                 query_language=self.query_language,
                 on_row_count=on_row_count,
+                on_error=on_error,
             )
         else:
             raise ValidationError({'phase': ['Job is not COMPLETED.']})

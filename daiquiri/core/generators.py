@@ -48,6 +48,16 @@ VOTABLE_ARRAY_DATATYPES = frozenset({
 })
 
 VOTABLE_DATATYPES = VOTABLE_PLAIN_DATATYPES | VOTABLE_TEXT_DATATYPES | VOTABLE_ARRAY_DATATYPES
+INTEGER_NULLS = {
+    'short': -32768,
+    'int': -2147483648,
+    'long': -9223372036854775808,
+}
+INTEGER_ARRAY_NULLS = {f'{datatype}[]': value for datatype, value in INTEGER_NULLS.items()}
+
+
+class IntegerNullCollision(ValueError):
+    pass
 
 
 def generate_csv(generator, fields):
@@ -92,7 +102,37 @@ def correct_col_for_votable(col, datatype=None):
     return corrected_col
 
 
-def generate_votable(generator, fields, infos=[], links=[], services=[], table=None, empty=False, max_records=None):
+def _integer_value(value, null_value, name, row_number):
+    if isinstance(value, str):
+        value = value.strip()
+    if value is None or value == 'NULL':
+        return null_value
+    value = int(value)
+    if value == null_value:
+        raise IntegerNullCollision(
+            f"Row {row_number}, column '{name}': {value} is reserved for NULL."
+        )
+    return value
+
+
+def _votable_integer_array(value, datatype, name, row_number):
+    if isinstance(value, str):
+        value = value.strip('{}[]').replace('{', '').replace('}', '')
+        value = value.split(',') if value else []
+
+    null_value = INTEGER_ARRAY_NULLS[datatype]
+
+    def items(array):
+        for item in array:
+            if isinstance(item, (list, tuple)):
+                yield from items(item)
+            else:
+                yield str(_integer_value(item, null_value, name, row_number))
+
+    return ' '.join(items(value))
+
+
+def generate_votable(generator, fields, infos=[], links=[], services=[], table=None, empty=False, max_records=None, on_error=None):
     yield """<?xml version="1.0"?>
 <VOTABLE version="1.3"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -162,37 +202,50 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
 
         if attrs:
             description = field.get('description')
-            if description:
+            null_value = INTEGER_ARRAY_NULLS.get(field.get('datatype'))
+            if description or null_value is not None:
+                elements = []
+                if description:
+                    elements.append(f'<DESCRIPTION>{escape(description)}</DESCRIPTION>')
+                if null_value is not None:
+                    elements.append(f'<VALUES null={quoteattr(str(null_value))} />')
                 yield """
-                <FIELD {}> <DESCRIPTION>{}</DESCRIPTION> </FIELD>
-                """.format(' '.join(attrs), escape(description))
+                <FIELD {}> {} </FIELD>""".format(' '.join(attrs), ' '.join(elements))
             else:
                 yield """
                 <FIELD {} />""".format(' '.join(attrs))
 
     # fmt: off
     overflow = False
+    error = None
     if not empty:
         yield """
             <DATA>
                 <TABLEDATA>"""
 
-        plain_fields = [field.get('datatype') in VOTABLE_PLAIN_DATATYPES for field in fields]
         # write rows of the table yielded by the generator
         for i, row in enumerate(generator):
             if max_records is not None and  i >= max_records:
                 overflow = True
                 break
-            yield '<TR><TD>{}</TD></TR>'.format(
-                '</TD><TD>'.join(
-                    [
-                        '' if cell in ['NULL', None]
-                        else str(cell) if plain
-                        else correct_col_for_votable(escape(str(cell)), field.get('datatype'))
-                        for cell, field, plain in zip(row, fields, plain_fields, strict=True)
-                    ]
-                )
-            )
+            try:
+                cells = []
+                for cell, field in zip(row, fields, strict=True):
+                    datatype = field.get('datatype')
+                    if cell in ['NULL', None]:
+                        cells.append('')
+                    elif datatype in VOTABLE_PLAIN_DATATYPES:
+                        cells.append(str(cell))
+                    elif datatype in INTEGER_ARRAY_NULLS:
+                        cells.append(_votable_integer_array(cell, datatype, field['name'], i + 1))
+                    else:
+                        cells.append(correct_col_for_votable(escape(str(cell)), datatype))
+            except IntegerNullCollision as exc:
+                error = str(exc)
+                if on_error:
+                    on_error(error)
+                break
+            yield '<TR><TD>{}</TD></TR>'.format('</TD><TD>'.join(cells))
 
         yield """
                 </TABLEDATA>
@@ -201,7 +254,10 @@ def generate_votable(generator, fields, infos=[], links=[], services=[], table=N
     yield """
         </TABLE>"""
 
-    if overflow:
+    if error:
+        yield f"""
+        <INFO name={quoteattr('QUERY_STATUS')} value={quoteattr('ERROR')}>{escape(error)}</INFO>"""
+    elif overflow:
         yield f"""
         <INFO name={quoteattr('QUERY_STATUS')} value={quoteattr('OVERFLOW')} />"""
 
@@ -255,9 +311,9 @@ def _generate_fits(
     # fmt:off
     formats_dict = {
         'boolean':   ('s', 'L', 1,  b'\x00',             lambda x: b'T' if x == 'true' else b'F'), #noqa: E501
-        'short':     ('h', 'I', 2,  32767,               int),
-        'int':       ('i', 'J', 4,  2147483647,          int),
-        'long':      ('q', 'K', 8,  9223372036854775807, int),
+        'short':     ('h', 'I', 2,  INTEGER_NULLS['short'], int),
+        'int':       ('i', 'J', 4,  INTEGER_NULLS['int'],   int),
+        'long':      ('q', 'K', 8,  INTEGER_NULLS['long'],  int),
         'float':     ('f', 'E', 4,  float('nan'),        float),
         'double':    ('d', 'D', 8,  float('nan'),        float),
         'char':      ('s', 'A', 32, b'',                 lambda x: x.encode()),
@@ -265,9 +321,9 @@ def _generate_fits(
         'array':     ('s', 'A', 64, b'',                 lambda x: x.encode()),
         'unknown':   ('s', 'A', 8,  b'',                 lambda x: x.encode()),
         'boolean[]': ('s', 'L', 1,  b'\x00',             lambda x: b'T' if str(x).lower() in ('t', 'true') else b'F'), # noqa: E501
-        'short[]':   ('h', 'I', 2,  32767,               int),
-        'int[]':     ('i', 'J', 4,  2147483647,          int),
-        'long[]':    ('q', 'K', 8,  9223372036854775807, int),
+        'short[]':   ('h', 'I', 2,  INTEGER_ARRAY_NULLS['short[]'], int),
+        'int[]':     ('i', 'J', 4,  INTEGER_ARRAY_NULLS['int[]'],   int),
+        'long[]':    ('q', 'K', 8,  INTEGER_ARRAY_NULLS['long[]'],  int),
         'float[]':   ('f', 'E', 4,  float('nan'),        float),
         'double[]':  ('d', 'D', 8,  float('nan'),        float),
         'char[]':    ('s', 'A', 32, b'',                 lambda x: x.encode()),
@@ -379,7 +435,7 @@ def _generate_fits(
         h1 += create_fits_card(f'TFORM{i + 1}', f"'{format_str}'", f'format for col {i + 1}    ')
 
         # NULL values only for int-like types
-        if datatype in ('short', 'int', 'long'):
+        if datatype in INTEGER_NULLS or datatype in INTEGER_ARRAY_NULLS:
             h1 += create_fits_card(
                 f'TNULL{i + 1}',
                 formats_dict[datatype][3],
@@ -470,9 +526,7 @@ def _encode_fits_array(value, datatype, formats_dict):
     encoded = []
     for item in values:
         if item is None or item == 'NULL':
-            if datatype not in ('float[]', 'double[]'):
-                raise ValueError(f'NULL elements in FITS {datatype} columns are not supported')
-            encoded.append(float('nan'))
+            encoded.append(formats_dict[datatype][3])
         else:
             encoded.append(formats_dict[datatype][4](item))
     if encoded:

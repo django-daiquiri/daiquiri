@@ -316,15 +316,21 @@ def create_download_table_task(download_id):
 
         try:
             _check_download_aborted(download_job)
+            stream_errors = []
             with open(download_job.file_path, write_label) as f:
                 stream = download_job.query_job.stream(
-                    download_job.format_key, on_row_count=update_processed_rows
+                    download_job.format_key,
+                    on_row_count=update_processed_rows,
+                    on_error=stream_errors.append,
                 )
                 for i, line in enumerate(stream, 1):
                     if download_job.format_key not in ('csv', 'votable', 'fits') or i % 1000 == 0:
                         _check_download_aborted(download_job)
                     f.write(line)
                 _check_download_aborted(download_job)
+            if stream_errors:
+                download_job.delete_file()
+                raise ValueError(stream_errors[0])
 
         except DownloadJobAborted:
             download_job.delete_file()
