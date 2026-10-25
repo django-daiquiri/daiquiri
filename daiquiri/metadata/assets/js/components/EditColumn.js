@@ -12,6 +12,8 @@ import Input from 'daiquiri/core/assets/js/components/form/Input'
 import Markdown from 'daiquiri/core/assets/js/components/form/Markdown'
 import Select from 'daiquiri/core/assets/js/components/form/Select'
 
+import GroupAccess from './GroupAccess'
+
 const EditColumn = ({ values, success, errors, setValues, onDiscover, onSave }) => {
   const { data: accessLevels } = useAccessLevelsQuery()
   const { data: meta } = useMetaQuery()
@@ -128,26 +130,10 @@ const EditColumn = ({ values, success, errors, setValues, onDiscover, onSave }) 
                 </div>
               </div>
 
-              <div className="mb-3">
-                <strong className="d-block mb-2">{gettext('Groups with access')}</strong>
-                <div className="row row-cols-1 row-cols-md-2 row-cols-xl-3 gy-1">
-                  {
-                    groups.map((group) => (
-                      <div className="col" key={group.id}>
-                        <Checkbox
-                          label={group.name}
-                          checked={values.groups.includes(group.id)}
-                          onChange={(checked) => setValues({ ...values, groups: checked ? (
-                            [ ...values.groups, group.id]
-                          ) : (
-                            values.groups.filter(group_id => group_id !== group.id)
-                          )})}
-                        />
-                      </div>
-                    ))
-                  }
-                </div>
-              </div>
+              <GroupAccess
+                groups={groups}
+                selectedIds={values.groups}
+                onChange={(groups) => setValues({ ...values, groups })} />
             </>
           }
 
