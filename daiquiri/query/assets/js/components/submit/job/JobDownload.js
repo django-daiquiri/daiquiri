@@ -123,6 +123,7 @@ const JobDownload = ({ job }) => {
               <TableDownload
                 key={downloadIndex}
                 jobId={job.id}
+                nrows={job.nrows}
                 downloadJobs={downloadJobs || []}
                 onSubmit={(data) => handleSubmit('table', data)}
                 onAbort={handleAbort}
