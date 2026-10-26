@@ -378,6 +378,8 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
                     'error_summary': download_job.error_summary,
                     'size': get_file_size(download_job.file_path),
                 }
+                if hasattr(download_job, 'processed_rows'):
+                    job_response['processed_rows'] = download_job.processed_rows
                 for par in download_config.get('params', []):
                     if hasattr(download_job, par):
                         job_response[par] = getattr(download_job, par)
@@ -536,6 +538,8 @@ class QueryJobViewSet(RowViewSetMixin, viewsets.ModelViewSet):
             or download_job.phase == download_job.PHASE_ARCHIVED
         ):
             download_job.phase = download_job.PHASE_PENDING
+            if hasattr(download_job, 'processed_rows'):
+                download_job.processed_rows = 0
             download_job.save()
 
         if download_job.phase == download_job.PHASE_PENDING:
