@@ -103,3 +103,49 @@ $handle-width: 0.5rem;
         }
     }
 }
+
+.dq-datalink-table {
+    table-layout: fixed;
+
+    th,
+    td {
+        vertical-align: top;
+    }
+
+    .dq-datalink-id-column { width: 15%; }
+    .dq-datalink-description-column { width: 25%; }
+    .dq-datalink-content-type-column { width: 12em; }
+    .dq-datalink-content-size-column { width: 7em; }
+
+    .dq-datalink-id,
+    .dq-datalink-description {
+        overflow-wrap: anywhere;
+    }
+
+    .dq-datalink-content-type {
+        overflow-wrap: anywhere;
+    }
+
+    th:last-child,
+    td:last-child {
+        white-space: nowrap;
+        text-align: right;
+    }
+
+    .dq-datalink-url {
+        display: flex;
+        min-width: 0;
+        white-space: nowrap;
+    }
+
+    .dq-datalink-url-prefix {
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .dq-datalink-url-suffix {
+        flex: 0 0 auto;
+    }
+}

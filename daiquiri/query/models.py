@@ -289,15 +289,16 @@ class QueryJob(Job):
                     row = process_result_row(row, columns, self.query_language)
                     yield from DownloadAdapter().prepend_row_values(row, prepend)
 
+            result_columns = process_result_columns(columns, self.query_language)
             yield from generate_votable(
                 row_generator(prepend),
-                process_result_columns(columns, self.query_language),
+                result_columns,
                 table=download_adapter.get_table_name(self.schema_name, self.table_name),
                 infos=download_adapter.get_infos(
                     'OK', self.query, self.query_language, job_sources
                 ),
                 links=download_adapter.get_links(job_sources),
-                services=download_adapter.get_services(),
+                services=download_adapter.get_services_for_fields(result_columns),
                 max_records=self.max_records,
             )
 

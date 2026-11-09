@@ -210,6 +210,14 @@ def get_job_column(job, display_column_name):
             return {}
 
 
+def get_result_datalink_path(job, display_column_name):
+    source = (job.metadata or {}).get('display_columns', {}).get(display_column_name)
+    if source and source[2]:
+        return next((service['path'] for service in getattr(settings, 'DATALINK_SERVICES', [])
+                     if service.get('column_name') == source[2]), None)
+    return None
+
+
 def get_job_columns(job):
     columns = []
 
@@ -221,6 +229,9 @@ def get_job_columns(job):
         for database_column in database_columns:
             column = get_job_column(job, database_column['name'])
             column.update(database_column)
+            path = get_result_datalink_path(job, database_column['name'])
+            if path:
+                column['datalink_path'] = path
             columns.append(column)
 
     return columns
@@ -239,6 +250,9 @@ def get_columns_metadata(job, columns):
         # Geometry identity must come from the cursor, even with older catalog metadata.
         if col.get('datatype') in PGSPHERE_TYPES or column.get('datatype') in PGSPHERE_TYPES:
             column = dict(column, datatype=col['datatype'], arraysize=col['arraysize'])
+        path = get_result_datalink_path(job, name)
+        if path:
+            column['datalink_path'] = path
         columns_list.append(column)
 
     return columns_list

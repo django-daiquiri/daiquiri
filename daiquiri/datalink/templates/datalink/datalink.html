@@ -4,10 +4,13 @@
 <!-- Context
 
 ID
+IDs
 
 datalinks: (array)
   * ID
   * access_url
+  * access_url_prefix (viewer display)
+  * access_url_suffix (viewer display)
   * service_Def
   * error_message
   * description
@@ -24,69 +27,70 @@ query_job:
 
 {% block wide %}
 
-    <h1>{% blocktrans %}Datalinks for {{ ID }}{% endblocktrans %}</h1>
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-5">
+        {% if ID %}
+        <h1 class="mb-0">{% blocktrans %}Datalinks for {{ ID }}{% endblocktrans %}</h1>
+        {% else %}
+        <h1 class="mb-0">{% trans 'Data Links' %}</h1>
+        {% endif %}
+        <a class="btn btn-secondary" href="{{ links_url }}">{% trans 'Show VOTable/XML' %}</a>
+    </div>
 
     {% if datalinks %}
 
-        <h2>Data Links</h2>
-
-        <table class="table table-condensed table-striped">
+        <div class="table-responsive">
+        <table class="table table-condensed table-striped dq-datalink-table">
+        <colgroup>
+            <col class="dq-datalink-id-column">
+            <col class="dq-datalink-description-column">
+            <col class="dq-datalink-url-column">
+            <col class="dq-datalink-content-type-column">
+            <col class="dq-datalink-content-size-column">
+        </colgroup>
 
         <thead>
             <tr>
-                <!-- <td><b>ID</b></td> -->
-                <td><b>access_url</b></td>
-                <!-- <td>service_def</td> -->
-                <!-- <td>error_message</td> -->
-                <td><b>description</b></td>
-                <td><b>semantics</b></td>
-                <td><b>content_type</b></td>
-                <td><b>content_length</b></td>
+                <th scope="col">ID</th>
+                <th scope="col">Description</th>
+                <th scope="col">Access URL</th>
+                <th scope="col">Content type</th>
+                <th scope="col">Content size</th>
             </tr>
         </thead>
 
         <tbody>
 
         {% for datalink in datalinks %}
-
-            {% if not datalink.service_def %}
-
             <tr>
-
-                <!-- <td>{{ datalink.ID }}</td> -->
-                <td><a href={{ datalink.access_url }}>{{ datalink.access_url }}</a></td>
-                <!-- <td>{{ datalink.service_def }}</td> -->
-                <!-- <td>{{ datalink.error_message }}</td> -->
-                <td>{{ datalink.description }}</td>
+                <td class="dq-datalink-id">{{ datalink.ID }}</td>
+                <td class="dq-datalink-description">{{ datalink.description }}</td>
                 <td>
-                    {% if datalink.semantics in custom_semantics %}
-                    <a href="{{ settings.SITE_URL }}{% url 'datalink:datalink-semantics' %}{{ datalink.semantics }}">{{ datalink.semantics }}</a>
-                    {% else %}
-                    <a href="http://www.ivoa.net/rdf/datalink/core{{ datalink.semantics }}">{{ datalink.semantics }}</a>
+                    {% if datalink.access_url %}
+                    <a class="dq-datalink-url" href="{{ datalink.access_url }}"
+                       title="{{ datalink.access_url }}" aria-label="{{ datalink.access_url }}">
+                        <span class="dq-datalink-url-prefix" aria-hidden="true">{{ datalink.access_url_prefix }}</span><span class="dq-datalink-url-suffix" aria-hidden="true">{{ datalink.access_url_suffix }}</span>
+                    </a>
                     {% endif %}
                 </td>
-                <td>{{ datalink.content_type }}</td>
+                <td class="dq-datalink-content-type">{{ datalink.content_type }}</td>
                 <td>
-                    {% if datalink.content_length > 0 %}
+                    {% if datalink.content_length %}
                     {{ datalink.content_length | filesizeformat }}
-                    {% else %}
-                    {{ datalink.content_length }}
                     {% endif %}
                 </td>
 
             </tr>
-
-            {% endif %}
 
         {% endfor %}
 
         </tbody>
 
         </table>
+        </div>
 
     {% else %}
 
-        <p>No datalinks could be found for this ID.</p>
+        <p>No datalinks could be found.</p>
 
     {% endif %}
 

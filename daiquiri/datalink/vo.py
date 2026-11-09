@@ -13,7 +13,8 @@ def get_availability():
     }
 
 
-def get_capabilities():
+def get_capabilities(path='/'):
+    link_list = get_link_list_name(path)
     return [
         {
             'id': 'ivo://ivoa.net/std/DataLink#links-1.0',
@@ -23,7 +24,7 @@ def get_capabilities():
                 'version': '1.0',
                 'access_url': {
                     'use': 'base',
-                    'url': settings.SITE_URL.rstrip('/') + reverse('datalink:link-list').rstrip('/')
+                    'url': settings.SITE_URL.rstrip('/') + reverse(f'datalink:{link_list}')
                 },
                 'query_types': ['GET', 'POST'],
                 'result_type': DATALINK_CONTENT_TYPE,
@@ -62,7 +63,11 @@ def get_resource():
     }
 
 
-def get_service():
+def get_service(path=None, field_id='datalinkID'):
+    if path is None:
+        access_url = settings.SITE_URL.rstrip('/') + '/datalink/links'
+    else:
+        access_url = settings.SITE_URL.rstrip('/') + reverse(f'datalink:{get_link_list_name(path)}')
     return {
         'params': [
             {
@@ -75,7 +80,7 @@ def get_service():
                 'name': 'accessURL',
                 'datatype': 'char',
                 'arraysize': '*',
-                'value': settings.SITE_URL.rstrip('/') + '/datalink/links'
+                'value': access_url
             }
         ],
         'groups': [
@@ -87,9 +92,25 @@ def get_service():
                         'datatype': 'char',
                         'arraysize': '*',
                         'value': '',
-                        'ref': 'datalinkID'
+                        'ref': field_id
                     }
                 ]
             }
         ]
     }
+
+
+def get_link_list_name(path):
+    return 'link-list' if path == '/' else f'{path.strip("/").replace("/", "-")}-link-list'
+
+
+def get_service_descriptors(fields):
+    services = []
+    for field in fields:
+        ucd = field.get('ucd') or ''
+        path = '/' if 'meta.id' in ucd and 'meta.ref' in ucd else field.get('datalink_path')
+        if path:
+            field_id = 'datalinkID' if not services else f'datalinkID{len(services) + 1}'
+            field['datalink_id'] = field_id
+            services.append(get_service(path, field_id))
+    return services
