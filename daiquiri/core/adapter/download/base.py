@@ -9,6 +9,7 @@ from django.conf import settings
 
 from daiquiri.core.adapter import DatabaseAdapter
 from daiquiri.core.generators import (
+    flatten_array_rows,
     generate_csv,
     generate_fits,
     generate_parquet,
@@ -77,6 +78,7 @@ class BaseDownloadAdapter:
                 rows = (process_result_row(row, native_columns, query_language) for row in rows)
             if on_row_count:
                 rows = _report_rows(rows, on_row_count)
+            rows = flatten_array_rows(rows, columns)
 
             if format_key == 'csv':
                 return generate_csv(rows, columns)
