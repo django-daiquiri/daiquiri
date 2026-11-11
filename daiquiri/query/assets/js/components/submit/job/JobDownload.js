@@ -27,7 +27,7 @@ const JobDownload = ({ job }) => {
   const [latestDownload, setLatestDownload] = useState(null)
   const [requestedDownloads, setRequestedDownloads] = useState([])
   const [pendingRequests, setPendingRequests] = useState(0)
-  const [submittingDownloadKey, setSubmittingDownloadKey] = useState(null)
+  const [submittingDownloadKeys, setSubmittingDownloadKeys] = useState({})
   const downloadedSequence = useRef(null)
 
   const { data: downloadForms } = useDownloadFormsQuery(job.id)
@@ -45,7 +45,10 @@ const JobDownload = ({ job }) => {
     startFastPolling()
     setLatestDownload(null)
     setPendingRequests((current) => current + 1)
-    setSubmittingDownloadKey(downloadKey)
+    setSubmittingDownloadKeys((current) => ({
+      ...current,
+      [downloadKey]: (current[downloadKey] || 0) + 1
+    }))
 
     mutation.mutate({
       job,
@@ -59,7 +62,10 @@ const JobDownload = ({ job }) => {
       },
       onSettled: () => {
         setPendingRequests((current) => current - 1)
-        setSubmittingDownloadKey((current) => current == downloadKey ? null : current)
+        setSubmittingDownloadKeys((current) => ({
+          ...current,
+          [downloadKey]: Math.max(0, (current[downloadKey] || 0) - 1)
+        }))
       }
     })
   }
@@ -127,7 +133,7 @@ const JobDownload = ({ job }) => {
                 downloadJobs={downloadJobs || []}
                 onSubmit={(data) => handleSubmit('table', data)}
                 onAbort={handleAbort}
-                isSubmitting={submittingDownloadKey == 'table'}
+                isSubmitting={Boolean(submittingDownloadKeys.table)}
               />
             )
           } else if (downloadForm.key == 'archive') {
@@ -149,6 +155,7 @@ const JobDownload = ({ job }) => {
                 downloadForm={downloadForm}
                 downloadJobs={downloadJobs || []}
                 onSubmit={(data) => handleSubmit(downloadForm.key, data)}
+                isSubmitting={Boolean(submittingDownloadKeys[downloadForm.key])}
               />
             )
           }
