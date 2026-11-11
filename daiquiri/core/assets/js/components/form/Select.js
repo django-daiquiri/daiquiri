@@ -5,7 +5,7 @@ import { uniqueId } from 'lodash'
 
 import Errors from './Errors'
 
-const Select = ({ label, value, options, errors, onChange }) => {
+const Select = ({ label, value, options, disabled, errors, onChange }) => {
   const id = uniqueId('select-')
 
   return (
@@ -18,6 +18,7 @@ const Select = ({ label, value, options, errors, onChange }) => {
         key={id}
         className={classNames('form-control', { 'is-invalid': errors })}
         value={value}
+        disabled={disabled}
         onChange={(event) => onChange(event.target.value)}
       >
         {options &&
@@ -36,6 +37,7 @@ Select.propTypes = {
   label: PropTypes.string.isRequired,
   value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   options: PropTypes.array,
+  disabled: PropTypes.bool,
   errors: PropTypes.array,
   onChange: PropTypes.func.isRequired,
 }
