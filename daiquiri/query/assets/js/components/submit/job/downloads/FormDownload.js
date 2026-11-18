@@ -6,7 +6,7 @@ import Input from 'daiquiri/core/assets/js/components/form/Input'
 import Select from 'daiquiri/core/assets/js/components/form/Select'
 import QueryApi from 'daiquiri/query/assets/js/api/QueryApi'
 
-const FormDownload = ({ jobId, downloadForm, downloadJobs, onSubmit }) => {
+const FormDownload = ({ jobId, downloadForm, downloadJobs, onSubmit, isSubmitting }) => {
 
   const form = downloadForm.form
 
@@ -18,12 +18,8 @@ const FormDownload = ({ jobId, downloadForm, downloadJobs, onSubmit }) => {
 
   const [values, setValues] = useState(initialValues)
 
-  const [showSpinner, setShowSpinner] = useState(false);
-
   const handleClick = () => {
-    setShowSpinner(true)
     onSubmit(values)
-    setTimeout(() => {setShowSpinner(false)}, 2000)
   }
 
   const formDownloadJobs = downloadJobs?.filter((job) => job.key == downloadForm.key)
@@ -38,10 +34,11 @@ const FormDownload = ({ jobId, downloadForm, downloadJobs, onSubmit }) => {
     if (formDownloadJobs.some(job => job.phase == 'PENDING')) {
       return gettext('Pending..')
     }
-    return showSpinner ? gettext('Pending..') : null
+    return isSubmitting ? gettext('Pending..') : null
   }
 
   const downloadStatus = getDownloadStatus()
+  const fieldsDisabled = Boolean(downloadStatus)
 
   const handleDownload = (downloadJob) => {
     window.location.href = QueryApi.getDownloadUrl(jobId, downloadJob.key, downloadJob.id)
@@ -114,6 +111,7 @@ const FormDownload = ({ jobId, downloadForm, downloadJobs, onSubmit }) => {
                     label={field.label}
                     help={field.help}
                     value={values[field.key]}
+                    disabled={fieldsDisabled}
                     onChange={(value) => setValues({...values, [field.key]: value})}
                   />
                 )
@@ -125,6 +123,7 @@ const FormDownload = ({ jobId, downloadForm, downloadJobs, onSubmit }) => {
                     help={field.help}
                     value={values[field.key]}
                     options={field.options}
+                    disabled={fieldsDisabled}
                     onChange={(value) => setValues({...values, [field.key]: value})} />
                 )
               }
@@ -135,7 +134,7 @@ const FormDownload = ({ jobId, downloadForm, downloadJobs, onSubmit }) => {
                     { downloadStatus ? (
                       <p className="text-primary">
                         <span>
-                        <span className="spinner-border spinner-border-sm">
+                        <span className="spinner-border spinner-border-sm me-2">
                         </span>
                           {downloadStatus}
                         </span>
@@ -180,7 +179,8 @@ FormDownload.propTypes = {
   downloadForm: PropTypes.object.isRequired,
   jobId: PropTypes.string.isRequired,
   downloadJobs: PropTypes.array.isRequired,
-  onSubmit: PropTypes.func.isRequired
+  onSubmit: PropTypes.func.isRequired,
+  isSubmitting: PropTypes.bool.isRequired
 }
 
 export default FormDownload
