@@ -10,8 +10,14 @@ from .constants import DATALINK_FIELDS, DATALINK_RELATION_TYPES
 from .models import Datalink
 
 
-def DatalinkAdapter():
-    return import_class(settings.DATALINK_ADAPTER)()
+def DatalinkAdapter(path='/'):
+    adapter = next((service['adapter'] for service in settings.DATALINK_SERVICES
+                    if service['path'] == path), None)
+    if path == '/' and settings.DATALINK_ADAPTER:
+        adapter = settings.DATALINK_ADAPTER
+    if adapter is None and path == '/':
+        adapter = 'daiquiri.datalink.adapter.DefaultDatalinkAdapter'
+    return import_class(adapter)()
 
 
 class BaseDatalinkAdapter:
@@ -69,7 +75,10 @@ class BaseDatalinkAdapter:
         '''
         context = {}
 
-        if 'ID' in kwargs:
+        if 'IDs' in kwargs:
+            context['datalinks'] = list(Datalink.objects.filter(ID__in=kwargs['IDs'])
+                                        .order_by('ID', 'semantics').values())
+        elif 'ID' in kwargs:
             # more precise would be to use a serializer instead of list(QuerySet.values())
             context['datalinks'] = list(Datalink.objects.filter(ID=kwargs['ID']).order_by('semantics').values())
             context['ID'] = kwargs['ID']
@@ -295,7 +304,9 @@ class DynamicDatalinkAdapterMixin:
         '''
         context = super().get_context_data(request, **kwargs)
 
-        if 'ID' in kwargs:
+        if 'IDs' in kwargs:
+            context['datalinks'] += self.get_dyn_datalink_links(kwargs['IDs'])
+        elif 'ID' in kwargs:
             context['datalinks'] = context['datalinks'] + self.get_dyn_datalink_links([kwargs['ID']], **kwargs)
 
         return context
