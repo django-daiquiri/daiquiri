@@ -54,10 +54,40 @@ INTEGER_NULLS = {
     'long': -9223372036854775808,
 }
 INTEGER_ARRAY_NULLS = {f'{datatype}[]': value for datatype, value in INTEGER_NULLS.items()}
+NUMERIC_ARRAY_DATATYPES = frozenset({
+    'short[]',
+    'int[]',
+    'long[]',
+    'float[]',
+    'double[]'
+})
 
 
 class IntegerNullCollision(ValueError):
     pass
+
+
+def flatten_array(value):
+    """Flatten a two-dimensional numeric array value."""
+    if isinstance(value, (list, tuple)) and value and isinstance(value[0], (list, tuple)):
+        return [item for row in value for item in row]
+    if isinstance(value, str) and value.startswith('{{') and value.endswith('}}'):
+        return '{' + value.replace('{', '').replace('}', '') + '}'
+    return value
+
+
+def flatten_array_rows(rows, fields):
+    """Pass one-dimensional numeric array values to the file generators."""
+    array_columns = [i for i, field in enumerate(fields)
+                     if field.get('datatype') in NUMERIC_ARRAY_DATATYPES]
+    if not array_columns:
+        yield from rows
+        return
+    for row in rows:
+        row = list(row)
+        for i in array_columns:
+            row[i] = flatten_array(row[i])
+        yield row
 
 
 def generate_csv(generator, fields):
