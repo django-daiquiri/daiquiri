@@ -34,6 +34,12 @@ def datalink_view(request, endpoint_path='/'):
 
 
 def _visible_datalinks(datalinks):
+    """Prepare DataLink rows for the HTML viewer.
+
+    Skip rows with a service descriptor reference or an error message. Split
+    the access URL so the viewer can shorten the middle and show the beginning
+    and end while linking to the full URL.
+    """
     visible = []
     for datalink in datalinks:
         if datalink.get('service_def') or datalink.get('error_message'):

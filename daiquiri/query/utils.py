@@ -211,6 +211,7 @@ def get_job_column(job, display_column_name):
 
 
 def get_result_datalink_path(job, display_column_name):
+    """Look up the DataLink path by the original column name, even when aliased."""
     source = (job.metadata or {}).get('display_columns', {}).get(display_column_name)
     if source and source[2]:
         return next((service['path'] for service in getattr(settings, 'DATALINK_SERVICES', [])

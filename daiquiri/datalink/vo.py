@@ -105,6 +105,7 @@ def get_link_list_name(path):
 
 
 def get_service_descriptors(fields):
+    """Build descriptors that link VOTable result columns to DataLink endpoints."""
     services = []
     for field in fields:
         ucd = field.get('ucd') or ''
