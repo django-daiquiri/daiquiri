@@ -98,7 +98,7 @@ const FormDownload = ({ jobId, downloadForm, downloadJobs, onSubmit, isSubmittin
       </div>
       <div className="card-body">
         <div className="row mb-4">
-          <p>{form.description}</p>
+          <div dangerouslySetInnerHTML={{__html: form.description}} />
         </div>
         <div className="form-group row mb-2">
         {
