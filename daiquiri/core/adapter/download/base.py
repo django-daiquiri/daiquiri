@@ -9,6 +9,7 @@ from django.conf import settings
 
 from daiquiri.core.adapter import DatabaseAdapter
 from daiquiri.core.generators import (
+    flatten_array_rows,
     generate_csv,
     generate_fits,
     generate_parquet,
@@ -77,18 +78,20 @@ class BaseDownloadAdapter:
                 rows = (process_result_row(row, native_columns, query_language) for row in rows)
             if on_row_count:
                 rows = _report_rows(rows, on_row_count)
+            rows = flatten_array_rows(rows, columns)
 
             if format_key == 'csv':
                 return generate_csv(rows, columns)
 
             elif format_key == 'votable':
+                services = self.get_services_for_fields(columns)
                 return generate_votable(
                     rows,
                     fields=columns,
                     table=self.get_table_name(schema_name, table_name),
                     infos=self.get_infos(query_status, query, query_language, sources),
                     links=self.get_links(sources),
-                    services=self.get_services(),
+                    services=services,
                     empty=(nrows == 0),
                     on_error=on_error,
                 )
@@ -108,13 +111,14 @@ class BaseDownloadAdapter:
                 )
 
             elif format_key == 'parquet':
+                services = self.get_services_for_fields(columns)
                 votable_meta = generate_votable(
                     rows,
                     fields=columns,
                     table=self.get_table_name(schema_name, table_name),
                     infos=self.get_infos(query_status, query, query_language, sources),
                     links=self.get_links(sources),
-                    services=self.get_services(),
+                    services=services,
                     empty=True,
                 )
                 votable_meta_str = ''
@@ -245,6 +249,20 @@ class BaseDownloadAdapter:
             from daiquiri.datalink.vo import get_service
 
             services.append(get_service())
+        return services
+
+    def get_services_for_fields(self, fields):
+        services = self.get_services()
+        if apps.is_installed('daiquiri.datalink'):
+            from daiquiri.datalink.vo import get_service, get_service_descriptors
+
+            field_services = get_service_descriptors(fields)
+            if field_services:
+                legacy_service = get_service()
+                services = [service for service in services if service != legacy_service]
+            for service in field_services:
+                if service not in services:
+                    services.append(service)
         return services
 
     def get_arraysizes_for_fits(

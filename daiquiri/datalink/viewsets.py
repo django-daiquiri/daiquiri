@@ -14,6 +14,7 @@ class SyncDatalinkJobViewSet(viewsets.GenericViewSet):
     '''
     Generate the datalink VOTable
     '''
+    endpoint_path = '/'
 
     def list(self, request):
         return self.perform_sync_job(request, request.GET)
@@ -27,7 +28,7 @@ class SyncDatalinkJobViewSet(viewsets.GenericViewSet):
         else:
             identifiers = []
 
-        adapter = DatalinkAdapter()
+        adapter = DatalinkAdapter(self.endpoint_path)
 
         # get all datalink entries (DatalinkTable, Metadata and Dynamic)
         rows = adapter.get_datalink_rows(identifiers)
