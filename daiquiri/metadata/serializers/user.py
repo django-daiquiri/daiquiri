@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.utils.functional import cached_property
 
 from rest_framework import serializers
 
@@ -43,13 +44,17 @@ class TableSerializer(serializers.ModelSerializer):
             'columns'
         )
 
+    @cached_property
+    def column_serializer(self):
+        return ColumnSerializer(context=self.context, many=True)
+
     def get_columns(self, obj):
         # filter the columns which are published for the groups of the user
         if not settings.METADATA_COLUMN_PERMISSIONS:
             queryset = obj.columns.all()
         else:
             queryset = obj.columns.filter_by_access_level(self.context['request'].user)
-        return ColumnSerializer(queryset, context=self.context, many=True).data
+        return self.column_serializer.to_representation(queryset)
 
 
 class SchemaSerializer(serializers.ModelSerializer):
@@ -71,6 +76,8 @@ class SchemaSerializer(serializers.ModelSerializer):
     def get_tables(self, obj):
         # filter the tables which are published for the groups of the user
         queryset = obj.tables.filter_by_access_level(self.context['request'].user)
+        if not settings.METADATA_COLUMN_PERMISSIONS:
+            queryset = queryset.prefetch_related('columns')
         return TableSerializer(queryset, context=self.context, many=True).data
 
 
