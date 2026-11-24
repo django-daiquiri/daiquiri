@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.db import models
@@ -66,11 +68,12 @@ class Schema(models.Model):
     )
     published = models.DateField(
         null=True, blank=True,
-        auto_now_add=True,
+        default=date.today,
         verbose_name=_('Published'),
     )
     updated = models.DateField(
         null=True, blank=True,
+        default=date.today,
         verbose_name=_('Updated'),
     )
     access_level = models.CharField(
@@ -196,11 +199,12 @@ class Table(models.Model):
     )
     published = models.DateField(
         null=True, blank=True,
-        auto_now_add=True,
+        default=date.today,
         verbose_name=_('Published'),
     )
     updated = models.DateField(
         null=True, blank=True,
+        default=date.today,
         verbose_name=_('Updated'),
     )
     access_level = models.CharField(
