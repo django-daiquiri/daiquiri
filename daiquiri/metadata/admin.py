@@ -1,11 +1,22 @@
+import json
+
 from django import forms
 from django.conf import settings
 from django.contrib import admin
+from django.db import models
+from django.forms.fields import InvalidJSONInput
 from django.utils.translation import gettext_lazy as _
 
 from daiquiri.core.validators import DatabaseObjectNameValidator
 
 from .models import Column, Function, Schema, Table
+
+
+class FormattedJSONField(forms.JSONField):
+    def prepare_value(self, value):
+        if isinstance(value, InvalidJSONInput):
+            return value
+        return json.dumps(value, cls=self.encoder, ensure_ascii=False, indent=2)
 
 
 class SchemaAdminForm(forms.ModelForm):
@@ -92,6 +103,7 @@ class FunctionAdminForm(forms.ModelForm):
 
 class SchemaAdmin(admin.ModelAdmin):
     form = SchemaAdminForm
+    formfield_overrides = {models.JSONField: {'form_class': FormattedJSONField}}
 
     search_fields = ('name',)
     list_display = ('order', '__str__', 'access_level', 'metadata_access_level')
@@ -100,6 +112,7 @@ class SchemaAdmin(admin.ModelAdmin):
 
 class TableAdmin(admin.ModelAdmin):
     form = TableAdminForm
+    formfield_overrides = {models.JSONField: {'form_class': FormattedJSONField}}
 
     search_fields = ('name', 'schema__name')
     list_display = ('order', '__str__', 'access_level', 'metadata_access_level')
