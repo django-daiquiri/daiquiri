@@ -52,6 +52,9 @@ class SchemaSerializer(serializers.ModelSerializer):
         )
 
     def get_tables(self, obj):
-        # filter the tables which are published for the groups of the user
-        queryset = obj.tables.filter(metadata_access_level=ACCESS_LEVEL_PUBLIC, published__isnull=False)
+        queryset = obj.tables.filter(
+            access_level=ACCESS_LEVEL_PUBLIC,
+            metadata_access_level=ACCESS_LEVEL_PUBLIC,
+            published__isnull=False,
+        )
         return TableSerializer(queryset, many=True).data

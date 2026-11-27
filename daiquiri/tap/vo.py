@@ -126,6 +126,10 @@ def get_capabilities():
 
 
 def get_tableset():
-    queryset = Schema.objects.filter(metadata_access_level=ACCESS_LEVEL_PUBLIC, published__isnull=False)
+    queryset = Schema.objects.filter(
+        access_level=ACCESS_LEVEL_PUBLIC,
+        metadata_access_level=ACCESS_LEVEL_PUBLIC,
+        published__isnull=False,
+    )
     serializer = SchemaSerializer(queryset, many=True)
     return serializer.data

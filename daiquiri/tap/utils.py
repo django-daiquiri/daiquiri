@@ -9,10 +9,7 @@ from .models import Table as TapTable
 
 
 def check_tap_visibility(obj):
-    # check if the metadata_access_level of the object is
-    #   (a) PUBLIC or INTERNAL if QUERY_ANONYMOUS is True
-    # or
-    #   (b) INTERNAL if QUERY_ANONYMOUS is False
+    """Check whether the object's metadata can appear in the SQL catalog."""
     return (obj.metadata_access_level == ACCESS_LEVEL_PUBLIC) or (
         obj.metadata_access_level == ACCESS_LEVEL_INTERNAL and not settings.QUERY_ANONYMOUS
     )
@@ -22,7 +19,7 @@ def update_schema(schema):
     """
     Update or create the schema in the TAP_SCHEMA.
     """
-    if check_tap_visibility(schema):
+    if schema.access_level == ACCESS_LEVEL_PUBLIC and check_tap_visibility(schema):
         try:
             tap_schema, created = TapSchema.objects.get_or_create(pk=schema.id)
         except ProgrammingError:
@@ -40,20 +37,7 @@ def update_schema(schema):
                 update_table(table)
 
     else:
-        # remove the schema from the TAP_SCHEMA (if it exists)
-        try:
-            tap_schema = TapSchema.objects.get(pk=schema.id)
-            tap_schema.delete()
-
-            # remove tables and columns
-            for tap_table in tap_schema.tables.all():
-                tap_table.columns.all().delete()
-                tap_table.delete()
-
-        except TapSchema.DoesNotExist:
-            pass
-        except ProgrammingError:
-            return
+        delete_schema(schema)
 
 
 def delete_schema(schema):
@@ -79,7 +63,12 @@ def update_table(table):
     except ProgrammingError:
         return
 
-    if check_tap_visibility(table) and tap_schema:
+    if (
+        tap_schema
+        and table.schema.access_level == ACCESS_LEVEL_PUBLIC
+        and table.access_level == ACCESS_LEVEL_PUBLIC
+        and check_tap_visibility(table)
+    ):
         tap_table, created = TapTable.objects.get_or_create(
             pk=table.id, defaults={'schema': tap_schema}
         )
@@ -99,15 +88,7 @@ def update_table(table):
                 update_column(column)
 
     else:
-        # remove the table from the TAP_SCHEMA (if it exists)
-        try:
-            tap_table = TapTable.objects.get(pk=table.id)
-            tap_table.delete()
-
-            # remove columns
-            tap_table.columns.all().delete()
-        except TapTable.DoesNotExist:
-            pass
+        delete_table(table)
 
 
 def delete_table(table):
