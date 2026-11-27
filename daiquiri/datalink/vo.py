@@ -109,7 +109,7 @@ def get_service_descriptors(fields):
     services = []
     for field in fields:
         ucd = field.get('ucd') or ''
-        path = '/' if 'meta.id' in ucd and 'meta.ref' in ucd else field.get('datalink_path')
+        path = field.get('datalink_path') or ('/' if 'meta.id' in ucd and 'meta.ref' in ucd else None)
         if path:
             field_id = 'datalinkID' if not services else f'datalinkID{len(services) + 1}'
             field['datalink_id'] = field_id
